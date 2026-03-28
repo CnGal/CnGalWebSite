@@ -1,0 +1,435 @@
+@typeparam TItem
+
+<div class="cg-datatable">
+    @* ── 工具栏 ── *@
+    <div class="cg-datatable__toolbar">
+        @if (!string.IsNullOrWhiteSpace(Title))
+        {
+            <h3 class="cg-datatable__title">@Title</h3>
+        }
+        <div class="cg-datatable__spacer"></div>
+        <div class="cg-datatable__actions">
+            @ToolbarContent
+            <div class="cg-datatable__search">
+                <CgMdiIcon Name="mdiMagnify" class="cg-datatable__search-icon" aria-hidden="true" />
+                <input class="cg-datatable__search-input"
+                       type="text"
+                       placeholder="搜索…"
+                       value="@_search"
+                       @oninput="OnSearchInput" />
+            </div>
+        </div>
+    </div>
+
+    @* ── 列定义（CascadingValue 收集） ── *@
+    <CascadingValue Value="this" IsFixed="true">
+        @ChildContent
+    </CascadingValue>
+
+    @* ── 表格主体 ── *@
+    <div class="cg-datatable__body">
+        @if (_loading)
+        {
+            <div class="cg-datatable__loading">
+                <CgProgressRing />
+            </div>
+        }
+        else if (_displayItems.Count == 0)
+        {
+            <div class="cg-datatable__empty">
+                <CgMdiIcon Name="mdiTableOff" class="cg-datatable__empty-icon" aria-hidden="true" />
+                <span>暂无数据</span>
+            </div>
+        }
+        else
+        {
+            <div class="cg-datatable__scroll">
+                <table class="cg-datatable__table">
+                    <thead>
+                        <tr>
+                            @foreach (var col in _columns)
+                            {
+                                <th style="@(col.Width != null ? $"width:{col.Width}" : null)"
+                                    class="@GetHeaderClass(col)"
+                                    @onclick="() => OnSortClicked(col)"
+                                    aria-sort="@GetAriaSortValue(col)">
+                                    <span class="cg-datatable__th-content">
+                                        @col.Title
+                                        @if (col.CanSort)
+                                        {
+                                            <span class="cg-datatable__sort-icons">
+                                                <CgMdiIcon Name="mdiChevronUp"
+                                                           class="@GetSortIconClass(col, false)"
+                                                           aria-hidden="true" />
+                                                <CgMdiIcon Name="mdiChevronDown"
+                                                           class="@GetSortIconClass(col, true)"
+                                                           aria-hidden="true" />
+                                            </span>
+                                        }
+                                    </span>
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in _displayItems)
+                        {
+                            <tr>
+                                @foreach (var col in _columns)
+                                {
+                                    <td>
+                                        @if (col.ChildContent != null)
+                                        {
+                                            @col.ChildContent(item)
+                                        }
+                                        else if (col.Field != null)
+                                        {
+                                            @GetPropertyValue(item, col.Field)
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+    @* ── 底部工具栏 ── *@
+    @if (_totalCount > 0 || _loading)
+    {
+        <div class="cg-datatable__footer">
+            <span class="cg-datatable__info">共 @_totalCount 条</span>
+
+            <div class="cg-datatable__page-size">
+                <span class="cg-datatable__page-size-label">每页</span>
+                <CgSelect Value="@_pageSizeStr"
+                          ValueChanged="OnPageSizeChanged"
+                          Options="@_pageSizeOptions" />
+            </div>
+
+            <CgPagination CurrentPage="@_currentPage"
+                          TotalPages="@_totalPages"
+                          CurrentPageChanged="OnPageChanged" />
+        </div>
+    }
+</div>
+
+@code {
+    private readonly List<CgDataTableColumn<TItem>> _columns = new();
+
+    // ── 状态 ──
+    private int _currentPage = 1;
+    private int _pageSize;
+    private string? _sortField;
+    private bool _sortDesc;
+    private string? _search;
+    private bool _loading;
+
+    // ── 计算值 ──
+    private List<TItem> _displayItems = new();
+    private int _totalCount;
+    private int _totalPages => _pageSize > 0 ? Math.Max(1, (int)Math.Ceiling((double)_totalCount / _pageSize)) : 1;
+    private string _pageSizeStr => _pageSize.ToString();
+    private IEnumerable<KeyValuePair<string, string>> _pageSizeOptions = [];
+
+    // ── 参数 ──
+
+    /// <summary>
+    /// 客户端模式数据源。传入后由组件内部完成排序、筛选和分页。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<TItem>? Items { get; set; }
+
+    /// <summary>
+    /// 服务端模式查询委托。传入后组件只负责 UI 交互，查询由调用方完成。
+    /// 与 <see cref="Items"/> 互斥，<see cref="OnServerQuery"/> 优先。
+    /// </summary>
+    [Parameter]
+    public Func<CgDataTableRequest, Task<CgDataTableResult<TItem>>>? OnServerQuery { get; set; }
+
+    /// <summary>
+    /// 工具栏标题。
+    /// </summary>
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// 工具栏额外内容（如添加按钮）。
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ToolbarContent { get; set; }
+
+    /// <summary>
+    /// 列定义子组件。
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// 默认排序字段名。
+    /// </summary>
+    [Parameter]
+    public string? DefaultSortField { get; set; }
+
+    /// <summary>
+    /// 默认是否降序。
+    /// </summary>
+    [Parameter]
+    public bool DefaultSortDesc { get; set; } = true;
+
+    /// <summary>
+    /// 默认每页条数。
+    /// </summary>
+    [Parameter]
+    public int DefaultPageSize { get; set; } = 10;
+
+    /// <summary>
+    /// 每页条数可选项。
+    /// </summary>
+    [Parameter]
+    public int[] PageSizeOptions { get; set; } = [5, 10, 20, 50];
+
+    // ── 列注册 ──
+
+    public void AddColumn(CgDataTableColumn<TItem> column)
+    {
+        if (!_columns.Contains(column))
+        {
+            _columns.Add(column);
+            StateHasChanged();
+        }
+    }
+
+    public void RemoveColumn(CgDataTableColumn<TItem> column)
+    {
+        _columns.Remove(column);
+    }
+
+    // ── 生命周期 ──
+
+    protected override void OnInitialized()
+    {
+        _pageSize = DefaultPageSize;
+        _sortField = DefaultSortField;
+        _sortDesc = DefaultSortDesc;
+
+        _pageSizeOptions = PageSizeOptions
+            .Select(s => new KeyValuePair<string, string>(s.ToString(), $"{s} 条"))
+            .ToList();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // 客户端模式下，Items 变化时重新计算
+        if (OnServerQuery == null && Items != null)
+        {
+            ApplyClientMode();
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && OnServerQuery != null)
+        {
+            await LoadServerDataAsync();
+        }
+    }
+
+    // ── 客户端模式逻辑 ──
+
+    private void ApplyClientMode()
+    {
+        if (Items == null)
+        {
+            _displayItems = new List<TItem>();
+            _totalCount = 0;
+            return;
+        }
+
+        IEnumerable<TItem> filtered = Items;
+
+        // 全局搜索
+        if (!string.IsNullOrWhiteSpace(_search))
+        {
+            var searchLower = _search.ToLowerInvariant();
+            filtered = filtered.Where(item =>
+            {
+                foreach (var col in _columns)
+                {
+                    if (col.Field == null) continue;
+                    var val = GetPropertyValue(item, col.Field);
+                    if (val != null && val.ToString()!.ToLowerInvariant().Contains(searchLower))
+                        return true;
+                }
+                return false;
+            });
+        }
+
+        // 排序
+        if (!string.IsNullOrWhiteSpace(_sortField))
+        {
+            filtered = _sortDesc
+                ? filtered.OrderByDescending(item => GetPropertyValue(item, _sortField!))
+                : filtered.OrderBy(item => GetPropertyValue(item, _sortField!));
+        }
+
+        var allFiltered = filtered.ToList();
+        _totalCount = allFiltered.Count;
+
+        // 确保当前页在有效范围内
+        if (_currentPage > _totalPages)
+            _currentPage = _totalPages;
+        if (_currentPage < 1)
+            _currentPage = 1;
+
+        // 分页
+        _displayItems = allFiltered
+            .Skip((_currentPage - 1) * _pageSize)
+            .Take(_pageSize)
+            .ToList();
+    }
+
+    // ── 服务端模式逻辑 ──
+
+    private async Task LoadServerDataAsync()
+    {
+        if (OnServerQuery == null) return;
+
+        _loading = true;
+        StateHasChanged();
+
+        try
+        {
+            var request = new CgDataTableRequest(
+                Page: _currentPage,
+                PageSize: _pageSize,
+                SortField: _sortField,
+                SortDesc: _sortDesc,
+                SearchText: _search);
+
+            var result = await OnServerQuery(request);
+            _displayItems = result.Items.ToList();
+            _totalCount = result.TotalCount;
+
+            // 确保当前页在有效范围内
+            if (_currentPage > _totalPages)
+            {
+                _currentPage = _totalPages;
+                // 页码修正后重新查询
+                result = await OnServerQuery(request with { Page = _currentPage });
+                _displayItems = result.Items.ToList();
+                _totalCount = result.TotalCount;
+            }
+        }
+        catch
+        {
+            _displayItems = new List<TItem>();
+            _totalCount = 0;
+        }
+        finally
+        {
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
+    // ── 事件处理 ──
+
+    private async Task OnSortClicked(CgDataTableColumn<TItem> col)
+    {
+        if (!col.CanSort) return;
+
+        if (_sortField == col.Field)
+        {
+            _sortDesc = !_sortDesc;
+        }
+        else
+        {
+            _sortField = col.Field;
+            _sortDesc = false;
+        }
+
+        _currentPage = 1;
+        await RefreshDataAsync();
+    }
+
+    private async Task OnSearchInput(ChangeEventArgs args)
+    {
+        _search = args.Value?.ToString();
+        _currentPage = 1;
+        await RefreshDataAsync();
+    }
+
+    private async Task OnPageChanged(int page)
+    {
+        _currentPage = page;
+        await RefreshDataAsync();
+    }
+
+    private async Task OnPageSizeChanged(string? value)
+    {
+        if (int.TryParse(value, out var size))
+        {
+            _pageSize = size;
+            _currentPage = 1;
+            await RefreshDataAsync();
+        }
+    }
+
+    private async Task RefreshDataAsync()
+    {
+        if (OnServerQuery != null)
+        {
+            await LoadServerDataAsync();
+        }
+        else
+        {
+            ApplyClientMode();
+        }
+    }
+
+    // ── 反射读属性 ──
+
+    private static object? GetPropertyValue(TItem? item, string propertyName)
+    {
+        if (item == null) return null;
+        var prop = typeof(TItem).GetProperty(propertyName);
+        return prop?.GetValue(item);
+    }
+
+    // ── 样式辅助 ──
+
+    private string GetHeaderClass(CgDataTableColumn<TItem> col)
+    {
+        var cls = "cg-datatable__th";
+        if (col.CanSort)
+            cls += " cg-datatable__th--sortable";
+        if (_sortField == col.Field)
+            cls += " cg-datatable__th--sorted";
+        return cls;
+    }
+
+    private string GetSortIconClass(CgDataTableColumn<TItem> col, bool isDesc)
+    {
+        var cls = "cg-datatable__sort-icon";
+        if (_sortField == col.Field)
+        {
+            if (_sortDesc == isDesc)
+                cls += " cg-datatable__sort-icon--active";
+        }
+        return cls;
+    }
+
+    private string? GetAriaSortValue(CgDataTableColumn<TItem> col)
+    {
+        if (!col.CanSort || _sortField != col.Field) return null;
+        return _sortDesc ? "descending" : "ascending";
+    }
+
+    /// <summary>
+    /// 允许外部调用方强制刷新数据（如操作完成后需重新加载）。
+    /// </summary>
+    public Task RefreshAsync() => RefreshDataAsync();
+}

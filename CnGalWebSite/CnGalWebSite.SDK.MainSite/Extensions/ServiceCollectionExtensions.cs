@@ -134,9 +134,12 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<ITagQueryService, TagQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IArticleQueryService, ArticleQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IVideoQueryService, VideoQueryService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<IPeripheryQueryService, PeripheryQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<ILotteryQueryService, LotteryQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IPlayedGameQueryService, PlayedGameQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IStoreInfoQueryService, StoreInfoQueryService>(services, apiBase, withAuth: false);
+        RegisterSdkHttpClient<ICommentQueryService, CommentQueryService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<ITableQueryService, TableQueryService>(services, apiBase, withAuth: false);
 
         // Command 服务
         RegisterSdkHttpClient<IEntryCommandService, EntryCommandService>(services, apiBase, withAuth: true);
@@ -145,7 +148,9 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<IVideoCommandService, VideoCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<ISpaceCommandService, SpaceCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<ILotteryCommandService, LotteryCommandService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<IPeripheryCommandService, PeripheryCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IPlayedGameCommandService, PlayedGameCommandService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<ICommentCommandService, CommentCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IFileCommandService, FileCommandService>(services, imageApiBase, withAuth: false);
 
         return services;

@@ -1,0 +1,98 @@
+.periphery-related-peripheries {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.periphery-related-peripheries > h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--cg-color-text);
+}
+
+.periphery-related-peripheries > h2 ::deep .cg-mdi-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--cg-color-primary);
+}
+
+.periphery-related-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.periphery-related-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: var(--cg-radius-lg);
+    text-decoration: none;
+    color: inherit;
+    transition: background var(--cg-transition-fast);
+}
+
+.periphery-related-item:hover {
+    background: var(--cg-color-hover-overlay);
+}
+
+.periphery-related-image {
+    width: 92px;
+    aspect-ratio: 460 / 215;
+    flex-shrink: 0;
+    border-radius: var(--cg-radius-md);
+    overflow: hidden;
+    background: color-mix(in oklab, var(--cg-color-bg) 95%, white);
+}
+
+.periphery-related-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.periphery-related-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cg-color-text-muted);
+}
+
+.periphery-related-placeholder ::deep .cg-mdi-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.periphery-related-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.periphery-related-name {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.periphery-related-intro {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

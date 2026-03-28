@@ -1,0 +1,95 @@
+@* 单条评论项（纯静态展示，支持递归子评论） *@
+
+@using CnGalWebSite.SDK.MainSite.Models.Comments
+
+<div class="comment-item @(IsChild ? "comment-item--child" : "")">
+    <div class="comment-item__header">
+        @if (!string.IsNullOrWhiteSpace(Model.User.PhotoPath))
+        {
+            <a href="@($"/space/index/{Model.User.Id}")" class="comment-item__avatar-link">
+                <img class="comment-item__avatar" src="@Model.User.PhotoPath" alt="@Model.User.Name" loading="lazy" />
+            </a>
+        }
+        else
+        {
+            <a href="@($"/space/index/{Model.User.Id}")" class="comment-item__avatar-link">
+                <div class="comment-item__avatar comment-item__avatar--placeholder">
+                    <CgMdiIcon Name="mdiAccount" />
+                </div>
+            </a>
+        }
+        <div class="comment-item__meta">
+            <a href="@($"/space/index/{Model.User.Id}")" class="comment-item__author">
+                @if (!string.IsNullOrWhiteSpace(ReplyToName))
+                {
+                    <span>@Model.User.Name</span>
+                    <span class="comment-item__reply-arrow">→</span>
+                    <span>@ReplyToName</span>
+                }
+                else
+                {
+                    @Model.User.Name
+                }
+            </a>
+            <time class="comment-item__time" datetime="@Model.CommentTime.ToString("yyyy-MM-ddTHH:mm:ss")">
+                @Model.CommentTime.ToString("yyyy-MM-dd HH:mm")
+            </time>
+        </div>
+    </div>
+
+    <div class="comment-item__body">
+        <CgHtmlContent Content="@Model.Text" />
+    </div>
+
+    @if (ShowActions)
+    {
+        <div class="comment-item__actions">
+            @ActionContent
+        </div>
+    }
+
+    @* 子评论递归展示 *@
+    @if (Model.Children.Count > 0)
+    {
+        <div class="comment-item__children @(Depth >= MaxDepth ? "comment-item__children--flat" : "")">
+            @foreach (var child in Model.Children)
+            {
+                var replyTo = Depth >= MaxDepth ? Model.User.Name : null;
+                <CommentItem Model="child"
+                             IsChild="true"
+                             Depth="Depth + 1"
+                             MaxDepth="MaxDepth"
+                             ParentUserName="@Model.User.Name"
+                             ShowActions="ShowActions"
+                             ActionTemplate="ActionTemplate" />
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommentItemViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public bool IsChild { get; set; }
+
+    [Parameter]
+    public int Depth { get; set; }
+
+    [Parameter]
+    public int MaxDepth { get; set; } = 3;
+
+    [Parameter]
+    public string? ParentUserName { get; set; }
+
+    [Parameter]
+    public bool ShowActions { get; set; }
+
+    [Parameter]
+    public RenderFragment<CommentItemViewModel>? ActionTemplate { get; set; }
+
+    private string? ReplyToName => Depth > MaxDepth ? ParentUserName : null;
+
+    private RenderFragment? ActionContent => ActionTemplate?.Invoke(Model);
+}

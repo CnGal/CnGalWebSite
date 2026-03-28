@@ -1,0 +1,232 @@
+﻿@page "/entries/birthdaycalendar"
+@page "/birthday"
+@inject IEntryQueryService EntryQueryService
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+
+<PageTitle>角色生日日历 - CnGal</PageTitle>
+
+@if (_errorMessage is not null)
+{
+    <section class="birthday-cal-error" aria-label="加载失败">
+        <div class="birthday-cal-error-icon">
+            <CgMdiIcon Name="mdiAlertCircleOutline" />
+        </div>
+        <h1>角色生日日历加载失败</h1>
+        <p>@_errorMessage</p>
+        <a href="/">返回首页</a>
+    </section>
+}
+else if (_loaded)
+{
+    <article class="birthday-cal">
+        <header class="birthday-cal-header">
+            <div class="birthday-cal-header-text">
+                <h1 class="birthday-cal-title">
+                    <CgMdiIcon Name="mdiCake" />
+                    角色生日日历
+                </h1>
+                <p class="birthday-cal-subtitle">按月份查看所有角色的生日</p>
+            </div>
+        </header>
+
+        @* ── Month Navigation ── *@
+        <nav class="birthday-cal-nav" aria-label="月份切换">
+            <a href="@GetMonthUrl(_displayDate.AddMonths(-1))" class="birthday-cal-nav-btn" aria-label="上个月">
+                <CgMdiIcon Name="mdiChevronLeft" />
+            </a>
+            <span class="birthday-cal-nav-label">
+                @_displayDate.Year 年 @_displayDate.Month 月
+            </span>
+            <a href="@GetMonthUrl(_displayDate.AddMonths(1))" class="birthday-cal-nav-btn" aria-label="下个月">
+                <CgMdiIcon Name="mdiChevronRight" />
+            </a>
+        </nav>
+
+        @* ── Calendar Grid ── *@
+        <div class="birthday-cal-grid" role="grid" aria-label="@(_displayDate.Year)年@(_displayDate.Month)月 角色生日日历">
+            @* Weekday headers *@
+            <div class="birthday-cal-weekday" role="columnheader">日</div>
+            <div class="birthday-cal-weekday" role="columnheader">一</div>
+            <div class="birthday-cal-weekday" role="columnheader">二</div>
+            <div class="birthday-cal-weekday" role="columnheader">三</div>
+            <div class="birthday-cal-weekday" role="columnheader">四</div>
+            <div class="birthday-cal-weekday" role="columnheader">五</div>
+            <div class="birthday-cal-weekday" role="columnheader">六</div>
+
+            @* Empty cells before first day *@
+            @for (var i = 0; i < _firstDayOffset; i++)
+            {
+                <div class="birthday-cal-cell birthday-cal-cell--empty" role="gridcell"></div>
+            }
+
+            @* Day cells *@
+            @for (var day = 1; day <= _daysInMonth; day++)
+            {
+                var currentDay = day;
+                var isToday = _displayDate.Year == _today.Year && _displayDate.Month == _today.Month && currentDay == _today.Day;
+                var rolesForDay = _items.Where(r => r.BirthdayMonth == _displayDate.Month && r.BirthdayDay == currentDay).ToList();
+                var hasRoles = rolesForDay.Count > 0;
+
+                <div class="birthday-cal-cell @(isToday ? "birthday-cal-cell--today" : "") @(hasRoles ? "birthday-cal-cell--has-roles" : "")" role="gridcell">
+                    <div class="birthday-cal-day-num @(isToday ? "birthday-cal-day-num--today" : "")">
+                        @currentDay
+                    </div>
+                    @if (hasRoles)
+                    {
+                        <div class="birthday-cal-day-roles">
+                            @foreach (var role in rolesForDay)
+                            {
+                                <BirthdayRoleChip Id="@role.Id" Name="@role.Name" Image="@role.Image" />
+                            }
+                        </div>
+                    }
+                </div>
+            }
+
+            @* Empty cells after last day *@
+            @{
+                var totalCells = _firstDayOffset + _daysInMonth;
+                var remaining = (7 - totalCells % 7) % 7;
+            }
+            @for (var i = 0; i < remaining; i++)
+            {
+                <div class="birthday-cal-cell birthday-cal-cell--empty" role="gridcell"></div>
+            }
+        </div>
+
+        @* ── Today's birthdays summary ── *@
+        @if (_displayDate.Year == _today.Year && _displayDate.Month == _today.Month)
+        {
+            var todayRoles = _items.Where(r => r.BirthdayMonth == _today.Month && r.BirthdayDay == _today.Day).ToList();
+            @if (todayRoles.Count > 0)
+            {
+                <section class="birthday-cal-today-section" aria-label="今日过生日的角色">
+                    <h2 class="birthday-cal-today-title">
+                        <CgMdiIcon Name="mdiPartyPopper" />
+                        今日过生日
+                    </h2>
+                    <ul class="birthday-cal-today-list">
+                        @foreach (var role in todayRoles)
+                        {
+                            <li>
+                                <a href="/entries/index/@role.Id" class="birthday-cal-today-card">
+                                    @if (!string.IsNullOrWhiteSpace(role.Image))
+                                    {
+                                        <div class="birthday-cal-today-avatar">
+                                            <img src="@role.Image" alt="@role.Name" loading="lazy" decoding="async" />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="birthday-cal-today-avatar birthday-cal-today-avatar--fallback">
+                                            <CgMdiIcon Name="mdiAccount" aria-hidden="true" />
+                                        </div>
+                                    }
+                                    <div class="birthday-cal-today-info">
+                                        <strong>@role.Name</strong>
+                                        @if (!string.IsNullOrWhiteSpace(role.GameName))
+                                        {
+                                            <span class="birthday-cal-today-game">
+                                                <CgMdiIcon Name="mdiControllerClassicOutline" aria-hidden="true" />
+                                                @role.GameName
+                                            </span>
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(role.BriefIntroduction))
+                                        {
+                                            <p>@role.BriefIntroduction</p>
+                                        }
+                                    </div>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </section>
+            }
+        }
+    </article>
+}
+else
+{
+    <section class="birthday-cal-loading" aria-label="加载中">
+        <div class="birthday-cal-loading-block birthday-cal-loading-block--header"></div>
+        <div class="birthday-cal-loading-block birthday-cal-loading-block--nav"></div>
+        <div class="birthday-cal-loading-block birthday-cal-loading-block--grid"></div>
+    </section>
+}
+
+@code {
+    private List<BirthdayCalendarItem> _items = [];
+    private string? _errorMessage;
+    private bool _loaded;
+
+    private DateTime _today;
+    private DateTime _displayDate;
+    private int _daysInMonth;
+    private int _firstDayOffset;
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int Year { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public int Month { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _today = DateTime.Now.Date;
+
+        // Determine display month from query parameters
+        if (Year > 0 && Month is >= 1 and <= 12)
+        {
+            _displayDate = new DateTime(Year, Month, 1);
+        }
+        else
+        {
+            _displayDate = new DateTime(_today.Year, _today.Month, 1);
+        }
+
+        _daysInMonth = DateTime.DaysInMonth(_displayDate.Year, _displayDate.Month);
+        _firstDayOffset = (int)new DateTime(_displayDate.Year, _displayDate.Month, 1).DayOfWeek;
+
+        // Fetch current month and adjacent months for spanning display
+        var currentMonth = _displayDate.Month;
+        var prevMonth = _displayDate.AddMonths(-1).Month;
+        var nextMonth = _displayDate.AddMonths(1).Month;
+
+        var tasks = new[]
+        {
+            EntryQueryService.GetRoleBirthdaysByMonthAsync(currentMonth),
+            EntryQueryService.GetRoleBirthdaysByMonthAsync(prevMonth),
+            EntryQueryService.GetRoleBirthdaysByMonthAsync(nextMonth)
+        };
+
+        var results = await Task.WhenAll(tasks);
+
+        var allItems = new List<BirthdayCalendarItem>();
+        var hasAnySuccess = false;
+
+        foreach (var result in results)
+        {
+            if (result.Success && result.Data is not null)
+            {
+                allItems.AddRange(result.Data);
+                hasAnySuccess = true;
+            }
+        }
+
+        if (!hasAnySuccess)
+        {
+            _errorMessage = results[0].Error?.Message ?? "获取角色生日列表失败，请稍后重试";
+            return;
+        }
+
+        _items = allItems;
+        _loaded = true;
+    }
+
+    private static string GetMonthUrl(DateTime date)
+    {
+        return $"/birthday?Year={date.Year}&Month={date.Month}";
+    }
+}

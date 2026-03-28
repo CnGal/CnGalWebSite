@@ -1,0 +1,24 @@
+.comment-reply-form {
+    padding: var(--cg-spacing-4);
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+}
+
+.comment-reply-form--child {
+    background: var(--cg-color-bg);
+}
+
+.comment-reply-form__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-2);
+    margin-top: var(--cg-spacing-3);
+    align-items: center;
+}
+
+@media (max-width: 640px) {
+    .comment-reply-form {
+        padding: var(--cg-spacing-3);
+    }
+}

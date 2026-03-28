@@ -23,13 +23,20 @@
             </CgFormGroup>
         </div>
 
+        <CgFormGroup Label="名称同步">
+            <CgCheckbox Value="@_syncDisplayName"
+                        ValueChanged="OnSyncDisplayNameChanged"
+                        Label="显示名称与唯一名称保持一致"/>
+        </CgFormGroup>
         <div class="lottery-fields-grid">
             <CgFormGroup Label="名称">
-                <CgInput @bind-Value="Model.Name" TValue="string" />
+                <CgInput Value="@Model.Name"
+                         ValueChanged="OnNameChanged" TValue="string" />
             </CgFormGroup>
 
             <CgFormGroup Label="显示名称">
-                <CgInput @bind-Value="Model.DisplayName" TValue="string" />
+                <CgInput @bind-Value="Model.DisplayName"
+                         Disabled="_syncDisplayName" />
             </CgFormGroup>
 
             <CgFormGroup Label="类型">
@@ -81,4 +88,40 @@
 @code {
     [Parameter] public EditLotteryModel Model { get; set; } = default!;
     [Parameter] public IEnumerable<string> EntryGameItems { get; set; } = [];
+
+    private bool _syncDisplayName;
+    private bool _syncInitialized;
+
+    protected override void OnParametersSet()
+    {
+        if (_syncInitialized)
+        {
+            return;
+        }
+
+        _syncDisplayName = string.Equals(Model.Name, Model.DisplayName, StringComparison.Ordinal);
+        _syncInitialized = true;
+    }
+
+    private Task OnNameChanged(string? value)
+    {
+        Model.Name = value ?? string.Empty;
+        if (_syncDisplayName)
+        {
+            Model.DisplayName = Model.Name;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private Task OnSyncDisplayNameChanged(bool value)
+    {
+        _syncDisplayName = value;
+        if (_syncDisplayName)
+        {
+            Model.DisplayName = Model.Name;
+        }
+
+        return Task.CompletedTask;
+    }
 }

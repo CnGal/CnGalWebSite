@@ -1,0 +1,261 @@
+/* ═══════════════════════════════════════════════
+   CgTabs — 通用 Tab 切换组件
+   纯 CSS radio-driven，SSR 友好
+   ═══════════════════════════════════════════════ */
+
+/* ── Radio inputs (hidden) ── */
+.cg-tabs__radio {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+}
+
+/* ── Tab 栏 ── */
+.cg-tabs__bar {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-bottom: var(--cg-spacing-4);
+}
+
+.cg-tabs__bar::-webkit-scrollbar {
+    display: none;
+}
+
+/* ── Tab 项 ── */
+.cg-tabs__tab {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    font-family: var(--cg-font-family);
+    transition: color var(--cg-transition-fast),
+                background-color var(--cg-transition-fast),
+                box-shadow var(--cg-transition-fast);
+}
+
+.cg-tabs__tab ::deep .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+/* ── Badge ── */
+.cg-tabs__badge {
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    background-color: var(--cg-color-border);
+    color: var(--cg-color-text-secondary);
+    padding: 1px 7px;
+    border-radius: var(--cg-radius-full);
+    line-height: 1.4;
+    transition: background-color var(--cg-transition-fast),
+                color var(--cg-transition-fast);
+}
+
+/* ── Panels: hidden by default ── */
+.cg-tabs__panel {
+    display: none;
+}
+
+/* ═══════════════════════════════════════════════
+   Variant: pill（药丸填充）
+   ═══════════════════════════════════════════════ */
+.cg-tabs--pill > .cg-tabs__bar {
+    gap: var(--cg-spacing-1);
+    padding: var(--cg-spacing-2);
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.cg-tabs--pill .cg-tabs__tab {
+    padding: var(--cg-spacing-2) var(--cg-spacing-4);
+    border-radius: var(--cg-radius-md);
+    background: transparent;
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+}
+
+.cg-tabs--pill .cg-tabs__tab:hover {
+    background-color: var(--cg-color-hover-overlay);
+    color: var(--cg-color-text);
+}
+
+/* ═══════════════════════════════════════════════
+   Variant: underline（底部下划线）
+   ═══════════════════════════════════════════════ */
+.cg-tabs--underline > .cg-tabs__bar {
+    background-color: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    box-shadow: var(--cg-shadow-sm);
+    overflow: hidden;
+    position: relative;
+}
+
+.cg-tabs--underline .cg-tabs__tab {
+    padding: var(--cg-spacing-3) var(--cg-spacing-5);
+    color: var(--cg-color-text-secondary);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    position: relative;
+}
+
+.cg-tabs--underline .cg-tabs__tab::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: var(--cg-spacing-5);
+    right: var(--cg-spacing-5);
+    height: 2px;
+    background-color: var(--cg-color-primary);
+    border-radius: 1px 1px 0 0;
+    transform: scaleX(0);
+    transition: transform var(--cg-transition-fast);
+}
+
+.cg-tabs--underline .cg-tabs__tab:hover {
+    color: var(--cg-color-text-primary);
+    background-color: var(--cg-color-hover-overlay);
+}
+
+/* ═══════════════════════════════════════════════
+   Radio :checked → Active Tab 样式 + Panel 显示
+   每条规则用 :nth-of-type 映射 radio ↔ label ↔ panel
+   支持最多 10 个 Tab
+   ═══════════════════════════════════════════════ */
+
+/* ── Pill variant: active tab styles ── */
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(1):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(1),
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(2):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(2),
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(3):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(3),
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(4):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(4),
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(5):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(5),
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(6):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(6),
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(7):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(7),
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(8):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(8),
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(9):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(9),
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(10):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(10) {
+    background-color: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(1):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(1):hover,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(2):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(2):hover,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(3):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(3):hover,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(4):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(4):hover,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(5):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(5):hover,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(6):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(6):hover,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(7):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(7):hover,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(8):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(8):hover,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(9):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(9):hover,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(10):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(10):hover {
+    background-color: var(--cg-color-primary-hover);
+    color: var(--cg-color-on-primary);
+}
+
+/* ── Underline variant: active tab styles ── */
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(1):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(1),
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(2):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(2),
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(3):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(3),
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(4):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(4),
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(5):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(5),
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(6):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(6),
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(7):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(7),
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(8):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(8),
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(9):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(9),
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(10):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(10) {
+    color: var(--cg-color-primary);
+}
+
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(1):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(1)::after,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(2):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(2)::after,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(3):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(3)::after,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(4):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(4)::after,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(5):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(5)::after,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(6):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(6)::after,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(7):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(7)::after,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(8):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(8)::after,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(9):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(9)::after,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(10):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(10)::after {
+    transform: scaleX(1);
+}
+
+/* ── Underline variant: active badge ── */
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(1):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(1) .cg-tabs__badge,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(2):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(2) .cg-tabs__badge,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(3):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(3) .cg-tabs__badge,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(4):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(4) .cg-tabs__badge,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(5):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(5) .cg-tabs__badge,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(6):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(6) .cg-tabs__badge,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(7):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(7) .cg-tabs__badge,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(8):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(8) .cg-tabs__badge,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(9):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(9) .cg-tabs__badge,
+.cg-tabs--underline > .cg-tabs__radio:nth-of-type(10):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(10) .cg-tabs__badge {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 15%, transparent);
+    color: var(--cg-color-primary);
+}
+
+/* ── Pill variant: active badge ── */
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(1):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(1) .cg-tabs__badge,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(2):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(2) .cg-tabs__badge,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(3):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(3) .cg-tabs__badge,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(4):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(4) .cg-tabs__badge,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(5):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(5) .cg-tabs__badge,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(6):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(6) .cg-tabs__badge,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(7):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(7) .cg-tabs__badge,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(8):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(8) .cg-tabs__badge,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(9):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(9) .cg-tabs__badge,
+.cg-tabs--pill > .cg-tabs__radio:nth-of-type(10):checked ~ .cg-tabs__bar > .cg-tabs__tab:nth-child(10) .cg-tabs__badge {
+    background-color: color-mix(in oklab, var(--cg-color-on-primary) 25%, transparent);
+    color: var(--cg-color-on-primary);
+}
+
+/* ═══════════════════════════════════════════════
+   Panel 显隐（:checked ~ section:nth-of-type）
+   section 元素的 nth-of-type 独立于 input 和 nav 计数
+   ═══════════════════════════════════════════════ */
+.cg-tabs > .cg-tabs__radio:nth-of-type(1):checked ~ .cg-tabs__panel:nth-of-type(1),
+.cg-tabs > .cg-tabs__radio:nth-of-type(2):checked ~ .cg-tabs__panel:nth-of-type(2),
+.cg-tabs > .cg-tabs__radio:nth-of-type(3):checked ~ .cg-tabs__panel:nth-of-type(3),
+.cg-tabs > .cg-tabs__radio:nth-of-type(4):checked ~ .cg-tabs__panel:nth-of-type(4),
+.cg-tabs > .cg-tabs__radio:nth-of-type(5):checked ~ .cg-tabs__panel:nth-of-type(5),
+.cg-tabs > .cg-tabs__radio:nth-of-type(6):checked ~ .cg-tabs__panel:nth-of-type(6),
+.cg-tabs > .cg-tabs__radio:nth-of-type(7):checked ~ .cg-tabs__panel:nth-of-type(7),
+.cg-tabs > .cg-tabs__radio:nth-of-type(8):checked ~ .cg-tabs__panel:nth-of-type(8),
+.cg-tabs > .cg-tabs__radio:nth-of-type(9):checked ~ .cg-tabs__panel:nth-of-type(9),
+.cg-tabs > .cg-tabs__radio:nth-of-type(10):checked ~ .cg-tabs__panel:nth-of-type(10) {
+    display: block;
+}
+
+/* ═══════════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .cg-tabs--pill > .cg-tabs__bar {
+        padding: var(--cg-spacing-1);
+        gap: 2px;
+    }
+
+    .cg-tabs--pill .cg-tabs__tab {
+        padding: var(--cg-spacing-2) var(--cg-spacing-3);
+        font-size: var(--cg-font-size-xs);
+    }
+
+    .cg-tabs--underline .cg-tabs__tab {
+        padding: var(--cg-spacing-2) var(--cg-spacing-3);
+        font-size: var(--cg-font-size-xs);
+    }
+
+    .cg-tabs--underline .cg-tabs__tab::after {
+        left: var(--cg-spacing-3);
+        right: var(--cg-spacing-3);
+    }
+}

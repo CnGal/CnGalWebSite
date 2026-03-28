@@ -1,0 +1,33 @@
+@using CnGalWebSite.DataModel.ViewModel
+
+@if (Pictures.Count > 0)
+{
+    <section class="periphery-gallery">
+        <h2>
+            <CgMdiIcon Name="mdiImageMultipleOutline" />
+            图片
+        </h2>
+        @foreach (var group in Pictures)
+        {
+            @if (!string.IsNullOrWhiteSpace(group.Modifier))
+            {
+                <h3 class="periphery-gallery-group-title">@group.Modifier</h3>
+            }
+            <ul class="periphery-gallery-grid">
+                @foreach (var pic in group.Pictures.Take(MaxPerGroup))
+                {
+                    <li>
+                        <a href="@pic.Url" target="_blank" rel="noopener noreferrer">
+                            <img src="@pic.Url" alt="@(!string.IsNullOrWhiteSpace(pic.Note) ? pic.Note : "周边图片")" loading="lazy" decoding="async" />
+                        </a>
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+}
+
+@code {
+    [Parameter] public IReadOnlyList<PicturesViewModel> Pictures { get; set; } = [];
+    [Parameter] public int MaxPerGroup { get; set; } = 12;
+}

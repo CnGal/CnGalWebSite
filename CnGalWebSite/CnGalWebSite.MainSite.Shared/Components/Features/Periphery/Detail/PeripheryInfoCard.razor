@@ -1,0 +1,145 @@
+@using CnGalWebSite.DataModel.Model
+
+@if (HasAnyInfo)
+{
+    <section class="periphery-info-card">
+        <h2>
+            <CgMdiIcon Name="mdiInformationOutline" />
+            基本信息
+        </h2>
+        <dl class="periphery-info-list">
+            @if (Type != PeripheryType.None)
+            {
+                <div class="periphery-info-row">
+                    <dt>类型</dt>
+                    <dd>@GetTypeDisplayName(Type)</dd>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Category))
+            {
+                <div class="periphery-info-row">
+                    <dt>类别</dt>
+                    <dd>@Category</dd>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Brand))
+            {
+                <div class="periphery-info-row">
+                    <dt>品牌</dt>
+                    <dd>@Brand</dd>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Author))
+            {
+                <div class="periphery-info-row">
+                    <dt>作者</dt>
+                    <dd>@Author</dd>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Material))
+            {
+                <div class="periphery-info-row">
+                    <dt>材质</dt>
+                    <dd>@Material</dd>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Size))
+            {
+                <div class="periphery-info-row">
+                    <dt>尺寸</dt>
+                    <dd>@Size</dd>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(IndividualParts))
+            {
+                <div class="periphery-info-row">
+                    <dt>部件数</dt>
+                    <dd>@IndividualParts</dd>
+                </div>
+            }
+            @if (!string.IsNullOrWhiteSpace(Price))
+            {
+                <div class="periphery-info-row">
+                    <dt>价格</dt>
+                    <dd>@Price</dd>
+                </div>
+            }
+            @if (PageCount > 0)
+            {
+                <div class="periphery-info-row">
+                    <dt>页数</dt>
+                    <dd>@PageCount</dd>
+                </div>
+            }
+            @if (SongCount > 0)
+            {
+                <div class="periphery-info-row">
+                    <dt>歌曲数</dt>
+                    <dd>@SongCount</dd>
+                </div>
+            }
+            <div class="periphery-info-row">
+                <dt>再版</dt>
+                <dd>@(IsReprint ? "是" : "否")</dd>
+            </div>
+            @if (IsAvailableItem)
+            {
+                <div class="periphery-info-row">
+                    <dt>装饰品</dt>
+                    <dd>是</dd>
+                </div>
+            }
+        </dl>
+
+        @if (!string.IsNullOrWhiteSpace(SaleLink))
+        {
+            <a class="periphery-sale-link" href="@SaleLink" target="_blank" rel="noopener noreferrer">
+                <CgMdiIcon Name="mdiCartOutline" />
+                前往购买
+            </a>
+        }
+    </section>
+}
+
+@code {
+    [Parameter] public PeripheryType Type { get; set; }
+    [Parameter] public string Category { get; set; } = "";
+    [Parameter] public string Brand { get; set; } = "";
+    [Parameter] public string Author { get; set; } = "";
+    [Parameter] public string Material { get; set; } = "";
+    [Parameter] public string Size { get; set; } = "";
+    [Parameter] public string IndividualParts { get; set; } = "";
+    [Parameter] public string Price { get; set; } = "";
+    [Parameter] public string SaleLink { get; set; } = "";
+    [Parameter] public bool IsReprint { get; set; }
+    [Parameter] public bool IsAvailableItem { get; set; }
+    [Parameter] public int PageCount { get; set; }
+    [Parameter] public int SongCount { get; set; }
+
+    private bool HasAnyInfo => Type != PeripheryType.None
+        || !string.IsNullOrWhiteSpace(Category)
+        || !string.IsNullOrWhiteSpace(Brand)
+        || !string.IsNullOrWhiteSpace(Author)
+        || !string.IsNullOrWhiteSpace(Material)
+        || !string.IsNullOrWhiteSpace(Size)
+        || !string.IsNullOrWhiteSpace(Price)
+        || PageCount > 0
+        || SongCount > 0;
+
+    private static string GetTypeDisplayName(PeripheryType type) => type switch
+    {
+        PeripheryType.SetorAlbumEtc => "设定集/画册",
+        PeripheryType.Ost => "原声集",
+        PeripheryType.Set => "套装",
+        PeripheryType.ActivationCode => "激活码",
+        PeripheryType.ColoredPaper => "色纸",
+        PeripheryType.Badge => "徽章",
+        PeripheryType.Postcard => "明信片",
+        PeripheryType.HangPainting => "挂画",
+        PeripheryType.Keychain => "挂件",
+        PeripheryType.Bookmark => "书签",
+        PeripheryType.Posters => "海报",
+        PeripheryType.CD => "光盘",
+        _ => "其他"
+    };
+}

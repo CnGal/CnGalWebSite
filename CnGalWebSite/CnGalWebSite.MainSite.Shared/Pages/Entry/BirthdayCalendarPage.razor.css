@@ -1,0 +1,423 @@
+/* ━━ Birthday Calendar Page ━━ */
+
+.birthday-cal {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* ── Header ── */
+
+.birthday-cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.birthday-cal-header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.birthday-cal-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--cg-font-size-2xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+::deep .birthday-cal-title .cg-mdi-icon {
+    width: 28px;
+    height: 28px;
+    color: var(--cg-color-primary);
+}
+
+.birthday-cal-subtitle {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    margin: 0;
+}
+
+/* ── Month Navigation ── */
+
+.birthday-cal-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.birthday-cal-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--cg-radius-full);
+    background-color: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    color: var(--cg-color-text);
+    text-decoration: none;
+    transition: background-color var(--cg-transition-fast), border-color var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
+}
+
+.birthday-cal-nav-btn:hover {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+    border-color: var(--cg-color-primary);
+    color: var(--cg-color-primary);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+::deep .birthday-cal-nav-btn .cg-mdi-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.birthday-cal-nav-label {
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    min-width: 10ch;
+    text-align: center;
+}
+
+/* ── Calendar Grid ── */
+
+.birthday-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    overflow: hidden;
+    background-color: var(--cg-color-surface);
+}
+
+.birthday-cal-weekday {
+    padding: 0.625rem 0.25rem;
+    text-align: center;
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-muted);
+    background-color: color-mix(in oklab, var(--cg-color-bg) 50%, var(--cg-color-surface));
+    border-bottom: 1px solid var(--cg-color-border);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.birthday-cal-cell {
+    min-height: 5.5rem;
+    padding: 0.375rem;
+    border-right: 1px solid color-mix(in oklab, var(--cg-color-border) 50%, transparent);
+    border-bottom: 1px solid color-mix(in oklab, var(--cg-color-border) 50%, transparent);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    transition: background-color var(--cg-transition-fast);
+}
+
+.birthday-cal-cell:nth-child(7n + 7) {
+    border-right: none;
+}
+
+.birthday-cal-cell--empty {
+    background-color: color-mix(in oklab, var(--cg-color-bg) 70%, var(--cg-color-surface));
+}
+
+.birthday-cal-cell--today {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 5%, var(--cg-color-surface));
+}
+
+.birthday-cal-cell--has-roles:not(.birthday-cal-cell--today) {
+    background-color: color-mix(in oklab, var(--cg-color-secondary) 3%, var(--cg-color-surface));
+}
+
+/* ── Day Number ── */
+
+.birthday-cal-day-num {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-text-muted);
+    padding: 0.125rem 0.25rem;
+    line-height: 1;
+}
+
+.birthday-cal-day-num--today {
+    color: var(--cg-color-on-primary);
+    background-color: var(--cg-color-primary);
+    border-radius: var(--cg-radius-full);
+    width: 1.625rem;
+    height: 1.625rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--cg-font-weight-bold);
+    font-size: var(--cg-font-size-xs);
+}
+
+/* ── Day Roles ── */
+
+.birthday-cal-day-roles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    flex: 1;
+    align-content: flex-start;
+}
+
+/* ── Today Section ── */
+
+.birthday-cal-today-section {
+    background-color: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    padding: 1.25rem;
+}
+
+.birthday-cal-today-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    margin: 0 0 1rem;
+}
+
+::deep .birthday-cal-today-title .cg-mdi-icon {
+    width: 22px;
+    height: 22px;
+    color: var(--cg-color-primary);
+}
+
+.birthday-cal-today-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.birthday-cal-today-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--cg-radius-md);
+    text-decoration: none;
+    color: inherit;
+    background-color: color-mix(in oklab, var(--cg-color-bg) 50%, var(--cg-color-surface));
+    border: 1px solid transparent;
+    transition: border-color var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
+}
+
+.birthday-cal-today-card:hover {
+    border-color: var(--cg-color-primary-hover);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.birthday-cal-today-avatar {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+    overflow: hidden;
+    background-color: var(--cg-color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.birthday-cal-today-avatar img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.birthday-cal-today-avatar--fallback {
+    color: var(--cg-color-text-muted);
+}
+
+::deep .birthday-cal-today-avatar--fallback .cg-mdi-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.birthday-cal-today-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.birthday-cal-today-info strong {
+    font-size: 1rem;
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    transition: color var(--cg-transition-fast);
+}
+
+.birthday-cal-today-card:hover .birthday-cal-today-info strong {
+    color: var(--cg-color-primary);
+}
+
+.birthday-cal-today-game {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.125rem;
+    font-size: 0.6875rem;
+    color: var(--cg-color-primary);
+    background-color: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+    padding: 0.125rem 0.375rem;
+    border-radius: var(--cg-radius-sm);
+    width: fit-content;
+}
+
+::deep .birthday-cal-today-game .cg-mdi-icon {
+    width: 0.85rem;
+    height: 0.85rem;
+}
+
+.birthday-cal-today-info p {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    margin: 0;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+/* ── Error state ── */
+
+.birthday-cal-error {
+    max-width: 600px;
+    margin: 4rem auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.birthday-cal-error-icon {
+    color: var(--cg-color-error);
+}
+
+::deep .birthday-cal-error-icon .cg-mdi-icon {
+    width: 48px;
+    height: 48px;
+}
+
+.birthday-cal-error h1 {
+    font-size: var(--cg-font-size-xl);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+.birthday-cal-error p {
+    color: var(--cg-color-text-muted);
+    margin: 0;
+}
+
+.birthday-cal-error a {
+    color: var(--cg-color-link);
+    text-decoration: none;
+    font-weight: var(--cg-font-weight-semibold);
+}
+
+.birthday-cal-error a:hover {
+    text-decoration: underline;
+}
+
+/* ── Loading skeleton ── */
+
+.birthday-cal-loading {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.birthday-cal-loading-block {
+    border-radius: var(--cg-radius-lg);
+    background: linear-gradient(
+        120deg,
+        color-mix(in oklab, var(--cg-color-bg) 90%, white),
+        color-mix(in oklab, var(--cg-color-bg) 76%, white),
+        color-mix(in oklab, var(--cg-color-bg) 90%, white)
+    );
+    background-size: 200% 100%;
+    animation: birthday-cal-skeleton 1.2s infinite;
+}
+
+.birthday-cal-loading-block--header {
+    height: 72px;
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+.birthday-cal-loading-block--nav {
+    height: 44px;
+    max-width: 250px;
+    margin: 0 auto;
+}
+
+.birthday-cal-loading-block--grid {
+    height: 450px;
+}
+
+@keyframes birthday-cal-skeleton {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+
+/* ── Responsive ── */
+
+@media (min-width: 640px) {
+    .birthday-cal {
+        padding: 2rem 1.5rem 4rem;
+    }
+
+    .birthday-cal-cell {
+        min-height: 6.5rem;
+        padding: 0.5rem;
+    }
+}
+
+@media (min-width: 960px) {
+    .birthday-cal-cell {
+        min-height: 7.5rem;
+        padding: 0.5rem 0.625rem;
+    }
+}
+
+@media (max-width: 639px) {
+    .birthday-cal-grid {
+        font-size: 0.8125rem;
+    }
+
+    .birthday-cal-cell {
+        min-height: 4rem;
+        padding: 0.25rem;
+    }
+
+    .birthday-cal-nav-label {
+        font-size: var(--cg-font-size-base);
+    }
+}

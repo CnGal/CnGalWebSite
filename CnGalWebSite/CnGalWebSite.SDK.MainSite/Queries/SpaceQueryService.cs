@@ -71,7 +71,8 @@ public sealed class SpaceQueryService(
             Ranks = basicInfo.Ranks?.ToList() ?? [],
             UserCertification = space.UserCertification,
             IsCurrentUser = space.IsCurrentUser,
-            SteamId = space.SteamId ?? string.Empty
+            SteamId = space.SteamId ?? string.Empty,
+            CanComment = space.CanComment
         };
     }
 }

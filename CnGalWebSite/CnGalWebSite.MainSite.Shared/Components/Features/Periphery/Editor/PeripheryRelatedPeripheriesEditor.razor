@@ -1,0 +1,21 @@
+@using CnGalWebSite.DataModel.ViewModel.Peripheries
+@using CnGalWebSite.SDK.MainSite.Models.PeripheryEdit
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Editor
+
+<section class="periphery-editor-section" id="section-periphery-peripheries">
+    <h2><CgMdiIcon Name="mdiGiftOutline" Class="periphery-section-icon" aria-hidden="true"/>关联周边</h2>
+    <p>管理与当前周边关联的其他周边。</p>
+
+    @if (Model != null)
+    {
+        <CgFormSection Title="周边关联" Icon="mdiLinkVariant" Flat>
+            <EntryRelevanceListEditor Title="周边" Items="Model.Peripheries" AutoCompleteItems="MetaOptions.PeripheryItems"/>
+        </CgFormSection>
+    }
+</section>
+
+@code {
+    [Parameter] public EditPeripheryRelatedPeripheriesViewModel Model { get; set; } = default!;
+
+    [Parameter] public PeripheryEditMetaOptions MetaOptions { get; set; } = default!;
+}

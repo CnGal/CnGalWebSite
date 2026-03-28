@@ -1,4 +1,4 @@
-﻿
+
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Comments;
 using CnGalWebSite.APIServer.Application.Disambigs;
@@ -3806,9 +3806,20 @@ namespace CnGalWebSite.APIServer.Application.Examines
         {
 
             await _commentService.UpdateCommentDataMainAsync(comment, examine);
-            _userRepository.Clear();
             //保存
             comment = await _commentRepository.UpdateAsync(comment);
+
+            // 重新加载评论及关联数据（用于后续生成通知消息）
+            comment = await _commentRepository.GetAll().AsNoTracking()
+                .Include(s => s.Article)
+                .Include(s => s.Entry)
+                .Include(s => s.Periphery)
+                .Include(s => s.Vote)
+                .Include(s => s.Lottery)
+                .Include(s => s.Video)
+                .Include(s => s.UserSpaceCommentManager).ThenInclude(s => s.ApplicationUser)
+                .Include(s => s.ParentCodeNavigation)
+                .FirstOrDefaultAsync(s => s.Id == comment.Id);
 
             //获取发表评论的用户
             var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == examine.PubulicUserId);

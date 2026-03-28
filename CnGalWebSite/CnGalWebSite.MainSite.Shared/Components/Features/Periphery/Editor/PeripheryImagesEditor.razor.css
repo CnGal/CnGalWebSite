@@ -1,0 +1,56 @@
+/* ── 图片网格 ── */
+.cg-image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--cg-spacing-4);
+}
+
+.cg-image-card {
+    position: relative;
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    overflow: hidden;
+    transition: box-shadow var(--cg-transition-fast);
+}
+
+.cg-image-card:hover {
+    box-shadow: var(--cg-shadow-md);
+}
+
+.cg-image-card__actions {
+    position: absolute;
+    top: var(--cg-spacing-2);
+    right: var(--cg-spacing-2);
+    display: flex;
+    gap: var(--cg-spacing-1);
+    opacity: 0;
+    transition: opacity var(--cg-transition-fast);
+    z-index: 1;
+}
+
+.cg-image-card:hover .cg-image-card__actions {
+    opacity: 1;
+}
+
+.cg-image-card__preview {
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: var(--cg-color-section-bg);
+}
+
+.cg-image-card__preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cg-image-card__note {
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    border-top: 1px solid var(--cg-color-border);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

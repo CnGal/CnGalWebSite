@@ -1,4 +1,4 @@
-﻿
+
 using CnGalWebSite.APIServer.Application.Comments.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Ranks;
@@ -267,7 +267,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
                     }
                     break;
                 case CommentType.CommentUser:
-                    userTemp = await _userRepository.GetAll().Include(s => s.UserSpaceCommentManager).FirstOrDefaultAsync(s => s.Id == examine.ObjectId);
+                    userTemp = await _userRepository.GetAll().AsNoTracking().Include(s => s.UserSpaceCommentManager).FirstOrDefaultAsync(s => s.Id == examine.ObjectId);
                     if (userTemp == null)
                     {
                         //判断是不是本人
@@ -278,11 +278,17 @@ namespace CnGalWebSite.APIServer.Application.Comments
                     }
                     if (userTemp.UserSpaceCommentManager == null)
                     {
-                        userTemp.UserSpaceCommentManager = new UserSpaceCommentManager();
-                        userTemp = await _userRepository.UpdateAsync(userTemp);
+                        var newManager = new UserSpaceCommentManager
+                        {
+                            ApplicationUserId = userTemp.Id
+                        };
+                        newManager = await _userSpaceCommentManagerRepository.InsertAsync(newManager);
+                        userSpace = newManager;
                     }
-                    userSpace = userTemp.UserSpaceCommentManager;
-                    _userRepository.Clear();
+                    else
+                    {
+                        userSpace = userTemp.UserSpaceCommentManager;
+                    }
                     break;
                 case CommentType.ReplyComment:
                     replyComment = await _commentRepository.GetAll().AsNoTracking()
@@ -305,7 +311,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
             }
 
 
-            //关联父对象
+            //关联父对象 - 只设置外键ID，不赋值导航属性，避免 EF 追踪冲突
             if (examine.Type != CommentType.CommentUser)
             {
                 tempId = long.Parse(examine.ObjectId);
@@ -314,46 +320,34 @@ namespace CnGalWebSite.APIServer.Application.Comments
             {
                 case CommentType.CommentArticle:
                     comment.ArticleId = tempId;
-                    comment.Article = article;
                     break;
                 case CommentType.CommentEntries:
                     comment.EntryId = (int)tempId;
-                    comment.Entry = entry;
                     break;
                 case CommentType.CommentPeriphery:
                     comment.PeripheryId = tempId;
-                    comment.Periphery = periphery;
                     break;
                 case CommentType.CommentVote:
                     comment.VoteId = tempId;
-                    comment.Vote = vote;
                     break;
                 case CommentType.CommentLottery:
                     comment.LotteryId = tempId;
-                    comment.Lottery = lottery;
                     break;
                 case CommentType.CommentVideo:
                     comment.VideoId = tempId;
-                    comment.Video = video;
                     break;
                 case CommentType.CommentUser:
-                    comment.UserSpaceCommentManager = userSpace;
                     comment.UserSpaceCommentManagerId = userSpace.Id;
                     break;
                 case CommentType.ReplyComment:
-                    //同步关联父对象的关联对象
-                    comment.Article = replyComment.Article;
-                    comment.ArticleId = replyComment.Article?.Id;
-                    comment.Entry = replyComment.Entry;
-                    comment.EntryId = replyComment.Entry?.Id;
-                    comment.UserSpaceCommentManager = replyComment.UserSpaceCommentManager;
-                    comment.UserSpaceCommentManagerId = replyComment.UserSpaceCommentManager?.Id;
-                    comment.Lottery = replyComment.Lottery;
-                    comment.LotteryId = replyComment.Lottery?.Id;
-                    comment.Vote = replyComment.Vote;
-                    comment.VoteId= replyComment.Vote?.Id;
-                    comment.Periphery = replyComment.Periphery;
-                    comment.PeripheryId = replyComment.Periphery?.Id;
+                    //同步关联父对象的关联对象 - 只设置外键
+                    comment.ArticleId = replyComment.ArticleId;
+                    comment.EntryId = replyComment.EntryId;
+                    comment.UserSpaceCommentManagerId = replyComment.UserSpaceCommentManagerId;
+                    comment.LotteryId = replyComment.LotteryId;
+                    comment.VoteId = replyComment.VoteId;
+                    comment.PeripheryId = replyComment.PeripheryId;
+                    comment.VideoId = replyComment.VideoId;
                     comment.ParentCodeNavigation = replyComment;
                     break;
             }
