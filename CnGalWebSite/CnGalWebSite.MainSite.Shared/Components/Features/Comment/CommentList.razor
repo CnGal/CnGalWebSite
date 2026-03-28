@@ -1,0 +1,78 @@
+﻿@* 只读评论列表（纯静态，含前端分页） *@
+
+@using CnGalWebSite.SDK.MainSite.Models.Comments
+
+@if (Items.Count == 0)
+{
+    <div class="comment-list__empty">
+        <CgMdiIcon Name="mdiCommentOutline" />
+        <p>暂无评论，快来抢沙发吧~</p>
+    </div>
+}
+else
+{
+    <div class="comment-list">
+        @{
+            var pagedItems = Items
+                .Skip((CurrentPage - 1) * PageSize)
+                .Take(PageSize)
+                .ToList();
+        }
+
+        @foreach (var item in pagedItems)
+        {
+            <CommentItem Model="item"
+                         IsChild="false"
+                         ShowActions="ShowActions"
+                         ActionTemplate="ActionTemplate" />
+        }
+
+        @if (TotalPages > 1)
+        {
+            <div class="comment-list__pagination">
+                @for (var i = 1; i <= TotalPages; i++)
+                {
+                    var page = i;
+                    <button type="button"
+                            class="comment-list__page-btn @(page == CurrentPage ? "comment-list__page-btn--active" : "")"
+                            @onclick="() => OnPageChanged(page)">
+                        @(page)
+                    </button>
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<CommentItemViewModel> Items { get; set; } = [];
+
+    [Parameter]
+    public int PageSize { get; set; } = 8;
+
+    [Parameter]
+    public bool ShowActions { get; set; }
+
+    [Parameter]
+    public RenderFragment<CommentItemViewModel>? ActionTemplate { get; set; }
+
+    private int CurrentPage { get; set; } = 1;
+
+    private int TotalPages => Items.Count > 0 ? ((Items.Count - 1) / PageSize) + 1 : 1;
+
+    private void OnPageChanged(int page)
+    {
+        CurrentPage = page;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// 跳转到最后一页（发送评论后调用）
+    /// </summary>
+    public void GoToLastPage()
+    {
+        CurrentPage = TotalPages;
+        StateHasChanged();
+    }
+}

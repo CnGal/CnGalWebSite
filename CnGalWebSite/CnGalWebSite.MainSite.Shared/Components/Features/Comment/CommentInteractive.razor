@@ -1,0 +1,201 @@
+﻿@* 评论区交互容器（仅登录用户使用）
+   拥有数据所有权，独立通过 SDK 获取/刷新评论数据
+   提供回复、删除等交互能力 *@
+
+@rendermode InteractiveServer
+
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.SDK.MainSite.Models.Comments
+@using CnGalWebSite.MainSite.Shared.Components.Features.Comment
+
+@inject ICommentQueryService CommentQueryService
+@inject ICommentCommandService CommentCommandService
+@inject ICgToastService ToastService
+
+<div class="comment-interactive">
+    @if (_isLoading)
+    {
+        <div class="comment-interactive__loading">
+            <CgProgressRing />
+        </div>
+    }
+    else if (_items is not null)
+    {
+        <CommentList @ref="_commentList"
+                     Items="_items"
+                     ShowActions="true"
+                     ActionTemplate="CommentActionTemplate" />
+
+        @* 主评论发表框 *@
+        <CommentReplyForm Type="Type"
+                          ObjectId="@ObjectId"
+                          IsChild="false"
+                          CommentCommandService="CommentCommandService"
+                          OnSubmitted="OnCommentSubmittedAsync" />
+    }
+    else if (_errorMessage is not null)
+    {
+        <div class="comment-interactive__error">
+            <p>@_errorMessage</p>
+            <CgButton Variant="CgButton.ButtonVariant.Text" OnClick="RefreshAsync">重试</CgButton>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommentType Type { get; set; }
+
+    [Parameter, EditorRequired]
+    public string ObjectId { get; set; } = "";
+
+    [Parameter]
+    public bool CanDelete { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private IReadOnlyList<CommentItemViewModel>? _items;
+    private bool _isLoading;
+    private string? _errorMessage;
+    private long? _replyingToId;
+    private string? _replyingToName;
+    private int _deleteConfirmId;
+    private CommentList? _commentList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+        StateHasChanged();
+
+        var result = await CommentQueryService.GetCommentsAsync(Type, ObjectId);
+        if (result.Success && result.Data is not null)
+        {
+            _items = result.Data.Items;
+        }
+        else
+        {
+            _errorMessage = result.Error?.Message ?? "获取评论失败";
+            _items = null;
+        }
+
+        _isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task RefreshAsync(MouseEventArgs _)
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task OnCommentSubmittedAsync()
+    {
+        await LoadDataAsync();
+        _commentList?.GoToLastPage();
+        await OnChanged.InvokeAsync();
+    }
+
+    private async Task OnReplySubmittedAsync()
+    {
+        _replyingToId = null;
+        _replyingToName = null;
+        await LoadDataAsync();
+        await OnChanged.InvokeAsync();
+    }
+
+    private void OnCancelReply()
+    {
+        _replyingToId = null;
+        _replyingToName = null;
+        StateHasChanged();
+    }
+
+    private void OnReplyClick(CommentItemViewModel comment)
+    {
+        if (_replyingToId == comment.Id)
+        {
+            _replyingToId = null;
+            _replyingToName = null;
+        }
+        else
+        {
+            _replyingToId = comment.Id;
+            _replyingToName = comment.User.Name;
+        }
+        _deleteConfirmId = 0;
+        StateHasChanged();
+    }
+
+    private async Task OnDeleteClick(CommentItemViewModel comment)
+    {
+        if (_deleteConfirmId != comment.Id)
+        {
+            _deleteConfirmId = (int)comment.Id;
+            ToastService.Show("确认删除请再次点击删除按钮", null, "info");
+            return;
+        }
+
+        _deleteConfirmId = 0;
+        var result = await CommentCommandService.DeleteCommentAsync(comment.Id);
+        if (result.Success)
+        {
+            ToastService.Show("删除评论成功", null, "success");
+            await LoadDataAsync();
+            await OnChanged.InvokeAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "删除评论失败", null, "error");
+        }
+    }
+
+    private RenderFragment<CommentItemViewModel> CommentActionTemplate => comment => __builder =>
+    {
+        <div class="comment-interactive__action-row">
+            @if (_replyingToId == comment.Id)
+            {
+                <CgButton Variant="CgButton.ButtonVariant.Text"
+                          OnClick="@(() => OnReplyClick(comment))">
+                    <CgMdiIcon Name="mdiClose" />
+                    取消回复
+                </CgButton>
+            }
+            else
+            {
+                <CgButton Variant="CgButton.ButtonVariant.Text"
+                          OnClick="@(() => OnReplyClick(comment))">
+                    <CgMdiIcon Name="mdiReply" />
+                    回复
+                </CgButton>
+            }
+
+            @if (CanDelete)
+            {
+                <CgButton Variant="CgButton.ButtonVariant.Text"
+                          OnClick="@(async (_) => await OnDeleteClick(comment))">
+                    <CgMdiIcon Name="mdiDeleteOutline" />
+                    删除
+                </CgButton>
+            }
+        </div>
+
+        @if (_replyingToId == comment.Id)
+        {
+            <div class="comment-interactive__inline-reply">
+                <CommentReplyForm Type="CommentType.ReplyComment"
+                                  ObjectId="@comment.Id.ToString()"
+                                  IsChild="true"
+                                  ShowCancel="true"
+                                  CommentCommandService="CommentCommandService"
+                                  OnSubmitted="OnReplySubmittedAsync"
+                                  OnCancel="OnCancelReply" />
+            </div>
+        }
+    };
+}

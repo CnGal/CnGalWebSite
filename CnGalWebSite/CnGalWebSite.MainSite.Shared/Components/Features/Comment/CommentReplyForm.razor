@@ -1,0 +1,127 @@
+@* 评论回复/发表表单（交互子组件，用于 CommentInteractive 内部） *@
+
+@using CnGalWebSite.DataModel.Model
+
+@inject ICgToastService ToastService
+
+<div class="comment-reply-form @(IsChild ? "comment-reply-form--child" : "")">
+    @if (UseMarkdown)
+    {
+        <CgMarkdownEditor Value="@_text" ValueChanged="OnTextChanged" Placeholder="请在留言板中友善发言，理性讨论" />
+    }
+    else
+    {
+        <CgTextarea Value="@_text"
+                    ValueChanged="OnTextChanged"
+                    Rows="3"
+                    Placeholder="请在留言板中友善发言，理性讨论" />
+    }
+
+    <div class="comment-reply-form__actions">
+        <CgButton Variant="CgButton.ButtonVariant.Primary"
+                  Async
+                  Disabled="_isSubmitting"
+                  OnClick="OnSubmitAsync">
+            @(_isSubmitting ? "发送中..." : "发表评论")
+        </CgButton>
+
+        <CgButton Variant="CgButton.ButtonVariant.Text"
+                  OnClick="OnToggleEditor">
+            @(UseMarkdown ? "切换纯文本" : "切换 Markdown")
+        </CgButton>
+
+        <CgImageUpload Text="上传图片"
+                       ShowPreview="false"
+                       OnImageUploaded="OnImageUploaded" />
+
+        @if (ShowCancel)
+        {
+            <CgButton Variant="CgButton.ButtonVariant.Text"
+                      OnClick="OnCancelAsync">
+                取消
+            </CgButton>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public CommentType Type { get; set; }
+
+    [Parameter]
+    public string ObjectId { get; set; } = "";
+
+    [Parameter]
+    public bool IsChild { get; set; }
+
+    [Parameter]
+    public bool ShowCancel { get; set; }
+
+    [Parameter]
+    public EventCallback OnSubmitted { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public ICommentCommandService CommentCommandService { get; set; } = default!;
+
+    private string _text = "";
+    private bool _isSubmitting;
+    private bool UseMarkdown { get; set; }
+
+    private void OnTextChanged(string? value)
+    {
+        _text = value ?? "";
+    }
+
+    private async Task OnSubmitAsync(MouseEventArgs _)
+    {
+        if (string.IsNullOrWhiteSpace(_text))
+        {
+            ToastService.Show("你还什么都没说呢，不能发表空的评论哦", null, "error");
+            return;
+        }
+
+        _isSubmitting = true;
+        StateHasChanged();
+
+        try
+        {
+            var result = await CommentCommandService.PublishCommentAsync(Type, ObjectId, _text);
+
+            if (result.Success)
+            {
+                _text = "";
+                ToastService.Show("发表评论成功，审核通过前仅自己可见", null, "success");
+                await OnSubmitted.InvokeAsync();
+            }
+            else
+            {
+                ToastService.Show(result.Error?.Message ?? "发表评论失败", null, "error");
+            }
+        }
+        finally
+        {
+            _isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OnToggleEditor()
+    {
+        UseMarkdown = !UseMarkdown;
+        StateHasChanged();
+    }
+
+    private void OnImageUploaded(string path)
+    {
+        _text += $"![]({path})";
+        StateHasChanged();
+    }
+
+    private async Task OnCancelAsync(MouseEventArgs _)
+    {
+        await OnCancel.InvokeAsync();
+    }
+}
