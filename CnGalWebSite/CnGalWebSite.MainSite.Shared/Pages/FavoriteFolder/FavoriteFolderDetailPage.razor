@@ -1,0 +1,104 @@
+@page "/favoritefolders/index/{Id:long}"
+
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.MainSite.Shared.Components.Features.FavoriteFolder
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+
+@inject IFavoriteFolderQueryService FavoriteFolderQueryService
+@inject NavigationManager NavigationManager
+
+@if (_isNotFound)
+{
+    <section class="cg-ff-not-found">
+        <h1>找不到这个收藏夹哦......</h1>
+        <p>可以在个人空间 → 收藏夹 → 编辑中设置收藏夹公开</p>
+        <CgButton Variant="primary" OnClick="@(() => NavigationManager.NavigateTo("/"))">返回首页</CgButton>
+    </section>
+}
+else if (_model != null)
+{
+    <PageTitle>@($"目录 - {_model.Name} - CnGal资料站")</PageTitle>
+
+    <article class="cg-ff-page">
+        <FavoriteFolderHero Model="_model" />
+
+        @if (_model.IsHidden)
+        {
+            <CgAlert Variant="warning">
+                当前目录处于隐藏状态，如果你看到了这个提示，请立即联系管理员
+            </CgAlert>
+        }
+
+        <section class="cg-ff-layout cg-ff-layout--desktop" aria-label="桌面详情布局">
+            <main class="cg-ff-main-col">
+                <FavoriteFolderObjectList Model="_model" />
+            </main>
+            <aside class="cg-ff-side-col">
+                <FavoriteFolderInfoCard Model="_model" />
+            </aside>
+        </section>
+    </article>
+}
+else if (_isError)
+{
+    <section class="cg-ff-not-found">
+        <h1>加载失败</h1>
+        <p>@_errorMessage</p>
+        <CgButton Variant="primary" OnClick="@(() => NavigationManager.NavigateTo("/"))">返回首页</CgButton>
+    </section>
+}
+else
+{
+    <section class="cg-ff-loading" aria-label="加载中">
+        <div class="cg-ff-loading-block"></div>
+        <div class="cg-ff-loading-block cg-ff-loading-block--wide"></div>
+        <div class="cg-ff-loading-block"></div>
+    </section>
+}
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    private FavoriteFolderDetailViewModel? _model;
+    private bool _isNotFound;
+    private bool _isError;
+    private string _errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_model != null && _model.Id != Id)
+        {
+            await LoadDataAsync();
+        }
+    }
+
+    private async Task LoadDataAsync()
+    {
+        _isNotFound = false;
+        _isError = false;
+        _model = null;
+
+        var result = await FavoriteFolderQueryService.GetFavoriteFolderDetailAsync(Id);
+
+        if (result.Success && result.Data != null)
+        {
+            _model = result.Data;
+        }
+        else if (result.Error?.StatusCode == 404)
+        {
+            _isNotFound = true;
+        }
+        else
+        {
+            _isError = true;
+            _errorMessage = result.Error?.Message ?? "未知错误";
+        }
+    }
+}

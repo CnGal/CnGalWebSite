@@ -1,0 +1,50 @@
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+
+<div class="cg-ff-info-card">
+    <h2 class="cg-ff-info-card-title">
+        <CgMdiIcon Name="mdiInformationOutline" aria-hidden="true" />
+        基本信息
+    </h2>
+    <div class="cg-ff-info-card-items">
+        <div class="cg-ff-info-item">
+            <CgMdiIcon Name="mdiFormatListBulleted" aria-hidden="true" />
+            <span class="cg-ff-info-item-label">总数</span>
+            <span class="cg-ff-info-item-value">@Model.TotalObjectCount</span>
+        </div>
+        <div class="cg-ff-info-item">
+            <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+            <span class="cg-ff-info-item-label">浏览数</span>
+            <span class="cg-ff-info-item-value">@Model.ReaderCount</span>
+        </div>
+        <div class="cg-ff-info-item">
+            <CgMdiIcon Name="mdiCalendarOutline" aria-hidden="true" />
+            <span class="cg-ff-info-item-label">创建时间</span>
+            <span class="cg-ff-info-item-value">@Model.CreateTime.ToString("yyyy-MM-dd")</span>
+        </div>
+        <div class="cg-ff-info-item">
+            <CgMdiIcon Name="mdiClockEditOutline" aria-hidden="true" />
+            <span class="cg-ff-info-item-label">最后编辑</span>
+            <span class="cg-ff-info-item-value">@Model.LastEditTime.ToString("yyyy-MM-dd")</span>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.UserName))
+    {
+        <div class="cg-ff-info-user">
+            <h3 class="cg-ff-info-user-title">创建者</h3>
+            <a href="/space/index/@Model.UserId" class="cg-ff-info-user-link">
+                @if (!string.IsNullOrWhiteSpace(Model.UserPhotoPath))
+                {
+                    <img src="@Model.UserPhotoPath" alt="@Model.UserName" class="cg-ff-info-user-avatar" />
+                }
+                <span>@Model.UserName</span>
+            </a>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public required FavoriteFolderDetailViewModel Model { get; set; }
+}

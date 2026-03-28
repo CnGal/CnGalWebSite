@@ -20,7 +20,7 @@
 }
 
 .entry-tip--danger {
-    color: #991b1b;
-    border-color: #fca5a5;
-    background: #fef2f2;
+    color: var(--cg-color-editor-error-text);
+    border-color: var(--cg-color-editor-error-border);
+    background: var(--cg-color-editor-error-bg);
 }

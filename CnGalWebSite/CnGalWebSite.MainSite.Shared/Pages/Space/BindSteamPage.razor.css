@@ -1,0 +1,20 @@
+.bind-steam-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+    gap: var(--cg-spacing-4);
+}
+
+.bind-steam-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;
+}
+
+.bind-steam-loading__text {
+    margin-left: var(--cg-spacing-4);
+    color: var(--cg-color-text-secondary);
+}

@@ -130,13 +130,13 @@
 }
 
 .cg-menu-item__icon--teal {
-    background: color-mix(in oklab, #14b8a6 12%, transparent);
-    color: #14b8a6;
+    background: color-mix(in oklab, var(--cg-color-brand-teal) 12%, transparent);
+    color: var(--cg-color-brand-teal);
 }
 
 .cg-menu-item__icon--purple {
-    background: color-mix(in oklab, #8b5cf6 12%, transparent);
-    color: #8b5cf6;
+    background: color-mix(in oklab, var(--cg-color-brand-purple) 12%, transparent);
+    color: var(--cg-color-brand-purple);
 }
 
 /* ── Item Content (text + description) ── */

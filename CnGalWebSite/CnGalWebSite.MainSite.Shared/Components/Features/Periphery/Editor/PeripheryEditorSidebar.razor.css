@@ -94,7 +94,7 @@
 .periphery-edit-sidebar__card--warning {
     background: color-mix(in oklab, var(--cg-color-warning) 6%, var(--cg-color-surface));
     border-color: color-mix(in oklab, var(--cg-color-warning) 20%, transparent);
-    color: #92400e;
+    color: var(--cg-color-editor-warning-text);
 }
 
 .periphery-edit-sidebar__card--warning ::deep .cg-mdi-icon {

@@ -1,0 +1,91 @@
+/* ── InfoCard —— 对齐 .entry-card ── */
+.cg-ff-info-card {
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    border-radius: var(--cg-radius-xl);
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    padding: 1.5rem;
+}
+
+.cg-ff-info-card-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--cg-color-text);
+    margin: 0 0 1.25rem;
+}
+
+.cg-ff-info-card-title ::deep .cg-mdi-icon {
+    width: 2rem;
+    height: 2rem;
+    color: var(--cg-color-primary);
+}
+
+.cg-ff-info-card-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+}
+
+.cg-ff-info-item {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    font-size: var(--cg-font-size-sm);
+}
+
+.cg-ff-info-item ::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--cg-color-text-muted);
+    flex-shrink: 0;
+}
+
+.cg-ff-info-item-label {
+    color: var(--cg-color-text-muted);
+}
+
+.cg-ff-info-item-value {
+    margin-left: auto;
+    font-weight: 600;
+    color: var(--cg-color-text);
+}
+
+.cg-ff-info-user {
+    margin-top: var(--cg-spacing-4);
+    padding-top: var(--cg-spacing-4);
+    border-top: 1px solid color-mix(in oklab, var(--cg-color-primary) 6%, var(--cg-color-border));
+}
+
+.cg-ff-info-user-title {
+    font-size: var(--cg-font-size-sm);
+    font-weight: 700;
+    color: var(--cg-color-text-muted);
+    margin: 0 0 var(--cg-spacing-2) 0;
+}
+
+.cg-ff-info-user-link {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    color: var(--cg-color-text);
+    text-decoration: none;
+    font-size: var(--cg-font-size-sm);
+    font-weight: 600;
+    transition: color var(--cg-transition-fast);
+    padding: 0.35rem 0;
+    border-radius: var(--cg-radius-md);
+}
+
+.cg-ff-info-user-link:hover {
+    color: var(--cg-color-primary);
+}
+
+.cg-ff-info-user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--cg-radius-full);
+    object-fit: cover;
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+}

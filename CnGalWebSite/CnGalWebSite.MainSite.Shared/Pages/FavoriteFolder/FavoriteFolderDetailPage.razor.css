@@ -1,0 +1,108 @@
+/* ── 页面级容器 —— 对齐 .entry-page ── */
+.cg-ff-page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
+}
+
+/* ── 两栏布局 —— 对齐 .entry-layout ── */
+.cg-ff-layout {
+    position: relative;
+    z-index: 1;
+}
+
+.cg-ff-layout--desktop {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.cg-ff-main-col,
+.cg-ff-side-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* ── 未找到 / 加载失败 ── */
+.cg-ff-not-found {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1.5rem;
+    text-align: center;
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.cg-ff-not-found h1 {
+    margin: 0 0 0.5rem;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 900;
+    color: var(--cg-color-text);
+}
+
+.cg-ff-not-found p {
+    margin: 0 0 1.5rem;
+    color: var(--cg-color-text-muted);
+    line-height: 1.7;
+    font-size: 0.95rem;
+}
+
+/* ── 骨架加载 —— 对齐 .entry-loading ── */
+.cg-ff-loading {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 920px;
+    margin: 2rem auto;
+}
+
+.cg-ff-loading-block {
+    border-radius: var(--cg-radius-lg);
+    height: 140px;
+    background: linear-gradient(
+        120deg,
+        color-mix(in oklab, var(--cg-color-bg) 90%, white),
+        color-mix(in oklab, var(--cg-color-bg) 76%, white),
+        color-mix(in oklab, var(--cg-color-bg) 90%, white)
+    );
+    background-size: 200% 100%;
+    animation: cg-ff-loading 1.2s infinite;
+}
+
+.cg-ff-loading-block--wide {
+    height: 220px;
+}
+
+@keyframes cg-ff-loading {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+
+/* ── 响应式 —— 对齐 entry 的断点策略 ── */
+@media (min-width: 768px) {
+    .cg-ff-page {
+        padding: 2rem 1.5rem 4rem;
+        gap: 2rem;
+    }
+
+    .cg-ff-layout--desktop {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 2rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .cg-ff-layout--desktop {
+        grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+        gap: 2rem;
+        align-items: start;
+    }
+}

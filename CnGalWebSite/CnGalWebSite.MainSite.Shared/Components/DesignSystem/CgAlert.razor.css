@@ -45,7 +45,7 @@
     background-color: color-mix(in oklab, var(--cg-color-warning) 8%, var(--cg-color-surface));
     border-color: color-mix(in oklab, var(--cg-color-warning) 25%, transparent);
     border-left-color: var(--cg-color-warning);
-    color: #92400e;
+    color: var(--cg-color-editor-warning-text);
 }
 
 /* ── error ── */
@@ -53,5 +53,5 @@
     background-color: color-mix(in oklab, var(--cg-color-error) 8%, var(--cg-color-surface));
     border-color: color-mix(in oklab, var(--cg-color-error) 25%, transparent);
     border-left-color: var(--cg-color-error);
-    color: #991b1b;
+    color: var(--cg-color-editor-error-text);
 }

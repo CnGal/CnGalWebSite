@@ -1,0 +1,163 @@
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Favorites
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+@using CnGalWebSite.MainSite.Shared.Services
+
+@inject IFavoriteFolderQueryService FavoriteFolderQueryService
+@inject IFavoriteFolderCommandService FavoriteFolderCommandService
+@inject ICgToastService ToastService
+
+<div class="cg-ff-obj-manager">
+    @if (_isLoading)
+    {
+        <div class="cg-ff-obj-manager-loading">
+            <CgProgressRing />
+            <span>加载中...</span>
+        </div>
+    }
+    else
+    {
+        @if (_objects.Count == 0)
+        {
+            <div class="cg-ff-obj-manager-empty">
+                <CgMdiIcon Name="mdiPackageVariant" aria-hidden="true" />
+                <span>暂无收藏对象</span>
+            </div>
+        }
+        else
+        {
+            <div class="cg-ff-obj-manager-list">
+                @foreach (var obj in _objects)
+                {
+                    <div class="cg-ff-obj-manager-item">
+                        <span class="cg-ff-obj-manager-item-type @GetTypeClass(obj.Type)">@GetTypeName(obj.Type)</span>
+                        <a href="@GetObjectUrl(obj)" class="cg-ff-obj-manager-item-name">@obj.ObjectName</a>
+                        <span class="cg-ff-obj-manager-item-date">@obj.CreateTime.ToString("yyyy-MM-dd")</span>
+                        <button class="cg-ff-obj-manager-item-move" @onclick="() => MoveObject(obj)" title="移动" type="button">
+                            <CgMdiIcon Name="mdiFileMove" aria-hidden="true" />
+                        </button>
+                        <button class="cg-ff-obj-manager-item-delete" @onclick="() => DeleteObject(obj)" title="删除" type="button">
+                            <CgMdiIcon Name="mdiDeleteOutline" aria-hidden="true" />
+                        </button>
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="cg-ff-obj-manager-pagination">
+            <CgButton Variant="ghost" OnClick="PreviousPage" Disabled="_currentPage <= 1">上一页</CgButton>
+            <span class="cg-ff-obj-manager-page-info">第 @_currentPage 页</span>
+            <CgButton Variant="ghost" OnClick="NextPage" Disabled="_objects.Count < PageSize">下一页</CgButton>
+        </div>
+    }
+</div>
+
+<FavoriteFolderMoveDialog @ref="_moveDialog" FolderId="FolderId" OnMoved="OnMoveCompleted" />
+
+@code {
+    [Parameter, EditorRequired]
+    public long FolderId { get; set; }
+
+    private const int PageSize = 20;
+    private List<FavoriteObjectOverviewModel> _objects = [];
+    private int _currentPage = 1;
+    private bool _isLoading = true;
+    private FavoriteFolderMoveDialog? _moveDialog;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadObjectsAsync();
+    }
+
+    private async Task LoadObjectsAsync()
+    {
+        _isLoading = true;
+        StateHasChanged();
+
+        var result = await FavoriteFolderQueryService.GetFavoriteObjectsAsync(FolderId, _currentPage, PageSize);
+        _objects = result.Success && result.Data != null ? result.Data.ToList() : [];
+
+        _isLoading = false;
+        StateHasChanged();
+    }
+
+    private async Task DeleteObject(FavoriteObjectOverviewModel obj)
+    {
+        var result = await FavoriteFolderCommandService.DeleteFavoriteObjectsAsync(FolderId, [obj.Id]);
+        if (result.Success)
+        {
+            _objects.Remove(obj);
+            ToastService.Show("删除成功", variant: "success");
+            StateHasChanged();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "删除失败", variant: "error");
+        }
+    }
+
+    private async Task MoveObject(FavoriteObjectOverviewModel obj)
+    {
+        if (_moveDialog != null)
+        {
+            var objectIds = new List<KeyValuePair<FavoriteObjectType, long>>
+            {
+                new(obj.Type, obj.ObjectId)
+            };
+            await _moveDialog.ShowAsync(objectIds);
+        }
+    }
+
+    private async Task OnMoveCompleted()
+    {
+        // Refresh list after moving
+        await LoadObjectsAsync();
+    }
+
+    private async Task PreviousPage()
+    {
+        if (_currentPage > 1)
+        {
+            _currentPage--;
+            await LoadObjectsAsync();
+        }
+    }
+
+    private async Task NextPage()
+    {
+        _currentPage++;
+        await LoadObjectsAsync();
+    }
+
+    private static string GetTypeName(FavoriteObjectType type) => type switch
+    {
+        FavoriteObjectType.Entry => "词条",
+        FavoriteObjectType.Article => "文章",
+        FavoriteObjectType.Video => "视频",
+        FavoriteObjectType.Tag => "标签",
+        FavoriteObjectType.Periphery => "周边",
+        _ => "其他"
+    };
+
+    private static string GetTypeClass(FavoriteObjectType type) => type switch
+    {
+        FavoriteObjectType.Entry => "type-entry",
+        FavoriteObjectType.Article => "type-article",
+        FavoriteObjectType.Video => "type-video",
+        FavoriteObjectType.Tag => "type-tag",
+        FavoriteObjectType.Periphery => "type-periphery",
+        _ => ""
+    };
+
+    private static string GetObjectUrl(FavoriteObjectOverviewModel obj) => obj.Type switch
+    {
+        FavoriteObjectType.Entry => $"/entries/index/{obj.ObjectId}",
+        FavoriteObjectType.Article => $"/articles/index/{obj.ObjectId}",
+        FavoriteObjectType.Video => $"/videos/index/{obj.ObjectId}",
+        FavoriteObjectType.Tag => $"/tags/index/{obj.ObjectId}",
+        FavoriteObjectType.Periphery => $"/peripheries/index/{obj.ObjectId}",
+        _ => "#"
+    };
+}

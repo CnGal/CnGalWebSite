@@ -1,0 +1,82 @@
+/* ── List container ── */
+.catalog-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* ── Horizontal card (image left, text right) ── */
+.catalog-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border: 1px solid color-mix(in oklab, var(--cg-color-border) 40%, transparent);
+    border-radius: var(--cg-radius-lg);
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    box-shadow: var(--cg-shadow-sm);
+    text-decoration: none;
+    color: var(--cg-color-text);
+    transition: all var(--cg-transition-normal);
+}
+
+.catalog-card:hover {
+    border-color: color-mix(in oklab, var(--cg-color-primary) 50%, transparent);
+    box-shadow: var(--cg-shadow-card-hover, 0 8px 25px -5px rgba(0, 0, 0, 0.1));
+    transform: translateY(-2px);
+}
+
+/* ── Cover (left side) ── */
+.catalog-card-cover {
+    flex-shrink: 0;
+    width: 100px;
+    aspect-ratio: 460 / 215;
+    border-radius: var(--cg-radius-md);
+    overflow: hidden;
+    background-color: var(--cg-color-bg);
+}
+
+.catalog-card-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--cg-transition-normal);
+}
+
+.catalog-card:hover .catalog-card-img {
+    transform: scale(1.06) translateZ(0);
+}
+
+/* ── Body (right side) ── */
+.catalog-card-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.catalog-card-name {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color var(--cg-transition-fast);
+}
+
+.catalog-card:hover .catalog-card-name {
+    color: var(--cg-color-primary);
+}
+
+.catalog-card-desc {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.45;
+}

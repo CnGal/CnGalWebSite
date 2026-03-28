@@ -1,0 +1,148 @@
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Search
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+
+@if (Model.TotalObjectCount == 0)
+{
+    <div class="cg-ff-objects-empty">
+        <CgMdiIcon Name="mdiPackageVariant" aria-hidden="true" />
+        <span>暂无收藏</span>
+    </div>
+}
+else
+{
+    <CgTabs Variant="underline" Items="GetObjectTabs()" DefaultActiveKey="@_defaultTab" Id="ff-object-tabs" AriaLabel="收藏内容">
+        <PanelTemplate Context="tabKey">
+            @switch (tabKey)
+            {
+                case "entries":
+                    @RenderEntries()
+                    break;
+                case "articles":
+                    @RenderArticles()
+                    break;
+                case "videos":
+                    @RenderVideos()
+                    break;
+                case "tags":
+                    @RenderTags()
+                    break;
+                case "peripheries":
+                    @RenderPeripheries()
+                    break;
+            }
+        </PanelTemplate>
+    </CgTabs>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public required FavoriteFolderDetailViewModel Model { get; set; }
+
+    private string _defaultTab = "entries";
+
+    protected override void OnParametersSet()
+    {
+        // Pick the first non-empty category as default
+        if (Model.Entries.Count > 0) _defaultTab = "entries";
+        else if (Model.Articles.Count > 0) _defaultTab = "articles";
+        else if (Model.Videos.Count > 0) _defaultTab = "videos";
+        else if (Model.Tags.Count > 0) _defaultTab = "tags";
+        else if (Model.Peripheries.Count > 0) _defaultTab = "peripheries";
+    }
+
+    private IReadOnlyList<CgTabItem> GetObjectTabs()
+    {
+        var tabs = new List<CgTabItem>();
+        if (Model.Entries.Count > 0)
+            tabs.Add(new CgTabItem("entries", "词条", "mdiArchiveOutline", Model.Entries.Count.ToString()));
+        if (Model.Articles.Count > 0)
+            tabs.Add(new CgTabItem("articles", "文章", "mdiNewspaperVariantMultipleOutline", Model.Articles.Count.ToString()));
+        if (Model.Videos.Count > 0)
+            tabs.Add(new CgTabItem("videos", "视频", "mdiPlayCircleOutline", Model.Videos.Count.ToString()));
+        if (Model.Tags.Count > 0)
+            tabs.Add(new CgTabItem("tags", "标签", "mdiTagOutline", Model.Tags.Count.ToString()));
+        if (Model.Peripheries.Count > 0)
+            tabs.Add(new CgTabItem("peripheries", "周边", "mdiBasketOutline", Model.Peripheries.Count.ToString()));
+        return tabs;
+    }
+
+    private RenderFragment RenderEntries() => __builder =>
+    {
+        var games = Model.Entries.Where(e => e.Type == EntryType.Game).ToList();
+        var groups = Model.Entries.Where(e => e.Type == EntryType.ProductionGroup).ToList();
+        var staff = Model.Entries.Where(e => e.Type == EntryType.Staff).ToList();
+        var roles = Model.Entries.Where(e => e.Type == EntryType.Role).ToList();
+
+        if (games.Count > 0) RenderEntryGroup("游戏", games, false)(__builder);
+        if (groups.Count > 0) RenderEntryGroup("制作组", groups, false)(__builder);
+        if (staff.Count > 0) RenderEntryGroup("STAFF", staff, true)(__builder);
+        if (roles.Count > 0) RenderEntryGroup("角色", roles, true)(__builder);
+    };
+
+    private RenderFragment RenderEntryGroup(string title, List<EntryInforTipViewModel> items, bool isSquare) => __builder =>
+    {
+        <div class="cg-ff-object-group">
+            <h3 class="cg-ff-object-group-title">@title (@items.Count)</h3>
+            <div class="cg-ff-object-grid">
+                @foreach (var item in items)
+                {
+                    <EntryCardItem Url="@($"/entries/index/{item.Id}")"
+                                   Image="@item.MainImage"
+                                   Title="@item.Name"
+                                   IsSquareCover="isSquare" />
+                }
+            </div>
+        </div>
+    };
+
+    private RenderFragment RenderArticles() => __builder =>
+    {
+        <div class="cg-ff-object-grid">
+            @foreach (var item in Model.Articles)
+            {
+                <EntryCardItem Url="@($"/articles/index/{item.Id}")"
+                               Image="@item.MainImage"
+                               Title="@item.DisplayName" />
+            }
+        </div>
+    };
+
+    private RenderFragment RenderVideos() => __builder =>
+    {
+        <div class="cg-ff-object-grid">
+            @foreach (var item in Model.Videos)
+            {
+                <EntryCardItem Url="@($"/videos/index/{item.Id}")"
+                               Image="@item.MainImage"
+                               Title="@item.DisplayName" />
+            }
+        </div>
+    };
+
+    private RenderFragment RenderTags() => __builder =>
+    {
+        <div class="cg-ff-object-grid">
+            @foreach (var item in Model.Tags)
+            {
+                <EntryCardItem Url="@($"/tags/index/{item.Id}")"
+                               Image="@item.MainImage"
+                               Title="@item.Name" />
+            }
+        </div>
+    };
+
+    private RenderFragment RenderPeripheries() => __builder =>
+    {
+        <div class="cg-ff-object-grid">
+            @foreach (var item in Model.Peripheries)
+            {
+                <EntryCardItem Url="@($"/peripheries/index/{item.Id}")"
+                               Image="@item.MainImage"
+                               Title="@item.Name" />
+            }
+        </div>
+    };
+}

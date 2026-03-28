@@ -1,0 +1,50 @@
+.cg-ff-move-desc {
+    color: var(--cg-color-text-secondary);
+    font-size: var(--cg-font-size-sm);
+    margin: 0 0 var(--cg-spacing-4) 0;
+}
+
+.cg-ff-move-loading,
+.cg-ff-move-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--cg-spacing-6);
+    color: var(--cg-color-text-muted);
+    gap: var(--cg-spacing-2);
+}
+
+.cg-ff-move-folder-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+}
+
+.cg-ff-move-folder-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    border-radius: var(--cg-radius-md);
+    border: 1px solid var(--cg-color-border);
+    cursor: pointer;
+    transition: all var(--cg-transition-fast);
+}
+
+.cg-ff-move-folder-item:hover {
+    background-color: var(--cg-color-hover-overlay);
+    border-color: var(--cg-color-primary);
+}
+
+.cg-ff-move-folder-item.selected {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 8%, transparent);
+    border-color: var(--cg-color-primary);
+}
+
+.cg-ff-move-folder-count {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    flex-shrink: 0;
+    margin-left: var(--cg-spacing-2);
+}

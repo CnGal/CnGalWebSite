@@ -17,22 +17,18 @@
 else if (_model is not null)
 {
     <article class="periphery-page">
-        <header class="periphery-header">
-            <PeripheryHero Name="@_model.Name"
-                           DisplayName="@_model.DisplayName"
-                           BriefIntroduction="@_model.BriefIntroduction"
-                           MainPicture="@_model.MainPicture"
-                           BackgroundPicture="@_model.BackgroundPicture"
-                           ReaderCount="_model.ReaderCount"
-                           CollectedCount="_model.CollectedCount"
-                           PeripheryId="_model.Id" />
-        </header>
+        <PeripheryHero Name="@_model.Name"
+                       DisplayName="@_model.DisplayName"
+                       BriefIntroduction="@_model.BriefIntroduction"
+                       MainPicture="@_model.MainPicture"
+                       BackgroundPicture="@_model.BackgroundPicture"
+                       ReaderCount="_model.ReaderCount"
+                       CollectedCount="_model.CollectedCount"
+                       PeripheryId="_model.Id" />
 
         @if (_model.IsHidden)
         {
-            <CgAlert Variant="warning" Class="periphery-hidden-alert">
-                当前周边处于隐藏状态，如果你看到了这个提示，请立即联系管理员
-            </CgAlert>
+            <CgAlert Variant="warning">当前周边处于隐藏状态，如果你看到了这个提示，请立即联系管理员</CgAlert>
         }
 
         @* ── 桌面端双栏布局 ── *@

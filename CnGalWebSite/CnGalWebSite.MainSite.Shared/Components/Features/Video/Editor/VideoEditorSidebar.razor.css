@@ -94,7 +94,7 @@
 .entry-edit-sidebar__card--warning {
     background: color-mix(in oklab, var(--cg-color-warning) 6%, var(--cg-color-surface));
     border-color: color-mix(in oklab, var(--cg-color-warning) 20%, transparent);
-    color: #92400e;
+    color: var(--cg-color-editor-warning-text);
 }
 
 .entry-edit-sidebar__card--warning ::deep .cg-mdi-icon {
@@ -105,7 +105,7 @@
 .entry-edit-sidebar__card--error {
     background: color-mix(in oklab, var(--cg-color-error) 6%, var(--cg-color-surface));
     border-color: color-mix(in oklab, var(--cg-color-error) 20%, transparent);
-    color: #991b1b;
+    color: var(--cg-color-editor-error-text);
 }
 
 .entry-edit-sidebar__card--error ::deep .cg-mdi-icon {

@@ -2,14 +2,18 @@ using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class PeripheryQueryService(
     HttpClient httpClient,
+    IMemoryCache memoryCache,
     ILogger<PeripheryQueryService> logger) : QueryServiceBase(httpClient), IPeripheryQueryService
 {
+    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
+
     protected override ILogger Logger => logger;
 
     public Task<SdkResult<PeripheryDetailViewModel>> GetPeripheryDetailAsync(long id, CancellationToken cancellationToken = default)
@@ -21,6 +25,29 @@ public sealed class PeripheryQueryService(
             "周边",
             id,
             cancellationToken);
+    }
+
+    public async Task<SdkResult<GameOverviewPeripheryListModel>> GetEntryOverviewPeripheriesAsync(int entryId, CancellationToken cancellationToken = default)
+    {
+        var cacheKey = $"main-site:entry-periphery-overview:{entryId}";
+        if (memoryCache.TryGetValue(cacheKey, out GameOverviewPeripheryListModel? cached) && cached is not null)
+        {
+            return SdkResult<GameOverviewPeripheryListModel>.Ok(cached);
+        }
+
+        var path = $"api/peripheries/GetEntryOverviewPeripheries/{entryId}";
+        var result = await GetAsync<GameOverviewPeripheryListModel>(
+            path,
+            "PERIPHERY",
+            "词条周边概览",
+            cancellationToken);
+
+        if (result.Success && result.Data is not null)
+        {
+            memoryCache.Set(cacheKey, result.Data, CacheDuration);
+        }
+
+        return result;
     }
 
     private static PeripheryDetailViewModel MapToViewModel(PeripheryViewModel dto)

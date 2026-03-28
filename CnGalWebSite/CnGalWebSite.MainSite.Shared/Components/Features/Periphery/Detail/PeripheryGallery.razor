@@ -1,12 +1,9 @@
 @using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 
 @if (Pictures.Count > 0)
 {
-    <section class="periphery-gallery">
-        <h2>
-            <CgMdiIcon Name="mdiImageMultipleOutline" />
-            图片
-        </h2>
+    <EntrySection Title="图片" Icon="mdiImageMultipleOutline">
         @foreach (var group in Pictures)
         {
             @if (!string.IsNullOrWhiteSpace(group.Modifier))
@@ -24,7 +21,7 @@
                 }
             </ul>
         }
-    </section>
+    </EntrySection>
 }
 
 @code {

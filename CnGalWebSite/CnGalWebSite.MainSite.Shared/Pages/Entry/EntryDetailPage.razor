@@ -1,9 +1,13 @@
 @page "/entries/index/{Id:int}"
 @inject IEntryQueryService EntryQueryService
 @inject IPlayedGameQueryService PlayedGameQueryService
+@inject IPeripheryQueryService PeripheryQueryService
+@inject IFavoriteFolderQueryService FavoriteFolderQueryService
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
 @using CnGalWebSite.DataModel.ViewModel.Search
+@using CnGalWebSite.DataModel.ViewModel.Peripheries
+@using CnGalWebSite.DataModel.ViewModel.Favorites
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 @using CnGalWebSite.MainSite.Shared.Services
 @using CnGalWebSite.Extensions
@@ -75,6 +79,8 @@ else if (Model is not null)
                     </EntryCardList>
                 </EntrySection>
 
+                <EntryPeripheryCard Model="PeripheryOverview" />
+
                 @* 登录用户使用交互式评分区域（支持编辑后实时刷新），未登录用户使用静态渲染 *@
                 <AuthorizeView>
                     <Authorized>
@@ -131,6 +137,8 @@ else if (Model is not null)
                                       GetExternalLinkDescription="ExternalLinkHelper.GetExternalLinkDescription"
                                       DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
                 </EntrySection>
+
+                <EntryCatalogCard Folders="RelateFolders" />
             </aside>
         </section>
 
@@ -225,6 +233,8 @@ else if (Model is not null)
                             </EntryCardList>
                         </EntrySection>
 
+                        <EntryPeripheryCard Model="PeripheryOverview" />
+
                         <EntryCard Title="相关内容" Icon="mdiLinkVariant" Class="entry-card--empty" Show="!HasRelatedContent() && Model.Roles.Count == 0 && (Model.IsHideOutlink || Model.OtherRelevances.Count == 0)">
                             <p>暂无相关内容。</p>
                         </EntryCard>
@@ -241,6 +251,8 @@ else if (Model is not null)
                                               GetExternalLinkDescription="ExternalLinkHelper.GetExternalLinkDescription"
                                               DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
                         </EntrySection>
+
+                        <EntryCatalogCard Folders="RelateFolders" />
                     </section>
 
                     @if (Model.Staffs.Count > 0)
@@ -271,13 +283,17 @@ else
 
     private EntryDetailViewModel? Model;
     private PlayedGameOverviewViewModel? ScoreOverview;
+    private GameOverviewPeripheryListModel? PeripheryOverview;
+    private IReadOnlyList<FavoriteFolderOverviewModel>? RelateFolders;
     private string? ErrorMessage;
 
     protected override async Task OnParametersSetAsync()
     {
-        // 并行请求词条详情和评分概览
+        // 并行请求词条详情、评分概览、周边概览、相关目录
         var entryTask = EntryQueryService.GetEntryDetailAsync(Id);
         var scoreTask = PlayedGameQueryService.GetOverviewAsync(Id);
+        var peripheryTask = PeripheryQueryService.GetEntryOverviewPeripheriesAsync(Id);
+        var catalogTask = FavoriteFolderQueryService.GetRelateFavoriteFoldersAsync(FavoriteObjectType.Entry, Id);
 
         var result = await entryTask;
         if (result.Success && result.Data is not null)
@@ -296,11 +312,21 @@ else
                 ScoreOverview = null;
             }
 
+            // 加载周边概览
+            var peripheryResult = await peripheryTask;
+            PeripheryOverview = peripheryResult.Success ? peripheryResult.Data : null;
+
+            // 加载相关目录
+            var catalogResult = await catalogTask;
+            RelateFolders = catalogResult.Success ? catalogResult.Data : null;
+
             return;
         }
 
         Model = null;
         ScoreOverview = null;
+        PeripheryOverview = null;
+        RelateFolders = null;
         ErrorMessage = result.Error?.Message ?? "请稍后重试";
     }
 

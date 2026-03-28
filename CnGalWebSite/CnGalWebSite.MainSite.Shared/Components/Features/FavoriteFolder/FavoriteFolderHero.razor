@@ -1,0 +1,53 @@
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+
+<header class="cg-ff-hero cg-ff-hero--wide">
+    <div class="cg-ff-hero-side">
+        @if (!string.IsNullOrWhiteSpace(Model.MainPicture))
+        {
+            <img src="@Model.MainPicture" alt="@Model.Name" class="cg-ff-cover" loading="eager" decoding="async" />
+        }
+        else
+        {
+            <div class="cg-ff-cover cg-ff-cover--empty" aria-label="暂无封面">
+                <CgMdiIcon Name="mdiHeartMultiple" aria-hidden="true" />
+            </div>
+        }
+    </div>
+    <div class="cg-ff-hero-main">
+        <div class="cg-ff-hero-top">
+            <span class="cg-ff-type">收藏夹</span>
+        </div>
+        <h1>@Model.Name</h1>
+        @if (!string.IsNullOrWhiteSpace(Model.BriefIntroduction))
+        {
+            <p class="cg-ff-brief">@Model.BriefIntroduction</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.UserName))
+        {
+            <div class="cg-ff-hero-chips">
+                <a href="/space/index/@Model.UserId" class="cg-ff-chip">
+                    @if (!string.IsNullOrWhiteSpace(Model.UserPhotoPath))
+                    {
+                        <img src="@Model.UserPhotoPath" alt="@Model.UserName" class="cg-ff-chip-avatar" />
+                    }
+                    创建者：@Model.UserName
+                </a>
+            </div>
+        }
+        @if (Model.Authority)
+        {
+            <div class="cg-ff-hero-actions">
+                <a class="cg-ff-edit-btn" href="/favoritefolders/edit/@Model.Id">
+                    <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                    <span>编辑收藏夹</span>
+                </a>
+            </div>
+        }
+    </div>
+</header>
+
+@code {
+    [Parameter, EditorRequired]
+    public required FavoriteFolderDetailViewModel Model { get; set; }
+}

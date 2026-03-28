@@ -140,6 +140,7 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<IStoreInfoQueryService, StoreInfoQueryService>(services, apiBase, withAuth: false);
         RegisterSdkHttpClient<ICommentQueryService, CommentQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<ITableQueryService, TableQueryService>(services, apiBase, withAuth: false);
+        RegisterSdkHttpClient<IFavoriteFolderQueryService, FavoriteFolderQueryService>(services, apiBase, withAuth: true);
 
         // Command 服务
         RegisterSdkHttpClient<IEntryCommandService, EntryCommandService>(services, apiBase, withAuth: true);
@@ -151,6 +152,7 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<IPeripheryCommandService, PeripheryCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IPlayedGameCommandService, PlayedGameCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<ICommentCommandService, CommentCommandService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<IFavoriteFolderCommandService, FavoriteFolderCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IFileCommandService, FileCommandService>(services, imageApiBase, withAuth: false);
 
         return services;

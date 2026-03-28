@@ -1,25 +1,4 @@
-.periphery-gallery {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.periphery-gallery > h2 {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    color: var(--cg-color-text);
-}
-
-.periphery-gallery > h2 ::deep .cg-mdi-icon {
-    width: 2rem;
-    height: 2rem;
-    color: var(--cg-color-primary);
-}
-
+/* Gallery grid styles – card container provided by EntryCard */
 .periphery-gallery-group-title {
     margin: 0.5rem 0 0;
     font-size: var(--cg-font-size-sm);

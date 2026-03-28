@@ -91,11 +91,11 @@
 1. 先建立 `Design Tokens`（颜色、字号、圆角、间距、阴影、层级、动效时长）。
 2. 用 CSS Variables + 语义化类名构建自研基础组件。
 3. 按页面迁移：先替换通用组件，再替换业务页面。
-4. 每迁移一个页面，删除对应第三方依赖调用点，最后清理包引用与静态资源。
+.4 每迁移一个页面，删除对应第三方依赖调用点，最后清理包引用与静态资源。
 
 ### 4.3 当前基础组件清单（Design System）
 
-以下组件已实现（共 24 个），均位于 `Components/DesignSystem/` 目录：
+以下组件已实现（共 30 个），均位于 `Components/DesignSystem/` 目录：
 
 | 组件 | 说明 |
 |---|---|
@@ -124,6 +124,12 @@
 | `CgMarkdownEditor` | Markdown 编辑器（含 JS Interop，支持工具栏与图片直传） |
 | `CgTreeView` | 树视图组件（用于标签树等层级数据展示） |
 | `CgMdiIcon` | MDI 图标（配合 `CgMdiIconMap.g.cs` 自动生成映射） |
+| `CgCarousel` | 轮播图组件 |
+| `CgDataTable` | 数据表格组件（含 `CgDataTableColumn`、`CgDataTableRequest`、`CgDataTableResult` 辅助类） |
+| `CgRating` | 评分组件 |
+| `CgRenderFreeze` | 渲染冻结组件（防止子组件不必要的重渲染） |
+| `CgSlider` | 滑块组件 |
+| `CgTabs` | 标签页组件（支持 `underline`/`pill` 两种样式变体，含 `CgTabItem` 辅助类） |
 
 ---
 
@@ -134,11 +140,21 @@
 1. **SSR 友好查询接口（Queries）**
    - 面向页面提供只读 Query 服务（详情、列表、聚合数据）。
    - 返回可直接渲染的 ViewModel，减少页面二次拼装成本。
-   - 当前已实现：`HomeQueryService`、`EntryQueryService`、`SpaceQueryService`、`TagQueryService`、`ArticleQueryService`、`VideoQueryService`、`LotteryQueryService`。
+   - 当前已实现：`HomeQueryService`、`EntryQueryService`、`SpaceQueryService`、`TagQueryService`、`ArticleQueryService`、`VideoQueryService`、`LotteryQueryService`、`PeripheryQueryService`、`PlayedGameQueryService`、`FavoriteFolderQueryService`、`TableQueryService`、`CommentQueryService`。
 2. **交互动作接口（Commands）**
    - 编辑资料、提交审核、文件上传等操作型命令。
    - 统一错误对象与用户提示模型，避免组件层重复处理异常。
-   - 当前已实现：`EntryCommandService`、`FileCommandService`、`ArticleCommandService`、`VideoCommandService`、`TagCommandService`。
+   - 当前已实现：`EntryCommandService`、`FileCommandService`、`ArticleCommandService`、`VideoCommandService`、`TagCommandService`、`SpaceCommandService`、`LotteryCommandService`、`PeripheryCommandService`、`FavoriteFolderCommandService`、`CommentCommandService`。
+
+### 5.3 当前整页交互模式页面清单
+
+以下页面声明了 `@rendermode InteractiveServer`（整页交互），原因如下：
+
+| 页面 | 交互必要性说明 |
+|---|---|
+| `TableSummaryPage` | Tab 切换、分页排序搜索、JSON/CSV 数据导出需要即时状态管理 |
+| `SearchPage` | 搜索框输入、筛选面板联动、排序切换和搜索结果实时更新 |
+| `*EditPage` 系列 | 表单编辑、自动保存、侧边栏实时验证反馈等重交互场景 |
 
 ### 5.1 当前 SDK 目录结构
 

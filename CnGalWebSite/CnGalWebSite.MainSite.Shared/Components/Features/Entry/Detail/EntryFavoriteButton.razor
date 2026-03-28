@@ -1,0 +1,77 @@
+@rendermode InteractiveServer
+@using CnGalWebSite.DataModel.Model
+@inject IFavoriteFolderCommandService FavoriteFolderCommandService
+@inject ICgToastService ToastService
+
+<button class="entry-favorite-btn @(_isFavorited ? "entry-favorite-btn--active" : "")"
+        @onclick="ToggleFavoriteAsync"
+        disabled="@_isLoading"
+        title="@(_isFavorited ? "取消收藏" : "收藏")"
+        aria-label="@(_isFavorited ? "取消收藏" : "收藏")">
+    @if (_isLoading)
+    {
+        <CgMdiIcon Name="mdiLoading" Class="entry-favorite-btn-spin" />
+    }
+    else
+    {
+        <CgMdiIcon Name="@(_isFavorited ? "mdiHeart" : "mdiHeartOutline")" />
+    }
+    <span>@(_isFavorited ? "已收藏" : "收藏")</span>
+</button>
+
+@code {
+    [Parameter]
+    public long ObjectId { get; set; }
+
+    [Parameter]
+    public FavoriteObjectType ObjectType { get; set; } = FavoriteObjectType.Entry;
+
+    private bool _isFavorited;
+    private bool _isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var result = await FavoriteFolderCommandService.IsObjectFavoritedAsync(ObjectId, ObjectType);
+            _isFavorited = result.Success && result.Data;
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleFavoriteAsync()
+    {
+        if (_isLoading) return;
+        _isLoading = true;
+
+        if (_isFavorited)
+        {
+            var result = await FavoriteFolderCommandService.UnFavoriteObjectAsync(ObjectId, ObjectType);
+            if (result.Success)
+            {
+                _isFavorited = false;
+                ToastService.Show("已取消收藏", null, "success");
+            }
+            else
+            {
+                ToastService.Show(result.Error?.Message ?? "取消收藏失败", null, "error");
+            }
+        }
+        else
+        {
+            var result = await FavoriteFolderCommandService.AddFavoriteObjectAsync(ObjectId, ObjectType);
+            if (result.Success)
+            {
+                _isFavorited = true;
+                ToastService.Show("已收藏到默认收藏夹", null, "success");
+            }
+            else
+            {
+                ToastService.Show(result.Error?.Message ?? "收藏失败", null, "error");
+            }
+        }
+
+        _isLoading = false;
+    }
+}
