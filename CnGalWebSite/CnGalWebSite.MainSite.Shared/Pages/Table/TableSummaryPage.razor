@@ -1,4 +1,4 @@
-﻿@page "/tables"
+@page "/tables"
 @page "/webs/tables"
 
 @rendermode InteractiveServer
@@ -9,6 +9,7 @@
 @using CnGalWebSite.Core.Models
 @using System.Text.Json
 @using Microsoft.JSInterop
+@using CnGalWebSite.SDK.MainSite.Infrastructure
 
 @inject ITableQueryService TableService
 @inject IJSRuntime JS
@@ -555,7 +556,7 @@
 
         if (format == "json")
         {
-            var json = JsonSerializer.Serialize(items, new JsonSerializerOptions { WriteIndented = true });
+            var json = JsonSerializer.Serialize(items, SdkJsonSerializerOptions.Indented);
             return (json, count);
         }
         else // csv

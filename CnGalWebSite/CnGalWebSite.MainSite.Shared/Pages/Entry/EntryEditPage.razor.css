@@ -13,9 +13,9 @@
 }
 
 .entry-edit-alert--error {
-    background-color: #fee2e2;
+    background-color: var(--cg-color-editor-error-bg);
     color: var(--cg-color-error);
-    border: 1px solid #fca5a5;
+    border: 1px solid var(--cg-color-editor-error-border);
 }
 
 /* ── 两栏布局 ── */

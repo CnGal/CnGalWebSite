@@ -99,28 +99,28 @@
 }
 
 .search-result-card__type-badge--entry {
-    background: #e0f2fe;
-    color: #0369a1;
+    background: var(--cg-color-badge-entry);
+    color: var(--cg-color-badge-entry-text);
 }
 
 .search-result-card__type-badge--article {
-    background: #fce7f3;
-    color: #be185d;
+    background: var(--cg-color-badge-article);
+    color: var(--cg-color-badge-article-text);
 }
 
 .search-result-card__type-badge--tag {
-    background: #e0e7ff;
-    color: #4338ca;
+    background: var(--cg-color-badge-tag);
+    color: var(--cg-color-badge-tag-text);
 }
 
 .search-result-card__type-badge--video {
-    background: #fef3c7;
-    color: #b45309;
+    background: var(--cg-color-badge-video);
+    color: var(--cg-color-badge-video-text);
 }
 
 .search-result-card__type-badge--periphery {
-    background: #d1fae5;
-    color: #047857;
+    background: var(--cg-color-badge-periphery);
+    color: var(--cg-color-badge-periphery-text);
 }
 
 /* ── Brief ── */

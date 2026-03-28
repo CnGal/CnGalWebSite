@@ -55,7 +55,7 @@
     top: var(--cg-spacing-2);
     right: var(--cg-spacing-2);
     background: linear-gradient(135deg, var(--cg-color-secondary), var(--cg-color-secondary-hover));
-    color: #fff;
+    color: var(--cg-color-on-dark);
     font-size: var(--cg-font-size-xs);
     font-weight: var(--cg-font-weight-bold);
     padding: 0.2rem 0.6rem;

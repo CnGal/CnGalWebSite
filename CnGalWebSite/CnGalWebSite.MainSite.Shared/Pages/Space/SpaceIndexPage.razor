@@ -64,7 +64,7 @@ else if (_model != null)
                                     <SpaceMainPage Model="_model" />
                                 </div>
 
-                                <div style="margin-top: var(--cg-spacing-8);">
+                                <div class="cg-space-comment-wrapper">
                                     <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
                                         Type="CommentType.CommentUser"
                                         ObjectId="@_model.Id"
@@ -75,7 +75,11 @@ else if (_model != null)
                             case "records":
                                 @if (_model.IsCurrentUser)
                                 {
-                                    <SpaceGameRecordSection UserId="@_model.Id" SteamId="@_model.SteamId" />
+                                    <AuthorizeView>
+                                        <Authorized>
+                                            <SpaceGameRecordSection UserId="@_model.Id" SteamId="@_model.SteamId" />
+                                        </Authorized>
+                                    </AuthorizeView>
                                 }
                                 else if (_gameRecords is not null)
                                 {

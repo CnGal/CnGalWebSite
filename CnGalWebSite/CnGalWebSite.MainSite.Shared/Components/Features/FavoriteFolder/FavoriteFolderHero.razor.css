@@ -99,7 +99,7 @@
 
 .cg-ff-status--private {
     background: color-mix(in oklab, var(--cg-color-warning) 10%, transparent);
-    color: #92400e;
+    color: var(--cg-color-editor-warning-text);
 }
 
 .cg-ff-brief {

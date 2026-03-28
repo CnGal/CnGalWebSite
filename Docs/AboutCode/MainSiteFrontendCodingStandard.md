@@ -147,6 +147,11 @@
   - **过渡**：`--cg-transition-fast` / `normal`。
   - **字体**：`--cg-font-family`（Plus Jakarta Sans）。
   - **组件 Token**：`--cg-header-height`。
+  - **编辑器状态色**：`--cg-color-editor-warning-text`、`--cg-color-editor-error-text`、`--cg-color-editor-error-bg`、`--cg-color-editor-error-border`。
+  - **覆盖层/暗底文字**：`--cg-color-overlay`、`--cg-color-on-dark`、`--cg-color-on-dark-secondary`、`--cg-color-on-dark-muted`。
+  - **徽章/星标色**：`--cg-color-amber`、`--cg-color-emerald`、`--cg-color-emerald-subtle`。
+  - **品牌色**：`--cg-color-brand-bilibili`、`--cg-color-brand-zhihu`、`--cg-color-brand-weibo`、`--cg-color-brand-purple`、`--cg-color-brand-teal`。
+  - **分类标签色**：`--cg-color-badge-entry`/`-text`、`--cg-color-badge-article`/`-text`、`--cg-color-badge-tag`/`-text`、`--cg-color-badge-video`/`-text`、`--cg-color-badge-periphery`/`-text`。
 - 组件样式与页面样式禁止硬编码重复色值；优先消费 `--cg-*` 变量。
 
 ### 5.2 样式隔离（MUST）

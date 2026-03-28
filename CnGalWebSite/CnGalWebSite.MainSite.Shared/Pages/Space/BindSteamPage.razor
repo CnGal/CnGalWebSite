@@ -1,7 +1,6 @@
 @page "/bind-steam/{ReturnUrl}"
 
 @using CnGalWebSite.DataModel.ViewModel.Space
-@using CnGalWebSite.SDK.MainSite.Infrastructure
 
 @inject ISpaceCommandService SpaceCommandService
 @inject NavigationManager NavigationManager
@@ -10,16 +9,16 @@
 
 @if (!string.IsNullOrEmpty(_statusMessage))
 {
-    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 50vh; gap: 1rem;">
+    <div class="bind-steam-container">
         <CgAlert Variant="@_statusVariant">@_statusMessage</CgAlert>
         <CgButton Variant="outline" Href="@_returnHref">返回</CgButton>
     </div>
 }
 else
 {
-    <div style="display: flex; justify-content: center; align-items: center; height: 50vh;">
+    <div class="bind-steam-loading">
         <CgProgressRing />
-        <span style="margin-left: 1rem;">正在处理 Steam 绑定...</span>
+        <span class="bind-steam-loading__text">正在处理 Steam 绑定...</span>
     </div>
 }
 
@@ -38,7 +37,7 @@ else
         {
             try
             {
-                _returnHref = SdkToolHelper.Base64DecodeUrl(ReturnUrl);
+                _returnHref = CnGalWebSite.SDK.MainSite.Infrastructure.SdkToolHelper.Base64DecodeUrl(ReturnUrl);
             }
             catch
             {

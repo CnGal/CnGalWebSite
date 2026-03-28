@@ -68,6 +68,42 @@
     --cg-color-focus-ring: color-mix(in oklab, var(--cg-color-primary) 20%, transparent);
     --cg-color-hover-overlay: rgba(0, 0, 0, 0.04);
     --cg-header-height: 64.67px;
+
+    /* ── 编辑器状态色 ── */
+    --cg-color-editor-warning-text: #92400e;
+    --cg-color-editor-error-text: #991b1b;
+    --cg-color-editor-error-bg: #fee2e2;
+    --cg-color-editor-error-border: #fca5a5;
+
+    /* ── 覆盖层/背景 ── */
+    --cg-color-overlay: rgba(0, 0, 0, 0.5);
+    --cg-color-on-dark: #ffffff;
+    --cg-color-on-dark-secondary: rgba(255, 255, 255, 0.85);
+    --cg-color-on-dark-muted: rgba(255, 255, 255, 0.7);
+
+    /* ── 星标/徽章色 ── */
+    --cg-color-amber: #f59e0b;
+    --cg-color-emerald: #10b981;
+    --cg-color-emerald-subtle: rgba(16, 185, 129, 0.1);
+
+    /* ── 品牌色（第三方平台） ── */
+    --cg-color-brand-bilibili: #ff6699;
+    --cg-color-brand-zhihu: #1f1f1f;
+    --cg-color-brand-weibo: #e6162d;
+    --cg-color-brand-purple: #8b5cf6;
+    --cg-color-brand-teal: #14b8a6;
+
+    /* ── 分类标签色 ── */
+    --cg-color-badge-entry: #e0f2fe;
+    --cg-color-badge-entry-text: #0369a1;
+    --cg-color-badge-article: #fce7f3;
+    --cg-color-badge-article-text: #be185d;
+    --cg-color-badge-tag: #e0e7ff;
+    --cg-color-badge-tag-text: #4338ca;
+    --cg-color-badge-video: #fef3c7;
+    --cg-color-badge-video-text: #b45309;
+    --cg-color-badge-periphery: #d1fae5;
+    --cg-color-badge-periphery-text: #065f46;
 }
 
 /* ── 全局重置 ── */

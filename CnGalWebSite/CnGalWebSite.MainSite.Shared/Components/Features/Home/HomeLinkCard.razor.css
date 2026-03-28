@@ -103,52 +103,52 @@
 }
 
 .home-card-community-icon.is-purple {
-    background: color-mix(in oklab, #8b5cf6 15%, white);
-    color: #8b5cf6;
+    background: color-mix(in oklab, var(--cg-color-brand-purple) 15%, white);
+    color: var(--cg-color-brand-purple);
 }
 
 .home-card-community-icon.is-pink {
-    background: color-mix(in oklab, #ff6699 15%, white);
-    color: #ff6699;
+    background: color-mix(in oklab, var(--cg-color-brand-bilibili) 15%, white);
+    color: var(--cg-color-brand-bilibili);
 }
 
 .home-card-community-icon.is-red {
-    background: color-mix(in oklab, #e6162d 15%, white);
-    color: #e6162d;
+    background: color-mix(in oklab, var(--cg-color-brand-weibo) 15%, white);
+    color: var(--cg-color-brand-weibo);
 }
 
 .home-card-community-icon.is-dark {
-    background: color-mix(in oklab, #1f1f1f 15%, white);
-    color: #1f1f1f;
+    background: color-mix(in oklab, var(--cg-color-brand-zhihu) 15%, white);
+    color: var(--cg-color-brand-zhihu);
 }
 
 /* hover 时图标变为实心色 */
 .home-card--community a:hover .home-card-community-icon.is-primary {
     background: var(--cg-color-primary);
-    color: #fff;
+    color: var(--cg-color-on-dark);
 }
 
 .home-card--community a:hover .home-card-community-icon.is-secondary {
     background: var(--cg-color-secondary);
-    color: #fff;
+    color: var(--cg-color-on-dark);
 }
 
 .home-card--community a:hover .home-card-community-icon.is-purple {
-    background: #8b5cf6;
-    color: #fff;
+    background: var(--cg-color-brand-purple);
+    color: var(--cg-color-on-dark);
 }
 
 .home-card--community a:hover .home-card-community-icon.is-pink {
-    background: #ff6699;
-    color: #fff;
+    background: var(--cg-color-brand-bilibili);
+    color: var(--cg-color-on-dark);
 }
 
 .home-card--community a:hover .home-card-community-icon.is-red {
-    background: #e6162d;
-    color: #fff;
+    background: var(--cg-color-brand-weibo);
+    color: var(--cg-color-on-dark);
 }
 
 .home-card--community a:hover .home-card-community-icon.is-dark {
-    background: #1f1f1f;
-    color: #fff;
+    background: var(--cg-color-brand-zhihu);
+    color: var(--cg-color-on-dark);
 }
