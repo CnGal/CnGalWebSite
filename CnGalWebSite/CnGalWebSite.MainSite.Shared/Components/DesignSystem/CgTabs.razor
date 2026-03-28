@@ -1,0 +1,120 @@
+@* CgTabs — 通用 Tab 切换组件，纯 CSS/SSR 友好 *@
+@* 两种视觉 Variant：pill（药丸填充）/ underline（底部下划线） *@
+@* 通过 radio + label + :checked 实现，无需 JS 交互 *@
+
+<div class="cg-tabs cg-tabs--@Variant" id="@_resolvedId">
+    @* ── Hidden radio inputs (驱动 CSS 状态) ── *@
+    @for (var i = 0; i < Items.Count; i++)
+    {
+        var item = Items[i];
+        var isDefault = item.Key == _activeKey;
+        <input type="radio"
+               name="@_resolvedId"
+               id="@GetRadioId(item.Key)"
+               class="cg-tabs__radio"
+               checked="@isDefault"
+               @onchange="() => OnRadioChanged(item.Key)"
+               aria-hidden="true" />
+    }
+
+    @* ── Tab 栏 ── *@
+    <nav class="cg-tabs__bar" role="tablist" aria-label="@AriaLabel">
+        @for (var i = 0; i < Items.Count; i++)
+        {
+            var item = Items[i];
+            <label for="@GetRadioId(item.Key)"
+                   class="cg-tabs__tab"
+                   role="tab">
+                @if (!string.IsNullOrEmpty(item.Icon))
+                {
+                    <CgMdiIcon Name="@item.Icon" aria-hidden="true" />
+                }
+                <span>@item.Label</span>
+                @if (!string.IsNullOrEmpty(item.Badge))
+                {
+                    <span class="cg-tabs__badge">@item.Badge</span>
+                }
+            </label>
+        }
+    </nav>
+
+    @* ── 面板区 ── *@
+    @if (PanelTemplate != null)
+    {
+        @for (var i = 0; i < Items.Count; i++)
+        {
+            var item = Items[i];
+            <section class="cg-tabs__panel"
+                     role="tabpanel"
+                     id="@($"{_resolvedId}-panel-{item.Key}")"
+                     aria-labelledby="@GetRadioId(item.Key)">
+                @PanelTemplate(item.Key)
+            </section>
+        }
+    }
+</div>
+
+@code {
+    /// <summary>
+    /// 视觉变体："pill"（药丸填充）或 "underline"（底部下划线）。
+    /// </summary>
+    [Parameter]
+    public string Variant { get; set; } = "pill";
+
+    /// <summary>
+    /// Tab 项列表。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<CgTabItem> Items { get; set; } = [];
+
+    /// <summary>
+    /// 默认激活 Tab 的 Key。未指定时取第一项。
+    /// </summary>
+    [Parameter]
+    public string? DefaultActiveKey { get; set; }
+
+    /// <summary>
+    /// 无障碍标签，用于 tablist 的 aria-label。
+    /// </summary>
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    /// <summary>
+    /// 组件唯一标识，用于 radio name/id。未指定时自动生成。
+    /// </summary>
+    [Parameter]
+    public string? Id { get; set; }
+
+    /// <summary>
+    /// 面板内容模板。context 参数为当前 Tab 的 Key。
+    /// 所有面板均会渲染到 DOM，CSS 控制可见性。
+    /// </summary>
+    [Parameter]
+    public RenderFragment<string>? PanelTemplate { get; set; }
+
+    /// <summary>
+    /// Tab 切换时回调（仅在交互渲染模式下触发，SSR 静态页不会触发）。
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> ActiveKeyChanged { get; set; }
+
+    private string _resolvedId = string.Empty;
+    private string _activeKey = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        _resolvedId = Id ?? $"cg-tabs-{Guid.NewGuid():N}";
+        _activeKey = DefaultActiveKey ?? (Items.Count > 0 ? Items[0].Key : string.Empty);
+    }
+
+    private async Task OnRadioChanged(string key)
+    {
+        _activeKey = key;
+        if (ActiveKeyChanged.HasDelegate)
+        {
+            await ActiveKeyChanged.InvokeAsync(key);
+        }
+    }
+
+    private string GetRadioId(string key) => $"{_resolvedId}-{key}";
+}

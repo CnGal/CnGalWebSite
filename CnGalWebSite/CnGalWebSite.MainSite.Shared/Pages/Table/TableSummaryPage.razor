@@ -75,23 +75,6 @@
     }
 </section>
 
-@* ── Tab 切换栏 ── *@
-<nav class="table-summary__tabs" role="tablist" aria-label="数据类别">
-    @foreach (var tab in _tabs)
-    {
-        var isActive = _activeTab == tab.Key;
-        <button class="table-summary__tab @(isActive ? "table-summary__tab--active" : "")"
-                role="tab"
-                aria-selected="@isActive"
-                id="tab-@tab.Key"
-                aria-controls="panel-@tab.Key"
-                @onclick="() => OnTabChanged(tab.Key)">
-            <CgMdiIcon Name="@tab.Icon" class="table-summary__tab-icon" aria-hidden="true" />
-            <span>@tab.Label</span>
-        </button>
-    }
-</nav>
-
 @* ── 导出工具栏 ── *@
 <div class="table-summary__toolbar">
     <div class="table-summary__toolbar-label">
@@ -110,267 +93,269 @@
     </div>
 </div>
 
-@* ── Tab 内容面板 ── *@
-<div class="table-summary__panel" role="tabpanel" id="panel-@_activeTab" aria-labelledby="tab-@_activeTab">
+@* ── Tab 切换栏 + 内容面板 ── *@
+<CgTabs Variant="pill" Items="_tabs" DefaultActiveKey="games" Id="table-tabs" AriaLabel="数据类别" ActiveKeyChanged="key => _activeTab = key">
+    <PanelTemplate Context="tabKey">
 
-    @switch (_activeTab)
-    {
-        case "games":
-            <CgDataTable TItem="BasicInforTableModel"
-                         Title="游戏列表"
-                         OnServerQuery="QueryGamesAsync"
-                         DefaultSortField="RealId"
-                         DefaultSortDesc="true"
-                         DefaultPageSize="10">
-                <CgDataTableColumn TItem="BasicInforTableModel" Title="Id" Field="RealId" Width="80px">
-                    <a href="/entries/index/@context.RealId" class="table-summary__link">@context.RealId</a>
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="BasicInforTableModel" Title="名称" Field="Name">
-                    <a href="/entries/index/@context.RealId" class="table-summary__link">@context.Name</a>
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="BasicInforTableModel" Title="发行时间" Field="IssueTime">
-                    @(context.IssueTime?.ToString("yyyy-MM-dd") ?? "—")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="BasicInforTableModel" Title="原作" Field="Original" />
-                <CgDataTableColumn TItem="BasicInforTableModel" Title="制作组" Field="ProductionGroup" />
-                <CgDataTableColumn TItem="BasicInforTableModel" Title="游戏平台" Field="GamePlatforms" Sortable="false" />
-                <CgDataTableColumn TItem="BasicInforTableModel" Title="引擎" Field="Engine" />
-                <CgDataTableColumn TItem="BasicInforTableModel" Title="发行商" Field="Publisher" />
-                <CgDataTableColumn TItem="BasicInforTableModel" Title="别称" Field="GameNickname" Sortable="false" />
-                <CgDataTableColumn TItem="BasicInforTableModel" Title="标签" Field="Tags" Sortable="false" />
-                <CgDataTableColumn TItem="BasicInforTableModel" Title="发行方式" Field="IssueMethod" />
-                <CgDataTableColumn TItem="BasicInforTableModel" Title="官网" Field="OfficialWebsite" Sortable="false">
-                    @if (!string.IsNullOrWhiteSpace(context.OfficialWebsite))
-                    {
-                        <a href="@context.OfficialWebsite" target="_blank" rel="noopener" class="table-summary__link">链接</a>
-                    }
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="BasicInforTableModel" Title="SteamId" Field="SteamId" />
-                <CgDataTableColumn TItem="BasicInforTableModel" Title="QQ群" Field="QQgroupGame" Sortable="false" />
-            </CgDataTable>
-            break;
+        @switch (tabKey)
+        {
+            case "games":
+                <CgDataTable TItem="BasicInforTableModel"
+                             Title="游戏列表"
+                             OnServerQuery="QueryGamesAsync"
+                             DefaultSortField="RealId"
+                             DefaultSortDesc="true"
+                             DefaultPageSize="10">
+                    <CgDataTableColumn TItem="BasicInforTableModel" Title="Id" Field="RealId" Width="80px">
+                        <a href="/entries/index/@context.RealId" class="table-summary__link">@context.RealId</a>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="BasicInforTableModel" Title="名称" Field="Name">
+                        <a href="/entries/index/@context.RealId" class="table-summary__link">@context.Name</a>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="BasicInforTableModel" Title="发行时间" Field="IssueTime">
+                        @(context.IssueTime?.ToString("yyyy-MM-dd") ?? "—")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="BasicInforTableModel" Title="原作" Field="Original" />
+                    <CgDataTableColumn TItem="BasicInforTableModel" Title="制作组" Field="ProductionGroup" />
+                    <CgDataTableColumn TItem="BasicInforTableModel" Title="游戏平台" Field="GamePlatforms" Sortable="false" />
+                    <CgDataTableColumn TItem="BasicInforTableModel" Title="引擎" Field="Engine" />
+                    <CgDataTableColumn TItem="BasicInforTableModel" Title="发行商" Field="Publisher" />
+                    <CgDataTableColumn TItem="BasicInforTableModel" Title="别称" Field="GameNickname" Sortable="false" />
+                    <CgDataTableColumn TItem="BasicInforTableModel" Title="标签" Field="Tags" Sortable="false" />
+                    <CgDataTableColumn TItem="BasicInforTableModel" Title="发行方式" Field="IssueMethod" />
+                    <CgDataTableColumn TItem="BasicInforTableModel" Title="官网" Field="OfficialWebsite" Sortable="false">
+                        @if (!string.IsNullOrWhiteSpace(context.OfficialWebsite))
+                        {
+                            <a href="@context.OfficialWebsite" target="_blank" rel="noopener" class="table-summary__link">链接</a>
+                        }
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="BasicInforTableModel" Title="SteamId" Field="SteamId" />
+                    <CgDataTableColumn TItem="BasicInforTableModel" Title="QQ群" Field="QQgroupGame" Sortable="false" />
+                </CgDataTable>
+                break;
 
-        case "groups":
-            <CgDataTable TItem="GroupInforTableModel"
-                         Title="制作组列表"
-                         OnServerQuery="QueryGroupsAsync"
-                         DefaultSortField="RealId"
-                         DefaultSortDesc="true"
-                         DefaultPageSize="10">
-                <CgDataTableColumn TItem="GroupInforTableModel" Title="Id" Field="RealId" Width="80px">
-                    <a href="/entries/index/@context.RealId" class="table-summary__link">@context.RealId</a>
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GroupInforTableModel" Title="名称" Field="Name">
-                    <a href="/entries/index/@context.RealId" class="table-summary__link">@context.Name</a>
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GroupInforTableModel" Title="QQ群" Field="QQgroupGroup" Sortable="false" />
-                <CgDataTableColumn TItem="GroupInforTableModel" Title="别称" Field="AnotherNameGroup" Sortable="false" />
-                <CgDataTableColumn TItem="GroupInforTableModel" Title="B站" Field="Bilibili" Sortable="false">
-                    @if (!string.IsNullOrWhiteSpace(context.Bilibili))
-                    {
-                        <a href="@context.Bilibili" target="_blank" rel="noopener" class="table-summary__link">链接</a>
-                    }
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GroupInforTableModel" Title="微博" Field="MicroBlog" Sortable="false">
-                    @if (!string.IsNullOrWhiteSpace(context.MicroBlog))
-                    {
-                        <a href="@context.MicroBlog" target="_blank" rel="noopener" class="table-summary__link">链接</a>
-                    }
-                </CgDataTableColumn>
-            </CgDataTable>
-            break;
+            case "groups":
+                <CgDataTable TItem="GroupInforTableModel"
+                             Title="制作组列表"
+                             OnServerQuery="QueryGroupsAsync"
+                             DefaultSortField="RealId"
+                             DefaultSortDesc="true"
+                             DefaultPageSize="10">
+                    <CgDataTableColumn TItem="GroupInforTableModel" Title="Id" Field="RealId" Width="80px">
+                        <a href="/entries/index/@context.RealId" class="table-summary__link">@context.RealId</a>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GroupInforTableModel" Title="名称" Field="Name">
+                        <a href="/entries/index/@context.RealId" class="table-summary__link">@context.Name</a>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GroupInforTableModel" Title="QQ群" Field="QQgroupGroup" Sortable="false" />
+                    <CgDataTableColumn TItem="GroupInforTableModel" Title="别称" Field="AnotherNameGroup" Sortable="false" />
+                    <CgDataTableColumn TItem="GroupInforTableModel" Title="B站" Field="Bilibili" Sortable="false">
+                        @if (!string.IsNullOrWhiteSpace(context.Bilibili))
+                        {
+                            <a href="@context.Bilibili" target="_blank" rel="noopener" class="table-summary__link">链接</a>
+                        }
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GroupInforTableModel" Title="微博" Field="MicroBlog" Sortable="false">
+                        @if (!string.IsNullOrWhiteSpace(context.MicroBlog))
+                        {
+                            <a href="@context.MicroBlog" target="_blank" rel="noopener" class="table-summary__link">链接</a>
+                        }
+                    </CgDataTableColumn>
+                </CgDataTable>
+                break;
 
-        case "staffs":
-            <CgDataTable TItem="StaffInforTableModel"
-                         Title="STAFF列表"
-                         OnServerQuery="QueryStaffsAsync"
-                         DefaultSortField="RealId"
-                         DefaultSortDesc="true"
-                         DefaultPageSize="10">
-                <CgDataTableColumn TItem="StaffInforTableModel" Title="Id" Field="RealId" Width="80px" />
-                <CgDataTableColumn TItem="StaffInforTableModel" Title="游戏名称" Field="GameName" />
-                <CgDataTableColumn TItem="StaffInforTableModel" Title="分组" Field="Subcategory" />
-                <CgDataTableColumn TItem="StaffInforTableModel" Title="官方职位" Field="PositionOfficial" />
-                <CgDataTableColumn TItem="StaffInforTableModel" Title="官方称呼" Field="NicknameOfficial" />
-                <CgDataTableColumn TItem="StaffInforTableModel" Title="通用职位" Field="PositionGeneral" />
-                <CgDataTableColumn TItem="StaffInforTableModel" Title="隶属组织" Field="SubordinateOrganization" />
-            </CgDataTable>
-            break;
+            case "staffs":
+                <CgDataTable TItem="StaffInforTableModel"
+                             Title="STAFF列表"
+                             OnServerQuery="QueryStaffsAsync"
+                             DefaultSortField="RealId"
+                             DefaultSortDesc="true"
+                             DefaultPageSize="10">
+                    <CgDataTableColumn TItem="StaffInforTableModel" Title="Id" Field="RealId" Width="80px" />
+                    <CgDataTableColumn TItem="StaffInforTableModel" Title="游戏名称" Field="GameName" />
+                    <CgDataTableColumn TItem="StaffInforTableModel" Title="分组" Field="Subcategory" />
+                    <CgDataTableColumn TItem="StaffInforTableModel" Title="官方职位" Field="PositionOfficial" />
+                    <CgDataTableColumn TItem="StaffInforTableModel" Title="官方称呼" Field="NicknameOfficial" />
+                    <CgDataTableColumn TItem="StaffInforTableModel" Title="通用职位" Field="PositionGeneral" />
+                    <CgDataTableColumn TItem="StaffInforTableModel" Title="隶属组织" Field="SubordinateOrganization" />
+                </CgDataTable>
+                break;
 
-        case "makers":
-            <CgDataTable TItem="MakerInforTableModel"
-                         Title="制作人列表"
-                         OnServerQuery="QueryMakersAsync"
-                         DefaultSortField="RealId"
-                         DefaultSortDesc="true"
-                         DefaultPageSize="10">
-                <CgDataTableColumn TItem="MakerInforTableModel" Title="Id" Field="RealId" Width="80px">
-                    <a href="/entries/index/@context.RealId" class="table-summary__link">@context.RealId</a>
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="MakerInforTableModel" Title="名称" Field="Name">
-                    <a href="/entries/index/@context.RealId" class="table-summary__link">@context.Name</a>
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="MakerInforTableModel" Title="别称" Field="AnotherName" Sortable="false" />
-                <CgDataTableColumn TItem="MakerInforTableModel" Title="B站" Field="Bilibili" Sortable="false">
-                    @if (!string.IsNullOrWhiteSpace(context.Bilibili))
-                    {
-                        <a href="@context.Bilibili" target="_blank" rel="noopener" class="table-summary__link">链接</a>
-                    }
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="MakerInforTableModel" Title="微博" Field="MicroBlog" Sortable="false">
-                    @if (!string.IsNullOrWhiteSpace(context.MicroBlog))
-                    {
-                        <a href="@context.MicroBlog" target="_blank" rel="noopener" class="table-summary__link">链接</a>
-                    }
-                </CgDataTableColumn>
-            </CgDataTable>
-            break;
+            case "makers":
+                <CgDataTable TItem="MakerInforTableModel"
+                             Title="制作人列表"
+                             OnServerQuery="QueryMakersAsync"
+                             DefaultSortField="RealId"
+                             DefaultSortDesc="true"
+                             DefaultPageSize="10">
+                    <CgDataTableColumn TItem="MakerInforTableModel" Title="Id" Field="RealId" Width="80px">
+                        <a href="/entries/index/@context.RealId" class="table-summary__link">@context.RealId</a>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="MakerInforTableModel" Title="名称" Field="Name">
+                        <a href="/entries/index/@context.RealId" class="table-summary__link">@context.Name</a>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="MakerInforTableModel" Title="别称" Field="AnotherName" Sortable="false" />
+                    <CgDataTableColumn TItem="MakerInforTableModel" Title="B站" Field="Bilibili" Sortable="false">
+                        @if (!string.IsNullOrWhiteSpace(context.Bilibili))
+                        {
+                            <a href="@context.Bilibili" target="_blank" rel="noopener" class="table-summary__link">链接</a>
+                        }
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="MakerInforTableModel" Title="微博" Field="MicroBlog" Sortable="false">
+                        @if (!string.IsNullOrWhiteSpace(context.MicroBlog))
+                        {
+                            <a href="@context.MicroBlog" target="_blank" rel="noopener" class="table-summary__link">链接</a>
+                        }
+                    </CgDataTableColumn>
+                </CgDataTable>
+                break;
 
-        case "roles":
-            <CgDataTable TItem="RoleInforTableModel"
-                         Title="角色列表"
-                         OnServerQuery="QueryRolesAsync"
-                         DefaultSortField="RealId"
-                         DefaultSortDesc="true"
-                         DefaultPageSize="10">
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="Id" Field="RealId" Width="80px">
-                    <a href="/entries/index/@context.RealId" class="table-summary__link">@context.RealId</a>
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="名称" Field="Name">
-                    <a href="/entries/index/@context.RealId" class="table-summary__link">@context.Name</a>
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="声优" Field="CV" />
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="别称" Field="AnotherNameRole" Sortable="false" />
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="性别" Field="Gender" >
-                    @context.Gender.GetDisplayName()
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="身材数据" Field="FigureData" Sortable="false" />
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="身材(主观)" Field="FigureSubjective" Sortable="false" />
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="生日" Field="Birthday">
-                    @(context.Birthday?.ToString("MM-dd") ?? "—")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="发色" Field="Haircolor" Sortable="false" />
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="瞳色" Field="Pupilcolor" Sortable="false" />
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="服饰" Field="ClothesAccessories" Sortable="false" />
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="性格" Field="Character" Sortable="false" />
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="角色身份" Field="RoleIdentity" Sortable="false" />
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="血型" Field="BloodType" Sortable="false" />
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="身高" Field="RoleHeight" Sortable="false" />
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="兴趣" Field="RoleTaste" Sortable="false" />
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="年龄" Field="RoleAge" Sortable="false" />
-                <CgDataTableColumn TItem="RoleInforTableModel" Title="登场游戏" Field="GameName" />
-            </CgDataTable>
-            break;
+            case "roles":
+                <CgDataTable TItem="RoleInforTableModel"
+                             Title="角色列表"
+                             OnServerQuery="QueryRolesAsync"
+                             DefaultSortField="RealId"
+                             DefaultSortDesc="true"
+                             DefaultPageSize="10">
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="Id" Field="RealId" Width="80px">
+                        <a href="/entries/index/@context.RealId" class="table-summary__link">@context.RealId</a>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="名称" Field="Name">
+                        <a href="/entries/index/@context.RealId" class="table-summary__link">@context.Name</a>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="声优" Field="CV" />
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="别称" Field="AnotherNameRole" Sortable="false" />
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="性别" Field="Gender">
+                        @context.Gender.GetDisplayName()
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="身材数据" Field="FigureData" Sortable="false" />
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="身材(主观)" Field="FigureSubjective" Sortable="false" />
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="生日" Field="Birthday">
+                        @(context.Birthday?.ToString("MM-dd") ?? "—")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="发色" Field="Haircolor" Sortable="false" />
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="瞳色" Field="Pupilcolor" Sortable="false" />
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="服饰" Field="ClothesAccessories" Sortable="false" />
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="性格" Field="Character" Sortable="false" />
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="角色身份" Field="RoleIdentity" Sortable="false" />
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="血型" Field="BloodType" Sortable="false" />
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="身高" Field="RoleHeight" Sortable="false" />
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="兴趣" Field="RoleTaste" Sortable="false" />
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="年龄" Field="RoleAge" Sortable="false" />
+                    <CgDataTableColumn TItem="RoleInforTableModel" Title="登场游戏" Field="GameName" />
+                </CgDataTable>
+                break;
 
-        case "prices":
-            <CgDataTable TItem="StoreInfoViewModel"
-                         Title="游戏价格列表"
-                         OnServerQuery="QueryStoreInfoAsync"
-                         DefaultSortField="Name"
-                         DefaultSortDesc="false"
-                         DefaultPageSize="10">
-                <CgDataTableColumn TItem="StoreInfoViewModel" Title="名称" Field="Name" />
-                <CgDataTableColumn TItem="StoreInfoViewModel" Title="平台" Field="PlatformName" />
-                <CgDataTableColumn TItem="StoreInfoViewModel" Title="状态" Field="State" />
-                <CgDataTableColumn TItem="StoreInfoViewModel" Title="币种" Field="CurrencyCode" />
-                <CgDataTableColumn TItem="StoreInfoViewModel" Title="原价" Field="OriginalPrice">
-                    @FormatPrice(context.OriginalPrice)
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="StoreInfoViewModel" Title="现价" Field="PriceNow">
-                    @FormatPrice(context.PriceNow)
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="StoreInfoViewModel" Title="折扣" Field="CutNow">
-                    @FormatPercent(context.CutNow)
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="StoreInfoViewModel" Title="史低" Field="PriceLowest">
-                    @FormatPrice(context.PriceLowest)
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="StoreInfoViewModel" Title="最高折扣" Field="CutLowest">
-                    @FormatPercent(context.CutLowest)
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="StoreInfoViewModel" Title="游玩时长" Field="PlayTime">
-                    @(context.PlayTime.HasValue ? $"{context.PlayTime.Value} 分钟" : "—")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="StoreInfoViewModel" Title="评测数" Field="EvaluationCount">
-                    @(context.EvaluationCount?.ToString("N0") ?? "—")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="StoreInfoViewModel" Title="好评率" Field="RecommendationRate">
-                    @FormatPercent(context.RecommendationRate)
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="StoreInfoViewModel" Title="拥有人数(下限)" Field="EstimationOwnersMin">
-                    @(context.EstimationOwnersMin?.ToString("N0") ?? "—")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="StoreInfoViewModel" Title="拥有人数(上限)" Field="EstimationOwnersMax">
-                    @(context.EstimationOwnersMax?.ToString("N0") ?? "—")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="StoreInfoViewModel" Title="链接" Field="Link" Sortable="false">
-                    @if (!string.IsNullOrWhiteSpace(context.Link))
-                    {
-                        <a href="@context.Link" target="_blank" rel="noopener" class="table-summary__link">查看</a>
-                    }
-                </CgDataTableColumn>
-            </CgDataTable>
-            break;
+            case "prices":
+                <CgDataTable TItem="StoreInfoViewModel"
+                             Title="游戏价格列表"
+                             OnServerQuery="QueryStoreInfoAsync"
+                             DefaultSortField="Name"
+                             DefaultSortDesc="false"
+                             DefaultPageSize="10">
+                    <CgDataTableColumn TItem="StoreInfoViewModel" Title="名称" Field="Name" />
+                    <CgDataTableColumn TItem="StoreInfoViewModel" Title="平台" Field="PlatformName" />
+                    <CgDataTableColumn TItem="StoreInfoViewModel" Title="状态" Field="State" />
+                    <CgDataTableColumn TItem="StoreInfoViewModel" Title="币种" Field="CurrencyCode" />
+                    <CgDataTableColumn TItem="StoreInfoViewModel" Title="原价" Field="OriginalPrice">
+                        @FormatPrice(context.OriginalPrice)
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="StoreInfoViewModel" Title="现价" Field="PriceNow">
+                        @FormatPrice(context.PriceNow)
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="StoreInfoViewModel" Title="折扣" Field="CutNow">
+                        @FormatPercent(context.CutNow)
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="StoreInfoViewModel" Title="史低" Field="PriceLowest">
+                        @FormatPrice(context.PriceLowest)
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="StoreInfoViewModel" Title="最高折扣" Field="CutLowest">
+                        @FormatPercent(context.CutLowest)
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="StoreInfoViewModel" Title="游玩时长" Field="PlayTime">
+                        @(context.PlayTime.HasValue ? $"{context.PlayTime.Value} 分钟" : "—")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="StoreInfoViewModel" Title="评测数" Field="EvaluationCount">
+                        @(context.EvaluationCount?.ToString("N0") ?? "—")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="StoreInfoViewModel" Title="好评率" Field="RecommendationRate">
+                        @FormatPercent(context.RecommendationRate)
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="StoreInfoViewModel" Title="拥有人数(下限)" Field="EstimationOwnersMin">
+                        @(context.EstimationOwnersMin?.ToString("N0") ?? "—")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="StoreInfoViewModel" Title="拥有人数(上限)" Field="EstimationOwnersMax">
+                        @(context.EstimationOwnersMax?.ToString("N0") ?? "—")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="StoreInfoViewModel" Title="链接" Field="Link" Sortable="false">
+                        @if (!string.IsNullOrWhiteSpace(context.Link))
+                        {
+                            <a href="@context.Link" target="_blank" rel="noopener" class="table-summary__link">查看</a>
+                        }
+                    </CgDataTableColumn>
+                </CgDataTable>
+                break;
 
-        case "scores":
-            <CgDataTable TItem="GameScoreTableModel"
-                         Title="评分列表"
-                         OnServerQuery="QueryGameScoresAsync"
-                         DefaultSortField="AllTotalSocre"
-                         DefaultSortDesc="true"
-                         DefaultPageSize="10">
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="Id" Field="GameId" Width="80px">
-                    <a href="/entries/index/@context.GameId" class="table-summary__link">@context.GameId</a>
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="游戏名" Field="GameName">
-                    <a href="/entries/index/@context.GameId" class="table-summary__link">@context.GameName</a>
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="配音" Field="AllCVSocre">
-                    @context.AllCVSocre.ToString("F1")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="程序" Field="AllSystemSocre">
-                    @context.AllSystemSocre.ToString("F1")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="演出" Field="AllShowSocre">
-                    @context.AllShowSocre.ToString("F1")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="美术" Field="AllPaintSocre">
-                    @context.AllPaintSocre.ToString("F1")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="剧本" Field="AllScriptSocre">
-                    @context.AllScriptSocre.ToString("F1")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="音乐" Field="AllMusicSocre">
-                    @context.AllMusicSocre.ToString("F1")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="总分(所有)" Field="AllTotalSocre">
-                    <strong>@context.AllTotalSocre.ToString("F1")</strong>
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="配音" Field="FilterCVSocre">
-                    @context.FilterCVSocre.ToString("F1")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="程序" Field="FilterSystemSocre">
-                    @context.FilterSystemSocre.ToString("F1")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="演出" Field="FilterShowSocre">
-                    @context.FilterShowSocre.ToString("F1")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="美术" Field="FilterPaintSocre">
-                    @context.FilterPaintSocre.ToString("F1")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="剧本" Field="FilterScriptSocre">
-                    @context.FilterScriptSocre.ToString("F1")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="音乐" Field="FilterMusicSocre">
-                    @context.FilterMusicSocre.ToString("F1")
-                </CgDataTableColumn>
-                <CgDataTableColumn TItem="GameScoreTableModel" Title="总分(过滤)" Field="FilterTotalSocre">
-                    <strong>@context.FilterTotalSocre.ToString("F1")</strong>
-                </CgDataTableColumn>
-            </CgDataTable>
-            break;
-    }
-</div>
+            case "scores":
+                <CgDataTable TItem="GameScoreTableModel"
+                             Title="评分列表"
+                             OnServerQuery="QueryGameScoresAsync"
+                             DefaultSortField="AllTotalSocre"
+                             DefaultSortDesc="true"
+                             DefaultPageSize="10">
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="Id" Field="GameId" Width="80px">
+                        <a href="/entries/index/@context.GameId" class="table-summary__link">@context.GameId</a>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="游戏名" Field="GameName">
+                        <a href="/entries/index/@context.GameId" class="table-summary__link">@context.GameName</a>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="配音" Field="AllCVSocre">
+                        @context.AllCVSocre.ToString("F1")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="程序" Field="AllSystemSocre">
+                        @context.AllSystemSocre.ToString("F1")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="演出" Field="AllShowSocre">
+                        @context.AllShowSocre.ToString("F1")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="美术" Field="AllPaintSocre">
+                        @context.AllPaintSocre.ToString("F1")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="剧本" Field="AllScriptSocre">
+                        @context.AllScriptSocre.ToString("F1")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="音乐" Field="AllMusicSocre">
+                        @context.AllMusicSocre.ToString("F1")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="总分(所有)" Field="AllTotalSocre">
+                        <strong>@context.AllTotalSocre.ToString("F1")</strong>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="配音" Field="FilterCVSocre">
+                        @context.FilterCVSocre.ToString("F1")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="程序" Field="FilterSystemSocre">
+                        @context.FilterSystemSocre.ToString("F1")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="演出" Field="FilterShowSocre">
+                        @context.FilterShowSocre.ToString("F1")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="美术" Field="FilterPaintSocre">
+                        @context.FilterPaintSocre.ToString("F1")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="剧本" Field="FilterScriptSocre">
+                        @context.FilterScriptSocre.ToString("F1")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="音乐" Field="FilterMusicSocre">
+                        @context.FilterMusicSocre.ToString("F1")
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameScoreTableModel" Title="总分(过滤)" Field="FilterTotalSocre">
+                        <strong>@context.FilterTotalSocre.ToString("F1")</strong>
+                    </CgDataTableColumn>
+                </CgDataTable>
+                break;
+        }
+    </PanelTemplate>
+</CgTabs>
 
 @code {
     // ── 数据 ──
@@ -380,9 +365,7 @@
     private bool _isExporting;
 
     // ── Tab 定义 ──
-    private readonly record struct TabDefinition(string Key, string Label, string Icon);
-
-    private static readonly TabDefinition[] _tabs =
+    private static readonly CgTabItem[] _tabs =
     [
         new("games", "游戏", "mdiGamepadSquare"),
         new("groups", "制作组", "mdiAccountMultiple"),
@@ -404,15 +387,8 @@
         }
         else
         {
-            _loadingError = result.Error.Message;
+            _loadingError = result.Error?.Message ?? "加载失败";
         }
-    }
-
-    // ── Tab 切换 ──
-
-    private void OnTabChanged(string tabKey)
-    {
-        _activeTab = tabKey;
     }
 
     // ── 服务端查询委托 ──

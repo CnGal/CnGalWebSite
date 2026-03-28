@@ -54,52 +54,39 @@ else if (_model != null)
             </div>
             
             <div class="cg-space-layout-main">
-                <div class="cg-space-tabs">
-                    <input type="radio" name="space-tab" id="space-tab-home" class="cg-space-tab-radio" checked />
-                    <input type="radio" name="space-tab" id="space-tab-records" class="cg-space-tab-radio" />
-
-                    <div class="cg-space-tab-bar">
-                        <label for="space-tab-home" class="cg-space-tab-label">
-                            <CgMdiIcon Name="mdiHomeOutline" aria-hidden="true" />
-                            <span>主页</span>
-                        </label>
-                        <label for="space-tab-records" class="cg-space-tab-label">
-                            <CgMdiIcon Name="mdiControllerClassicOutline" aria-hidden="true" />
-                            <span>游玩记录</span>
-                            @if (_gameRecords is not null)
-                            {
-                                <span class="cg-space-tab-badge">@_gameRecords.Records.Count(r => !r.IsHidden && (r.ShowPublicly || _model.IsCurrentUser))</span>
-                            }
-                        </label>
-                    </div>
-
-                    <div class="cg-space-tab-panel cg-space-tab-panel--home">
-                        <div class="cg-space-tab-card">
-                            <SpaceMainPage Model="_model" />
-                        </div>
-
-                        <div style="margin-top: var(--cg-spacing-8);">
-                            <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
-                                Type="CommentType.CommentUser"
-                                ObjectId="@_model.Id"
-                                CanComment="_model.CanComment" />
-                        </div>
-                    </div>
-
-                    <div class="cg-space-tab-panel cg-space-tab-panel--records">
-                        @if (_model.IsCurrentUser)
+                <CgTabs Variant="underline" Items="GetSpaceTabs()" DefaultActiveKey="home" Id="space-tabs" AriaLabel="个人空间">
+                    <PanelTemplate Context="tabKey">
+                        @switch (tabKey)
                         {
-                            <SpaceGameRecordSection UserId="@_model.Id" SteamId="@_model.SteamId" />
+                            case "home":
+                                <div class="cg-space-tab-card">
+                                    <SpaceMainPage Model="_model" />
+                                </div>
+
+                                <div style="margin-top: var(--cg-spacing-8);">
+                                    <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
+                                        Type="CommentType.CommentUser"
+                                        ObjectId="@_model.Id"
+                                        CanComment="_model.CanComment" />
+                                </div>
+                                break;
+
+                            case "records":
+                                @if (_model.IsCurrentUser)
+                                {
+                                    <SpaceGameRecordSection UserId="@_model.Id" SteamId="@_model.SteamId" />
+                                }
+                                else if (_gameRecords is not null)
+                                {
+                                    <SpaceGameRecordList Model="_gameRecords"
+                                                        IsCurrentUser="false"
+                                                        SteamUsers="_steamUsers"
+                                                        SteamId="@_model.SteamId" />
+                                }
+                                break;
                         }
-                        else if (_gameRecords is not null)
-                        {
-                            <SpaceGameRecordList Model="_gameRecords"
-                                                IsCurrentUser="false"
-                                                SteamUsers="_steamUsers"
-                                                SteamId="@_model.SteamId" />
-                        }
-                    </div>
-                </div>
+                    </PanelTemplate>
+                </CgTabs>
             </div>
         </div>
     </div>
@@ -128,6 +115,16 @@ else
     private bool _isNotFound;
     private bool _isError;
     private string _errorMessage = string.Empty;
+
+    private IReadOnlyList<CgTabItem> GetSpaceTabs()
+    {
+        var recordCount = _gameRecords?.Records.Count(r => !r.IsHidden && (r.ShowPublicly || _model!.IsCurrentUser));
+        return
+        [
+            new CgTabItem("home", "主页", "mdiHomeOutline"),
+            new CgTabItem("records", "游玩记录", "mdiControllerClassicOutline", recordCount?.ToString()),
+        ];
+    }
 
     protected override async Task OnInitializedAsync()
     {

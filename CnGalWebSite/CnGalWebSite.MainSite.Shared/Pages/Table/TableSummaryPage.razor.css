@@ -94,60 +94,6 @@
     flex-shrink: 0;
 }
 
-/* ── Tab 切换栏 ── */
-.table-summary__tabs {
-    display: flex;
-    gap: var(--cg-spacing-1);
-    padding: var(--cg-spacing-2);
-    background: var(--cg-color-surface);
-    border-radius: var(--cg-radius-lg);
-    box-shadow: var(--cg-shadow-sm);
-    margin-bottom: var(--cg-spacing-5);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-}
-
-.table-summary__tab {
-    display: flex;
-    align-items: center;
-    gap: var(--cg-spacing-1);
-    padding: var(--cg-spacing-2) var(--cg-spacing-4);
-    border: none;
-    border-radius: var(--cg-radius-md);
-    background: transparent;
-    color: var(--cg-color-text-muted);
-    font-size: var(--cg-font-size-sm);
-    font-weight: var(--cg-font-weight-medium);
-    font-family: var(--cg-font-family);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background-color var(--cg-transition-fast),
-                color var(--cg-transition-fast),
-                box-shadow var(--cg-transition-fast);
-}
-
-.table-summary__tab:hover {
-    background-color: var(--cg-color-hover-overlay);
-    color: var(--cg-color-text);
-}
-
-.table-summary__tab--active {
-    background-color: var(--cg-color-primary);
-    color: var(--cg-color-on-primary);
-    box-shadow: var(--cg-shadow-sm);
-}
-
-.table-summary__tab--active:hover {
-    background-color: var(--cg-color-primary-hover);
-    color: var(--cg-color-on-primary);
-}
-
-::deep .table-summary__tab-icon {
-    width: 18px;
-    height: 18px;
-}
-
 /* ── 导出工具栏 ── */
 .table-summary__toolbar {
     display: flex;
@@ -215,8 +161,12 @@
     height: 16px;
 }
 
-/* ── Tab 面板 ── */
-.table-summary__panel {
+/* ── CgTabs 面板 ── */
+::deep .cg-tabs {
+    margin-bottom: var(--cg-spacing-5);
+}
+
+::deep .cg-tabs__panel {
     min-height: 400px;
 }
 
@@ -253,16 +203,6 @@
 
     .table-summary__stat-value {
         font-size: var(--cg-font-size-base);
-    }
-
-    .table-summary__tabs {
-        padding: var(--cg-spacing-1);
-        gap: 2px;
-    }
-
-    .table-summary__tab {
-        padding: var(--cg-spacing-2) var(--cg-spacing-3);
-        font-size: var(--cg-font-size-xs);
     }
 }
 
