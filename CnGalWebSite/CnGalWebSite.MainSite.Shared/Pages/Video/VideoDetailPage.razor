@@ -111,9 +111,10 @@ else if (Model is not null)
                                   DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
             </EntrySection>
 
-            <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="video-card--comment" Show="Model.CanComment" Description="可前往评论区参与讨论，分享你的看法。">
-                <a class="video-action-btn" href="@($"/space/comments?type=video&id={Model.Id}")">前往评论区</a>
-            </EntryCard>
+            <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
+                Type="CommentType.CommentVideo"
+                ObjectId="@Model.Id.ToString()"
+                CanComment="Model.CanComment" />
         </footer>
     </article>
 }

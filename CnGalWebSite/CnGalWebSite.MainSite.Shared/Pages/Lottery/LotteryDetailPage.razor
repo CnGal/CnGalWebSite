@@ -47,10 +47,10 @@ else if (_model is not null)
 
                 <LotteryWinnerList Awards="_model.Awards" />
 
-                <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="lottery-card--comment" Show="_model.CanComment"
-                           Description="可前往评论区参与讨论，分享你的看法。">
-                    <a class="lottery-action-btn" href="@($"/space/comments?type=lottery&id={_model.Id}")">前往评论区</a>
-                </EntryCard>
+                <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
+                    Type="CommentType.CommentLottery"
+                    ObjectId="@_model.Id.ToString()"
+                    CanComment="_model.CanComment" />
             </main>
 
             <aside class="lottery-side-col">
@@ -110,10 +110,10 @@ else if (_model is not null)
 
             <LotteryWinnerList Awards="_model.Awards" />
 
-            <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="lottery-card--comment" Show="_model.CanComment"
-                       Description="可前往评论区参与讨论，分享你的看法。">
-                <a class="lottery-action-btn" href="@($"/space/comments?type=lottery&id={_model.Id}")">前往评论区</a>
-            </EntryCard>
+            <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
+                Type="CommentType.CommentLottery"
+                ObjectId="@_model.Id.ToString()"
+                CanComment="_model.CanComment" />
         </section>
     </article>
 }

@@ -106,9 +106,10 @@ else if (_model is not null)
                 </ul>
             </EntrySection>
 
-            <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="article-card--comment" Show="_model.CanComment" Description="可前往评论区参与讨论，分享你的看法。">
-                <a class="article-action-btn" href="@($"/space/comments?type=article&id={_model.Id}")">前往评论区</a>
-            </EntryCard>
+            <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
+                Type="CommentType.CommentArticle"
+                ObjectId="@_model.Id.ToString()"
+                CanComment="_model.CanComment" />
         </footer>
     </article>
 }

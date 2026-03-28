@@ -44,10 +44,10 @@ else if (_model is not null)
 
                 <PeripheryRelatedEntries Entries="_model.Entries" />
 
-                <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="periphery-card--comment" Show="_model.CanComment"
-                           Description="可前往评论区参与讨论，分享你的看法。">
-                    <a class="periphery-action-btn" href="@($"/space/comments?type=periphery&id={_model.Id}")">前往评论区</a>
-                </EntryCard>
+                <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
+                    Type="CommentType.CommentPeriphery"
+                    ObjectId="@_model.Id.ToString()"
+                    CanComment="_model.CanComment" />
             </main>
 
             <aside class="periphery-side-col">
@@ -93,10 +93,10 @@ else if (_model is not null)
 
             <PeripheryRelatedPeripheries Peripheries="_model.Peripheries" />
 
-            <EntryCard Title="评论入口" Icon="mdiCommentTextOutline" Class="periphery-card--comment" Show="_model.CanComment"
-                       Description="可前往评论区参与讨论，分享你的看法。">
-                <a class="periphery-action-btn" href="@($"/space/comments?type=periphery&id={_model.Id}")">前往评论区</a>
-            </EntryCard>
+            <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
+                Type="CommentType.CommentPeriphery"
+                ObjectId="@_model.Id.ToString()"
+                CanComment="_model.CanComment" />
         </section>
     </article>
 }

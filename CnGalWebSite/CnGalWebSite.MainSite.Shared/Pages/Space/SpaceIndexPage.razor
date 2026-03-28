@@ -77,6 +77,13 @@ else if (_model != null)
                         <div class="cg-space-tab-card">
                             <SpaceMainPage Model="_model" />
                         </div>
+
+                        <div style="margin-top: var(--cg-spacing-8);">
+                            <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
+                                Type="CommentType.CommentUser"
+                                ObjectId="@_model.Id"
+                                CanComment="_model.CanComment" />
+                        </div>
                     </div>
 
                     <div class="cg-space-tab-panel cg-space-tab-panel--records">

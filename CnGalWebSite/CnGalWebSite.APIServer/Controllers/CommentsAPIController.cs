@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Comments;
+using CnGalWebSite.APIServer.Application.Comments;
 using CnGalWebSite.APIServer.Application.Comments.Dtos;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -296,7 +296,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     }
                     break;
                 case CommentType.CommentUser:
-                    userTemp = await _userRepository.GetAll().Include(s => s.UserSpaceCommentManager).FirstOrDefaultAsync(s => s.Id == model.ObjectId);
+                    userTemp = await _userRepository.GetAll().AsNoTracking().Include(s => s.UserSpaceCommentManager).FirstOrDefaultAsync(s => s.Id == model.ObjectId);
                     if (userTemp == null)
                     {
                         return new Result { Successful = false, Error = "无法找到该用户，Id" + model.ObjectId };
@@ -305,13 +305,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     {
                         return new Result { Successful = false, Error = "该用户不允许留言" };
                     }
-                    if (userTemp.UserSpaceCommentManager == null)
-                    {
-                        userTemp.UserSpaceCommentManager = new UserSpaceCommentManager();
-                        userTemp = await _userRepository.UpdateAsync(userTemp);
-                    }
                     userSpace = userTemp.UserSpaceCommentManager;
-                    _userRepository.Clear();
                     break;
                 case CommentType.ReplyComment:
                     replyComment = await _commentRepository.GetAll().AsNoTracking().Include(s => s.ApplicationUser).FirstOrDefaultAsync(s => s.Id == tempId);
