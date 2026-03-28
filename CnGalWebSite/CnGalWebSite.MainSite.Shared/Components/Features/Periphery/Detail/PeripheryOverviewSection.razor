@@ -1,12 +1,9 @@
 @using CnGalWebSite.DataModel.ViewModel.Peripheries
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 
 @if (OverviewModels.Count > 0)
 {
-    <section class="periphery-overview-section">
-        <h2>
-            <CgMdiIcon Name="mdiViewGridOutline" />
-            周边概览
-        </h2>
+    <EntrySection Title="周边概览" Icon="mdiViewGridOutline">
         @foreach (var group in OverviewModels)
         {
             <div class="periphery-overview-group">
@@ -55,7 +52,7 @@
                 }
             </div>
         }
-    </section>
+    </EntrySection>
 }
 
 @code {

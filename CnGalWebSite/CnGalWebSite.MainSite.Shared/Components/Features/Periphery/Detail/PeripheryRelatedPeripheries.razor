@@ -1,12 +1,9 @@
 @using CnGalWebSite.DataModel.ViewModel.Search
+@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 
 @if (Peripheries.Count > 0)
 {
-    <section class="periphery-related-peripheries">
-        <h2>
-            <CgMdiIcon Name="mdiGiftOutline" />
-            关联周边
-        </h2>
+    <EntryCard Title="关联周边" Icon="mdiGiftOutline">
         <ul class="periphery-related-list">
             @foreach (var item in Peripheries)
             {
@@ -35,7 +32,7 @@
                 </li>
             }
         </ul>
-    </section>
+    </EntryCard>
 }
 
 @code {

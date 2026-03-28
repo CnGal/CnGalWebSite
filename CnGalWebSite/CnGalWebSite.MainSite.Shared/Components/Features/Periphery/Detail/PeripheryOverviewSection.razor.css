@@ -1,30 +1,13 @@
-.periphery-overview-section {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-}
-
-.periphery-overview-section > h2 {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    color: var(--cg-color-text);
-}
-
-.periphery-overview-section > h2 ::deep .cg-mdi-icon {
-    width: 2rem;
-    height: 2rem;
-    color: var(--cg-color-primary);
-}
-
+/* Internal styles – card container provided by EntryCard */
 .periphery-overview-group {
     border: 1px solid var(--cg-color-border);
     border-radius: var(--cg-radius-xl);
     padding: 1.25rem;
     background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+}
+
+.periphery-overview-group + .periphery-overview-group {
+    margin-top: 1rem;
 }
 
 .periphery-overview-group-header {

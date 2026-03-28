@@ -8,11 +8,6 @@
     padding: 1.5rem 1rem 3rem;
 }
 
-.periphery-header {
-    display: flex;
-    flex-direction: column;
-}
-
 .periphery-layout {
     position: relative;
     z-index: 1;
@@ -33,10 +28,6 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-}
-
-.periphery-hidden-alert {
-    margin-bottom: 0;
 }
 
 /* ── 错误态 ── */
@@ -90,29 +81,6 @@
 @keyframes periphery-loading {
     from { background-position: 200% 0; }
     to { background-position: -200% 0; }
-}
-
-/* ── 评论入口按钮 ── */
-.periphery-action-btn {
-    border-radius: var(--cg-radius-lg);
-    border: 1px solid var(--cg-color-primary);
-    color: white;
-    background: var(--cg-color-primary);
-    text-decoration: none;
-    padding: 0.6rem 1.25rem;
-    font-size: 0.9rem;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    transition: var(--cg-transition-fast);
-    box-shadow: var(--cg-shadow-sm);
-}
-
-.periphery-action-btn:hover {
-    background: var(--cg-color-primary-hover);
-    border-color: var(--cg-color-primary-hover);
 }
 
 /* ── 响应式布局 ── */
