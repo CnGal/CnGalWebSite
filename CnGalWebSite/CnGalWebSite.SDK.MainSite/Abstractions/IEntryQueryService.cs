@@ -17,4 +17,10 @@ public interface IEntryQueryService
     /// </summary>
     Task<SdkResult<IReadOnlyList<GamePublishTimesTimelineItem>>> GetPublishGamesTimelineAsync(
         long afterTime, long beforeTime, int mode = 0, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取指定月份的角色生日列表（用于日历页）
+    /// </summary>
+    Task<SdkResult<IReadOnlyList<BirthdayCalendarItem>>> GetRoleBirthdaysByMonthAsync(
+        int month, CancellationToken cancellationToken = default);
 }

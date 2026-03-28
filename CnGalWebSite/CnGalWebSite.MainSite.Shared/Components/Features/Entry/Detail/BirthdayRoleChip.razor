@@ -1,0 +1,19 @@
+<a href="/entries/index/@Id" class="birthday-role-chip" title="@Name">
+    @if (!string.IsNullOrWhiteSpace(Image))
+    {
+        <img src="@Image" alt="@Name" loading="lazy" decoding="async" />
+    }
+    else
+    {
+        <span class="birthday-role-chip-fallback">
+            <CgMdiIcon Name="mdiAccount" aria-hidden="true" />
+        </span>
+    }
+    <span class="birthday-role-chip-name">@Name</span>
+</a>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    [Parameter] public string Name { get; set; } = "";
+    [Parameter] public string? Image { get; set; }
+}

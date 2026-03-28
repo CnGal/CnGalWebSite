@@ -1,0 +1,58 @@
+.birthday-role-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.5rem 0.2rem 0.2rem;
+    text-decoration: none;
+    color: inherit;
+    border-radius: var(--cg-radius-full);
+    background-color: color-mix(in oklab, var(--cg-color-primary) 8%, transparent);
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 18%, transparent);
+    transition: background-color var(--cg-transition-fast), border-color var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
+    max-width: 100%;
+}
+
+.birthday-role-chip:hover {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 16%, transparent);
+    border-color: var(--cg-color-primary);
+    box-shadow: 0 1px 4px color-mix(in oklab, var(--cg-color-primary) 20%, transparent);
+}
+
+.birthday-role-chip img {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.birthday-role-chip-fallback {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background-color: var(--cg-color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--cg-color-text-muted);
+}
+
+::deep .birthday-role-chip-fallback .cg-mdi-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+}
+
+.birthday-role-chip-name {
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+.birthday-role-chip:hover .birthday-role-chip-name {
+    color: var(--cg-color-primary);
+}

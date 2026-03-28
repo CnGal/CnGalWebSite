@@ -106,6 +106,35 @@ public sealed class EntryQueryService(
         return SdkResult<IReadOnlyList<GamePublishTimesTimelineItem>>.Ok(items);
     }
 
+    public async Task<SdkResult<IReadOnlyList<BirthdayCalendarItem>>> GetRoleBirthdaysByMonthAsync(
+        int month, CancellationToken cancellationToken = default)
+    {
+        var cacheKey = $"main-site:role-birthdays-month:{month}";
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<BirthdayCalendarItem>? cached) && cached is not null)
+        {
+            return SdkResult<IReadOnlyList<BirthdayCalendarItem>>.Ok(cached);
+        }
+
+        var path = $"api/entries/GetRoleBirthdaysByTime?month={month}";
+        var result = await GetAsync<List<RoleBrithdayViewModel>>(
+            path, "ENTRY_BIRTHDAYS", "角色生日列表", cancellationToken);
+
+        if (!result.Success || result.Data is null)
+        {
+            return SdkResult<IReadOnlyList<BirthdayCalendarItem>>.Fail(
+                result.Error?.Code ?? "ENTRY_BIRTHDAYS_FAILED",
+                result.Error?.Message ?? "获取角色生日列表失败",
+                result.Error?.StatusCode);
+        }
+
+        IReadOnlyList<BirthdayCalendarItem> items = result.Data
+            .Select(MapToBirthdayItem)
+            .ToList();
+
+        memoryCache.Set(cacheKey, items, EntryCacheDuration);
+        return SdkResult<IReadOnlyList<BirthdayCalendarItem>>.Ok(items);
+    }
+
     private static GamePublishTimesCardItem MapToCardItem(EntryInforTipViewModel dto) => new()
     {
         Id = dto.Id,
@@ -125,6 +154,24 @@ public sealed class EntryQueryService(
         PublishTime = dto.PublishTime,
         PublishTimeNote = dto.PublishTimeNote
     };
+
+    private static BirthdayCalendarItem MapToBirthdayItem(RoleBrithdayViewModel dto)
+    {
+        var gameInfor = dto.AddInfors?.FirstOrDefault(x => x.Modifier == "登场游戏");
+        var gameName = gameInfor?.Contents?.FirstOrDefault()?.DisplayName;
+
+        return new BirthdayCalendarItem
+        {
+            Id = dto.Id,
+            Name = dto.Name ?? "",
+            Image = dto.MainImage ?? "",
+            BriefIntroduction = dto.BriefIntroduction ?? "",
+            BirthdayMonth = dto.Brithday.Month,
+            BirthdayDay = dto.Brithday.Day,
+            GameName = gameName
+        };
+    }
+
 
     private static EntryDetailViewModel MapToViewModel(EntryIndexViewModel entry)
     {
