@@ -1,0 +1,90 @@
+.cg-ff-info-card {
+    background-color: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    box-shadow: var(--cg-shadow-sm);
+    padding: var(--cg-spacing-4);
+    margin-bottom: var(--cg-spacing-4);
+}
+
+.cg-ff-info-card-title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text-primary);
+    margin: 0 0 var(--cg-spacing-3) 0;
+    padding-bottom: var(--cg-spacing-2);
+    border-bottom: 1px solid var(--cg-color-border);
+}
+
+.cg-ff-info-card-title ::deep .cg-mdi-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--cg-color-primary);
+}
+
+.cg-ff-info-card-items {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+}
+
+.cg-ff-info-item {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    font-size: var(--cg-font-size-sm);
+}
+
+.cg-ff-info-item ::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--cg-color-text-muted);
+    flex-shrink: 0;
+}
+
+.cg-ff-info-item-label {
+    color: var(--cg-color-text-secondary);
+}
+
+.cg-ff-info-item-value {
+    margin-left: auto;
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-text-primary);
+}
+
+.cg-ff-info-user {
+    margin-top: var(--cg-spacing-3);
+    padding-top: var(--cg-spacing-3);
+    border-top: 1px solid var(--cg-color-border);
+}
+
+.cg-ff-info-user-title {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-secondary);
+    margin: 0 0 var(--cg-spacing-2) 0;
+}
+
+.cg-ff-info-user-link {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    color: var(--cg-color-text-primary);
+    text-decoration: none;
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+    transition: color var(--cg-transition-fast);
+}
+
+.cg-ff-info-user-link:hover {
+    color: var(--cg-color-primary);
+}
+
+.cg-ff-info-user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--cg-radius-full);
+    object-fit: cover;
+}

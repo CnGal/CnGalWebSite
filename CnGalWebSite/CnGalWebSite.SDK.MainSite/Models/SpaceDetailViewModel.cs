@@ -54,4 +54,6 @@ public sealed class SpaceDetailViewModel
     public required string SteamId { get; init; }
 
     public required bool CanComment { get; init; }
+
+    public required bool IsShowFavorites { get; init; }
 }

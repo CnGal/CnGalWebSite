@@ -1,0 +1,70 @@
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+
+@if (IsCurrentUser)
+{
+    <div class="cg-favorite-folder-toolbar">
+        <a href="/favoritefolders/create" class="cg-favorite-folder-create-btn">
+            <CgMdiIcon Name="mdiPlusCircleOutline" aria-hidden="true" />
+            <span>创建收藏夹</span>
+        </a>
+    </div>
+}
+
+<div class="cg-favorite-folder-list">
+    @if (Folders.Count == 0)
+    {
+        <div class="cg-favorite-folder-empty">
+            <CgMdiIcon Name="mdiHeartOutline" Class="cg-favorite-folder-empty-icon" aria-hidden="true" />
+            <span>暂无收藏夹</span>
+        </div>
+    }
+    else
+    {
+        @foreach (var folder in Folders)
+        {
+            <a href="/favoritefolders/index/@folder.Id" class="cg-favorite-folder-card">
+                <div class="cg-favorite-folder-card-image-wrapper">
+                    @if (!string.IsNullOrWhiteSpace(folder.MainImage))
+                    {
+                        <img src="@folder.MainImage" alt="@folder.Name" loading="lazy" class="cg-favorite-folder-card-image" />
+                    }
+                    else
+                    {
+                        <div class="cg-favorite-folder-card-placeholder">
+                            <CgMdiIcon Name="mdiHeartMultiple" aria-hidden="true" />
+                        </div>
+                    }
+                    <span class="cg-favorite-folder-card-count">@folder.Count 项</span>
+                </div>
+                <div class="cg-favorite-folder-card-body">
+                    <h3 class="cg-favorite-folder-card-name">@folder.Name</h3>
+                    @if (!string.IsNullOrWhiteSpace(folder.BriefIntroduction))
+                    {
+                        <p class="cg-favorite-folder-card-desc">@folder.BriefIntroduction</p>
+                    }
+                    <div class="cg-favorite-folder-card-meta">
+                        @if (folder.IsDefault)
+                        {
+                            <span class="cg-favorite-folder-card-badge">默认</span>
+                        }
+                        @if (!folder.ShowPublicly)
+                        {
+                            <span class="cg-favorite-folder-card-badge cg-favorite-folder-card-badge--private">
+                                <CgMdiIcon Name="mdiLockOutline" aria-hidden="true" /> 私密
+                            </span>
+                        }
+                    </div>
+                </div>
+            </a>
+        }
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<FavoriteFolderSummaryItem> Folders { get; set; }
+
+    [Parameter]
+    public bool IsCurrentUser { get; set; }
+}

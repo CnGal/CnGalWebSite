@@ -72,7 +72,8 @@ public sealed class SpaceQueryService(
             UserCertification = space.UserCertification,
             IsCurrentUser = space.IsCurrentUser,
             SteamId = space.SteamId ?? string.Empty,
-            CanComment = space.CanComment
+            CanComment = space.CanComment,
+            IsShowFavorites = space.IsShowFavorites
         };
     }
 }

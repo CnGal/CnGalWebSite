@@ -1,0 +1,233 @@
+@page "/favoritefolders/edit/{Id:long}"
+@page "/favoritefolders/create"
+
+@rendermode InteractiveServer
+
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Favorites
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+@using CnGalWebSite.MainSite.Shared.Components.Features.FavoriteFolder
+@using CnGalWebSite.MainSite.Shared.Services
+
+@inject IFavoriteFolderQueryService FavoriteFolderQueryService
+@inject IFavoriteFolderCommandService FavoriteFolderCommandService
+@inject NavigationManager NavigationManager
+@inject ICgToastService ToastService
+
+<PageTitle>@(_isCreateMode ? "创建收藏夹" : "编辑收藏夹") - CnGal资料站</PageTitle>
+
+<div class="cg-ff-edit-container">
+    @if (_isLoading)
+    {
+        <div class="cg-ff-edit-loading">
+            <CgProgressRing />
+            <span>加载中...</span>
+        </div>
+    }
+    else if (_isError)
+    {
+        <div class="cg-ff-edit-error">
+            <h2>加载失败</h2>
+            <p>@_errorMessage</p>
+            <CgButton Variant="primary" OnClick="@(() => NavigationManager.NavigateTo("/"))">返回首页</CgButton>
+        </div>
+    }
+    else
+    {
+        <div class="cg-ff-edit-layout">
+            <div class="cg-ff-edit-sidebar">
+                <div class="cg-ff-edit-sidebar-card">
+                    <h2 class="cg-ff-edit-sidebar-title">
+                        <CgMdiIcon Name="mdiHeartMultiple" aria-hidden="true" />
+                        @(_isCreateMode ? "创建收藏夹" : "编辑收藏夹")
+                    </h2>
+                    <nav class="cg-ff-edit-nav">
+                        <a href="#basic-info" class="cg-ff-edit-nav-item active">
+                            <CgMdiIcon Name="mdiTextBoxOutline" aria-hidden="true" />
+                            基本信息
+                        </a>
+                        @if (!_isCreateMode)
+                        {
+                            <a href="#manage-objects" class="cg-ff-edit-nav-item">
+                                <CgMdiIcon Name="mdiFormatListBulleted" aria-hidden="true" />
+                                管理收藏
+                            </a>
+                        }
+                    </nav>
+                </div>
+            </div>
+
+            <div class="cg-ff-edit-main">
+                <section id="basic-info" class="cg-ff-edit-section">
+                    <h2 class="cg-ff-edit-section-title">基本信息</h2>
+
+                    <CgFormGroup Label="名称">
+                        <CgInput @bind-Value="_name" Placeholder="请输入收藏夹名称" />
+                    </CgFormGroup>
+
+                    <CgFormGroup Label="简介">
+                        <CgTextarea @bind-Value="_briefIntroduction" Placeholder="请输入收藏夹简介" />
+                    </CgFormGroup>
+
+                    <CgFormGroup Label="主图 URL">
+                        <CgInput @bind-Value="_mainImage" Placeholder="请输入主图链接" />
+                    </CgFormGroup>
+
+                    <div class="cg-ff-edit-checkboxes">
+                        <CgCheckbox Label="默认收藏夹" @bind-Value="_isDefault" />
+                        <CgCheckbox Label="向他人公开" @bind-Value="_showPublicly" />
+                        <CgCheckbox Label="不展示在个人主页中" @bind-Value="_isHidden" />
+                    </div>
+                </section>
+
+                @if (!_isCreateMode)
+                {
+                    <section id="manage-objects" class="cg-ff-edit-section">
+                        <h2 class="cg-ff-edit-section-title">管理收藏</h2>
+                        <FavoriteFolderObjectManager FolderId="Id" />
+                    </section>
+                }
+
+                <div class="cg-ff-edit-actions">
+                    <CgButton Variant="primary" OnClick="OnSubmit" Disabled="_isSaving">
+                        @(_isSaving ? "保存中..." : _isCreateMode ? "创建" : "保存")
+                    </CgButton>
+                    <CgButton Variant="ghost" OnClick="OnCancel">取消</CgButton>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    private bool _isCreateMode => Id == 0;
+    private bool _isLoading = true;
+    private bool _isError;
+    private bool _isSaving;
+    private string _errorMessage = string.Empty;
+
+    // Form fields
+    private string _name = string.Empty;
+    private string _briefIntroduction = string.Empty;
+    private string _mainImage = string.Empty;
+    private bool _isDefault;
+    private bool _showPublicly = true;
+    private bool _isHidden;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_isCreateMode)
+        {
+            _isLoading = false;
+        }
+        else
+        {
+            await LoadEditDataAsync();
+        }
+    }
+
+    private async Task LoadEditDataAsync()
+    {
+        _isLoading = true;
+        var result = await FavoriteFolderQueryService.GetFavoriteFolderForEditAsync(Id);
+
+        if (result.Success && result.Data != null)
+        {
+            var data = result.Data;
+            _name = data.Name ?? string.Empty;
+            _briefIntroduction = data.BriefIntroduction ?? string.Empty;
+            _mainImage = data.MainImage ?? string.Empty;
+            _isDefault = data.IsDefault;
+            _showPublicly = data.ShowPublicly;
+            _isHidden = data.IsHidden;
+        }
+        else
+        {
+            _isError = true;
+            _errorMessage = result.Error?.Message ?? "获取编辑数据失败";
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task OnSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(_name))
+        {
+            ToastService.Show("必须填写收藏夹名称", variant: "error");
+            return;
+        }
+
+        _isSaving = true;
+
+        try
+        {
+            if (_isCreateMode)
+            {
+                var createResult = await FavoriteFolderCommandService.CreateFavoriteFolderAsync(new CreateFavoriteFolderViewModel
+                {
+                    Name = _name,
+                    BriefIntroduction = _briefIntroduction,
+                    MainImage = _mainImage,
+                    IsDefault = _isDefault,
+                    ShowPublicly = _showPublicly,
+                    IsHidden = _isHidden
+                });
+
+                if (createResult.Success)
+                {
+                    ToastService.Show("创建收藏夹成功", variant: "success");
+                    NavigationManager.NavigateTo("/space/index");
+                }
+                else
+                {
+                    ToastService.Show(createResult.Error?.Message ?? "创建失败", variant: "error");
+                }
+            }
+            else
+            {
+                var editResult = await FavoriteFolderCommandService.EditFavoriteFolderAsync(new EditFavoriteFolderViewModel
+                {
+                    Id = Id,
+                    Name = _name,
+                    BriefIntroduction = _briefIntroduction,
+                    MainImage = _mainImage,
+                    IsDefault = _isDefault,
+                    ShowPublicly = _showPublicly,
+                    IsHidden = _isHidden
+                });
+
+                if (editResult.Success)
+                {
+                    ToastService.Show("保存收藏夹成功", variant: "success");
+                    NavigationManager.NavigateTo($"/favoritefolders/index/{Id}");
+                }
+                else
+                {
+                    ToastService.Show(editResult.Error?.Message ?? "保存失败", variant: "error");
+                }
+            }
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    private void OnCancel()
+    {
+        if (_isCreateMode)
+        {
+            NavigationManager.NavigateTo("/space/index");
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/favoritefolders/index/{Id}");
+        }
+    }
+}

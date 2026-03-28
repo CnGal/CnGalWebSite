@@ -11,6 +11,7 @@
 
 @inject ISpaceQueryService SpaceQueryService
 @inject IPlayedGameQueryService PlayedGameQueryService
+@inject IFavoriteFolderQueryService FavoriteFolderQueryService
 @inject NavigationManager NavigationManager
 
 @if (_isNotFound)
@@ -84,6 +85,13 @@ else if (_model != null)
                                                         SteamId="@_model.SteamId" />
                                 }
                                 break;
+
+                            case "favorites":
+                                @if (_favoriteFolders is not null)
+                                {
+                                    <SpaceFavoriteFolderList Folders="_favoriteFolders" IsCurrentUser="_model.IsCurrentUser" />
+                                }
+                                break;
                         }
                     </PanelTemplate>
                 </CgTabs>
@@ -112,18 +120,29 @@ else
     private SpaceDetailViewModel? _model;
     private UserGameRecordsViewModel? _gameRecords;
     private IReadOnlyList<SteamUserInfoItem> _steamUsers = [];
+    private IReadOnlyList<FavoriteFolderSummaryItem>? _favoriteFolders;
     private bool _isNotFound;
     private bool _isError;
     private string _errorMessage = string.Empty;
 
+    private bool _showFavoritesTab => _model is not null && (_model.IsCurrentUser || _model.IsShowFavorites);
+
     private IReadOnlyList<CgTabItem> GetSpaceTabs()
     {
         var recordCount = _gameRecords?.Records.Count(r => !r.IsHidden && (r.ShowPublicly || _model!.IsCurrentUser));
-        return
-        [
+        var tabs = new List<CgTabItem>
+        {
             new CgTabItem("home", "主页", "mdiHomeOutline"),
             new CgTabItem("records", "游玩记录", "mdiControllerClassicOutline", recordCount?.ToString()),
-        ];
+        };
+
+        if (_showFavoritesTab)
+        {
+            var favCount = _favoriteFolders?.Count;
+            tabs.Add(new CgTabItem("favorites", "收藏夹", "mdiHeartMultiple", favCount > 0 ? favCount.ToString() : null));
+        }
+
+        return tabs;
     }
 
     protected override async Task OnInitializedAsync()
@@ -145,6 +164,7 @@ else
         _isError = false;
         _model = null;
         _gameRecords = null;
+        _favoriteFolders = null;
 
         var targetId = Id ?? string.Empty;
         var result = await SpaceQueryService.GetSpaceDetailAsync(targetId);
@@ -153,22 +173,21 @@ else
         {
             _model = result.Data;
 
+            var tasks = new List<Task>();
+
             // 非当前用户：静态加载游玩记录（当前用户由 SpaceGameRecordSection 交互式加载）
             if (!_model.IsCurrentUser)
             {
-                var recordsTask = PlayedGameQueryService.GetUserGameRecordsAsync(_model.Id);
-                var steamInfoTask = PlayedGameQueryService.GetUserSteamInfoAsync(_model.Id);
-
-                await Task.WhenAll(recordsTask, steamInfoTask);
-
-                var recordsResult = recordsTask.Result;
-                _gameRecords = recordsResult.Success ? recordsResult.Data : null;
-
-                var steamInfoResult = steamInfoTask.Result;
-                _steamUsers = steamInfoResult.Success && steamInfoResult.Data is not null
-                    ? steamInfoResult.Data
-                    : [];
+                tasks.Add(LoadGameRecordsAsync());
             }
+
+            // 加载收藏夹列表（条件：当前用户或允许展示）
+            if (_model.IsCurrentUser || _model.IsShowFavorites)
+            {
+                tasks.Add(LoadFavoriteFoldersAsync());
+            }
+
+            await Task.WhenAll(tasks);
         }
         else if (result.Error?.StatusCode == 404)
         {
@@ -180,5 +199,28 @@ else
             _errorMessage = result.Error?.Message ?? "未知错误";
         }
     }
-}
 
+    private async Task LoadGameRecordsAsync()
+    {
+        var recordsTask = PlayedGameQueryService.GetUserGameRecordsAsync(_model!.Id);
+        var steamInfoTask = PlayedGameQueryService.GetUserSteamInfoAsync(_model.Id);
+
+        await Task.WhenAll(recordsTask, steamInfoTask);
+
+        var recordsResult = recordsTask.Result;
+        _gameRecords = recordsResult.Success ? recordsResult.Data : null;
+
+        var steamInfoResult = steamInfoTask.Result;
+        _steamUsers = steamInfoResult.Success && steamInfoResult.Data is not null
+            ? steamInfoResult.Data
+            : [];
+    }
+
+    private async Task LoadFavoriteFoldersAsync()
+    {
+        var foldersResult = await FavoriteFolderQueryService.GetUserFavoriteFoldersAsync(_model!.Id);
+        _favoriteFolders = foldersResult.Success && foldersResult.Data is not null
+            ? foldersResult.Data
+            : [];
+    }
+}
