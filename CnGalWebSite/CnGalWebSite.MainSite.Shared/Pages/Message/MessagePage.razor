@@ -1,0 +1,142 @@
+@page "/space/messages"
+@attribute [Authorize]
+@rendermode InteractiveServer
+
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.MainSite.Shared.Components.Features.Message
+
+@inject ISpaceQueryService SpaceQueryService
+@inject ISpaceCommandService SpaceCommandService
+
+<PageTitle>消息中心 - CnGal资料站</PageTitle>
+
+<div class="message-page">
+    <div class="message-page__header">
+        <h1 class="message-page__title">
+            <CgMdiIcon Name="mdiEmailOutline" aria-hidden="true" />
+            <span>消息中心</span>
+        </h1>
+    </div>
+
+    @if (_isLoading)
+    {
+        <div class="message-page__loading">
+            <CgProgressRing />
+            <span>加载消息中...</span>
+        </div>
+    }
+    else if (_isError)
+    {
+        <div class="message-page__error">
+            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
+            <p>@_errorMessage</p>
+            <CgButton Variant="primary" OnClick="LoadDataAsync">重试</CgButton>
+        </div>
+    }
+    else if (_model is not null)
+    {
+        <CgTabs Variant="underline"
+                Items="GetMessageTabs()"
+                DefaultActiveKey="@_defaultTab"
+                Id="message-tabs"
+                AriaLabel="消息分类">
+            <PanelTemplate Context="tabKey">
+                @switch (tabKey)
+                {
+                    case "all":
+                        <div class="message-page__tab-panel">
+                            <MessageList Messages="_model.All" />
+                        </div>
+                        break;
+                    case "replies":
+                        <div class="message-page__tab-panel">
+                            <MessageList Messages="_model.Replies" />
+                        </div>
+                        break;
+                    case "passed":
+                        <div class="message-page__tab-panel">
+                            <MessageList Messages="_model.Passed" />
+                        </div>
+                        break;
+                    case "rejected":
+                        <div class="message-page__tab-panel">
+                            <MessageList Messages="_model.Rejected" />
+                        </div>
+                        break;
+                }
+            </PanelTemplate>
+        </CgTabs>
+    }
+</div>
+
+@code {
+    private MessageListViewModel? _model;
+    private bool _isLoading = true;
+    private bool _isError;
+    private string _errorMessage = string.Empty;
+    private string _defaultTab = "all";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        _isLoading = true;
+        _isError = false;
+        _model = null;
+        StateHasChanged();
+
+        var result = await SpaceQueryService.GetUserMessagesAsync();
+
+        if (result.Success && result.Data is not null)
+        {
+            _model = result.Data;
+
+            // 优先显示有未读消息的标签页
+            if (_model.HasUnreadRejected)
+            {
+                _defaultTab = "rejected";
+            }
+            else if (_model.HasUnreadReplies)
+            {
+                _defaultTab = "replies";
+            }
+            else if (_model.HasUnreadPassed)
+            {
+                _defaultTab = "passed";
+            }
+            else
+            {
+                _defaultTab = "all";
+            }
+
+            // 后台标记全部已读
+            _ = SpaceCommandService.ReadAllMessagesAsync();
+        }
+        else
+        {
+            _isError = true;
+            _errorMessage = result.Error?.Message ?? "获取消息列表失败";
+        }
+
+        _isLoading = false;
+    }
+
+    private IReadOnlyList<CgTabItem> GetMessageTabs()
+    {
+        var allCount = _model?.All.Count;
+        var replyCount = _model?.Replies.Count;
+        var passedCount = _model?.Passed.Count;
+        var rejectedCount = _model?.Rejected.Count;
+
+        return
+        [
+            new CgTabItem("all", "全部", "mdiEmailMultipleOutline", allCount > 0 ? allCount.ToString() : null),
+            new CgTabItem("replies", "回复我的", "mdiCommentTextOutline", replyCount > 0 ? replyCount.ToString() : null),
+            new CgTabItem("passed", "审核通过", "mdiCheckCircleOutline", passedCount > 0 ? passedCount.ToString() : null),
+            new CgTabItem("rejected", "审核驳回", "mdiAlertCircleOutline", rejectedCount > 0 ? rejectedCount.ToString() : null),
+        ];
+    }
+}

@@ -193,3 +193,42 @@
     padding: 0;
     width: 100%;
 }
+
+/* ── Badge (avatar overlay) ── */
+
+.cg-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    font-size: 10px;
+    font-weight: var(--cg-font-weight-bold);
+    line-height: 16px;
+    text-align: center;
+    color: #fff;
+    background: var(--cg-color-error);
+    border-radius: var(--cg-radius-full);
+    border: 2px solid var(--cg-color-surface);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* make trigger button a positioning context */
+.cg-action-btn {
+    position: relative;
+}
+
+/* ── Badge (inline in menu item) ── */
+
+.cg-badge--inline {
+    position: static;
+    border: none;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    font-size: 11px;
+    line-height: 18px;
+    flex-shrink: 0;
+}

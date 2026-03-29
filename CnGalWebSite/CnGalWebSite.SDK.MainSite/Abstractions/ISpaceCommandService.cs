@@ -19,4 +19,9 @@ public interface ISpaceCommandService
     /// 刷新当前用户的 Steam 游玩记录。
     /// </summary>
     Task<SdkResult<string>> RefreshSteamInfoAsync(string? userId = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 将当前用户所有消息标记为已读。
+    /// </summary>
+    Task<SdkResult<string>> ReadAllMessagesAsync(CancellationToken cancellationToken = default);
 }

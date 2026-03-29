@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.SDK.MainSite.Abstractions;
@@ -43,6 +44,62 @@ public sealed class SpaceQueryService(
         return result;
     }
 
+    public async Task<SdkResult<MessageListViewModel>> GetUserMessagesAsync(CancellationToken cancellationToken = default)
+    {
+        var result = await GetAsync<List<Message>>(
+            "api/space/GetUserMessages",
+            "MESSAGE",
+            "用户消息列表",
+            cancellationToken);
+
+        if (!result.Success || result.Data is null)
+        {
+            return SdkResult<MessageListViewModel>.Fail(
+                result.Error?.Code ?? "MESSAGE_QUERY_FAILED",
+                result.Error?.Message ?? "获取用户消息列表失败",
+                result.Error?.StatusCode);
+        }
+
+        var allItems = result.Data
+            .OrderByDescending(m => m.PostTime)
+            .Select(MapToMessageViewModel)
+            .ToList();
+
+        var replies = allItems
+            .Where(m => m.Type is MessageType.ArticleReply or MessageType.SpaceReply or MessageType.CommentReply)
+            .ToList();
+
+        var passed = allItems
+            .Where(m => m.Type is MessageType.ExaminePassed)
+            .ToList();
+
+        var rejected = allItems
+            .Where(m => m.Type is MessageType.ExamineUnPassed)
+            .ToList();
+
+        var viewModel = new MessageListViewModel
+        {
+            All = allItems,
+            Replies = replies,
+            Passed = passed,
+            Rejected = rejected,
+            HasUnreadReplies = replies.Any(m => !m.IsReaded),
+            HasUnreadPassed = passed.Any(m => !m.IsReaded),
+            HasUnreadRejected = rejected.Any(m => !m.IsReaded),
+        };
+
+        return SdkResult<MessageListViewModel>.Ok(viewModel);
+    }
+
+    public async Task<SdkResult<long>> GetUnreadMessageCountAsync(CancellationToken cancellationToken = default)
+    {
+        return await GetAsync<long>(
+            "api/space/GetUserUnReadedMessageCount",
+            "MESSAGE",
+            "未读消息数量",
+            cancellationToken);
+    }
+
     private static SpaceDetailViewModel MapToViewModel(PersonalSpaceViewModel space)
     {
         var basicInfo = space.BasicInfor ?? new UserInforViewModel();
@@ -76,4 +133,29 @@ public sealed class SpaceQueryService(
             IsShowFavorites = space.IsShowFavorites
         };
     }
+
+    private static MessageItemViewModel MapToMessageViewModel(Message m) => new()
+    {
+        Id = m.Id,
+        Title = m.Title ?? string.Empty,
+        Text = m.Text ?? string.Empty,
+        Image = m.Image ?? string.Empty,
+        Link = m.Link ?? string.Empty,
+        LinkTitle = m.LinkTitle ?? string.Empty,
+        PostTime = m.PostTime,
+        IsReaded = m.IsReaded,
+        Type = m.Type,
+        CommentId = ParseCommentId(m.AdditionalInfor),
+    };
+
+    private static long ParseCommentId(string? additionalInfo)
+    {
+        if (string.IsNullOrWhiteSpace(additionalInfo))
+        {
+            return 0;
+        }
+
+        return long.TryParse(additionalInfo, out var id) ? id : 0;
+    }
 }
+

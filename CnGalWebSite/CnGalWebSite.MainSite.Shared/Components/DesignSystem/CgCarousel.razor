@@ -17,6 +17,8 @@
             {
                 <a class="cg-carousel__slide cg-carousel__slide--solo"
                    href="@solo.Link"
+                   target="@(IsExternalLink(solo.Link) ? "_blank" : null)"
+                   rel="@(IsExternalLink(solo.Link) ? "noopener noreferrer" : null)"
                    aria-label="@solo.Alt">
                     <img class="cg-carousel__image"
                          src="@solo.Image"
@@ -51,6 +53,8 @@
                 {
                     <a class="cg-carousel__slide"
                        href="@item.Link"
+                       target="@(IsExternalLink(item.Link) ? "_blank" : null)"
+                       rel="@(IsExternalLink(item.Link) ? "noopener noreferrer" : null)"
                        style="--slide-index: @i;"
                        aria-label="@item.Alt">
                         <img class="cg-carousel__image"
@@ -131,4 +135,11 @@
 
     /// <summary>轮播项数据模型</summary>
     public record CgCarouselItem(string Image, string? Link, string? Alt);
+
+    private static bool IsExternalLink(string? link)
+    {
+        if (string.IsNullOrEmpty(link)) return false;
+        return link.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+            || link.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
+    }
 }

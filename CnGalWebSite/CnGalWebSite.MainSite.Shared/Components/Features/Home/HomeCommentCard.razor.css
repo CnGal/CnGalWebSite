@@ -73,6 +73,19 @@
     overflow: hidden;
 }
 
-::deep .home-comment-content p {
+/* Make CgHtmlContent wrapper layout-transparent so line-clamp still works */
+::deep .cg-html-content {
+    display: contents;
+}
+
+::deep .cg-html-content p {
     margin: 0;
+}
+
+::deep .cg-html-content img {
+    display: inline;
+    max-height: 1.2em;
+    margin: 0;
+    vertical-align: text-bottom;
+    border-radius: 0;
 }

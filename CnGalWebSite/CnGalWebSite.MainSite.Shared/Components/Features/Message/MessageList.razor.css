@@ -1,0 +1,37 @@
+/* ── MessageList ── */
+
+.message-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+}
+
+.message-list__pagination {
+    margin-top: var(--cg-spacing-5);
+    display: flex;
+    justify-content: center;
+}
+
+/* ── Empty state ── */
+
+.message-list__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--cg-spacing-10) var(--cg-spacing-5);
+    color: var(--cg-color-text-muted);
+    text-align: center;
+}
+
+.message-list__empty ::deep .cg-mdi-icon {
+    width: 48px;
+    height: 48px;
+    opacity: 0.5;
+    margin-bottom: var(--cg-spacing-3);
+}
+
+.message-list__empty p {
+    font-size: var(--cg-font-size-sm);
+    margin: 0;
+}
