@@ -1,5 +1,7 @@
 <li class="home-card home-banner">
-    <a href="@Link" target="_blank" rel="noopener noreferrer">
+    <a href="@Link"
+       target="@(IsExternalLink(Link) ? "_blank" : null)"
+       rel="@(IsExternalLink(Link) ? "noopener noreferrer" : null)">
         <img src="@Image" alt="@Note" loading="lazy" decoding="async" />
     </a>
 </li>
@@ -8,4 +10,11 @@
     [Parameter] public string Link { get; set; } = "";
     [Parameter] public string Image { get; set; } = "";
     [Parameter] public string Note { get; set; } = "";
+
+    private static bool IsExternalLink(string? link)
+    {
+        if (string.IsNullOrEmpty(link)) return false;
+        return link.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+            || link.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
+    }
 }
