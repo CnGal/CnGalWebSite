@@ -21,6 +21,10 @@
             {
                 <CgMdiIcon Name="mdiAccountCircleOutline" aria-hidden="true" />
             }
+            @if (_unreadCount > 0)
+            {
+                <span class="cg-badge" aria-label="@($"{_unreadCount} 条未读消息")">@FormatBadge(_unreadCount)</span>
+            }
         </button>
     </TriggerContent>
     <ChildContent>
@@ -56,6 +60,10 @@
                     <CgMdiIcon Name="mdiBellOutline" aria-hidden="true" />
                 </span>
                 <span class="cg-menu-item__text">消息通知</span>
+                @if (_unreadCount > 0)
+                {
+                    <span class="cg-badge cg-badge--inline" aria-label="@($"{_unreadCount} 条未读")">@FormatBadge(_unreadCount)</span>
+                }
             </a>
         </div>
         <div class="cg-menu-divider"></div>
@@ -80,6 +88,7 @@
     private string? _lastLoadedUserId;
     private string _avatarUrl = string.Empty;
     private string _personalSignature = string.Empty;
+    private long _unreadCount;
     private bool _avatarReady => string.IsNullOrWhiteSpace(_avatarUrl) == false;
 
     protected override async Task OnParametersSetAsync()
@@ -88,6 +97,7 @@
         {
             _avatarUrl = string.Empty;
             _lastLoadedUserId = null;
+            _unreadCount = 0;
             return;
         }
 
@@ -99,7 +109,12 @@
         _lastLoadedUserId = UserId;
         _avatarUrl = string.Empty;
 
-        var result = await SpaceQueryService.GetSpaceDetailAsync(UserId);
+        var spaceTask = SpaceQueryService.GetSpaceDetailAsync(UserId);
+        var unreadTask = SpaceQueryService.GetUnreadMessageCountAsync();
+
+        await Task.WhenAll(spaceTask, unreadTask);
+
+        var result = spaceTask.Result;
         if (result.Success && result.Data != null)
         {
             _avatarUrl = string.IsNullOrWhiteSpace(result.Data.PhotoPath) ? string.Empty : result.Data.PhotoPath;
@@ -110,5 +125,10 @@
             _avatarUrl = string.Empty;
             _personalSignature = string.Empty;
         }
+
+        var unreadResult = unreadTask.Result;
+        _unreadCount = unreadResult.Success ? unreadResult.Data : 0;
     }
+
+    private static string FormatBadge(long count) => count > 99 ? "99+" : count.ToString();
 }

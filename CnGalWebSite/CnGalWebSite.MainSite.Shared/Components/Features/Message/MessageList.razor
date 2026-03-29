@@ -1,0 +1,49 @@
+@* MessageList — 消息列表（含分页） *@
+
+@if (Messages.Count == 0)
+{
+    <div class="message-list__empty">
+        <CgMdiIcon Name="mdiEmailOpenOutline" aria-hidden="true" />
+        <p>暂无消息</p>
+    </div>
+}
+else
+{
+    <div class="message-list">
+        @foreach (var item in GetPagedMessages())
+        {
+            <MessageCard Model="item" />
+        }
+    </div>
+
+    @if (TotalPages > 1)
+    {
+        <div class="message-list__pagination">
+            <CgPagination CurrentPage="_currentPage"
+                          TotalPages="TotalPages"
+                          CurrentPageChanged="OnPageChanged" />
+        </div>
+    }
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<MessageItemViewModel> Messages { get; set; }
+
+    private const int PageSize = 10;
+    private int _currentPage = 1;
+
+    private int TotalPages => Messages.Count > 0 ? (Messages.Count - 1) / PageSize + 1 : 1;
+
+    private IEnumerable<MessageItemViewModel> GetPagedMessages()
+    {
+        return Messages
+            .Skip((_currentPage - 1) * PageSize)
+            .Take(PageSize);
+    }
+
+    private void OnPageChanged(int page)
+    {
+        _currentPage = page;
+    }
+}

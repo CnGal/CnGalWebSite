@@ -1,0 +1,68 @@
+@using CnGalWebSite.DataModel.Model
+@* MessageCard — 单条消息展示卡片 *@
+
+<div class="message-card @(Model.IsReaded ? "" : "message-card--unread")">
+    <div class="message-card__header">
+        @if (!string.IsNullOrWhiteSpace(Model.Image))
+        {
+            <img class="message-card__avatar" src="@Model.Image" alt="@Model.Title" loading="lazy" />
+        }
+        else
+        {
+            <div class="message-card__avatar message-card__avatar--placeholder">
+                <CgMdiIcon Name="mdiAccountCircleOutline" aria-hidden="true" />
+            </div>
+        }
+        <div class="message-card__meta">
+            <span class="message-card__title">@Model.Title</span>
+            <time class="message-card__time" datetime="@Model.PostTime.ToString("yyyy-MM-ddTHH:mm:ss")">
+                @Model.PostTime.ToString("yyyy-MM-dd HH:mm")
+            </time>
+        </div>
+        <span class="message-card__type-badge message-card__type-badge--@GetTypeClass()">
+            @GetTypeLabel()
+        </span>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Text))
+    {
+        <div class="message-card__body">
+            <CgHtmlContent Html="@Model.Text" />
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.Link))
+    {
+        <div class="message-card__actions">
+            <a class="message-card__link" href="@Model.Link">
+                <CgMdiIcon Name="mdiOpenInNew" aria-hidden="true" />
+                <span>查看详情</span>
+            </a>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public required MessageItemViewModel Model { get; set; }
+
+    private string GetTypeClass() => Model.Type switch
+    {
+        MessageType.ArticleReply or MessageType.CommentReply or MessageType.SpaceReply => "reply",
+        MessageType.ExaminePassed => "passed",
+        MessageType.ExamineUnPassed => "rejected",
+        MessageType.LotteryWinner => "lottery",
+        _ => "default"
+    };
+
+    private string GetTypeLabel() => Model.Type switch
+    {
+        MessageType.ArticleReply => "文章回复",
+        MessageType.CommentReply => "评论回复",
+        MessageType.SpaceReply => "空间留言",
+        MessageType.ExaminePassed => "审核通过",
+        MessageType.ExamineUnPassed => "审核驳回",
+        MessageType.LotteryWinner => "中奖通知",
+        _ => "通知"
+    };
+}

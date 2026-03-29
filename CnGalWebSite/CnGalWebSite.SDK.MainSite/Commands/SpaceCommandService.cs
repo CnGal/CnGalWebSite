@@ -110,4 +110,24 @@ public sealed class SpaceCommandService(
         memoryCache.Remove($"main-site:user-game-records:{userId}");
         memoryCache.Remove($"main-site:user-steam-info:{userId}");
     }
+
+    public async Task<SdkResult<string>> ReadAllMessagesAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await GetFromJsonAsync<Result>("api/space/ReadedAllMessages/", cancellationToken);
+
+            if (result is { Successful: true })
+            {
+                return SdkResult<string>.Ok("已将所有消息标记为已读");
+            }
+
+            return SdkResult<string>.Fail("MESSAGE_READ_ALL_FAILED", result?.Error ?? "标记消息已读失败");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "标记所有消息已读异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
+            return SdkResult<string>.Fail("MESSAGE_READ_ALL_EXCEPTION", "标记消息已读时发生异常");
+        }
+    }
 }
