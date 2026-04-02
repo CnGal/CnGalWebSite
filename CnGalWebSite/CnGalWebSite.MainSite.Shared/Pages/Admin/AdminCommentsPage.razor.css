@@ -1,0 +1,121 @@
+.admin-comments-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-6);
+}
+
+.admin-page-title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    font-size: var(--cg-font-size-xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+.admin-page-title ::deep .cg-mdi-icon {
+    width: 28px;
+    height: 28px;
+    color: var(--cg-color-primary);
+}
+
+/* ─── Comment cells ─── */
+
+.admin-comment-user {
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-primary);
+}
+
+.admin-comment-text {
+    white-space: pre-line;
+    max-width: 300px;
+    word-break: break-all;
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text);
+    line-height: 1.5;
+}
+
+.admin-comment-object {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+}
+
+/* ─── Badges ─── */
+
+.admin-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: var(--cg-radius-full);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    line-height: 1.6;
+}
+
+.admin-badge--visible {
+    background: color-mix(in srgb, var(--cg-color-success) 12%, transparent);
+    color: var(--cg-color-success);
+}
+
+.admin-badge--hidden {
+    background: color-mix(in srgb, var(--cg-color-error) 12%, transparent);
+    color: var(--cg-color-error);
+}
+
+/* ─── Action buttons ─── */
+
+.admin-actions {
+    display: flex;
+    gap: var(--cg-spacing-1);
+}
+
+.admin-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: var(--cg-radius-md);
+    cursor: pointer;
+    background: transparent;
+    transition: background var(--cg-transition-fast), color var(--cg-transition-fast);
+}
+
+.admin-action-btn ::deep .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.admin-action-btn--up {
+    color: var(--cg-color-success);
+}
+
+.admin-action-btn--up:hover {
+    background: color-mix(in srgb, var(--cg-color-success) 12%, transparent);
+}
+
+.admin-action-btn--down {
+    color: var(--cg-color-primary);
+}
+
+.admin-action-btn--down:hover {
+    background: color-mix(in srgb, var(--cg-color-primary) 12%, transparent);
+}
+
+.admin-action-btn--show {
+    color: var(--cg-color-warning);
+}
+
+.admin-action-btn--show:hover {
+    background: color-mix(in srgb, var(--cg-color-warning) 12%, transparent);
+}
+
+.admin-action-btn--hide {
+    color: var(--cg-color-error);
+}
+
+.admin-action-btn--hide:hover {
+    background: color-mix(in srgb, var(--cg-color-error) 12%, transparent);
+}

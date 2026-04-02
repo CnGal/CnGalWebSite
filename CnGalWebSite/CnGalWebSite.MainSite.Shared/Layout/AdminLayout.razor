@@ -1,0 +1,115 @@
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+
+<AuthorizeView Roles="Admin">
+    <Authorized>
+        <div class="admin-layout">
+            <aside class="admin-sidebar">
+                <a class="admin-sidebar__brand" href="/">
+                    <CgMdiIcon Name="mdiShieldCrownOutline" aria-hidden="true" />
+                    <span>CnGal 管理后台</span>
+                </a>
+
+                <nav class="admin-sidebar__nav" aria-label="管理导航">
+                    <a href="/admin" class="admin-nav-item @GetActiveClass("/admin/index", "/admin")">
+                        <CgMdiIcon Name="mdiViewDashboard" aria-hidden="true" />
+                        <span>概览</span>
+                    </a>
+                    <a href="/admin/tools" class="admin-nav-item @GetActiveClass("/admin/tools")">
+                        <CgMdiIcon Name="mdiWrenchOutline" aria-hidden="true" />
+                        <span>工具</span>
+                    </a>
+
+                    <div class="admin-nav-group-label">内容管理</div>
+                    <a href="/admin/listentries" class="admin-nav-item @GetActiveClass("/admin/listentries")">
+                        <CgMdiIcon Name="mdiBookOpenPageVariantOutline" aria-hidden="true" />
+                        <span>词条</span>
+                    </a>
+                    <a href="/admin/listarticles" class="admin-nav-item @GetActiveClass("/admin/listarticles")">
+                        <CgMdiIcon Name="mdiNoteTextOutline" aria-hidden="true" />
+                        <span>文章</span>
+                    </a>
+                    <a href="/admin/listvideos" class="admin-nav-item @GetActiveClass("/admin/listvideos")">
+                        <CgMdiIcon Name="mdiVideoOutline" aria-hidden="true" />
+                        <span>视频</span>
+                    </a>
+                    <a href="/admin/listtags" class="admin-nav-item @GetActiveClass("/admin/listtags")">
+                        <CgMdiIcon Name="mdiTagOutline" aria-hidden="true" />
+                        <span>标签</span>
+                    </a>
+                    <a href="/admin/listcomments" class="admin-nav-item @GetActiveClass("/admin/listcomments")">
+                        <CgMdiIcon Name="mdiCommentTextMultipleOutline" aria-hidden="true" />
+                        <span>评论</span>
+                    </a>
+
+                    <div class="admin-nav-group-label">系统</div>
+                    <a href="/admin/listusers" class="admin-nav-item @GetActiveClass("/admin/listusers")">
+                        <CgMdiIcon Name="mdiAccountGroupOutline" aria-hidden="true" />
+                        <span>用户</span>
+                    </a>
+                    <a href="/admin/listfiles" class="admin-nav-item @GetActiveClass("/admin/listfiles")">
+                        <CgMdiIcon Name="mdiFolderOutline" aria-hidden="true" />
+                        <span>文件</span>
+                    </a>
+                    <a href="/admin/listmessages" class="admin-nav-item @GetActiveClass("/admin/listmessages")">
+                        <CgMdiIcon Name="mdiEmailOutline" aria-hidden="true" />
+                        <span>消息</span>
+                    </a>
+                    <a href="/admin/managehome" class="admin-nav-item @GetActiveClass("/admin/managehome")">
+                        <CgMdiIcon Name="mdiCogOutline" aria-hidden="true" />
+                        <span>网站设置</span>
+                    </a>
+                </nav>
+
+                <div class="admin-sidebar__footer">
+                    <a href="/" class="admin-nav-item">
+                        <CgMdiIcon Name="mdiArrowLeft" aria-hidden="true" />
+                        <span>返回主站</span>
+                    </a>
+                </div>
+            </aside>
+
+            <div class="admin-main">
+                <header class="admin-topbar">
+                    <div class="admin-topbar__breadcrumb">
+                        <CgMdiIcon Name="mdiMenu" aria-hidden="true" />
+                        <span>管理后台</span>
+                    </div>
+                    <div class="admin-topbar__actions">
+                        <span class="admin-topbar__user">
+                            <CgMdiIcon Name="mdiAccountCircleOutline" aria-hidden="true" />
+                            @context.User.Identity?.Name
+                        </span>
+                    </div>
+                </header>
+
+                <main class="admin-content">
+                    @Body
+                </main>
+            </div>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="admin-not-authorized">
+            <CgMdiIcon Name="mdiShieldAlertOutline" aria-hidden="true" />
+            <h2>无权访问</h2>
+            <p>此页面仅限管理员访问。</p>
+            <a href="/">返回首页</a>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private string GetActiveClass(params string[] paths)
+    {
+        var currentPath = new Uri(NavigationManager.Uri).AbsolutePath.TrimEnd('/').ToLowerInvariant();
+        foreach (var path in paths)
+        {
+            if (currentPath == path.TrimEnd('/').ToLowerInvariant())
+            {
+                return "admin-nav-item--active";
+            }
+        }
+        return string.Empty;
+    }
+}

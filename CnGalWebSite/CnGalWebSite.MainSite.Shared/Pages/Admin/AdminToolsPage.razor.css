@@ -1,0 +1,27 @@
+.admin-tools-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-6);
+}
+
+.admin-page-title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    font-size: var(--cg-font-size-xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+.admin-page-title ::deep .cg-mdi-icon {
+    width: 28px;
+    height: 28px;
+    color: var(--cg-color-primary);
+}
+
+.admin-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--cg-spacing-4);
+}

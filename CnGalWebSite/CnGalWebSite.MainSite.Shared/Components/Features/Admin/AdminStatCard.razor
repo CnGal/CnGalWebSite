@@ -1,0 +1,18 @@
+@* AdminStatCard — 管理后台统计概览卡片 *@
+
+<div class="admin-stat-card" style="--_accent: @Color">
+    <div class="admin-stat-card__icon">
+        <CgMdiIcon Name="@Icon" aria-hidden="true" />
+    </div>
+    <div class="admin-stat-card__body">
+        <span class="admin-stat-card__label">@Label</span>
+        <span class="admin-stat-card__value">@Value</span>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; } = string.Empty;
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public string Icon { get; set; } = "mdiInformation";
+    [Parameter] public string Color { get; set; } = "var(--cg-color-primary)";
+}

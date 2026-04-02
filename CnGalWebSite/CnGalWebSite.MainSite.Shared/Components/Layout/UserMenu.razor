@@ -65,6 +65,16 @@
                     <span class="cg-badge cg-badge--inline" aria-label="@($"{_unreadCount} 条未读")">@FormatBadge(_unreadCount)</span>
                 }
             </a>
+            <AuthorizeView Roles="Admin">
+                <Authorized>
+                    <a class="cg-menu-item" href="/admin">
+                        <span class="cg-menu-item__icon cg-menu-item__icon--purple">
+                            <CgMdiIcon Name="mdiShieldCrownOutline" aria-hidden="true" />
+                        </span>
+                        <span class="cg-menu-item__text">管理后台</span>
+                    </a>
+                </Authorized>
+            </AuthorizeView>
         </div>
         <div class="cg-menu-divider"></div>
         <div class="cg-menu-list">

@@ -1,0 +1,148 @@
+@page "/admin/listcomments"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IAdminQueryService AdminQueryService
+@inject IAdminCommandService AdminCommandService
+@inject ICgToastService ToastService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Admin
+
+<PageTitle>评论管理 - CnGal</PageTitle>
+
+<div class="admin-comments-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiCommentTextMultipleOutline" aria-hidden="true" />
+        评论管理
+    </h1>
+
+    <CgDataTable TItem="CommentOverviewModel"
+                 Title="评论列表"
+                 OnServerQuery="OnServerQuery"
+                 DefaultSortField="Id"
+                 DefaultSortDesc="true"
+                 @ref="_dataTable">
+        <CgDataTableColumn TItem="CommentOverviewModel" Title="Id" Field="Id" Width="80px" />
+        <CgDataTableColumn TItem="CommentOverviewModel" Title="时间" Field="CommentTime">
+            <ChildContent Context="item">
+                @item.CommentTime.ToString("yyyy-MM-dd HH:mm")
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="CommentOverviewModel" Title="用户" Field="UserName">
+            <ChildContent Context="item">
+                <span class="admin-comment-user">@item.UserName</span>
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="CommentOverviewModel" Title="内容" Field="Text">
+            <ChildContent Context="item">
+                <div class="admin-comment-text">@item.Text</div>
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="CommentOverviewModel" Title="目标" Field="ObjectName">
+            <ChildContent Context="item">
+                <span class="admin-comment-object">@item.ObjectName</span>
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="CommentOverviewModel" Title="状态" Field="IsHidden">
+            <ChildContent Context="item">
+                @if (item.IsHidden)
+                {
+                    <span class="admin-badge admin-badge--hidden">已隐藏</span>
+                }
+                else
+                {
+                    <span class="admin-badge admin-badge--visible">可见</span>
+                }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="CommentOverviewModel" Title="优先级" Field="Priority" Width="80px" />
+        <CgDataTableColumn TItem="CommentOverviewModel" Title="操作" Sortable="false" Width="140px">
+            <ChildContent Context="item">
+                <div class="admin-actions">
+                    <button class="admin-action-btn admin-action-btn--up"
+                            title="增加权重"
+                            @onclick="() => EditPriority(item, true)">
+                        <CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" />
+                    </button>
+                    <button class="admin-action-btn admin-action-btn--down"
+                            title="降低权重"
+                            @onclick="() => EditPriority(item, false)">
+                        <CgMdiIcon Name="mdiArrowDownBold" aria-hidden="true" />
+                    </button>
+                    @if (item.IsHidden)
+                    {
+                        <button class="admin-action-btn admin-action-btn--show"
+                                title="显示评论"
+                                @onclick="() => ToggleHidden(item, false)">
+                            <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="admin-action-btn admin-action-btn--hide"
+                                title="隐藏评论"
+                                @onclick="() => ToggleHidden(item, true)">
+                            <CgMdiIcon Name="mdiEyeOffOutline" aria-hidden="true" />
+                        </button>
+                    }
+                </div>
+            </ChildContent>
+        </CgDataTableColumn>
+    </CgDataTable>
+</div>
+
+@code {
+    private CgDataTable<CommentOverviewModel>? _dataTable;
+
+    private async Task<CgDataTableResult<CommentOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? string.Empty,
+            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await AdminQueryService.GetCommentsAsync(parameter);
+        if (result.Success && result.Data is not null)
+        {
+            return new CgDataTableResult<CommentOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+        }
+
+        return new CgDataTableResult<CommentOverviewModel>([], 0);
+    }
+
+    private async Task EditPriority(CommentOverviewModel item, bool up)
+    {
+        var result = await AdminCommandService.EditCommentPriorityAsync(
+            new[] { item.Id }, up ? 1 : -1);
+
+        if (result.Success)
+        {
+            ToastService.Show(up ? "已增加权重" : "已降低权重", variant: "success");
+            if (_dataTable is not null) await _dataTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error");
+        }
+    }
+
+    private async Task ToggleHidden(CommentOverviewModel item, bool hide)
+    {
+        var result = await AdminCommandService.HideCommentAsync(
+            new[] { item.Id }, hide);
+
+        if (result.Success)
+        {
+            ToastService.Show(hide ? "已隐藏评论" : "已显示评论", variant: "success");
+            if (_dataTable is not null) await _dataTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error");
+        }
+    }
+}

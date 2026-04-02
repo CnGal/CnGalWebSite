@@ -1,0 +1,51 @@
+.admin-stat-card {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-4);
+    padding: var(--cg-spacing-5);
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    transition: box-shadow var(--cg-transition-fast);
+}
+
+.admin-stat-card:hover {
+    box-shadow: var(--cg-shadow-md);
+}
+
+.admin-stat-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--cg-radius-md);
+    background: color-mix(in srgb, var(--_accent) 12%, transparent);
+    color: var(--_accent);
+    flex-shrink: 0;
+}
+
+.admin-stat-card__icon ::deep .cg-mdi-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.admin-stat-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-1);
+    min-width: 0;
+}
+
+.admin-stat-card__label {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    font-weight: var(--cg-font-weight-medium);
+}
+
+.admin-stat-card__value {
+    font-size: var(--cg-font-size-xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    line-height: 1.2;
+}
