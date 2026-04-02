@@ -1,0 +1,78 @@
+@page "/admin"
+@page "/admin/index"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IAdminQueryService AdminQueryService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.MainSite.Shared.Components.Features.Admin
+
+<PageTitle>管理后台 - CnGal</PageTitle>
+
+<div class="admin-index-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiViewDashboard" aria-hidden="true" />
+        网站数据概览
+    </h1>
+
+    @if (ErrorMessage is not null)
+    {
+        <CgAlert Variant="error">@ErrorMessage</CgAlert>
+    }
+    else if (!IsReady)
+    {
+        <div class="admin-loading">
+            <CgProgressRing />
+            <span>加载中…</span>
+        </div>
+    }
+    else
+    {
+        <section class="admin-stats-grid">
+            <AdminStatCard Label="系统名称"
+                           Value="@(ServerModel?.SystemName ?? "—")"
+                           Icon="mdiServerNetwork"
+                           Color="var(--cg-color-primary)" />
+            <AdminStatCard Label="服务器名称"
+                           Value="@(ServerModel?.ServerName ?? "—")"
+                           Icon="mdiMonitor"
+                           Color="var(--cg-color-secondary)" />
+            <AdminStatCard Label="SDK 版本"
+                           Value="@(ServerModel?.SDKVersion ?? "—")"
+                           Icon="mdiCodeBraces"
+                           Color="var(--cg-color-success)" />
+            <AdminStatCard Label="最近更新时间"
+                           Value="@(ServerModel?.LastUpdateTime.ToString("yyyy-MM-dd HH:mm") ?? "—")"
+                           Icon="mdiUpdate"
+                           Color="var(--cg-color-warning)" />
+            <AdminStatCard Label="后台任务状态"
+                           Value="@(ServerModel?.IsRuningBackgroundTask == true ? "运行中" : "空闲")"
+                           Icon="mdiCog"
+                           Color="@(ServerModel?.IsRuningBackgroundTask == true ? "var(--cg-color-success)" : "var(--cg-color-text-muted)")" />
+        </section>
+    }
+</div>
+
+@code {
+    private ServerStaticOverviewModel? ServerModel;
+    private string? ErrorMessage;
+    private bool IsReady;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var result = await AdminQueryService.GetServerOverviewAsync();
+            if (result.Success && result.Data is not null)
+            {
+                ServerModel = result.Data;
+            }
+            else
+            {
+                ErrorMessage = result.Error?.Message ?? "获取服务器概览数据失败";
+            }
+            IsReady = true;
+            StateHasChanged();
+        }
+    }
+}

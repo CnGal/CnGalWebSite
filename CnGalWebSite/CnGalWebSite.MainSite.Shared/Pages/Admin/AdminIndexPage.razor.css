@@ -1,0 +1,37 @@
+.admin-index-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-6);
+}
+
+.admin-page-title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    font-size: var(--cg-font-size-xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+.admin-page-title ::deep .cg-mdi-icon {
+    width: 28px;
+    height: 28px;
+    color: var(--cg-color-primary);
+}
+
+.admin-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-10) 0;
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+}
+
+.admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--cg-spacing-4);
+}

@@ -1,0 +1,41 @@
+.admin-tool-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-5);
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    transition: box-shadow var(--cg-transition-fast);
+}
+
+.admin-tool-card:hover {
+    box-shadow: var(--cg-shadow-md);
+}
+
+.admin-tool-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+}
+
+.admin-tool-card__header ::deep .cg-mdi-icon {
+    width: 22px;
+    height: 22px;
+    color: var(--cg-color-primary);
+    flex-shrink: 0;
+}
+
+.admin-tool-card__title {
+    font-size: var(--cg-font-size-base);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+.admin-tool-card__desc {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    margin: 0;
+    line-height: 1.5;
+}

@@ -1,0 +1,45 @@
+@page "/admin/liststoreinfo"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IAdminQueryService AdminQueryService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Steam
+
+<PageTitle>商店信息管理 - CnGal</PageTitle>
+
+<div class="admin-list-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiStorefrontOutline" aria-hidden="true" />
+        商店信息管理
+    </h1>
+
+    <CgDataTable TItem="StoreInfoOverviewModel"
+                 Title="商店信息列表"
+                 OnServerQuery="OnServerQuery"
+                 DefaultSortField="Id"
+                 DefaultSortDesc="true">
+        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="Id" Field="Id" Width="80px" />
+        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="名称" Field="Name" />
+        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="平台" Field="PlatformName" />
+        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="链接" Field="Link">
+            <ChildContent Context="item">
+                <span class="admin-cell-muted">@item.Link</span>
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="状态" Field="State">
+            <ChildContent Context="item">
+                <span class="admin-badge admin-badge--info">@item.State</span>
+            </ChildContent>
+        </CgDataTableColumn>
+    </CgDataTable>
+</div>
+
+@code {
+    private async Task<CgDataTableResult<StoreInfoOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var result = await AdminQueryService.GetStoreInfoListAsync(parameter);
+        return result.Success && result.Data is not null ? new CgDataTableResult<StoreInfoOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<StoreInfoOverviewModel>([], 0);
+    }
+}

@@ -1,0 +1,48 @@
+@* AdminToolCard — 管理后台工具操作卡片 *@
+
+<div class="admin-tool-card">
+    <div class="admin-tool-card__header">
+        <CgMdiIcon Name="@Icon" aria-hidden="true" />
+        <h3 class="admin-tool-card__title">@Title</h3>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Description))
+    {
+        <p class="admin-tool-card__desc">@Description</p>
+    }
+    <CgButton Variant="secondary"
+              Disabled="@Loading"
+              OnClick="@HandleClick">
+        @if (Loading)
+        {
+            <CgProgressRing />
+            <span>执行中…</span>
+        }
+        else
+        {
+            <span>执行</span>
+        }
+    </CgButton>
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string Description { get; set; } = string.Empty;
+    [Parameter] public string Icon { get; set; } = "mdiWrenchOutline";
+    [Parameter] public EventCallback OnClick { get; set; }
+
+    private bool Loading { get; set; }
+
+    private async Task HandleClick()
+    {
+        if (Loading) return;
+        Loading = true;
+        try
+        {
+            await OnClick.InvokeAsync();
+        }
+        finally
+        {
+            Loading = false;
+        }
+    }
+}

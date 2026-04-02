@@ -176,6 +176,11 @@
     color: var(--cg-color-error);
 }
 
+.cg-menu-item__icon--purple {
+    background: color-mix(in oklab, var(--cg-color-brand-purple, #7c3aed) 12%, transparent);
+    color: var(--cg-color-brand-purple, #7c3aed);
+}
+
 /* ── Danger Item ── */
 
 .cg-menu-item--danger {

@@ -1,0 +1,101 @@
+using CnGalWebSite.SDK.MainSite.Models;
+
+namespace CnGalWebSite.SDK.MainSite.Abstractions;
+
+public interface IAdminCommandService
+{
+    /// <summary>
+    /// 刷新搜索缓存（重建 ES 索引）。
+    /// </summary>
+    Task<SdkResult<bool>> RefreshSearchDataAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 执行预置的临时脚本。
+    /// </summary>
+    Task<SdkResult<bool>> RunTempFunctionAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 调整评论优先级。
+    /// </summary>
+    Task<SdkResult<bool>> EditCommentPriorityAsync(long[] ids, int plusPriority, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 隐藏或显示评论。
+    /// </summary>
+    Task<SdkResult<bool>> HideCommentAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default);
+
+    // ─── 词条操作 ───
+
+    /// <summary>
+    /// 调整词条优先级。
+    /// </summary>
+    Task<SdkResult<bool>> EditEntryPriorityAsync(int[] ids, int plusPriority, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 隐藏或显示词条。
+    /// </summary>
+    Task<SdkResult<bool>> HideEntryAsync(int[] ids, bool isHidden, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 隐藏或显示词条外链。
+    /// </summary>
+    Task<SdkResult<bool>> HideEntryOutlinkAsync(int[] ids, bool isHidden, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 设置词条可否评论。
+    /// </summary>
+    Task<SdkResult<bool>> EditEntryCanCommentAsync(int[] ids, bool canComment, CancellationToken cancellationToken = default);
+
+    // ─── 文章操作 ───
+
+    /// <summary>
+    /// 调整文章优先级。
+    /// </summary>
+    Task<SdkResult<bool>> EditArticlePriorityAsync(long[] ids, int plusPriority, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 隐藏或显示文章。
+    /// </summary>
+    Task<SdkResult<bool>> HideArticleAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 设置文章可否评论。
+    /// </summary>
+    Task<SdkResult<bool>> EditArticleCanCommentAsync(long[] ids, bool canComment, CancellationToken cancellationToken = default);
+
+    // ─── 视频操作 ───
+
+    Task<SdkResult<bool>> EditVideoPriorityAsync(long[] ids, int plusPriority, CancellationToken cancellationToken = default);
+    Task<SdkResult<bool>> HideVideoAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default);
+    Task<SdkResult<bool>> EditVideoCanCommentAsync(long[] ids, bool canComment, CancellationToken cancellationToken = default);
+
+    // ─── 标签操作 ───
+
+    Task<SdkResult<bool>> HideTagAsync(int[] ids, bool isHidden, CancellationToken cancellationToken = default);
+
+    // ─── 抽奖操作 ───
+
+    Task<SdkResult<bool>> EditLotteryPriorityAsync(long[] ids, int plusPriority, CancellationToken cancellationToken = default);
+    Task<SdkResult<bool>> HideLotteryAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default);
+    Task<SdkResult<bool>> EditLotteryCanCommentAsync(long[] ids, bool canComment, CancellationToken cancellationToken = default);
+
+    // ─── 周边操作 ───
+
+    Task<SdkResult<bool>> EditPeripheryPriorityAsync(long[] ids, int plusPriority, CancellationToken cancellationToken = default);
+    Task<SdkResult<bool>> HidePeripheryAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default);
+    Task<SdkResult<bool>> EditPeripheryCanCommentAsync(long[] ids, bool canComment, CancellationToken cancellationToken = default);
+
+    // ─── 投票操作 ───
+
+    Task<SdkResult<bool>> EditVotePriorityAsync(long[] ids, int plusPriority, CancellationToken cancellationToken = default);
+    Task<SdkResult<bool>> HideVoteAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default);
+    Task<SdkResult<bool>> EditVoteCanCommentAsync(long[] ids, bool canComment, CancellationToken cancellationToken = default);
+
+    // ─── 用户操作 ───
+
+    Task<SdkResult<bool>> EditSpaceCanCommentAsync(string[] ids, bool canComment, CancellationToken cancellationToken = default);
+
+    // ─── 备份操作 ───
+
+    Task<SdkResult<bool>> RunBackUpArchiveAsync(long[] ids, CancellationToken cancellationToken = default);
+}

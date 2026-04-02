@@ -1,0 +1,35 @@
+@page "/admin/listalmanacs"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IAdminQueryService AdminQueryService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Almanacs
+
+<PageTitle>年鉴管理 - CnGal</PageTitle>
+
+<div class="admin-list-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiCalendarTextOutline" aria-hidden="true" />
+        年鉴管理
+    </h1>
+
+    <CgDataTable TItem="AlmanacOverviewModel"
+                 Title="年鉴列表"
+                 OnServerQuery="OnServerQuery"
+                 DefaultSortField="Id"
+                 DefaultSortDesc="true">
+        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="Id" Field="Id" Width="80px" />
+        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="名称" Field="Name" />
+        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="年份" Field="Year" Width="80px" />
+    </CgDataTable>
+</div>
+
+@code {
+    private async Task<CgDataTableResult<AlmanacOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var result = await AdminQueryService.GetAlmanacsAsync(parameter);
+        return result.Success && result.Data is not null ? new CgDataTableResult<AlmanacOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<AlmanacOverviewModel>([], 0);
+    }
+}

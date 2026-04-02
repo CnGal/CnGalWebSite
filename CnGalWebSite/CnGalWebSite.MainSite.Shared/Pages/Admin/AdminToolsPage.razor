@@ -1,0 +1,58 @@
+@page "/admin/tools"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IAdminCommandService AdminCommandService
+@inject ICgToastService ToastService
+@using CnGalWebSite.MainSite.Shared.Components.Features.Admin
+
+<PageTitle>管理工具 - CnGal</PageTitle>
+
+<div class="admin-tools-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiWrenchOutline" aria-hidden="true" />
+        管理工具
+    </h1>
+
+    <div class="admin-tools-grid">
+        <AdminToolCard Title="刷新搜索缓存"
+                       Description="将会删除 ES 数据并重新设置，建议重启 ES 后执行"
+                       Icon="mdiDatabaseRefreshOutline"
+                       OnClick="OnRefreshSearchData" />
+
+        <AdminToolCard Title="执行临时脚本"
+                       Description="将会执行预设置好的临时脚本"
+                       Icon="mdiScriptTextPlayOutline"
+                       OnClick="OnRunTempFunction" />
+    </div>
+</div>
+
+@code {
+    private async Task OnRefreshSearchData()
+    {
+        ToastService.Show("正在刷新搜索缓存，请稍候…", variant: "info");
+        var result = await AdminCommandService.RefreshSearchDataAsync();
+        if (result.Success)
+        {
+            ToastService.Show("成功刷新搜索缓存", variant: "success");
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "刷新搜索缓存失败", variant: "error");
+        }
+    }
+
+    private async Task OnRunTempFunction()
+    {
+        ToastService.Show("正在执行临时脚本，请稍候…", variant: "info");
+        var result = await AdminCommandService.RunTempFunctionAsync();
+        if (result.Success)
+        {
+            ToastService.Show("成功执行临时脚本", variant: "success");
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "执行临时脚本失败", variant: "error");
+        }
+    }
+}

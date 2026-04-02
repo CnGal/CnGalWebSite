@@ -1,0 +1,57 @@
+@page "/admin/listbackuparchives"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IAdminQueryService AdminQueryService
+@inject IAdminCommandService AdminCommandService
+@inject ICgToastService ToastService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.BackUpArchives
+
+<PageTitle>备份管理 - CnGal</PageTitle>
+
+<div class="admin-list-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiDatabaseOutline" aria-hidden="true" />
+        备份管理
+    </h1>
+
+    <CgDataTable TItem="BackUpArchiveOverviewModel"
+                 Title="备份列表"
+                 OnServerQuery="OnServerQuery"
+                 DefaultSortField="Id"
+                 DefaultSortDesc="true"
+                 @ref="_dataTable">
+        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" Title="Id" Field="Id" Width="80px" />
+        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" Title="最后备份时间" Field="LastBackUpTime">
+            <ChildContent Context="item">@item.LastBackUpTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" Title="操作" Sortable="false" Width="50px">
+            <ChildContent Context="item">
+                <div class="admin-actions">
+                    <button class="admin-action-btn admin-action-btn--run" title="执行备份" @onclick="() => RunBackUp(item)">
+                        <CgMdiIcon Name="mdiPlayCircleOutline" aria-hidden="true" />
+                    </button>
+                </div>
+            </ChildContent>
+        </CgDataTableColumn>
+    </CgDataTable>
+</div>
+
+@code {
+    private CgDataTable<BackUpArchiveOverviewModel>? _dataTable;
+
+    private async Task<CgDataTableResult<BackUpArchiveOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var result = await AdminQueryService.GetBackUpArchivesAsync(parameter);
+        return result.Success && result.Data is not null ? new CgDataTableResult<BackUpArchiveOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<BackUpArchiveOverviewModel>([], 0);
+    }
+
+    private async Task RunBackUp(BackUpArchiveOverviewModel item)
+    {
+        var r = await AdminCommandService.RunBackUpArchiveAsync(new[] { item.Id });
+        if (r.Success) { ToastService.Show("备份任务已执行", variant: "success"); if (_dataTable is not null) await _dataTable.RefreshAsync(); }
+        else { ToastService.Show(r.Error?.Message ?? "执行备份失败", variant: "error"); }
+    }
+}

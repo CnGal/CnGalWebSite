@@ -1,0 +1,74 @@
+@page "/admin/listperipheries"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IAdminQueryService AdminQueryService
+@inject IAdminCommandService AdminCommandService
+@inject ICgToastService ToastService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Peripheries
+
+<PageTitle>周边管理 - CnGal</PageTitle>
+
+<div class="admin-list-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiToyBrickOutline" aria-hidden="true" />
+        周边管理
+    </h1>
+
+    <CgDataTable TItem="PeripheryOverviewModel" Title="周边列表" OnServerQuery="OnServerQuery" DefaultSortField="Id" DefaultSortDesc="true" @ref="_dataTable">
+        <CgDataTableColumn TItem="PeripheryOverviewModel" Title="Id" Field="Id" Width="80px" />
+        <CgDataTableColumn TItem="PeripheryOverviewModel" Title="名称" Field="Name">
+            <ChildContent Context="item"><a class="admin-cell-name" href="@($"/peripheries/index/{item.Id}")">@item.Name</a></ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="PeripheryOverviewModel" Title="最后编辑" Field="LastEditTime">
+            <ChildContent Context="item">@item.LastEditTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="PeripheryOverviewModel" Title="优先级" Field="Priority" Width="80px" />
+        <CgDataTableColumn TItem="PeripheryOverviewModel" Title="状态" Field="IsHidden">
+            <ChildContent Context="item">
+                @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
+                else { <span class="admin-badge admin-badge--visible">可见</span> }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="PeripheryOverviewModel" Title="留言板" Field="CanComment">
+            <ChildContent Context="item">
+                @if (item.CanComment) { <span class="admin-badge admin-badge--yes">开启</span> }
+                else { <span class="admin-badge admin-badge--no">关闭</span> }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="PeripheryOverviewModel" Title="操作" Sortable="false" Width="150px">
+            <ChildContent Context="item">
+                <div class="admin-actions">
+                    <button class="admin-action-btn admin-action-btn--up" title="增加权重" @onclick="() => EditPriority(item, true)"><CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" /></button>
+                    <button class="admin-action-btn admin-action-btn--down" title="降低权重" @onclick="() => EditPriority(item, false)"><CgMdiIcon Name="mdiArrowDownBold" aria-hidden="true" /></button>
+                    @if (item.CanComment) { <button class="admin-action-btn admin-action-btn--nocomment" title="关闭留言板" @onclick="() => ToggleCanComment(item, false)"><CgMdiIcon Name="mdiCommentRemoveOutline" aria-hidden="true" /></button> }
+                    else { <button class="admin-action-btn admin-action-btn--comment" title="开启留言板" @onclick="() => ToggleCanComment(item, true)"><CgMdiIcon Name="mdiCommentCheckOutline" aria-hidden="true" /></button> }
+                    @if (item.IsHidden) { <button class="admin-action-btn admin-action-btn--show" title="显示" @onclick="() => ToggleHidden(item, false)"><CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" /></button> }
+                    else { <button class="admin-action-btn admin-action-btn--hide" title="隐藏" @onclick="() => ToggleHidden(item, true)"><CgMdiIcon Name="mdiEyeOffOutline" aria-hidden="true" /></button> }
+                </div>
+            </ChildContent>
+        </CgDataTableColumn>
+    </CgDataTable>
+</div>
+
+@code {
+    private CgDataTable<PeripheryOverviewModel>? _dataTable;
+
+    private async Task<CgDataTableResult<PeripheryOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var result = await AdminQueryService.GetPeripheriesAsync(parameter);
+        return result.Success && result.Data is not null ? new CgDataTableResult<PeripheryOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<PeripheryOverviewModel>([], 0);
+    }
+
+    private async Task EditPriority(PeripheryOverviewModel item, bool up) { var r = await AdminCommandService.EditPeripheryPriorityAsync(new[] { item.Id }, up ? 1 : -1); await HandleResult(r, up ? "已增加权重" : "已降低权重"); }
+    private async Task ToggleHidden(PeripheryOverviewModel item, bool hide) { var r = await AdminCommandService.HidePeripheryAsync(new[] { item.Id }, hide); await HandleResult(r, hide ? "已隐藏" : "已显示"); }
+    private async Task ToggleCanComment(PeripheryOverviewModel item, bool canComment) { var r = await AdminCommandService.EditPeripheryCanCommentAsync(new[] { item.Id }, canComment); await HandleResult(r, canComment ? "已开启留言板" : "已关闭留言板"); }
+
+    private async Task HandleResult(SdkResult<bool> result, string successMessage)
+    {
+        if (result.Success) { ToastService.Show(successMessage, variant: "success"); if (_dataTable is not null) await _dataTable.RefreshAsync(); }
+        else { ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error"); }
+    }
+}

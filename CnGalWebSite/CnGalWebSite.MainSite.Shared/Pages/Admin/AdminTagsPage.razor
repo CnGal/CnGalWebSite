@@ -1,0 +1,69 @@
+@page "/admin/listtags"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IAdminQueryService AdminQueryService
+@inject IAdminCommandService AdminCommandService
+@inject ICgToastService ToastService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Tags
+
+<PageTitle>标签管理 - CnGal</PageTitle>
+
+<div class="admin-list-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiTagOutline" aria-hidden="true" />
+        标签管理
+    </h1>
+
+    <CgDataTable TItem="TagOverviewModel"
+                 Title="标签列表"
+                 OnServerQuery="OnServerQuery"
+                 DefaultSortField="Id"
+                 DefaultSortDesc="true"
+                 @ref="_dataTable">
+        <CgDataTableColumn TItem="TagOverviewModel" Title="Id" Field="Id" Width="80px" />
+        <CgDataTableColumn TItem="TagOverviewModel" Title="名称" Field="Name">
+            <ChildContent Context="item">
+                <a class="admin-cell-name" href="@($"/tags/index/{item.Id}")">@item.Name</a>
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="TagOverviewModel" Title="最后编辑" Field="LastEditTime">
+            <ChildContent Context="item">@item.LastEditTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="TagOverviewModel" Title="状态" Field="IsHidden">
+            <ChildContent Context="item">
+                @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
+                else { <span class="admin-badge admin-badge--visible">可见</span> }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="TagOverviewModel" Title="操作" Sortable="false" Width="80px">
+            <ChildContent Context="item">
+                <div class="admin-actions">
+                    @if (item.IsHidden)
+                    { <button class="admin-action-btn admin-action-btn--show" title="显示" @onclick="() => ToggleHidden(item, false)"><CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" /></button> }
+                    else
+                    { <button class="admin-action-btn admin-action-btn--hide" title="隐藏" @onclick="() => ToggleHidden(item, true)"><CgMdiIcon Name="mdiEyeOffOutline" aria-hidden="true" /></button> }
+                </div>
+            </ChildContent>
+        </CgDataTableColumn>
+    </CgDataTable>
+</div>
+
+@code {
+    private CgDataTable<TagOverviewModel>? _dataTable;
+
+    private async Task<CgDataTableResult<TagOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var result = await AdminQueryService.GetTagsAsync(parameter);
+        return result.Success && result.Data is not null ? new CgDataTableResult<TagOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<TagOverviewModel>([], 0);
+    }
+
+    private async Task ToggleHidden(TagOverviewModel item, bool hide)
+    {
+        var r = await AdminCommandService.HideTagAsync(new[] { item.Id }, hide);
+        if (r.Success) { ToastService.Show(hide ? "已隐藏标签" : "已显示标签", variant: "success"); if (_dataTable is not null) await _dataTable.RefreshAsync(); }
+        else { ToastService.Show(r.Error?.Message ?? "操作失败", variant: "error"); }
+    }
+}
