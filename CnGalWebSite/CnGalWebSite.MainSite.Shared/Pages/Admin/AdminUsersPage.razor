@@ -1,0 +1,82 @@
+@page "/admin/listusers"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IAdminQueryService AdminQueryService
+@inject IAdminCommandService AdminCommandService
+@inject ICgToastService ToastService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Admin
+
+<PageTitle>用户管理 - CnGal</PageTitle>
+
+<div class="admin-list-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiAccountGroupOutline" aria-hidden="true" />
+        用户管理
+    </h1>
+
+    <CgDataTable TItem="UserOverviewModel"
+                 Title="用户列表"
+                 OnServerQuery="OnServerQuery"
+                 DefaultSortField="RegistTime"
+                 DefaultSortDesc="true"
+                 @ref="_dataTable">
+        <CgDataTableColumn TItem="UserOverviewModel" Title="用户名" Field="UserName">
+            <ChildContent Context="item">
+                <a class="admin-cell-name" href="@($"/space/index/{item.Id}")">@item.UserName</a>
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="UserOverviewModel" Title="邮箱" Field="Email" />
+        <CgDataTableColumn TItem="UserOverviewModel" Title="个性签名" Field="PersonalSignature">
+            <ChildContent Context="item">
+                <div class="admin-cell-text">@item.PersonalSignature</div>
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="UserOverviewModel" Title="注册时间" Field="RegistTime">
+            <ChildContent Context="item">@item.RegistTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="UserOverviewModel" Title="最后在线" Field="LastOnlineTime">
+            <ChildContent Context="item">@item.LastOnlineTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="UserOverviewModel" Title="在线时长(h)" Field="OnlineTime">
+            <ChildContent Context="item">@((item.OnlineTime / 3600.0).ToString("0.0"))</ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="UserOverviewModel" Title="贡献值" Field="DisplayContributionValue" Width="80px" />
+        <CgDataTableColumn TItem="UserOverviewModel" Title="积分" Field="DisplayIntegral" Width="80px" />
+        <CgDataTableColumn TItem="UserOverviewModel" Title="留言板" Field="CanComment">
+            <ChildContent Context="item">
+                @if (item.CanComment) { <span class="admin-badge admin-badge--yes">开启</span> }
+                else { <span class="admin-badge admin-badge--no">关闭</span> }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="UserOverviewModel" Title="操作" Sortable="false" Width="50px">
+            <ChildContent Context="item">
+                <div class="admin-actions">
+                    @if (item.CanComment)
+                    { <button class="admin-action-btn admin-action-btn--nocomment" title="关闭留言板" @onclick="() => ToggleCanComment(item, false)"><CgMdiIcon Name="mdiCommentRemoveOutline" aria-hidden="true" /></button> }
+                    else
+                    { <button class="admin-action-btn admin-action-btn--comment" title="开启留言板" @onclick="() => ToggleCanComment(item, true)"><CgMdiIcon Name="mdiCommentCheckOutline" aria-hidden="true" /></button> }
+                </div>
+            </ChildContent>
+        </CgDataTableColumn>
+    </CgDataTable>
+</div>
+
+@code {
+    private CgDataTable<UserOverviewModel>? _dataTable;
+
+    private async Task<CgDataTableResult<UserOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "RegistTime" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var result = await AdminQueryService.GetUsersAsync(parameter);
+        return result.Success && result.Data is not null ? new CgDataTableResult<UserOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<UserOverviewModel>([], 0);
+    }
+
+    private async Task ToggleCanComment(UserOverviewModel item, bool canComment)
+    {
+        var r = await AdminCommandService.EditSpaceCanCommentAsync(new[] { item.Id }, canComment);
+        if (r.Success) { ToastService.Show(canComment ? "已开启留言板" : "已关闭留言板", variant: "success"); if (_dataTable is not null) await _dataTable.RefreshAsync(); }
+        else { ToastService.Show(r.Error?.Message ?? "操作失败", variant: "error"); }
+    }
+}
