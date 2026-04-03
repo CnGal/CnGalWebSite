@@ -98,4 +98,12 @@ public interface IAdminCommandService
     // ─── 备份操作 ───
 
     Task<SdkResult<bool>> RunBackUpArchiveAsync(long[] ids, CancellationToken cancellationToken = default);
+
+    // ─── 轮播图操作 ───
+
+    Task<SdkResult<bool>> EditCarouselPriorityAsync(int[] ids, int plusPriority, CancellationToken cancellationToken = default);
+
+    // ─── 友情链接操作 ───
+
+    Task<SdkResult<bool>> EditFriendLinkPriorityAsync(int[] ids, int plusPriority, CancellationToken cancellationToken = default);
 }

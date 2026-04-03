@@ -8,7 +8,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CnGalWebSite.DataModel\CnGalWebSite.DataModel.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.DrawingBed.Models\CnGalWebSite.DrawingBed.Models.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Extensions\CnGalWebSite.Extensions.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.TimedTask.Models\CnGalWebSite.TimedTask.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>
