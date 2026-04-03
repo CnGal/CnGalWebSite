@@ -1,0 +1,132 @@
+@page "/admin/manageexpo"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IAdminQueryService AdminQueryService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Expo
+
+<PageTitle>展会管理 - CnGal</PageTitle>
+
+<div class="admin-list-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiCalendarStar" aria-hidden="true" />
+        展会管理
+    </h1>
+
+    <CgTabs Items="@_tabs"
+            DefaultActiveKey="activities"
+            Variant="underline"
+            AriaLabel="展会管理"
+            Id="admin-expo-tabs">
+        <PanelTemplate>
+            @if (context == "activities")
+            {
+                <CgDataTable TItem="ExpoActivityOverviewModel"
+                             Title="活动列表"
+                             OnServerQuery="OnQueryActivities"
+                             DefaultSortField="Id"
+                             DefaultSortDesc="true">
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="Id" Field="Id" Width="80px" />
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="名称" Field="Name" />
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="优先级" Field="Priority" Width="80px" />
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="票根数" Field="TicketCount" Width="80px" />
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="状态" Field="Hidden">
+                        <ChildContent Context="item">
+                            @if (item.Hidden)
+                            {
+                                <span class="admin-badge admin-badge--hidden">已隐藏</span>
+                            }
+                            else
+                            {
+                                <span class="admin-badge admin-badge--visible">可见</span>
+                            }
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="创建时间" Field="CreateTime" Width="160px">
+                        <ChildContent Context="item">
+                            @item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+                        </ChildContent>
+                    </CgDataTableColumn>
+                </CgDataTable>
+            }
+            else if (context == "tickets")
+            {
+                <CgDataTable TItem="ExpoTicketOverviewModel"
+                             Title="票根列表"
+                             OnServerQuery="OnQueryTickets"
+                             DefaultSortField="Id"
+                             DefaultSortDesc="true">
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="Id" Field="Id" Width="80px" />
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="昵称" Field="Nickname" />
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="活动" Field="ActivityName" />
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="座位" Field="SeatInfo" />
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="编号" Field="Number" Width="80px" />
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="状态" Field="Hidden">
+                        <ChildContent Context="item">
+                            @if (item.Hidden)
+                            {
+                                <span class="admin-badge admin-badge--hidden">已隐藏</span>
+                            }
+                            else
+                            {
+                                <span class="admin-badge admin-badge--visible">可见</span>
+                            }
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="创建时间" Field="CreateTime" Width="160px">
+                        <ChildContent Context="item">
+                            @item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+                        </ChildContent>
+                    </CgDataTableColumn>
+                </CgDataTable>
+            }
+        </PanelTemplate>
+    </CgTabs>
+</div>
+
+@code {
+    private readonly IReadOnlyList<CgTabItem> _tabs =
+    [
+        new CgTabItem("activities", "活动管理", "mdiCalendarStar"),
+        new CgTabItem("tickets", "票根管理", "mdiTicket"),
+    ];
+
+    private async Task<CgDataTableResult<ExpoActivityOverviewModel>> OnQueryActivities(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? string.Empty,
+            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await AdminQueryService.GetExpoActivitiesAsync(parameter);
+        if (result.Success && result.Data is not null)
+        {
+            return new CgDataTableResult<ExpoActivityOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+        }
+        return new CgDataTableResult<ExpoActivityOverviewModel>([], 0);
+    }
+
+    private async Task<CgDataTableResult<ExpoTicketOverviewModel>> OnQueryTickets(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? string.Empty,
+            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await AdminQueryService.GetExpoTicketsAsync(parameter);
+        if (result.Success && result.Data is not null)
+        {
+            return new CgDataTableResult<ExpoTicketOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+        }
+        return new CgDataTableResult<ExpoTicketOverviewModel>([], 0);
+    }
+}

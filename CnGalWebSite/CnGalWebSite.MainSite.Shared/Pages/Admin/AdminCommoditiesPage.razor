@@ -1,0 +1,132 @@
+@page "/admin/listcommodities"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IAdminQueryService AdminQueryService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Commodities
+
+<PageTitle>看板娘小卖铺 - CnGal</PageTitle>
+
+<div class="admin-list-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiStorefrontOutline" aria-hidden="true" />
+        看板娘小卖铺
+    </h1>
+
+    <CgTabs Items="@_tabs"
+            DefaultActiveKey="commodities"
+            Variant="underline"
+            AriaLabel="小卖铺管理"
+            Id="admin-commodity-tabs">
+        <PanelTemplate>
+            @if (context == "commodities")
+            {
+                <CgDataTable TItem="CommodityOverviewModel"
+                             Title="商品列表"
+                             OnServerQuery="OnQueryCommodities"
+                             DefaultSortField="Id"
+                             DefaultSortDesc="true">
+                    <CgDataTableColumn TItem="CommodityOverviewModel" Title="Id" Field="Id" Width="80px" />
+                    <CgDataTableColumn TItem="CommodityOverviewModel" Title="名称" Field="Name" />
+                    <CgDataTableColumn TItem="CommodityOverviewModel" Title="价格" Field="Price" Width="80px" />
+                    <CgDataTableColumn TItem="CommodityOverviewModel" Title="类型" Field="Type">
+                        <ChildContent Context="item">
+                            <span class="admin-badge">@item.Type</span>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="CommodityOverviewModel" Title="用户数" Field="UserCount" Width="80px" />
+                    <CgDataTableColumn TItem="CommodityOverviewModel" Title="状态" Field="IsHidden">
+                        <ChildContent Context="item">
+                            @if (item.IsHidden)
+                            {
+                                <span class="admin-badge admin-badge--hidden">已隐藏</span>
+                            }
+                            else
+                            {
+                                <span class="admin-badge admin-badge--visible">可见</span>
+                            }
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="CommodityOverviewModel" Title="优先级" Field="Priority" Width="80px" />
+                </CgDataTable>
+            }
+            else if (context == "codes")
+            {
+                <CgDataTable TItem="CommodityCodeOverviewModel"
+                             Title="兑换码列表"
+                             OnServerQuery="OnQueryCodes"
+                             DefaultSortField="Id"
+                             DefaultSortDesc="true">
+                    <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="Id" Field="Id" Width="80px" />
+                    <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="兑换码" Field="Code" />
+                    <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="类型" Field="Type">
+                        <ChildContent Context="item">
+                            <span class="admin-badge">@item.Type</span>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="数量" Field="Count" Width="80px" />
+                    <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="状态" Field="Redeemed">
+                        <ChildContent Context="item">
+                            @if (item.Redeemed)
+                            {
+                                <span class="admin-badge admin-badge--hidden">已兑换</span>
+                            }
+                            else
+                            {
+                                <span class="admin-badge admin-badge--visible">未兑换</span>
+                            }
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="用户" Field="UserName" Width="120px" />
+                </CgDataTable>
+            }
+        </PanelTemplate>
+    </CgTabs>
+</div>
+
+@code {
+    private readonly IReadOnlyList<CgTabItem> _tabs =
+    [
+        new CgTabItem("commodities", "小卖铺", "mdiStorefrontOutline"),
+        new CgTabItem("codes", "兑换码", "mdiGiftOutline"),
+    ];
+
+    private async Task<CgDataTableResult<CommodityOverviewModel>> OnQueryCommodities(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? string.Empty,
+            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await AdminQueryService.GetCommoditiesAsync(parameter);
+        if (result.Success && result.Data is not null)
+        {
+            return new CgDataTableResult<CommodityOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+        }
+        return new CgDataTableResult<CommodityOverviewModel>([], 0);
+    }
+
+    private async Task<CgDataTableResult<CommodityCodeOverviewModel>> OnQueryCodes(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? string.Empty,
+            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await AdminQueryService.GetCommodityCodesAsync(parameter);
+        if (result.Success && result.Data is not null)
+        {
+            return new CgDataTableResult<CommodityCodeOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+        }
+        return new CgDataTableResult<CommodityCodeOverviewModel>([], 0);
+    }
+}

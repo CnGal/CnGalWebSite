@@ -1,0 +1,142 @@
+@page "/admin/listnews"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IAdminQueryService AdminQueryService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Admin
+@using CnGalWebSite.DataModel.ViewModel.News
+
+<PageTitle>动态管理 - CnGal</PageTitle>
+
+<div class="admin-list-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiNewspaperVariantOutline" aria-hidden="true" />
+        动态管理
+    </h1>
+
+    <CgTabs Items="@_tabs"
+            DefaultActiveKey="gamenews"
+            Variant="underline"
+            AriaLabel="动态管理"
+            Id="admin-news-tabs">
+        <PanelTemplate>
+            @if (context == "gamenews")
+            {
+                <CgDataTable TItem="GameNewsOverviewModel"
+                             Title="游戏动态列表"
+                             OnServerQuery="OnQueryGameNews"
+                             DefaultSortField="Id"
+                             DefaultSortDesc="true">
+                    <CgDataTableColumn TItem="GameNewsOverviewModel" Title="Id" Field="Id" Width="80px" />
+                    <CgDataTableColumn TItem="GameNewsOverviewModel" Title="标题" Field="Title">
+                        <ChildContent Context="item">
+                            @if (item.ArticleId > 0)
+                            {
+                                <a class="admin-cell-name" href="@($"/articles/index/{item.ArticleId}")">@item.Title</a>
+                            }
+                            else
+                            {
+                                <span>@item.Title</span>
+                            }
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameNewsOverviewModel" Title="作者" Field="Author" Width="120px" />
+                    <CgDataTableColumn TItem="GameNewsOverviewModel" Title="状态" Field="State">
+                        <ChildContent Context="item">
+                            <span class="admin-badge">@item.State</span>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameNewsOverviewModel" Title="发布时间" Field="PublishTime" Width="160px">
+                        <ChildContent Context="item">
+                            @item.PublishTime.ToString("yyyy-MM-dd HH:mm")
+                        </ChildContent>
+                    </CgDataTableColumn>
+                </CgDataTable>
+            }
+            else if (context == "weeklynews")
+            {
+                <CgDataTable TItem="WeeklyNewsOverviewModel"
+                             Title="周报列表"
+                             OnServerQuery="OnQueryWeeklyNews"
+                             DefaultSortField="Id"
+                             DefaultSortDesc="true">
+                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="Id" Field="Id" Width="80px" />
+                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="标题" Field="Title">
+                        <ChildContent Context="item">
+                            @if (item.ArticleId > 0)
+                            {
+                                <a class="admin-cell-name" href="@($"/articles/index/{item.ArticleId}")">@item.Title</a>
+                            }
+                            else
+                            {
+                                <span>@item.Title</span>
+                            }
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="状态" Field="State">
+                        <ChildContent Context="item">
+                            <span class="admin-badge">@item.State</span>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="发布时间" Field="PublishTime" Width="160px">
+                        <ChildContent Context="item">
+                            @item.PublishTime.ToString("yyyy-MM-dd HH:mm")
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="创建时间" Field="CreateTime" Width="160px">
+                        <ChildContent Context="item">
+                            @item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+                        </ChildContent>
+                    </CgDataTableColumn>
+                </CgDataTable>
+            }
+        </PanelTemplate>
+    </CgTabs>
+</div>
+
+@code {
+    private readonly IReadOnlyList<CgTabItem> _tabs =
+    [
+        new CgTabItem("gamenews", "动态", "mdiNewspaperVariantOutline"),
+        new CgTabItem("weeklynews", "周报", "mdiCalendarRange"),
+    ];
+
+    private async Task<CgDataTableResult<GameNewsOverviewModel>> OnQueryGameNews(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? string.Empty,
+            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await AdminQueryService.GetGameNewsAsync(parameter);
+        if (result.Success && result.Data is not null)
+        {
+            return new CgDataTableResult<GameNewsOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+        }
+        return new CgDataTableResult<GameNewsOverviewModel>([], 0);
+    }
+
+    private async Task<CgDataTableResult<WeeklyNewsOverviewModel>> OnQueryWeeklyNews(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? string.Empty,
+            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await AdminQueryService.GetWeeklyNewsAsync(parameter);
+        if (result.Success && result.Data is not null)
+        {
+            return new CgDataTableResult<WeeklyNewsOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+        }
+        return new CgDataTableResult<WeeklyNewsOverviewModel>([], 0);
+    }
+}

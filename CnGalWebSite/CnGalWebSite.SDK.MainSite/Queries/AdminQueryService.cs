@@ -3,8 +3,12 @@ using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Almanacs;
 using CnGalWebSite.DataModel.ViewModel.BackUpArchives;
+using CnGalWebSite.DataModel.ViewModel.Commodities;
+using CnGalWebSite.DataModel.ViewModel.Expo;
 using CnGalWebSite.DataModel.ViewModel.Favorites;
+using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
+using CnGalWebSite.DataModel.ViewModel.News;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Recommends;
 using CnGalWebSite.DataModel.ViewModel.Steam;
@@ -142,4 +146,44 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
     public Task<SdkResult<QueryResultModel<VoteOverviewModel>>> GetVotesAsync(
         QueryParameterModel parameter, CancellationToken cancellationToken = default)
         => QueryListAsync<VoteOverviewModel>("api/votes/List", "ADMIN_VOTES", "投票", parameter, cancellationToken);
+
+    // ─── 网站设置 ───
+
+    public Task<SdkResult<QueryResultModel<CarouselOverviewModel>>> GetCarouselsAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<CarouselOverviewModel>("api/home/ListCarousels", "ADMIN_CAROUSELS", "轮播图", parameter, cancellationToken);
+
+    public Task<SdkResult<QueryResultModel<FriendLinkOverviewModel>>> GetFriendLinksAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<FriendLinkOverviewModel>("api/home/ListFriendLinks", "ADMIN_FRIENDLINKS", "友情链接", parameter, cancellationToken);
+
+    // ─── 动态/周报 ───
+
+    public Task<SdkResult<QueryResultModel<GameNewsOverviewModel>>> GetGameNewsAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<GameNewsOverviewModel>("api/news/ListGameNews", "ADMIN_GAME_NEWS", "游戏动态", parameter, cancellationToken);
+
+    public Task<SdkResult<QueryResultModel<WeeklyNewsOverviewModel>>> GetWeeklyNewsAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<WeeklyNewsOverviewModel>("api/news/ListWeeklyNews", "ADMIN_WEEKLY_NEWS", "周报", parameter, cancellationToken);
+
+    // ─── 展会管理 ───
+
+    public Task<SdkResult<QueryResultModel<ExpoActivityOverviewModel>>> GetExpoActivitiesAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<ExpoActivityOverviewModel>("api/expo/ListActivity", "ADMIN_EXPO_ACTIVITIES", "展会活动", parameter, cancellationToken);
+
+    public Task<SdkResult<QueryResultModel<ExpoTicketOverviewModel>>> GetExpoTicketsAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<ExpoTicketOverviewModel>("api/expo/ListTicket", "ADMIN_EXPO_TICKETS", "展会票根", parameter, cancellationToken);
+
+    // ─── 小卖铺 ───
+
+    public Task<SdkResult<QueryResultModel<CommodityOverviewModel>>> GetCommoditiesAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<CommodityOverviewModel>("api/commodities/List", "ADMIN_COMMODITIES", "商品", parameter, cancellationToken);
+
+    public Task<SdkResult<QueryResultModel<CommodityCodeOverviewModel>>> GetCommodityCodesAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<CommodityCodeOverviewModel>("api/commodities/ListCode", "ADMIN_COMMODITY_CODES", "兑换码", parameter, cancellationToken);
 }

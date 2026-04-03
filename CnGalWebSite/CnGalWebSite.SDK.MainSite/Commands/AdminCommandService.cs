@@ -208,4 +208,18 @@ public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminComm
         => PostCommandAsync("api/BackUpArchives/RunBackUpArchive",
             new RunBackUpArchiveModel { Ids = ids },
             "RUN_BACKUP", "执行备份", cancellationToken);
+
+    // ─── 轮播图 ───
+
+    public Task<SdkResult<bool>> EditCarouselPriorityAsync(int[] ids, int plusPriority, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/home/EditCarouselPriorityAsync",
+            new EditEntryPriorityViewModel { Ids = ids, PlusPriority = plusPriority },
+            "EDIT_CAROUSEL_PRIORITY", "调整轮播图优先级", cancellationToken);
+
+    // ─── 友情链接 ───
+
+    public Task<SdkResult<bool>> EditFriendLinkPriorityAsync(int[] ids, int plusPriority, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/home/EditFriendLinkPriorityAsync",
+            new EditEntryPriorityViewModel { Ids = ids, PlusPriority = plusPriority },
+            "EDIT_FRIENDLINK_PRIORITY", "调整友情链接优先级", cancellationToken);
 }

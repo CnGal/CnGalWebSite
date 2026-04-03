@@ -118,7 +118,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddMainSiteSdk(this IServiceCollection services, string apiBaseAddress, string imageApiBaseAddress)
+    public static IServiceCollection AddMainSiteSdk(this IServiceCollection services, string apiBaseAddress, string imageApiBaseAddress, string taskApiBaseAddress)
     {
         services.AddMemoryCache();
         services.AddHttpContextAccessor();
@@ -126,6 +126,7 @@ public static class ServiceCollectionExtensions
 
         var apiBase = new Uri(EnsureTrailingSlash(apiBaseAddress));
         var imageApiBase = new Uri(EnsureTrailingSlash(imageApiBaseAddress));
+        var taskApiBase = new Uri(EnsureTrailingSlash(taskApiBaseAddress));
 
         // Query 服务（均需认证）
         RegisterSdkHttpClient<IHomeQueryService, HomeQueryService>(services, apiBase, withAuth: true);
@@ -158,6 +159,10 @@ public static class ServiceCollectionExtensions
         // Admin 服务（需认证）
         RegisterSdkHttpClient<IAdminQueryService, AdminQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IAdminCommandService, AdminCommandService>(services, apiBase, withAuth: true);
+
+        // 外部服务（DrawingBed / TimedTask，认证）
+        RegisterSdkHttpClient<IFileQueryService, FileQueryService>(services, imageApiBase, withAuth: true);
+        RegisterSdkHttpClient<ITimedTaskService, TimedTaskService>(services, taskApiBase, withAuth: true);
 
         return services;
     }

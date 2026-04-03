@@ -2,8 +2,12 @@ using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Almanacs;
 using CnGalWebSite.DataModel.ViewModel.BackUpArchives;
+using CnGalWebSite.DataModel.ViewModel.Commodities;
+using CnGalWebSite.DataModel.ViewModel.Expo;
 using CnGalWebSite.DataModel.ViewModel.Favorites;
+using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
+using CnGalWebSite.DataModel.ViewModel.News;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Recommends;
 using CnGalWebSite.DataModel.ViewModel.Steam;
@@ -123,6 +127,70 @@ public interface IAdminQueryService
     /// 分页查询投票列表。
     /// </summary>
     Task<SdkResult<QueryResultModel<VoteOverviewModel>>> GetVotesAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    // ─── 网站设置 ───
+
+    /// <summary>
+    /// 分页查询轮播图列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<CarouselOverviewModel>>> GetCarouselsAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 分页查询友情链接列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<FriendLinkOverviewModel>>> GetFriendLinksAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    // ─── 动态/周报 ───
+
+    /// <summary>
+    /// 分页查询游戏动态列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<GameNewsOverviewModel>>> GetGameNewsAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 分页查询周报列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<WeeklyNewsOverviewModel>>> GetWeeklyNewsAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    // ─── 展会管理 ───
+
+    /// <summary>
+    /// 分页查询展会活动列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<ExpoActivityOverviewModel>>> GetExpoActivitiesAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 分页查询展会票根列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<ExpoTicketOverviewModel>>> GetExpoTicketsAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    // ─── 小卖铺 ───
+
+    /// <summary>
+    /// 分页查询商品列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<CommodityOverviewModel>>> GetCommoditiesAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 分页查询兑换码列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<CommodityCodeOverviewModel>>> GetCommodityCodesAsync(
         QueryParameterModel parameter,
         CancellationToken cancellationToken = default);
 }

@@ -1,0 +1,181 @@
+@page "/admin/managehome"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IAdminQueryService AdminQueryService
+@inject IAdminCommandService AdminCommandService
+@inject ICgToastService ToastService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Home
+
+<PageTitle>网站设置 - CnGal</PageTitle>
+
+<div class="admin-list-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiCogOutline" aria-hidden="true" />
+        网站设置
+    </h1>
+
+    <CgTabs Items="@_tabs"
+            DefaultActiveKey="carousels"
+            Variant="underline"
+            AriaLabel="网站设置"
+            Id="admin-site-settings-tabs">
+        <PanelTemplate>
+            @if (context == "carousels")
+            {
+                <CgDataTable TItem="CarouselOverviewModel"
+                             Title="轮播图列表"
+                             OnServerQuery="OnQueryCarousels"
+                             DefaultSortField="Id"
+                             DefaultSortDesc="true"
+                             @ref="_carouselTable">
+                    <CgDataTableColumn TItem="CarouselOverviewModel" Title="Id" Field="Id" Width="80px" />
+                    <CgDataTableColumn TItem="CarouselOverviewModel" Title="备注" Field="Note" />
+                    <CgDataTableColumn TItem="CarouselOverviewModel" Title="类型" Field="Type">
+                        <ChildContent Context="item">
+                            <span class="admin-badge">@item.Type</span>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="CarouselOverviewModel" Title="优先级" Field="Priority" Width="80px" />
+                    <CgDataTableColumn TItem="CarouselOverviewModel" Title="预览" Sortable="false" Width="120px">
+                        <ChildContent Context="item">
+                            @if (!string.IsNullOrWhiteSpace(item.Image))
+                            {
+                                <img src="@item.Image" alt="轮播图预览" style="max-width: 100px; max-height: 50px; border-radius: 4px;" />
+                            }
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="CarouselOverviewModel" Title="操作" Sortable="false" Width="120px">
+                        <ChildContent Context="item">
+                            <div class="admin-actions">
+                                <button class="admin-action-btn admin-action-btn--up" title="增加权重"
+                                        @onclick="() => EditCarouselPriority(item, true)">
+                                    <CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" />
+                                </button>
+                                <button class="admin-action-btn admin-action-btn--down" title="降低权重"
+                                        @onclick="() => EditCarouselPriority(item, false)">
+                                    <CgMdiIcon Name="mdiArrowDownBold" aria-hidden="true" />
+                                </button>
+                            </div>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                </CgDataTable>
+            }
+            else if (context == "friendlinks")
+            {
+                <CgDataTable TItem="FriendLinkOverviewModel"
+                             Title="友情链接列表"
+                             OnServerQuery="OnQueryFriendLinks"
+                             DefaultSortField="Id"
+                             DefaultSortDesc="true"
+                             @ref="_friendLinkTable">
+                    <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="Id" Field="Id" Width="80px" />
+                    <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="名称" Field="Name" />
+                    <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="链接" Field="Link">
+                        <ChildContent Context="item">
+                            <a href="@item.Link" target="_blank" rel="noopener noreferrer" class="admin-cell-name">@item.Link</a>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="优先级" Field="Priority" Width="80px" />
+                    <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="图标" Sortable="false" Width="60px">
+                        <ChildContent Context="item">
+                            @if (!string.IsNullOrWhiteSpace(item.Image))
+                            {
+                                <img src="@item.Image" alt="图标" style="width: 32px; height: 32px; border-radius: 4px;" />
+                            }
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="操作" Sortable="false" Width="120px">
+                        <ChildContent Context="item">
+                            <div class="admin-actions">
+                                <button class="admin-action-btn admin-action-btn--up" title="增加权重"
+                                        @onclick="() => EditFriendLinkPriority(item, true)">
+                                    <CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" />
+                                </button>
+                                <button class="admin-action-btn admin-action-btn--down" title="降低权重"
+                                        @onclick="() => EditFriendLinkPriority(item, false)">
+                                    <CgMdiIcon Name="mdiArrowDownBold" aria-hidden="true" />
+                                </button>
+                            </div>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                </CgDataTable>
+            }
+        </PanelTemplate>
+    </CgTabs>
+</div>
+
+@code {
+    private CgDataTable<CarouselOverviewModel>? _carouselTable;
+    private CgDataTable<FriendLinkOverviewModel>? _friendLinkTable;
+
+    private readonly IReadOnlyList<CgTabItem> _tabs =
+    [
+        new CgTabItem("carousels", "轮播图", "mdiImageArea"),
+        new CgTabItem("friendlinks", "友情链接", "mdiLink"),
+    ];
+
+    private async Task<CgDataTableResult<CarouselOverviewModel>> OnQueryCarousels(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? string.Empty,
+            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await AdminQueryService.GetCarouselsAsync(parameter);
+        if (result.Success && result.Data is not null)
+        {
+            return new CgDataTableResult<CarouselOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+        }
+        return new CgDataTableResult<CarouselOverviewModel>([], 0);
+    }
+
+    private async Task<CgDataTableResult<FriendLinkOverviewModel>> OnQueryFriendLinks(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? string.Empty,
+            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await AdminQueryService.GetFriendLinksAsync(parameter);
+        if (result.Success && result.Data is not null)
+        {
+            return new CgDataTableResult<FriendLinkOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+        }
+        return new CgDataTableResult<FriendLinkOverviewModel>([], 0);
+    }
+
+    private async Task EditCarouselPriority(CarouselOverviewModel item, bool up)
+    {
+        var result = await AdminCommandService.EditCarouselPriorityAsync(new[] { item.Id }, up ? 1 : -1);
+        await HandleResult(result, up ? "已增加权重" : "已降低权重", _carouselTable);
+    }
+
+    private async Task EditFriendLinkPriority(FriendLinkOverviewModel item, bool up)
+    {
+        var result = await AdminCommandService.EditFriendLinkPriorityAsync(new[] { item.Id }, up ? 1 : -1);
+        await HandleResult(result, up ? "已增加权重" : "已降低权重", _friendLinkTable);
+    }
+
+    private async Task HandleResult<T>(SdkResult<bool> result, string successMessage, CgDataTable<T>? table)
+    {
+        if (result.Success)
+        {
+            ToastService.Show(successMessage, variant: "success");
+            if (table is not null) await table.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error");
+        }
+    }
+}

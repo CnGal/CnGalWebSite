@@ -7,12 +7,13 @@ using Microsoft.AspNetCore.HttpOverrides;
 var builder = WebApplication.CreateBuilder(args);
 var apiBaseAddress = builder.Configuration["MainSiteApi:BaseAddress"];
 var imageApiBaseAddress = builder.Configuration["MainSiteApi:ImageApiPath"];
+var taskApiBaseAddress = builder.Configuration["MainSiteApi:TaskApiPath"];
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddMainSiteOidcAuthentication(builder.Configuration);
-builder.Services.AddMainSiteSdk(apiBaseAddress!, imageApiBaseAddress!);
+builder.Services.AddMainSiteSdk(apiBaseAddress!, imageApiBaseAddress!, taskApiBaseAddress!);
 builder.Services.AddMainSiteSharedServices();
 //添加状态检查
 builder.Services.AddHealthChecks();

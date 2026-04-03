@@ -1,0 +1,89 @@
+@page "/admin/listfiles"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IFileQueryService FileQueryService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DrawingBed.Models.ViewModels
+@using CnGalWebSite.DrawingBed.Models.DataModels
+
+<PageTitle>上传记录 - CnGal</PageTitle>
+
+<div class="admin-list-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiFileMultipleOutline" aria-hidden="true" />
+        上传记录
+    </h1>
+
+    <CgDataTable TItem="UploadRecordOverviewModel"
+                 Title="上传记录列表"
+                 OnServerQuery="OnQueryFiles"
+                 DefaultSortField="Id"
+                 DefaultSortDesc="true">
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="Id" Field="Id" Width="80px" />
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="预览" Sortable="false" Width="80px">
+            <ChildContent Context="item">
+                @if (item.Type == UploadFileType.Image && !string.IsNullOrWhiteSpace(item.Url))
+                {
+                    <img src="@item.Url" alt="预览" style="max-width: 60px; max-height: 40px; border-radius: 4px; object-fit: cover;" />
+                }
+                else if (!string.IsNullOrWhiteSpace(item.Url))
+                {
+                    <CgMdiIcon Name="mdiFileOutline" aria-hidden="true" />
+                }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="类型" Field="Type">
+            <ChildContent Context="item">
+                <span class="admin-badge">@item.Type</span>
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="大小" Field="Size" Width="100px">
+            <ChildContent Context="item">
+                @if (item.Size.HasValue)
+                {
+                    @($"{(double)item.Size / (1024 * 1024):0.00} MB")
+                }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="Sha1" Field="Sha1" Width="120px">
+            <ChildContent Context="item">
+                <span style="font-family: monospace; font-size: 0.75rem;" title="@item.Sha1">
+                    @(item.Sha1?.Length > 10 ? item.Sha1[..10] + "…" : item.Sha1)
+                </span>
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="时长" Field="Duration" Width="80px">
+            <ChildContent Context="item">
+                @(item.Duration?.ToString(@"hh\:mm\:ss") ?? "—")
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="用户Id" Field="UserId" Width="120px" />
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="上传时间" Field="UploadTime" Width="160px">
+            <ChildContent Context="item">
+                @item.UploadTime.ToString("yyyy-MM-dd HH:mm")
+            </ChildContent>
+        </CgDataTableColumn>
+    </CgDataTable>
+</div>
+
+@code {
+    private async Task<CgDataTableResult<UploadRecordOverviewModel>> OnQueryFiles(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? string.Empty,
+            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await FileQueryService.GetUploadRecordsAsync(parameter);
+        if (result.Success && result.Data is not null)
+        {
+            return new CgDataTableResult<UploadRecordOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+        }
+        return new CgDataTableResult<UploadRecordOverviewModel>([], 0);
+    }
+}
