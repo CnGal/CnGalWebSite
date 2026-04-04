@@ -2,22 +2,37 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: var(--cg-spacing-3) var(--cg-spacing-6);
+    padding: 0 var(--cg-spacing-4);
+    height: 36px;
     border: 1px solid transparent;
     border-radius: var(--cg-radius-md);
-    font-size: var(--cg-font-size-md);
+    font-size: var(--cg-font-size-sm);
     font-weight: var(--cg-font-weight-medium);
     font-family: inherit;
-    line-height: 1.2;
+    line-height: 1;
     cursor: pointer;
     transition: all var(--cg-transition-fast);
     text-decoration: none;
-    gap: .5rem;
+    gap: var(--cg-spacing-1);
+    user-select: none;
+    white-space: nowrap;
+    background-color: transparent;
 }
 
-.cg-btn:disabled {
-    opacity: 0.55;
+.cg-btn:disabled,
+.cg-btn--disabled {
+    opacity: 0.5;
     cursor: not-allowed;
+    pointer-events: none;
+}
+
+.cg-btn:active:not(:disabled):not(.cg-btn--disabled) {
+    transform: scale(0.98);
+}
+
+.cg-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--cg-color-focus-ring);
 }
 
 /* ── primary ── */
@@ -26,7 +41,7 @@
     color: var(--cg-color-on-primary);
 }
 
-.cg-btn--primary:hover:not(:disabled) {
+.cg-btn--primary:hover:not(:disabled):not(.cg-btn--disabled) {
     background: var(--cg-color-primary-hover);
 }
 
@@ -37,6 +52,10 @@
     color: var(--cg-color-text);
 }
 
+.cg-btn--secondary:hover:not(:disabled):not(.cg-btn--disabled) {
+    background: var(--cg-color-bg);
+}
+
 /* ── outline ── */
 .cg-btn--outline {
     background-color: transparent;
@@ -44,7 +63,7 @@
     color: var(--cg-color-text-primary);
 }
 
-.cg-btn--outline:hover:not(:disabled) {
+.cg-btn--outline:hover:not(:disabled):not(.cg-btn--disabled) {
     background-color: var(--cg-color-hover-overlay);
 }
 
@@ -54,7 +73,7 @@
     color: var(--cg-color-on-primary);
 }
 
-.cg-btn--danger:hover:not(:disabled) {
+.cg-btn--danger:hover:not(:disabled):not(.cg-btn--disabled) {
     opacity: 0.9;
 }
 
@@ -67,7 +86,7 @@
     border-radius: var(--cg-radius-md);
 }
 
-.cg-btn--ghost:hover:not(:disabled) {
+.cg-btn--ghost:hover:not(:disabled):not(.cg-btn--disabled) {
     background-color: var(--cg-color-hover-overlay);
     color: var(--cg-color-text);
 }
@@ -76,20 +95,21 @@
 .cg-btn--ghost-danger {
     background: transparent;
     border-color: transparent;
-    color: var(--cg-color-text-secondary);
+    color: var(--cg-color-error);
     padding: var(--cg-spacing-1);
     border-radius: var(--cg-radius-md);
 }
 
-.cg-btn--ghost-danger:hover:not(:disabled) {
+.cg-btn--ghost-danger:hover:not(:disabled):not(.cg-btn--disabled) {
     background-color: color-mix(in oklab, var(--cg-color-error) 10%, transparent);
     color: var(--cg-color-error);
 }
 
 /* ── sm ── */
 .cg-btn--sm {
-    padding: var(--cg-spacing-1) var(--cg-spacing-3);
-    font-size: var(--cg-font-size-sm);
+    height: 28px;
+    padding: 0 var(--cg-spacing-3);
+    font-size: 13px;
 }
 
 /* ── loading ── */
