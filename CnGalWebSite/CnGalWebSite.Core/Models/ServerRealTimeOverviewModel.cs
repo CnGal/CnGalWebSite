@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +13,11 @@ namespace CnGalWebSite.Core.Models
         public long CPUCoreNumber { get; set; }
 
         public TimeSpan TotalProcessorTime { get; set; }
+
+        /// <summary>
+        /// 进程运行时间
+        /// </summary>
+        public TimeSpan ProcessUptime { get; set; }
 
         public TimeSpan TimeSpanGetData { get; set; }
 
