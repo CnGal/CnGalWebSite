@@ -1,7 +1,13 @@
 <div class="cg-form-group">
     @if (!string.IsNullOrWhiteSpace(Label))
     {
-        <label class="cg-form-group__label">@Label</label>
+        <label class="cg-form-group__label">
+            @Label
+            @if (Required)
+            {
+                <span class="cg-form-group__required" aria-hidden="true">*</span>
+            }
+        </label>
     }
     @ChildContent
 </div>
@@ -9,6 +15,9 @@
 @code {
     [Parameter]
     public string? Label { get; set; }
+
+    [Parameter]
+    public bool Required { get; set; }
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }

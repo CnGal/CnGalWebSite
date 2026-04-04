@@ -1,3 +1,5 @@
+using CnGalWebSite.DataModel.ViewModel.Home;
+using CnGalWebSite.DataModel.ViewModel.News;
 using CnGalWebSite.SDK.MainSite.Models;
 
 namespace CnGalWebSite.SDK.MainSite.Abstractions;
@@ -103,7 +105,55 @@ public interface IAdminCommandService
 
     Task<SdkResult<bool>> EditCarouselPriorityAsync(int[] ids, int plusPriority, CancellationToken cancellationToken = default);
 
+    Task<SdkResult<bool>> EditCarouselAsync(CarouselEditModel model, CancellationToken cancellationToken = default);
+
     // ─── 友情链接操作 ───
 
     Task<SdkResult<bool>> EditFriendLinkPriorityAsync(int[] ids, int plusPriority, CancellationToken cancellationToken = default);
+
+    Task<SdkResult<bool>> EditFriendLinkAsync(FriendLinkEditModel model, CancellationToken cancellationToken = default);
+
+    // ─── 动态操作 ───
+
+    /// <summary>
+    /// 编辑动态。
+    /// </summary>
+    Task<SdkResult<bool>> EditGameNewsAsync(EditGameNewsModel model, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 添加自定义动态。
+    /// </summary>
+    Task<SdkResult<bool>> AddCustomNewsAsync(EditGameNewsModel model, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 发布动态为文章。
+    /// </summary>
+    Task<SdkResult<bool>> PublishGameNewsAsync(long id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 忽略或恢复动态。
+    /// </summary>
+    Task<SdkResult<bool>> IgnoreGameNewsAsync(long[] ids, bool isIgnore, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 从微博链接导入动态。
+    /// </summary>
+    Task<SdkResult<bool>> AddWeiboNewsAsync(string link, CancellationToken cancellationToken = default);
+
+    // ─── 周报操作 ───
+
+    /// <summary>
+    /// 编辑周报。
+    /// </summary>
+    Task<SdkResult<bool>> EditWeeklyNewsAsync(EditWeeklyNewsModel model, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 发布周报为文章。
+    /// </summary>
+    Task<SdkResult<bool>> PublishWeeklyNewsAsync(long id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 重置周报内容。
+    /// </summary>
+    Task<SdkResult<bool>> ResetWeeklyNewsAsync(long id, CancellationToken cancellationToken = default);
 }

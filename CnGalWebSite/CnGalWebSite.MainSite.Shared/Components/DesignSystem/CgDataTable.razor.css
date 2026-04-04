@@ -57,24 +57,29 @@
 
 .cg-datatable__search-input {
     padding: var(--cg-spacing-1) var(--cg-spacing-3) var(--cg-spacing-1) calc(var(--cg-spacing-2) + 22px);
-    border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-md);
+    border: 1px solid transparent;
+    border-radius: var(--cg-radius-xl, 1.5rem);
+    height: 36px;
     font-size: var(--cg-font-size-sm);
     font-family: var(--cg-font-family);
     color: var(--cg-color-text);
-    background: var(--cg-color-bg);
+    background-color: color-mix(in oklab, var(--cg-color-border) 40%, var(--cg-color-surface));
     outline: none;
     width: 200px;
-    transition: border-color var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
+    transition: all var(--cg-transition-fast);
 }
 
 .cg-datatable__search-input::placeholder {
     color: var(--cg-color-text-muted);
 }
 
+.cg-datatable__search-input:hover {
+    border-color: color-mix(in oklab, var(--cg-color-primary) 50%, transparent);
+}
+
 .cg-datatable__search-input:focus {
     border-color: var(--cg-color-primary);
-    box-shadow: 0 0 0 3px var(--cg-color-focus-ring);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--cg-color-primary) 15%, transparent);
 }
 
 /* ── 表格滚动区 ── */
@@ -127,19 +132,16 @@
 /* ── 排序图标 ── */
 .cg-datatable__sort-icons {
     display: inline-flex;
-    flex-direction: column;
     align-items: center;
     margin-left: 2px;
-    line-height: 0;
 }
 
 ::deep .cg-datatable__sort-icon {
-    width: 14px;
-    height: 14px;
-    margin: -3px 0;
+    width: 16px !important;
+    height: 16px !important;
     color: var(--cg-color-text-muted);
     opacity: 0.35;
-    transition: opacity var(--cg-transition-fast), color var(--cg-transition-fast);
+    transition: opacity var(--cg-transition-fast), color var(--cg-transition-fast), transform var(--cg-transition-fast);
 }
 
 ::deep .cg-datatable__sort-icon--active {

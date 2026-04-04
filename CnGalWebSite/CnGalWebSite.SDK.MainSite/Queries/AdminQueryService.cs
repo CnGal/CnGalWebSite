@@ -4,16 +4,24 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Almanacs;
 using CnGalWebSite.DataModel.ViewModel.BackUpArchives;
 using CnGalWebSite.DataModel.ViewModel.Commodities;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Expo;
 using CnGalWebSite.DataModel.ViewModel.Favorites;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.News;
+using CnGalWebSite.DataModel.ViewModel.Articles;
+using CnGalWebSite.DataModel.ViewModel.OperationRecords;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
+using CnGalWebSite.DataModel.ViewModel.PlayedGames;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Recommends;
+using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Videos;
+using CnGalWebSite.Extensions;
 
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
@@ -33,6 +41,24 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
             "api/admin/GetServerStaticDataOverview",
             "ADMIN",
             "服务器概览",
+            cancellationToken);
+    }
+
+    public Task<SdkResult<ServerRealTimeOverviewModel>> GetServerRealTimeOverviewAsync(CancellationToken cancellationToken = default)
+    {
+        return GetAsync<ServerRealTimeOverviewModel>(
+            "api/admin/GetServerRealTimeDataOverview",
+            "ADMIN",
+            "服务器动态数据概览",
+            cancellationToken);
+    }
+
+    public Task<SdkResult<UserDataOverviewModel>> GetUserDataOverviewAsync(CancellationToken cancellationToken = default)
+    {
+        return GetAsync<UserDataOverviewModel>(
+            "api/admin/GetUserDataOverview",
+            "ADMIN",
+            "用户概览",
             cancellationToken);
     }
 
@@ -157,6 +183,18 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
         QueryParameterModel parameter, CancellationToken cancellationToken = default)
         => QueryListAsync<FriendLinkOverviewModel>("api/home/ListFriendLinks", "ADMIN_FRIENDLINKS", "友情链接", parameter, cancellationToken);
 
+    public Task<SdkResult<CarouselEditModel>> GetCarouselEditAsync(
+        int id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<CarouselEditModel, CarouselEditModel>(
+            $"api/home/EditCarousel?id={id}", dto => dto,
+            "ADMIN_CAROUSEL", "轮播图", id, cancellationToken);
+            
+    public Task<SdkResult<FriendLinkEditModel>> GetFriendLinkEditAsync(
+        int id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<FriendLinkEditModel, FriendLinkEditModel>(
+            $"api/home/EditFriendLink?id={id}", dto => dto,
+            "ADMIN_FRIENDLINK", "友情链接", id, cancellationToken);
+
     // ─── 动态/周报 ───
 
     public Task<SdkResult<QueryResultModel<GameNewsOverviewModel>>> GetGameNewsAsync(
@@ -166,6 +204,30 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
     public Task<SdkResult<QueryResultModel<WeeklyNewsOverviewModel>>> GetWeeklyNewsAsync(
         QueryParameterModel parameter, CancellationToken cancellationToken = default)
         => QueryListAsync<WeeklyNewsOverviewModel>("api/news/ListWeeklyNews", "ADMIN_WEEKLY_NEWS", "周报", parameter, cancellationToken);
+
+    public Task<SdkResult<EditGameNewsModel>> GetGameNewsEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<EditGameNewsModel, EditGameNewsModel>(
+            $"api/news/EditGameNews/{id}", dto => dto,
+            "ADMIN_GAME_NEWS", "动态", id, cancellationToken);
+
+    public Task<SdkResult<EditWeeklyNewsModel>> GetWeeklyNewsEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<EditWeeklyNewsModel, EditWeeklyNewsModel>(
+            $"api/news/EditWeeklyNews/{id}", dto => dto,
+            "ADMIN_WEEKLY_NEWS", "周报", id, cancellationToken);
+
+    public Task<SdkResult<ArticleViewModel>> GetGameNewsPreviewAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<ArticleViewModel, ArticleViewModel>(
+            $"api/news/GetGameNewsPreview/{id}", dto => dto,
+            "ADMIN_GAME_NEWS_PREVIEW", "动态预览", id, cancellationToken);
+
+    public Task<SdkResult<ArticleViewModel>> GetWeeklyNewsPreviewAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<ArticleViewModel, ArticleViewModel>(
+            $"api/news/GetWeelyNewsPreview/{id}", dto => dto,
+            "ADMIN_WEEKLY_NEWS_PREVIEW", "周报预览", id, cancellationToken);
 
     // ─── 展会管理 ───
 
@@ -186,4 +248,43 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
     public Task<SdkResult<QueryResultModel<CommodityCodeOverviewModel>>> GetCommodityCodesAsync(
         QueryParameterModel parameter, CancellationToken cancellationToken = default)
         => QueryListAsync<CommodityCodeOverviewModel>("api/commodities/ListCode", "ADMIN_COMMODITY_CODES", "兑换码", parameter, cancellationToken);
+
+    // ─── 词条子功能 ───
+
+    public Task<SdkResult<QueryResultModel<GameRecordOverviewModel>>> GetPlayedGamesAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<GameRecordOverviewModel>("api/playedgame/List", "ADMIN_PLAYED_GAMES", "游玩记录", parameter, cancellationToken);
+
+    public Task<SdkResult<QueryResultModel<EntryInformationTypeOverviewModel>>> GetEntryInformationTypesAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<EntryInformationTypeOverviewModel>("api/entries/ListEntryInformationTypes", "ADMIN_ENTRY_INFO_TYPES", "基础信息类型", parameter, cancellationToken);
+
+    // ─── 用户子功能 ───
+
+    public Task<SdkResult<QueryResultModel<RankOverviewModel>>> GetRanksAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<RankOverviewModel>("api/ranks/ListRanks", "ADMIN_RANKS", "头衔", parameter, cancellationToken);
+
+    public Task<SdkResult<QueryResultModel<UserCertificationOverviewModel>>> GetUserCertificationsAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<UserCertificationOverviewModel>("api/account/ListUserCertifications", "ADMIN_CERTIFICATIONS", "认证", parameter, cancellationToken);
+
+    public Task<SdkResult<QueryResultModel<OperationRecordOverviewModel>>> GetOperationRecordsAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<OperationRecordOverviewModel>("api/account/ListOperationRecords", "ADMIN_OP_RECORDS", "操作记录", parameter, cancellationToken);
+
+    // ─── 数据图表 ───
+
+    public async Task<SdkResult<LineChartModel>> GetLineChartAsync(
+        LineChartType type, DateTime afterTime, DateTime beforeTime,
+        CancellationToken cancellationToken = default)
+    {
+        var afterMs = afterTime.ToUnixTimeMilliseconds();
+        var beforeMs = beforeTime.ToUnixTimeMilliseconds();
+        return await GetAsync<LineChartModel>(
+            $"api/admin/GetLineChart?Type={type}&AfterTime={afterMs}&BeforeTime={beforeMs}",
+            "ADMIN_CHART",
+            "图表数据",
+            cancellationToken);
+    }
 }

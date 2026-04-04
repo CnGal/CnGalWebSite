@@ -1,8 +1,9 @@
-@page "/admin/listalmanacs"
+﻿@page "/admin/listalmanacs"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
 @rendermode InteractiveServer
 @inject IAdminQueryService AdminQueryService
+@inject NavigationManager NavigationManager
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Almanacs
 
@@ -20,8 +21,34 @@
                  DefaultSortField="Id"
                  DefaultSortDesc="true">
         <CgDataTableColumn TItem="AlmanacOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="名称" Field="Name" />
         <CgDataTableColumn TItem="AlmanacOverviewModel" Title="年份" Field="Year" Width="80px" />
+        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="名称" Field="Name" />
+        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="简介" Field="BriefIntroduction">
+            <ChildContent Context="item">
+                <div class="admin-cell-text">@item.BriefIntroduction</div>
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="词条数" Field="EntryCount" Sortable="false" Width="80px" />
+        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="文章数" Field="ArticleCount" Sortable="false" Width="80px" />
+        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="更新时间" Field="UpdateTime">
+            <ChildContent Context="item">
+                @item.UpdateTime.ToString("yyyy-MM-dd HH:mm")
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="操作" Sortable="false" Width="100px">
+            <ChildContent Context="item">
+                <div class="admin-actions">
+                    <button class="admin-action-btn admin-action-btn--up" title="编辑"
+                            @onclick="@(() => NavigationManager.NavigateTo($"/almanac/edit/{item.Id}"))">
+                        <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                    </button>
+                    <button class="admin-action-btn admin-action-btn--show" title="查看"
+                            @onclick="@(() => NavigationManager.NavigateTo($"/almanac/{item.Id}"))">
+                        <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+                    </button>
+                </div>
+            </ChildContent>
+        </CgDataTableColumn>
     </CgDataTable>
 </div>
 

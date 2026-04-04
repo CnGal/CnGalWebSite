@@ -5,8 +5,8 @@
     backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    overflow-y: auto;
+    align-items: center;
+    overflow-y: hidden;
     z-index: 1000;
     animation: cg-modal-mask-fade-in var(--cg-transition-normal);
 }
@@ -17,8 +17,10 @@
 
 .cg-modal-panel {
     width: min(640px, 92vw);
+    max-height: calc(100vh - 4rem);
+    display: flex;
+    flex-direction: column;
     flex-shrink: 0;
-    margin: auto 0;
     border-radius: var(--cg-radius-lg);
     background: var(--cg-color-surface);
     box-shadow: var(--cg-shadow-card-hover);
@@ -31,6 +33,7 @@
 }
 
 .cg-modal-header {
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -46,6 +49,8 @@
 }
 
 .cg-modal-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
     padding: 1.5rem;
     color: var(--cg-color-text);
     font-size: var(--cg-font-size-md);
@@ -53,6 +58,7 @@
 }
 
 .cg-modal-footer {
+    flex-shrink: 0;
     display: flex;
     justify-content: flex-end;
     gap: var(--cg-spacing-3);

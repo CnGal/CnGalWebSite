@@ -102,25 +102,6 @@
     </CgDataTable>
 </div>
 
-<style>
-    .admin-badge--running {
-        color: var(--color-info, #2196f3);
-        background: color-mix(in srgb, var(--color-info, #2196f3) 12%, transparent);
-    }
-
-    .admin-badge--fail {
-        color: var(--color-error, #f44336);
-        background: color-mix(in srgb, var(--color-error, #f44336) 12%, transparent);
-    }
-
-    .admin-action-btn--run {
-        color: var(--color-info, #2196f3);
-    }
-
-    .admin-action-btn--run:hover {
-        background: color-mix(in srgb, var(--color-info, #2196f3) 12%, transparent);
-    }
-</style>
 
 @code {
     private CgDataTable<TimedTaskOverviewModel>? _table;

@@ -124,6 +124,15 @@ body {
 
 a {
     color: var(--cg-color-link);
+    text-decoration: none;
+    transition: color var(--cg-transition-fast);
+}
+
+a:hover {
+    color: var(--cg-color-primary-hover);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
 }
 
 h1:focus,

@@ -7,6 +7,9 @@
 @inject ICgToastService ToastService
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Admin
+@using CnGalWebSite.DataModel.ViewModel.Ranks
+@using CnGalWebSite.DataModel.ViewModel.Space
+@using CnGalWebSite.DataModel.ViewModel.OperationRecords
 
 <PageTitle>用户管理 - CnGal</PageTitle>
 
@@ -16,55 +19,164 @@
         用户管理
     </h1>
 
-    <CgDataTable TItem="UserOverviewModel"
-                 Title="用户列表"
-                 OnServerQuery="OnServerQuery"
-                 DefaultSortField="RegistTime"
-                 DefaultSortDesc="true"
-                 @ref="_dataTable">
-        <CgDataTableColumn TItem="UserOverviewModel" Title="用户名" Field="UserName">
-            <ChildContent Context="item">
-                <a class="admin-cell-name" href="@($"/space/index/{item.Id}")">@item.UserName</a>
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="UserOverviewModel" Title="邮箱" Field="Email" />
-        <CgDataTableColumn TItem="UserOverviewModel" Title="个性签名" Field="PersonalSignature">
-            <ChildContent Context="item">
-                <div class="admin-cell-text">@item.PersonalSignature</div>
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="UserOverviewModel" Title="注册时间" Field="RegistTime">
-            <ChildContent Context="item">@item.RegistTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="UserOverviewModel" Title="最后在线" Field="LastOnlineTime">
-            <ChildContent Context="item">@item.LastOnlineTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="UserOverviewModel" Title="在线时长(h)" Field="OnlineTime">
-            <ChildContent Context="item">@((item.OnlineTime / 3600.0).ToString("0.0"))</ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="UserOverviewModel" Title="贡献值" Field="DisplayContributionValue" Width="80px" />
-        <CgDataTableColumn TItem="UserOverviewModel" Title="积分" Field="DisplayIntegral" Width="80px" />
-        <CgDataTableColumn TItem="UserOverviewModel" Title="留言板" Field="CanComment">
-            <ChildContent Context="item">
-                @if (item.CanComment) { <span class="admin-badge admin-badge--yes">开启</span> }
-                else { <span class="admin-badge admin-badge--no">关闭</span> }
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="UserOverviewModel" Title="操作" Sortable="false" Width="50px">
-            <ChildContent Context="item">
-                <div class="admin-actions">
-                    @if (item.CanComment)
-                    { <button class="admin-action-btn admin-action-btn--nocomment" title="关闭留言板" @onclick="() => ToggleCanComment(item, false)"><CgMdiIcon Name="mdiCommentRemoveOutline" aria-hidden="true" /></button> }
-                    else
-                    { <button class="admin-action-btn admin-action-btn--comment" title="开启留言板" @onclick="() => ToggleCanComment(item, true)"><CgMdiIcon Name="mdiCommentCheckOutline" aria-hidden="true" /></button> }
-                </div>
-            </ChildContent>
-        </CgDataTableColumn>
-    </CgDataTable>
+    <CgTabs Items="@_tabs"
+            DefaultActiveKey="users"
+            Variant="underline"
+            AriaLabel="用户管理"
+            Id="admin-users-tabs">
+        <PanelTemplate>
+            @if (context == "users")
+            {
+                <CgDataTable TItem="UserOverviewModel"
+                             Title="用户列表"
+                             OnServerQuery="OnServerQuery"
+                             DefaultSortField="RegistTime"
+                             DefaultSortDesc="true"
+                             @ref="_dataTable">
+                    <CgDataTableColumn TItem="UserOverviewModel" Title="用户名" Field="UserName">
+                        <ChildContent Context="item">
+                            <a class="admin-cell-name" href="@($"/space/index/{item.Id}")">@item.UserName</a>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="UserOverviewModel" Title="邮箱" Field="Email" />
+                    <CgDataTableColumn TItem="UserOverviewModel" Title="个性签名" Field="PersonalSignature">
+                        <ChildContent Context="item"><div class="admin-cell-text">@item.PersonalSignature</div></ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="UserOverviewModel" Title="注册时间" Field="RegistTime">
+                        <ChildContent Context="item">@item.RegistTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="UserOverviewModel" Title="最后在线" Field="LastOnlineTime">
+                        <ChildContent Context="item">@item.LastOnlineTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="UserOverviewModel" Title="在线时长(h)" Field="OnlineTime">
+                        <ChildContent Context="item">@((item.OnlineTime / 3600.0).ToString("0.0"))</ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="UserOverviewModel" Title="贡献值" Field="DisplayContributionValue" Width="80px" />
+                    <CgDataTableColumn TItem="UserOverviewModel" Title="积分" Field="DisplayIntegral" Width="80px" />
+                    <CgDataTableColumn TItem="UserOverviewModel" Title="留言板" Field="CanComment">
+                        <ChildContent Context="item">
+                            @if (item.CanComment) { <span class="admin-badge admin-badge--yes">开启</span> }
+                            else { <span class="admin-badge admin-badge--no">关闭</span> }
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="UserOverviewModel" Title="操作" Sortable="false" Width="50px">
+                        <ChildContent Context="item">
+                            <div class="admin-actions">
+                                @if (item.CanComment)
+                                { <button class="admin-action-btn admin-action-btn--nocomment" title="关闭留言板" @onclick="() => ToggleCanComment(item, false)"><CgMdiIcon Name="mdiCommentRemoveOutline" aria-hidden="true" /></button> }
+                                else
+                                { <button class="admin-action-btn admin-action-btn--comment" title="开启留言板" @onclick="() => ToggleCanComment(item, true)"><CgMdiIcon Name="mdiCommentCheckOutline" aria-hidden="true" /></button> }
+                            </div>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                </CgDataTable>
+            }
+            else if (context == "ranks")
+            {
+                <CgDataTable TItem="RankOverviewModel"
+                             Title="头衔列表"
+                             OnServerQuery="OnQueryRanks"
+                             DefaultSortField="Id"
+                             DefaultSortDesc="true">
+                    <CgDataTableColumn TItem="RankOverviewModel" Title="Id" Field="Id" Width="80px" />
+                    <CgDataTableColumn TItem="RankOverviewModel" Title="名称" Field="Name" />
+                    <CgDataTableColumn TItem="RankOverviewModel" Title="显示文本" Field="Text" />
+                    <CgDataTableColumn TItem="RankOverviewModel" Title="类型" Field="Type">
+                        <ChildContent Context="item"><span class="admin-badge">@item.Type</span></ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="RankOverviewModel" Title="人数" Field="Count" Width="80px" />
+                    <CgDataTableColumn TItem="RankOverviewModel" Title="优先级" Field="Priority" Width="80px" />
+                    <CgDataTableColumn TItem="RankOverviewModel" Title="图片" Sortable="false" Width="60px">
+                        <ChildContent Context="item">
+                            @if (!string.IsNullOrWhiteSpace(item.Image))
+                            { <img src="@item.Image" alt="头衔图片" style="width: 32px; height: 32px; border-radius: 4px;" /> }
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="RankOverviewModel" Title="状态" Field="IsHidden">
+                        <ChildContent Context="item">
+                            @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
+                            else { <span class="admin-badge admin-badge--visible">可见</span> }
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="RankOverviewModel" Title="创建时间" Field="CreateTime">
+                        <ChildContent Context="item">@item.CreateTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
+                    </CgDataTableColumn>
+                </CgDataTable>
+            }
+            else if (context == "certifications")
+            {
+                <CgDataTable TItem="UserCertificationOverviewModel"
+                             Title="认证列表"
+                             OnServerQuery="OnQueryCertifications"
+                             DefaultSortField="Id"
+                             DefaultSortDesc="true">
+                    <CgDataTableColumn TItem="UserCertificationOverviewModel" Title="Id" Field="Id" Width="80px" />
+                    <CgDataTableColumn TItem="UserCertificationOverviewModel" Title="用户" Field="UserName">
+                        <ChildContent Context="item">
+                            <a class="admin-cell-name" href="@($"/space/index/{item.UserId}")">@item.UserName</a>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="UserCertificationOverviewModel" Title="词条" Field="EntryName">
+                        <ChildContent Context="item">
+                            @if (item.EntryId > 0)
+                            { <a class="admin-cell-name" href="@($"/entries/index/{item.EntryId}")">@item.EntryName</a> }
+                            else { <span>@item.EntryName</span> }
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="UserCertificationOverviewModel" Title="词条类型" Field="EntryType">
+                        <ChildContent Context="item"><span class="admin-badge">@item.EntryType</span></ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="UserCertificationOverviewModel" Title="认证时间" Field="CertificationTime">
+                        <ChildContent Context="item">@item.CertificationTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
+                    </CgDataTableColumn>
+                </CgDataTable>
+            }
+            else if (context == "operationrecords")
+            {
+                <CgDataTable TItem="OperationRecordOverviewModel"
+                             Title="操作记录列表"
+                             OnServerQuery="OnQueryOperationRecords"
+                             DefaultSortField="Id"
+                             DefaultSortDesc="true">
+                    <CgDataTableColumn TItem="OperationRecordOverviewModel" Title="Id" Field="Id" Width="80px" />
+                    <CgDataTableColumn TItem="OperationRecordOverviewModel" Title="类型" Field="Type">
+                        <ChildContent Context="item"><span class="admin-badge">@item.Type</span></ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="OperationRecordOverviewModel" Title="用户" Field="UserName">
+                        <ChildContent Context="item">
+                            <a class="admin-cell-name" href="@($"/space/index/{item.UserId}")">@item.UserName</a>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="OperationRecordOverviewModel" Title="目标Id" Field="ObjectId" Width="100px" />
+                    <CgDataTableColumn TItem="OperationRecordOverviewModel" Title="Ip" Field="Ip" Width="120px" />
+                    <CgDataTableColumn TItem="OperationRecordOverviewModel" Title="Cookie" Field="Cookie">
+                        <ChildContent Context="item">
+                            <span style="font-family: monospace; font-size: 0.75rem;" title="@item.Cookie">
+                                @(item.Cookie?.Length > 20 ? item.Cookie[..20] + "…" : item.Cookie)
+                            </span>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="OperationRecordOverviewModel" Title="操作时间" Field="OperationTime">
+                        <ChildContent Context="item">@item.OperationTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
+                    </CgDataTableColumn>
+                </CgDataTable>
+            }
+        </PanelTemplate>
+    </CgTabs>
 </div>
 
 @code {
     private CgDataTable<UserOverviewModel>? _dataTable;
+
+    private readonly IReadOnlyList<CgTabItem> _tabs =
+    [
+        new CgTabItem("users", "用户", "mdiAccountOutline"),
+        new CgTabItem("ranks", "头衔", "mdiMedalOutline"),
+        new CgTabItem("certifications", "认证", "mdiStarOutline"),
+        new CgTabItem("operationrecords", "操作记录", "mdiTextSearchVariant"),
+    ];
+
+    // ─── 用户查询 ───
 
     private async Task<CgDataTableResult<UserOverviewModel>> OnServerQuery(CgDataTableRequest request)
     {
@@ -72,6 +184,35 @@
         var result = await AdminQueryService.GetUsersAsync(parameter);
         return result.Success && result.Data is not null ? new CgDataTableResult<UserOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<UserOverviewModel>([], 0);
     }
+
+    // ─── 头衔查询 ───
+
+    private async Task<CgDataTableResult<RankOverviewModel>> OnQueryRanks(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var result = await AdminQueryService.GetRanksAsync(parameter);
+        return result.Success && result.Data is not null ? new CgDataTableResult<RankOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<RankOverviewModel>([], 0);
+    }
+
+    // ─── 认证查询 ───
+
+    private async Task<CgDataTableResult<UserCertificationOverviewModel>> OnQueryCertifications(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var result = await AdminQueryService.GetUserCertificationsAsync(parameter);
+        return result.Success && result.Data is not null ? new CgDataTableResult<UserCertificationOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<UserCertificationOverviewModel>([], 0);
+    }
+
+    // ─── 操作记录查询 ───
+
+    private async Task<CgDataTableResult<OperationRecordOverviewModel>> OnQueryOperationRecords(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var result = await AdminQueryService.GetOperationRecordsAsync(parameter);
+        return result.Success && result.Data is not null ? new CgDataTableResult<OperationRecordOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<OperationRecordOverviewModel>([], 0);
+    }
+
+    // ─── 用户操作 ───
 
     private async Task ToggleCanComment(UserOverviewModel item, bool canComment)
     {

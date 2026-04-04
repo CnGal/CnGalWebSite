@@ -4,13 +4,15 @@
     gap: var(--cg-spacing-4);
     padding: var(--cg-spacing-5);
     background: var(--cg-color-surface);
-    border: 1px solid var(--cg-color-border);
+    border: 1px solid transparent;
+    box-shadow: var(--cg-shadow-sm);
     border-radius: var(--cg-radius-lg);
-    transition: box-shadow var(--cg-transition-fast);
+    transition: all var(--cg-transition-normal);
 }
 
 .admin-stat-card:hover {
-    box-shadow: var(--cg-shadow-md);
+    box-shadow: var(--cg-shadow-card-hover);
+    transform: translateY(-4px);
 }
 
 .admin-stat-card__icon {
@@ -44,8 +46,13 @@
 }
 
 .admin-stat-card__value {
-    font-size: var(--cg-font-size-xl);
+    font-size: clamp(var(--cg-font-size-md), 4vw, var(--cg-font-size-lg));
     font-weight: var(--cg-font-weight-bold);
     color: var(--cg-color-text);
-    line-height: 1.2;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    word-break: break-word;
 }

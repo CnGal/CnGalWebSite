@@ -1,0 +1,77 @@
+/* AdminNewsPage — scoped styles */
+
+/* ── 顶部工具栏 ── */
+.admin-news-toolbar {
+    display: flex;
+    gap: var(--cg-spacing-3);
+    margin-bottom: var(--cg-spacing-4);
+    flex-wrap: wrap;
+}
+
+/* ── 关联词条行 ── */
+.admin-news-entry-row {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    margin-bottom: var(--cg-spacing-2);
+}
+
+.admin-news-entry-row .cg-input {
+    flex: 1;
+}
+
+.admin-news-entry-row .admin-action-btn--delete {
+    flex-shrink: 0;
+}
+
+/* ── 空状态提示 ── */
+.admin-empty-text {
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+    padding: var(--cg-spacing-3) 0;
+    text-align: center;
+}
+
+/* ── 预览弹窗元素 ── */
+.admin-preview-loading {
+    display: flex;
+    justify-content: center;
+    padding: var(--cg-spacing-8) 0;
+}
+
+.admin-preview-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-4);
+    margin-bottom: var(--cg-spacing-4);
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+}
+
+.admin-preview-author,
+.admin-preview-time {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+}
+
+/* ── 来源类型徽章 ── */
+.admin-badge--rss-weibo {
+    background-color: #df2029;
+    color: white;
+}
+
+.admin-badge--rss-bilibili {
+    background-color: #fb7299;
+    color: white;
+}
+
+.admin-badge--rss-heybox {
+    background-color: #2b2b2b;
+    color: white;
+}
+
+.admin-badge--rss-custom {
+    background-color: var(--cg-color-primary);
+    color: white;
+}

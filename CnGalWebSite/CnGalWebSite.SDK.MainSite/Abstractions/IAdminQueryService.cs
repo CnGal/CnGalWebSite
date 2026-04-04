@@ -1,15 +1,22 @@
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Almanacs;
+using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.BackUpArchives;
 using CnGalWebSite.DataModel.ViewModel.Commodities;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Expo;
 using CnGalWebSite.DataModel.ViewModel.Favorites;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.News;
+using CnGalWebSite.DataModel.ViewModel.OperationRecords;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
+using CnGalWebSite.DataModel.ViewModel.PlayedGames;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Recommends;
+using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Videos;
@@ -24,6 +31,16 @@ public interface IAdminQueryService
     /// 获取 API Server 静态概览数据。
     /// </summary>
     Task<SdkResult<ServerStaticOverviewModel>> GetServerOverviewAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取 API Server 动态概览数据。
+    /// </summary>
+    Task<SdkResult<ServerRealTimeOverviewModel>> GetServerRealTimeOverviewAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取用户数据概览。
+    /// </summary>
+    Task<SdkResult<UserDataOverviewModel>> GetUserDataOverviewAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询评论列表（服务端分页）。
@@ -146,6 +163,10 @@ public interface IAdminQueryService
         QueryParameterModel parameter,
         CancellationToken cancellationToken = default);
 
+    Task<SdkResult<CarouselEditModel>> GetCarouselEditAsync(int id, CancellationToken cancellationToken = default);
+    
+    Task<SdkResult<FriendLinkEditModel>> GetFriendLinkEditAsync(int id, CancellationToken cancellationToken = default);
+
     // ─── 动态/周报 ───
 
     /// <summary>
@@ -160,6 +181,34 @@ public interface IAdminQueryService
     /// </summary>
     Task<SdkResult<QueryResultModel<WeeklyNewsOverviewModel>>> GetWeeklyNewsAsync(
         QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取单条动态的编辑模型。
+    /// </summary>
+    Task<SdkResult<EditGameNewsModel>> GetGameNewsEditAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取单条周报的编辑模型。
+    /// </summary>
+    Task<SdkResult<EditWeeklyNewsModel>> GetWeeklyNewsEditAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取动态预览（文章视图模型）。
+    /// </summary>
+    Task<SdkResult<ArticleViewModel>> GetGameNewsPreviewAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取周报预览（文章视图模型）。
+    /// </summary>
+    Task<SdkResult<ArticleViewModel>> GetWeeklyNewsPreviewAsync(
+        long id,
         CancellationToken cancellationToken = default);
 
     // ─── 展会管理 ───
@@ -192,5 +241,53 @@ public interface IAdminQueryService
     /// </summary>
     Task<SdkResult<QueryResultModel<CommodityCodeOverviewModel>>> GetCommodityCodesAsync(
         QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    // ─── 词条子功能 ───
+
+    /// <summary>
+    /// 分页查询游玩记录列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<GameRecordOverviewModel>>> GetPlayedGamesAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 分页查询基础信息类型列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<EntryInformationTypeOverviewModel>>> GetEntryInformationTypesAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    // ─── 用户子功能 ───
+
+    /// <summary>
+    /// 分页查询头衔列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<RankOverviewModel>>> GetRanksAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 分页查询用户认证列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<UserCertificationOverviewModel>>> GetUserCertificationsAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 分页查询操作记录列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<OperationRecordOverviewModel>>> GetOperationRecordsAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    // ─── 数据图表 ───
+
+    /// <summary>
+    /// 获取折线图数据。
+    /// </summary>
+    Task<SdkResult<LineChartModel>> GetLineChartAsync(
+        LineChartType type, DateTime afterTime, DateTime beforeTime,
         CancellationToken cancellationToken = default);
 }

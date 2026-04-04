@@ -1,0 +1,186 @@
+@page "/admin/listfriendlinks"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IAdminQueryService QueryService
+@inject IAdminCommandService CommandService
+@inject ICgToastService ToastService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Home
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.Extensions
+
+<PageTitle>友情链接管理 - CnGal</PageTitle>
+
+<div class="admin-list-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiLinkVariant" aria-hidden="true" />
+        友情链接管理
+    </h1>
+
+    <CgDataTable TItem="FriendLinkOverviewModel"
+                 Title="友情链接列表"
+                 OnServerQuery="OnQueryAsync"
+                 DefaultSortField="Id"
+                 DefaultSortDesc="true"
+                 @ref="_table">
+        <ToolbarContent>
+            <CgButton Variant="outline" OnClick="OnCreateAsync">
+                <CgMdiIcon Name="mdiPlus" />
+                添加友情链接
+            </CgButton>
+        </ToolbarContent>
+        <ChildContent>
+            <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="ID" Field="Id" Width="100px" />
+        <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="展示图" Width="100px">
+            <ChildContent Context="context">
+                <img src="@context.Image" alt="友情链接" style="max-height: 40px; border-radius: 4px;" />
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="名称" Field="Name" />
+        <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="链接" Field="Link" />
+        <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="权重" Field="Priority" Sortable="true" Width="100px" />
+        <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="操作" Width="140px">
+            <ChildContent Context="context">
+                <div class="admin-actions">
+                    <button class="admin-action-btn admin-action-btn--up" title="增加权重" @onclick="() => OnEditPriorityAsync(context, 1)"><CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" /></button>
+                    <button class="admin-action-btn admin-action-btn--down" title="降低权重" @onclick="() => OnEditPriorityAsync(context, -1)"><CgMdiIcon Name="mdiArrowDownBold" aria-hidden="true" /></button>
+                    <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditAsync(context)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                </div>
+            </ChildContent>
+        </CgDataTableColumn>
+        </ChildContent>
+    </CgDataTable>
+</div>
+
+<CgModal IsOpen="_showEditModal" OnClose="() => _showEditModal = false" Title="@(_isNew ? "添加友情链接" : "编辑友情链接")">
+    <ChildContent>
+        <CgFormSection Flat>
+            @if (_editModel != null)
+            {
+                <CgFormGroup Label="图片" Required="true">
+                    <CgImageUpload @bind-Value="_editModel.Image" />
+                </CgFormGroup>
+                
+                <CgFormGroup Label="名称" Required="true">
+                    <CgInput @bind-Value="_editModel.Name" Placeholder="网站或项目名称" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="链接" Required="true">
+                    <CgInput @bind-Value="_editModel.Link" Placeholder="跳转的外部链接" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="权重">
+                    <CgInput @bind-Value="_editModel.Priority" />
+                </CgFormGroup>
+            }
+            else
+            {
+                <div class="admin-loading-state">
+                    <CgProgressRing />
+                    <span class="admin-loading-state__text">正在加载...</span>
+                </div>
+            }
+        </CgFormSection>
+    </ChildContent>
+    <Footer>
+        <div class="admin-modal-footer">
+            <CgButton Variant="secondary" OnClick="() => _showEditModal = false">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="SaveAsync">保存</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
+@code {
+    private CgDataTable<FriendLinkOverviewModel>? _table;
+    private bool _showEditModal;
+    private bool _isNew;
+    private FriendLinkEditModel? _editModel;
+
+    private async Task<CgDataTableResult<FriendLinkOverviewModel>> OnQueryAsync(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? string.Empty,
+            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await QueryService.GetFriendLinksAsync(parameter);
+        if (result.Success && result.Data != null)
+        {
+            return new CgDataTableResult<FriendLinkOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+        }
+
+        ToastService.Show(result.Error?.Message ?? "获取友情链接列表失败", variant: "error");
+        return new CgDataTableResult<FriendLinkOverviewModel>([], 0);
+    }
+
+    private async Task OnEditPriorityAsync(FriendLinkOverviewModel model, int plusPriority)
+    {
+        var result = await CommandService.EditFriendLinkPriorityAsync([model.Id], plusPriority);
+        if (result.Success)
+        {
+            ToastService.Show("已更新友情链接权重", variant: "success");
+            if (_table != null)
+            {
+                await _table.RefreshAsync();
+            }
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error");
+        }
+    }
+
+    private async Task OnCreateAsync()
+    {
+        _isNew = true;
+        _editModel = new FriendLinkEditModel();
+        _showEditModal = true;
+        await Task.CompletedTask;
+    }
+
+    private async Task OnEditAsync(FriendLinkOverviewModel model)
+    {
+        _isNew = false;
+        _editModel = null;
+        _showEditModal = true;
+        StateHasChanged();
+
+        var result = await QueryService.GetFriendLinkEditAsync(model.Id);
+        if (result.Success && result.Data != null)
+        {
+            _editModel = result.Data;
+            StateHasChanged();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取详情失败", variant: "error");
+            _showEditModal = false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_editModel == null) return;
+        
+        var result = await CommandService.EditFriendLinkAsync(_editModel);
+        if (result.Success)
+        {
+            ToastService.Show("友情链接已保存", variant: "success");
+            _showEditModal = false;
+            if (_table != null)
+            {
+                await _table.RefreshAsync();
+            }
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
+        }
+    }
+}

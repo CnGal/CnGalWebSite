@@ -3,6 +3,7 @@
 @layout AdminLayout
 @rendermode InteractiveServer
 @inject IAdminQueryService AdminQueryService
+@inject NavigationManager NavigationManager
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Admin
 
@@ -20,6 +21,14 @@
                  DefaultSortField="Id"
                  DefaultSortDesc="true">
         <CgDataTableColumn TItem="MessageOverviewModel" Title="Id" Field="Id" Width="80px" />
+        <CgDataTableColumn TItem="MessageOverviewModel" Title="类型" Field="Type">
+            <ChildContent Context="item">
+                <span class="admin-badge">@item.Type</span>
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="MessageOverviewModel" Title="发送时间" Field="PostTime">
+            <ChildContent Context="item">@item.PostTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
+        </CgDataTableColumn>
         <CgDataTableColumn TItem="MessageOverviewModel" Title="标题" Field="Title" />
         <CgDataTableColumn TItem="MessageOverviewModel" Title="内容" Field="Text">
             <ChildContent Context="item"><div class="admin-cell-text">@item.Text</div></ChildContent>
@@ -27,13 +36,23 @@
         <CgDataTableColumn TItem="MessageOverviewModel" Title="用户" Field="UserName">
             <ChildContent Context="item"><span class="admin-cell-name">@item.UserName</span></ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="MessageOverviewModel" Title="发送时间" Field="PostTime">
-            <ChildContent Context="item">@item.PostTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
-        </CgDataTableColumn>
         <CgDataTableColumn TItem="MessageOverviewModel" Title="已读" Field="IsReaded">
             <ChildContent Context="item">
                 @if (item.IsReaded) { <span class="admin-badge admin-badge--yes">已读</span> }
                 else { <span class="admin-badge admin-badge--no">未读</span> }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="MessageOverviewModel" Title="操作" Sortable="false" Width="50px">
+            <ChildContent Context="item">
+                <div class="admin-actions">
+                    @if (!string.IsNullOrWhiteSpace(item.Link))
+                    {
+                        <button class="admin-action-btn admin-action-btn--show" title="查看"
+                                @onclick="() => NavigationManager.NavigateTo(item.Link)">
+                            <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+                        </button>
+                    }
+                </div>
             </ChildContent>
         </CgDataTableColumn>
     </CgDataTable>

@@ -2,9 +2,10 @@
 @page "/admin/index"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
-@rendermode InteractiveServer
 @inject IAdminQueryService AdminQueryService
 @using CnGalWebSite.Core.Models
+@using CnGalWebSite.Core.Helpers
+@using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.MainSite.Shared.Components.Features.Admin
 
 <PageTitle>管理后台 - CnGal</PageTitle>
@@ -15,64 +16,161 @@
         网站数据概览
     </h1>
 
-    @if (ErrorMessage is not null)
+    @if (_errorMessage is not null)
     {
-        <CgAlert Variant="error">@ErrorMessage</CgAlert>
+        <CgAlert Variant="error">@_errorMessage</CgAlert>
     }
-    else if (!IsReady)
-    {
-        <div class="admin-loading">
-            <CgProgressRing />
-            <span>加载中…</span>
+
+    <h2 class="admin-overview-subtitle">
+        <CgMdiIcon Name="mdiServerNetwork" />
+        运行状态概览
+    </h2>
+
+    <div class="server-cards-grid">
+        <!-- API Server Card -->
+        <div class="server-card">
+            <div class="server-card-header">
+                <CgMdiIcon Name="mdiApi" />
+                <span>API Server 状态</span>
+            </div>
+            
+            <div class="server-card-props">
+                <div class="prop-item">
+                    <span class="prop-label">服务器名称</span>
+                    <span class="prop-value">@(_apiStaticModel?.ServerName ?? "—")</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">系统名称</span>
+                    <span class="prop-value">@(_apiStaticModel?.SystemName ?? "—")</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">SDK 版本</span>
+                    <span class="prop-value">@(_apiStaticModel?.SDKVersion ?? "—")</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">后台任务</span>
+                    <span class="prop-value @(_apiStaticModel?.IsRuningBackgroundTask == true ? "text-success" : "")">
+                        @(_apiStaticModel?.IsRuningBackgroundTask == true ? "运行中" : "空闲")
+                    </span>
+                </div>
+            </div>
+
+            <div class="hardware-metrics">
+                <div class="metric-row">
+                    <div class="metric-header">
+                        <span>CPU (@(_apiRealTimeModel?.CPUCoreNumber.ToString() ?? "-") 核心)</span>
+                        <span>@(_apiRealTimeModel != null ? $"{_apiRealTimeModel.CPUUtilization:F1}%" : "-")</span>
+                    </div>
+                    <div class="metric-bar-bg">
+                        <div class="metric-bar-fill" style="width: @(_apiRealTimeModel != null ? $"{Math.Clamp(_apiRealTimeModel.CPUUtilization, 0, 100):F1}%" : "0%");"></div>
+                    </div>
+                </div>
+                <div class="metric-row">
+                    <div class="metric-header">
+                        <span>内存 (@(_apiRealTimeModel != null ? $"{_apiRealTimeModel.Memory.UsedString} / {_apiRealTimeModel.Memory.TotalString}" : "-"))</span>
+                        <span>@(_apiRealTimeModel != null && _apiRealTimeModel.Memory.Total > 0 ? $"{_apiRealTimeModel.Memory.Used / _apiRealTimeModel.Memory.Total * 100:F1}%" : "-")</span>
+                    </div>
+                    <div class="metric-bar-bg">
+                        <div class="metric-bar-fill" style="width: @(_apiRealTimeModel != null && _apiRealTimeModel.Memory.Total > 0 ? $"{Math.Clamp(_apiRealTimeModel.Memory.Used / _apiRealTimeModel.Memory.Total * 100, 0, 100):F1}%" : "0%");"></div>
+                    </div>
+                </div>
+            </div>
         </div>
-    }
-    else
-    {
-        <section class="admin-stats-grid">
-            <AdminStatCard Label="系统名称"
-                           Value="@(ServerModel?.SystemName ?? "—")"
-                           Icon="mdiServerNetwork"
-                           Color="var(--cg-color-primary)" />
-            <AdminStatCard Label="服务器名称"
-                           Value="@(ServerModel?.ServerName ?? "—")"
-                           Icon="mdiMonitor"
-                           Color="var(--cg-color-secondary)" />
-            <AdminStatCard Label="SDK 版本"
-                           Value="@(ServerModel?.SDKVersion ?? "—")"
-                           Icon="mdiCodeBraces"
-                           Color="var(--cg-color-success)" />
-            <AdminStatCard Label="最近更新时间"
-                           Value="@(ServerModel?.LastUpdateTime.ToString("yyyy-MM-dd HH:mm") ?? "—")"
-                           Icon="mdiUpdate"
-                           Color="var(--cg-color-warning)" />
-            <AdminStatCard Label="后台任务状态"
-                           Value="@(ServerModel?.IsRuningBackgroundTask == true ? "运行中" : "空闲")"
-                           Icon="mdiCog"
-                           Color="@(ServerModel?.IsRuningBackgroundTask == true ? "var(--cg-color-success)" : "var(--cg-color-text-muted)")" />
-        </section>
-    }
+
+        <!-- Blazor Server Card -->
+        <div class="server-card">
+            <div class="server-card-header">
+                <CgMdiIcon Name="mdiApplicationBrackets" />
+                <span>Blazor Server 状态 (SSR)</span>
+            </div>
+            
+            <div class="server-card-props">
+                <div class="prop-item">
+                    <span class="prop-label">服务器名称</span>
+                    <span class="prop-value">@(_blazorStaticModel?.ServerName ?? "—")</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">系统名称</span>
+                    <span class="prop-value">@(_blazorStaticModel?.SystemName ?? "—")</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">SDK 版本</span>
+                    <span class="prop-value">@(_blazorStaticModel?.SDKVersion ?? "—")</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">最近更新</span>
+                    <span class="prop-value">@(_blazorStaticModel?.LastUpdateTime.ToString("yyyy-MM-dd HH:mm") ?? "—")</span>
+                </div>
+            </div>
+
+            <div class="hardware-metrics">
+                <div class="metric-row">
+                    <div class="metric-header">
+                        <span>CPU (@(_blazorRealTimeModel?.CPUCoreNumber.ToString() ?? "-") 核心)</span>
+                        <span>@(_blazorRealTimeModel != null ? $"{_blazorRealTimeModel.CPUUtilization:F1}%" : "-")</span>
+                    </div>
+                    <div class="metric-bar-bg">
+                        <div class="metric-bar-fill" style="width: @(_blazorRealTimeModel != null ? $"{Math.Clamp(_blazorRealTimeModel.CPUUtilization, 0, 100):F1}%" : "0%");"></div>
+                    </div>
+                </div>
+                <div class="metric-row">
+                    <div class="metric-header">
+                        <span>内存 (@(_blazorRealTimeModel != null ? $"{_blazorRealTimeModel.Memory.UsedString} / {_blazorRealTimeModel.Memory.TotalString}" : "-"))</span>
+                        <span>@(_blazorRealTimeModel != null && _blazorRealTimeModel.Memory.Total > 0 ? $"{_blazorRealTimeModel.Memory.Used / _blazorRealTimeModel.Memory.Total * 100:F1}%" : "-")</span>
+                    </div>
+                    <div class="metric-bar-bg">
+                        <div class="metric-bar-fill" style="width: @(_blazorRealTimeModel != null && _blazorRealTimeModel.Memory.Total > 0 ? $"{Math.Clamp(_blazorRealTimeModel.Memory.Used / _blazorRealTimeModel.Memory.Total * 100, 0, 100):F1}%" : "0%");"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="admin-overview-subtitle">
+        <CgMdiIcon Name="mdiAccountGroup" />
+        用户数据
+    </h2>
+    <div class="admin-stats-grid">
+        <AdminStatCard Label="总用户数" Value="@(_userModel?.UserTotalNumber.ToString() ?? "—")" Icon="mdiAccountMultiple" Color="var(--cg-color-primary)" />
+        <AdminStatCard Label="已验证邮箱" Value="@(_userModel?.UserVerifyEmailNumber.ToString() ?? "—")" Icon="mdiEmailCheck" Color="var(--cg-color-success)" />
+        <AdminStatCard Label="二次身份验证" Value="@(_userModel?.UserSecondaryVerificationNumber.ToString() ?? "—")" Icon="mdiShieldCheck" Color="var(--cg-color-warning)" />
+        <AdminStatCard Label="7天活跃在线" Value="@(_userModel?.UserActiveNumber.ToString() ?? "—")" Icon="mdiRun" Color="var(--cg-color-secondary)" />
+        <AdminStatCard Label="邮箱验证比例" Value="@(_userModel != null && _userModel.UserTotalNumber > 0 ? $"{_userModel.UserVerifyEmailNumber * 100.0 / _userModel.UserTotalNumber:F1}%" : "—")" Icon="mdiPercent" Color="var(--cg-color-text-muted)" />
+        <AdminStatCard Label="活跃用户比例" Value="@(_userModel != null && _userModel.UserTotalNumber > 0 ? $"{_userModel.UserActiveNumber * 100.0 / _userModel.UserTotalNumber:F1}%" : "—")" Icon="mdiPercent" Color="var(--cg-color-text-muted)" />
+    </div>
 </div>
 
 @code {
-    private ServerStaticOverviewModel? ServerModel;
-    private string? ErrorMessage;
-    private bool IsReady;
+    private ServerStaticOverviewModel? _apiStaticModel;
+    private ServerRealTimeOverviewModel? _apiRealTimeModel;
+    private ServerStaticOverviewModel? _blazorStaticModel;
+    private ServerRealTimeOverviewModel? _blazorRealTimeModel;
+    private UserDataOverviewModel? _userModel;
+    private string? _errorMessage;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+        try
         {
-            var result = await AdminQueryService.GetServerOverviewAsync();
-            if (result.Success && result.Data is not null)
-            {
-                ServerModel = result.Data;
-            }
-            else
-            {
-                ErrorMessage = result.Error?.Message ?? "获取服务器概览数据失败";
-            }
-            IsReady = true;
-            StateHasChanged();
+            var apiStaticTask = AdminQueryService.GetServerOverviewAsync();
+            var apiRtTask = AdminQueryService.GetServerRealTimeOverviewAsync();
+            var userTask = AdminQueryService.GetUserDataOverviewAsync();
+
+            await Task.WhenAll(apiStaticTask, apiRtTask, userTask);
+
+            if (apiStaticTask.Result.Success) _apiStaticModel = apiStaticTask.Result.Data;
+            else _errorMessage = apiStaticTask.Result.Error?.Message;
+
+            if (apiRtTask.Result.Success) _apiRealTimeModel = apiRtTask.Result.Data;
+            if (userTask.Result.Success) _userModel = userTask.Result.Data;
+
+            // 调用本地 Blazor Server 静态信息，并获取本地进程状态资源
+            _blazorStaticModel = SystemEnvironmentHelper.GetServerStaticDataOverview();
+            _blazorRealTimeModel = SystemEnvironmentHelper.GetServerRealTimeDataOverview();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = "获取服务器概览数据失败: " + ex.Message;
         }
     }
 }

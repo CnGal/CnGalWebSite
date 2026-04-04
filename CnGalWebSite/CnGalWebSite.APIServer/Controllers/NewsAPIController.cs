@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Articles;
+using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Users;
@@ -558,6 +558,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     PublishTime = s.PublishTime,
                     Title = s.Title,
                     ArticleId = s.ArticleId ?? 0,
+                    RssType = s.RSS != null ? s.RSS.Type : null,
                 }).ToListAsync(),
                 Total = total,
                 Parameter = model

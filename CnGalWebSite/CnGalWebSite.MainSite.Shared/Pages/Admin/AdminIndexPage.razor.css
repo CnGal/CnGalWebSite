@@ -1,37 +1,119 @@
 .admin-index-page {
     display: flex;
     flex-direction: column;
-    gap: var(--cg-spacing-6);
+    gap: var(--cg-spacing-4);
 }
 
-.admin-page-title {
+.admin-overview-subtitle {
     display: flex;
     align-items: center;
-    gap: var(--cg-spacing-3);
-    font-size: var(--cg-font-size-xl);
+    gap: var(--cg-spacing-2);
+    font-size: var(--cg-font-size-lg);
     font-weight: var(--cg-font-weight-bold);
-    color: var(--cg-color-text);
-    margin: 0;
-}
-
-.admin-page-title ::deep .cg-mdi-icon {
-    width: 28px;
-    height: 28px;
-    color: var(--cg-color-primary);
-}
-
-.admin-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--cg-spacing-3);
-    padding: var(--cg-spacing-10) 0;
-    color: var(--cg-color-text-muted);
-    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-primary);
+    margin: var(--cg-spacing-4) 0 0 0;
+    padding-bottom: var(--cg-spacing-2);
+    border-bottom: 1px solid var(--cg-color-border);
 }
 
 .admin-stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: var(--cg-spacing-4);
+}
+
+.server-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--cg-spacing-4);
+}
+
+.server-card {
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    padding: var(--cg-spacing-5);
+    box-shadow: var(--cg-shadow-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+.server-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    font-size: var(--cg-font-size-md);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text-primary);
+    margin-bottom: var(--cg-spacing-1);
+}
+
+.admin-page-title ::deep svg,
+.admin-overview-subtitle ::deep svg,
+.server-card-header ::deep svg {
+    color: var(--cg-color-primary);
+}
+
+.server-card-props {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--cg-spacing-3);
+}
+
+.prop-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.prop-label {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+}
+
+.prop-value {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-text-primary);
+    word-wrap: break-word;
+}
+
+.text-success {
+    color: var(--cg-color-success);
+}
+
+.hardware-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+    margin-top: auto;
+    padding-top: var(--cg-spacing-4);
+    border-top: 1px dashed var(--cg-color-border);
+}
+
+.metric-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+}
+
+.metric-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+}
+
+.metric-bar-bg {
+    height: 6px;
+    background: var(--cg-color-bg);
+    border-radius: var(--cg-radius-full);
+    overflow: hidden;
+}
+
+.metric-bar-fill {
+    height: 100%;
+    border-radius: var(--cg-radius-full);
+    background-color: var(--cg-color-primary);
 }

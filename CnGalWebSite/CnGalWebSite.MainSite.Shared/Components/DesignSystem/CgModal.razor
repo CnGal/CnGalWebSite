@@ -1,7 +1,7 @@
 @if (_isOpenInternal)
 {
     <div class="cg-modal-mask @(_isClosing ? "cg-modal-closing" : "")" @onclick="OnMaskClick">
-        <section class="cg-modal-panel @(_isClosing ? "cg-modal-panel-closing" : "")" @onclick:stopPropagation="true" role="dialog" aria-modal="true">
+        <section class="cg-modal-panel @(_isClosing ? "cg-modal-panel-closing" : "")" style="@(Width != null ? $"width: {Width}; max-width: 92vw;": "")" @onclick:stopPropagation="true" role="dialog" aria-modal="true">
             <CgRenderFreeze Freeze="_isClosing">
                 <header class="cg-modal-header">
                     <h3>@Title</h3>
@@ -26,6 +26,9 @@
 
     [Parameter]
     public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? Width { get; set; }
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }

@@ -3,6 +3,8 @@ using CnGalWebSite.MainSite.Components;
 using CnGalWebSite.MainSite.Shared;
 using CnGalWebSite.SDK.MainSite.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Components.Server.Circuits;
+using CnGalWebSite.MainSite.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var apiBaseAddress = builder.Configuration["MainSiteApi:BaseAddress"];
@@ -17,6 +19,8 @@ builder.Services.AddMainSiteSdk(apiBaseAddress!, imageApiBaseAddress!, taskApiBa
 builder.Services.AddMainSiteSharedServices();
 //添加状态检查
 builder.Services.AddHealthChecks();
+builder.Services.AddScoped<CircuitHandler, IdleCircuitHandler>();
+
 var app = builder.Build();
 //设置请求来源
 if (!app.Environment.IsDevelopment())

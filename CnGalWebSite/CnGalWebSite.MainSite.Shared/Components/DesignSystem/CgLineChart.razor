@@ -1,0 +1,160 @@
+@* CgLineChart — 基于 Canvas 的折线图组件，通过 JS 模块渲染 *@
+@inject IJSRuntime JsRuntime
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+
+<div class="cg-line-chart @(IsExpanded ? "cg-line-chart--expanded" : "") @CssClass" style="@Style">
+    <div class="cg-line-chart__header">
+        <span class="cg-line-chart__title">@Title</span>
+        <div class="cg-line-chart__actions">
+            @if (ShowTimeRangeSelector)
+            {
+                <select class="cg-line-chart__select" value="@_selectedDays" @onchange="OnDaysChanged">
+                    <option value="15">15天</option>
+                    <option value="30">1个月</option>
+                    <option value="90">3个月</option>
+                    <option value="180">6个月</option>
+                    <option value="365">1年</option>
+                    <option value="999999">所有</option>
+                </select>
+            }
+            <button type="button" class="cg-line-chart__action-btn" @onclick="ToggleExpand" title="@(IsExpanded ? "还原宽度" : "横跨多列")">
+                <CgMdiIcon Name="@(IsExpanded ? "mdiFullscreenExit" : "mdiFullscreen")" aria-hidden="true" />
+            </button>
+        </div>
+    </div>
+    <div class="cg-line-chart__body">
+        <canvas id="@_canvasId" width="600" height="@Height" style="width: 100%; height: @(Height)px; max-height: @(Height)px;"></canvas>
+    </div>
+</div>
+
+@code {
+    private string _canvasId = $"cg-chart-{Guid.NewGuid():N}";
+    private IJSObjectReference? _chartModule;
+    private int _selectedDays = 30;
+
+    /// <summary>
+    /// 图表标题。
+    /// </summary>
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// X 轴标签列表。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<string>? Labels { get; set; }
+
+    /// <summary>
+    /// 数据系列集合。每个系列包含名称和数据点。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<CgLineChartSeries>? Series { get; set; }
+
+    /// <summary>
+    /// 图表高度（px）。
+    /// </summary>
+    [Parameter]
+    public int Height { get; set; } = 300;
+
+    /// <summary>
+    /// 是否显示时间范围选择器。
+    /// </summary>
+    [Parameter]
+    public bool ShowTimeRangeSelector { get; set; }
+
+    /// <summary>
+    /// 时间范围变化时的回调，参数为天数。
+    /// </summary>
+    [Parameter]
+    public EventCallback<int> OnTimeRangeChanged { get; set; }
+
+    [Parameter]
+    public bool IsExpanded { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsExpandedChanged { get; set; }
+
+    /// <summary>
+    /// 附加 CSS 类名。
+    /// </summary>
+    [Parameter]
+    public string? CssClass { get; set; }
+
+    /// <summary>
+    /// 附加行内样式。
+    /// </summary>
+    [Parameter]
+    public string? Style { get; set; }
+
+    private async Task ToggleExpand()
+    {
+        IsExpanded = !IsExpanded;
+        await IsExpandedChanged.InvokeAsync(IsExpanded);
+        StateHasChanged();
+        
+        // Wait for CSS reflow
+        await Task.Delay(50);
+        await RenderChart();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _chartModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/CnGalWebSite.MainSite.Shared/scripts/cg-line-chart.js");
+            await RenderChart();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_chartModule is not null)
+        {
+            await RenderChart();
+        }
+    }
+
+    private async Task RenderChart()
+    {
+        if (_chartModule is null) return;
+
+        var labels = Labels ?? [];
+        var datasets = new List<object>();
+        if (Series is not null)
+        {
+            foreach (var s in Series)
+            {
+                datasets.Add(new { label = s.Name, data = s.Data });
+            }
+        }
+
+        await _chartModule.InvokeVoidAsync("render", _canvasId, labels, datasets, Title ?? "");
+    }
+
+    private async Task OnDaysChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out var days))
+        {
+            _selectedDays = days;
+            await OnTimeRangeChanged.InvokeAsync(days);
+        }
+    }
+
+    /// <summary>
+    /// 公开方法：外部可调用以刷新图表。
+    /// </summary>
+    public async Task RefreshAsync()
+    {
+        await RenderChart();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_chartModule is not null)
+        {
+            await _chartModule.DisposeAsync();
+        }
+    }
+}

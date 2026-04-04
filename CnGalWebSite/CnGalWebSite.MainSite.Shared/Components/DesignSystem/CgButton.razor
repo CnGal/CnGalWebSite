@@ -1,12 +1,12 @@
 @if (!string.IsNullOrEmpty(Href))
 {
-    <a class="@CssClass" href="@Href" @attributes="AdditionalAttributes">
+    <a class="@CssClass" href="@(IsDisabled ? null : Href)" aria-disabled="@(IsDisabled ? "true" : null)" role="button" tabindex="@(IsDisabled ? -1 : 0)" @attributes="AdditionalAttributes">
         @ChildContent
     </a>
 }
 else
 {
-    <button class="@CssClass" type="@Type" disabled="@IsDisabled" @onclick="HandleClickAsync" @attributes="AdditionalAttributes">
+    <button class="@CssClass" type="@Type" disabled="@IsDisabled" aria-disabled="@(IsDisabled ? "true" : null)" @onclick="HandleClickAsync" @attributes="AdditionalAttributes">
         @if (_isLoading)
         {
             <CgProgressRing Size="sm" />
@@ -92,6 +92,10 @@ else
             if (_isLoading)
             {
                 cls += " cg-btn--loading";
+            }
+            if (IsDisabled)
+            {
+                cls += " cg-btn--disabled";
             }
             return cls;
         }

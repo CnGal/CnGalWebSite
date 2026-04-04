@@ -19,6 +19,10 @@
                         <CgMdiIcon Name="mdiWrenchOutline" aria-hidden="true" />
                         <span>工具</span>
                     </a>
+                    <a href="/admin/data" class="admin-nav-item @GetActiveClass("/admin/data")">
+                        <CgMdiIcon Name="mdiChartLineVariant" aria-hidden="true" />
+                        <span>数据概览</span>
+                    </a>
 
                     <div class="admin-nav-group-label">内容管理</div>
                     <a href="/admin/listentries" class="admin-nav-item @GetActiveClass("/admin/listentries")">
@@ -58,6 +62,10 @@
                     <a href="/admin/listusers" class="admin-nav-item @GetActiveClass("/admin/listusers")">
                         <CgMdiIcon Name="mdiAccountGroupOutline" aria-hidden="true" />
                         <span>用户</span>
+                    </a>
+                    <a href="/admin/listcircuits" class="admin-nav-item @GetActiveClass("/admin/listcircuits")">
+                        <CgMdiIcon Name="mdiNetwork" aria-hidden="true" />
+                        <span>线路</span>
                     </a>
                     <a href="/admin/listmessages" class="admin-nav-item @GetActiveClass("/admin/listmessages")">
                         <CgMdiIcon Name="mdiEmailOutline" aria-hidden="true" />
@@ -105,9 +113,13 @@
                         <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" />
                         <span>定时任务</span>
                     </a>
-                    <a href="/admin/managehome" class="admin-nav-item @GetActiveClass("/admin/managehome")">
-                        <CgMdiIcon Name="mdiCogOutline" aria-hidden="true" />
-                        <span>网站设置</span>
+                    <a href="/admin/listcarousels" class="admin-nav-item @GetActiveClass("/admin/listcarousels")">
+                        <CgMdiIcon Name="mdiViewCarouselOutline" aria-hidden="true" />
+                        <span>轮播图</span>
+                    </a>
+                    <a href="/admin/listfriendlinks" class="admin-nav-item @GetActiveClass("/admin/listfriendlinks")">
+                        <CgMdiIcon Name="mdiLinkVariant" aria-hidden="true" />
+                        <span>友情链接</span>
                     </a>
                 </nav>
 
@@ -121,15 +133,20 @@
 
             <div class="admin-main">
                 <header class="admin-topbar">
-                    <div class="admin-topbar__breadcrumb">
-                        <CgMdiIcon Name="mdiMenu" aria-hidden="true" />
-                        <span>管理后台</span>
-                    </div>
-                    <div class="admin-topbar__actions">
-                        <span class="admin-topbar__user">
-                            <CgMdiIcon Name="mdiAccountCircleOutline" aria-hidden="true" />
-                            @context.User.Identity?.Name
-                        </span>
+                    <div class="admin-topbar__right">
+                        <a href="/search" class="admin-topbar__search" aria-label="搜索内容">
+                            <div class="admin-topbar__search-inner">
+                                <div class="admin-topbar__search-icon">
+                                    <CgMdiIcon Name="mdiMagnify" aria-hidden="true" />
+                                </div>
+                                <span class="admin-topbar__search-placeholder">搜索词条、制作组...</span>
+                            </div>
+                        </a>
+
+                        <div class="admin-topbar__actions">
+                            <CnGalWebSite.MainSite.Shared.Components.Layout.CreateMenu />
+                            <CnGalWebSite.MainSite.Shared.Components.Layout.UserMenu UserName="@context.User.Identity?.Name" UserId="@context.User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value" CurrentReturnUrl="@CurrentReturnUrl" />
+                        </div>
                     </div>
                 </header>
 
@@ -150,6 +167,8 @@
 </AuthorizeView>
 
 @code {
+    private string CurrentReturnUrl => new Uri(NavigationManager.Uri).PathAndQuery;
+
     private string GetActiveClass(params string[] paths)
     {
         var currentPath = new Uri(NavigationManager.Uri).AbsolutePath.TrimEnd('/').ToLowerInvariant();

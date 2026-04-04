@@ -3,7 +3,9 @@ using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.BackUpArchives;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
+using CnGalWebSite.DataModel.ViewModel.News;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Votes;
@@ -212,14 +214,52 @@ public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminComm
     // ─── 轮播图 ───
 
     public Task<SdkResult<bool>> EditCarouselPriorityAsync(int[] ids, int plusPriority, CancellationToken cancellationToken = default)
-        => PostCommandAsync("api/home/EditCarouselPriorityAsync",
+        => PostCommandAsync("api/home/EditCarouselPriority",
             new EditEntryPriorityViewModel { Ids = ids, PlusPriority = plusPriority },
             "EDIT_CAROUSEL_PRIORITY", "调整轮播图优先级", cancellationToken);
+
+    public Task<SdkResult<bool>> EditCarouselAsync(CarouselEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/home/EditCarousel", model, "EDIT_CAROUSEL", "编辑轮播图", cancellationToken);
 
     // ─── 友情链接 ───
 
     public Task<SdkResult<bool>> EditFriendLinkPriorityAsync(int[] ids, int plusPriority, CancellationToken cancellationToken = default)
-        => PostCommandAsync("api/home/EditFriendLinkPriorityAsync",
+        => PostCommandAsync("api/home/EditFriendLinkPriority",
             new EditEntryPriorityViewModel { Ids = ids, PlusPriority = plusPriority },
             "EDIT_FRIENDLINK_PRIORITY", "调整友情链接优先级", cancellationToken);
+
+    public Task<SdkResult<bool>> EditFriendLinkAsync(FriendLinkEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/home/EditFriendLink", model, "EDIT_FRIENDLINK", "编辑友情链接", cancellationToken);
+
+    // ─── 动态 ───
+
+    public Task<SdkResult<bool>> EditGameNewsAsync(EditGameNewsModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/news/EditGameNews", model, "EDIT_GAME_NEWS", "编辑动态", cancellationToken);
+
+    public Task<SdkResult<bool>> AddCustomNewsAsync(EditGameNewsModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/news/AddCustomNews", model, "ADD_CUSTOM_NEWS", "添加自定义动态", cancellationToken);
+
+    public Task<SdkResult<bool>> PublishGameNewsAsync(long id, CancellationToken cancellationToken = default)
+        => GetCommandAsync($"api/news/PublishGameNews/{id}", "PUBLISH_GAME_NEWS", "发布动态", cancellationToken);
+
+    public Task<SdkResult<bool>> IgnoreGameNewsAsync(long[] ids, bool isIgnore, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/news/IgnoreGameNews",
+            new IgnoreGameNewsModel { Ids = ids, IsIgnore = isIgnore },
+            "IGNORE_GAME_NEWS", "忽略/恢复动态", cancellationToken);
+
+    public Task<SdkResult<bool>> AddWeiboNewsAsync(string link, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/news/AddWeiboNews",
+            new AddWeiboNewsModel { Link = link },
+            "ADD_WEIBO_NEWS", "导入微博动态", cancellationToken);
+
+    // ─── 周报 ───
+
+    public Task<SdkResult<bool>> EditWeeklyNewsAsync(EditWeeklyNewsModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/news/EditWeeklyNews", model, "EDIT_WEEKLY_NEWS", "编辑周报", cancellationToken);
+
+    public Task<SdkResult<bool>> PublishWeeklyNewsAsync(long id, CancellationToken cancellationToken = default)
+        => GetCommandAsync($"api/news/PublishWeelyNews/{id}", "PUBLISH_WEEKLY_NEWS", "发布周报", cancellationToken);
+
+    public Task<SdkResult<bool>> ResetWeeklyNewsAsync(long id, CancellationToken cancellationToken = default)
+        => GetCommandAsync($"api/news/ResetWeelyNews/{id}", "RESET_WEEKLY_NEWS", "重置周报", cancellationToken);
 }
