@@ -342,6 +342,28 @@
     background: var(--cg-color-surface-hover);
 }
 
+/* ─── Rank Preview ─── */
+
+::deep .rank-preview-area {
+    display: flex;
+    align-items: center;
+    min-height: 36px;
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    border-radius: var(--cg-radius-md);
+    background: var(--cg-color-bg);
+    border: 1px dashed var(--cg-color-border);
+}
+
+::deep .user-rank {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: var(--cg-radius-full);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    line-height: 1.6;
+}
+
 /* ─── Not Authorized ─── */
 
 .admin-not-authorized {

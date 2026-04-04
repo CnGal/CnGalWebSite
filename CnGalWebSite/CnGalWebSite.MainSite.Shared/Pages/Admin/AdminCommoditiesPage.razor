@@ -3,8 +3,13 @@
 @layout AdminLayout
 @rendermode InteractiveServer
 @inject IAdminQueryService AdminQueryService
+@inject IAdminCommandService AdminCommandService
+@inject ICgToastService ToastService
 @using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Commodities
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.Extensions
 
 <PageTitle>看板娘小卖铺 - CnGal</PageTitle>
 
@@ -26,29 +31,51 @@
                              Title="商品列表"
                              OnServerQuery="OnQueryCommodities"
                              DefaultSortField="Id"
-                             DefaultSortDesc="true">
+                             DefaultSortDesc="true"
+                             @ref="_commodityTable">
+                    <ToolbarContent>
+                        <CgButton Variant="outline" OnClick="OnCreateCommodityAsync">
+                            <CgMdiIcon Name="mdiPlus" />
+                            添加商品
+                        </CgButton>
+                    </ToolbarContent>
+                    <ChildContent>
                     <CgDataTableColumn TItem="CommodityOverviewModel" Title="Id" Field="Id" Width="80px" />
+                    <CgDataTableColumn TItem="CommodityOverviewModel" Title="图片" Sortable="false" Width="60px">
+                        <ChildContent Context="item">
+                            @if (!string.IsNullOrWhiteSpace(item.Image))
+                            { <img src="@item.Image" alt="商品图片" style="width: 32px; height: 32px; border-radius: 4px; object-fit: cover;" /> }
+                        </ChildContent>
+                    </CgDataTableColumn>
                     <CgDataTableColumn TItem="CommodityOverviewModel" Title="名称" Field="Name" />
                     <CgDataTableColumn TItem="CommodityOverviewModel" Title="价格" Field="Price" Width="80px" />
                     <CgDataTableColumn TItem="CommodityOverviewModel" Title="类型" Field="Type">
                         <ChildContent Context="item">
-                            <span class="admin-badge">@item.Type</span>
+                            <span class="admin-badge">@item.Type.GetDisplayName()</span>
                         </ChildContent>
                     </CgDataTableColumn>
+                    <CgDataTableColumn TItem="CommodityOverviewModel" Title="值" Field="Value" />
                     <CgDataTableColumn TItem="CommodityOverviewModel" Title="用户数" Field="UserCount" Width="80px" />
                     <CgDataTableColumn TItem="CommodityOverviewModel" Title="状态" Field="IsHidden">
                         <ChildContent Context="item">
-                            @if (item.IsHidden)
-                            {
-                                <span class="admin-badge admin-badge--hidden">已隐藏</span>
-                            }
-                            else
-                            {
-                                <span class="admin-badge admin-badge--visible">可见</span>
-                            }
+                            @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
+                            else { <span class="admin-badge admin-badge--visible">可见</span> }
                         </ChildContent>
                     </CgDataTableColumn>
                     <CgDataTableColumn TItem="CommodityOverviewModel" Title="优先级" Field="Priority" Width="80px" />
+                    <CgDataTableColumn TItem="CommodityOverviewModel" Title="最后编辑" Field="LastEditTime" Width="160px">
+                        <ChildContent Context="item">
+                            @item.LastEditTime.ToString("yyyy-MM-dd HH:mm")
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="CommodityOverviewModel" Title="操作" Sortable="false" Width="60px">
+                        <ChildContent Context="item">
+                            <div class="admin-actions">
+                                <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditCommodityAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                            </div>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    </ChildContent>
                 </CgDataTable>
             }
             else if (context == "codes")
@@ -57,76 +84,362 @@
                              Title="兑换码列表"
                              OnServerQuery="OnQueryCodes"
                              DefaultSortField="Id"
-                             DefaultSortDesc="true">
+                             DefaultSortDesc="true"
+                             @ref="_codeTable">
+                    <ToolbarContent>
+                        <CgButton Variant="outline" OnClick="OnCreateCodeAsync">
+                            <CgMdiIcon Name="mdiPlus" />
+                            添加兑换码
+                        </CgButton>
+                        <CgButton Variant="outline" OnClick="() => _showImportModal = true">
+                            <CgMdiIcon Name="mdiImport" />
+                            批量导入
+                        </CgButton>
+                    </ToolbarContent>
+                    <ChildContent>
                     <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="Id" Field="Id" Width="80px" />
                     <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="兑换码" Field="Code" />
                     <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="类型" Field="Type">
                         <ChildContent Context="item">
-                            <span class="admin-badge">@item.Type</span>
+                            <span class="admin-badge">@item.Type.GetDisplayName()</span>
                         </ChildContent>
                     </CgDataTableColumn>
                     <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="数量" Field="Count" Width="80px" />
-                    <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="状态" Field="Redeemed">
+                    <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="兑换者" Field="UserName">
                         <ChildContent Context="item">
-                            @if (item.Redeemed)
-                            {
-                                <span class="admin-badge admin-badge--hidden">已兑换</span>
-                            }
-                            else
-                            {
-                                <span class="admin-badge admin-badge--visible">未兑换</span>
-                            }
+                            @if (item.Redeemed && !string.IsNullOrEmpty(item.UserId))
+                            { <a class="admin-cell-name" href="@($"/space/index/{item.UserId}")">@item.UserName</a> }
+                            else { <span>无</span> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="用户" Field="UserName" Width="120px" />
+                    <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="兑换时间" Field="RedeemedTime" Width="160px">
+                        <ChildContent Context="item">
+                            @(item.RedeemedTime?.ToString("yyyy-MM-dd HH:mm") ?? "无")
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="状态" Field="Redeemed">
+                        <ChildContent Context="item">
+                            @if (item.Hide) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
+                            @if (item.Redeemed) { <span class="admin-badge admin-badge--hidden">已兑换</span> }
+                            else { <span class="admin-badge admin-badge--visible">未兑换</span> }
+                            @if (item.CanRedeemed) { <span class="admin-badge admin-badge--yes">可兑换</span> }
+                            else { <span class="admin-badge admin-badge--no">不可兑换</span> }
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="CommodityCodeOverviewModel" Title="操作" Sortable="false" Width="60px">
+                        <ChildContent Context="item">
+                            <div class="admin-actions">
+                                <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditCodeAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                            </div>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    </ChildContent>
                 </CgDataTable>
             }
         </PanelTemplate>
     </CgTabs>
 </div>
 
+@* ─── 商品编辑弹窗 ─── *@
+
+<CgModal IsOpen="_showCommodityModal" OnClose="() => _showCommodityModal = false" Title="@(_isNewCommodity ? "添加商品" : "编辑商品")">
+    <ChildContent>
+        <CgFormSection Flat>
+            @if (_commodityEditModel != null)
+            {
+                <CgFormGroup Label="名称" Required="true">
+                    <CgInput @bind-Value="_commodityEditModel.Name" Placeholder="商品名称" />
+                </CgFormGroup>
+                <CgFormGroup Label="简介">
+                    <CgInput @bind-Value="_commodityEditModel.BriefIntroduction" Placeholder="商品简介" />
+                </CgFormGroup>
+                <CgFormGroup Label="价格">
+                    <CgInput @bind-Value="_commodityEditModel.Price" />
+                </CgFormGroup>
+                <CgFormGroup Label="类型">
+                    <CgEnumSelect TEnum="CommodityType" @bind-Value="_commodityEditModel.Type" />
+                </CgFormGroup>
+                <CgFormGroup Label="值">
+                    <CgInput @bind-Value="_commodityEditModel.Value" Placeholder="商品值" />
+                </CgFormGroup>
+                <CgFormGroup Label="图片">
+                    <CgImageUpload @bind-Value="_commodityEditModel.Image" />
+                </CgFormGroup>
+                <CgFormGroup Label="优先级">
+                    <CgInput @bind-Value="_commodityEditModel.Priority" />
+                </CgFormGroup>
+                <CgFormGroup Label="是否隐藏">
+                    <CgCheckbox @bind-Value="_commodityEditModel.IsHidden" Label="隐藏此商品" />
+                </CgFormGroup>
+            }
+            else
+            {
+                <div class="admin-loading-state">
+                    <CgProgressRing />
+                    <span class="admin-loading-state__text">正在加载...</span>
+                </div>
+            }
+        </CgFormSection>
+    </ChildContent>
+    <Footer>
+        <div class="admin-modal-footer">
+            <CgButton Variant="secondary" OnClick="() => _showCommodityModal = false">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="SaveCommodityAsync">保存</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
+@* ─── 兑换码编辑弹窗 ─── *@
+
+<CgModal IsOpen="_showCodeModal" OnClose="() => _showCodeModal = false" Title="@(_isNewCode ? "添加兑换码" : "编辑兑换码")">
+    <ChildContent>
+        <CgFormSection Flat>
+            @if (_codeEditModel != null)
+            {
+                <CgFormGroup Label="兑换码" Required="true">
+                    <CgInput @bind-Value="_codeEditModel.Code" Placeholder="兑换码" />
+                </CgFormGroup>
+                <CgFormGroup Label="类型">
+                    <CgEnumSelect TEnum="CommodityCodeType" @bind-Value="_codeEditModel.Type" />
+                </CgFormGroup>
+                <CgFormGroup Label="数量">
+                    <CgInput @bind-Value="_codeEditModel.Count" />
+                </CgFormGroup>
+                <CgFormGroup Label="是否可兑换">
+                    <CgCheckbox @bind-Value="_codeEditModel.CanRedeemed" Label="允许兑换" />
+                </CgFormGroup>
+                <CgFormGroup Label="是否隐藏">
+                    <CgCheckbox @bind-Value="_codeEditModel.Hide" Label="隐藏此兑换码" />
+                </CgFormGroup>
+            }
+            else
+            {
+                <div class="admin-loading-state">
+                    <CgProgressRing />
+                    <span class="admin-loading-state__text">正在加载...</span>
+                </div>
+            }
+        </CgFormSection>
+    </ChildContent>
+    <Footer>
+        <div class="admin-modal-footer">
+            <CgButton Variant="secondary" OnClick="() => _showCodeModal = false">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="SaveCodeAsync">保存</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
+@* ─── 兑换码批量导入弹窗 ─── *@
+
+<CgModal IsOpen="_showImportModal" OnClose="() => _showImportModal = false" Title="批量导入兑换码">
+    <ChildContent>
+        <CgFormSection Flat>
+            <CgFormGroup Label="兑换码（每行输入一个）" Required="true">
+                <CgTextarea @bind-Value="_importCodes" Placeholder="每行一个兑换码" />
+            </CgFormGroup>
+            <CgFormGroup Label="类型">
+                <CgEnumSelect TEnum="CommodityCodeType" @bind-Value="_importType" />
+            </CgFormGroup>
+            <CgFormGroup Label="数量">
+                <CgInput @bind-Value="_importCount" />
+            </CgFormGroup>
+            <CgFormGroup Label="是否可兑换">
+                <CgCheckbox @bind-Value="_importCanRedeemed" Label="允许兑换" />
+            </CgFormGroup>
+            <CgFormGroup Label="是否隐藏">
+                <CgCheckbox @bind-Value="_importHide" Label="隐藏" />
+            </CgFormGroup>
+            @if (_importProgress is not null)
+            {
+                <CgFormGroup Label="导入进度">
+                    <span>@_importProgress</span>
+                </CgFormGroup>
+            }
+        </CgFormSection>
+    </ChildContent>
+    <Footer>
+        <div class="admin-modal-footer">
+            <CgButton Variant="secondary" OnClick="() => _showImportModal = false">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="ImportCodesAsync">导入</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
 @code {
+    private CgDataTable<CommodityOverviewModel>? _commodityTable;
+    private CgDataTable<CommodityCodeOverviewModel>? _codeTable;
+
+    // ─── 商品编辑状态 ───
+    private bool _showCommodityModal;
+    private bool _isNewCommodity;
+    private CommodityEditModel? _commodityEditModel;
+
+    // ─── 兑换码编辑状态 ───
+    private bool _showCodeModal;
+    private bool _isNewCode;
+    private CommodityCodeEditModel? _codeEditModel;
+
+    // ─── 批量导入状态 ───
+    private bool _showImportModal;
+    private string _importCodes = string.Empty;
+    private CommodityCodeType _importType = CommodityCodeType.GCoins;
+    private int _importCount = 1;
+    private bool _importCanRedeemed = true;
+    private bool _importHide;
+    private string? _importProgress;
+
     private readonly IReadOnlyList<CgTabItem> _tabs =
     [
         new CgTabItem("commodities", "小卖铺", "mdiStorefrontOutline"),
         new CgTabItem("codes", "兑换码", "mdiGiftOutline"),
     ];
 
+    // ─── 商品查询 ───
+
     private async Task<CgDataTableResult<CommodityOverviewModel>> OnQueryCommodities(CgDataTableRequest request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
-
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
         var result = await AdminQueryService.GetCommoditiesAsync(parameter);
-        if (result.Success && result.Data is not null)
-        {
-            return new CgDataTableResult<CommodityOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
-        }
-        return new CgDataTableResult<CommodityOverviewModel>([], 0);
+        return result.Success && result.Data is not null ? new CgDataTableResult<CommodityOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<CommodityOverviewModel>([], 0);
     }
+
+    // ─── 兑换码查询 ───
 
     private async Task<CgDataTableResult<CommodityCodeOverviewModel>> OnQueryCodes(CgDataTableRequest request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
-
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
         var result = await AdminQueryService.GetCommodityCodesAsync(parameter);
-        if (result.Success && result.Data is not null)
+        return result.Success && result.Data is not null ? new CgDataTableResult<CommodityCodeOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<CommodityCodeOverviewModel>([], 0);
+    }
+
+    // ─── 商品 CRUD ───
+
+    private async Task OnCreateCommodityAsync()
+    {
+        _isNewCommodity = true;
+        _commodityEditModel = new CommodityEditModel();
+        _showCommodityModal = true;
+        await Task.CompletedTask;
+    }
+
+    private async Task OnEditCommodityAsync(CommodityOverviewModel model)
+    {
+        _isNewCommodity = false;
+        _commodityEditModel = null;
+        _showCommodityModal = true;
+        StateHasChanged();
+
+        var result = await AdminQueryService.GetCommodityEditAsync(model.Id);
+        if (result.Success && result.Data != null)
         {
-            return new CgDataTableResult<CommodityCodeOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+            _commodityEditModel = result.Data;
+            StateHasChanged();
         }
-        return new CgDataTableResult<CommodityCodeOverviewModel>([], 0);
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取详情失败", variant: "error");
+            _showCommodityModal = false;
+        }
+    }
+
+    private async Task SaveCommodityAsync()
+    {
+        if (_commodityEditModel == null) return;
+
+        var result = await AdminCommandService.EditCommodityAsync(_commodityEditModel);
+        if (result.Success)
+        {
+            ToastService.Show("商品已保存", variant: "success");
+            _showCommodityModal = false;
+            if (_commodityTable != null) await _commodityTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
+        }
+    }
+
+    // ─── 兑换码 CRUD ───
+
+    private async Task OnCreateCodeAsync()
+    {
+        _isNewCode = true;
+        _codeEditModel = new CommodityCodeEditModel { CanRedeemed = true };
+        _showCodeModal = true;
+        await Task.CompletedTask;
+    }
+
+    private async Task OnEditCodeAsync(CommodityCodeOverviewModel model)
+    {
+        _isNewCode = false;
+        _codeEditModel = null;
+        _showCodeModal = true;
+        StateHasChanged();
+
+        var result = await AdminQueryService.GetCommodityCodeEditAsync(model.Id);
+        if (result.Success && result.Data != null)
+        {
+            _codeEditModel = result.Data;
+            StateHasChanged();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取详情失败", variant: "error");
+            _showCodeModal = false;
+        }
+    }
+
+    private async Task SaveCodeAsync()
+    {
+        if (_codeEditModel == null) return;
+
+        var result = await AdminCommandService.EditCommodityCodeAsync(_codeEditModel);
+        if (result.Success)
+        {
+            ToastService.Show("兑换码已保存", variant: "success");
+            _showCodeModal = false;
+            if (_codeTable != null) await _codeTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
+        }
+    }
+
+    // ─── 批量导入兑换码 ───
+
+    private async Task ImportCodesAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_importCodes)) return;
+
+        var codes = _importCodes.Replace(" ", "").Replace('\r', '\n').Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        var successCount = 0;
+        var failCount = 0;
+
+        for (var i = 0; i < codes.Length; i++)
+        {
+            _importProgress = $"正在导入 {i + 1}/{codes.Length}...";
+            StateHasChanged();
+
+            var model = new CommodityCodeEditModel
+            {
+                Code = codes[i],
+                Type = _importType,
+                Count = _importCount,
+                CanRedeemed = _importCanRedeemed,
+                Hide = _importHide
+            };
+
+            var result = await AdminCommandService.EditCommodityCodeAsync(model);
+            if (result.Success) successCount++;
+            else failCount++;
+        }
+
+        _importProgress = null;
+        _showImportModal = false;
+        _importCodes = string.Empty;
+
+        ToastService.Show($"批量导入完成：成功 {successCount} 条，失败 {failCount} 条", variant: failCount > 0 ? "warning" : "success");
+        if (_codeTable != null) await _codeTable.RefreshAsync();
     }
 }

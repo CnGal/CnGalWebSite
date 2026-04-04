@@ -1,8 +1,10 @@
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.BackUpArchives;
+using CnGalWebSite.DataModel.ViewModel.Commodities;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.Expo;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.News;
@@ -308,4 +310,20 @@ public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminComm
 
     public Task<SdkResult<bool>> ResetWeeklyNewsAsync(long id, CancellationToken cancellationToken = default)
         => GetCommandAsync($"api/news/ResetWeelyNews/{id}", "RESET_WEEKLY_NEWS", "重置周报", cancellationToken);
+
+    // ─── 展会 ───
+
+    public Task<SdkResult<bool>> EditExpoActivityAsync(ExpoActivityEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/expo/EditActivity", model, "EDIT_EXPO_ACTIVITY", "编辑展会活动", cancellationToken);
+
+    public Task<SdkResult<bool>> EditExpoTicketAsync(ExpoTicketEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/expo/EditTicket", model, "EDIT_EXPO_TICKET", "编辑展会票根", cancellationToken);
+
+    // ─── 商品 ───
+
+    public Task<SdkResult<bool>> EditCommodityAsync(CommodityEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/commodities/Edit", model, "EDIT_COMMODITY", "编辑商品", cancellationToken);
+
+    public Task<SdkResult<bool>> EditCommodityCodeAsync(CommodityCodeEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/commodities/EditCode", model, "EDIT_COMMODITY_CODE", "编辑兑换码", cancellationToken);
 }

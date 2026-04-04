@@ -241,6 +241,20 @@ public interface IAdminQueryService
         QueryParameterModel parameter,
         CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// 获取展会活动编辑模型。
+    /// </summary>
+    Task<SdkResult<ExpoActivityEditModel>> GetExpoActivityEditAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取展会票根编辑模型。
+    /// </summary>
+    Task<SdkResult<ExpoTicketEditModel>> GetExpoTicketEditAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
     // ─── 小卖铺 ───
 
     /// <summary>
@@ -255,6 +269,20 @@ public interface IAdminQueryService
     /// </summary>
     Task<SdkResult<QueryResultModel<CommodityCodeOverviewModel>>> GetCommodityCodesAsync(
         QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取商品编辑模型。
+    /// </summary>
+    Task<SdkResult<CommodityEditModel>> GetCommodityEditAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取兑换码编辑模型。
+    /// </summary>
+    Task<SdkResult<CommodityCodeEditModel>> GetCommodityCodeEditAsync(
+        long id,
         CancellationToken cancellationToken = default);
 
     // ─── 词条子功能 ───

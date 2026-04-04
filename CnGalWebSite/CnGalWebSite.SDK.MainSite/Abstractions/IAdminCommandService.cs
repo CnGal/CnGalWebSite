@@ -1,4 +1,6 @@
+﻿using CnGalWebSite.DataModel.ViewModel.Commodities;
 using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.Expo;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.News;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
@@ -192,4 +194,28 @@ public interface IAdminCommandService
     /// 重置周报内容。
     /// </summary>
     Task<SdkResult<bool>> ResetWeeklyNewsAsync(long id, CancellationToken cancellationToken = default);
+
+    // ─── 展会操作 ───
+
+    /// <summary>
+    /// 编辑/新增展会活动。
+    /// </summary>
+    Task<SdkResult<bool>> EditExpoActivityAsync(ExpoActivityEditModel model, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 编辑/新增展会票根。
+    /// </summary>
+    Task<SdkResult<bool>> EditExpoTicketAsync(ExpoTicketEditModel model, CancellationToken cancellationToken = default);
+
+    // ─── 商品操作 ───
+
+    /// <summary>
+    /// 编辑/新增商品。
+    /// </summary>
+    Task<SdkResult<bool>> EditCommodityAsync(CommodityEditModel model, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 编辑/新增兑换码。
+    /// </summary>
+    Task<SdkResult<bool>> EditCommodityCodeAsync(CommodityCodeEditModel model, CancellationToken cancellationToken = default);
 }

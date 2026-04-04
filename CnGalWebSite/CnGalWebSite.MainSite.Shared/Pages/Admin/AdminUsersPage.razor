@@ -96,6 +96,14 @@
                         <ChildContent Context="item"><span class="admin-badge">@item.Type.GetDisplayName()</span></ChildContent>
                     </CgDataTableColumn>
                     <CgDataTableColumn TItem="RankOverviewModel" Title="人数" Field="Count" Width="80px" />
+                    <CgDataTableColumn TItem="RankOverviewModel" Title="样式" Sortable="false">
+                        <ChildContent Context="item">
+                            @if (item.Type == RankType.Rank || !string.IsNullOrWhiteSpace(item.CSS) || !string.IsNullOrWhiteSpace(item.Styles))
+                            {
+                                <span class="user-rank @item.CSS" style="@item.Styles">@(string.IsNullOrWhiteSpace(item.Text) ? item.Name : item.Text)</span>
+                            }
+                        </ChildContent>
+                    </CgDataTableColumn>
                     <CgDataTableColumn TItem="RankOverviewModel" Title="优先级" Field="Priority" Width="80px" />
                     <CgDataTableColumn TItem="RankOverviewModel" Title="图片" Sortable="false" Width="60px">
                         <ChildContent Context="item">
@@ -221,6 +229,19 @@
 
                 <CgFormGroup Label="优先级">
                     <CgInput @bind-Value="_rankEditModel.Priority" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="样式预览">
+                    <div class="rank-preview-area">
+                        @if (_rankEditModel.Type == RankType.Rank || !string.IsNullOrWhiteSpace(_rankEditModel.CSS) || !string.IsNullOrWhiteSpace(_rankEditModel.Styles))
+                        {
+                            <span class="user-rank @_rankEditModel.CSS" style="@_rankEditModel.Styles">@(string.IsNullOrWhiteSpace(_rankEditModel.Text) ? _rankEditModel.Name : _rankEditModel.Text)</span>
+                        }
+                        else
+                        {
+                            <span class="admin-loading-state__text">输入 CSS 或 Styles 后此处显示预览</span>
+                        }
+                    </div>
                 </CgFormGroup>
             }
             else

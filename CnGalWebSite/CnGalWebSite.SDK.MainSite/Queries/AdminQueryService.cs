@@ -249,6 +249,34 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
         QueryParameterModel parameter, CancellationToken cancellationToken = default)
         => QueryListAsync<CommodityCodeOverviewModel>("api/commodities/ListCode", "ADMIN_COMMODITY_CODES", "兑换码", parameter, cancellationToken);
 
+    // ─── 展会编辑模型查询（P2 CRUD） ───
+
+    public Task<SdkResult<ExpoActivityEditModel>> GetExpoActivityEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<ExpoActivityEditModel, ExpoActivityEditModel>(
+            $"api/expo/EditActivity?id={id}", dto => dto,
+            "ADMIN_EXPO_ACTIVITY", "展会活动", id, cancellationToken);
+
+    public Task<SdkResult<ExpoTicketEditModel>> GetExpoTicketEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<ExpoTicketEditModel, ExpoTicketEditModel>(
+            $"api/expo/EditTicket?id={id}", dto => dto,
+            "ADMIN_EXPO_TICKET", "展会票根", id, cancellationToken);
+
+    // ─── 小卖铺编辑模型查询（P2 CRUD） ───
+
+    public Task<SdkResult<CommodityEditModel>> GetCommodityEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<CommodityEditModel, CommodityEditModel>(
+            $"api/commodities/Edit?id={id}", dto => dto,
+            "ADMIN_COMMODITY", "商品", id, cancellationToken);
+
+    public Task<SdkResult<CommodityCodeEditModel>> GetCommodityCodeEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<CommodityCodeEditModel, CommodityCodeEditModel>(
+            $"api/commodities/EditCode?id={id}", dto => dto,
+            "ADMIN_COMMODITY_CODE", "兑换码", id, cancellationToken);
+
     // ─── 词条子功能 ───
 
     public Task<SdkResult<QueryResultModel<GameRecordOverviewModel>>> GetPlayedGamesAsync(
