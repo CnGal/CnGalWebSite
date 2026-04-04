@@ -17,9 +17,8 @@
     display: flex;
     flex-direction: column;
     background: var(--cg-color-surface);
-    border-right: 1px solid var(--cg-color-border);
+    box-shadow: var(--cg-shadow-sm);
     z-index: 10;
-    overflow-y: auto;
 }
 
 .admin-sidebar__brand {
@@ -44,8 +43,28 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: var(--cg-spacing-3) var(--cg-spacing-3);
+    padding: var(--cg-spacing-3);
     gap: var(--cg-spacing-1);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--cg-color-border) 80%, transparent) transparent;
+}
+
+.admin-sidebar__nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.admin-sidebar__nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.admin-sidebar__nav::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--cg-color-border) 80%, transparent);
+    border-radius: var(--cg-radius-full);
+}
+
+.admin-sidebar__nav::-webkit-scrollbar-thumb:hover {
+    background: var(--cg-color-text-muted);
 }
 
 .admin-nav-group-label {
@@ -67,7 +86,7 @@
     text-decoration: none;
     font-size: var(--cg-font-size-sm);
     font-weight: var(--cg-font-weight-medium);
-    transition: background var(--cg-transition-fast), color var(--cg-transition-fast);
+    transition: all var(--cg-transition-fast);
 }
 
 .admin-nav-item ::deep .cg-mdi-icon {
@@ -80,6 +99,7 @@
 .admin-nav-item:hover {
     background: var(--cg-color-hover-overlay);
     color: var(--cg-color-primary);
+    transform: translateX(4px);
 }
 
 .admin-nav-item:hover ::deep .cg-mdi-icon {
@@ -119,23 +139,72 @@
     align-items: center;
     justify-content: space-between;
     padding: var(--cg-spacing-3) var(--cg-spacing-5);
-    background: var(--cg-color-surface);
-    border-bottom: 1px solid var(--cg-color-border);
-    backdrop-filter: blur(8px);
+    background: color-mix(in srgb, var(--cg-color-surface) 85%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--cg-color-border) 50%, transparent);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+    backdrop-filter: blur(16px);
     min-height: 56px;
 }
 
-.admin-topbar__breadcrumb {
+.admin-topbar__right {
     display: flex;
+    flex: 1;
+    justify-content: flex-end;
     align-items: center;
-    gap: var(--cg-spacing-2);
-    font-size: var(--cg-font-size-sm);
-    color: var(--cg-color-text-muted);
+    gap: 1rem;
 }
 
-.admin-topbar__breadcrumb ::deep .cg-mdi-icon {
-    width: 20px;
-    height: 20px;
+.admin-topbar__search {
+    display: none;
+    flex-direction: column;
+    min-width: 10rem;
+    max-width: 16rem;
+    height: 2.5rem;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+@media (min-width: 768px) {
+    .admin-topbar__search {
+        display: flex;
+    }
+}
+
+.admin-topbar__search-inner {
+    display: flex;
+    width: 100%;
+    flex: 1;
+    align-items: stretch;
+    border-radius: var(--cg-radius-xl, 1.5rem);
+    height: 100%;
+    background-color: color-mix(in oklab, var(--cg-color-border) 40%, var(--cg-color-surface));
+    border: 1px solid transparent;
+    transition: all var(--cg-transition-fast);
+}
+
+.admin-topbar__search:hover .admin-topbar__search-inner {
+    border-color: color-mix(in oklab, var(--cg-color-primary) 50%, transparent);
+}
+
+.admin-topbar__search-icon {
+    color: var(--cg-color-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 1rem;
+}
+
+.admin-topbar__search-icon ::deep .cg-mdi-icon {
+    width: 22px;
+    height: 22px;
+}
+
+.admin-topbar__search-placeholder {
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+    font-size: 0.875rem;
+    color: var(--cg-color-text-muted);
 }
 
 .admin-topbar__actions {
@@ -144,23 +213,133 @@
     gap: var(--cg-spacing-3);
 }
 
-.admin-topbar__user {
-    display: flex;
-    align-items: center;
-    gap: var(--cg-spacing-2);
-    font-size: var(--cg-font-size-sm);
-    color: var(--cg-color-text);
-}
-
-.admin-topbar__user ::deep .cg-mdi-icon {
-    width: 22px;
-    height: 22px;
-    opacity: 0.6;
-}
-
 .admin-content {
     flex: 1;
     padding: var(--cg-spacing-6);
+}
+
+/* ─── Global Page Wrappers ─── */
+::deep .admin-index-page,
+::deep .admin-tools-page,
+::deep .admin-comments-page,
+::deep .admin-list-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-6);
+}
+
+/* ─── Page Title Global (inside Admin) ─── */
+::deep .admin-page-title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    font-size: var(--cg-font-size-xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+::deep .admin-page-title .cg-mdi-icon {
+    width: 28px;
+    height: 28px;
+    color: var(--cg-color-primary);
+}
+
+/* ─── Badges Global (inside Admin) ─── */
+::deep .admin-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: var(--cg-radius-full);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    line-height: 1.6;
+    background: var(--cg-color-surface-hover);
+    color: var(--cg-color-text);
+}
+
+::deep .admin-badge--visible, ::deep .admin-badge--yes, ::deep .admin-badge--success {
+    background: color-mix(in srgb, var(--cg-color-success) 12%, transparent);
+    color: var(--cg-color-success);
+}
+
+::deep .admin-badge--hidden, ::deep .admin-badge--no, ::deep .admin-badge--fail {
+    background: color-mix(in srgb, var(--cg-color-error) 12%, transparent);
+    color: var(--cg-color-error);
+}
+
+::deep .admin-badge--warning {
+    background: color-mix(in srgb, var(--cg-color-warning) 12%, transparent);
+    color: var(--cg-color-warning);
+}
+
+::deep .admin-badge--running, ::deep .admin-badge--info, ::deep .admin-badge--primary {
+    background: color-mix(in srgb, var(--cg-color-primary) 12%, transparent);
+    color: var(--cg-color-primary);
+}
+
+/* ─── Action Buttons Global (inside Admin) ─── */
+::deep .admin-actions {
+    display: flex;
+    gap: var(--cg-spacing-1);
+}
+
+::deep .admin-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: var(--cg-radius-md);
+    cursor: pointer;
+    background: transparent;
+    transition: background var(--cg-transition-fast), color var(--cg-transition-fast);
+}
+
+::deep .admin-action-btn .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+}
+
+/* Primary/Info Actions */
+::deep .admin-action-btn--down, ::deep .admin-action-btn--edit, ::deep .admin-action-btn--link, ::deep .admin-action-btn--run {
+    color: var(--cg-color-primary);
+}
+::deep .admin-action-btn--down:hover, ::deep .admin-action-btn--edit:hover, ::deep .admin-action-btn--link:hover, ::deep .admin-action-btn--run:hover {
+    background: color-mix(in srgb, var(--cg-color-primary) 12%, transparent);
+}
+
+/* Success Actions */
+::deep .admin-action-btn--up, ::deep .admin-action-btn--publish, ::deep .admin-action-btn--comment {
+    color: var(--cg-color-success);
+}
+::deep .admin-action-btn--up:hover, ::deep .admin-action-btn--publish:hover, ::deep .admin-action-btn--comment:hover {
+    background: color-mix(in srgb, var(--cg-color-success) 12%, transparent);
+}
+
+/* Warning Actions */
+::deep .admin-action-btn--show, ::deep .admin-action-btn--reset {
+    color: var(--cg-color-warning);
+}
+::deep .admin-action-btn--show:hover, ::deep .admin-action-btn--reset:hover {
+    background: color-mix(in srgb, var(--cg-color-warning) 12%, transparent);
+}
+
+/* Error Actions */
+::deep .admin-action-btn--hide, ::deep .admin-action-btn--delete, ::deep .admin-action-btn--nocomment {
+    color: var(--cg-color-error);
+}
+::deep .admin-action-btn--hide:hover, ::deep .admin-action-btn--delete:hover, ::deep .admin-action-btn--nocomment:hover {
+    background: color-mix(in srgb, var(--cg-color-error) 12%, transparent);
+}
+
+/* Neutral Actions */
+::deep .admin-action-btn--preview {
+    color: var(--cg-color-text-muted);
+}
+::deep .admin-action-btn--preview:hover {
+    background: var(--cg-color-surface-hover);
 }
 
 /* ─── Not Authorized ─── */

@@ -125,15 +125,20 @@
 
             <div class="admin-main">
                 <header class="admin-topbar">
-                    <div class="admin-topbar__breadcrumb">
-                        <CgMdiIcon Name="mdiMenu" aria-hidden="true" />
-                        <span>管理后台</span>
-                    </div>
-                    <div class="admin-topbar__actions">
-                        <span class="admin-topbar__user">
-                            <CgMdiIcon Name="mdiAccountCircleOutline" aria-hidden="true" />
-                            @context.User.Identity?.Name
-                        </span>
+                    <div class="admin-topbar__right">
+                        <a href="/search" class="admin-topbar__search" aria-label="搜索内容">
+                            <div class="admin-topbar__search-inner">
+                                <div class="admin-topbar__search-icon">
+                                    <CgMdiIcon Name="mdiMagnify" aria-hidden="true" />
+                                </div>
+                                <span class="admin-topbar__search-placeholder">搜索词条、制作组...</span>
+                            </div>
+                        </a>
+
+                        <div class="admin-topbar__actions">
+                            <CnGalWebSite.MainSite.Shared.Components.Layout.CreateMenu />
+                            <CnGalWebSite.MainSite.Shared.Components.Layout.UserMenu UserName="@context.User.Identity?.Name" UserId="@context.User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value" CurrentReturnUrl="@CurrentReturnUrl" />
+                        </div>
                     </div>
                 </header>
 
@@ -154,6 +159,8 @@
 </AuthorizeView>
 
 @code {
+    private string CurrentReturnUrl => new Uri(NavigationManager.Uri).PathAndQuery;
+
     private string GetActiveClass(params string[] paths)
     {
         var currentPath = new Uri(NavigationManager.Uri).AbsolutePath.TrimEnd('/').ToLowerInvariant();

@@ -22,40 +22,6 @@
 
 .admin-news-entry-row .admin-action-btn--delete {
     flex-shrink: 0;
-    color: var(--cg-color-error);
-}
-
-/* ── 操作按钮样式覆盖 ── */
-::deep .admin-action-btn--edit {
-    color: var(--cg-color-primary);
-}
-
-::deep .admin-action-btn--publish {
-    color: var(--cg-color-success);
-}
-
-::deep .admin-action-btn--preview {
-    color: var(--cg-color-text-muted);
-}
-
-::deep .admin-action-btn--reset {
-    color: var(--cg-color-warning);
-}
-
-/* ── 状态徽章 ── */
-::deep .admin-badge--warning {
-    background: var(--cg-color-warning);
-    color: #fff;
-}
-
-::deep .admin-badge--visible {
-    background: var(--cg-color-success);
-    color: #fff;
-}
-
-::deep .admin-badge--hidden {
-    background: var(--cg-color-text-muted);
-    color: #fff;
 }
 
 /* ── 空状态提示 ── */

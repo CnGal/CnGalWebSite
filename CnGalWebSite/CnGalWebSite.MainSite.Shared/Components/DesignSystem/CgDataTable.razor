@@ -58,12 +58,18 @@
                                         @if (col.CanSort)
                                         {
                                             <span class="cg-datatable__sort-icons">
-                                                <CgMdiIcon Name="mdiChevronUp"
-                                                           class="@GetSortIconClass(col, false)"
-                                                           aria-hidden="true" />
-                                                <CgMdiIcon Name="mdiChevronDown"
-                                                           class="@GetSortIconClass(col, true)"
-                                                           aria-hidden="true" />
+                                                @if (_sortField == col.Field)
+                                                {
+                                                    <CgMdiIcon Name="@(_sortDesc ? "mdiArrowDown" : "mdiArrowUp")"
+                                                               class="cg-datatable__sort-icon cg-datatable__sort-icon--active"
+                                                               aria-hidden="true" />
+                                                }
+                                                else
+                                                {
+                                                    <CgMdiIcon Name="mdiSwapVertical"
+                                                               class="cg-datatable__sort-icon"
+                                                               aria-hidden="true" />
+                                                }
                                             </span>
                                         }
                                     </span>
@@ -408,17 +414,6 @@
             cls += " cg-datatable__th--sortable";
         if (_sortField == col.Field)
             cls += " cg-datatable__th--sorted";
-        return cls;
-    }
-
-    private string GetSortIconClass(CgDataTableColumn<TItem> col, bool isDesc)
-    {
-        var cls = "cg-datatable__sort-icon";
-        if (_sortField == col.Field)
-        {
-            if (_sortDesc == isDesc)
-                cls += " cg-datatable__sort-icon--active";
-        }
         return cls;
     }
 
