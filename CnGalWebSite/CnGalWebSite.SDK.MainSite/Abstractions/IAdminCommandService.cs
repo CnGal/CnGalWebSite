@@ -1,5 +1,9 @@
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.News;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
+using CnGalWebSite.DataModel.ViewModel.Recommends;
+using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.SDK.MainSite.Models;
 
 namespace CnGalWebSite.SDK.MainSite.Abstractions;
@@ -96,6 +100,26 @@ public interface IAdminCommandService
     // ─── 用户操作 ───
 
     Task<SdkResult<bool>> EditSpaceCanCommentAsync(string[] ids, bool canComment, CancellationToken cancellationToken = default);
+
+    // ─── 头衔操作 ───
+
+    Task<SdkResult<bool>> EditRankAsync(RankEditModel model, CancellationToken cancellationToken = default);
+
+    Task<SdkResult<bool>> EditRankPriorityAsync(long[] ids, int plusPriority, CancellationToken cancellationToken = default);
+
+    Task<SdkResult<bool>> HideRankAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default);
+
+    // ─── 推荐操作 ───
+
+    Task<SdkResult<bool>> EditRecommendAsync(RecommendEditModel model, CancellationToken cancellationToken = default);
+
+    // ─── 商店信息操作 ───
+
+    Task<SdkResult<bool>> EditStoreInfoAsync(StoreInfoEditModel model, CancellationToken cancellationToken = default);
+
+    // ─── 基础信息类型操作 ───
+
+    Task<SdkResult<bool>> EditEntryInformationTypeAsync(EntryInformationTypeEditModel model, CancellationToken cancellationToken = default);
 
     // ─── 备份操作 ───
 

@@ -287,4 +287,30 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
             "图表数据",
             cancellationToken);
     }
+
+    // ─── 编辑模型查询（P0 CRUD） ───
+
+    public Task<SdkResult<RecommendEditModel>> GetRecommendEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<RecommendEditModel, RecommendEditModel>(
+            $"api/recommends/Edit?id={id}", dto => dto,
+            "ADMIN_RECOMMEND", "推荐", id, cancellationToken);
+
+    public Task<SdkResult<StoreInfoEditModel>> GetStoreInfoEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<StoreInfoEditModel, StoreInfoEditModel>(
+            $"api/storeinfo/Edit?id={id}", dto => dto,
+            "ADMIN_STOREINFO", "商店信息", id, cancellationToken);
+
+    public Task<SdkResult<EntryInformationTypeEditModel>> GetEntryInformationTypeEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<EntryInformationTypeEditModel, EntryInformationTypeEditModel>(
+            $"api/entries/EditEntryInformationType?id={id}", dto => dto,
+            "ADMIN_ENTRY_INFO_TYPE", "基础信息类型", id, cancellationToken);
+
+    public Task<SdkResult<RankEditModel>> GetRankEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<RankEditModel, RankEditModel>(
+            $"api/ranks/Edit?id={id}", dto => dto,
+            "ADMIN_RANK", "头衔", id, cancellationToken);
 }

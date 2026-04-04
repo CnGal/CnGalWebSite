@@ -1,11 +1,16 @@
-﻿@page "/admin/listrecommends"
+@page "/admin/listrecommends"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
 @rendermode InteractiveServer
-@inject IAdminQueryService AdminQueryService
+@inject IAdminQueryService QueryService
+@inject IAdminCommandService CommandService
+@inject ICgToastService ToastService
 @inject NavigationManager NavigationManager
 @using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Recommends
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.Extensions
 
 <PageTitle>推荐管理 - CnGal</PageTitle>
 
@@ -17,55 +22,166 @@
 
     <CgDataTable TItem="RecommendOverviewModel"
                  Title="推荐列表"
-                 OnServerQuery="OnServerQuery"
+                 OnServerQuery="OnQueryAsync"
                  DefaultSortField="Id"
-                 DefaultSortDesc="true">
-        <CgDataTableColumn TItem="RecommendOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="RecommendOverviewModel" Title="状态" Field="IsHidden">
-            <ChildContent Context="item">
-                @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
-                else { <span class="admin-badge admin-badge--visible">可见</span> }
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="RecommendOverviewModel" Title="关联词条" Field="EntryName">
-            <ChildContent Context="item">
-                @if (item.EntryId > 0)
-                {
-                    <a class="admin-cell-name" href="@($"/entries/index/{item.EntryId}")">@item.EntryName</a>
-                }
-                else
-                {
-                    <span>@item.EntryName</span>
-                }
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="RecommendOverviewModel" Title="原因" Field="Reason">
-            <ChildContent Context="item"><div class="admin-cell-text">@item.Reason</div></ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="RecommendOverviewModel" Title="更新时间" Field="UpdateTime">
-            <ChildContent Context="item">@item.UpdateTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="RecommendOverviewModel" Title="操作" Sortable="false" Width="50px">
-            <ChildContent Context="item">
-                <div class="admin-actions">
+                 DefaultSortDesc="true"
+                 @ref="_table">
+        <ToolbarContent>
+            <CgButton Variant="outline" OnClick="OnCreateAsync">
+                <CgMdiIcon Name="mdiPlus" />
+                添加推荐
+            </CgButton>
+        </ToolbarContent>
+        <ChildContent>
+            <CgDataTableColumn TItem="RecommendOverviewModel" Title="ID" Field="Id" Width="80px" />
+            <CgDataTableColumn TItem="RecommendOverviewModel" Title="状态" Field="IsHidden">
+                <ChildContent Context="item">
+                    @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
+                    else { <span class="admin-badge admin-badge--visible">可见</span> }
+                </ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="RecommendOverviewModel" Title="关联词条" Field="EntryName">
+                <ChildContent Context="item">
                     @if (item.EntryId > 0)
                     {
-                        <button class="admin-action-btn admin-action-btn--show" title="查看词条"
-                                @onclick="@(() => NavigationManager.NavigateTo($"/entries/index/{item.EntryId}"))">
-                            <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
-                        </button>
+                        <a class="admin-cell-name" href="@($"/entries/index/{item.EntryId}")">@item.EntryName</a>
                     }
-                </div>
-            </ChildContent>
-        </CgDataTableColumn>
+                    else
+                    {
+                        <span>@item.EntryName</span>
+                    }
+                </ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="RecommendOverviewModel" Title="原因" Field="Reason">
+                <ChildContent Context="item"><div class="admin-cell-text">@item.Reason.GetDisplayName()</div></ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="RecommendOverviewModel" Title="更新时间" Field="UpdateTime">
+                <ChildContent Context="item">@item.UpdateTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="RecommendOverviewModel" Title="操作" Sortable="false" Width="100px">
+                <ChildContent Context="item">
+                    <div class="admin-actions">
+                        <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                        @if (item.EntryId > 0)
+                        {
+                            <button class="admin-action-btn admin-action-btn--show" title="查看词条"
+                                    @onclick="@(() => NavigationManager.NavigateTo($"/entries/index/{item.EntryId}"))">
+                                <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+                            </button>
+                        }
+                    </div>
+                </ChildContent>
+            </CgDataTableColumn>
+        </ChildContent>
     </CgDataTable>
 </div>
 
+<CgModal IsOpen="_showEditModal" OnClose="() => _showEditModal = false" Title="@(_isNew ? "添加推荐" : "编辑推荐")">
+    <ChildContent>
+        <CgFormSection Flat>
+            @if (_editModel != null)
+            {
+                <CgFormGroup Label="词条 ID" Required="true">
+                    <CgInput @bind-Value="_editModel.EntryId" Placeholder="关联的词条ID" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="推荐原因">
+                    <CgEnumSelect TEnum="RecommendReason" @bind-Value="_editModel.Reason" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="是否隐藏">
+                    <CgCheckbox @bind-Value="_editModel.IsHidden" Label="隐藏此推荐" />
+                </CgFormGroup>
+            }
+            else
+            {
+                <div class="admin-loading-state">
+                    <CgProgressRing />
+                    <span class="admin-loading-state__text">正在加载...</span>
+                </div>
+            }
+        </CgFormSection>
+    </ChildContent>
+    <Footer>
+        <div class="admin-modal-footer">
+            <CgButton Variant="secondary" OnClick="() => _showEditModal = false">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="SaveAsync">保存</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
 @code {
-    private async Task<CgDataTableResult<RecommendOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    private CgDataTable<RecommendOverviewModel>? _table;
+    private bool _showEditModal;
+    private bool _isNew;
+    private RecommendEditModel? _editModel;
+
+    private async Task<CgDataTableResult<RecommendOverviewModel>> OnQueryAsync(CgDataTableRequest request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetRecommendsAsync(parameter);
-        return result.Success && result.Data is not null ? new CgDataTableResult<RecommendOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<RecommendOverviewModel>([], 0);
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? string.Empty,
+            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await QueryService.GetRecommendsAsync(parameter);
+        if (result.Success && result.Data != null)
+        {
+            return new CgDataTableResult<RecommendOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+        }
+
+        ToastService.Show(result.Error?.Message ?? "获取推荐列表失败", variant: "error");
+        return new CgDataTableResult<RecommendOverviewModel>([], 0);
+    }
+
+    private async Task OnCreateAsync()
+    {
+        _isNew = true;
+        _editModel = new RecommendEditModel();
+        _showEditModal = true;
+        await Task.CompletedTask;
+    }
+
+    private async Task OnEditAsync(RecommendOverviewModel model)
+    {
+        _isNew = false;
+        _editModel = null;
+        _showEditModal = true;
+        StateHasChanged();
+
+        var result = await QueryService.GetRecommendEditAsync(model.Id);
+        if (result.Success && result.Data != null)
+        {
+            _editModel = result.Data;
+            StateHasChanged();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取详情失败", variant: "error");
+            _showEditModal = false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_editModel == null) return;
+
+        var result = await CommandService.EditRecommendAsync(_editModel);
+        if (result.Success)
+        {
+            ToastService.Show("推荐已保存", variant: "success");
+            _showEditModal = false;
+            if (_table != null)
+            {
+                await _table.RefreshAsync();
+            }
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
+        }
     }
 }

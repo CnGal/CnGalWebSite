@@ -7,6 +7,7 @@
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.TimedTask.Models.ViewModels
 @using CnGalWebSite.TimedTask.Models.DataModels
+@using CnGalWebSite.SDK.MainSite.Models
 
 <PageTitle>定时任务 - CnGal</PageTitle>
 
@@ -22,89 +23,150 @@
                  DefaultSortField="Id"
                  DefaultSortDesc="true"
                  @ref="_table">
-        <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="Id" Field="Id" Width="60px" />
-        <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="名称" Field="Type">
-            <ChildContent Context="item">
-                <span class="admin-badge">@item.Type</span>
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="参数" Field="Parameter" Width="120px">
-            <ChildContent Context="item">
-                <span title="@item.Parameter">@(item.Parameter?.Length > 20 ? item.Parameter[..20] + "…" : item.Parameter ?? "—")</span>
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="类型" Field="ExecuteType">
-            <ChildContent Context="item">
-                <span class="admin-badge">@item.ExecuteType</span>
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="时间" Field="IntervalTime" Width="100px">
-            <ChildContent Context="item">
-                @if (item.ExecuteType == TimedTaskExecuteType.EveryDay)
-                {
-                    @(item.EveryTime?.ToString("HH:mm:ss") ?? "—")
-                }
-                else
-                {
-                    @($"{item.IntervalTime / 60.0:0.0} 小时")
-                }
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="上次执行" Field="LastExecutedTime" Width="160px">
-            <ChildContent Context="item">
-                @(item.LastExecutedTime?.ToString("yyyy-MM-dd HH:mm") ?? "—")
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="状态" Field="IsLastFail" Width="100px">
-            <ChildContent Context="item">
-                @if (item.IsRuning)
-                {
-                    <span class="admin-badge admin-badge--running">运行中</span>
-                }
-                else if (item.IsPause)
-                {
-                    <span class="admin-badge admin-badge--hidden">已暂停</span>
-                }
-                else if (item.IsLastFail)
-                {
-                    <span class="admin-badge admin-badge--fail">上次失败</span>
-                }
-                else
-                {
-                    <span class="admin-badge admin-badge--visible">正常</span>
-                }
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="操作" Sortable="false" Width="140px">
-            <ChildContent Context="item">
-                <div class="admin-actions">
-                    <button class="admin-action-btn admin-action-btn--run" title="运行"
-                            @onclick="() => RunTask(item)">
-                        <CgMdiIcon Name="mdiPlay" aria-hidden="true" />
-                    </button>
-                    @if (item.IsPause)
+        <ToolbarContent>
+            <CgButton Variant="outline" OnClick="OnCreateAsync">
+                <CgMdiIcon Name="mdiPlus" />
+                添加定时任务
+            </CgButton>
+        </ToolbarContent>
+        <ChildContent>
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="Id" Field="Id" Width="60px" />
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="名称" Field="Type">
+                <ChildContent Context="item">
+                    <span class="admin-badge">@item.Type</span>
+                </ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="参数" Field="Parameter" Width="120px">
+                <ChildContent Context="item">
+                    <span title="@item.Parameter">@(item.Parameter?.Length > 20 ? item.Parameter[..20] + "…" : item.Parameter ?? "—")</span>
+                </ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="类型" Field="ExecuteType">
+                <ChildContent Context="item">
+                    <span class="admin-badge">@item.ExecuteType</span>
+                </ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="时间" Field="IntervalTime" Width="100px">
+                <ChildContent Context="item">
+                    @if (item.ExecuteType == TimedTaskExecuteType.EveryDay)
                     {
-                        <button class="admin-action-btn admin-action-btn--up" title="恢复"
-                                @onclick="() => PauseTask(item, false)">
-                            <CgMdiIcon Name="mdiPlayCircleOutline" aria-hidden="true" />
-                        </button>
+                        @(item.EveryTime?.ToString("HH:mm:ss") ?? "—")
                     }
                     else
                     {
-                        <button class="admin-action-btn admin-action-btn--down" title="暂停"
-                                @onclick="() => PauseTask(item, true)">
-                            <CgMdiIcon Name="mdiPauseCircleOutline" aria-hidden="true" />
-                        </button>
+                        @($"{item.IntervalTime / 60.0:0.0} 小时")
                     }
-                </div>
-            </ChildContent>
-        </CgDataTableColumn>
+                </ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="上次执行" Field="LastExecutedTime" Width="160px">
+                <ChildContent Context="item">
+                    @(item.LastExecutedTime?.ToString("yyyy-MM-dd HH:mm") ?? "—")
+                </ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="状态" Field="IsLastFail" Width="100px">
+                <ChildContent Context="item">
+                    @if (item.IsRuning)
+                    {
+                        <span class="admin-badge admin-badge--running">运行中</span>
+                    }
+                    else if (item.IsPause)
+                    {
+                        <span class="admin-badge admin-badge--hidden">已暂停</span>
+                    }
+                    else if (item.IsLastFail)
+                    {
+                        <span class="admin-badge admin-badge--fail">上次失败</span>
+                    }
+                    else
+                    {
+                        <span class="admin-badge admin-badge--visible">正常</span>
+                    }
+                </ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="操作" Sortable="false" Width="180px">
+                <ChildContent Context="item">
+                    <div class="admin-actions">
+                        <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                        <button class="admin-action-btn admin-action-btn--run" title="运行"
+                                @onclick="() => RunTask(item)">
+                            <CgMdiIcon Name="mdiPlay" aria-hidden="true" />
+                        </button>
+                        @if (item.IsPause)
+                        {
+                            <button class="admin-action-btn admin-action-btn--up" title="恢复"
+                                    @onclick="() => PauseTask(item, false)">
+                                <CgMdiIcon Name="mdiPlayCircleOutline" aria-hidden="true" />
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="admin-action-btn admin-action-btn--down" title="暂停"
+                                    @onclick="() => PauseTask(item, true)">
+                                <CgMdiIcon Name="mdiPauseCircleOutline" aria-hidden="true" />
+                            </button>
+                        }
+                    </div>
+                </ChildContent>
+            </CgDataTableColumn>
+        </ChildContent>
     </CgDataTable>
 </div>
 
+<CgModal IsOpen="_showEditModal" OnClose="() => _showEditModal = false" Title="@(_isNew ? "添加定时任务" : "编辑定时任务")">
+    <ChildContent>
+        <CgFormSection Flat>
+            @if (_editModel != null)
+            {
+                <CgFormGroup Label="名称">
+                    <CgInput @bind-Value="_editModel.Name" Placeholder="任务名称" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="任务类型">
+                    <CgEnumSelect TEnum="TimedTaskType" @bind-Value="_editModel.Type" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="执行类型">
+                    <CgEnumSelect TEnum="TimedTaskExecuteType" @bind-Value="_editModel.ExecuteType" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="间隔时间（分钟）">
+                    <CgInput @bind-Value="_editModel.IntervalTime" Placeholder="间隔分钟数" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="固定时间">
+                    <CgInput @bind-Value="_editModel.EveryTime" Placeholder="固定执行时间" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="参数">
+                    <CgInput @bind-Value="_editModel.Parameter" Placeholder="任务参数" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="是否暂停">
+                    <CgCheckbox @bind-Value="_editModel.IsPause" Label="暂停执行" />
+                </CgFormGroup>
+            }
+            else
+            {
+                <div class="admin-loading-state">
+                    <CgProgressRing />
+                    <span class="admin-loading-state__text">正在加载...</span>
+                </div>
+            }
+        </CgFormSection>
+    </ChildContent>
+    <Footer>
+        <div class="admin-modal-footer">
+            <CgButton Variant="secondary" OnClick="() => _showEditModal = false">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="SaveAsync">保存</CgButton>
+        </div>
+    </Footer>
+</CgModal>
 
 @code {
     private CgDataTable<TimedTaskOverviewModel>? _table;
+    private bool _showEditModal;
+    private bool _isNew;
+    private TimedTaskEditModel? _editModel;
 
     private async Task<CgDataTableResult<TimedTaskOverviewModel>> OnQueryTimedTasks(CgDataTableRequest request)
     {
@@ -123,6 +185,54 @@
             return new CgDataTableResult<TimedTaskOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
         }
         return new CgDataTableResult<TimedTaskOverviewModel>([], 0);
+    }
+
+    private async Task OnCreateAsync()
+    {
+        _isNew = true;
+        _editModel = new TimedTaskEditModel();
+        _showEditModal = true;
+        await Task.CompletedTask;
+    }
+
+    private async Task OnEditAsync(TimedTaskOverviewModel model)
+    {
+        _isNew = false;
+        _editModel = null;
+        _showEditModal = true;
+        StateHasChanged();
+
+        var result = await TimedTaskService.GetTimedTaskEditAsync(model.Id);
+        if (result.Success && result.Data != null)
+        {
+            _editModel = result.Data;
+            StateHasChanged();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取详情失败", variant: "error");
+            _showEditModal = false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_editModel == null) return;
+
+        var result = await TimedTaskService.EditTimedTaskAsync(_editModel);
+        if (result.Success)
+        {
+            ToastService.Show("定时任务已保存", variant: "success");
+            _showEditModal = false;
+            if (_table != null)
+            {
+                await _table.RefreshAsync();
+            }
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
+        }
     }
 
     private async Task RunTask(TimedTaskOverviewModel item)

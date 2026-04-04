@@ -6,9 +6,12 @@
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
 @using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.ViewModel.PlayedGames
 @using CnGalWebSite.DataModel.ViewModel.Entries
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.Extensions
 
 <PageTitle>词条管理 - CnGal</PageTitle>
 
@@ -124,7 +127,15 @@
                              Title="基础信息类型列表"
                              OnServerQuery="OnQueryInfoTypes"
                              DefaultSortField="Id"
-                             DefaultSortDesc="true">
+                             DefaultSortDesc="true"
+                             @ref="_infoTypeTable">
+                    <ToolbarContent>
+                        <CgButton Variant="outline" OnClick="OnCreateInfoTypeAsync">
+                            <CgMdiIcon Name="mdiPlus" />
+                            添加基础信息类型
+                        </CgButton>
+                    </ToolbarContent>
+                    <ChildContent>
                     <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" Title="Id" Field="Id" Width="80px" />
                     <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" Title="名称" Field="Name" />
                     <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" Title="介绍" Field="Description">
@@ -140,7 +151,7 @@
                         <ChildContent Context="item">
                             @foreach (var t in item.Types)
                             {
-                                <span class="admin-badge" style="margin-right: 4px;">@t</span>
+                                <span class="admin-badge" style="margin-right: 4px;">@t.GetDisplayName()</span>
                             }
                         </ChildContent>
                     </CgDataTableColumn>
@@ -150,14 +161,73 @@
                             else { <span class="admin-badge admin-badge--visible">可见</span> }
                         </ChildContent>
                     </CgDataTableColumn>
+                    <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" Title="操作" Sortable="false" Width="60px">
+                        <ChildContent Context="item">
+                            <div class="admin-actions">
+                                <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditInfoTypeAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                            </div>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    </ChildContent>
                 </CgDataTable>
             }
         </PanelTemplate>
     </CgTabs>
 </div>
 
+<CgModal IsOpen="_showInfoTypeModal" OnClose="() => _showInfoTypeModal = false" Title="@(_isNewInfoType ? "添加基础信息类型" : "编辑基础信息类型")">
+    <ChildContent>
+        <CgFormSection Flat>
+            @if (_infoTypeEditModel != null)
+            {
+                <CgFormGroup Label="名称" Required="true">
+                    <CgInput @bind-Value="_infoTypeEditModel.Name" Placeholder="类型名称" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="介绍">
+                    <CgInput @bind-Value="_infoTypeEditModel.Description" Placeholder="类型说明" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="图标">
+                    <CgInput @bind-Value="_infoTypeEditModel.Icon" Placeholder="MDI 图标名称" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="是否隐藏">
+                    <CgCheckbox @bind-Value="_infoTypeEditModel.IsHidden" Label="隐藏此类型" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="支持的词条类型">
+                    @foreach (var entryType in Enum.GetValues<EntryType>())
+                    {
+                        <CgCheckbox Value="_infoTypeEditModel.Types.Contains(entryType)"
+                                    ValueChanged="v => ToggleEntryType(entryType, v)"
+                                    Label="@entryType.GetDisplayName()" />
+                    }
+                </CgFormGroup>
+            }
+            else
+            {
+                <div class="admin-loading-state">
+                    <CgProgressRing />
+                    <span class="admin-loading-state__text">正在加载...</span>
+                </div>
+            }
+        </CgFormSection>
+    </ChildContent>
+    <Footer>
+        <div class="admin-modal-footer">
+            <CgButton Variant="secondary" OnClick="() => _showInfoTypeModal = false">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="SaveInfoTypeAsync">保存</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
 @code {
     private CgDataTable<EntryOverviewModel>? _dataTable;
+    private CgDataTable<EntryInformationTypeOverviewModel>? _infoTypeTable;
+    private bool _showInfoTypeModal;
+    private bool _isNewInfoType;
+    private EntryInformationTypeEditModel? _infoTypeEditModel;
 
     private readonly IReadOnlyList<CgTabItem> _tabs =
     [
@@ -204,5 +274,68 @@
     {
         if (result.Success) { ToastService.Show(successMessage, variant: "success"); if (_dataTable is not null) await _dataTable.RefreshAsync(); }
         else { ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error"); }
+    }
+
+    // ─── 基础信息类型 CRUD ───
+
+    private async Task OnCreateInfoTypeAsync()
+    {
+        _isNewInfoType = true;
+        _infoTypeEditModel = new EntryInformationTypeEditModel();
+        _showInfoTypeModal = true;
+        await Task.CompletedTask;
+    }
+
+    private async Task OnEditInfoTypeAsync(EntryInformationTypeOverviewModel model)
+    {
+        _isNewInfoType = false;
+        _infoTypeEditModel = null;
+        _showInfoTypeModal = true;
+        StateHasChanged();
+
+        var result = await AdminQueryService.GetEntryInformationTypeEditAsync(model.Id);
+        if (result.Success && result.Data != null)
+        {
+            _infoTypeEditModel = result.Data;
+            StateHasChanged();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取详情失败", variant: "error");
+            _showInfoTypeModal = false;
+        }
+    }
+
+    private async Task SaveInfoTypeAsync()
+    {
+        if (_infoTypeEditModel == null) return;
+
+        var result = await AdminCommandService.EditEntryInformationTypeAsync(_infoTypeEditModel);
+        if (result.Success)
+        {
+            ToastService.Show("基础信息类型已保存", variant: "success");
+            _showInfoTypeModal = false;
+            if (_infoTypeTable != null)
+            {
+                await _infoTypeTable.RefreshAsync();
+            }
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
+        }
+    }
+
+    private void ToggleEntryType(EntryType type, bool isChecked)
+    {
+        if (_infoTypeEditModel == null) return;
+        if (isChecked && !_infoTypeEditModel.Types.Contains(type))
+        {
+            _infoTypeEditModel.Types.Add(type);
+        }
+        else if (!isChecked)
+        {
+            _infoTypeEditModel.Types.Remove(type);
+        }
     }
 }

@@ -6,10 +6,13 @@
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
 @using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.ViewModel.Ranks
 @using CnGalWebSite.DataModel.ViewModel.Space
 @using CnGalWebSite.DataModel.ViewModel.OperationRecords
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.Extensions
 
 <PageTitle>用户管理 - CnGal</PageTitle>
 
@@ -77,12 +80,20 @@
                              Title="头衔列表"
                              OnServerQuery="OnQueryRanks"
                              DefaultSortField="Id"
-                             DefaultSortDesc="true">
+                             DefaultSortDesc="true"
+                             @ref="_rankTable">
+                    <ToolbarContent>
+                        <CgButton Variant="outline" OnClick="OnCreateRankAsync">
+                            <CgMdiIcon Name="mdiPlus" />
+                            添加头衔
+                        </CgButton>
+                    </ToolbarContent>
+                    <ChildContent>
                     <CgDataTableColumn TItem="RankOverviewModel" Title="Id" Field="Id" Width="80px" />
                     <CgDataTableColumn TItem="RankOverviewModel" Title="名称" Field="Name" />
                     <CgDataTableColumn TItem="RankOverviewModel" Title="显示文本" Field="Text" />
                     <CgDataTableColumn TItem="RankOverviewModel" Title="类型" Field="Type">
-                        <ChildContent Context="item"><span class="admin-badge">@item.Type</span></ChildContent>
+                        <ChildContent Context="item"><span class="admin-badge">@item.Type.GetDisplayName()</span></ChildContent>
                     </CgDataTableColumn>
                     <CgDataTableColumn TItem="RankOverviewModel" Title="人数" Field="Count" Width="80px" />
                     <CgDataTableColumn TItem="RankOverviewModel" Title="优先级" Field="Priority" Width="80px" />
@@ -101,6 +112,20 @@
                     <CgDataTableColumn TItem="RankOverviewModel" Title="创建时间" Field="CreateTime">
                         <ChildContent Context="item">@item.CreateTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
                     </CgDataTableColumn>
+                    <CgDataTableColumn TItem="RankOverviewModel" Title="操作" Sortable="false" Width="180px">
+                        <ChildContent Context="item">
+                            <div class="admin-actions">
+                                <button class="admin-action-btn admin-action-btn--up" title="增加优先级" @onclick="() => OnEditRankPriorityAsync(item, 1)"><CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" /></button>
+                                <button class="admin-action-btn admin-action-btn--down" title="降低优先级" @onclick="() => OnEditRankPriorityAsync(item, -1)"><CgMdiIcon Name="mdiArrowDownBold" aria-hidden="true" /></button>
+                                @if (item.IsHidden)
+                                { <button class="admin-action-btn admin-action-btn--show" title="显示头衔" @onclick="() => OnToggleRankHiddenAsync(item, false)"><CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" /></button> }
+                                else
+                                { <button class="admin-action-btn admin-action-btn--hide" title="隐藏头衔" @onclick="() => OnToggleRankHiddenAsync(item, true)"><CgMdiIcon Name="mdiEyeOffOutline" aria-hidden="true" /></button> }
+                                <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditRankAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                            </div>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    </ChildContent>
                 </CgDataTable>
             }
             else if (context == "certifications")
@@ -165,8 +190,62 @@
     </CgTabs>
 </div>
 
+<CgModal IsOpen="_showRankModal" OnClose="() => _showRankModal = false" Title="@(_isNewRank ? "添加头衔" : "编辑头衔")">
+    <ChildContent>
+        <CgFormSection Flat>
+            @if (_rankEditModel != null)
+            {
+                <CgFormGroup Label="名称" Required="true">
+                    <CgInput @bind-Value="_rankEditModel.Name" Placeholder="头衔名称" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="显示文本">
+                    <CgInput @bind-Value="_rankEditModel.Text" Placeholder="头衔显示文本" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="类型">
+                    <CgEnumSelect TEnum="RankType" @bind-Value="_rankEditModel.Type" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="CSS">
+                    <CgInput @bind-Value="_rankEditModel.CSS" Placeholder="CSS 样式" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="Styles">
+                    <CgInput @bind-Value="_rankEditModel.Styles" Placeholder="内联样式" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="图片">
+                    <CgImageUpload @bind-Value="_rankEditModel.Image" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="优先级">
+                    <CgInput @bind-Value="_rankEditModel.Priority" />
+                </CgFormGroup>
+            }
+            else
+            {
+                <div class="admin-loading-state">
+                    <CgProgressRing />
+                    <span class="admin-loading-state__text">正在加载...</span>
+                </div>
+            }
+        </CgFormSection>
+    </ChildContent>
+    <Footer>
+        <div class="admin-modal-footer">
+            <CgButton Variant="secondary" OnClick="() => _showRankModal = false">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="SaveRankAsync">保存</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
 @code {
     private CgDataTable<UserOverviewModel>? _dataTable;
+    private CgDataTable<RankOverviewModel>? _rankTable;
+    private bool _showRankModal;
+    private bool _isNewRank;
+    private RankEditModel? _rankEditModel;
 
     private readonly IReadOnlyList<CgTabItem> _tabs =
     [
@@ -219,5 +298,83 @@
         var r = await AdminCommandService.EditSpaceCanCommentAsync(new[] { item.Id }, canComment);
         if (r.Success) { ToastService.Show(canComment ? "已开启留言板" : "已关闭留言板", variant: "success"); if (_dataTable is not null) await _dataTable.RefreshAsync(); }
         else { ToastService.Show(r.Error?.Message ?? "操作失败", variant: "error"); }
+    }
+
+    // ─── 头衔 CRUD + 操作 ───
+
+    private async Task OnCreateRankAsync()
+    {
+        _isNewRank = true;
+        _rankEditModel = new RankEditModel();
+        _showRankModal = true;
+        await Task.CompletedTask;
+    }
+
+    private async Task OnEditRankAsync(RankOverviewModel model)
+    {
+        _isNewRank = false;
+        _rankEditModel = null;
+        _showRankModal = true;
+        StateHasChanged();
+
+        var result = await AdminQueryService.GetRankEditAsync(model.Id);
+        if (result.Success && result.Data != null)
+        {
+            _rankEditModel = result.Data;
+            StateHasChanged();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取详情失败", variant: "error");
+            _showRankModal = false;
+        }
+    }
+
+    private async Task SaveRankAsync()
+    {
+        if (_rankEditModel == null) return;
+
+        var result = await AdminCommandService.EditRankAsync(_rankEditModel);
+        if (result.Success)
+        {
+            ToastService.Show("头衔已保存", variant: "success");
+            _showRankModal = false;
+            if (_rankTable != null)
+            {
+                await _rankTable.RefreshAsync();
+            }
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
+        }
+    }
+
+    private async Task OnEditRankPriorityAsync(RankOverviewModel model, int plusPriority)
+    {
+        var result = await AdminCommandService.EditRankPriorityAsync(new[] { model.Id }, plusPriority);
+        if (result.Success)
+        {
+            ToastService.Show("已更新头衔优先级", variant: "success");
+            if (_rankTable is not null) await _rankTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error");
+        }
+    }
+
+    private async Task OnToggleRankHiddenAsync(RankOverviewModel model, bool isHidden)
+    {
+        var result = await AdminCommandService.HideRankAsync(new[] { model.Id }, isHidden);
+        if (result.Success)
+        {
+            ToastService.Show(isHidden ? "已隐藏头衔" : "已显示头衔", variant: "success");
+            if (_rankTable is not null) await _rankTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error");
+        }
     }
 }
