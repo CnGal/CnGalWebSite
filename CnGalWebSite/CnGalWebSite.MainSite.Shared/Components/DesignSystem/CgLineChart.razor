@@ -3,22 +3,29 @@
 @using Microsoft.JSInterop
 @implements IAsyncDisposable
 
-<div class="cg-line-chart @CssClass" style="@Style">
+<div class="cg-line-chart @(IsExpanded ? "cg-line-chart--expanded" : "") @CssClass" style="@Style">
     <div class="cg-line-chart__header">
         <span class="cg-line-chart__title">@Title</span>
-        @if (ShowTimeRangeSelector)
-        {
-            <select class="cg-line-chart__select" value="@_selectedDays" @onchange="OnDaysChanged">
-                <option value="15">15天</option>
-                <option value="30">1个月</option>
-                <option value="90">3个月</option>
-                <option value="180">6个月</option>
-                <option value="365">1年</option>
-                <option value="999999">所有</option>
-            </select>
-        }
+        <div class="cg-line-chart__actions">
+            @if (ShowTimeRangeSelector)
+            {
+                <select class="cg-line-chart__select" value="@_selectedDays" @onchange="OnDaysChanged">
+                    <option value="15">15天</option>
+                    <option value="30">1个月</option>
+                    <option value="90">3个月</option>
+                    <option value="180">6个月</option>
+                    <option value="365">1年</option>
+                    <option value="999999">所有</option>
+                </select>
+            }
+            <button type="button" class="cg-line-chart__action-btn" @onclick="ToggleExpand" title="@(IsExpanded ? "还原宽度" : "横跨多列")">
+                <CgMdiIcon Name="@(IsExpanded ? "mdiFullscreenExit" : "mdiFullscreen")" aria-hidden="true" />
+            </button>
+        </div>
     </div>
-    <canvas id="@_canvasId" width="600" height="@Height" style="width: 100%; max-height: @(Height)px;"></canvas>
+    <div class="cg-line-chart__body">
+        <canvas id="@_canvasId" width="600" height="@Height" style="width: 100%; height: @(Height)px; max-height: @(Height)px;"></canvas>
+    </div>
 </div>
 
 @code {
@@ -62,6 +69,12 @@
     [Parameter]
     public EventCallback<int> OnTimeRangeChanged { get; set; }
 
+    [Parameter]
+    public bool IsExpanded { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsExpandedChanged { get; set; }
+
     /// <summary>
     /// 附加 CSS 类名。
     /// </summary>
@@ -73,6 +86,17 @@
     /// </summary>
     [Parameter]
     public string? Style { get; set; }
+
+    private async Task ToggleExpand()
+    {
+        IsExpanded = !IsExpanded;
+        await IsExpandedChanged.InvokeAsync(IsExpanded);
+        StateHasChanged();
+        
+        // Wait for CSS reflow
+        await Task.Delay(50);
+        await RenderChart();
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

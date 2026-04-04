@@ -10,3 +10,8 @@
     color: var(--cg-color-text-primary);
     font-size: var(--cg-font-size-sm);
 }
+
+.cg-form-group__required {
+    color: var(--cg-color-error, #ef4444);
+    margin-left: 2px;
+}

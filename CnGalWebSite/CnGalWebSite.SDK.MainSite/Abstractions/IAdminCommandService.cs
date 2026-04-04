@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.News;
 using CnGalWebSite.SDK.MainSite.Models;
 
@@ -104,9 +105,13 @@ public interface IAdminCommandService
 
     Task<SdkResult<bool>> EditCarouselPriorityAsync(int[] ids, int plusPriority, CancellationToken cancellationToken = default);
 
+    Task<SdkResult<bool>> EditCarouselAsync(CarouselEditModel model, CancellationToken cancellationToken = default);
+
     // ─── 友情链接操作 ───
 
     Task<SdkResult<bool>> EditFriendLinkPriorityAsync(int[] ids, int plusPriority, CancellationToken cancellationToken = default);
+
+    Task<SdkResult<bool>> EditFriendLinkAsync(FriendLinkEditModel model, CancellationToken cancellationToken = default);
 
     // ─── 动态操作 ───
 

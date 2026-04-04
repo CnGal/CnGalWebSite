@@ -29,8 +29,13 @@ export function render(canvasId, labels, datasets, title) {
     const chartW = W - padL - padR;
     const chartH = H - padT - padB;
 
+    const computedStyle = getComputedStyle(document.body);
+    const textColor = computedStyle.getPropertyValue('--cg-color-text-primary').trim() || '#0f172a';
+    const textMuted = computedStyle.getPropertyValue('--cg-color-text-muted').trim() || '#64748b';
+    const borderColor = computedStyle.getPropertyValue('--cg-color-border').trim() || '#e2e8f0';
+
     if (!labels || labels.length === 0 || !datasets || datasets.length === 0) {
-        ctx.fillStyle = '#888';
+        ctx.fillStyle = textMuted;
         ctx.font = '14px Inter, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText('暂无数据', W / 2, H / 2);
@@ -47,17 +52,21 @@ export function render(canvasId, labels, datasets, title) {
     }
     if (allMin === allMax) { allMax = allMin + 1; }
     const range = allMax - allMin;
-    const yMin = Math.floor(allMin - range * 0.05);
+    let yMin = Math.floor(allMin - range * 0.05);
     const yMax = Math.ceil(allMax + range * 0.05);
+
+    // 如果原始数据均大于等于 0，则将 y 轴底部限制为 0
+    if (allMin >= 0 && yMin < 0) {
+        yMin = 0;
+    }
+
     const yRange = yMax - yMin || 1;
 
-    // Background
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, W, H);
+    // Background removed to be transparent so CSS surface color shines through
 
     // Title
     if (title) {
-        ctx.fillStyle = '#e0e0ff';
+        ctx.fillStyle = textColor;
         ctx.font = 'bold 14px Inter, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(title, W / 2, 24);
@@ -65,7 +74,7 @@ export function render(canvasId, labels, datasets, title) {
 
     // Grid lines
     const gridLines = 5;
-    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.strokeStyle = borderColor;
     ctx.lineWidth = 1;
     for (let i = 0; i <= gridLines; i++) {
         const y = padT + (chartH / gridLines) * i;
@@ -76,7 +85,7 @@ export function render(canvasId, labels, datasets, title) {
     }
 
     // Y-axis labels
-    ctx.fillStyle = '#888';
+    ctx.fillStyle = textMuted;
     ctx.font = '11px Inter, sans-serif';
     ctx.textAlign = 'right';
     for (let i = 0; i <= gridLines; i++) {
@@ -88,7 +97,7 @@ export function render(canvasId, labels, datasets, title) {
     // X-axis labels (show max ~10)
     const maxXLabels = 10;
     const step = Math.max(1, Math.floor(labels.length / maxXLabels));
-    ctx.fillStyle = '#888';
+    ctx.fillStyle = textMuted;
     ctx.font = '10px Inter, sans-serif';
     ctx.textAlign = 'center';
     for (let i = 0; i < labels.length; i += step) {
@@ -142,7 +151,7 @@ export function render(canvasId, labels, datasets, title) {
             ctx.fillStyle = color;
             ctx.fillRect(legendX, legendY - 8, 12, 4);
             legendX += 16;
-            ctx.fillStyle = '#ccc';
+            ctx.fillStyle = textMuted;
             ctx.textAlign = 'left';
             ctx.fillText(datasets[si].label || '', legendX, legendY);
             legendX += ctx.measureText(datasets[si].label || '').width + 16;

@@ -33,6 +33,16 @@ public interface IAdminQueryService
     Task<SdkResult<ServerStaticOverviewModel>> GetServerOverviewAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// 获取 API Server 动态概览数据。
+    /// </summary>
+    Task<SdkResult<ServerRealTimeOverviewModel>> GetServerRealTimeOverviewAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取用户数据概览。
+    /// </summary>
+    Task<SdkResult<UserDataOverviewModel>> GetUserDataOverviewAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// 分页查询评论列表（服务端分页）。
     /// </summary>
     Task<SdkResult<QueryResultModel<CommentOverviewModel>>> GetCommentsAsync(
@@ -152,6 +162,10 @@ public interface IAdminQueryService
     Task<SdkResult<QueryResultModel<FriendLinkOverviewModel>>> GetFriendLinksAsync(
         QueryParameterModel parameter,
         CancellationToken cancellationToken = default);
+
+    Task<SdkResult<CarouselEditModel>> GetCarouselEditAsync(int id, CancellationToken cancellationToken = default);
+    
+    Task<SdkResult<FriendLinkEditModel>> GetFriendLinkEditAsync(int id, CancellationToken cancellationToken = default);
 
     // ─── 动态/周报 ───
 

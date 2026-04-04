@@ -3,6 +3,7 @@ using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.BackUpArchives;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.News;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
@@ -213,16 +214,22 @@ public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminComm
     // ─── 轮播图 ───
 
     public Task<SdkResult<bool>> EditCarouselPriorityAsync(int[] ids, int plusPriority, CancellationToken cancellationToken = default)
-        => PostCommandAsync("api/home/EditCarouselPriorityAsync",
+        => PostCommandAsync("api/home/EditCarouselPriority",
             new EditEntryPriorityViewModel { Ids = ids, PlusPriority = plusPriority },
             "EDIT_CAROUSEL_PRIORITY", "调整轮播图优先级", cancellationToken);
+
+    public Task<SdkResult<bool>> EditCarouselAsync(CarouselEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/home/EditCarousel", model, "EDIT_CAROUSEL", "编辑轮播图", cancellationToken);
 
     // ─── 友情链接 ───
 
     public Task<SdkResult<bool>> EditFriendLinkPriorityAsync(int[] ids, int plusPriority, CancellationToken cancellationToken = default)
-        => PostCommandAsync("api/home/EditFriendLinkPriorityAsync",
+        => PostCommandAsync("api/home/EditFriendLinkPriority",
             new EditEntryPriorityViewModel { Ids = ids, PlusPriority = plusPriority },
             "EDIT_FRIENDLINK_PRIORITY", "调整友情链接优先级", cancellationToken);
+
+    public Task<SdkResult<bool>> EditFriendLinkAsync(FriendLinkEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/home/EditFriendLink", model, "EDIT_FRIENDLINK", "编辑友情链接", cancellationToken);
 
     // ─── 动态 ───
 

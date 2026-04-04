@@ -63,6 +63,10 @@
                         <CgMdiIcon Name="mdiAccountGroupOutline" aria-hidden="true" />
                         <span>用户</span>
                     </a>
+                    <a href="/admin/listcircuits" class="admin-nav-item @GetActiveClass("/admin/listcircuits")">
+                        <CgMdiIcon Name="mdiNetwork" aria-hidden="true" />
+                        <span>线路</span>
+                    </a>
                     <a href="/admin/listmessages" class="admin-nav-item @GetActiveClass("/admin/listmessages")">
                         <CgMdiIcon Name="mdiEmailOutline" aria-hidden="true" />
                         <span>消息</span>
@@ -109,9 +113,13 @@
                         <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" />
                         <span>定时任务</span>
                     </a>
-                    <a href="/admin/managehome" class="admin-nav-item @GetActiveClass("/admin/managehome")">
-                        <CgMdiIcon Name="mdiCogOutline" aria-hidden="true" />
-                        <span>网站设置</span>
+                    <a href="/admin/listcarousels" class="admin-nav-item @GetActiveClass("/admin/listcarousels")">
+                        <CgMdiIcon Name="mdiViewCarouselOutline" aria-hidden="true" />
+                        <span>轮播图</span>
+                    </a>
+                    <a href="/admin/listfriendlinks" class="admin-nav-item @GetActiveClass("/admin/listfriendlinks")">
+                        <CgMdiIcon Name="mdiLinkVariant" aria-hidden="true" />
+                        <span>友情链接</span>
                     </a>
                 </nav>
 

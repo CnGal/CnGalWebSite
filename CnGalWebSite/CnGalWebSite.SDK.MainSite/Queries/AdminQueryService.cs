@@ -44,6 +44,24 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
             cancellationToken);
     }
 
+    public Task<SdkResult<ServerRealTimeOverviewModel>> GetServerRealTimeOverviewAsync(CancellationToken cancellationToken = default)
+    {
+        return GetAsync<ServerRealTimeOverviewModel>(
+            "api/admin/GetServerRealTimeDataOverview",
+            "ADMIN",
+            "服务器动态数据概览",
+            cancellationToken);
+    }
+
+    public Task<SdkResult<UserDataOverviewModel>> GetUserDataOverviewAsync(CancellationToken cancellationToken = default)
+    {
+        return GetAsync<UserDataOverviewModel>(
+            "api/admin/GetUserDataOverview",
+            "ADMIN",
+            "用户概览",
+            cancellationToken);
+    }
+
     // ─── 通用分页查询辅助方法 ───
 
     private async Task<SdkResult<QueryResultModel<T>>> QueryListAsync<T>(
@@ -164,6 +182,18 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
     public Task<SdkResult<QueryResultModel<FriendLinkOverviewModel>>> GetFriendLinksAsync(
         QueryParameterModel parameter, CancellationToken cancellationToken = default)
         => QueryListAsync<FriendLinkOverviewModel>("api/home/ListFriendLinks", "ADMIN_FRIENDLINKS", "友情链接", parameter, cancellationToken);
+
+    public Task<SdkResult<CarouselEditModel>> GetCarouselEditAsync(
+        int id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<CarouselEditModel, CarouselEditModel>(
+            $"api/home/EditCarousel?id={id}", dto => dto,
+            "ADMIN_CAROUSEL", "轮播图", id, cancellationToken);
+            
+    public Task<SdkResult<FriendLinkEditModel>> GetFriendLinkEditAsync(
+        int id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<FriendLinkEditModel, FriendLinkEditModel>(
+            $"api/home/EditFriendLink?id={id}", dto => dto,
+            "ADMIN_FRIENDLINK", "友情链接", id, cancellationToken);
 
     // ─── 动态/周报 ───
 
