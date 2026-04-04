@@ -52,6 +52,18 @@ public interface IAdminCommandService
     /// </summary>
     Task<SdkResult<bool>> EditEntryCanCommentAsync(int[] ids, bool canComment, CancellationToken cancellationToken = default);
 
+    // ─── 游玩记录操作 ───
+
+    /// <summary>
+    /// 隐藏或显示游玩记录。
+    /// </summary>
+    Task<SdkResult<bool>> HidePlayedGameAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 公开或隐藏游玩记录的公开状态。
+    /// </summary>
+    Task<SdkResult<bool>> ShowPubliclyPlayedGameAsync(long[] ids, bool showPublicly, CancellationToken cancellationToken = default);
+
     // ─── 文章操作 ───
 
     /// <summary>

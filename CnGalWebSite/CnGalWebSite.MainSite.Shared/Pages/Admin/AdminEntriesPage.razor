@@ -88,7 +88,8 @@
                              Title="游玩记录列表"
                              OnServerQuery="OnQueryPlayedGames"
                              DefaultSortField="Id"
-                             DefaultSortDesc="true">
+                             DefaultSortDesc="true"
+                             @ref="_playedGameTable">
                     <CgDataTableColumn TItem="GameRecordOverviewModel" Title="Id" Field="Id" Width="80px" />
                     <CgDataTableColumn TItem="GameRecordOverviewModel" Title="游戏" Field="GameName">
                         <ChildContent Context="item">
@@ -98,12 +99,19 @@
                         </ChildContent>
                     </CgDataTableColumn>
                     <CgDataTableColumn TItem="GameRecordOverviewModel" Title="用户" Field="UserName">
-                        <ChildContent Context="item"><span class="admin-cell-name">@item.UserName</span></ChildContent>
+                        <ChildContent Context="item">
+                            <a class="admin-cell-name" href="@($"/space/index/{item.UserId}")">@item.UserName</a>
+                        </ChildContent>
                     </CgDataTableColumn>
                     <CgDataTableColumn TItem="GameRecordOverviewModel" Title="类型" Field="Type">
                         <ChildContent Context="item"><span class="admin-badge">@item.Type</span></ChildContent>
                     </CgDataTableColumn>
                     <CgDataTableColumn TItem="GameRecordOverviewModel" Title="总分" Field="TotalSocre" Width="80px" />
+                    <CgDataTableColumn TItem="GameRecordOverviewModel" Title="评语" Field="PlayImpressions" Sortable="false">
+                        <ChildContent Context="item">
+                            <div class="admin-cell-text">@item.PlayImpressions</div>
+                        </ChildContent>
+                    </CgDataTableColumn>
                     <CgDataTableColumn TItem="GameRecordOverviewModel" Title="公开" Field="ShowPublicly">
                         <ChildContent Context="item">
                             @if (item.ShowPublicly) { <span class="admin-badge admin-badge--yes">公开</span> }
@@ -118,6 +126,20 @@
                     </CgDataTableColumn>
                     <CgDataTableColumn TItem="GameRecordOverviewModel" Title="最后编辑" Field="LastEditTime">
                         <ChildContent Context="item">@item.LastEditTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameRecordOverviewModel" Title="操作" Sortable="false" Width="120px">
+                        <ChildContent Context="item">
+                            <div class="admin-actions">
+                                @if (item.ShowPublicly)
+                                { <button class="admin-action-btn admin-action-btn--hide" title="设为私密" @onclick="() => ToggleShowPublicly(item, false)"><CgMdiIcon Name="mdiLinkVariantOff" aria-hidden="true" /></button> }
+                                else
+                                { <button class="admin-action-btn admin-action-btn--link" title="设为公开" @onclick="() => ToggleShowPublicly(item, true)"><CgMdiIcon Name="mdiLinkVariant" aria-hidden="true" /></button> }
+                                @if (item.IsHidden)
+                                { <button class="admin-action-btn admin-action-btn--show" title="显示记录" @onclick="() => TogglePlayedGameHidden(item, false)"><CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" /></button> }
+                                else
+                                { <button class="admin-action-btn admin-action-btn--hide" title="隐藏记录" @onclick="() => TogglePlayedGameHidden(item, true)"><CgMdiIcon Name="mdiEyeOffOutline" aria-hidden="true" /></button> }
+                            </div>
+                        </ChildContent>
                     </CgDataTableColumn>
                 </CgDataTable>
             }
@@ -224,6 +246,7 @@
 
 @code {
     private CgDataTable<EntryOverviewModel>? _dataTable;
+    private CgDataTable<GameRecordOverviewModel>? _playedGameTable;
     private CgDataTable<EntryInformationTypeOverviewModel>? _infoTypeTable;
     private bool _showInfoTypeModal;
     private bool _isNewInfoType;
@@ -269,6 +292,26 @@
     private async Task ToggleHidden(EntryOverviewModel item, bool hide) { var r = await AdminCommandService.HideEntryAsync(new[] { item.Id }, hide); await HandleResult(r, hide ? "已隐藏词条" : "已显示词条"); }
     private async Task ToggleOutlink(EntryOverviewModel item, bool hide) { var r = await AdminCommandService.HideEntryOutlinkAsync(new[] { item.Id }, hide); await HandleResult(r, hide ? "已隐藏外链" : "已显示外链"); }
     private async Task ToggleCanComment(EntryOverviewModel item, bool canComment) { var r = await AdminCommandService.EditEntryCanCommentAsync(new[] { item.Id }, canComment); await HandleResult(r, canComment ? "已开启留言板" : "已关闭留言板"); }
+
+    // ─── 游玩记录操作 ───
+
+    private async Task TogglePlayedGameHidden(GameRecordOverviewModel item, bool hide)
+    {
+        var r = await AdminCommandService.HidePlayedGameAsync(new[] { item.Id }, hide);
+        await HandlePlayedGameResult(r, hide ? "已隐藏记录" : "已显示记录");
+    }
+
+    private async Task ToggleShowPublicly(GameRecordOverviewModel item, bool showPublicly)
+    {
+        var r = await AdminCommandService.ShowPubliclyPlayedGameAsync(new[] { item.Id }, showPublicly);
+        await HandlePlayedGameResult(r, showPublicly ? "已设为公开" : "已设为私密");
+    }
+
+    private async Task HandlePlayedGameResult(SdkResult<bool> result, string successMessage)
+    {
+        if (result.Success) { ToastService.Show(successMessage, variant: "success"); if (_playedGameTable is not null) await _playedGameTable.RefreshAsync(); }
+        else { ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error"); }
+    }
 
     private async Task HandleResult(SdkResult<bool> result, string successMessage)
     {

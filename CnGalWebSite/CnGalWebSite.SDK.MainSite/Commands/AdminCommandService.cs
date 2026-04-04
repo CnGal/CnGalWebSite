@@ -7,6 +7,7 @@ using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.News;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
+using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Recommends;
 using CnGalWebSite.DataModel.ViewModel.Steam;
@@ -107,6 +108,18 @@ public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminComm
         => PostCommandAsync("api/comments/EditEntryCanComment",
             new EditEntryCanCommentModel { Ids = ids, CanComment = canComment },
             "EDIT_ENTRY_CAN_COMMENT", "设置词条留言板", cancellationToken);
+
+    // ─── 游玩记录 ───
+
+    public Task<SdkResult<bool>> HidePlayedGameAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/playedgame/HiddenGameRecord",
+            new HiddenGameRecordModel { PlayedGameIds = ids, IsHidden = isHidden },
+            "HIDE_PLAYED_GAME", "操作游玩记录显隐", cancellationToken);
+
+    public Task<SdkResult<bool>> ShowPubliclyPlayedGameAsync(long[] ids, bool showPublicly, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/playedgame/ShowPubliclyGameRecord",
+            new HiddenGameRecordModel { PlayedGameIds = ids, IsHidden = showPublicly },
+            "SHOW_PUBLICLY_PLAYED_GAME", "操作游玩记录公开状态", cancellationToken);
 
     // ─── 文章 ───
 

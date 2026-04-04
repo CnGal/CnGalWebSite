@@ -10,6 +10,13 @@
 .admin-comment-user {
     font-weight: var(--cg-font-weight-medium);
     color: var(--cg-color-primary);
+    text-decoration: none;
+    transition: var(--cg-transition-fast);
+}
+
+.admin-comment-user:hover {
+    color: var(--cg-color-primary-hover);
+    text-decoration: underline;
 }
 
 .admin-comment-text {
@@ -23,5 +30,11 @@
 
 .admin-comment-object {
     font-size: var(--cg-font-size-sm);
-    color: var(--cg-color-text-muted);
+    color: var(--cg-color-link);
+    text-decoration: none;
+    transition: var(--cg-transition-fast);
+}
+
+.admin-comment-object:hover {
+    text-decoration: underline;
 }
