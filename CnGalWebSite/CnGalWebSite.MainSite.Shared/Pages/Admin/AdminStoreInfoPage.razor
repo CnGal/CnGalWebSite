@@ -1,11 +1,16 @@
-﻿@page "/admin/liststoreinfo"
+@page "/admin/liststoreinfo"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
 @rendermode InteractiveServer
-@inject IAdminQueryService AdminQueryService
+@inject IAdminQueryService QueryService
+@inject IAdminCommandService CommandService
+@inject ICgToastService ToastService
 @inject NavigationManager NavigationManager
 @using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Steam
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.Extensions
 
 <PageTitle>商店信息管理 - CnGal</PageTitle>
 
@@ -17,75 +22,213 @@
 
     <CgDataTable TItem="StoreInfoOverviewModel"
                  Title="商店信息列表"
-                 OnServerQuery="OnServerQuery"
+                 OnServerQuery="OnQueryAsync"
                  DefaultSortField="Id"
-                 DefaultSortDesc="true">
-        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="名称" Field="Name" />
-        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="平台" Field="PlatformName" Width="100px" />
-        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="平台类型" Field="PlatformType" Width="100px">
-            <ChildContent Context="item">
-                <span class="admin-badge">@item.PlatformType</span>
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="状态" Field="State">
-            <ChildContent Context="item">
-                <span class="admin-badge admin-badge--info">@item.State</span>
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="现价" Field="PriceNow" Width="80px">
-            <ChildContent Context="item">
-                @(item.PriceNow.HasValue ? $"¥{item.PriceNow:0.00}" : "—")
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="折扣" Field="CutNow" Width="80px">
-            <ChildContent Context="item">
-                @if (item.CutNow.HasValue && item.CutNow > 0)
-                {
-                    <span class="admin-badge admin-badge--yes">-@(item.CutNow)%</span>
-                }
-                else
-                {
-                    <span>—</span>
-                }
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="更新方式" Field="UpdateType" Width="100px">
-            <ChildContent Context="item">
-                <span class="admin-badge">@item.UpdateType</span>
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="更新时间" Field="UpdateTime" Width="160px">
-            <ChildContent Context="item">
-                @item.UpdateTime.ToString("yyyy-MM-dd HH:mm")
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="链接" Field="Link">
-            <ChildContent Context="item">
-                <span class="admin-cell-muted">@item.Link</span>
-            </ChildContent>
-        </CgDataTableColumn>
-        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="操作" Sortable="false" Width="50px">
-            <ChildContent Context="item">
-                <div class="admin-actions">
-                    @if (item.EntryId.HasValue && item.EntryId > 0)
+                 DefaultSortDesc="true"
+                 @ref="_table">
+        <ToolbarContent>
+            <CgButton Variant="outline" OnClick="OnCreateAsync">
+                <CgMdiIcon Name="mdiPlus" />
+                添加商店信息
+            </CgButton>
+        </ToolbarContent>
+        <ChildContent>
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="ID" Field="Id" Width="80px" />
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="名称" Field="Name" />
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="平台" Field="PlatformName" Width="100px" />
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="平台类型" Field="PlatformType" Width="100px">
+                <ChildContent Context="item">
+                    <span class="admin-badge">@item.PlatformType.GetDisplayName()</span>
+                </ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="状态" Field="State">
+                <ChildContent Context="item">
+                    <span class="admin-badge admin-badge--info">@item.State.GetDisplayName()</span>
+                </ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="现价" Field="PriceNow" Width="80px">
+                <ChildContent Context="item">
+                    @(item.PriceNow.HasValue ? $"¥{item.PriceNow:0.00}" : "—")
+                </ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="折扣" Field="CutNow" Width="80px">
+                <ChildContent Context="item">
+                    @if (item.CutNow.HasValue && item.CutNow > 0)
                     {
-                        <button class="admin-action-btn admin-action-btn--show" title="查看词条"
-                                @onclick="@(() => NavigationManager.NavigateTo($"/entries/index/{item.EntryId}"))">
-                            <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
-                        </button>
+                        <span class="admin-badge admin-badge--yes">-@(item.CutNow)%</span>
                     }
-                </div>
-            </ChildContent>
-        </CgDataTableColumn>
+                    else
+                    {
+                        <span>—</span>
+                    }
+                </ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="更新方式" Field="UpdateType" Width="100px">
+                <ChildContent Context="item">
+                    <span class="admin-badge">@item.UpdateType.GetDisplayName()</span>
+                </ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="更新时间" Field="UpdateTime" Width="160px">
+                <ChildContent Context="item">
+                    @item.UpdateTime.ToString("yyyy-MM-dd HH:mm")
+                </ChildContent>
+            </CgDataTableColumn>
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="操作" Sortable="false" Width="100px">
+                <ChildContent Context="item">
+                    <div class="admin-actions">
+                        <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                        @if (item.EntryId.HasValue && item.EntryId > 0)
+                        {
+                            <button class="admin-action-btn admin-action-btn--show" title="查看词条"
+                                    @onclick="@(() => NavigationManager.NavigateTo($"/entries/index/{item.EntryId}"))">
+                                <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+                            </button>
+                        }
+                    </div>
+                </ChildContent>
+            </CgDataTableColumn>
+        </ChildContent>
     </CgDataTable>
 </div>
 
+<CgModal IsOpen="_showEditModal" OnClose="() => _showEditModal = false" Title="@(_isNew ? "添加商店信息" : "编辑商店信息")">
+    <ChildContent>
+        <CgFormSection Flat>
+            @if (_editModel != null)
+            {
+                <CgFormGroup Label="名称">
+                    <CgInput @bind-Value="_editModel.Name" Placeholder="游戏名称" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="平台名称">
+                    <CgInput @bind-Value="_editModel.PlatformName" Placeholder="例如 Steam" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="平台类型">
+                    <CgEnumSelect TEnum="PublishPlatformType" @bind-Value="_editModel.PlatformType" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="链接">
+                    <CgInput @bind-Value="_editModel.Link" Placeholder="商店页面链接" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="状态">
+                    <CgEnumSelect TEnum="StoreState" @bind-Value="_editModel.State" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="更新方式">
+                    <CgEnumSelect TEnum="StoreUpdateType" @bind-Value="_editModel.UpdateType" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="币种">
+                    <CgEnumSelect TEnum="CurrencyCode" @bind-Value="_editModel.CurrencyCode" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="关联词条 ID">
+                    <CgInput @bind-Value="_editModel.EntryId" Placeholder="关联的词条ID" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="现价">
+                    <CgInput @bind-Value="_editModel.PriceNow" Placeholder="当前售价" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="原价">
+                    <CgInput @bind-Value="_editModel.OriginalPrice" Placeholder="原价" />
+                </CgFormGroup>
+
+                <CgFormGroup Label="当前折扣">
+                    <CgInput @bind-Value="_editModel.CutNow" Placeholder="折扣百分比" />
+                </CgFormGroup>
+            }
+            else
+            {
+                <div class="admin-loading-state">
+                    <CgProgressRing />
+                    <span class="admin-loading-state__text">正在加载...</span>
+                </div>
+            }
+        </CgFormSection>
+    </ChildContent>
+    <Footer>
+        <div class="admin-modal-footer">
+            <CgButton Variant="secondary" OnClick="() => _showEditModal = false">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="SaveAsync">保存</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
 @code {
-    private async Task<CgDataTableResult<StoreInfoOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    private CgDataTable<StoreInfoOverviewModel>? _table;
+    private bool _showEditModal;
+    private bool _isNew;
+    private StoreInfoEditModel? _editModel;
+
+    private async Task<CgDataTableResult<StoreInfoOverviewModel>> OnQueryAsync(CgDataTableRequest request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetStoreInfoListAsync(parameter);
-        return result.Success && result.Data is not null ? new CgDataTableResult<StoreInfoOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<StoreInfoOverviewModel>([], 0);
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? string.Empty,
+            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await QueryService.GetStoreInfoListAsync(parameter);
+        if (result.Success && result.Data != null)
+        {
+            return new CgDataTableResult<StoreInfoOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+        }
+
+        ToastService.Show(result.Error?.Message ?? "获取商店信息列表失败", variant: "error");
+        return new CgDataTableResult<StoreInfoOverviewModel>([], 0);
+    }
+
+    private async Task OnCreateAsync()
+    {
+        _isNew = true;
+        _editModel = new StoreInfoEditModel();
+        _showEditModal = true;
+        await Task.CompletedTask;
+    }
+
+    private async Task OnEditAsync(StoreInfoOverviewModel model)
+    {
+        _isNew = false;
+        _editModel = null;
+        _showEditModal = true;
+        StateHasChanged();
+
+        var result = await QueryService.GetStoreInfoEditAsync(model.Id);
+        if (result.Success && result.Data != null)
+        {
+            _editModel = result.Data;
+            StateHasChanged();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取详情失败", variant: "error");
+            _showEditModal = false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_editModel == null) return;
+
+        var result = await CommandService.EditStoreInfoAsync(_editModel);
+        if (result.Success)
+        {
+            ToastService.Show("商店信息已保存", variant: "success");
+            _showEditModal = false;
+            if (_table != null)
+            {
+                await _table.RefreshAsync();
+            }
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
+        }
     }
 }

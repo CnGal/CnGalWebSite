@@ -1,4 +1,4 @@
-﻿@page "/admin/listalmanacs"
+@page "/admin/listalmanacs"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
 @rendermode InteractiveServer
@@ -20,6 +20,13 @@
                  OnServerQuery="OnServerQuery"
                  DefaultSortField="Id"
                  DefaultSortDesc="true">
+        <ToolbarContent>
+            <CgButton Variant="outline" OnClick="@(() => NavigationManager.NavigateTo("/almanac/edit"))">
+                <CgMdiIcon Name="mdiPlus" />
+                添加年鉴
+            </CgButton>
+        </ToolbarContent>
+        <ChildContent>
         <CgDataTableColumn TItem="AlmanacOverviewModel" Title="Id" Field="Id" Width="80px" />
         <CgDataTableColumn TItem="AlmanacOverviewModel" Title="年份" Field="Year" Width="80px" />
         <CgDataTableColumn TItem="AlmanacOverviewModel" Title="名称" Field="Name" />
@@ -49,6 +56,7 @@
                 </div>
             </ChildContent>
         </CgDataTableColumn>
+        </ChildContent>
     </CgDataTable>
 </div>
 

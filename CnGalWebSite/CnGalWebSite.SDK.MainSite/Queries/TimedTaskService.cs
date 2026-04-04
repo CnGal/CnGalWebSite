@@ -89,4 +89,44 @@ public sealed class TimedTaskService(HttpClient httpClient, ILogger<TimedTaskSer
             return SdkResult<bool>.Fail("PAUSE_TIMED_TASK_EXCEPTION", "操作定时任务时发生异常");
         }
     }
+
+    // ─── 编辑 ───
+
+    public async Task<SdkResult<TimedTaskEditModel>> GetTimedTaskEditAsync(long id, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await GetFromJsonAsync<TimedTaskEditModel>($"api/timedtasks/EditAsync?id={id}", cancellationToken);
+            if (result is null)
+            {
+                return SdkResult<TimedTaskEditModel>.Fail("GET_TIMED_TASK_EDIT_FAILED", "获取定时任务详情失败");
+            }
+            return SdkResult<TimedTaskEditModel>.Ok(result);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "获取定时任务详情异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
+            return SdkResult<TimedTaskEditModel>.Fail("GET_TIMED_TASK_EDIT_EXCEPTION", "获取定时任务详情时发生异常");
+        }
+    }
+
+    public async Task<SdkResult<bool>> EditTimedTaskAsync(TimedTaskEditModel model, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await PostAsJsonAsync<TimedTaskEditModel, Result>(
+                "api/timedtasks/EditAsync", model, cancellationToken);
+
+            if (result is null || !result.Success)
+            {
+                return SdkResult<bool>.Fail("EDIT_TIMED_TASK_FAILED", result?.Message ?? "编辑定时任务失败");
+            }
+            return SdkResult<bool>.Ok(true);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "编辑定时任务异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
+            return SdkResult<bool>.Fail("EDIT_TIMED_TASK_EXCEPTION", "编辑定时任务时发生异常");
+        }
+    }
 }

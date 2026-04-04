@@ -1,8 +1,10 @@
 @page "/admin"
 @page "/admin/index"
 @attribute [Authorize(Roles = "Admin")]
+@rendermode InteractiveServer
 @layout AdminLayout
 @inject IAdminQueryService AdminQueryService
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.Core.Helpers
 @using CnGalWebSite.DataModel.ViewModel.Admin
@@ -24,6 +26,10 @@
     <h2 class="admin-overview-subtitle">
         <CgMdiIcon Name="mdiServerNetwork" />
         运行状态概览
+        @if (_lastRefreshTime.HasValue)
+        {
+            <span class="refresh-time">上次刷新: @_lastRefreshTime.Value.ToString("HH:mm:ss")</span>
+        }
     </h2>
 
     <div class="server-cards-grid">
@@ -49,9 +55,21 @@
                 </div>
                 <div class="prop-item">
                     <span class="prop-label">后台任务</span>
-                    <span class="prop-value @(_apiStaticModel?.IsRuningBackgroundTask == true ? "text-success" : "")">
-                        @(_apiStaticModel?.IsRuningBackgroundTask == true ? "运行中" : "空闲")
+                    <span class="prop-value @(_apiStaticModel?.IsRuningBackgroundTask == true ? "text-success" : "text-error")">
+                        @(_apiStaticModel?.IsRuningBackgroundTask == true ? "运行中" : "未运行")
                     </span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">最近更新</span>
+                    <span class="prop-value">@(_apiStaticModel?.LastUpdateTime.ToString("yyyy-MM-dd HH:mm") ?? "—")</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">进程运行时间</span>
+                    <span class="prop-value">@FormatUptime(_apiRealTimeModel?.ProcessUptime)</span>
+                </div>
+                <div class="prop-item">
+                    <span class="prop-label">API 延时</span>
+                    <span class="prop-value @GetLatencyColorClass(_apiLatencyMs)">@(_apiLatencyMs.HasValue ? $"{_apiLatencyMs.Value} ms" : "—")</span>
                 </div>
             </div>
 
@@ -62,16 +80,16 @@
                         <span>@(_apiRealTimeModel != null ? $"{_apiRealTimeModel.CPUUtilization:F1}%" : "-")</span>
                     </div>
                     <div class="metric-bar-bg">
-                        <div class="metric-bar-fill" style="width: @(_apiRealTimeModel != null ? $"{Math.Clamp(_apiRealTimeModel.CPUUtilization, 0, 100):F1}%" : "0%");"></div>
+                        <div class="metric-bar-fill @GetMetricColorClass(_apiRealTimeModel?.CPUUtilization)" style="width: @(_apiRealTimeModel != null ? $"{Math.Clamp(_apiRealTimeModel.CPUUtilization, 0, 100):F1}%" : "0%");"></div>
                     </div>
                 </div>
                 <div class="metric-row">
                     <div class="metric-header">
                         <span>内存 (@(_apiRealTimeModel != null ? $"{_apiRealTimeModel.Memory.UsedString} / {_apiRealTimeModel.Memory.TotalString}" : "-"))</span>
-                        <span>@(_apiRealTimeModel != null && _apiRealTimeModel.Memory.Total > 0 ? $"{_apiRealTimeModel.Memory.Used / _apiRealTimeModel.Memory.Total * 100:F1}%" : "-")</span>
+                        <span>@GetMemoryPercentText(_apiRealTimeModel)</span>
                     </div>
                     <div class="metric-bar-bg">
-                        <div class="metric-bar-fill" style="width: @(_apiRealTimeModel != null && _apiRealTimeModel.Memory.Total > 0 ? $"{Math.Clamp(_apiRealTimeModel.Memory.Used / _apiRealTimeModel.Memory.Total * 100, 0, 100):F1}%" : "0%");"></div>
+                        <div class="metric-bar-fill @GetMetricColorClass(GetMemoryPercent(_apiRealTimeModel))" style="width: @GetMemoryBarWidth(_apiRealTimeModel);"></div>
                     </div>
                 </div>
             </div>
@@ -101,6 +119,10 @@
                     <span class="prop-label">最近更新</span>
                     <span class="prop-value">@(_blazorStaticModel?.LastUpdateTime.ToString("yyyy-MM-dd HH:mm") ?? "—")</span>
                 </div>
+                <div class="prop-item">
+                    <span class="prop-label">进程运行时间</span>
+                    <span class="prop-value">@FormatUptime(_blazorRealTimeModel?.ProcessUptime)</span>
+                </div>
             </div>
 
             <div class="hardware-metrics">
@@ -110,16 +132,16 @@
                         <span>@(_blazorRealTimeModel != null ? $"{_blazorRealTimeModel.CPUUtilization:F1}%" : "-")</span>
                     </div>
                     <div class="metric-bar-bg">
-                        <div class="metric-bar-fill" style="width: @(_blazorRealTimeModel != null ? $"{Math.Clamp(_blazorRealTimeModel.CPUUtilization, 0, 100):F1}%" : "0%");"></div>
+                        <div class="metric-bar-fill @GetMetricColorClass(_blazorRealTimeModel?.CPUUtilization)" style="width: @(_blazorRealTimeModel != null ? $"{Math.Clamp(_blazorRealTimeModel.CPUUtilization, 0, 100):F1}%" : "0%");"></div>
                     </div>
                 </div>
                 <div class="metric-row">
                     <div class="metric-header">
                         <span>内存 (@(_blazorRealTimeModel != null ? $"{_blazorRealTimeModel.Memory.UsedString} / {_blazorRealTimeModel.Memory.TotalString}" : "-"))</span>
-                        <span>@(_blazorRealTimeModel != null && _blazorRealTimeModel.Memory.Total > 0 ? $"{_blazorRealTimeModel.Memory.Used / _blazorRealTimeModel.Memory.Total * 100:F1}%" : "-")</span>
+                        <span>@GetMemoryPercentText(_blazorRealTimeModel)</span>
                     </div>
                     <div class="metric-bar-bg">
-                        <div class="metric-bar-fill" style="width: @(_blazorRealTimeModel != null && _blazorRealTimeModel.Memory.Total > 0 ? $"{Math.Clamp(_blazorRealTimeModel.Memory.Used / _blazorRealTimeModel.Memory.Total * 100, 0, 100):F1}%" : "0%");"></div>
+                        <div class="metric-bar-fill @GetMetricColorClass(GetMemoryPercent(_blazorRealTimeModel))" style="width: @GetMemoryBarWidth(_blazorRealTimeModel);"></div>
                     </div>
                 </div>
             </div>
@@ -147,30 +169,141 @@
     private ServerRealTimeOverviewModel? _blazorRealTimeModel;
     private UserDataOverviewModel? _userModel;
     private string? _errorMessage;
+    private DateTime? _lastRefreshTime;
+    private long? _apiLatencyMs;
+    private Timer? _refreshTimer;
 
     protected override async Task OnInitializedAsync()
+    {
+        // 首次加载所有数据
+        await LoadStaticDataAsync();
+        await RefreshRealTimeDataAsync();
+
+        // 启动 1 秒自动刷新定时器
+        _refreshTimer = new Timer(OnTimerCallback, null, 1000, 1000);
+    }
+
+    /// <summary>
+    /// 加载静态数据（仅首次）
+    /// </summary>
+    private async Task LoadStaticDataAsync()
     {
         try
         {
             var apiStaticTask = AdminQueryService.GetServerOverviewAsync();
-            var apiRtTask = AdminQueryService.GetServerRealTimeOverviewAsync();
             var userTask = AdminQueryService.GetUserDataOverviewAsync();
 
-            await Task.WhenAll(apiStaticTask, apiRtTask, userTask);
+            await Task.WhenAll(apiStaticTask, userTask);
 
             if (apiStaticTask.Result.Success) _apiStaticModel = apiStaticTask.Result.Data;
             else _errorMessage = apiStaticTask.Result.Error?.Message;
 
-            if (apiRtTask.Result.Success) _apiRealTimeModel = apiRtTask.Result.Data;
             if (userTask.Result.Success) _userModel = userTask.Result.Data;
 
-            // 调用本地 Blazor Server 静态信息，并获取本地进程状态资源
             _blazorStaticModel = SystemEnvironmentHelper.GetServerStaticDataOverview();
-            _blazorRealTimeModel = SystemEnvironmentHelper.GetServerRealTimeDataOverview();
         }
         catch (Exception ex)
         {
             _errorMessage = "获取服务器概览数据失败: " + ex.Message;
         }
+    }
+
+    /// <summary>
+    /// 刷新实时数据（CPU、内存、Uptime）
+    /// </summary>
+    private async Task RefreshRealTimeDataAsync()
+    {
+        try
+        {
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            var apiRtTask = AdminQueryService.GetServerRealTimeOverviewAsync();
+            await apiRtTask;
+            sw.Stop();
+            _apiLatencyMs = sw.ElapsedMilliseconds;
+
+            if (apiRtTask.Result.Success) _apiRealTimeModel = apiRtTask.Result.Data;
+
+            _blazorRealTimeModel = SystemEnvironmentHelper.GetServerRealTimeDataOverview();
+            _lastRefreshTime = DateTime.Now;
+        }
+        catch
+        {
+            // 静默处理刷新失败，保留上次数据
+        }
+    }
+
+    private async void OnTimerCallback(object? state)
+    {
+        await InvokeAsync(async () =>
+        {
+            await RefreshRealTimeDataAsync();
+            StateHasChanged();
+        });
+    }
+
+    #region 辅助方法
+
+    private static string FormatUptime(TimeSpan? uptime)
+    {
+        if (uptime is null) return "—";
+        var ts = uptime.Value;
+        if (ts.TotalDays >= 1)
+            return $"{(int)ts.TotalDays}天 {ts.Hours}时 {ts.Minutes}分";
+        if (ts.TotalHours >= 1)
+            return $"{(int)ts.TotalHours}时 {ts.Minutes}分 {ts.Seconds}秒";
+        if (ts.TotalMinutes >= 1)
+            return $"{(int)ts.TotalMinutes}分 {ts.Seconds}秒";
+        return $"{ts.Seconds}秒";
+    }
+
+    private static double? GetMemoryPercent(ServerRealTimeOverviewModel? model)
+    {
+        if (model == null || model.Memory.Total <= 0) return null;
+        return model.Memory.Used / model.Memory.Total * 100;
+    }
+
+    private static string GetMemoryPercentText(ServerRealTimeOverviewModel? model)
+    {
+        var pct = GetMemoryPercent(model);
+        return pct.HasValue ? $"{pct.Value:F1}%" : "-";
+    }
+
+    /// <summary>
+    /// 根据使用率百分比返回对应的颜色 CSS 类
+    /// </summary>
+    private static string GetMetricColorClass(double? percent)
+    {
+        if (percent is null) return "";
+        return percent.Value switch
+        {
+            >= 90 => "metric-critical",
+            >= 70 => "metric-warning",
+            _ => "metric-normal"
+        };
+    }
+
+    private static string GetMemoryBarWidth(ServerRealTimeOverviewModel? model)
+    {
+        var pct = GetMemoryPercent(model);
+        if (pct is not { } value) return "0%";
+        return $"{Math.Clamp(value, 0, 100):F1}%";
+    }
+
+    private static string GetLatencyColorClass(long? ms)
+    {
+        if (ms is null) return "";
+        return ms.Value switch
+        {
+            >= 500 => "text-error",
+            >= 200 => "text-warning",
+            _ => "text-success"
+        };
+    }
+
+    #endregion
+
+    public void Dispose()
+    {
+        _refreshTimer?.Dispose();
     }
 }

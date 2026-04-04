@@ -249,6 +249,34 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
         QueryParameterModel parameter, CancellationToken cancellationToken = default)
         => QueryListAsync<CommodityCodeOverviewModel>("api/commodities/ListCode", "ADMIN_COMMODITY_CODES", "兑换码", parameter, cancellationToken);
 
+    // ─── 展会编辑模型查询（P2 CRUD） ───
+
+    public Task<SdkResult<ExpoActivityEditModel>> GetExpoActivityEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<ExpoActivityEditModel, ExpoActivityEditModel>(
+            $"api/expo/EditActivity?id={id}", dto => dto,
+            "ADMIN_EXPO_ACTIVITY", "展会活动", id, cancellationToken);
+
+    public Task<SdkResult<ExpoTicketEditModel>> GetExpoTicketEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<ExpoTicketEditModel, ExpoTicketEditModel>(
+            $"api/expo/EditTicket?id={id}", dto => dto,
+            "ADMIN_EXPO_TICKET", "展会票根", id, cancellationToken);
+
+    // ─── 小卖铺编辑模型查询（P2 CRUD） ───
+
+    public Task<SdkResult<CommodityEditModel>> GetCommodityEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<CommodityEditModel, CommodityEditModel>(
+            $"api/commodities/Edit?id={id}", dto => dto,
+            "ADMIN_COMMODITY", "商品", id, cancellationToken);
+
+    public Task<SdkResult<CommodityCodeEditModel>> GetCommodityCodeEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<CommodityCodeEditModel, CommodityCodeEditModel>(
+            $"api/commodities/EditCode?id={id}", dto => dto,
+            "ADMIN_COMMODITY_CODE", "兑换码", id, cancellationToken);
+
     // ─── 词条子功能 ───
 
     public Task<SdkResult<QueryResultModel<GameRecordOverviewModel>>> GetPlayedGamesAsync(
@@ -287,4 +315,30 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
             "图表数据",
             cancellationToken);
     }
+
+    // ─── 编辑模型查询（P0 CRUD） ───
+
+    public Task<SdkResult<RecommendEditModel>> GetRecommendEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<RecommendEditModel, RecommendEditModel>(
+            $"api/recommends/Edit?id={id}", dto => dto,
+            "ADMIN_RECOMMEND", "推荐", id, cancellationToken);
+
+    public Task<SdkResult<StoreInfoEditModel>> GetStoreInfoEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<StoreInfoEditModel, StoreInfoEditModel>(
+            $"api/storeinfo/Edit?id={id}", dto => dto,
+            "ADMIN_STOREINFO", "商店信息", id, cancellationToken);
+
+    public Task<SdkResult<EntryInformationTypeEditModel>> GetEntryInformationTypeEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<EntryInformationTypeEditModel, EntryInformationTypeEditModel>(
+            $"api/entries/EditEntryInformationType?id={id}", dto => dto,
+            "ADMIN_ENTRY_INFO_TYPE", "基础信息类型", id, cancellationToken);
+
+    public Task<SdkResult<RankEditModel>> GetRankEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<RankEditModel, RankEditModel>(
+            $"api/ranks/Edit?id={id}", dto => dto,
+            "ADMIN_RANK", "头衔", id, cancellationToken);
 }

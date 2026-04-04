@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.Core.Helpers;
+using CnGalWebSite.Core.Helpers;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace CnGalWebSite.HealthCheck.Checks
@@ -7,8 +7,7 @@ namespace CnGalWebSite.HealthCheck.Checks
     {
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
-            var client = new MemoryMetricsClient();
-            var metrics = client.GetMetrics();
+            var metrics = MemoryMetricsClient.GetMetrics();
             var percentUsed = 100 * metrics.Used / metrics.Total;
 
             var status = HealthStatus.Healthy;

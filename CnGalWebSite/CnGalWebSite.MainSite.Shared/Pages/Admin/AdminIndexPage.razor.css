@@ -83,6 +83,14 @@
     color: var(--cg-color-success);
 }
 
+.text-warning {
+    color: var(--cg-color-warning);
+}
+
+.text-error {
+    color: var(--cg-color-error, #ef4444);
+}
+
 .hardware-metrics {
     display: flex;
     flex-direction: column;
@@ -116,4 +124,26 @@
     height: 100%;
     border-radius: var(--cg-radius-full);
     background-color: var(--cg-color-primary);
+    transition: width 0.6s ease, background-color 0.4s ease;
+}
+
+/* 负载等级颜色 */
+.metric-bar-fill.metric-normal {
+    background-color: var(--cg-color-success);
+}
+
+.metric-bar-fill.metric-warning {
+    background-color: var(--cg-color-warning);
+}
+
+.metric-bar-fill.metric-critical {
+    background-color: var(--cg-color-error, #ef4444);
+}
+
+/* 刷新时间显示 */
+.refresh-time {
+    margin-left: auto;
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-normal);
+    color: var(--cg-color-text-muted);
 }

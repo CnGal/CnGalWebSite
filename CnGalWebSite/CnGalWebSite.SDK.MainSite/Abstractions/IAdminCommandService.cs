@@ -1,5 +1,11 @@
+﻿using CnGalWebSite.DataModel.ViewModel.Commodities;
+using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.Expo;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.News;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
+using CnGalWebSite.DataModel.ViewModel.Recommends;
+using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.SDK.MainSite.Models;
 
 namespace CnGalWebSite.SDK.MainSite.Abstractions;
@@ -47,6 +53,18 @@ public interface IAdminCommandService
     /// 设置词条可否评论。
     /// </summary>
     Task<SdkResult<bool>> EditEntryCanCommentAsync(int[] ids, bool canComment, CancellationToken cancellationToken = default);
+
+    // ─── 游玩记录操作 ───
+
+    /// <summary>
+    /// 隐藏或显示游玩记录。
+    /// </summary>
+    Task<SdkResult<bool>> HidePlayedGameAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 公开或隐藏游玩记录的公开状态。
+    /// </summary>
+    Task<SdkResult<bool>> ShowPubliclyPlayedGameAsync(long[] ids, bool showPublicly, CancellationToken cancellationToken = default);
 
     // ─── 文章操作 ───
 
@@ -96,6 +114,26 @@ public interface IAdminCommandService
     // ─── 用户操作 ───
 
     Task<SdkResult<bool>> EditSpaceCanCommentAsync(string[] ids, bool canComment, CancellationToken cancellationToken = default);
+
+    // ─── 头衔操作 ───
+
+    Task<SdkResult<bool>> EditRankAsync(RankEditModel model, CancellationToken cancellationToken = default);
+
+    Task<SdkResult<bool>> EditRankPriorityAsync(long[] ids, int plusPriority, CancellationToken cancellationToken = default);
+
+    Task<SdkResult<bool>> HideRankAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default);
+
+    // ─── 推荐操作 ───
+
+    Task<SdkResult<bool>> EditRecommendAsync(RecommendEditModel model, CancellationToken cancellationToken = default);
+
+    // ─── 商店信息操作 ───
+
+    Task<SdkResult<bool>> EditStoreInfoAsync(StoreInfoEditModel model, CancellationToken cancellationToken = default);
+
+    // ─── 基础信息类型操作 ───
+
+    Task<SdkResult<bool>> EditEntryInformationTypeAsync(EntryInformationTypeEditModel model, CancellationToken cancellationToken = default);
 
     // ─── 备份操作 ───
 
@@ -156,4 +194,28 @@ public interface IAdminCommandService
     /// 重置周报内容。
     /// </summary>
     Task<SdkResult<bool>> ResetWeeklyNewsAsync(long id, CancellationToken cancellationToken = default);
+
+    // ─── 展会操作 ───
+
+    /// <summary>
+    /// 编辑/新增展会活动。
+    /// </summary>
+    Task<SdkResult<bool>> EditExpoActivityAsync(ExpoActivityEditModel model, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 编辑/新增展会票根。
+    /// </summary>
+    Task<SdkResult<bool>> EditExpoTicketAsync(ExpoTicketEditModel model, CancellationToken cancellationToken = default);
+
+    // ─── 商品操作 ───
+
+    /// <summary>
+    /// 编辑/新增商品。
+    /// </summary>
+    Task<SdkResult<bool>> EditCommodityAsync(CommodityEditModel model, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 编辑/新增兑换码。
+    /// </summary>
+    Task<SdkResult<bool>> EditCommodityCodeAsync(CommodityCodeEditModel model, CancellationToken cancellationToken = default);
 }

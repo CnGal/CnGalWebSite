@@ -25,4 +25,14 @@ public interface ITimedTaskService
     /// 暂停/恢复定时任务。
     /// </summary>
     Task<SdkResult<bool>> PauseTimedTaskAsync(int[] ids, bool isPause, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取定时任务编辑模型。
+    /// </summary>
+    Task<SdkResult<TimedTaskEditModel>> GetTimedTaskEditAsync(long id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 编辑或添加定时任务。
+    /// </summary>
+    Task<SdkResult<bool>> EditTimedTaskAsync(TimedTaskEditModel model, CancellationToken cancellationToken = default);
 }

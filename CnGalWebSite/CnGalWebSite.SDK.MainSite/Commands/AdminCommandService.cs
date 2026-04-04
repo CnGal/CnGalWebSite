@@ -1,12 +1,18 @@
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.BackUpArchives;
+using CnGalWebSite.DataModel.ViewModel.Commodities;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.DataModel.ViewModel.Entries;
+using CnGalWebSite.DataModel.ViewModel.Expo;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.News;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
+using CnGalWebSite.DataModel.ViewModel.PlayedGames;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
+using CnGalWebSite.DataModel.ViewModel.Recommends;
+using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.SDK.MainSite.Abstractions;
@@ -104,6 +110,18 @@ public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminComm
         => PostCommandAsync("api/comments/EditEntryCanComment",
             new EditEntryCanCommentModel { Ids = ids, CanComment = canComment },
             "EDIT_ENTRY_CAN_COMMENT", "设置词条留言板", cancellationToken);
+
+    // ─── 游玩记录 ───
+
+    public Task<SdkResult<bool>> HidePlayedGameAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/playedgame/HiddenGameRecord",
+            new HiddenGameRecordModel { PlayedGameIds = ids, IsHidden = isHidden },
+            "HIDE_PLAYED_GAME", "操作游玩记录显隐", cancellationToken);
+
+    public Task<SdkResult<bool>> ShowPubliclyPlayedGameAsync(long[] ids, bool showPublicly, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/playedgame/ShowPubliclyGameRecord",
+            new HiddenGameRecordModel { PlayedGameIds = ids, IsHidden = showPublicly },
+            "SHOW_PUBLICLY_PLAYED_GAME", "操作游玩记录公开状态", cancellationToken);
 
     // ─── 文章 ───
 
@@ -211,6 +229,36 @@ public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminComm
             new RunBackUpArchiveModel { Ids = ids },
             "RUN_BACKUP", "执行备份", cancellationToken);
 
+    // ─── 头衔 ───
+
+    public Task<SdkResult<bool>> EditRankAsync(RankEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/ranks/Edit", model, "EDIT_RANK", "编辑头衔", cancellationToken);
+
+    public Task<SdkResult<bool>> EditRankPriorityAsync(long[] ids, int plusPriority, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/ranks/EditRankPriority",
+            new EditRankPriorityViewModel { Ids = ids, PlusPriority = plusPriority },
+            "EDIT_RANK_PRIORITY", "调整头衔优先级", cancellationToken);
+
+    public Task<SdkResult<bool>> HideRankAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/ranks/HiddenRank",
+            new HiddenRankModel { Ids = ids, IsHidden = isHidden },
+            "HIDE_RANK", "操作头衔显隐", cancellationToken);
+
+    // ─── 推荐 ───
+
+    public Task<SdkResult<bool>> EditRecommendAsync(RecommendEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/recommends/Edit", model, "EDIT_RECOMMEND", "编辑推荐", cancellationToken);
+
+    // ─── 商店信息 ───
+
+    public Task<SdkResult<bool>> EditStoreInfoAsync(StoreInfoEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/storeinfo/Edit", model, "EDIT_STOREINFO", "编辑商店信息", cancellationToken);
+
+    // ─── 基础信息类型 ───
+
+    public Task<SdkResult<bool>> EditEntryInformationTypeAsync(EntryInformationTypeEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/entries/EditEntryInformationType", model, "EDIT_ENTRY_INFO_TYPE", "编辑基础信息类型", cancellationToken);
+
     // ─── 轮播图 ───
 
     public Task<SdkResult<bool>> EditCarouselPriorityAsync(int[] ids, int plusPriority, CancellationToken cancellationToken = default)
@@ -262,4 +310,20 @@ public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminComm
 
     public Task<SdkResult<bool>> ResetWeeklyNewsAsync(long id, CancellationToken cancellationToken = default)
         => GetCommandAsync($"api/news/ResetWeelyNews/{id}", "RESET_WEEKLY_NEWS", "重置周报", cancellationToken);
+
+    // ─── 展会 ───
+
+    public Task<SdkResult<bool>> EditExpoActivityAsync(ExpoActivityEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/expo/EditActivity", model, "EDIT_EXPO_ACTIVITY", "编辑展会活动", cancellationToken);
+
+    public Task<SdkResult<bool>> EditExpoTicketAsync(ExpoTicketEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/expo/EditTicket", model, "EDIT_EXPO_TICKET", "编辑展会票根", cancellationToken);
+
+    // ─── 商品 ───
+
+    public Task<SdkResult<bool>> EditCommodityAsync(CommodityEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/commodities/Edit", model, "EDIT_COMMODITY", "编辑商品", cancellationToken);
+
+    public Task<SdkResult<bool>> EditCommodityCodeAsync(CommodityCodeEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/commodities/EditCode", model, "EDIT_COMMODITY_CODE", "编辑兑换码", cancellationToken);
 }

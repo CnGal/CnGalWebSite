@@ -3,8 +3,11 @@
 @layout AdminLayout
 @rendermode InteractiveServer
 @inject IAdminQueryService AdminQueryService
+@inject IAdminCommandService AdminCommandService
+@inject ICgToastService ToastService
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Expo
+@using CnGalWebSite.SDK.MainSite.Models
 
 <PageTitle>展会管理 - CnGal</PageTitle>
 
@@ -26,21 +29,35 @@
                              Title="活动列表"
                              OnServerQuery="OnQueryActivities"
                              DefaultSortField="Id"
-                             DefaultSortDesc="true">
+                             DefaultSortDesc="true"
+                             @ref="_activityTable">
+                    <ToolbarContent>
+                        <CgButton Variant="outline" OnClick="OnCreateActivityAsync">
+                            <CgMdiIcon Name="mdiPlus" />
+                            添加活动
+                        </CgButton>
+                    </ToolbarContent>
+                    <ChildContent>
                     <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="Id" Field="Id" Width="80px" />
                     <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="名称" Field="Name" />
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="前景图" Sortable="false" Width="60px">
+                        <ChildContent Context="item">
+                            @if (!string.IsNullOrWhiteSpace(item.ForegroundImage))
+                            { <img src="@item.ForegroundImage" alt="前景图" style="width: 32px; height: 32px; border-radius: 4px; object-fit: cover;" /> }
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="背景图" Sortable="false" Width="60px">
+                        <ChildContent Context="item">
+                            @if (!string.IsNullOrWhiteSpace(item.BackgroundImage))
+                            { <img src="@item.BackgroundImage" alt="背景图" style="width: 32px; height: 32px; border-radius: 4px; object-fit: cover;" /> }
+                        </ChildContent>
+                    </CgDataTableColumn>
                     <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="优先级" Field="Priority" Width="80px" />
                     <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="票根数" Field="TicketCount" Width="80px" />
                     <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="状态" Field="Hidden">
                         <ChildContent Context="item">
-                            @if (item.Hidden)
-                            {
-                                <span class="admin-badge admin-badge--hidden">已隐藏</span>
-                            }
-                            else
-                            {
-                                <span class="admin-badge admin-badge--visible">可见</span>
-                            }
+                            @if (item.Hidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
+                            else { <span class="admin-badge admin-badge--visible">可见</span> }
                         </ChildContent>
                     </CgDataTableColumn>
                     <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="创建时间" Field="CreateTime" Width="160px">
@@ -48,6 +65,14 @@
                             @item.CreateTime.ToString("yyyy-MM-dd HH:mm")
                         </ChildContent>
                     </CgDataTableColumn>
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="操作" Sortable="false" Width="60px">
+                        <ChildContent Context="item">
+                            <div class="admin-actions">
+                                <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditActivityAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                            </div>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    </ChildContent>
                 </CgDataTable>
             }
             else if (context == "tickets")
@@ -56,22 +81,30 @@
                              Title="票根列表"
                              OnServerQuery="OnQueryTickets"
                              DefaultSortField="Id"
-                             DefaultSortDesc="true">
+                             DefaultSortDesc="true"
+                             @ref="_ticketTable">
+                    <ToolbarContent>
+                        <CgButton Variant="outline" OnClick="OnCreateTicketAsync">
+                            <CgMdiIcon Name="mdiPlus" />
+                            添加票根
+                        </CgButton>
+                    </ToolbarContent>
+                    <ChildContent>
                     <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="Id" Field="Id" Width="80px" />
                     <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="昵称" Field="Nickname" />
                     <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="活动" Field="ActivityName" />
                     <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="座位" Field="SeatInfo" />
                     <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="编号" Field="Number" Width="80px" />
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="图片" Sortable="false" Width="60px">
+                        <ChildContent Context="item">
+                            @if (!string.IsNullOrWhiteSpace(item.Image))
+                            { <img src="@item.Image" alt="票根图片" style="width: 32px; height: 32px; border-radius: 4px; object-fit: cover;" /> }
+                        </ChildContent>
+                    </CgDataTableColumn>
                     <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="状态" Field="Hidden">
                         <ChildContent Context="item">
-                            @if (item.Hidden)
-                            {
-                                <span class="admin-badge admin-badge--hidden">已隐藏</span>
-                            }
-                            else
-                            {
-                                <span class="admin-badge admin-badge--visible">可见</span>
-                            }
+                            @if (item.Hidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
+                            else { <span class="admin-badge admin-badge--visible">可见</span> }
                         </ChildContent>
                     </CgDataTableColumn>
                     <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="创建时间" Field="CreateTime" Width="160px">
@@ -79,54 +112,231 @@
                             @item.CreateTime.ToString("yyyy-MM-dd HH:mm")
                         </ChildContent>
                     </CgDataTableColumn>
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="操作" Sortable="false" Width="60px">
+                        <ChildContent Context="item">
+                            <div class="admin-actions">
+                                <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditTicketAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                            </div>
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    </ChildContent>
                 </CgDataTable>
             }
         </PanelTemplate>
     </CgTabs>
 </div>
 
+@* ─── 活动编辑弹窗 ─── *@
+
+<CgModal IsOpen="_showActivityModal" OnClose="() => _showActivityModal = false" Title="@(_isNewActivity ? "添加活动" : "编辑活动")">
+    <ChildContent>
+        <CgFormSection Flat>
+            @if (_activityEditModel != null)
+            {
+                <CgFormGroup Label="名称" Required="true">
+                    <CgInput @bind-Value="_activityEditModel.Name" Placeholder="活动名称" />
+                </CgFormGroup>
+                <CgFormGroup Label="描述">
+                    <CgTextarea @bind-Value="_activityEditModel.Description" Placeholder="活动描述" />
+                </CgFormGroup>
+                <CgFormGroup Label="前景图">
+                    <CgImageUpload @bind-Value="_activityEditModel.ForegroundImage" />
+                </CgFormGroup>
+                <CgFormGroup Label="背景图">
+                    <CgImageUpload @bind-Value="_activityEditModel.BackgroundImage" />
+                </CgFormGroup>
+                <CgFormGroup Label="优先级">
+                    <CgInput @bind-Value="_activityEditModel.Priority" />
+                </CgFormGroup>
+                <CgFormGroup Label="是否隐藏">
+                    <CgCheckbox @bind-Value="_activityEditModel.Hidden" Label="隐藏此活动" />
+                </CgFormGroup>
+            }
+            else
+            {
+                <div class="admin-loading-state">
+                    <CgProgressRing />
+                    <span class="admin-loading-state__text">正在加载...</span>
+                </div>
+            }
+        </CgFormSection>
+    </ChildContent>
+    <Footer>
+        <div class="admin-modal-footer">
+            <CgButton Variant="secondary" OnClick="() => _showActivityModal = false">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="SaveActivityAsync">保存</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
+@* ─── 票根编辑弹窗 ─── *@
+
+<CgModal IsOpen="_showTicketModal" OnClose="() => _showTicketModal = false" Title="@(_isNewTicket ? "添加票根" : "编辑票根")">
+    <ChildContent>
+        <CgFormSection Flat>
+            @if (_ticketEditModel != null)
+            {
+                <CgFormGroup Label="活动ID" Required="true">
+                    <CgInput @bind-Value="_ticketEditModel.ActivityId" Placeholder="活动ID" />
+                </CgFormGroup>
+                <CgFormGroup Label="昵称">
+                    <CgInput @bind-Value="_ticketEditModel.Nickname" Placeholder="昵称" />
+                </CgFormGroup>
+                <CgFormGroup Label="座位信息">
+                    <CgInput @bind-Value="_ticketEditModel.SeatInfo" Placeholder="座位信息" />
+                </CgFormGroup>
+                <CgFormGroup Label="编号">
+                    <CgInput @bind-Value="_ticketEditModel.Number" />
+                </CgFormGroup>
+                <CgFormGroup Label="票根图片">
+                    <CgImageUpload @bind-Value="_ticketEditModel.Image" />
+                </CgFormGroup>
+                <CgFormGroup Label="是否隐藏">
+                    <CgCheckbox @bind-Value="_ticketEditModel.Hidden" Label="隐藏此票根" />
+                </CgFormGroup>
+            }
+            else
+            {
+                <div class="admin-loading-state">
+                    <CgProgressRing />
+                    <span class="admin-loading-state__text">正在加载...</span>
+                </div>
+            }
+        </CgFormSection>
+    </ChildContent>
+    <Footer>
+        <div class="admin-modal-footer">
+            <CgButton Variant="secondary" OnClick="() => _showTicketModal = false">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="SaveTicketAsync">保存</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
 @code {
+    private CgDataTable<ExpoActivityOverviewModel>? _activityTable;
+    private CgDataTable<ExpoTicketOverviewModel>? _ticketTable;
+    private bool _showActivityModal;
+    private bool _isNewActivity;
+    private ExpoActivityEditModel? _activityEditModel;
+    private bool _showTicketModal;
+    private bool _isNewTicket;
+    private ExpoTicketEditModel? _ticketEditModel;
+
     private readonly IReadOnlyList<CgTabItem> _tabs =
     [
         new CgTabItem("activities", "活动管理", "mdiCalendarStar"),
         new CgTabItem("tickets", "票根管理", "mdiTicket"),
     ];
 
+    // ─── 活动查询 ───
+
     private async Task<CgDataTableResult<ExpoActivityOverviewModel>> OnQueryActivities(CgDataTableRequest request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
-
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
         var result = await AdminQueryService.GetExpoActivitiesAsync(parameter);
-        if (result.Success && result.Data is not null)
-        {
-            return new CgDataTableResult<ExpoActivityOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
-        }
-        return new CgDataTableResult<ExpoActivityOverviewModel>([], 0);
+        return result.Success && result.Data is not null ? new CgDataTableResult<ExpoActivityOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<ExpoActivityOverviewModel>([], 0);
     }
+
+    // ─── 票根查询 ───
 
     private async Task<CgDataTableResult<ExpoTicketOverviewModel>> OnQueryTickets(CgDataTableRequest request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
-
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
         var result = await AdminQueryService.GetExpoTicketsAsync(parameter);
-        if (result.Success && result.Data is not null)
+        return result.Success && result.Data is not null ? new CgDataTableResult<ExpoTicketOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<ExpoTicketOverviewModel>([], 0);
+    }
+
+    // ─── 活动 CRUD ───
+
+    private async Task OnCreateActivityAsync()
+    {
+        _isNewActivity = true;
+        _activityEditModel = new ExpoActivityEditModel();
+        _showActivityModal = true;
+        await Task.CompletedTask;
+    }
+
+    private async Task OnEditActivityAsync(ExpoActivityOverviewModel model)
+    {
+        _isNewActivity = false;
+        _activityEditModel = null;
+        _showActivityModal = true;
+        StateHasChanged();
+
+        var result = await AdminQueryService.GetExpoActivityEditAsync(model.Id);
+        if (result.Success && result.Data != null)
         {
-            return new CgDataTableResult<ExpoTicketOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+            _activityEditModel = result.Data;
+            StateHasChanged();
         }
-        return new CgDataTableResult<ExpoTicketOverviewModel>([], 0);
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取详情失败", variant: "error");
+            _showActivityModal = false;
+        }
+    }
+
+    private async Task SaveActivityAsync()
+    {
+        if (_activityEditModel == null) return;
+
+        var result = await AdminCommandService.EditExpoActivityAsync(_activityEditModel);
+        if (result.Success)
+        {
+            ToastService.Show("活动已保存", variant: "success");
+            _showActivityModal = false;
+            if (_activityTable != null) await _activityTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
+        }
+    }
+
+    // ─── 票根 CRUD ───
+
+    private async Task OnCreateTicketAsync()
+    {
+        _isNewTicket = true;
+        _ticketEditModel = new ExpoTicketEditModel();
+        _showTicketModal = true;
+        await Task.CompletedTask;
+    }
+
+    private async Task OnEditTicketAsync(ExpoTicketOverviewModel model)
+    {
+        _isNewTicket = false;
+        _ticketEditModel = null;
+        _showTicketModal = true;
+        StateHasChanged();
+
+        var result = await AdminQueryService.GetExpoTicketEditAsync(model.Id);
+        if (result.Success && result.Data != null)
+        {
+            _ticketEditModel = result.Data;
+            StateHasChanged();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取详情失败", variant: "error");
+            _showTicketModal = false;
+        }
+    }
+
+    private async Task SaveTicketAsync()
+    {
+        if (_ticketEditModel == null) return;
+
+        var result = await AdminCommandService.EditExpoTicketAsync(_ticketEditModel);
+        if (result.Success)
+        {
+            ToastService.Show("票根已保存", variant: "success");
+            _showTicketModal = false;
+            if (_ticketTable != null) await _ticketTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
+        }
     }
 }
