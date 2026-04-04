@@ -10,6 +10,7 @@ using CnGalWebSite.DataModel.ViewModel.Favorites;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.News;
+using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
@@ -173,6 +174,30 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
     public Task<SdkResult<QueryResultModel<WeeklyNewsOverviewModel>>> GetWeeklyNewsAsync(
         QueryParameterModel parameter, CancellationToken cancellationToken = default)
         => QueryListAsync<WeeklyNewsOverviewModel>("api/news/ListWeeklyNews", "ADMIN_WEEKLY_NEWS", "周报", parameter, cancellationToken);
+
+    public Task<SdkResult<EditGameNewsModel>> GetGameNewsEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<EditGameNewsModel, EditGameNewsModel>(
+            $"api/news/EditGameNews/{id}", dto => dto,
+            "ADMIN_GAME_NEWS", "动态", id, cancellationToken);
+
+    public Task<SdkResult<EditWeeklyNewsModel>> GetWeeklyNewsEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<EditWeeklyNewsModel, EditWeeklyNewsModel>(
+            $"api/news/EditWeeklyNews/{id}", dto => dto,
+            "ADMIN_WEEKLY_NEWS", "周报", id, cancellationToken);
+
+    public Task<SdkResult<ArticleViewModel>> GetGameNewsPreviewAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<ArticleViewModel, ArticleViewModel>(
+            $"api/news/GetGameNewsPreview/{id}", dto => dto,
+            "ADMIN_GAME_NEWS_PREVIEW", "动态预览", id, cancellationToken);
+
+    public Task<SdkResult<ArticleViewModel>> GetWeeklyNewsPreviewAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<ArticleViewModel, ArticleViewModel>(
+            $"api/news/GetWeelyNewsPreview/{id}", dto => dto,
+            "ADMIN_WEEKLY_NEWS_PREVIEW", "周报预览", id, cancellationToken);
 
     // ─── 展会管理 ───
 

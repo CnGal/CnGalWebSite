@@ -1,11 +1,16 @@
-@page "/admin/listnews"
-@attribute [Authorize(Roles = "Admin")]
+﻿@page "/admin/listnews"
+@attribute [Authorize(Roles = "Editor")]
 @layout AdminLayout
 @rendermode InteractiveServer
 @inject IAdminQueryService AdminQueryService
+@inject IAdminCommandService AdminCommandService
+@inject ICgToastService ToastService
 @using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.ViewModel.News
+@using CnGalWebSite.DataModel.ViewModel.Articles
+@using CnGalWebSite.DataModel.ViewModel
 
 <PageTitle>动态管理 - CnGal</PageTitle>
 
@@ -14,6 +19,16 @@
         <CgMdiIcon Name="mdiNewspaperVariantOutline" aria-hidden="true" />
         动态管理
     </h1>
+
+    @* ── 顶部操作按钮 ── *@
+    <div class="admin-news-toolbar">
+        <CgButton Variant="primary" Size="sm" OnClick="OpenAddNewsModal">
+            <CgMdiIcon Name="mdiPlus" aria-hidden="true" /> 添加动态
+        </CgButton>
+        <CgButton Variant="secondary" Size="sm" OnClick="() => _showWeiboModal = true">
+            <CgMdiIcon Name="mdiSinaWeibo" aria-hidden="true" /> 导入微博
+        </CgButton>
+    </div>
 
     <CgTabs Items="@_tabs"
             DefaultActiveKey="gamenews"
@@ -27,7 +42,8 @@
                              Title="游戏动态列表"
                              OnServerQuery="OnQueryGameNews"
                              DefaultSortField="Id"
-                             DefaultSortDesc="true">
+                             DefaultSortDesc="true"
+                             @ref="_gameNewsTable">
                     <CgDataTableColumn TItem="GameNewsOverviewModel" Title="Id" Field="Id" Width="80px" />
                     <CgDataTableColumn TItem="GameNewsOverviewModel" Title="标题" Field="Title">
                         <ChildContent Context="item">
@@ -44,12 +60,29 @@
                     <CgDataTableColumn TItem="GameNewsOverviewModel" Title="作者" Field="Author" Width="120px" />
                     <CgDataTableColumn TItem="GameNewsOverviewModel" Title="状态" Field="State">
                         <ChildContent Context="item">
-                            <span class="admin-badge">@item.State</span>
+                            <span class="admin-badge @GetStateBadgeClass(item.State)">@item.State.GetDisplayName()</span>
                         </ChildContent>
                     </CgDataTableColumn>
                     <CgDataTableColumn TItem="GameNewsOverviewModel" Title="发布时间" Field="PublishTime" Width="160px">
                         <ChildContent Context="item">
                             @item.PublishTime.ToString("yyyy-MM-dd HH:mm")
+                        </ChildContent>
+                    </CgDataTableColumn>
+                    <CgDataTableColumn TItem="GameNewsOverviewModel" Title="操作" Sortable="false" Width="220px">
+                        <ChildContent Context="item">
+                            <div class="admin-actions">
+                                <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OpenEditGameNewsModal(item.Id)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                                @if (item.State == GameNewsState.Edit)
+                                {
+                                    <button class="admin-action-btn admin-action-btn--publish" title="发布" @onclick="() => PublishGameNews(item.Id)"><CgMdiIcon Name="mdiPublish" aria-hidden="true" /></button>
+                                    <button class="admin-action-btn admin-action-btn--hide" title="忽略" @onclick="() => IgnoreGameNews(item.Id, true)"><CgMdiIcon Name="mdiEyeOffOutline" aria-hidden="true" /></button>
+                                }
+                                else if (item.State == GameNewsState.Ignore)
+                                {
+                                    <button class="admin-action-btn admin-action-btn--show" title="恢复" @onclick="() => IgnoreGameNews(item.Id, false)"><CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" /></button>
+                                }
+                                <button class="admin-action-btn admin-action-btn--preview" title="预览" @onclick="() => PreviewGameNews(item.Id)"><CgMdiIcon Name="mdiEye" aria-hidden="true" /></button>
+                            </div>
                         </ChildContent>
                     </CgDataTableColumn>
                 </CgDataTable>
@@ -60,7 +93,8 @@
                              Title="周报列表"
                              OnServerQuery="OnQueryWeeklyNews"
                              DefaultSortField="Id"
-                             DefaultSortDesc="true">
+                             DefaultSortDesc="true"
+                             @ref="_weeklyNewsTable">
                     <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="Id" Field="Id" Width="80px" />
                     <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="标题" Field="Title">
                         <ChildContent Context="item">
@@ -76,7 +110,7 @@
                     </CgDataTableColumn>
                     <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="状态" Field="State">
                         <ChildContent Context="item">
-                            <span class="admin-badge">@item.State</span>
+                            <span class="admin-badge @GetStateBadgeClass(item.State)">@item.State.GetDisplayName()</span>
                         </ChildContent>
                     </CgDataTableColumn>
                     <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="发布时间" Field="PublishTime" Width="160px">
@@ -89,18 +123,244 @@
                             @item.CreateTime.ToString("yyyy-MM-dd HH:mm")
                         </ChildContent>
                     </CgDataTableColumn>
+                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="操作" Sortable="false" Width="220px">
+                        <ChildContent Context="item">
+                            <div class="admin-actions">
+                                <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OpenEditWeeklyNewsModal(item.Id)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                                @if (item.State == GameNewsState.Edit)
+                                {
+                                    <button class="admin-action-btn admin-action-btn--publish" title="发布" @onclick="() => PublishWeeklyNews(item.Id)"><CgMdiIcon Name="mdiPublish" aria-hidden="true" /></button>
+                                }
+                                <button class="admin-action-btn admin-action-btn--reset" title="重置" @onclick="() => ResetWeeklyNews(item.Id)"><CgMdiIcon Name="mdiRefresh" aria-hidden="true" /></button>
+                                <button class="admin-action-btn admin-action-btn--preview" title="预览" @onclick="() => PreviewWeeklyNews(item.Id)"><CgMdiIcon Name="mdiEye" aria-hidden="true" /></button>
+                            </div>
+                        </ChildContent>
+                    </CgDataTableColumn>
                 </CgDataTable>
             }
         </PanelTemplate>
     </CgTabs>
 </div>
 
+@* ═══════════════════  动态编辑弹窗  ═══════════════════ *@
+<CgModal IsOpen="_showEditGameNewsModal" Title="@(_isAddingNews ? "添加动态" : "编辑动态")" OnClose="CloseEditGameNewsModal">
+    <ChildContent>
+    @if (_editingGameNews != null)
+    {
+        <CgFormSection Title="基本信息" Icon="mdiInformationOutline" Flat>
+            <CgFormGroup Label="标题">
+                <CgInput @bind-Value="_editingGameNews.Title" Placeholder="请输入标题" />
+            </CgFormGroup>
+            <CgFormGroup Label="作者">
+                <CgInput @bind-Value="_editingGameNews.Author" Placeholder="请输入作者" />
+            </CgFormGroup>
+            <CgFormGroup Label="简介">
+                <CgTextarea @bind-Value="_editingGameNews.BriefIntroduction" Placeholder="请输入简介" />
+            </CgFormGroup>
+            <CgFormGroup Label="主图链接">
+                <CgInput @bind-Value="_editingGameNews.MainPicture" Placeholder="请输入主图URL" />
+            </CgFormGroup>
+        </CgFormSection>
+
+        <CgFormSection Title="分类与来源" Icon="mdiTagOutline" Flat>
+            <CgFormGroup Label="文章类型">
+                <CgEnumSelect TEnum="ArticleType" @bind-Value="_editingGameNews.Type" />
+            </CgFormGroup>
+            <CgFormGroup Label="动态类型">
+                <CgInput @bind-Value="_editingGameNews.NewsType" Placeholder="例如：新闻、公告等" />
+            </CgFormGroup>
+            <CgFormGroup Label="来源类型">
+                <CgEnumSelect TEnum="OriginalRSSType" @bind-Value="_editingGameNews.RssType" />
+            </CgFormGroup>
+            <CgFormGroup Label="原文链接">
+                <CgInput @bind-Value="_editingGameNews.Link" Placeholder="请输入原文链接" />
+            </CgFormGroup>
+            <CgFormGroup Label="原文发布时间">
+                <CgDateInput @bind-Value="_gameNewsPublishTime" Mode="CgDateInputMode.DateTime" />
+            </CgFormGroup>
+        </CgFormSection>
+
+        <CgFormSection Title="作者关联" Icon="mdiAccountOutline" Flat>
+            <CgFormGroup Label="微博Id">
+                <CgInput @bind-Value="_editingGameNews.WeiboId" Placeholder="请输入微博Id" />
+            </CgFormGroup>
+            <CgFormGroup Label="关联词条名称">
+                <CgInput @bind-Value="_editingGameNews.AuthorEntryName" Placeholder="请输入关联词条名称" />
+            </CgFormGroup>
+        </CgFormSection>
+
+        <CgFormSection Title="关联词条" Icon="mdiLinkVariant" Flat>
+            @for (var i = 0; i < _editingGameNews.Entries.Count; i++)
+            {
+                var index = i;
+                <div class="admin-news-entry-row">
+                    <CgInput Value="@_editingGameNews.Entries[index].DisplayName" TValue="string"
+                             ValueChanged="v => _editingGameNews.Entries[index].DisplayName = v"
+                             Placeholder="词条名称" />
+                    <button class="admin-action-btn admin-action-btn--delete" title="删除" @onclick="() => _editingGameNews.Entries.RemoveAt(index)">
+                        <CgMdiIcon Name="mdiClose" aria-hidden="true" />
+                    </button>
+                </div>
+            }
+            <CgButton Variant="outline" Size="sm" OnClick="() => _editingGameNews.Entries.Add(new RelevancesModel())">
+                <CgMdiIcon Name="mdiPlus" aria-hidden="true" /> 添加词条
+            </CgButton>
+        </CgFormSection>
+
+        <CgFormSection Title="正文" Icon="mdiTextBoxOutline" Flat>
+            <CgFormGroup Label="正文内容 (Markdown)">
+                <CgTextarea @bind-Value="_editingGameNews.MainPage" Placeholder="请输入正文内容（支持Markdown）" />
+            </CgFormGroup>
+        </CgFormSection>
+    }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="secondary" OnClick="CloseEditGameNewsModal">取消</CgButton>
+        <CgButton Variant="primary" Async OnClick="SaveGameNews">保存</CgButton>
+    </Footer>
+</CgModal>
+
+@* ═══════════════════  周报编辑弹窗  ═══════════════════ *@
+<CgModal IsOpen="_showEditWeeklyNewsModal" Title="编辑周报" OnClose="CloseEditWeeklyNewsModal">
+    <ChildContent>
+    @if (_editingWeeklyNews != null)
+    {
+        <CgFormSection Title="基本信息" Icon="mdiInformationOutline" Flat>
+            <CgFormGroup Label="标题">
+                <CgInput @bind-Value="_editingWeeklyNews.Title" Placeholder="请输入标题" />
+            </CgFormGroup>
+            <CgFormGroup Label="简介">
+                <CgTextarea @bind-Value="_editingWeeklyNews.BriefIntroduction" Placeholder="请输入简介" />
+            </CgFormGroup>
+            <CgFormGroup Label="主图链接">
+                <CgInput @bind-Value="_editingWeeklyNews.MainPicture" Placeholder="请输入主图URL" />
+            </CgFormGroup>
+        </CgFormSection>
+
+        <CgFormSection Title="时间与类型" Icon="mdiClockOutline" Flat>
+            <CgFormGroup Label="文章类型">
+                <CgEnumSelect TEnum="ArticleType" @bind-Value="_editingWeeklyNews.Type" />
+            </CgFormGroup>
+            <CgFormGroup Label="发布时间">
+                <CgDateInput @bind-Value="_weeklyNewsPublishTime" Mode="CgDateInputMode.DateTime" />
+            </CgFormGroup>
+            <CgFormGroup Label="创建时间">
+                <CgDateInput @bind-Value="_weeklyNewsCreateTime" Mode="CgDateInputMode.DateTime" />
+            </CgFormGroup>
+        </CgFormSection>
+
+        <CgFormSection Title="关联动态" Icon="mdiNewspaperVariantOutline" Flat>
+            @if (_editingWeeklyNews.News.Any())
+            {
+                @foreach (var newsItem in _editingWeeklyNews.News)
+                {
+                    <CgCheckbox @bind-Value="newsItem.IsSelected"
+                                Label="@($"[{newsItem.NewsId}] {newsItem.NewsTitle}")" />
+                }
+            }
+            else
+            {
+                <p class="admin-empty-text">该周没有可关联的动态</p>
+            }
+        </CgFormSection>
+
+        <CgFormSection Title="正文" Icon="mdiTextBoxOutline" Flat>
+            <CgFormGroup Label="正文内容 (Markdown)">
+                <CgTextarea @bind-Value="_editingWeeklyNews.MainPage" Placeholder="请输入正文内容（支持Markdown）" />
+            </CgFormGroup>
+        </CgFormSection>
+    }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="secondary" OnClick="CloseEditWeeklyNewsModal">取消</CgButton>
+        <CgButton Variant="primary" Async OnClick="SaveWeeklyNews">保存</CgButton>
+    </Footer>
+</CgModal>
+
+@* ═══════════════════  微博导入弹窗  ═══════════════════ *@
+<CgModal IsOpen="_showWeiboModal" Title="导入微博动态" OnClose="() => _showWeiboModal = false">
+    <ChildContent>
+    <CgFormGroup Label="微博链接">
+        <CgInput @bind-Value="_weiboLink" Placeholder="请粘贴微博链接" />
+    </CgFormGroup>
+    </ChildContent>
+
+    <Footer>
+        <CgButton Variant="secondary" OnClick="() => _showWeiboModal = false">取消</CgButton>
+        <CgButton Variant="primary" Async OnClick="ImportWeiboNews">导入</CgButton>
+    </Footer>
+</CgModal>
+
+@* ═══════════════════  预览弹窗  ═══════════════════ *@
+<CgModal IsOpen="_showPreviewModal" Title="@(_previewTitle ?? "预览")" OnClose="() => _showPreviewModal = false">
+    <ChildContent>
+    @if (_previewLoading)
+    {
+        <div class="admin-preview-loading">
+            <CgProgressRing />
+        </div>
+    }
+    else if (_previewContent != null)
+    {
+        <div class="admin-preview-meta">
+            @if (!string.IsNullOrWhiteSpace(_previewContent.OriginalAuthor))
+            {
+                <span class="admin-preview-author">
+                    <CgMdiIcon Name="mdiAccountOutline" aria-hidden="true" /> @_previewContent.OriginalAuthor
+                </span>
+            }
+            @if (_previewContent.PubishTime.HasValue)
+            {
+                <span class="admin-preview-time">
+                    <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" /> @_previewContent.PubishTime.Value.ToString("yyyy-MM-dd HH:mm")
+                </span>
+            }
+        </div>
+        <CgHtmlContent Content="@_previewContent.MainPage" />
+    }
+    else
+    {
+        <CgAlert Variant="error">预览加载失败</CgAlert>
+    }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="secondary" OnClick="() => _showPreviewModal = false">关闭</CgButton>
+    </Footer>
+</CgModal>
+
 @code {
+    private CgDataTable<GameNewsOverviewModel>? _gameNewsTable;
+    private CgDataTable<WeeklyNewsOverviewModel>? _weeklyNewsTable;
+
     private readonly IReadOnlyList<CgTabItem> _tabs =
     [
         new CgTabItem("gamenews", "动态", "mdiNewspaperVariantOutline"),
         new CgTabItem("weeklynews", "周报", "mdiCalendarRange"),
     ];
+
+    // ─── 动态编辑状态 ───
+    private bool _showEditGameNewsModal;
+    private bool _isAddingNews;
+    private EditGameNewsModel? _editingGameNews;
+    private DateTime? _gameNewsPublishTime;
+
+    // ─── 周报编辑状态 ───
+    private bool _showEditWeeklyNewsModal;
+    private EditWeeklyNewsModel? _editingWeeklyNews;
+    private DateTime? _weeklyNewsPublishTime;
+    private DateTime? _weeklyNewsCreateTime;
+
+    // ─── 微博导入 ───
+    private bool _showWeiboModal;
+    private string _weiboLink = string.Empty;
+
+    // ─── 预览 ───
+    private bool _showPreviewModal;
+    private bool _previewLoading;
+    private string? _previewTitle;
+    private ArticleViewModel? _previewContent;
+
+    // ═══════════════════  列表查询  ═══════════════════
 
     private async Task<CgDataTableResult<GameNewsOverviewModel>> OnQueryGameNews(CgDataTableRequest request)
     {
@@ -139,4 +399,246 @@
         }
         return new CgDataTableResult<WeeklyNewsOverviewModel>([], 0);
     }
+
+    // ═══════════════════  动态编辑  ═══════════════════
+
+    private void OpenAddNewsModal(MouseEventArgs _)
+    {
+        _isAddingNews = true;
+        _editingGameNews = new EditGameNewsModel
+        {
+            PublishTime = DateTime.Now,
+            Type = ArticleType.News,
+            Entries = new List<RelevancesModel>()
+        };
+        _gameNewsPublishTime = _editingGameNews.PublishTime;
+        _showEditGameNewsModal = true;
+    }
+
+    private async Task OpenEditGameNewsModal(long id)
+    {
+        _isAddingNews = false;
+        var result = await AdminQueryService.GetGameNewsEditAsync(id);
+        if (result.Success && result.Data is not null)
+        {
+            _editingGameNews = result.Data;
+            _gameNewsPublishTime = _editingGameNews.PublishTime;
+            _showEditGameNewsModal = true;
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取动态编辑数据失败", variant: "error");
+        }
+    }
+
+    private void CloseEditGameNewsModal()
+    {
+        _showEditGameNewsModal = false;
+        _editingGameNews = null;
+    }
+
+    private async Task SaveGameNews(MouseEventArgs _)
+    {
+        if (_editingGameNews == null) return;
+
+        if (_gameNewsPublishTime.HasValue)
+        {
+            _editingGameNews.PublishTime = _gameNewsPublishTime.Value;
+        }
+
+        SdkResult<bool> result;
+        if (_isAddingNews)
+        {
+            result = await AdminCommandService.AddCustomNewsAsync(_editingGameNews);
+        }
+        else
+        {
+            result = await AdminCommandService.EditGameNewsAsync(_editingGameNews);
+        }
+
+        if (result.Success)
+        {
+            ToastService.Show(_isAddingNews ? "动态添加成功" : "动态保存成功", variant: "success");
+            CloseEditGameNewsModal();
+            if (_gameNewsTable is not null) await _gameNewsTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error");
+        }
+    }
+
+    private async Task PublishGameNews(long id)
+    {
+        var result = await AdminCommandService.PublishGameNewsAsync(id);
+        if (result.Success)
+        {
+            ToastService.Show("动态发布成功", variant: "success");
+            if (_gameNewsTable is not null) await _gameNewsTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "发布失败", variant: "error");
+        }
+    }
+
+    private async Task IgnoreGameNews(long id, bool isIgnore)
+    {
+        var result = await AdminCommandService.IgnoreGameNewsAsync(new[] { id }, isIgnore);
+        if (result.Success)
+        {
+            ToastService.Show(isIgnore ? "已忽略该动态" : "已恢复该动态", variant: "success");
+            if (_gameNewsTable is not null) await _gameNewsTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error");
+        }
+    }
+
+    // ═══════════════════  周报编辑  ═══════════════════
+
+    private async Task OpenEditWeeklyNewsModal(long id)
+    {
+        var result = await AdminQueryService.GetWeeklyNewsEditAsync(id);
+        if (result.Success && result.Data is not null)
+        {
+            _editingWeeklyNews = result.Data;
+            _weeklyNewsPublishTime = _editingWeeklyNews.PublishTime;
+            _weeklyNewsCreateTime = _editingWeeklyNews.CreateTime;
+            _showEditWeeklyNewsModal = true;
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取周报编辑数据失败", variant: "error");
+        }
+    }
+
+    private void CloseEditWeeklyNewsModal()
+    {
+        _showEditWeeklyNewsModal = false;
+        _editingWeeklyNews = null;
+    }
+
+    private async Task SaveWeeklyNews(MouseEventArgs _)
+    {
+        if (_editingWeeklyNews == null) return;
+
+        if (_weeklyNewsPublishTime.HasValue)
+        {
+            _editingWeeklyNews.PublishTime = _weeklyNewsPublishTime.Value;
+        }
+        if (_weeklyNewsCreateTime.HasValue)
+        {
+            _editingWeeklyNews.CreateTime = _weeklyNewsCreateTime.Value;
+        }
+
+        var result = await AdminCommandService.EditWeeklyNewsAsync(_editingWeeklyNews);
+        if (result.Success)
+        {
+            ToastService.Show("周报保存成功", variant: "success");
+            CloseEditWeeklyNewsModal();
+            if (_weeklyNewsTable is not null) await _weeklyNewsTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
+        }
+    }
+
+    private async Task PublishWeeklyNews(long id)
+    {
+        var result = await AdminCommandService.PublishWeeklyNewsAsync(id);
+        if (result.Success)
+        {
+            ToastService.Show("周报发布成功", variant: "success");
+            if (_weeklyNewsTable is not null) await _weeklyNewsTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "发布失败", variant: "error");
+        }
+    }
+
+    private async Task ResetWeeklyNews(long id)
+    {
+        var result = await AdminCommandService.ResetWeeklyNewsAsync(id);
+        if (result.Success)
+        {
+            ToastService.Show("周报已重置", variant: "success");
+            if (_weeklyNewsTable is not null) await _weeklyNewsTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "重置失败", variant: "error");
+        }
+    }
+
+    // ═══════════════════  微博导入  ═══════════════════
+
+    private async Task ImportWeiboNews(MouseEventArgs _)
+    {
+        if (string.IsNullOrWhiteSpace(_weiboLink))
+        {
+            ToastService.Show("请输入微博链接", variant: "warning");
+            return;
+        }
+
+        var result = await AdminCommandService.AddWeiboNewsAsync(_weiboLink);
+        if (result.Success)
+        {
+            ToastService.Show("微博动态导入成功", variant: "success");
+            _weiboLink = string.Empty;
+            _showWeiboModal = false;
+            if (_gameNewsTable is not null) await _gameNewsTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "导入失败", variant: "error");
+        }
+    }
+
+    // ═══════════════════  预览  ═══════════════════
+
+    private async Task PreviewGameNews(long id)
+    {
+        _previewTitle = "动态预览";
+        _previewContent = null;
+        _previewLoading = true;
+        _showPreviewModal = true;
+
+        var result = await AdminQueryService.GetGameNewsPreviewAsync(id);
+        _previewLoading = false;
+        if (result.Success && result.Data is not null)
+        {
+            _previewContent = result.Data;
+            _previewTitle = result.Data.Name ?? "动态预览";
+        }
+    }
+
+    private async Task PreviewWeeklyNews(long id)
+    {
+        _previewTitle = "周报预览";
+        _previewContent = null;
+        _previewLoading = true;
+        _showPreviewModal = true;
+
+        var result = await AdminQueryService.GetWeeklyNewsPreviewAsync(id);
+        _previewLoading = false;
+        if (result.Success && result.Data is not null)
+        {
+            _previewContent = result.Data;
+            _previewTitle = result.Data.Name ?? "周报预览";
+        }
+    }
+
+    // ═══════════════════  辅助  ═══════════════════
+
+    private static string GetStateBadgeClass(GameNewsState state) => state switch
+    {
+        GameNewsState.Edit => "admin-badge--warning",
+        GameNewsState.Publish => "admin-badge--visible",
+        GameNewsState.Ignore => "admin-badge--hidden",
+        _ => ""
+    };
 }

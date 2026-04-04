@@ -1,6 +1,7 @@
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Almanacs;
+using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.BackUpArchives;
 using CnGalWebSite.DataModel.ViewModel.Commodities;
 using CnGalWebSite.DataModel.ViewModel.Entries;
@@ -166,6 +167,34 @@ public interface IAdminQueryService
     /// </summary>
     Task<SdkResult<QueryResultModel<WeeklyNewsOverviewModel>>> GetWeeklyNewsAsync(
         QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取单条动态的编辑模型。
+    /// </summary>
+    Task<SdkResult<EditGameNewsModel>> GetGameNewsEditAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取单条周报的编辑模型。
+    /// </summary>
+    Task<SdkResult<EditWeeklyNewsModel>> GetWeeklyNewsEditAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取动态预览（文章视图模型）。
+    /// </summary>
+    Task<SdkResult<ArticleViewModel>> GetGameNewsPreviewAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取周报预览（文章视图模型）。
+    /// </summary>
+    Task<SdkResult<ArticleViewModel>> GetWeeklyNewsPreviewAsync(
+        long id,
         CancellationToken cancellationToken = default);
 
     // ─── 展会管理 ───
