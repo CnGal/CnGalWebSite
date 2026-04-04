@@ -1,0 +1,11 @@
+.admin-data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+    gap: 24px;
+}
+
+@media (max-width: 600px) {
+    .admin-data-grid {
+        grid-template-columns: 1fr;
+    }
+}

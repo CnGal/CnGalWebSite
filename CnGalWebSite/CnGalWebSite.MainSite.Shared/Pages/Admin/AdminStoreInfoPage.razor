@@ -1,8 +1,9 @@
-@page "/admin/liststoreinfo"
+﻿@page "/admin/liststoreinfo"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
 @rendermode InteractiveServer
 @inject IAdminQueryService AdminQueryService
+@inject NavigationManager NavigationManager
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Steam
 
@@ -21,15 +22,60 @@
                  DefaultSortDesc="true">
         <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="Id" Field="Id" Width="80px" />
         <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="名称" Field="Name" />
-        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="平台" Field="PlatformName" />
-        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="链接" Field="Link">
+        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="平台" Field="PlatformName" Width="100px" />
+        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="平台类型" Field="PlatformType" Width="100px">
             <ChildContent Context="item">
-                <span class="admin-cell-muted">@item.Link</span>
+                <span class="admin-badge">@item.PlatformType</span>
             </ChildContent>
         </CgDataTableColumn>
         <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="状态" Field="State">
             <ChildContent Context="item">
                 <span class="admin-badge admin-badge--info">@item.State</span>
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="现价" Field="PriceNow" Width="80px">
+            <ChildContent Context="item">
+                @(item.PriceNow.HasValue ? $"¥{item.PriceNow:0.00}" : "—")
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="折扣" Field="CutNow" Width="80px">
+            <ChildContent Context="item">
+                @if (item.CutNow.HasValue && item.CutNow > 0)
+                {
+                    <span class="admin-badge admin-badge--yes">-@(item.CutNow)%</span>
+                }
+                else
+                {
+                    <span>—</span>
+                }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="更新方式" Field="UpdateType" Width="100px">
+            <ChildContent Context="item">
+                <span class="admin-badge">@item.UpdateType</span>
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="更新时间" Field="UpdateTime" Width="160px">
+            <ChildContent Context="item">
+                @item.UpdateTime.ToString("yyyy-MM-dd HH:mm")
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="链接" Field="Link">
+            <ChildContent Context="item">
+                <span class="admin-cell-muted">@item.Link</span>
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="操作" Sortable="false" Width="50px">
+            <ChildContent Context="item">
+                <div class="admin-actions">
+                    @if (item.EntryId.HasValue && item.EntryId > 0)
+                    {
+                        <button class="admin-action-btn admin-action-btn--show" title="查看词条"
+                                @onclick="@(() => NavigationManager.NavigateTo($"/entries/index/{item.EntryId}"))">
+                            <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+                        </button>
+                    }
+                </div>
             </ChildContent>
         </CgDataTableColumn>
     </CgDataTable>

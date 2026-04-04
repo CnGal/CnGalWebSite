@@ -1,0 +1,88 @@
+@page "/admin/data"
+@attribute [Authorize(Roles = "Admin")]
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject IAdminQueryService AdminQueryService
+@using CnGalWebSite.DataModel.ViewModel.Others
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+
+<PageTitle>数据概览 - CnGal</PageTitle>
+
+<div class="admin-list-page">
+    <h1 class="admin-page-title">
+        <CgMdiIcon Name="mdiChartLineVariant" aria-hidden="true" />
+        数据概览
+    </h1>
+
+    <div class="admin-data-grid">
+        @foreach (var chartType in _chartTypes)
+        {
+            <CgLineChart @ref="_chartRefs[chartType]"
+                         Title="@chartType.GetDisplayName()"
+                         Labels="@GetLabels(chartType)"
+                         Series="@GetSeries(chartType)"
+                         ShowTimeRangeSelector="true"
+                         OnTimeRangeChanged="(days) => OnDaysChanged(chartType, days)" />
+        }
+    </div>
+</div>
+
+@code {
+    private readonly LineChartType[] _chartTypes =
+    [
+        LineChartType.User,
+        LineChartType.Entry,
+        LineChartType.Article,
+        LineChartType.Tag,
+        LineChartType.Examine,
+        LineChartType.Comment,
+        LineChartType.Message,
+        LineChartType.File,
+        LineChartType.BackUpArchive,
+    ];
+
+    private readonly Dictionary<LineChartType, CgLineChart?> _chartRefs = new();
+    private readonly Dictionary<LineChartType, LineChartModel?> _chartData = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            foreach (var ct in _chartTypes)
+            {
+                await LoadChart(ct, 30);
+            }
+            StateHasChanged();
+        }
+    }
+
+    private IReadOnlyList<string>? GetLabels(LineChartType chartType)
+        => _chartData.GetValueOrDefault(chartType)?.Options.XAxis.Data;
+
+    private IReadOnlyList<CgLineChartSeries>? GetSeries(LineChartType chartType)
+    {
+        var model = _chartData.GetValueOrDefault(chartType);
+        if (model is null) return null;
+        return model.Options.Series
+            .Select(s => new CgLineChartSeries { Name = s.Name, Data = s.Data })
+            .ToList();
+    }
+
+    private async Task OnDaysChanged(LineChartType chartType, int days)
+    {
+        await LoadChart(chartType, days);
+        StateHasChanged();
+    }
+
+    private async Task LoadChart(LineChartType chartType, int days)
+    {
+        var beforeTime = DateTime.Now.Date.AddDays(1);
+        var afterTime = days > 9999 ? new DateTime(100, 10, 10) : beforeTime.AddDays(-days);
+
+        var result = await AdminQueryService.GetLineChartAsync(chartType, afterTime, beforeTime);
+        if (result.Success && result.Data is not null)
+        {
+            _chartData[chartType] = result.Data;
+        }
+    }
+}

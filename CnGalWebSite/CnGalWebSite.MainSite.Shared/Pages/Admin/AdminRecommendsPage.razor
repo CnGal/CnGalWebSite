@@ -1,8 +1,9 @@
-@page "/admin/listrecommends"
+﻿@page "/admin/listrecommends"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
 @rendermode InteractiveServer
 @inject IAdminQueryService AdminQueryService
+@inject NavigationManager NavigationManager
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Recommends
 
@@ -20,14 +21,41 @@
                  DefaultSortField="Id"
                  DefaultSortDesc="true">
         <CgDataTableColumn TItem="RecommendOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="RecommendOverviewModel" Title="关联词条" Field="EntryName" />
-        <CgDataTableColumn TItem="RecommendOverviewModel" Title="原因" Field="Reason">
-            <ChildContent Context="item"><div class="admin-cell-text">@item.Reason</div></ChildContent>
-        </CgDataTableColumn>
         <CgDataTableColumn TItem="RecommendOverviewModel" Title="状态" Field="IsHidden">
             <ChildContent Context="item">
                 @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
                 else { <span class="admin-badge admin-badge--visible">可见</span> }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="RecommendOverviewModel" Title="关联词条" Field="EntryName">
+            <ChildContent Context="item">
+                @if (item.EntryId > 0)
+                {
+                    <a class="admin-cell-name" href="@($"/entries/index/{item.EntryId}")">@item.EntryName</a>
+                }
+                else
+                {
+                    <span>@item.EntryName</span>
+                }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="RecommendOverviewModel" Title="原因" Field="Reason">
+            <ChildContent Context="item"><div class="admin-cell-text">@item.Reason</div></ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="RecommendOverviewModel" Title="更新时间" Field="UpdateTime">
+            <ChildContent Context="item">@item.UpdateTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="RecommendOverviewModel" Title="操作" Sortable="false" Width="50px">
+            <ChildContent Context="item">
+                <div class="admin-actions">
+                    @if (item.EntryId > 0)
+                    {
+                        <button class="admin-action-btn admin-action-btn--show" title="查看词条"
+                                @onclick="@(() => NavigationManager.NavigateTo($"/entries/index/{item.EntryId}"))">
+                            <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+                        </button>
+                    }
+                </div>
             </ChildContent>
         </CgDataTableColumn>
     </CgDataTable>

@@ -26,6 +26,28 @@
         <CgDataTableColumn TItem="BackUpArchiveOverviewModel" Title="最后备份时间" Field="LastBackUpTime">
             <ChildContent Context="item">@item.LastBackUpTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
         </CgDataTableColumn>
+        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" Title="用时" Field="LastTimeUsed" Width="100px">
+            <ChildContent Context="item">
+                @item.LastTimeUsed.ToString("0.0 秒")
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" Title="目标" Field="Type" Width="100px">
+            <ChildContent Context="item">
+                <span class="admin-badge">@item.Type</span>
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" Title="状态" Field="IsLastFail" Width="80px">
+            <ChildContent Context="item">
+                @if (item.IsLastFail)
+                {
+                    <span class="admin-badge admin-badge--hidden">失败</span>
+                }
+                else
+                {
+                    <span class="admin-badge admin-badge--visible">成功</span>
+                }
+            </ChildContent>
+        </CgDataTableColumn>
         <CgDataTableColumn TItem="BackUpArchiveOverviewModel" Title="操作" Sortable="false" Width="50px">
             <ChildContent Context="item">
                 <div class="admin-actions">

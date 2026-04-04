@@ -4,16 +4,23 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Almanacs;
 using CnGalWebSite.DataModel.ViewModel.BackUpArchives;
 using CnGalWebSite.DataModel.ViewModel.Commodities;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Expo;
 using CnGalWebSite.DataModel.ViewModel.Favorites;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.News;
+using CnGalWebSite.DataModel.ViewModel.OperationRecords;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
+using CnGalWebSite.DataModel.ViewModel.PlayedGames;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Recommends;
+using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Videos;
+using CnGalWebSite.Extensions;
 
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
@@ -186,4 +193,43 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
     public Task<SdkResult<QueryResultModel<CommodityCodeOverviewModel>>> GetCommodityCodesAsync(
         QueryParameterModel parameter, CancellationToken cancellationToken = default)
         => QueryListAsync<CommodityCodeOverviewModel>("api/commodities/ListCode", "ADMIN_COMMODITY_CODES", "兑换码", parameter, cancellationToken);
+
+    // ─── 词条子功能 ───
+
+    public Task<SdkResult<QueryResultModel<GameRecordOverviewModel>>> GetPlayedGamesAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<GameRecordOverviewModel>("api/playedgame/List", "ADMIN_PLAYED_GAMES", "游玩记录", parameter, cancellationToken);
+
+    public Task<SdkResult<QueryResultModel<EntryInformationTypeOverviewModel>>> GetEntryInformationTypesAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<EntryInformationTypeOverviewModel>("api/entries/ListEntryInformationTypes", "ADMIN_ENTRY_INFO_TYPES", "基础信息类型", parameter, cancellationToken);
+
+    // ─── 用户子功能 ───
+
+    public Task<SdkResult<QueryResultModel<RankOverviewModel>>> GetRanksAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<RankOverviewModel>("api/ranks/ListRanks", "ADMIN_RANKS", "头衔", parameter, cancellationToken);
+
+    public Task<SdkResult<QueryResultModel<UserCertificationOverviewModel>>> GetUserCertificationsAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<UserCertificationOverviewModel>("api/account/ListUserCertifications", "ADMIN_CERTIFICATIONS", "认证", parameter, cancellationToken);
+
+    public Task<SdkResult<QueryResultModel<OperationRecordOverviewModel>>> GetOperationRecordsAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<OperationRecordOverviewModel>("api/account/ListOperationRecords", "ADMIN_OP_RECORDS", "操作记录", parameter, cancellationToken);
+
+    // ─── 数据图表 ───
+
+    public async Task<SdkResult<LineChartModel>> GetLineChartAsync(
+        LineChartType type, DateTime afterTime, DateTime beforeTime,
+        CancellationToken cancellationToken = default)
+    {
+        var afterMs = afterTime.ToUnixTimeMilliseconds();
+        var beforeMs = beforeTime.ToUnixTimeMilliseconds();
+        return await GetAsync<LineChartModel>(
+            $"api/admin/GetLineChart?Type={type}&AfterTime={afterMs}&BeforeTime={beforeMs}",
+            "ADMIN_CHART",
+            "图表数据",
+            cancellationToken);
+    }
 }

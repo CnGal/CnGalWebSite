@@ -1,8 +1,9 @@
-@page "/admin/listfavoritefolders"
+﻿@page "/admin/listfavoritefolders"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
 @rendermode InteractiveServer
 @inject IAdminQueryService AdminQueryService
+@inject NavigationManager NavigationManager
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Favorites
 
@@ -21,16 +22,25 @@
                  DefaultSortDesc="true">
         <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="Id" Field="Id" Width="80px" />
         <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="名称" Field="Name" />
+        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="图片" Sortable="false" Width="80px">
+            <ChildContent Context="item">
+                @if (!string.IsNullOrWhiteSpace(item.MainImage))
+                {
+                    <img src="@item.MainImage" alt="收藏夹图片" style="max-width: 60px; max-height: 40px; border-radius: 4px; object-fit: cover;" />
+                }
+            </ChildContent>
+        </CgDataTableColumn>
         <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="用户" Field="UserName">
             <ChildContent Context="item"><span class="admin-cell-name">@item.UserName</span></ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="数量" Field="Count" Width="80px" />
         <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="创建时间" Field="CreateTime">
             <ChildContent Context="item">@item.CreateTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="默认" Field="IsDefault">
+        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="数量" Field="Count" Width="80px" />
+        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="状态" Field="IsHidden">
             <ChildContent Context="item">
-                @if (item.IsDefault) { <span class="admin-badge admin-badge--info">默认</span> }
+                @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
+                else { <span class="admin-badge admin-badge--visible">可见</span> }
             </ChildContent>
         </CgDataTableColumn>
         <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="公开" Field="ShowPublicly">
@@ -39,10 +49,23 @@
                 else { <span class="admin-badge admin-badge--no">私密</span> }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="状态" Field="IsHidden">
+        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="默认" Field="IsDefault">
             <ChildContent Context="item">
-                @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
-                else { <span class="admin-badge admin-badge--visible">可见</span> }
+                @if (item.IsDefault) { <span class="admin-badge admin-badge--info">默认</span> }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="操作" Sortable="false" Width="100px">
+            <ChildContent Context="item">
+                <div class="admin-actions">
+                    <button class="admin-action-btn admin-action-btn--show" title="查看"
+                            @onclick="@(() => NavigationManager.NavigateTo($"/favoritefolders/index/{item.Id}"))">
+                        <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+                    </button>
+                    <button class="admin-action-btn admin-action-btn--up" title="编辑"
+                            @onclick="@(() => NavigationManager.NavigateTo($"/space/EditSpaceFavoriteObjects?UserId={item.UserId}&amp;FolderId={item.Id}"))">
+                        <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                    </button>
+                </div>
             </ChildContent>
         </CgDataTableColumn>
     </CgDataTable>
