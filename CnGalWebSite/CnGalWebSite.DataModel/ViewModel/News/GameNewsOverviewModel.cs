@@ -1,4 +1,4 @@
-﻿
+
 using CnGalWebSite.DataModel.Model;
 using System;
 using System.Collections.Generic;
@@ -35,6 +35,10 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         /// 文章Id
         /// </summary>
         public long ArticleId { get; set; }
+        /// <summary>
+        /// 来源类型
+        /// </summary>
+        public OriginalRSSType? RssType { get; set; }
 
     }
 }

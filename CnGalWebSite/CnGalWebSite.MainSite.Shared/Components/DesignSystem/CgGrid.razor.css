@@ -1,5 +1,5 @@
 .cg-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(var(--cg-grid-min, 260px), 1fr));
-    gap: var(--cg-spacing-4);
+    column-gap: var(--cg-spacing-4);
 }

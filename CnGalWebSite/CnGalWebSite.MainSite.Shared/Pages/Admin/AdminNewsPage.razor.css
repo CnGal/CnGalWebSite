@@ -54,3 +54,24 @@
     align-items: center;
     gap: var(--cg-spacing-1);
 }
+
+/* ── 来源类型徽章 ── */
+.admin-badge--rss-weibo {
+    background-color: #df2029;
+    color: white;
+}
+
+.admin-badge--rss-bilibili {
+    background-color: #fb7299;
+    color: white;
+}
+
+.admin-badge--rss-heybox {
+    background-color: #2b2b2b;
+    color: white;
+}
+
+.admin-badge--rss-custom {
+    background-color: var(--cg-color-primary);
+    color: white;
+}
