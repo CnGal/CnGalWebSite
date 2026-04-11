@@ -37,13 +37,13 @@ else if (_model is not null)
             </CgAlert>
         }
 
-        <footer class="tag-footer-related">
+        <section class="tag-footer-related" aria-label="相关内容">
             <TagChildTags Tags="_model.ChildrenTags" />
 
             <TagChildEntries Entries="_model.ChildrenEntries" />
 
             <EditRecordListCard Records="_editRecords" />
-        </footer>
+        </section>
     </article>
 }
 else

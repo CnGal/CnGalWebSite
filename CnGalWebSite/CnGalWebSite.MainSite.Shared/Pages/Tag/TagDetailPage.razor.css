@@ -2,35 +2,32 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    max-width: 1200px; /* Aligned with article page readable width */
+    gap: 1.5rem;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 2rem 1rem 4rem;
+    padding: 1.5rem 1rem 3rem;
 }
 
 .tag-header {
     display: flex;
     flex-direction: column;
-    margin-bottom: 2rem;
     gap: 1.5rem;
 }
 
 .tag-main-content {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    margin-bottom: 3rem;
+    gap: 1.5rem;
 }
 
 .tag-footer-related {
     display: flex;
     flex-direction: column;
-    gap: 2rem;
-    border-top: 1px solid var(--cg-color-border);
-    padding-top: 3rem;
+    gap: 1.5rem;
 }
 
 .tag-hidden-alert {
-    margin-bottom: 2rem;
+    margin-bottom: 0;
 }
 
 .tag-not-found {
@@ -56,8 +53,8 @@
 .tag-loading {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    max-width: 960px;
+    gap: 1rem;
+    max-width: 920px;
     margin: 2rem auto;
 }
 
@@ -75,7 +72,7 @@
 }
 
 .tag-loading-block--wide {
-    height: 300px;
+    height: 220px;
 }
 
 @keyframes tag-loading {
@@ -85,6 +82,11 @@
 
 @media (min-width: 768px) {
     .tag-page {
-        padding: 3rem 2rem 5rem;
+        padding: 2rem 1.5rem 4rem;
+        gap: 2rem;
+    }
+
+    .tag-footer-related {
+        gap: 2rem;
     }
 }

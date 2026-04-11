@@ -8,7 +8,7 @@
     <section class="edit-record-list-card" aria-label="编辑记录">
         <h2><CgMdiIcon Name="mdiHistory" aria-hidden="true" />编辑记录</h2>
 
-        <div class="edit-record-list-card__list" role="list">
+        <div class="edit-record-list-card__list @(Columns >= 2 ? "edit-record-list-card__list--two-col" : "")" role="list">
             @{
                 var displayRecords = ShowAll ? Records : Records.Take(MaxCount).ToList();
             }
@@ -73,4 +73,11 @@
     /// </summary>
     [Parameter]
     public bool ShowAll { get; set; }
+
+    /// <summary>
+    /// 列表栏数：1 = 单栏，2 = 双栏（默认双栏，适用于文章/视频/标签等宽幅页面）。
+    /// 词条、周边等侧栏场景应传 1。
+    /// </summary>
+    [Parameter]
+    public int Columns { get; set; } = 2;
 }

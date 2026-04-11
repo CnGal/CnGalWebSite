@@ -28,7 +28,7 @@
 }
 
 @media (min-width: 640px) {
-    .edit-record-list-card__list {
+    .edit-record-list-card__list--two-col {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 2px 1rem;
