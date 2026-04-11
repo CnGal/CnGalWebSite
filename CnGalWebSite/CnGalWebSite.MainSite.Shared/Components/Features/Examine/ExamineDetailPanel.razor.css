@@ -127,6 +127,9 @@
     padding: var(--cg-spacing-4);
     max-height: 600px;
     overflow-y: auto;
+    overflow-x: auto;
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 .examine-detail-panel__text-block {
@@ -195,3 +198,134 @@
     height: 18px;
     margin-right: 4px;
 }
+
+/* ── Preposition Alert ── */
+.examine-detail-panel__preposition-alert {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    background: color-mix(in srgb, var(--cg-color-error) 8%, var(--cg-color-surface));
+    border: 1px solid color-mix(in srgb, var(--cg-color-error) 30%, transparent);
+    border-radius: var(--cg-radius-lg);
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-error);
+}
+
+::deep .examine-detail-panel__preposition-alert .cg-mdi-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.examine-detail-panel__preposition-alert a {
+    color: var(--cg-color-error);
+    font-weight: var(--cg-font-weight-semibold);
+    text-decoration: underline;
+}
+
+/* ── Contrast View ── */
+.examine-detail-panel__contrast {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--cg-spacing-4);
+}
+
+@media (max-width: 768px) {
+    .examine-detail-panel__contrast {
+        grid-template-columns: 1fr;
+    }
+}
+
+.examine-detail-panel__contrast-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+    min-width: 0;
+}
+
+.examine-detail-panel__contrast-title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    font-size: var(--cg-font-size-base);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    margin: 0;
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    border-radius: var(--cg-radius-md);
+}
+
+.examine-detail-panel__contrast-title--before {
+    background: color-mix(in srgb, var(--cg-color-warning) 10%, var(--cg-color-surface));
+    border: 1px solid color-mix(in srgb, var(--cg-color-warning) 25%, transparent);
+}
+
+.examine-detail-panel__contrast-title--after {
+    background: color-mix(in srgb, var(--cg-color-success, #22c55e) 10%, var(--cg-color-surface));
+    border: 1px solid color-mix(in srgb, var(--cg-color-success, #22c55e) 25%, transparent);
+}
+
+::deep .examine-detail-panel__contrast-title .cg-mdi-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.examine-detail-panel__contrast-title--before ::deep .cg-mdi-icon {
+    color: var(--cg-color-warning);
+}
+
+.examine-detail-panel__contrast-title--after ::deep .cg-mdi-icon {
+    color: var(--cg-color-success, #22c55e);
+}
+
+/* ── Sensitive Words ── */
+.examine-detail-panel__section--sensitive {
+    border-color: var(--cg-color-error);
+}
+
+.examine-detail-panel__section--sensitive .examine-detail-panel__section-title {
+    background: color-mix(in srgb, var(--cg-color-error) 8%, var(--cg-color-surface));
+}
+
+.examine-detail-panel__sensitive-words {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-2);
+}
+
+.examine-detail-panel__sensitive-word {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--cg-spacing-2);
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-error);
+    background: color-mix(in srgb, var(--cg-color-error) 10%, transparent);
+    border-radius: var(--cg-radius-full);
+    border: 1px solid color-mix(in srgb, var(--cg-color-error) 20%, transparent);
+}
+
+/* ── Contribution Value ── */
+.examine-detail-panel__contribution {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    background: color-mix(in srgb, var(--cg-color-primary) 6%, var(--cg-color-surface));
+    border: 1px solid color-mix(in srgb, var(--cg-color-primary) 20%, transparent);
+    border-radius: var(--cg-radius-lg);
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text);
+}
+
+::deep .examine-detail-panel__contribution .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--cg-color-primary);
+}
+
+.examine-detail-panel__contribution strong {
+    color: var(--cg-color-primary);
+    font-weight: var(--cg-font-weight-bold);
+}
+

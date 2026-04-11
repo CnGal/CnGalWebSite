@@ -136,4 +136,55 @@ public sealed class ExamineQueryService(HttpClient httpClient, IMemoryCache memo
             "EXAMINE_DETAIL",
             "审核详情",
             cancellationToken);
+
+    // ─── 对比审核（两个版本的 Before/After） ───
+
+    public async Task<SdkResult<ExamineViewModel>> GetContrastExamineAsync(
+        long contrastId, long currentId, CancellationToken cancellationToken = default)
+    {
+        // 分别加载两条审核记录的详情
+        // BeforeModel 取自 contrastId 的 AfterModel（对比版本的终态）
+        // AfterModel 取自 currentId 的 AfterModel（当前版本的终态）
+        var contrastResult = await GetExamineDetailAsync(contrastId, cancellationToken);
+        if (!contrastResult.Success || contrastResult.Data is null)
+        {
+            return contrastResult;
+        }
+
+        var currentResult = await GetExamineDetailAsync(currentId, cancellationToken);
+        if (!currentResult.Success || currentResult.Data is null)
+        {
+            return currentResult;
+        }
+
+        // 组合成对比模型：Before = contrast 的 AfterModel, After = current 的 AfterModel
+        var combined = new ExamineViewModel
+        {
+            Id = contrastResult.Data.Id,
+            ObjectId = contrastResult.Data.ObjectId,
+            ObjectName = contrastResult.Data.ObjectName,
+            ObjectBriefIntroduction = contrastResult.Data.ObjectBriefIntroduction,
+            Image = contrastResult.Data.Image,
+            IsThumbnail = contrastResult.Data.IsThumbnail,
+            Type = contrastResult.Data.Type,
+            Operation = contrastResult.Data.Operation,
+            EditOverview = contrastResult.Data.EditOverview,
+            IsPassed = contrastResult.Data.IsPassed,
+            PassedAdminName = contrastResult.Data.PassedAdminName,
+            IsAdmin = contrastResult.Data.IsAdmin,
+            Comments = contrastResult.Data.Comments,
+            Note = contrastResult.Data.Note,
+            UserId = contrastResult.Data.UserId,
+            UserName = contrastResult.Data.UserName,
+            ApplyTime = contrastResult.Data.ApplyTime,
+            PassedTime = contrastResult.Data.PassedTime,
+            PrepositionExamineId = contrastResult.Data.PrepositionExamineId,
+            ContributionValue = contrastResult.Data.ContributionValue,
+            SensitiveWords = contrastResult.Data.SensitiveWords,
+            BeforeModel = contrastResult.Data.AfterModel,
+            AfterModel = currentResult.Data.AfterModel,
+        };
+
+        return SdkResult<ExamineViewModel>.Ok(combined);
+    }
 }

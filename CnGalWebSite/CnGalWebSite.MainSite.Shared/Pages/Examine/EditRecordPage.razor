@@ -13,7 +13,7 @@
 <div class="edit-record-page">
     <header class="edit-record-page__header">
         <h1 class="edit-record-page__title">
-            <CgMdiIcon Name="mdiHistory" aria-hidden="true" />
+            <CgMdiIcon Name="mdiHistory" aria-hidden="true"/>
             <span>编辑记录</span>
         </h1>
     </header>
@@ -21,14 +21,14 @@
     @if (_isLoading)
     {
         <div class="edit-record-page__loading">
-            <CgProgressRing />
+            <CgProgressRing/>
             <span>加载编辑记录中...</span>
         </div>
     }
     else if (_isError)
     {
         <div class="edit-record-page__error">
-            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
+            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true"/>
             <p>@_errorMessage</p>
             <CgButton Variant="primary" OnClick="LoadDataAsync">重试</CgButton>
             <a href="/" class="cg-btn cg-btn--secondary">返回首页</a>
@@ -40,7 +40,7 @@
         <div class="edit-record-page__object-banner">
             @if (!string.IsNullOrWhiteSpace(_overview.Image))
             {
-                <img class="edit-record-page__object-image" src="@_overview.Image" alt="@_overview.ObjectName" loading="lazy" />
+                <img class="edit-record-page__object-image" src="@_overview.Image" alt="@_overview.ObjectName" loading="lazy"/>
             }
             <div class="edit-record-page__object-info">
                 <h2 class="edit-record-page__object-name">@($"『{_overview.ObjectName}』历史编辑记录总览")</h2>
@@ -49,32 +49,93 @@
                     <p class="edit-record-page__object-desc">@_overview.ObjectBriefIntroduction</p>
                 }
                 <a class="edit-record-page__object-link" href="@GetObjectUrl()">
-                    <CgMdiIcon Name="mdiOpenInNew" aria-hidden="true" />
+                    <CgMdiIcon Name="mdiOpenInNew" aria-hidden="true"/>
                     查看详情
                 </a>
             </div>
         </div>
 
-        @* ── 主体：左侧时间线 + 右侧详情 ── *@
+        @* ── 主体：左侧时间线 + 右侧详情/对比 ── *@
         <div class="edit-record-page__body">
             <aside class="edit-record-page__sidebar">
                 <div class="edit-record-page__sidebar-header">
-                    <CgMdiIcon Name="mdiFormatListBulleted" aria-hidden="true" />
+                    <CgMdiIcon Name="mdiFormatListBulleted" aria-hidden="true"/>
                     <span>编辑记录 (@_overview.Examines.Count)</span>
                 </div>
                 <EditRecordTimeline Items="@_overview.Examines"
                                     SelectedId="@_selectedId"
-                                    OnSelected="OnTimelineItemSelected" />
+                                    OnSelected="OnTimelineItemSelected"/>
             </aside>
             <main class="edit-record-page__main">
+                @* ── 对比视图选择器 ── *@
+                <div class="edit-record-page__contrast-bar">
+                    <div class="edit-record-page__contrast-selector">
+                        <label class="edit-record-page__contrast-label">
+                            <CgMdiIcon Name="mdiHistory" aria-hidden="true"/>
+                            对比版本
+                        </label>
+                        <select class="edit-record-page__contrast-select" value="@_contrastId" @onchange="OnContrastChanged">
+                            @foreach (var item in _overview.Examines)
+                            {
+                                <option value="@item.Id">@($"#{item.Id:00000} — {item.ApplyTime:yyyy-MM-dd HH:mm}")</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="edit-record-page__contrast-selector">
+                        <label class="edit-record-page__contrast-label">
+                            <CgMdiIcon Name="mdiHistory" aria-hidden="true"/>
+                            当前版本
+                        </label>
+                        <select class="edit-record-page__contrast-select" value="@_currentId" @onchange="OnCurrentChanged">
+                            @foreach (var item in _overview.Examines)
+                            {
+                                <option value="@item.Id">@($"#{item.Id:00000} — {item.ApplyTime:yyyy-MM-dd HH:mm}")</option>
+                            }
+                        </select>
+                    </div>
+                    <CgButton Variant="primary" OnClick="LoadContrastAsync" Disabled="_isContrastLoading">
+                        <CgMdiIcon Name="mdiMagnify" aria-hidden="true"/>
+                        对比
+                    </CgButton>
+                </div>
+
+                @* ── 对比视图内容 ── *@
+                @if (_isContrastLoading)
+                {
+                    <div class="edit-record-page__loading">
+                        <CgProgressRing/>
+                        <span>加载对比数据中...</span>
+                    </div>
+                }
+                else if (_contrastModel is not null)
+                {
+                    <section class="edit-record-page__contrast-view">
+                        <div class="edit-record-page__contrast-column">
+                            <h3 class="edit-record-page__contrast-column-title edit-record-page__contrast-column-title--before">
+                                <CgMdiIcon Name="mdiFileRestoreOutline" aria-hidden="true"/>
+                                对比版本 (#@_contrastId)
+                            </h3>
+                            <ExaminePreDataView Model="@_contrastModel.BeforeModel"/>
+                        </div>
+                        <div class="edit-record-page__contrast-column">
+                            <h3 class="edit-record-page__contrast-column-title edit-record-page__contrast-column-title--after">
+                                <CgMdiIcon Name="mdiFileDocumentCheckOutline" aria-hidden="true"/>
+                                当前版本 (#@_currentId)
+                            </h3>
+                            <ExaminePreDataView Model="@_contrastModel.AfterModel"/>
+                        </div>
+                    </section>
+                }
+
+                @* ── 编辑记录详情 ── *@
                 @if (_selectedRecord is not null)
                 {
-                    <EditRecordDetail Model="@_selectedRecord" />
+                    <EditRecordDetail Model="@_selectedRecord"/>
                 }
-                else
+                else if (_contrastModel is null)
                 {
                     <div class="edit-record-page__no-selection">
-                        <CgMdiIcon Name="mdiCursorDefaultClickOutline" aria-hidden="true" />
+                        <CgMdiIcon Name="mdiCursorDefaultClickOutline" aria-hidden="true"/>
                         <span>请在左侧选择一条编辑记录查看详情</span>
                     </div>
                 }
@@ -84,18 +145,18 @@
 </div>
 
 @code {
-    [SupplyParameterFromQuery]
-    [Parameter]
-    public long ContrastId { get; set; }
+    [SupplyParameterFromQuery] [Parameter] public long ContrastId { get; set; }
 
-    [SupplyParameterFromQuery]
-    [Parameter]
-    public long CurrentId { get; set; }
+    [SupplyParameterFromQuery] [Parameter] public long CurrentId { get; set; }
 
     private ExaminesOverviewViewModel? _overview;
     private EditRecordAloneViewModel? _selectedRecord;
+    private ExamineViewModel? _contrastModel;
     private long _selectedId;
+    private long _contrastId;
+    private long _currentId;
     private bool _isLoading = true;
+    private bool _isContrastLoading;
     private bool _isError;
     private string _errorMessage = string.Empty;
 
@@ -118,6 +179,7 @@
         _isError = false;
         _overview = null;
         _selectedRecord = null;
+        _contrastModel = null;
         StateHasChanged();
 
         var result = await ExamineQueryService.GetExaminesOverviewAsync(ContrastId);
@@ -126,12 +188,22 @@
         {
             _overview = result.Data;
 
+            // 初始化对比 ID
+            _contrastId = ContrastId;
+            _currentId = CurrentId > 0 ? CurrentId : _overview.Examines.LastOrDefault()?.Id ?? ContrastId;
+
             // 定位选中项：优先选 ContrastId 对应的记录，其次选 IsSelected=true 的
             _selectedRecord = _overview.Examines.FirstOrDefault(e => e.Id == ContrastId)
-                ?? _overview.Examines.FirstOrDefault(e => e.IsSelected)
-                ?? _overview.Examines.FirstOrDefault();
+                              ?? _overview.Examines.FirstOrDefault(e => e.IsSelected)
+                              ?? _overview.Examines.FirstOrDefault();
 
             _selectedId = _selectedRecord?.Id ?? 0;
+
+            // 如果有 CurrentId，自动加载对比视图
+            if (CurrentId > 0)
+            {
+                await LoadContrastAsync();
+            }
         }
         else
         {
@@ -142,12 +214,47 @@
         _isLoading = false;
     }
 
+    private async Task LoadContrastAsync()
+    {
+        if (_contrastId <= 0 || _currentId <= 0 || _contrastId > _currentId)
+        {
+            return;
+        }
+
+        _isContrastLoading = true;
+        StateHasChanged();
+
+        var result = await ExamineQueryService.GetContrastExamineAsync(_contrastId, _currentId);
+        if (result.Success && result.Data is not null)
+        {
+            _contrastModel = result.Data;
+        }
+
+        _isContrastLoading = false;
+    }
+
     private Task OnTimelineItemSelected(EditRecordAloneViewModel item)
     {
         _selectedRecord = item;
         _selectedId = item.Id;
         StateHasChanged();
         return Task.CompletedTask;
+    }
+
+    private void OnContrastChanged(ChangeEventArgs e)
+    {
+        if (long.TryParse(e.Value?.ToString(), out var id))
+        {
+            _contrastId = id;
+        }
+    }
+
+    private void OnCurrentChanged(ChangeEventArgs e)
+    {
+        if (long.TryParse(e.Value?.ToString(), out var id))
+        {
+            _currentId = id;
+        }
     }
 
     private string? GetObjectUrl()
@@ -163,4 +270,5 @@
             _ => null
         };
     }
+
 }

@@ -119,6 +119,65 @@
         </section>
     }
 
+    @* ── 前置审核警告 ── *@
+    @if (Model.PrepositionExamineId > 0 && Model.IsPassed == null)
+    {
+        <div class="examine-detail-panel__preposition-alert">
+            <CgMdiIcon Name="mdiAlertOutline" aria-hidden="true" />
+            <span>当前审核拥有一个前置审核，请先</span>
+            <a href="/examine?Id=@Model.PrepositionExamineId">审核前置审核 #@Model.PrepositionExamineId</a>
+        </div>
+    }
+
+    @* ── 修改前/修改后对比 ── *@
+    @if (HasBeforeOrAfterData())
+    {
+        <section class="examine-detail-panel__contrast">
+            <div class="examine-detail-panel__contrast-column">
+                <h4 class="examine-detail-panel__contrast-title examine-detail-panel__contrast-title--before">
+                    <CgMdiIcon Name="mdiFileRestoreOutline" aria-hidden="true" />
+                    @(Model.IsPassed == null ? "修改前" : "编辑后")
+                </h4>
+                <ExaminePreDataView Model="@Model.BeforeModel" />
+            </div>
+            <div class="examine-detail-panel__contrast-column">
+                <h4 class="examine-detail-panel__contrast-title examine-detail-panel__contrast-title--after">
+                    <CgMdiIcon Name="mdiFileDocumentCheckOutline" aria-hidden="true" />
+                    @(Model.IsPassed == null ? "修改后" : "当前状态")
+                </h4>
+                <ExaminePreDataView Model="@Model.AfterModel" />
+            </div>
+        </section>
+    }
+
+    @* ── 敏感词列表 ── *@
+    @if (Model.SensitiveWords is { Count: > 0 })
+    {
+        <section class="examine-detail-panel__section examine-detail-panel__section--sensitive">
+            <h4 class="examine-detail-panel__section-title">
+                <CgMdiIcon Name="mdiShieldAlertOutline" aria-hidden="true" />
+                敏感词检测 (@Model.SensitiveWords.Count)
+            </h4>
+            <div class="examine-detail-panel__section-body">
+                <div class="examine-detail-panel__sensitive-words">
+                    @foreach (var word in Model.SensitiveWords)
+                    {
+                        <span class="examine-detail-panel__sensitive-word">@word</span>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+
+    @* ── 贡献值 ── *@
+    @if (Model.ContributionValue > 0)
+    {
+        <div class="examine-detail-panel__contribution">
+            <CgMdiIcon Name="mdiStarOutline" aria-hidden="true" />
+            <span>附加贡献值：<strong>@Model.ContributionValue</strong></span>
+        </div>
+    }
+
     @* ── 编辑记录链接 ── *@
     @if (Model.IsPassed == true)
     {
@@ -179,6 +238,22 @@
             ExaminedNormalListModelType.Video => $"/videos/index/{Model.ObjectId}",
             _ => null
         };
+    }
+
+    private bool HasBeforeOrAfterData()
+    {
+        return HasData(Model.BeforeModel) || HasData(Model.AfterModel);
+
+        static bool HasData(ExaminePreDataModel? m)
+        {
+            if (m is null) return false;
+            return !string.IsNullOrWhiteSpace(m.MainPage)
+                   || m.Pictures.Count > 0
+                   || m.Texts.Count > 0
+                   || m.Relevances.Count > 0
+                   || m.Outlinks.Count > 0
+                   || m.Audio.Count > 0;
+        }
     }
 
     private async Task HandleProc(bool isPassed)

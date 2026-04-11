@@ -48,4 +48,13 @@ public interface IExamineQueryService
     Task<SdkResult<ExamineViewModel>> GetExamineDetailAsync(
         long examineId,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取两个版本之间的对比审核详情。
+    /// 通过加载 contrastId 对应的审核记录，获取 BeforeModel（对比版本截止状态）和 AfterModel（当前版本截止状态）。
+    /// </summary>
+    Task<SdkResult<ExamineViewModel>> GetContrastExamineAsync(
+        long contrastId,
+        long currentId,
+        CancellationToken cancellationToken = default);
 }
