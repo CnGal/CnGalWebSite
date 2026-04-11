@@ -1,0 +1,220 @@
+@using CnGalWebSite.DataModel.ViewModel.Admin
+@using CnGalWebSite.DataModel.ViewModel.EditRecords
+@using CnGalWebSite.DataModel.ViewModel.Search
+@using CnGalWebSite.DataModel.Model
+
+@inject IExamineQueryService ExamineQueryService
+@inject IExamineCommandService ExamineCommandService
+@inject ICgToastService ToastService
+@inject NavigationManager NavigationManager
+
+@* 用户内容中心概览面板 *@
+
+@if (_loading)
+{
+    <div class="user-content-loading">
+        <CgProgressRing />
+    </div>
+}
+else if (_error != null)
+{
+    <CgAlert Variant="error">@_error</CgAlert>
+}
+else if (_model != null)
+{
+    @* ── 近期修改（未读审阅记录） ── *@
+    @if (_model.UnReviewExamines.Any())
+    {
+        <section class="user-content-section">
+            <div class="user-content-section__header">
+                <h3 class="user-content-section__title">
+                    <CgMdiIcon Name="mdiEmailOutline" class="user-content-section__icon" aria-hidden="true" />
+                    近期修改
+                </h3>
+                <CgButton Variant="primary" OnClick="ReviewAll">
+                    <CgMdiIcon Name="mdiCheckAll" aria-hidden="true" />
+                    全部已读
+                </CgButton>
+            </div>
+
+            @foreach (var item in _model.UnReviewExamines.Skip((_unReviewPage - 1) * PageSize).Take(PageSize))
+            {
+                <div class="user-content-card">
+                    <div class="user-content-card__info">
+                        <span class="user-content-card__user">@(item.UserInfor?.Name ?? "未知用户")</span>
+                        <span class="user-content-card__desc">
+                            对「@(string.IsNullOrWhiteSpace(item.RelatedName) ? $"Id：{item.RelatedId}" : item.RelatedName)」
+                            @item.Operation.GetDisplayName()
+                        </span>
+                        <span class="user-content-card__time">@item.ApplyTime.ToString("yyyy-MM-dd HH:mm")</span>
+                    </div>
+                    <div class="user-content-card__actions">
+                        <button class="examine-action-btn examine-action-btn--approve" title="已读" @onclick="() => OnReviewItem(item, EditRecordReviewState.Reviewed)">
+                            <CgMdiIcon Name="mdiEmailOpenOutline" aria-hidden="true" />
+                        </button>
+                        <button class="examine-action-btn examine-action-btn--ignore" title="忽略" @onclick="() => OnReviewItem(item, EditRecordReviewState.Ignored)">
+                            <CgMdiIcon Name="mdiBellOffOutline" aria-hidden="true" />
+                        </button>
+                    </div>
+                </div>
+            }
+
+            @if (UnReviewTotalPages > 1)
+            {
+                <CgPagination CurrentPage="@_unReviewPage" TotalPages="@UnReviewTotalPages" CurrentPageChanged="p => { _unReviewPage = p; }" />
+            }
+        </section>
+    }
+
+    @* ── 待审核编辑 ── *@
+    @if (_model.PendingExamines.Any())
+    {
+        <section class="user-content-section">
+            <div class="user-content-section__header">
+                <h3 class="user-content-section__title">
+                    <CgMdiIcon Name="mdiClockOutline" class="user-content-section__icon" aria-hidden="true" />
+                    待审核编辑
+                </h3>
+            </div>
+
+            @foreach (var item in _model.PendingExamines.Skip((_pendingPage - 1) * PageSize).Take(PageSize))
+            {
+                <div class="user-content-card">
+                    <div class="user-content-card__info">
+                        <span class="user-content-card__user">@(item.UserInfor?.Name ?? "未知用户")</span>
+                        <span class="user-content-card__desc">
+                            对「@(string.IsNullOrWhiteSpace(item.RelatedName) ? $"Id：{item.RelatedId}" : item.RelatedName)」
+                            @item.Operation.GetDisplayName()
+                        </span>
+                        <span class="user-content-card__time">@item.ApplyTime.ToString("yyyy-MM-dd HH:mm")</span>
+                    </div>
+                    <div class="user-content-card__actions">
+                        <a class="examine-action-btn examine-action-btn--view" href="/examine?id=@item.Id" title="查看">
+                            <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+                        </a>
+                    </div>
+                </div>
+            }
+
+            @if (PendingTotalPages > 1)
+            {
+                <CgPagination CurrentPage="@_pendingPage" TotalPages="@PendingTotalPages" CurrentPageChanged="p => { _pendingPage = p; }" />
+            }
+        </section>
+    }
+
+    @* ── 最近编辑的词条 ── *@
+    @if (_model.UnReviewEntries.Any())
+    {
+        <section class="user-content-section">
+            <div class="user-content-section__header">
+                <h3 class="user-content-section__title">
+                    <CgMdiIcon Name="mdiPencilOutline" class="user-content-section__icon" aria-hidden="true" />
+                    最近编辑
+                </h3>
+            </div>
+
+            <div class="user-content-entry-grid">
+                @foreach (var item in _model.UnReviewEntries.Skip((_entryPage - 1) * PageSize).Take(PageSize))
+                {
+                    <a class="user-content-entry-card" href="/entries/index/@item.Id">
+                        @if (!string.IsNullOrWhiteSpace(item.MainImage))
+                        {
+                            <img class="user-content-entry-card__image" src="@item.MainImage" alt="@item.Name" loading="lazy" />
+                        }
+                        else
+                        {
+                            <div class="user-content-entry-card__placeholder">
+                                <CgMdiIcon Name="mdiImageOutline" aria-hidden="true" />
+                            </div>
+                        }
+                        <span class="user-content-entry-card__name">@(item.Name ?? "—")</span>
+                    </a>
+                }
+            </div>
+
+            @if (EntryTotalPages > 1)
+            {
+                <CgPagination CurrentPage="@_entryPage" TotalPages="@EntryTotalPages" CurrentPageChanged="p => { _entryPage = p; }" />
+            }
+        </section>
+    }
+
+    @if (!_model.UnReviewExamines.Any() && !_model.PendingExamines.Any() && !_model.UnReviewEntries.Any())
+    {
+        <div class="user-content-empty">
+            <CgMdiIcon Name="mdiCheckCircleOutline" class="user-content-empty__icon" aria-hidden="true" />
+            <span>暂无新动态，一切就绪！</span>
+        </div>
+    }
+}
+
+@code {
+    private const int PageSize = 10;
+
+    private UserContentCenterViewModel? _model;
+    private bool _loading = true;
+    private string? _error;
+
+    private int _unReviewPage = 1;
+    private int _pendingPage = 1;
+    private int _entryPage = 1;
+
+    private int UnReviewTotalPages => _model?.UnReviewExamines.Count > 0 ? ((_model.UnReviewExamines.Count - 1) / PageSize) + 1 : 1;
+    private int PendingTotalPages => _model?.PendingExamines.Count > 0 ? ((_model.PendingExamines.Count - 1) / PageSize) + 1 : 1;
+    private int EntryTotalPages => _model?.UnReviewEntries.Count > 0 ? ((_model.UnReviewEntries.Count - 1) / PageSize) + 1 : 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        _loading = true;
+        _error = null;
+        StateHasChanged();
+
+        var result = await ExamineQueryService.GetUserContentCenterAsync();
+        if (result.Success && result.Data != null)
+        {
+            _model = result.Data;
+        }
+        else
+        {
+            _error = result.Error?.Message ?? "加载用户内容中心数据失败";
+        }
+
+        _loading = false;
+    }
+
+    private async Task ReviewAll()
+    {
+        if (_model == null || !_model.UnReviewExamines.Any()) return;
+
+        var examineIds = _model.UnReviewExamines.Select(s => s.Id).ToArray();
+        var result = await ExamineCommandService.EditReviewStateAsync(examineIds, EditRecordReviewState.Reviewed);
+        if (result.Success)
+        {
+            _model.UnReviewExamines.Clear();
+            ToastService.Show("全部已读成功", variant: "success");
+        }
+        else
+        {
+            ToastService.Show("全部已读失败", result.Error?.Message, "error");
+        }
+    }
+
+    private async Task OnReviewItem(ExaminedNormalListModel item, EditRecordReviewState state)
+    {
+        var result = await ExamineCommandService.EditReviewStateAsync(new[] { item.Id }, state);
+        if (result.Success)
+        {
+            _model?.UnReviewExamines.Remove(item);
+        }
+        else
+        {
+            ToastService.Show("操作失败", result.Error?.Message, "error");
+        }
+    }
+}

@@ -1,0 +1,117 @@
+@using CnGalWebSite.DataModel.ViewModel.EditRecords
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.Core.Models
+
+@inject IExamineQueryService ExamineQueryService
+@inject IExamineCommandService ExamineCommandService
+@inject ICgToastService ToastService
+@inject NavigationManager NavigationManager
+
+@* 审阅记录列表面板（服务端分页） *@
+
+<CgDataTable TItem="UserReviewEditRecordOverviewModel"
+             Title="审阅记录列表"
+             OnServerQuery="LoadReviewRecordsAsync"
+             DefaultSortField="@nameof(UserReviewEditRecordOverviewModel.ReviewedTime)"
+             DefaultSortDesc="true"
+             @ref="_dataTable">
+
+    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" Title="审阅时间" Field="@nameof(UserReviewEditRecordOverviewModel.ReviewedTime)">
+        <ChildContent Context="item">
+            @(item.ReviewedTime?.ToString("yyyy-MM-dd HH:mm") ?? "—")
+        </ChildContent>
+    </CgDataTableColumn>
+
+    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" Title="词条名称" Sortable="false">
+        <ChildContent Context="item">
+            @(item.EntryName ?? "—")
+        </ChildContent>
+    </CgDataTableColumn>
+
+    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" Title="操作" Sortable="false">
+        <ChildContent Context="item">
+            @item.Operation.GetDisplayName()
+        </ChildContent>
+    </CgDataTableColumn>
+
+    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" Title="状态" Sortable="false">
+        <ChildContent Context="item">
+            <ReviewStateBadge State="@item.State" />
+        </ChildContent>
+    </CgDataTableColumn>
+
+    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" Title="编辑者" Sortable="false">
+        <ChildContent Context="item">
+            <a class="examine-user-link" href="/space/index/@item.UserId">@(item.UserName ?? "—")</a>
+        </ChildContent>
+    </CgDataTableColumn>
+
+    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" Title="操作" Sortable="false" Width="120px">
+        <ChildContent Context="item">
+            <div class="examine-actions">
+                <button class="examine-action-btn examine-action-btn--view" title="查看" @onclick="() => LookItem(item)">
+                    <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+                </button>
+                @if (item.ReviewedTime == null)
+                {
+                    <button class="examine-action-btn examine-action-btn--approve" title="已读" @onclick="() => ReadItem(item, EditRecordReviewState.Reviewed)">
+                        <CgMdiIcon Name="mdiEmailOpenOutline" aria-hidden="true" />
+                    </button>
+                    <button class="examine-action-btn examine-action-btn--ignore" title="忽略" @onclick="() => ReadItem(item, EditRecordReviewState.Ignored)">
+                        <CgMdiIcon Name="mdiBellOffOutline" aria-hidden="true" />
+                    </button>
+                }
+            </div>
+        </ChildContent>
+    </CgDataTableColumn>
+
+</CgDataTable>
+
+@code {
+    private CgDataTable<UserReviewEditRecordOverviewModel>? _dataTable;
+
+    private async Task<CgDataTableResult<UserReviewEditRecordOverviewModel>> LoadReviewRecordsAsync(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? "",
+            SortBy = string.IsNullOrWhiteSpace(request.SortField) ? new[] { "ReviewedTime" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await ExamineQueryService.GetUserReviewEditRecordsAsync(parameter);
+        if (result.Success && result.Data != null)
+        {
+            return new CgDataTableResult<UserReviewEditRecordOverviewModel>(
+                result.Data.Items.ToList(),
+                result.Data.Total);
+        }
+
+        return new CgDataTableResult<UserReviewEditRecordOverviewModel>([], 0);
+    }
+
+    private void LookItem(UserReviewEditRecordOverviewModel model)
+    {
+        NavigationManager.NavigateTo($"/examine?Id={model.ExamineId}");
+    }
+
+    private async Task ReadItem(UserReviewEditRecordOverviewModel model, EditRecordReviewState state)
+    {
+        var operationName = state == EditRecordReviewState.Reviewed ? "标记已读" : "忽略";
+        var result = await ExamineCommandService.EditReviewStateAsync(new[] { model.ExamineId }, state);
+        if (result.Success)
+        {
+            ToastService.Show(operationName + "成功", variant: "success");
+            if (_dataTable != null)
+            {
+                await _dataTable.RefreshAsync();
+            }
+        }
+        else
+        {
+            ToastService.Show(operationName + "失败", result.Error?.Message, "error");
+        }
+    }
+}

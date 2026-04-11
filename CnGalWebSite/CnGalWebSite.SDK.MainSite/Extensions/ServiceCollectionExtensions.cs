@@ -160,6 +160,10 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<IAdminQueryService, AdminQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IAdminCommandService, AdminCommandService>(services, apiBase, withAuth: true);
 
+        // Examine 服务（需认证，审核/审阅/监控）
+        RegisterSdkHttpClient<IExamineQueryService, ExamineQueryService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<IExamineCommandService, ExamineCommandService>(services, apiBase, withAuth: true);
+
         // 外部服务（DrawingBed / TimedTask，认证）
         RegisterSdkHttpClient<IFileQueryService, FileQueryService>(services, imageApiBase, withAuth: true);
         RegisterSdkHttpClient<ITimedTaskService, TimedTaskService>(services, taskApiBase, withAuth: true);

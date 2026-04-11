@@ -1,0 +1,197 @@
+.user-content-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+/* ── 区块 ── */
+.user-content-section {
+    margin-bottom: var(--cg-spacing-6);
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    padding: var(--cg-spacing-5);
+}
+
+.user-content-section__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--cg-spacing-4);
+}
+
+.user-content-section__title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+::deep .user-content-section__icon {
+    width: 20px;
+    height: 20px;
+    color: var(--cg-color-primary);
+}
+
+/* ── 卡片 ── */
+.user-content-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    border-radius: var(--cg-radius-md);
+    transition: background var(--cg-transition-fast);
+}
+
+.user-content-card:hover {
+    background: var(--cg-color-hover-overlay);
+}
+
+.user-content-card + .user-content-card {
+    border-top: 1px solid var(--cg-color-border);
+}
+
+.user-content-card__info {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.user-content-card__user {
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-text);
+    font-size: var(--cg-font-size-sm);
+}
+
+.user-content-card__desc {
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+}
+
+.user-content-card__time {
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-xs);
+}
+
+.user-content-card__actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+/* ── 操作按钮 ── */
+.examine-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: var(--cg-radius-md);
+    background: transparent;
+    cursor: pointer;
+    transition: background var(--cg-transition-fast);
+    text-decoration: none;
+}
+
+.examine-action-btn:hover {
+    background: var(--cg-color-hover-overlay);
+}
+
+::deep .examine-action-btn .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.examine-action-btn--view {
+    color: var(--cg-color-primary);
+}
+
+.examine-action-btn--approve {
+    color: var(--cg-color-success);
+}
+
+.examine-action-btn--ignore {
+    color: var(--cg-color-warning);
+}
+
+/* ── 词条网格 ── */
+.user-content-entry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--cg-spacing-4);
+}
+
+.user-content-entry-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--cg-color-text);
+    border-radius: var(--cg-radius-md);
+    overflow: hidden;
+    transition: box-shadow var(--cg-transition-fast), transform var(--cg-transition-fast);
+    border: 1px solid var(--cg-color-border);
+}
+
+.user-content-entry-card:hover {
+    box-shadow: var(--cg-shadow-md);
+    transform: translateY(-2px);
+}
+
+.user-content-entry-card__image {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+}
+
+.user-content-entry-card__placeholder {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--cg-color-section-bg);
+    color: var(--cg-color-text-muted);
+}
+
+::deep .user-content-entry-card__placeholder .cg-mdi-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.user-content-entry-card__name {
+    padding: var(--cg-spacing-2);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+    text-align: center;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── 空状态 ── */
+.user-content-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-3);
+    min-height: 200px;
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-md);
+}
+
+::deep .user-content-empty__icon {
+    width: 48px;
+    height: 48px;
+    color: var(--cg-color-success);
+}

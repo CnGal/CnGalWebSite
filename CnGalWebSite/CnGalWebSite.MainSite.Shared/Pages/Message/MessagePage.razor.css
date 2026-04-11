@@ -1,7 +1,7 @@
 /* ── MessagePage ── */
 
 .message-page {
-    max-width: 900px;
+    max-width: 1200px;
     margin: var(--cg-spacing-6) auto;
     padding: 0 var(--cg-spacing-4);
 }
