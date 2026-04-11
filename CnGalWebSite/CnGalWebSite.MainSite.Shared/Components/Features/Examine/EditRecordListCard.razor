@@ -1,0 +1,76 @@
+@using CnGalWebSite.DataModel.ViewModel.Admin
+@using CnGalWebSite.DataModel.Model
+
+@* 编辑记录列表卡片 — 通用组件，可嵌入词条/文章/视频/标签/周边详情页 *@
+
+@if (Records is not null && Records.Count > 0)
+{
+    <section class="edit-record-list-card" aria-label="编辑记录">
+        <h2><CgMdiIcon Name="mdiHistory" aria-hidden="true" />编辑记录</h2>
+
+        <div class="edit-record-list-card__list" role="list">
+            @{
+                var displayRecords = ShowAll ? Records : Records.Take(MaxCount).ToList();
+            }
+            @foreach (var item in displayRecords)
+            {
+                <a class="edit-record-list-card__item"
+                   href="@($"/home/editrecord?ContrastId={item.Id}")"
+                   role="listitem">
+                    <div class="edit-record-list-card__avatar">
+                        @if (!string.IsNullOrWhiteSpace(item.UserInfor?.PhotoPath))
+                        {
+                            <img src="@item.UserInfor.PhotoPath"
+                                 alt="@(item.UserInfor.Name ?? "用户")"
+                                 loading="lazy" />
+                        }
+                        else
+                        {
+                            <CgMdiIcon Name="mdiAccountCircleOutline" aria-hidden="true" />
+                        }
+                    </div>
+                    <div class="edit-record-list-card__content">
+                        <div class="edit-record-list-card__header">
+                            <span class="edit-record-list-card__user">@(item.UserInfor?.Name ?? "—")</span>
+                            <span class="edit-record-list-card__op">@item.Operation.GetDisplayName()</span>
+                        </div>
+                        <div class="edit-record-list-card__time">
+                            <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" />
+                            @item.ApplyTime.ToString("yyyy-MM-dd HH:mm")
+                        </div>
+                    </div>
+                    <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+                </a>
+            }
+        </div>
+
+        @if (!ShowAll && Records.Count > MaxCount)
+        {
+            <a class="edit-record-list-card__more"
+               href="@($"/home/editrecord?ContrastId={Records.First().Id}")">
+                查看全部 @Records.Count 条编辑记录
+                <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
+            </a>
+        }
+    </section>
+}
+
+@code {
+    /// <summary>
+    /// 编辑记录列表（已通过的审核记录）。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<ExaminedNormalListModel>? Records { get; set; }
+
+    /// <summary>
+    /// 默认最多显示的记录数。
+    /// </summary>
+    [Parameter]
+    public int MaxCount { get; set; } = 8;
+
+    /// <summary>
+    /// 是否显示全部记录。
+    /// </summary>
+    [Parameter]
+    public bool ShowAll { get; set; }
+}

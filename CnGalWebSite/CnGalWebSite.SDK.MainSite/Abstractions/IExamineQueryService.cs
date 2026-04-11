@@ -1,6 +1,7 @@
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.EditRecords;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.SDK.MainSite.Models;
 
@@ -56,5 +57,40 @@ public interface IExamineQueryService
     Task<SdkResult<ExamineViewModel>> GetContrastExamineAsync(
         long contrastId,
         long currentId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取指定词条的编辑记录列表（已通过的审核记录）。
+    /// </summary>
+    Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetEntryEditRecordsAsync(
+        int entryId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取指定文章的编辑记录列表（已通过的审核记录）。
+    /// </summary>
+    Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetArticleEditRecordsAsync(
+        long articleId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取指定视频的编辑记录列表（已通过的审核记录）。
+    /// </summary>
+    Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetVideoEditRecordsAsync(
+        long videoId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取指定标签的编辑记录列表（已通过的审核记录）。
+    /// </summary>
+    Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetTagEditRecordsAsync(
+        long tagId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取指定周边的编辑记录列表（已通过的审核记录）。
+    /// </summary>
+    Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetPeripheryEditRecordsAsync(
+        long peripheryId,
         CancellationToken cancellationToken = default);
 }

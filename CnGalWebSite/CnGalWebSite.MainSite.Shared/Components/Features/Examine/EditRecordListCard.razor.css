@@ -1,0 +1,159 @@
+.edit-record-list-card {
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    border-radius: var(--cg-radius-xl);
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    padding: 1.5rem;
+}
+
+.edit-record-list-card > h2 {
+    margin: 0 0 1.25rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--cg-color-text);
+}
+
+.edit-record-list-card > h2 ::deep .cg-mdi-icon {
+    width: 2rem;
+    height: 2rem;
+    color: var(--cg-color-primary);
+}
+
+.edit-record-list-card__list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+@media (min-width: 640px) {
+    .edit-record-list-card__list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 2px 1rem;
+    }
+}
+
+.edit-record-list-card__item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.5rem;
+    border-radius: var(--cg-radius-md);
+    text-decoration: none;
+    color: inherit;
+    transition: background var(--cg-transition-fast);
+}
+
+.edit-record-list-card__item:hover {
+    background: var(--cg-color-hover-overlay);
+}
+
+::deep .edit-record-list-card__item > .cg-mdi-icon {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    color: var(--cg-color-primary);
+    opacity: 0.5;
+    transition: opacity var(--cg-transition-fast);
+}
+
+.edit-record-list-card__item:hover ::deep > .cg-mdi-icon {
+    opacity: 1;
+}
+
+::deep .edit-record-list-card__avatar .cg-mdi-icon {
+    color: var(--cg-color-primary);
+}
+
+.edit-record-list-card__avatar {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--cg-radius-full);
+    overflow: hidden;
+    background: color-mix(in srgb, var(--cg-color-primary) 8%, var(--cg-color-bg));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-record-list-card__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+::deep .edit-record-list-card__avatar .cg-mdi-icon {
+    width: 22px;
+    height: 22px;
+    color: var(--cg-color-text-muted);
+}
+
+.edit-record-list-card__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.edit-record-list-card__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2px;
+}
+
+.edit-record-list-card__user {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--cg-color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.edit-record-list-card__op {
+    font-size: 0.75rem;
+    color: var(--cg-color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.edit-record-list-card__time {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.75rem;
+    color: var(--cg-color-text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+::deep .edit-record-list-card__time .cg-mdi-icon {
+    width: 14px;
+    height: 14px;
+}
+
+.edit-record-list-card__more {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 0.35rem;
+    margin-top: 0.75rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--cg-color-primary);
+    text-decoration: none;
+    border-radius: var(--cg-radius-md);
+    transition: background var(--cg-transition-fast);
+}
+
+.edit-record-list-card__more:hover {
+    background: color-mix(in srgb, var(--cg-color-primary) 8%, transparent);
+}
+
+::deep .edit-record-list-card__more .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+}

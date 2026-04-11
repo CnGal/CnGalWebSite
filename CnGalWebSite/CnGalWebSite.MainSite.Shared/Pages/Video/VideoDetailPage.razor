@@ -1,8 +1,11 @@
 @page "/videos/index/{Id:long}"
 @inject IVideoQueryService VideoQueryService
+@inject IExamineQueryService ExamineQueryService
 @using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.MainSite.Shared.Components.Features.Video.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+@using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 @using CnGalWebSite.MainSite.Shared.Services
 
 <PageTitle>@(Model is null ? "视频详情" : $"{GetDisplayTitle()} - 视频详情")</PageTitle>
@@ -111,6 +114,8 @@ else if (Model is not null)
                                   DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
             </EntrySection>
 
+            <EditRecordListCard Records="_editRecords" />
+
             <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
                 Type="CommentType.CommentVideo"
                 ObjectId="@Model.Id.ToString()"
@@ -132,19 +137,27 @@ else
     public long Id { get; set; }
 
     private VideoDetailViewModel? Model;
+    private IReadOnlyList<ExaminedNormalListModel>? _editRecords;
     private string? ErrorMessage;
 
     protected override async Task OnParametersSetAsync()
     {
-        var result = await VideoQueryService.GetVideoDetailAsync(Id);
+        var videoTask = VideoQueryService.GetVideoDetailAsync(Id);
+        var editRecordsTask = ExamineQueryService.GetVideoEditRecordsAsync(Id);
+
+        var result = await videoTask;
         if (result.Success && result.Data is not null)
         {
             ErrorMessage = null;
             Model = result.Data;
+
+            var editRecordsResult = await editRecordsTask;
+            _editRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
             return;
         }
 
         Model = null;
+        _editRecords = null;
         ErrorMessage = result.Error?.Message ?? "请稍后重试";
     }
 

@@ -159,9 +159,21 @@
     private bool _isContrastLoading;
     private bool _isError;
     private string _errorMessage = string.Empty;
+    private bool _initialized;
+    private bool _selfNavigating;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
+        // Only reload on first render or self-initiated navigation.
+        // When navigating away, Blazor resets query params and fires this method;
+        // _selfNavigating is false in that case, so we skip the reload.
+        if (_initialized && !_selfNavigating)
+        {
+            return;
+        }
+        _selfNavigating = false;
+        _initialized = true;
+
         await LoadDataAsync();
     }
 

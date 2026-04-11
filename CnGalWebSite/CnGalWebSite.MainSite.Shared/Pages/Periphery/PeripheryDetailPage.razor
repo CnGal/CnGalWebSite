@@ -1,8 +1,11 @@
 @page "/peripheries/index/{Id:long}"
 @inject IPeripheryQueryService PeripheryQueryService
+@inject IExamineQueryService ExamineQueryService
 @using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.MainSite.Shared.Components.Features.Periphery.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+@using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 
 <PageTitle>@(_model is null ? "周边详情" : $"{GetDisplayTitle()} - 周边详情")</PageTitle>
 
@@ -62,6 +65,8 @@ else if (_model is not null)
                                    SongCount="_model.SongCount" />
 
                 <PeripheryRelatedPeripheries Peripheries="_model.Peripheries" />
+
+                <EditRecordListCard Records="_editRecords" />
             </aside>
         </section>
 
@@ -89,6 +94,8 @@ else if (_model is not null)
 
             <PeripheryRelatedPeripheries Peripheries="_model.Peripheries" />
 
+            <EditRecordListCard Records="_editRecords" />
+
             <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
                 Type="CommentType.CommentPeriphery"
                 ObjectId="@_model.Id.ToString()"
@@ -110,19 +117,27 @@ else
     public long Id { get; set; }
 
     private PeripheryDetailViewModel? _model;
+    private IReadOnlyList<ExaminedNormalListModel>? _editRecords;
     private string? _errorMessage;
 
     protected override async Task OnParametersSetAsync()
     {
-        var result = await PeripheryQueryService.GetPeripheryDetailAsync(Id);
+        var peripheryTask = PeripheryQueryService.GetPeripheryDetailAsync(Id);
+        var editRecordsTask = ExamineQueryService.GetPeripheryEditRecordsAsync(Id);
+
+        var result = await peripheryTask;
         if (result.Success && result.Data is not null)
         {
             _errorMessage = null;
             _model = result.Data;
+
+            var editRecordsResult = await editRecordsTask;
+            _editRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
             return;
         }
 
         _model = null;
+        _editRecords = null;
         _errorMessage = result.Error?.Message ?? "请稍后重试";
     }
 

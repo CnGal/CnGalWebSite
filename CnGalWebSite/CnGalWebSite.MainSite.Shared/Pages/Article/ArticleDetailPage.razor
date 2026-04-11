@@ -1,9 +1,12 @@
 @page "/articles/index/{Id:long}"
 @inject IArticleQueryService ArticleQueryService
+@inject IExamineQueryService ExamineQueryService
 @using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.ViewModel.Search
 @using CnGalWebSite.MainSite.Shared.Components.Features.Article.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+@using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 @using CnGalWebSite.MainSite.Shared.Services
 
 <PageTitle>@(_model is null ? "文章详情" : $"{GetDisplayTitle()} - 文章详情")</PageTitle>
@@ -106,6 +109,8 @@ else if (_model is not null)
                 </ul>
             </EntrySection>
 
+            <EditRecordListCard Records="_editRecords" />
+
             <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
                 Type="CommentType.CommentArticle"
                 ObjectId="@_model.Id.ToString()"
@@ -127,19 +132,27 @@ else
     public long Id { get; set; }
 
     private ArticleDetailViewModel? _model;
+    private IReadOnlyList<ExaminedNormalListModel>? _editRecords;
     private string? _errorMessage;
 
     protected override async Task OnParametersSetAsync()
     {
-        var result = await ArticleQueryService.GetArticleDetailAsync(Id);
+        var articleTask = ArticleQueryService.GetArticleDetailAsync(Id);
+        var editRecordsTask = ExamineQueryService.GetArticleEditRecordsAsync(Id);
+
+        var result = await articleTask;
         if (result.Success && result.Data is not null)
         {
             _errorMessage = null;
             _model = result.Data;
+
+            var editRecordsResult = await editRecordsTask;
+            _editRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
             return;
         }
 
         _model = null;
+        _editRecords = null;
         _errorMessage = result.Error?.Message ?? "请稍后重试";
     }
 
