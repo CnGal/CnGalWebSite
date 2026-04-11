@@ -3,8 +3,10 @@
 @inject IPlayedGameQueryService PlayedGameQueryService
 @inject IPeripheryQueryService PeripheryQueryService
 @inject IFavoriteFolderQueryService FavoriteFolderQueryService
+@inject IExamineQueryService ExamineQueryService
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.ViewModel.Search
 @using CnGalWebSite.DataModel.ViewModel.Peripheries
 @using CnGalWebSite.DataModel.ViewModel.Favorites
@@ -138,6 +140,8 @@ else if (Model is not null)
                                       DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
                 </EntrySection>
 
+                <EntryEditRecordCard Records="EditRecords" />
+
                 <EntryCatalogCard Folders="RelateFolders" />
             </aside>
         </section>
@@ -252,6 +256,8 @@ else if (Model is not null)
                                               DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
                         </EntrySection>
 
+                        <EntryEditRecordCard Records="EditRecords" />
+
                         <EntryCatalogCard Folders="RelateFolders" />
                     </section>
 
@@ -285,15 +291,17 @@ else
     private PlayedGameOverviewViewModel? ScoreOverview;
     private GameOverviewPeripheryListModel? PeripheryOverview;
     private IReadOnlyList<FavoriteFolderOverviewModel>? RelateFolders;
+    private IReadOnlyList<ExaminedNormalListModel>? EditRecords;
     private string? ErrorMessage;
 
     protected override async Task OnParametersSetAsync()
     {
-        // 并行请求词条详情、评分概览、周边概览、相关目录
+        // 并行请求词条详情、评分概览、周边概览、相关目录、编辑记录
         var entryTask = EntryQueryService.GetEntryDetailAsync(Id);
         var scoreTask = PlayedGameQueryService.GetOverviewAsync(Id);
         var peripheryTask = PeripheryQueryService.GetEntryOverviewPeripheriesAsync(Id);
         var catalogTask = FavoriteFolderQueryService.GetRelateFavoriteFoldersAsync(FavoriteObjectType.Entry, Id);
+        var editRecordsTask = ExamineQueryService.GetEntryEditRecordsAsync(Id);
 
         var result = await entryTask;
         if (result.Success && result.Data is not null)
@@ -320,6 +328,10 @@ else
             var catalogResult = await catalogTask;
             RelateFolders = catalogResult.Success ? catalogResult.Data : null;
 
+            // 加载编辑记录
+            var editRecordsResult = await editRecordsTask;
+            EditRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
+
             return;
         }
 
@@ -327,6 +339,7 @@ else
         ScoreOverview = null;
         PeripheryOverview = null;
         RelateFolders = null;
+        EditRecords = null;
         ErrorMessage = result.Error?.Message ?? "请稍后重试";
     }
 

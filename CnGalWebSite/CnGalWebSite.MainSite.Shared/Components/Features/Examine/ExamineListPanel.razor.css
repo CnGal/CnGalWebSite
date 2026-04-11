@@ -1,0 +1,49 @@
+.examine-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.examine-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: var(--cg-radius-md);
+    background: transparent;
+    cursor: pointer;
+    transition: background var(--cg-transition-fast);
+}
+
+.examine-action-btn:hover {
+    background: var(--cg-color-hover-overlay);
+}
+
+::deep .examine-action-btn .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.examine-action-btn--view {
+    color: var(--cg-color-primary);
+}
+
+.examine-action-btn--approve {
+    color: var(--cg-color-success);
+}
+
+.examine-action-btn--reject {
+    color: var(--cg-color-error);
+}
+
+.examine-user-link {
+    color: var(--cg-color-link);
+    text-decoration: none;
+    font-size: var(--cg-font-size-sm);
+}
+
+.examine-user-link:hover {
+    text-decoration: underline;
+}

@@ -1,0 +1,163 @@
+.examine-pre-data-view {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+}
+
+/* ── Section ── */
+.examine-pre-data-view__section {
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-md);
+    overflow: hidden;
+}
+
+.examine-pre-data-view__section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    margin: 0;
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    border-bottom: 1px solid var(--cg-color-border);
+    background: color-mix(in srgb, var(--cg-color-surface) 60%, var(--cg-color-bg) 40%);
+}
+
+::deep .examine-pre-data-view__section-title .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--cg-color-primary);
+}
+
+.examine-pre-data-view__section-body {
+    padding: var(--cg-spacing-3);
+    max-height: 400px;
+    overflow-y: auto;
+    font-size: var(--cg-font-size-sm);
+    line-height: 1.6;
+}
+
+.examine-pre-data-view__group-title {
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-muted);
+    padding: var(--cg-spacing-2) 0 var(--cg-spacing-1);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ── Table ── */
+.examine-pre-data-view__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--cg-font-size-xs);
+}
+
+.examine-pre-data-view__table th,
+.examine-pre-data-view__table td {
+    padding: var(--cg-spacing-1) var(--cg-spacing-2);
+    text-align: left;
+    border-bottom: 1px solid var(--cg-color-border);
+    word-break: break-word;
+}
+
+.examine-pre-data-view__table th {
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-muted);
+    background: color-mix(in srgb, var(--cg-color-bg) 50%, var(--cg-color-surface) 50%);
+}
+
+.examine-pre-data-view__table td {
+    color: var(--cg-color-text);
+}
+
+/* ── Image Grid ── */
+.examine-pre-data-view__image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--cg-spacing-2);
+}
+
+.examine-pre-data-view__image-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.examine-pre-data-view__image-item img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--cg-radius-sm);
+    border: 1px solid var(--cg-color-border);
+}
+
+.examine-pre-data-view__image-note {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Tag List ── */
+.examine-pre-data-view__tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-1);
+}
+
+.examine-pre-data-view__tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--cg-spacing-2);
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-primary);
+    background: color-mix(in srgb, var(--cg-color-primary) 10%, transparent);
+    border-radius: var(--cg-radius-full);
+    border: 1px solid color-mix(in srgb, var(--cg-color-primary) 20%, transparent);
+}
+
+/* ── Audio ── */
+.examine-pre-data-view__audio-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-1) 0;
+    border-bottom: 1px solid var(--cg-color-border);
+    font-size: var(--cg-font-size-xs);
+}
+
+.examine-pre-data-view__audio-item:last-child {
+    border-bottom: none;
+}
+
+.examine-pre-data-view__audio-item a {
+    color: var(--cg-color-link);
+    text-decoration: none;
+    font-size: var(--cg-font-size-xs);
+}
+
+.examine-pre-data-view__audio-item a:hover {
+    text-decoration: underline;
+}
+
+/* ── Empty ── */
+.examine-pre-data-view__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-4);
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+}
+
+::deep .examine-pre-data-view__empty .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+}

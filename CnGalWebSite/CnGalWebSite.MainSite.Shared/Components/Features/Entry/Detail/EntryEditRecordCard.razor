@@ -1,0 +1,17 @@
+@using CnGalWebSite.DataModel.ViewModel.Admin
+
+@* 词条编辑记录卡片 — 委托到通用 EditRecordListCard *@
+
+<CnGalWebSite.MainSite.Shared.Components.Features.Examine.EditRecordListCard
+    Records="Records" MaxCount="MaxCount" ShowAll="ShowAll" Columns="1" />
+
+@code {
+    [Parameter]
+    public IReadOnlyList<ExaminedNormalListModel>? Records { get; set; }
+
+    [Parameter]
+    public int MaxCount { get; set; } = 8;
+
+    [Parameter]
+    public bool ShowAll { get; set; }
+}

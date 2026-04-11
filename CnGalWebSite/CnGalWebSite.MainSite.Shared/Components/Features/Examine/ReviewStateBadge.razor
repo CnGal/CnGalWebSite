@@ -1,0 +1,37 @@
+@using CnGalWebSite.DataModel.Model
+
+@* 审阅状态标签：未读 / 已读 / 忽略 *@
+
+<span class="review-state-badge @GetVariantClass()">
+    <CgMdiIcon Name="@GetIconName()" class="review-state-badge__icon" aria-hidden="true" />
+    <span>@GetDisplayText()</span>
+</span>
+
+@code {
+    [Parameter]
+    public EditRecordReviewState State { get; set; }
+
+    private string GetVariantClass() => State switch
+    {
+        EditRecordReviewState.UnRead => "review-state-badge--unread",
+        EditRecordReviewState.Reviewed => "review-state-badge--reviewed",
+        EditRecordReviewState.Ignored => "review-state-badge--ignored",
+        _ => "review-state-badge--unread"
+    };
+
+    private string GetIconName() => State switch
+    {
+        EditRecordReviewState.UnRead => "mdiEmailOutline",
+        EditRecordReviewState.Reviewed => "mdiCheckBold",
+        EditRecordReviewState.Ignored => "mdiBellOffOutline",
+        _ => "mdiEmailOutline"
+    };
+
+    private string GetDisplayText() => State switch
+    {
+        EditRecordReviewState.UnRead => "未读",
+        EditRecordReviewState.Reviewed => "已读",
+        EditRecordReviewState.Ignored => "忽略",
+        _ => "未读"
+    };
+}

@@ -292,6 +292,29 @@
     border-radius: var(--cg-radius-sm);
 }
 
+::deep .home-upcoming-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0.2rem 0.5rem;
+    border-radius: var(--cg-radius-full);
+    color: var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 18%, transparent);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+::deep .home-upcoming-date .cg-mdi-icon {
+    width: 0.75rem;
+    height: 0.75rem;
+    flex-shrink: 0;
+}
+
 .home-card {
     border: 1px solid var(--cg-color-border);
     border-radius: var(--cg-radius-lg);

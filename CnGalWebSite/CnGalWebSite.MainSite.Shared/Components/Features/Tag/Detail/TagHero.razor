@@ -2,56 +2,52 @@
 
 @if (!string.IsNullOrWhiteSpace(Name))
 {
-    <section class="tag-hero">
-        @if (HasBackground)
+    <header class="tag-hero @(HasMainPicture ? "tag-hero--wide" : "tag-hero--no-image")">
+        @if (HasMainPicture)
         {
-            <div class="tag-hero-bg" style="background-image: url('@BackgroundPicture')"></div>
+            <div class="tag-hero-side">
+                <img src="@MainPicture" alt="@Name" class="tag-cover" loading="eager" decoding="async" />
+            </div>
         }
-
-        <div class="tag-hero-content">
-            @if (!string.IsNullOrWhiteSpace(MainPicture))
-            {
-                <img class="tag-hero-image" src="@MainPicture" alt="@Name" loading="eager" />
-            }
-
-            <div class="tag-hero-text">
-                <span class="tag-hero-type">
+        <div class="tag-hero-main">
+            <div class="tag-hero-top">
+                <span class="tag-type">
                     <CgMdiIcon Name="mdiTagMultipleOutline" />
                     标签
                 </span>
-                <h1>@Name</h1>
-                @if (!string.IsNullOrWhiteSpace(BriefIntroduction))
-                {
-                    <p class="tag-hero-intro">@BriefIntroduction</p>
-                }
-                <div class="tag-hero-meta">
-                    <CgMdiIcon Name="mdiEyeOutline" />
-                    <span>@ReaderCount 次浏览</span>
-                </div>
-                
-                @if (TagId > 0)
-                {
-                    <div class="tag-hero-actions">
-                        <AuthorizeView>
-                            <Authorized>
-                                <CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail.EntryFavoriteButton ObjectId="TagId" ObjectType="CnGalWebSite.DataModel.Model.FavoriteObjectType.Tag" />
-                                <a class="tag-edit-btn" href="/tags/edit/@TagId">
-                                    <CgMdiIcon Name="mdiPencilOutline" />
-                                    <span>编辑标签</span>
-                                </a>
-                            </Authorized>
-                            <NotAuthorized>
-                                <a class="tag-edit-btn tag-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/tags/edit/{TagId}")">
-                                    <CgMdiIcon Name="mdiPencilOutline" />
-                                    <span>登录后编辑</span>
-                                </a>
-                            </NotAuthorized>
-                        </AuthorizeView>
-                    </div>
-                }
             </div>
+            <h1>@Name</h1>
+            @if (!string.IsNullOrWhiteSpace(BriefIntroduction))
+            {
+                <p class="tag-brief">@BriefIntroduction</p>
+            }
+            <div class="tag-hero-meta">
+                <CgMdiIcon Name="mdiEyeOutline" />
+                <span>@ReaderCount 次浏览</span>
+            </div>
+
+            @if (TagId > 0)
+            {
+                <div class="tag-hero-actions">
+                    <AuthorizeView>
+                        <Authorized>
+                            <CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail.EntryFavoriteButton ObjectId="TagId" ObjectType="CnGalWebSite.DataModel.Model.FavoriteObjectType.Tag" />
+                            <a class="tag-edit-btn" href="/tags/edit/@TagId">
+                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                <span>编辑标签</span>
+                            </a>
+                        </Authorized>
+                        <NotAuthorized>
+                            <a class="tag-edit-btn tag-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/tags/edit/{TagId}")">
+                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                <span>登录后编辑</span>
+                            </a>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </div>
+            }
         </div>
-    </section>
+    </header>
 }
 
 @code {
@@ -62,5 +58,5 @@
     [Parameter] public int ReaderCount { get; set; }
     [Parameter] public int TagId { get; set; }
 
-    private bool HasBackground => !string.IsNullOrWhiteSpace(BackgroundPicture);
+    private bool HasMainPicture => !string.IsNullOrWhiteSpace(MainPicture);
 }

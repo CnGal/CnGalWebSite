@@ -1,175 +1,159 @@
+/* ── Tag Hero — aligned with EntryHero card layout ── */
+
 .tag-hero {
-    position: relative;
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: var(--cg-radius-xl);
-    overflow: hidden;
-    min-height: 180px;
-}
-
-.tag-hero-bg {
-    position: absolute;
-    inset: 0;
-    background-size: cover;
-    background-position: center;
-    filter: blur(12px) brightness(0.45);
-    transform: scale(1.1);
-    z-index: 0;
-}
-
-.tag-hero-content {
-    position: relative;
-    z-index: 1;
-    display: flex;
+    box-shadow: var(--cg-shadow-sm);
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 1.5rem;
-    padding: 2rem 1.5rem;
-    align-items: flex-start;
+    align-items: center;
 }
 
-.tag-hero-image {
-    width: 240px;
-    height: auto;
-    max-height: 320px;
-    object-fit: cover;
-    border-radius: var(--cg-radius-lg);
-    box-shadow: var(--cg-shadow-lg);
-    flex-shrink: 0;
-}
+/* ── Side (cover image) ── */
 
-.tag-hero-text {
+.tag-hero-side {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    min-width: 0;
+    gap: 1rem;
+    align-items: center;
+    width: 100%;
 }
 
-.tag-hero-text h1 {
+.tag-cover {
+    width: 100%;
+    aspect-ratio: 460 / 215;
+    object-fit: cover;
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    background: color-mix(in oklab, var(--cg-color-bg) 90%, white);
+    border-radius: var(--cg-radius-lg);
+    box-shadow: var(--cg-shadow-md);
+    max-width: 100%;
+}
+
+/* ── Main (text content) ── */
+
+.tag-hero-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.tag-hero-main h1 {
     margin: 0;
-    font-size: var(--cg-font-size-2xl);
-    font-weight: var(--cg-font-weight-bold);
-    color: white;
-    line-height: 1.3;
-    text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 900;
+    line-height: 1.2;
+    color: var(--cg-color-text);
 }
 
-.tag-hero:not(:has(.tag-hero-bg)) .tag-hero-text h1 {
-    color: var(--cg-color-text-primary);
-    text-shadow: none;
+.tag-hero-top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
-.tag-hero-type {
+.tag-type {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    background: var(--cg-color-primary);
-    color: var(--cg-color-on-primary);
-    padding: 0.2rem 0.75rem;
-    border-radius: var(--cg-radius-full);
-    font-size: var(--cg-font-size-xs);
-    font-weight: var(--cg-font-weight-bold);
+    border-radius: var(--cg-radius-sm);
+    background: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+    color: var(--cg-color-primary);
+    padding: 0.15rem 0.6rem;
+    font-size: 0.7rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    width: fit-content;
 }
 
-.tag-hero-intro {
+::deep .tag-type .cg-mdi-icon {
+    width: 14px;
+    height: 14px;
+}
+
+.tag-brief {
     margin: 0;
-    font-size: var(--cg-font-size-sm);
-    color: rgba(255, 255, 255, 0.85);
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.tag-hero:not(:has(.tag-hero-bg)) .tag-hero-intro {
     color: var(--cg-color-text-muted);
+    line-height: 1.7;
+    font-size: 0.95rem;
 }
 
 .tag-hero-meta {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    font-size: var(--cg-font-size-xs);
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.tag-hero:not(:has(.tag-hero-bg)) .tag-hero-meta {
+    font-size: 0.8rem;
     color: var(--cg-color-text-muted);
 }
 
-.tag-hero:not(:has(.tag-hero-bg)) {
-    background: var(--cg-color-surface);
-    border: 1px solid var(--cg-color-border);
+::deep .tag-hero-meta .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
 }
 
-/* ── 编辑按钮 ── */
+/* ── Actions (edit button) ── */
+
 .tag-hero-actions {
     display: flex;
-    gap: var(--cg-spacing-2);
-    margin-top: var(--cg-spacing-2);
+    gap: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 .tag-edit-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.4rem 1.2rem;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
     border-radius: var(--cg-radius-full);
-    font-size: var(--cg-font-size-sm);
-    font-weight: var(--cg-font-weight-semibold);
+    font-size: 0.8rem;
+    font-weight: 600;
     text-decoration: none;
-    transition: all var(--cg-transition-fast);
+    transition: var(--cg-transition-fast);
+    border: 1px solid var(--cg-color-primary);
     background: var(--cg-color-primary);
-    color: var(--cg-color-on-primary);
-    z-index: 2; /* Ensure clickability above background */
-    position: relative;
+    color: #fff;
 }
 
 .tag-edit-btn:hover {
-    background: var(--cg-color-primary-hover);
+    opacity: 0.9;
+}
+
+.tag-edit-btn ::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
 }
 
 .tag-edit-btn--login {
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
     color: var(--cg-color-primary);
-    border: 1px solid var(--cg-color-primary);
 }
 
 .tag-edit-btn--login:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: color-mix(in oklab, var(--cg-color-primary) 8%, transparent);
+    opacity: 1;
 }
 
-.tag-hero:not(:has(.tag-hero-bg)) .tag-edit-btn--login {
-    background: transparent;
-    border-color: var(--cg-color-primary);
-}
+/* ── Responsive: desktop grid ── */
 
-.tag-hero:not(:has(.tag-hero-bg)) .tag-edit-btn--login:hover {
-    background: var(--cg-color-hover-overlay);
-}
-
-@media (max-width: 640px) {
-    .tag-hero-content {
-        flex-direction: column;
+@media (min-width: 768px) {
+    .tag-hero {
+        gap: 2.5rem;
+        padding: 2rem;
         align-items: center;
-        text-align: center;
-        padding: 1.5rem 1rem;
     }
 
-    .tag-hero-image {
-        width: 160px;
+    .tag-hero--wide {
+        grid-template-columns: 5fr 7fr;
     }
+}
 
-    .tag-hero-text h1 {
-        font-size: var(--cg-font-size-xl);
-    }
-
-    .tag-hero-type {
-        align-self: center;
-    }
-
-    .tag-hero-meta, .tag-hero-actions {
-        justify-content: center;
-        align-self: center;
+@media (min-width: 1024px) {
+    .tag-hero--wide {
+        grid-template-columns: 5fr 7fr;
     }
 }

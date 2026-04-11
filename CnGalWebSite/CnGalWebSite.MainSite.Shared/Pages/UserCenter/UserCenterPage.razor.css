@@ -1,0 +1,60 @@
+.user-center-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--cg-spacing-6) var(--cg-spacing-4);
+}
+
+/* ── 页头 ── */
+.user-center-page__header {
+    margin-bottom: var(--cg-spacing-5);
+    padding-bottom: var(--cg-spacing-4);
+    border-bottom: 1px solid var(--cg-color-border);
+}
+
+.user-center-page__title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    font-size: var(--cg-font-size-xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+.user-center-page__title ::deep .cg-mdi-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--cg-color-primary);
+}
+
+
+/* ── 未登录状态 ── */
+.user-center-page--unauth {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    text-align: center;
+    gap: var(--cg-spacing-3);
+    color: var(--cg-color-text-muted);
+}
+
+::deep .user-center-unauth__icon {
+    width: 64px;
+    height: 64px;
+    color: var(--cg-color-text-muted);
+    opacity: 0.5;
+}
+
+.user-center-page--unauth h2 {
+    font-size: var(--cg-font-size-xl);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+.user-center-page--unauth p {
+    margin: 0;
+    font-size: var(--cg-font-size-sm);
+}

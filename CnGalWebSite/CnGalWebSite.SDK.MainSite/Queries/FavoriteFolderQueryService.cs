@@ -138,6 +138,12 @@ public sealed class FavoriteFolderQueryService(
 
     public async Task<SdkResult<IReadOnlyList<FavoriteObjectOverviewModel>>> GetFavoriteObjectsAsync(long folderId, int page, int pageSize, CancellationToken cancellationToken = default)
     {
+        var cacheKey = $"main-site:favorite-objects:{folderId}:{page}:{pageSize}";
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FavoriteObjectOverviewModel>? cached) && cached is not null)
+        {
+            return SdkResult<IReadOnlyList<FavoriteObjectOverviewModel>>.Ok(cached);
+        }
+
         var path = $"api/favorites/ListUserFavoriteObjects?folderId={folderId}";
         var queryParam = new CnGalWebSite.Core.Models.QueryParameterModel
         {
@@ -164,6 +170,7 @@ public sealed class FavoriteFolderQueryService(
 
             var queryResult = Deserialize<CnGalWebSite.Core.Models.QueryResultModel<FavoriteObjectOverviewModel>>(responseBody);
             IReadOnlyList<FavoriteObjectOverviewModel> data = queryResult?.Items?.ToList() ?? [];
+            memoryCache.Set(cacheKey, data, FolderDetailCacheDuration);
             return SdkResult<IReadOnlyList<FavoriteObjectOverviewModel>>.Ok(data);
         }
         catch (Exception ex)
@@ -175,12 +182,25 @@ public sealed class FavoriteFolderQueryService(
 
     public async Task<SdkResult<IReadOnlyList<FavoriteFolderOverviewModel>>> GetUserFoldersByFolderIdAsync(long folderId, CancellationToken cancellationToken = default)
     {
+        var cacheKey = $"main-site:user-folders-by-folder:{folderId}";
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FavoriteFolderOverviewModel>? cached) && cached is not null)
+        {
+            return SdkResult<IReadOnlyList<FavoriteFolderOverviewModel>>.Ok(cached);
+        }
+
         var path = $"api/favorites/GetUserFavoriteInforFromFolderId/{folderId}";
-        return await GetAsync<IReadOnlyList<FavoriteFolderOverviewModel>>(
+        var result = await GetAsync<IReadOnlyList<FavoriteFolderOverviewModel>>(
             path,
             "FAVORITE_FOLDER",
             "用户收藏夹列表（按收藏夹ID）",
             cancellationToken);
+
+        if (result.Success && result.Data is not null)
+        {
+            memoryCache.Set(cacheKey, result.Data, FolderDetailCacheDuration);
+        }
+
+        return result;
     }
 
     private static FavoriteFolderDetailViewModel MapToDetailViewModel(FavoriteFolderViewModel dto)

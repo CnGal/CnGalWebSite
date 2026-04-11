@@ -1,0 +1,117 @@
+﻿@page "/examine"
+@page "/home/examines"
+@rendermode InteractiveServer
+
+@using CnGalWebSite.DataModel.ViewModel.Admin
+@using CnGalWebSite.MainSite.Shared.Components.Features.Examine
+
+@inject IExamineQueryService ExamineQueryService
+@inject NavigationManager NavigationManager
+
+<PageTitle>审核详情 - CnGal资料站</PageTitle>
+
+<div class="examine-detail-page">
+    <header class="examine-detail-page__header">
+        <h1 class="examine-detail-page__title">
+            <CgMdiIcon Name="mdiFileDocumentCheckOutline" aria-hidden="true" />
+            <span>审核详情</span>
+        </h1>
+        <nav class="examine-detail-page__nav">
+            <a href="/usercenter" class="examine-detail-page__back">
+                <CgMdiIcon Name="mdiArrowLeft" aria-hidden="true" />
+                返回内容中心
+            </a>
+        </nav>
+    </header>
+
+    @if (Id <= 0 && _model is null)
+    {
+        <div class="examine-detail-page__error">
+            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
+            <p>请提供有效的审核记录 ID</p>
+            <a href="/usercenter" class="cg-btn cg-btn--primary">返回内容中心</a>
+        </div>
+    }
+    else if (_isLoading)
+    {
+        <div class="examine-detail-page__loading">
+            <CgProgressRing />
+            <span>加载审核记录中...</span>
+        </div>
+    }
+    else if (_isError)
+    {
+        <div class="examine-detail-page__error">
+            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
+            <p>@_errorMessage</p>
+            <CgButton Variant="primary" OnClick="LoadDataAsync">重试</CgButton>
+            <a href="/usercenter" class="cg-btn cg-btn--secondary">返回内容中心</a>
+        </div>
+    }
+    else if (_model is not null)
+    {
+        <ExamineDetailPanel Model="@_model" OnProcCompleted="OnProcCompleted" />
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public long Id { get; set; }
+
+    private ExamineViewModel? _model;
+    private bool _isLoading = true;
+    private bool _isError;
+    private string _errorMessage = string.Empty;
+    private bool _initialized;
+    private bool _selfNavigating;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Only reload on first render or self-initiated navigation.
+        // When navigating away, Blazor resets query params and fires this method;
+        // _selfNavigating is false in that case, so we skip the reload.
+        if (_initialized && !_selfNavigating)
+        {
+            return;
+        }
+        _selfNavigating = false;
+        _initialized = true;
+
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        if (Id <= 0)
+        {
+            _isLoading = false;
+            return;
+        }
+
+        _isLoading = true;
+        _isError = false;
+        _model = null;
+        StateHasChanged();
+
+        var result = await ExamineQueryService.GetExamineDetailAsync(Id);
+
+        if (result.Success && result.Data is not null)
+        {
+            _model = result.Data;
+        }
+        else
+        {
+            _isError = true;
+            _errorMessage = result.Error?.Message ?? "获取审核详情失败";
+        }
+
+        _isLoading = false;
+    }
+
+    private Task OnProcCompleted()
+    {
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

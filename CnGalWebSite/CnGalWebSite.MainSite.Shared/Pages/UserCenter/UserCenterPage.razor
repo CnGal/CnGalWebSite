@@ -1,0 +1,69 @@
+@page "/usercenter"
+@rendermode InteractiveServer
+
+@using CnGalWebSite.MainSite.Shared.Components.Features.Examine
+
+<PageTitle>内容中心 - CnGal</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        <div class="user-center-page">
+            <header class="user-center-page__header">
+                <h1 class="user-center-page__title">
+                    <CgMdiIcon Name="mdiAccountOutline" aria-hidden="true" />
+                    <span>内容中心</span>
+                </h1>
+            </header>
+
+            <CgTabs Items="@_tabs"
+                    Variant="underline"
+                    DefaultActiveKey="overview"
+                    AriaLabel="内容中心标签页"
+                    Id="user-center-tabs">
+                <PanelTemplate Context="key">
+                    @switch (key)
+                    {
+                        case "overview":
+                            <div class="user-center-page__panel">
+                                <UserContentOverview />
+                            </div>
+                            break;
+                        case "examines":
+                            <div class="user-center-page__panel">
+                                <ExamineListPanel />
+                            </div>
+                            break;
+                        case "reviews":
+                            <div class="user-center-page__panel">
+                                <ReviewRecordListPanel />
+                            </div>
+                            break;
+                        case "monitors":
+                            <div class="user-center-page__panel">
+                                <MonitorListPanel />
+                            </div>
+                            break;
+                    }
+                </PanelTemplate>
+            </CgTabs>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="user-center-page user-center-page--unauth">
+            <CgMdiIcon Name="mdiLockOutline" class="user-center-unauth__icon" aria-hidden="true" />
+            <h2>请先登录</h2>
+            <p>登录后即可查看你的审核记录、审阅和关注的词条。</p>
+            <a href="/authentication/login" class="cg-btn cg-btn--primary">登录</a>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private static readonly IReadOnlyList<CgTabItem> _tabs = new CgTabItem[]
+    {
+        new("overview", "概览", "mdiViewDashboardOutline"),
+        new("examines", "审核记录", "mdiFileDocumentCheckOutline"),
+        new("reviews", "审阅记录", "mdiEmailCheckOutline"),
+        new("monitors", "关注的词条", "mdiHeartOutline"),
+    };
+}
