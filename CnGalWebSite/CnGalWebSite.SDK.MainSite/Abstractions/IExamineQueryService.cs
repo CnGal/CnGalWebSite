@@ -1,6 +1,7 @@
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.EditRecords;
+using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.SDK.MainSite.Models;
 
 namespace CnGalWebSite.SDK.MainSite.Abstractions;
@@ -32,5 +33,19 @@ public interface IExamineQueryService
     /// 获取用户内容中心概览数据。
     /// </summary>
     Task<SdkResult<UserContentCenterViewModel>> GetUserContentCenterAsync(
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取编辑记录概览（某条目/文章/标签/视频/周边的全部已通过审核记录）。
+    /// </summary>
+    Task<SdkResult<ExaminesOverviewViewModel>> GetExaminesOverviewAsync(
+        long examineId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取单条审核记录详情。
+    /// </summary>
+    Task<SdkResult<ExamineViewModel>> GetExamineDetailAsync(
+        long examineId,
         CancellationToken cancellationToken = default);
 }

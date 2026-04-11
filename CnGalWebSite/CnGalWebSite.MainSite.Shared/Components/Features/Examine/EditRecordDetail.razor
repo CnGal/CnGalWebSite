@@ -1,0 +1,80 @@
+@using CnGalWebSite.DataModel.ViewModel.Home
+
+@* 编辑记录详情 — 展示选中编辑记录的概览、批注、备注 *@
+
+@if (Model is not null)
+{
+    <div class="edit-record-detail">
+        <div class="edit-record-detail__header">
+            <h3 class="edit-record-detail__title">
+                <CgMdiIcon Name="mdiFileDocumentOutline" aria-hidden="true" />
+                <span>@($"#{Model.Id:00000}") — @Model.Operation.GetDisplayName()</span>
+            </h3>
+            <div class="edit-record-detail__meta">
+                <span class="edit-record-detail__meta-item">
+                    <CgMdiIcon Name="mdiAccountOutline" aria-hidden="true" />
+                    @(Model.UserName ?? "—")
+                </span>
+                <span class="edit-record-detail__meta-item">
+                    <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" />
+                    @Model.ApplyTime.ToString("yyyy-MM-dd HH:mm")
+                </span>
+                @if (!string.IsNullOrWhiteSpace(Model.PassedAdminName))
+                {
+                    <span class="edit-record-detail__meta-item">
+                        <CgMdiIcon Name="mdiShieldCheckOutline" aria-hidden="true" />
+                        审核人：@Model.PassedAdminName
+                    </span>
+                }
+            </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.EditOverview))
+        {
+            <section class="edit-record-detail__section">
+                <h4 class="edit-record-detail__section-title">
+                    <CgMdiIcon Name="mdiTextBoxOutline" aria-hidden="true" />
+                    编辑概览
+                </h4>
+                <div class="edit-record-detail__overview-content">
+                    <CgHtmlContent Content="@Model.EditOverview" />
+                </div>
+            </section>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Comments))
+        {
+            <section class="edit-record-detail__section edit-record-detail__section--comments">
+                <h4 class="edit-record-detail__section-title">
+                    <CgMdiIcon Name="mdiCommentTextOutline" aria-hidden="true" />
+                    批注
+                </h4>
+                <div class="edit-record-detail__text-block">@Model.Comments</div>
+            </section>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Note))
+        {
+            <section class="edit-record-detail__section edit-record-detail__section--note">
+                <h4 class="edit-record-detail__section-title">
+                    <CgMdiIcon Name="mdiNoteTextOutline" aria-hidden="true" />
+                    备注
+                </h4>
+                <div class="edit-record-detail__text-block">@Model.Note</div>
+            </section>
+        }
+
+        @if (string.IsNullOrWhiteSpace(Model.EditOverview) && string.IsNullOrWhiteSpace(Model.Comments) && string.IsNullOrWhiteSpace(Model.Note))
+        {
+            <div class="edit-record-detail__empty">
+                <CgMdiIcon Name="mdiInformationOutline" aria-hidden="true" />
+                <span>暂无详细内容</span>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public EditRecordAloneViewModel? Model { get; set; }
+}

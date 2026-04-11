@@ -107,7 +107,7 @@
 
 - `Components/DesignSystem/`：基础组件（Button/Input/Modal/Pagination...），不包含业务术语，前缀 `Cg`。
 - `Components/Features/{Domain}/`：业务组件（如词条卡片、文章摘要、评分区），按领域分组。
-  - 当前领域：`Entry`（词条，含 `Detail/` 详情子目录与 `Editor/` 编辑子目录）、`Article`（文章，含 `Detail/` 与 `Editor/`）、`Video`（视频，含 `Detail/` 与 `Editor/`）、`Tag`（标签，含 `Detail/` 与 `Editor/`）、`Home`（首页）、`Space`（个人空间）。
+  - 当前领域：`Entry`（词条，含 `Detail/` 详情子目录与 `Editor/` 编辑子目录）、`Article`（文章，含 `Detail/` 与 `Editor/`）、`Video`（视频，含 `Detail/` 与 `Editor/`）、`Tag`（标签，含 `Detail/` 与 `Editor/`）、`Home`（首页）、`Space`（个人空间）、`Examine`（审核/编辑记录）、`Message`（消息）。
 - `Components/Layout/`：非全局壳的布局辅助组件（如 `UserMenu`）。
 - `Layout/`：全局壳与导航（`MainLayout`），不承载业务查询逻辑。
 
@@ -187,15 +187,15 @@
 ### 6.1 目录规范（MUST）
 
 - `MainSite.Shared` 当前结构：
-  - `Pages/{Domain}/`（如 `Pages/Home/`、`Pages/Entry/`、`Pages/Article/`、`Pages/Video/`、`Pages/Tag/`、`Pages/Space/`）
+  - `Pages/{Domain}/`（如 `Pages/Home/`、`Pages/Entry/`、`Pages/Article/`、`Pages/Video/`、`Pages/Tag/`、`Pages/Space/`、`Pages/Examine/`、`Pages/Message/`、`Pages/UserCenter/`）
   - `Layout/`（`MainLayout`）
   - `Components/DesignSystem/`（基础组件）
-  - `Components/Features/{Domain}/`（业务组件，如 `Entry/Detail/`、`Entry/Editor/`、`Article/Detail/`、`Article/Editor/`、`Video/Detail/`、`Video/Editor/`、`Tag/Detail/`、`Tag/Editor/`、`Home/`、`Space/`）
+  - `Components/Features/{Domain}/`（业务组件，如 `Entry/Detail/`、`Entry/Editor/`、`Article/Detail/`、`Article/Editor/`、`Video/Detail/`、`Video/Editor/`、`Tag/Detail/`、`Tag/Editor/`、`Home/`、`Space/`、`Examine/`、`Message/`）
   - `Components/Layout/`（布局辅助组件，如 `UserMenu`）
   - `Services/`（前端服务接口与实现，如 `ICgToastService`、`CgToastService`；共享帮助方法，如 `ExternalLinkHelper`）
   - `Extensions/`（DI 注册扩展，如 `ServiceCollectionExtensions.AddMainSiteSharedServices`）
 - `SDK.MainSite` 当前结构：
-  - `Abstractions/`（12 个接口：`IHomeQueryService`、`IEntryQueryService`、`ISpaceQueryService`、`ITagQueryService`、`IArticleQueryService`、`IVideoQueryService`、`IEntryCommandService`、`IArticleCommandService`、`IVideoCommandService`、`ITagCommandService`、`IFileCommandService`、`IMainSiteAuthRequestService`）
+  - `Abstractions/`（14 个接口：`IHomeQueryService`、`IEntryQueryService`、`ISpaceQueryService`、`ITagQueryService`、`IArticleQueryService`、`IVideoQueryService`、`IEntryCommandService`、`IArticleCommandService`、`IVideoCommandService`、`ITagCommandService`、`IFileCommandService`、`IMainSiteAuthRequestService`、`IExamineQueryService`、`IExamineCommandService`）
   - `Queries/`（6 个查询服务：`Home`、`Entry`、`Space`、`Tag`、`Article`、`Video`）
   - `Commands/`（5 个命令服务：`Entry`、`Article`、`Video`、`Tag`、`File`）
   - `Auth/`

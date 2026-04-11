@@ -3,7 +3,7 @@
 
 @using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 
-<PageTitle>用户中心 - CnGal</PageTitle>
+<PageTitle>内容中心 - CnGal</PageTitle>
 
 <AuthorizeView>
     <Authorized>
@@ -11,14 +11,14 @@
             <header class="user-center-page__header">
                 <h1 class="user-center-page__title">
                     <CgMdiIcon Name="mdiAccountOutline" aria-hidden="true" />
-                    <span>用户中心</span>
+                    <span>内容中心</span>
                 </h1>
             </header>
 
             <CgTabs Items="@_tabs"
                     Variant="underline"
                     DefaultActiveKey="overview"
-                    AriaLabel="用户中心标签页"
+                    AriaLabel="内容中心标签页"
                     Id="user-center-tabs">
                 <PanelTemplate Context="key">
                     @switch (key)

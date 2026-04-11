@@ -1,0 +1,45 @@
+@using CnGalWebSite.DataModel.ViewModel.Home
+
+@* 编辑记录时间线列表 — 展示所有已通过的编辑记录，支持选中高亮 *@
+
+<div class="edit-record-timeline" role="list" aria-label="编辑记录列表">
+    @foreach (var item in Items.OrderByDescending(s => s.Id))
+    {
+        var isActive = item.Id == SelectedId;
+        <button class="edit-record-timeline__item @(isActive ? "edit-record-timeline__item--active" : "")"
+                role="listitem"
+                aria-current="@(isActive ? "true" : "false")"
+                @onclick="() => OnItemClick(item)">
+            <div class="edit-record-timeline__marker"></div>
+            <div class="edit-record-timeline__content">
+                <div class="edit-record-timeline__header">
+                    <span class="edit-record-timeline__id">@($"#{item.Id:00000}")</span>
+                    <span class="edit-record-timeline__op">@item.Operation.GetDisplayName()</span>
+                </div>
+                <div class="edit-record-timeline__meta">
+                    <span class="edit-record-timeline__user">
+                        <CgMdiIcon Name="mdiAccountOutline" aria-hidden="true" />
+                        @(item.UserName ?? "—")
+                    </span>
+                    <span class="edit-record-timeline__time">@item.ApplyTime.ToString("yyyy-MM-dd HH:mm")</span>
+                </div>
+            </div>
+        </button>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public List<EditRecordAloneViewModel> Items { get; set; } = new();
+
+    [Parameter]
+    public long SelectedId { get; set; }
+
+    [Parameter]
+    public EventCallback<EditRecordAloneViewModel> OnSelected { get; set; }
+
+    private async Task OnItemClick(EditRecordAloneViewModel item)
+    {
+        await OnSelected.InvokeAsync(item);
+    }
+}

@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.EditRecords;
+using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
@@ -115,4 +116,24 @@ public sealed class ExamineQueryService(HttpClient httpClient, IMemoryCache memo
 
         return result;
     }
+
+    // ─── 编辑记录概览 ───
+
+    public Task<SdkResult<ExaminesOverviewViewModel>> GetExaminesOverviewAsync(
+        long examineId, CancellationToken cancellationToken = default)
+        => GetAsync<ExaminesOverviewViewModel>(
+            $"api/examines/GetExaminesOverview/{examineId}",
+            "EXAMINE_OVERVIEW",
+            "编辑记录概览",
+            cancellationToken);
+
+    // ─── 单条审核详情 ───
+
+    public Task<SdkResult<ExamineViewModel>> GetExamineDetailAsync(
+        long examineId, CancellationToken cancellationToken = default)
+        => GetAsync<ExamineViewModel>(
+            $"api/examines/GetExamineView/{examineId}",
+            "EXAMINE_DETAIL",
+            "审核详情",
+            cancellationToken);
 }

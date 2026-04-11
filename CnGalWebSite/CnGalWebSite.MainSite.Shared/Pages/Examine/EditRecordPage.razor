@@ -1,0 +1,166 @@
+@page "/home/editrecord"
+@rendermode InteractiveServer
+
+@using CnGalWebSite.DataModel.ViewModel.Home
+@using CnGalWebSite.DataModel.ViewModel.Admin
+@using CnGalWebSite.MainSite.Shared.Components.Features.Examine
+
+@inject IExamineQueryService ExamineQueryService
+@inject NavigationManager NavigationManager
+
+<PageTitle>编辑记录 - CnGal资料站</PageTitle>
+
+<div class="edit-record-page">
+    <header class="edit-record-page__header">
+        <h1 class="edit-record-page__title">
+            <CgMdiIcon Name="mdiHistory" aria-hidden="true" />
+            <span>编辑记录</span>
+        </h1>
+    </header>
+
+    @if (_isLoading)
+    {
+        <div class="edit-record-page__loading">
+            <CgProgressRing />
+            <span>加载编辑记录中...</span>
+        </div>
+    }
+    else if (_isError)
+    {
+        <div class="edit-record-page__error">
+            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
+            <p>@_errorMessage</p>
+            <CgButton Variant="primary" OnClick="LoadDataAsync">重试</CgButton>
+            <a href="/" class="cg-btn cg-btn--secondary">返回首页</a>
+        </div>
+    }
+    else if (_overview is not null)
+    {
+        @* ── 对象信息标题栏 ── *@
+        <div class="edit-record-page__object-banner">
+            @if (!string.IsNullOrWhiteSpace(_overview.Image))
+            {
+                <img class="edit-record-page__object-image" src="@_overview.Image" alt="@_overview.ObjectName" loading="lazy" />
+            }
+            <div class="edit-record-page__object-info">
+                <h2 class="edit-record-page__object-name">@($"『{_overview.ObjectName}』历史编辑记录总览")</h2>
+                @if (!string.IsNullOrWhiteSpace(_overview.ObjectBriefIntroduction))
+                {
+                    <p class="edit-record-page__object-desc">@_overview.ObjectBriefIntroduction</p>
+                }
+                <a class="edit-record-page__object-link" href="@GetObjectUrl()">
+                    <CgMdiIcon Name="mdiOpenInNew" aria-hidden="true" />
+                    查看详情
+                </a>
+            </div>
+        </div>
+
+        @* ── 主体：左侧时间线 + 右侧详情 ── *@
+        <div class="edit-record-page__body">
+            <aside class="edit-record-page__sidebar">
+                <div class="edit-record-page__sidebar-header">
+                    <CgMdiIcon Name="mdiFormatListBulleted" aria-hidden="true" />
+                    <span>编辑记录 (@_overview.Examines.Count)</span>
+                </div>
+                <EditRecordTimeline Items="@_overview.Examines"
+                                    SelectedId="@_selectedId"
+                                    OnSelected="OnTimelineItemSelected" />
+            </aside>
+            <main class="edit-record-page__main">
+                @if (_selectedRecord is not null)
+                {
+                    <EditRecordDetail Model="@_selectedRecord" />
+                }
+                else
+                {
+                    <div class="edit-record-page__no-selection">
+                        <CgMdiIcon Name="mdiCursorDefaultClickOutline" aria-hidden="true" />
+                        <span>请在左侧选择一条编辑记录查看详情</span>
+                    </div>
+                }
+            </main>
+        </div>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public long ContrastId { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public long CurrentId { get; set; }
+
+    private ExaminesOverviewViewModel? _overview;
+    private EditRecordAloneViewModel? _selectedRecord;
+    private long _selectedId;
+    private bool _isLoading = true;
+    private bool _isError;
+    private string _errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        if (ContrastId <= 0)
+        {
+            _isError = true;
+            _errorMessage = "缺少必要的编辑记录ID参数";
+            _isLoading = false;
+            return;
+        }
+
+        _isLoading = true;
+        _isError = false;
+        _overview = null;
+        _selectedRecord = null;
+        StateHasChanged();
+
+        var result = await ExamineQueryService.GetExaminesOverviewAsync(ContrastId);
+
+        if (result.Success && result.Data is not null)
+        {
+            _overview = result.Data;
+
+            // 定位选中项：优先选 ContrastId 对应的记录，其次选 IsSelected=true 的
+            _selectedRecord = _overview.Examines.FirstOrDefault(e => e.Id == ContrastId)
+                ?? _overview.Examines.FirstOrDefault(e => e.IsSelected)
+                ?? _overview.Examines.FirstOrDefault();
+
+            _selectedId = _selectedRecord?.Id ?? 0;
+        }
+        else
+        {
+            _isError = true;
+            _errorMessage = result.Error?.Message ?? "获取编辑记录概览失败";
+        }
+
+        _isLoading = false;
+    }
+
+    private Task OnTimelineItemSelected(EditRecordAloneViewModel item)
+    {
+        _selectedRecord = item;
+        _selectedId = item.Id;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private string? GetObjectUrl()
+    {
+        if (_overview is null) return null;
+        return _overview.Type switch
+        {
+            ExaminedNormalListModelType.Entry => $"/entries/index/{_overview.ObjectId}",
+            ExaminedNormalListModelType.Article => $"/articles/index/{_overview.ObjectId}",
+            ExaminedNormalListModelType.Periphery => $"/peripheries/index/{_overview.ObjectId}",
+            ExaminedNormalListModelType.Tag => $"/tags/index/{_overview.ObjectId}",
+            ExaminedNormalListModelType.Video => $"/videos/index/{_overview.ObjectId}",
+            _ => null
+        };
+    }
+}
