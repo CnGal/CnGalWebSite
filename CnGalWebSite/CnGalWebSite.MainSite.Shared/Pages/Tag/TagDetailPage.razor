@@ -49,9 +49,8 @@ else if (_model is not null)
 else
 {
     <section class="tag-loading" aria-label="加载中">
-        <div class="tag-loading-block tag-loading-block--wide"></div>
-        <div class="tag-loading-block"></div>
-        <div class="tag-loading-block"></div>
+        <CgProgressRing Size="lg" Color="var(--cg-color-primary)" />
+        <span class="tag-loading-text">加载中...</span>
     </section>
 }
 
@@ -65,6 +64,15 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
+        if (_model?.Id == Id)
+        {
+            return;
+        }
+
+        _model = null;
+        _editRecords = null;
+        _errorMessage = null;
+
         var tagTask = TagQueryService.GetTagDetailAsync(Id);
         var editRecordsTask = ExamineQueryService.GetTagEditRecordsAsync(Id);
 

@@ -74,31 +74,16 @@
 .article-loading {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    max-width: 960px;
-    margin: 2rem auto;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    min-height: 40vh;
 }
 
-.article-loading-block {
-    border-radius: var(--cg-radius-lg);
-    height: 140px;
-    background: linear-gradient(
-        120deg,
-        color-mix(in oklab, var(--cg-color-bg) 90%, white),
-        color-mix(in oklab, var(--cg-color-bg) 76%, white),
-        color-mix(in oklab, var(--cg-color-bg) 90%, white)
-    );
-    background-size: 200% 100%;
-    animation: article-loading 1.2s infinite;
-}
-
-.article-loading-block--wide {
-    height: 400px; /* Adjust height to match typical hero image aspect ratio */
-}
-
-@keyframes article-loading {
-    from { background-position: 200% 0; }
-    to { background-position: -200% 0; }
+.article-loading-text {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    font-weight: var(--cg-font-weight-medium);
 }
 
 .article-action-btn {

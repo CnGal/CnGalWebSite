@@ -81,31 +81,16 @@
 .entry-loading {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 1rem;
-    max-width: 920px;
-    margin: 2rem auto;
+    min-height: 40vh;
 }
 
-.entry-loading-block {
-    border-radius: var(--cg-radius-lg);
-    height: 140px;
-    background: linear-gradient(
-        120deg,
-        color-mix(in oklab, var(--cg-color-bg) 90%, white),
-        color-mix(in oklab, var(--cg-color-bg) 76%, white),
-        color-mix(in oklab, var(--cg-color-bg) 90%, white)
-    );
-    background-size: 200% 100%;
-    animation: entry-loading 1.2s infinite;
-}
-
-.entry-loading-block--wide {
-    height: 220px;
-}
-
-@keyframes entry-loading {
-    from { background-position: 200% 0; }
-    to { background-position: -200% 0; }
+.entry-loading-text {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    font-weight: var(--cg-font-weight-medium);
 }
 
 .entry-not-found a {

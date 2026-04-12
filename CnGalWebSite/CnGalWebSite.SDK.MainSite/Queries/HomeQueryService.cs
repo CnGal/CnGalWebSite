@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.ViewModel;
+﻿using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
@@ -25,48 +25,63 @@ public sealed class HomeQueryService(
 
     protected override ILogger Logger => logger;
 
-    public async Task<SdkResult<HomeSummaryViewModel>> GetHomeSummaryAsync(CancellationToken cancellationToken = default)
+    public async Task<SdkResult<HomeSummaryViewModel>> GetHomeSummaryAsync(
+        CancellationToken cancellationToken = default)
     {
         const string cacheKey = "main-site:home-summary";
         if (memoryCache.TryGetValue(cacheKey, out HomeSummaryViewModel? cached) && cached is not null)
         {
-            // Always refresh random data so it's not stale
-            var refreshWarnings = new List<SdkErrorModel>();
-            cached.HotRecommends = NormalizeHomeItemUrls(
-                await GetListSafeAsync<HotRecommendItemModel>("api/home/ListHotRecommends", "HOME_HOT_RECOMMENDS_FAILED", refreshWarnings, cancellationToken));
-            cached.Evaluations = NormalizeHomeItemUrls(
-                await GetListSafeAsync<EvaluationItemModel>("api/home/ListEvaluations", "HOME_EVALUATIONS_FAILED", refreshWarnings, cancellationToken));
             return SdkResult<HomeSummaryViewModel>.Ok(cached);
         }
 
         var warnings = new List<SdkErrorModel>();
         const int totalRequests = 20;
 
-        var tableResult = await GetResultSafeAsync<TableViewModel>("api/tables/GetTableView", "HOME_TABLE_FAILED", warnings, cancellationToken);
+        var tableResult = await GetResultSafeAsync<TableViewModel>("api/tables/GetTableView", "HOME_TABLE_FAILED",
+            warnings, cancellationToken);
 
-        var carouselsResult = await GetListSafeAsync<CarouselViewModel>("api/home/GetHomeCarouselsView", "HOME_CAROUSELS_FAILED", warnings, cancellationToken);
-        var hotRecommendsResult = await GetListSafeAsync<HotRecommendItemModel>("api/home/ListHotRecommends", "HOME_HOT_RECOMMENDS_FAILED", warnings, cancellationToken);
-        var publishedGamesResult = await GetListSafeAsync<PublishedGameItemModel>("api/home/ListPublishedGames", "HOME_PUBLISHED_GAMES_FAILED", warnings, cancellationToken);
-        var recentlyDemoGamesResult = await GetListSafeAsync<RecentlyDemoGameItemModel>("api/home/ListRecentlyDemoGames", "HOME_RECENTLY_DEMO_GAMES_FAILED", warnings, cancellationToken);
-        var upcomingGamesResult = await GetListSafeAsync<UpcomingGameItemModel>("api/home/ListUpcomingGames", "HOME_UPCOMING_GAMES_FAILED", warnings, cancellationToken);
-        var activityCarouselsResult = await GetListSafeAsync<CarouselViewModel>("api/home/GetActivityCarouselsView", "HOME_ACTIVITY_CAROUSELS_FAILED", warnings, cancellationToken);
-        var homeNewsResult = await GetListSafeAsync<HomeNewsAloneViewModel>("api/home/GetHomeNewsView", "HOME_NEWS_FAILED", warnings, cancellationToken);
-        var weeklyNewsResult = await GetListSafeAsync<ArticleInforTipViewModel>("api/news/GetWeeklyNewsOverview", "HOME_WEEKLY_NEWS_FAILED", warnings, cancellationToken);
-        var latestArticlesResult = await GetListSafeAsync<LatestArticleItemModel>("api/home/ListLatestArticles", "HOME_LATEST_ARTICLES_FAILED", warnings, cancellationToken);
-        var latestVideosResult = await GetListSafeAsync<LatestVideoItemModel>("api/home/ListLatestVideos", "HOME_LATEST_VIDEOS_FAILED", warnings, cancellationToken);
-        var friendLinksResult = await GetListSafeAsync<FriendLinkItemModel>("api/home/ListFriendLinks", "HOME_FRIEND_LINKS_FAILED", warnings, cancellationToken);
+        var carouselsResult = await GetListSafeAsync<CarouselViewModel>("api/home/GetHomeCarouselsView",
+            "HOME_CAROUSELS_FAILED", warnings, cancellationToken);
+        var hotRecommendsResult = await GetListSafeAsync<HotRecommendItemModel>("api/home/ListHotRecommends",
+            "HOME_HOT_RECOMMENDS_FAILED", warnings, cancellationToken);
+        var publishedGamesResult = await GetListSafeAsync<PublishedGameItemModel>("api/home/ListPublishedGames",
+            "HOME_PUBLISHED_GAMES_FAILED", warnings, cancellationToken);
+        var recentlyDemoGamesResult = await GetListSafeAsync<RecentlyDemoGameItemModel>(
+            "api/home/ListRecentlyDemoGames", "HOME_RECENTLY_DEMO_GAMES_FAILED", warnings, cancellationToken);
+        var upcomingGamesResult = await GetListSafeAsync<UpcomingGameItemModel>("api/home/ListUpcomingGames",
+            "HOME_UPCOMING_GAMES_FAILED", warnings, cancellationToken);
+        var activityCarouselsResult = await GetListSafeAsync<CarouselViewModel>("api/home/GetActivityCarouselsView",
+            "HOME_ACTIVITY_CAROUSELS_FAILED", warnings, cancellationToken);
+        var homeNewsResult = await GetListSafeAsync<HomeNewsAloneViewModel>("api/home/GetHomeNewsView",
+            "HOME_NEWS_FAILED", warnings, cancellationToken);
+        var weeklyNewsResult = await GetListSafeAsync<ArticleInforTipViewModel>("api/news/GetWeeklyNewsOverview",
+            "HOME_WEEKLY_NEWS_FAILED", warnings, cancellationToken);
+        var latestArticlesResult = await GetListSafeAsync<LatestArticleItemModel>("api/home/ListLatestArticles",
+            "HOME_LATEST_ARTICLES_FAILED", warnings, cancellationToken);
+        var latestVideosResult = await GetListSafeAsync<LatestVideoItemModel>("api/home/ListLatestVideos",
+            "HOME_LATEST_VIDEOS_FAILED", warnings, cancellationToken);
+        var friendLinksResult = await GetListSafeAsync<FriendLinkItemModel>("api/home/ListFriendLinks",
+            "HOME_FRIEND_LINKS_FAILED", warnings, cancellationToken);
         var birthdaysResult = await GetListSafeAsync<RoleBrithdayViewModel>(
             $"api/entries/GetRoleBirthdaysByTime?month={DateTime.Now.Month}&day={DateTime.Now.Day}",
             "HOME_BIRTHDAYS_FAILED",
             warnings,
             cancellationToken);
-        var announcementsResult = await GetListSafeAsync<AnnouncementItemModel>("api/home/ListAnnouncements", "HOME_ANNOUNCEMENTS_FAILED", warnings, cancellationToken);
-        var recentlyEditedGamesResult = await GetListSafeAsync<RecentlyEditedGameItemModel>("api/home/ListRecentlyEditedGames", "HOME_RECENTLY_EDITED_GAMES_FAILED", warnings, cancellationToken);
-        var evaluationsResult = await GetListSafeAsync<EvaluationItemModel>("api/home/ListEvaluations", "HOME_EVALUATIONS_FAILED", warnings, cancellationToken);
-        var hotTagsResult = await GetListSafeAsync<HotTagItemModel>("api/home/ListHotTags", "HOME_HOT_TAGS_FAILED", warnings, cancellationToken);
-        var latestCommentsResult = await GetListSafeAsync<LatestCommentItemModel>("api/home/ListLatestComments?renderMarkdown=true", "HOME_LATEST_COMMENTS_FAILED", warnings, cancellationToken);
-        var freeGamesResult = await GetListSafeAsync<FreeGameItemModel>("api/home/ListFreeGames", "HOME_FREE_GAMES_FAILED", warnings, cancellationToken);
-        var discountGamesResult = await GetListSafeAsync<DiscountGameItemModel>("api/home/ListDiscountGames", "HOME_DISCOUNT_GAMES_FAILED", warnings, cancellationToken);
+        var announcementsResult = await GetListSafeAsync<AnnouncementItemModel>("api/home/ListAnnouncements",
+            "HOME_ANNOUNCEMENTS_FAILED", warnings, cancellationToken);
+        var recentlyEditedGamesResult = await GetListSafeAsync<RecentlyEditedGameItemModel>(
+            "api/home/ListRecentlyEditedGames", "HOME_RECENTLY_EDITED_GAMES_FAILED", warnings, cancellationToken);
+        var evaluationsResult = await GetListSafeAsync<EvaluationItemModel>("api/home/ListEvaluations",
+            "HOME_EVALUATIONS_FAILED", warnings, cancellationToken);
+        var hotTagsResult = await GetListSafeAsync<HotTagItemModel>("api/home/ListHotTags", "HOME_HOT_TAGS_FAILED",
+            warnings, cancellationToken);
+        var latestCommentsResult = await GetListSafeAsync<LatestCommentItemModel>(
+            "api/home/ListLatestComments?renderMarkdown=true", "HOME_LATEST_COMMENTS_FAILED", warnings,
+            cancellationToken);
+        var freeGamesResult = await GetListSafeAsync<FreeGameItemModel>("api/home/ListFreeGames",
+            "HOME_FREE_GAMES_FAILED", warnings, cancellationToken);
+        var discountGamesResult = await GetListSafeAsync<DiscountGameItemModel>("api/home/ListDiscountGames",
+            "HOME_DISCOUNT_GAMES_FAILED", warnings, cancellationToken);
 
         if (warnings.Count == totalRequests)
         {
@@ -106,7 +121,8 @@ public sealed class HomeQueryService(
         return SdkResult<HomeSummaryViewModel>.Ok(model);
     }
 
-    public async Task<SdkResult<SearchViewModel>> SearchAsync(string queryString, CancellationToken cancellationToken = default)
+    public async Task<SdkResult<SearchViewModel>> SearchAsync(string queryString,
+        CancellationToken cancellationToken = default)
     {
         var cacheKey = $"main-site:search:{queryString}";
         if (memoryCache.TryGetValue(cacheKey, out SearchViewModel? cached) && cached is not null)
@@ -125,7 +141,8 @@ public sealed class HomeQueryService(
         return result;
     }
 
-    public async Task<SdkResult<SquareSummaryViewModel>> GetSquareSummaryAsync(CancellationToken cancellationToken = default)
+    public async Task<SdkResult<SquareSummaryViewModel>> GetSquareSummaryAsync(
+        CancellationToken cancellationToken = default)
     {
         const string cacheKey = "main-site:square-summary";
         if (memoryCache.TryGetValue(cacheKey, out SquareSummaryViewModel? cached) && cached is not null)
@@ -136,9 +153,12 @@ public sealed class HomeQueryService(
         var warnings = new List<SdkErrorModel>();
         const int totalRequests = 4;
 
-        var randomTagsResult = await GetListSafeAsync<RandomTagModel>("api/tags/GetRandomTags", "SQUARE_RANDOM_TAGS_FAILED", warnings, cancellationToken);
-        var lotteriesResult = await GetListSafeAsync<LotteryCardViewModel>("api/lotteries/GetLotteryCards", "SQUARE_LOTTERIES_FAILED", warnings, cancellationToken);
-        var votesResult = await GetListSafeAsync<VoteCardViewModel>("api/votes/GetVoteCards", "SQUARE_VOTES_FAILED", warnings, cancellationToken);
+        var randomTagsResult = await GetListSafeAsync<RandomTagModel>("api/tags/GetRandomTags",
+            "SQUARE_RANDOM_TAGS_FAILED", warnings, cancellationToken);
+        var lotteriesResult = await GetListSafeAsync<LotteryCardViewModel>("api/lotteries/GetLotteryCards",
+            "SQUARE_LOTTERIES_FAILED", warnings, cancellationToken);
+        var votesResult = await GetListSafeAsync<VoteCardViewModel>("api/votes/GetVoteCards", "SQUARE_VOTES_FAILED",
+            warnings, cancellationToken);
 
         // 编辑概览折线图（公开接口，无需授权）
         var editOverview = await GetEditOverviewChartSafeAsync(warnings, cancellationToken);
@@ -235,17 +255,10 @@ public sealed class HomeQueryService(
     {
         return
         [
+            new() { Title = "CnGal玩家交流群", Text = "本群无资源请支持正版，调戏看板娘要注意节度哦", Link = "https://qm.qq.com/q/bgKC6yy5ri" },
             new()
             {
-                Title = "CnGal玩家交流群",
-                Text = "本群无资源请支持正版，调戏看板娘要注意节度哦",
-                Link = "https://qm.qq.com/q/bgKC6yy5ri"
-            },
-            new()
-            {
-                Title = "CnGal编辑者交流与Bug反馈群",
-                Text = "群主很懒,什么都没有留下",
-                Link = "https://jq.qq.com/?_wv=1027&k=JzuI1IkF"
+                Title = "CnGal编辑者交流与Bug反馈群", Text = "群主很懒,什么都没有留下", Link = "https://jq.qq.com/?_wv=1027&k=JzuI1IkF"
             },
             new()
             {
@@ -253,24 +266,9 @@ public sealed class HomeQueryService(
                 Text = "CnGal资料站官方QQ频道",
                 Link = "https://qun.qq.com/qqweb/qunpro/share?_wv=3&_wwv=128&inviteCode=onAQQ&from=246610&biz=ka"
             },
-            new()
-            {
-                Title = "Bilibili",
-                Text = "B站官方账号",
-                Link = "https://space.bilibili.com/145239325"
-            },
-            new()
-            {
-                Title = "微博",
-                Text = "微博官方账号",
-                Link = "https://weibo.com/cngalorg"
-            },
-            new()
-            {
-                Title = "小黑盒",
-                Text = "小黑盒官方账号",
-                Link = "https://www.xiaoheihe.cn/app/user/profile/30519991"
-            }
+            new() { Title = "Bilibili", Text = "B站官方账号", Link = "https://space.bilibili.com/145239325" },
+            new() { Title = "微博", Text = "微博官方账号", Link = "https://weibo.com/cngalorg" },
+            new() { Title = "小黑盒", Text = "小黑盒官方账号", Link = "https://www.xiaoheihe.cn/app/user/profile/30519991" }
         ];
     }
 
@@ -342,11 +340,7 @@ public sealed class HomeQueryService(
         catch (Exception ex)
         {
             logger.LogWarning(ex, "广场页编辑概览图表加载异常");
-            warnings.Add(new SdkErrorModel
-            {
-                Code = "SQUARE_EDIT_OVERVIEW_EXCEPTION",
-                Message = "编辑概览图表加载异常",
-            });
+            warnings.Add(new SdkErrorModel { Code = "SQUARE_EDIT_OVERVIEW_EXCEPTION", Message = "编辑概览图表加载异常", });
             return null;
         }
     }

@@ -126,9 +126,8 @@ else if (Model is not null)
 else
 {
     <section class="video-loading" aria-label="加载中">
-        <div class="video-loading-block video-loading-block--wide"></div>
-        <div class="video-loading-block"></div>
-        <div class="video-loading-block"></div>
+        <CgProgressRing Size="lg" Color="var(--cg-color-primary)" />
+        <span class="video-loading-text">加载中...</span>
     </section>
 }
 
@@ -142,6 +141,15 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
+        if (Model?.Id == Id)
+        {
+            return;
+        }
+
+        Model = null;
+        _editRecords = null;
+        ErrorMessage = null;
+
         var videoTask = VideoQueryService.GetVideoDetailAsync(Id);
         var editRecordsTask = ExamineQueryService.GetVideoEditRecordsAsync(Id);
 
