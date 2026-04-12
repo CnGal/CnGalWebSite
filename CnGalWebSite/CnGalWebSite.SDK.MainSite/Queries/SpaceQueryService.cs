@@ -295,4 +295,13 @@ public sealed class SpaceQueryService(
         };
         return SdkResult<UserHeatMapViewModel>.Ok(vm);
     }
+
+    public async Task<SdkResult<UserTaskModel>> GetUserTasksAsync(CancellationToken cancellationToken = default)
+    {
+        return await GetAsync<UserTaskModel>(
+            "api/space/GetUserTasks",
+            "SPACE",
+            "用户任务状态",
+            cancellationToken);
+    }
 }

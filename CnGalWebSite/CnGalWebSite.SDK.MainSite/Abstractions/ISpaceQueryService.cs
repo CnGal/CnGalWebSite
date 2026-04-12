@@ -36,5 +36,10 @@ public interface ISpaceQueryService
     /// 获取用户热力图数据。
     /// </summary>
     Task<SdkResult<UserHeatMapViewModel>> GetUserHeatMapAsync(string userId, UserHeatMapType type, DateTime? after = null, DateTime? before = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取当前登录用户的任务完成状态。
+    /// </summary>
+    Task<SdkResult<UserTaskModel>> GetUserTasksAsync(CancellationToken cancellationToken = default);
 }
 

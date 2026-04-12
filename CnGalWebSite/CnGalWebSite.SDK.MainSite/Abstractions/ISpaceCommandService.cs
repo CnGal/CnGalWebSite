@@ -24,4 +24,9 @@ public interface ISpaceCommandService
     /// 将当前用户所有消息标记为已读。
     /// </summary>
     Task<SdkResult<string>> ReadAllMessagesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 执行每日签到。
+    /// </summary>
+    Task<SdkResult<string>> SignInAsync(CancellationToken cancellationToken = default);
 }

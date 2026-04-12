@@ -186,6 +186,11 @@
     color: var(--cg-color-brand-teal, #14b8a6);
 }
 
+.cg-menu-item__icon--emerald {
+    background: color-mix(in oklab, var(--cg-color-emerald, #10b981) 12%, transparent);
+    color: var(--cg-color-emerald, #10b981);
+}
+
 /* ── Danger Item ── */
 
 .cg-menu-item--danger {
