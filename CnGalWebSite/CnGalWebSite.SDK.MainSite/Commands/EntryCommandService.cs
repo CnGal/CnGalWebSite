@@ -6,12 +6,14 @@ using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.EntryEdit;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class EntryCommandService(
     HttpClient httpClient,
+    IMemoryCache memoryCache,
     ILogger<EntryCommandService> logger) : CommandServiceBase(httpClient), IEntryCommandService
 {
     protected override ILogger Logger => logger;
@@ -145,6 +147,7 @@ public sealed class EntryCommandService(
                 
                 if (result?.Successful == true && long.TryParse(result.Error, out var newId))
                 {
+                    InvalidateEntryCaches(newId);
                     return SdkResult<long>.Ok(newId);
                 }
                 
@@ -179,6 +182,7 @@ public sealed class EntryCommandService(
                     return SdkResult<long>.Fail("ENTRY_EDIT_PARTIAL_FAILED", string.Join("；", errors));
                 }
                 
+                InvalidateEntryCaches(request.Data.Id);
                 return SdkResult<long>.Ok(request.Data.Id); // 此时 Data.Id 就是原词条的 Id
             }
         }
@@ -206,5 +210,13 @@ public sealed class EntryCommandService(
     private Task<Result?> SubmitPartAsync<T>(string path, T model, CancellationToken cancellationToken)
     {
         return PostAsJsonAsync<T, Result>(path, model, cancellationToken);
+    }
+
+    private void InvalidateEntryCaches(long entryId)
+    {
+        memoryCache.Remove($"main-site:entry-detail:{entryId}");
+        memoryCache.Remove($"main-site:entry-edit-records:{entryId}");
+        memoryCache.Remove("main-site:user-content-center");
+        memoryCache.Remove("main-site:home-summary");
     }
 }

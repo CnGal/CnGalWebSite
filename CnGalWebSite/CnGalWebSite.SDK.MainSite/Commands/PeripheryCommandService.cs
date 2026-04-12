@@ -4,12 +4,14 @@ using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.PeripheryEdit;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class PeripheryCommandService(
     HttpClient httpClient,
+    IMemoryCache memoryCache,
     ILogger<PeripheryCommandService> logger) : CommandServiceBase(httpClient), IPeripheryCommandService
 {
     protected override ILogger Logger => logger;
@@ -117,6 +119,7 @@ public sealed class PeripheryCommandService(
 
                 if (result?.Successful == true && long.TryParse(result.Error, out var newId))
                 {
+                    InvalidatePeripheryCaches(newId);
                     return SdkResult<long>.Ok(newId);
                 }
 
@@ -146,6 +149,7 @@ public sealed class PeripheryCommandService(
                     return SdkResult<long>.Fail("PERIPHERY_EDIT_PARTIAL_FAILED", string.Join("；", errors));
                 }
 
+                InvalidatePeripheryCaches(request.Data.Main.Id);
                 return SdkResult<long>.Ok(request.Data.Main.Id);
             }
         }
@@ -159,5 +163,12 @@ public sealed class PeripheryCommandService(
     private Task<Result?> SubmitPartAsync<T>(string path, T model, CancellationToken cancellationToken)
     {
         return PostAsJsonAsync<T, Result>(path, model, cancellationToken);
+    }
+
+    private void InvalidatePeripheryCaches(long peripheryId)
+    {
+        memoryCache.Remove($"main-site:periphery-detail:{peripheryId}");
+        memoryCache.Remove($"main-site:periphery-edit-records:{peripheryId}");
+        memoryCache.Remove("main-site:user-content-center");
     }
 }

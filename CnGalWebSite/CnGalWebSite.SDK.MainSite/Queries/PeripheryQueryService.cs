@@ -16,15 +16,28 @@ public sealed class PeripheryQueryService(
 
     protected override ILogger Logger => logger;
 
-    public Task<SdkResult<PeripheryDetailViewModel>> GetPeripheryDetailAsync(long id, CancellationToken cancellationToken = default)
+    public async Task<SdkResult<PeripheryDetailViewModel>> GetPeripheryDetailAsync(long id, CancellationToken cancellationToken = default)
     {
-        return GetSingleAsync<PeripheryViewModel, PeripheryDetailViewModel>(
+        var cacheKey = $"main-site:periphery-detail:{id}";
+        if (memoryCache.TryGetValue(cacheKey, out PeripheryDetailViewModel? cached) && cached is not null)
+        {
+            return SdkResult<PeripheryDetailViewModel>.Ok(cached);
+        }
+
+        var result = await GetSingleAsync<PeripheryViewModel, PeripheryDetailViewModel>(
             $"api/peripheries/GetPeripheryView/{id}",
             MapToViewModel,
             "PERIPHERY",
             "周边",
             id,
             cancellationToken);
+
+        if (result.Success && result.Data is not null)
+        {
+            memoryCache.Set(cacheKey, result.Data, CacheDuration);
+        }
+
+        return result;
     }
 
     public async Task<SdkResult<GameOverviewPeripheryListModel>> GetEntryOverviewPeripheriesAsync(int entryId, CancellationToken cancellationToken = default)

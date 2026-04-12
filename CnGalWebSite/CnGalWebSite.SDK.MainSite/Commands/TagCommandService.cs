@@ -4,12 +4,14 @@ using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.TagEdit;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class TagCommandService(
     HttpClient httpClient,
+    IMemoryCache memoryCache,
     ILogger<TagCommandService> logger) : CommandServiceBase(httpClient), ITagCommandService
 {
     protected override ILogger Logger => logger;
@@ -103,6 +105,7 @@ public sealed class TagCommandService(
 
                 if (result?.Successful == true && long.TryParse(result.Error, out var newId))
                 {
+                    InvalidateTagCaches(newId);
                     return SdkResult<long>.Ok(newId);
                 }
 
@@ -131,6 +134,7 @@ public sealed class TagCommandService(
                     return SdkResult<long>.Fail("TAG_EDIT_PARTIAL_FAILED", string.Join("；", errors));
                 }
 
+                InvalidateTagCaches(request.Data.Main.Id);
                 return SdkResult<long>.Ok(request.Data.Main.Id);
             }
         }
@@ -144,5 +148,13 @@ public sealed class TagCommandService(
     private Task<Result?> SubmitPartAsync<T>(string path, T model, CancellationToken cancellationToken)
     {
         return PostAsJsonAsync<T, Result>(path, model, cancellationToken);
+    }
+
+    private void InvalidateTagCaches(long tagId)
+    {
+        memoryCache.Remove($"main-site:tag-detail:{tagId}");
+        memoryCache.Remove("main-site:tag-tree");
+        memoryCache.Remove($"main-site:tag-edit-records:{tagId}");
+        memoryCache.Remove("main-site:user-content-center");
     }
 }
