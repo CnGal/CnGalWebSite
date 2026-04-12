@@ -1,0 +1,105 @@
+.cg-space-tab-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--cg-spacing-8);
+    color: var(--cg-color-text-muted);
+    gap: var(--cg-spacing-2);
+}
+
+.cg-space-tab-empty ::deep .cg-mdi-icon {
+    width: 48px;
+    height: 48px;
+    opacity: 0.5;
+}
+
+.cg-space-edit-record-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+}
+
+.cg-space-edit-record-item {
+    display: flex;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-3);
+    border-radius: var(--cg-radius-md);
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    text-decoration: none;
+    color: inherit;
+    align-items: center;
+    transition: box-shadow var(--cg-transition-fast);
+}
+
+.cg-space-edit-record-item:hover {
+    box-shadow: var(--cg-shadow-md);
+}
+
+.cg-space-edit-record-status {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--cg-radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cg-space-edit-record-status ::deep .cg-mdi-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.cg-space-edit-record-status--passed {
+    background: var(--cg-color-emerald-subtle, #d1fae5);
+    color: var(--cg-color-success, #10b981);
+}
+
+.cg-space-edit-record-status--failed {
+    background: color-mix(in oklab, var(--cg-color-error) 12%, transparent);
+    color: var(--cg-color-error);
+}
+
+.cg-space-edit-record-status--pending {
+    background: color-mix(in oklab, var(--cg-color-warning) 12%, transparent);
+    color: var(--cg-color-warning);
+}
+
+.cg-space-edit-record-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.cg-space-edit-record-title {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+}
+
+.cg-space-edit-record-type-badge {
+    display: inline-flex;
+    padding: 1px 6px;
+    border-radius: var(--cg-radius-sm);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-medium);
+    background: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+    color: var(--cg-color-primary);
+    flex-shrink: 0;
+}
+
+.cg-space-edit-record-meta {
+    display: flex;
+    gap: var(--cg-spacing-3);
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    margin-top: 2px;
+}
+
+.cg-space-edit-record-op {
+    color: var(--cg-color-text-secondary);
+}

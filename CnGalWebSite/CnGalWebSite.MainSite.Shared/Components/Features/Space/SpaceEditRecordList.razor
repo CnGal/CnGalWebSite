@@ -1,0 +1,99 @@
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.DataModel.ViewModel.Admin
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+
+@if (Model is null || Model.Items.Count == 0)
+{
+    <div class="cg-space-tab-empty">
+        <CgMdiIcon Name="mdiScriptTextOutline" aria-hidden="true" />
+        <p>暂无编辑记录</p>
+    </div>
+}
+else
+{
+    <div class="cg-space-edit-record-list">
+        @foreach (var record in Model.Items)
+        {
+            <a class="cg-space-edit-record-item" href="@GetEditRecordUrl(record)">
+                <div class="cg-space-edit-record-status @GetStatusClass(record.IsPassed)">
+                    <CgMdiIcon Name="@GetStatusIcon(record.IsPassed)" aria-hidden="true" />
+                </div>
+                <div class="cg-space-edit-record-info">
+                    <div class="cg-space-edit-record-title">
+                        <span class="cg-space-edit-record-type-badge">@GetTypeText(record.Type)</span>
+                        <span>@record.RelatedName</span>
+                    </div>
+                    <div class="cg-space-edit-record-meta">
+                        <span>@record.ApplyTime.ToString("yyyy-MM-dd HH:mm")</span>
+                        <span class="cg-space-edit-record-op">@GetOperationText(record.Operation)</span>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <CgPagination CurrentPage="Model.CurrentPage"
+                      TotalPages="Model.TotalPages"
+                      HrefTemplate="@PaginationHrefTemplate" />
+    }
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public required UserEditRecordsViewModel? Model { get; set; }
+
+    /// <summary>
+    /// 分页链接模板，供 SSR 模式使用。例如: "/space/index/abc?editRecordsPage={0}"
+    /// </summary>
+    [Parameter]
+    public string? PaginationHrefTemplate { get; set; }
+
+    private static string GetStatusClass(bool? isPassed) => isPassed switch
+    {
+        true => "cg-space-edit-record-status--passed",
+        false => "cg-space-edit-record-status--failed",
+        null => "cg-space-edit-record-status--pending"
+    };
+
+    private static string GetStatusIcon(bool? isPassed) => isPassed switch
+    {
+        true => "mdiCheckCircleOutline",
+        false => "mdiCloseCircleOutline",
+        null => "mdiClockOutline"
+    };
+
+    private static string GetTypeText(ExaminedNormalListModelType type) => type switch
+    {
+        ExaminedNormalListModelType.Entry => "词条",
+        ExaminedNormalListModelType.Article => "文章",
+        ExaminedNormalListModelType.Tag => "标签",
+        ExaminedNormalListModelType.Video => "视频",
+        ExaminedNormalListModelType.Periphery => "周边",
+        ExaminedNormalListModelType.Comment => "评论",
+        ExaminedNormalListModelType.User => "用户",
+        ExaminedNormalListModelType.PlayedGame => "游玩记录",
+        ExaminedNormalListModelType.FavoriteFolder => "收藏夹",
+        _ => "其他"
+    };
+
+    private static string GetOperationText(Operation operation)
+    {
+        // Simplified operation names
+        var name = operation.ToString();
+        if (name.StartsWith("Establish")) return "创建";
+        if (name.Contains("Main")) return "编辑主要信息";
+        if (name.Contains("Image")) return "编辑图片";
+        if (name.Contains("Relevance")) return "编辑关联";
+        if (name.Contains("Tag")) return "编辑标签";
+        if (name.Contains("MainPage")) return "编辑主页";
+        return "编辑";
+    }
+
+    private static string GetEditRecordUrl(ExaminedNormalListModel record)
+    {
+        return $"/examine?Id={record.Id}";
+    }
+}

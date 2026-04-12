@@ -26,6 +26,7 @@
     cursor: pointer;
     transition: all var(--cg-transition-fast);
     user-select: none;
+    text-decoration: none;
 }
 
 .cg-pagination__btn:hover:not(:disabled):not(.cg-pagination__btn--active) {
@@ -34,9 +35,11 @@
     color: var(--cg-color-primary);
 }
 
-.cg-pagination__btn:disabled {
+.cg-pagination__btn:disabled,
+.cg-pagination__btn--disabled {
     opacity: 0.4;
     cursor: not-allowed;
+    pointer-events: none;
 }
 
 /* ── Active page ── */

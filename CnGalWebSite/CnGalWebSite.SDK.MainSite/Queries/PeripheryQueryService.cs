@@ -63,6 +63,26 @@ public sealed class PeripheryQueryService(
         return result;
     }
 
+    public async Task<SdkResult<IReadOnlyList<GameOverviewPeripheryListModel>>> GetUserOverviewPeripheriesAsync(string userId, CancellationToken cancellationToken = default)
+    {
+        var path = $"api/peripheries/GetUserOverviewPeripheries/{userId}";
+        var result = await GetAsync<List<GameOverviewPeripheryListModel>>(
+            path,
+            "PERIPHERY",
+            "用户周边列表",
+            cancellationToken);
+
+        if (!result.Success || result.Data is null)
+        {
+            return SdkResult<IReadOnlyList<GameOverviewPeripheryListModel>>.Fail(
+                result.Error?.Code ?? "PERIPHERY_USER_OVERVIEW_FAILED",
+                result.Error?.Message ?? "获取用户周边列表失败",
+                result.Error?.StatusCode);
+        }
+
+        return SdkResult<IReadOnlyList<GameOverviewPeripheryListModel>>.Ok(result.Data);
+    }
+
     private static PeripheryDetailViewModel MapToViewModel(PeripheryViewModel dto)
     {
         return new PeripheryDetailViewModel

@@ -1,18 +1,25 @@
 @using CnGalWebSite.DataModel.ViewModel.Peripheries
-@using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
 
-@if (OverviewModels.Count > 0)
+@if (Model is null || Model.Count == 0)
 {
-    <EntrySection Title="周边概览" Icon="mdiViewGridOutline">
-        @foreach (var group in OverviewModels)
+    <div class="cg-space-tab-empty">
+        <CgMdiIcon Name="mdiBasketOutline" aria-hidden="true" />
+        <p>暂无周边收藏</p>
+    </div>
+}
+else
+{
+    <div class="cg-space-periphery-sections">
+        @foreach (var group in Model)
         {
-            <div class="periphery-overview-group">
-                <a class="periphery-overview-group-header" href="@GetGroupUrl(group)">
+            <div class="cg-space-periphery-group">
+                <a class="cg-space-periphery-group-header" href="@GetGroupUrl(group)">
                     @if (!string.IsNullOrWhiteSpace(group.Image))
                     {
-                        <img class="periphery-overview-group-image @(group.IsThumbnail ? "periphery-overview-group-image--round" : "")" src="@group.Image" alt="@group.Name" loading="lazy" />
+                        <img class="cg-space-periphery-group-image @(group.IsThumbnail ? "cg-space-periphery-group-image--round" : "")" src="@group.Image" alt="@group.Name" loading="lazy" />
                     }
-                    <div class="periphery-overview-group-info">
+                    <div class="cg-space-periphery-group-info">
                         <h3>@group.Name</h3>
                         @if (!string.IsNullOrWhiteSpace(group.BriefIntroduction))
                         {
@@ -23,26 +30,32 @@
 
                 @if (group.Peripheries.Count > 0)
                 {
-                    <ul class="periphery-overview-items">
+                    <ul class="cg-space-periphery-grid">
                         @foreach (var item in group.Peripheries)
                         {
                             <li>
-                                <a href="@($"/peripheries/index/{item.Id}")" class="periphery-overview-item">
-                                    <div class="periphery-overview-item-image">
+                                <a class="cg-space-periphery-item" href="@($"/peripheries/index/{item.Id}")">
+                                    <div class="cg-space-periphery-item-image">
                                         @if (!string.IsNullOrWhiteSpace(item.Image))
                                         {
                                             <img src="@item.Image" alt="@item.Name" loading="lazy" decoding="async" />
                                         }
                                         else
                                         {
-                                            <div class="periphery-overview-item-placeholder">
+                                            <div class="cg-space-periphery-item-placeholder">
                                                 <CgMdiIcon Name="mdiGiftOutline" />
                                             </div>
                                         }
+                                        @if (item.IsCollected)
+                                        {
+                                            <span class="cg-space-periphery-collected-badge" title="已收集">
+                                                <CgMdiIcon Name="mdiBasket" />
+                                            </span>
+                                        }
                                     </div>
-                                    <span class="periphery-overview-item-name">@item.Name</span>
-                                    <span class="periphery-overview-item-stat">
-                                        <CgMdiIcon Name="mdiHeartOutline" />
+                                    <span class="cg-space-periphery-item-name">@item.Name</span>
+                                    <span class="cg-space-periphery-item-stat">
+                                        <CgMdiIcon Name="mdiAccountMultipleOutline" aria-hidden="true" />
                                         @item.CollectedCount
                                     </span>
                                 </a>
@@ -52,11 +65,12 @@
                 }
             </div>
         }
-    </EntrySection>
+    </div>
 }
 
 @code {
-    [Parameter] public IReadOnlyList<GameOverviewPeripheryListModel> OverviewModels { get; set; } = [];
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<GameOverviewPeripheryListModel>? Model { get; set; }
 
     private static string GetGroupUrl(GameOverviewPeripheryListModel group) => group.Type switch
     {
