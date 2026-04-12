@@ -1,4 +1,4 @@
-﻿@page "/admin/listfavoritefolders"
+@page "/admin/listfavoritefolders"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
 @rendermode InteractiveServer
@@ -7,7 +7,7 @@
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Favorites
 
-<PageTitle>收藏夹管理 - CnGal</PageTitle>
+<CgPageMeta Title="收藏夹管理" />
 
 <div class="admin-list-page">
     <h1 class="admin-page-title">

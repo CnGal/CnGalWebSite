@@ -8,7 +8,7 @@
 @using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 @using CnGalWebSite.MainSite.Shared.Services
 
-<PageTitle>@(Model is null ? "视频详情" : $"{GetDisplayTitle()} - 视频详情")</PageTitle>
+<CgPageMeta Title="@(Model is null ? null : GetDisplayTitle())" Description="@(Model?.BriefIntroduction)" Image="@(Model?.MainPicture)" />
 
 @if (ErrorMessage is not null)
 {

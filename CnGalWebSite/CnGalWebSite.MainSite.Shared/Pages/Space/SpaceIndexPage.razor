@@ -27,7 +27,7 @@
 }
 else if (_model != null)
 {
-    <PageTitle>@($"{_model.Name} - 个人空间 - CnGal资料站")</PageTitle>
+    <CgPageMeta Title="@($"{_model.Name} - 个人空间")" Description="@(_model.PersonalSignature)" Image="@(_model.PhotoPath)" />
 
     <div class="cg-space-container">
         <div class="cg-space-layout-row">
