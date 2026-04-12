@@ -241,6 +241,12 @@ public sealed class PlayedGameQueryService(
 
     public async Task<SdkResult<IReadOnlyList<RandomReviewItem>>> GetRandomReviewsAsync(CancellationToken cancellationToken = default)
     {
+        const string cacheKey = "main-site:random-reviews";
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<RandomReviewItem>? cached) && cached is not null)
+        {
+            return SdkResult<IReadOnlyList<RandomReviewItem>>.Ok(cached);
+        }
+
         var result = await GetAsync<List<PlayedGameUserScoreRandomModel>>(
             RandomReviewsPath,
             "RANDOM_REVIEWS",
@@ -256,6 +262,7 @@ public sealed class PlayedGameQueryService(
             .Select(MapRandomReview)
             .ToList();
 
+        memoryCache.Set(cacheKey, items, TimeSpan.FromMinutes(2));
         return SdkResult<IReadOnlyList<RandomReviewItem>>.Ok(items);
     }
 

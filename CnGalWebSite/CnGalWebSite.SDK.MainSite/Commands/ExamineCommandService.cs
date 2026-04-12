@@ -4,11 +4,12 @@ using CnGalWebSite.DataModel.ViewModel.EditRecords;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
-public sealed class ExamineCommandService(HttpClient httpClient, ILogger<ExamineCommandService> logger)
+public sealed class ExamineCommandService(HttpClient httpClient, IMemoryCache memoryCache, ILogger<ExamineCommandService> logger)
     : CommandServiceBase(httpClient), IExamineCommandService
 {
     protected override ILogger Logger => logger;
@@ -26,6 +27,10 @@ public sealed class ExamineCommandService(HttpClient httpClient, ILogger<Examine
             {
                 return SdkResult<bool>.Fail("EXAMINE_PROC_FAILED", result?.Error ?? "审核处理失败");
             }
+
+            memoryCache.Remove("main-site:user-content-center");
+            memoryCache.Remove($"main-site:examine-detail:{id}");
+            memoryCache.Remove($"main-site:examine-overview:{id}");
             return SdkResult<bool>.Ok(true);
         }
         catch (Exception ex)

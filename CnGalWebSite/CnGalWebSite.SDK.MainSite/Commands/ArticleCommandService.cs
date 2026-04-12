@@ -4,12 +4,14 @@ using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.ArticleEdit;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class ArticleCommandService(
     HttpClient httpClient,
+    IMemoryCache memoryCache,
     ILogger<ArticleCommandService> logger) : CommandServiceBase(httpClient), IArticleCommandService
 {
     protected override ILogger Logger => logger;
@@ -121,6 +123,7 @@ public sealed class ArticleCommandService(
 
                 if (result?.Successful == true && long.TryParse(result.Error, out var newId))
                 {
+                    InvalidateArticleCaches(newId);
                     return SdkResult<long>.Ok(newId);
                 }
 
@@ -149,6 +152,7 @@ public sealed class ArticleCommandService(
                     return SdkResult<long>.Fail("ARTICLE_EDIT_PARTIAL_FAILED", string.Join("；", errors));
                 }
 
+                InvalidateArticleCaches(request.Data.Main.Id);
                 return SdkResult<long>.Ok(request.Data.Main.Id);
             }
         }
@@ -162,5 +166,13 @@ public sealed class ArticleCommandService(
     private Task<Result?> SubmitPartAsync<T>(string path, T model, CancellationToken cancellationToken)
     {
         return PostAsJsonAsync<T, Result>(path, model, cancellationToken);
+    }
+
+    private void InvalidateArticleCaches(long articleId)
+    {
+        memoryCache.Remove($"main-site:article-detail:{articleId}");
+        memoryCache.Remove($"main-site:article-edit-records:{articleId}");
+        memoryCache.Remove("main-site:user-content-center");
+        memoryCache.Remove("main-site:home-summary");
     }
 }

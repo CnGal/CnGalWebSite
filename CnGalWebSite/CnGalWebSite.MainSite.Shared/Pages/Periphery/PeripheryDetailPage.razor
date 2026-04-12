@@ -106,9 +106,8 @@ else if (_model is not null)
 else
 {
     <section class="periphery-loading" aria-label="加载中">
-        <div class="periphery-loading-block periphery-loading-block--wide"></div>
-        <div class="periphery-loading-block"></div>
-        <div class="periphery-loading-block"></div>
+        <CgProgressRing Size="lg" Color="var(--cg-color-primary)" />
+        <span class="periphery-loading-text">加载中...</span>
     </section>
 }
 
@@ -122,6 +121,15 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
+        if (_model?.Id == Id)
+        {
+            return;
+        }
+
+        _model = null;
+        _editRecords = null;
+        _errorMessage = null;
+
         var peripheryTask = PeripheryQueryService.GetPeripheryDetailAsync(Id);
         var editRecordsTask = ExamineQueryService.GetPeripheryEditRecordsAsync(Id);
 

@@ -13,28 +13,54 @@ public sealed class TagQueryService(
     IMemoryCache memoryCache,
     ILogger<TagQueryService> logger) : QueryServiceBase(httpClient), ITagQueryService
 {
-    private static readonly TimeSpan CvPageCacheDuration = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
 
     protected override ILogger Logger => logger;
 
-    public Task<SdkResult<List<TagTreeModel>>> GetTagTreeAsync(CancellationToken cancellationToken = default)
+    public async Task<SdkResult<List<TagTreeModel>>> GetTagTreeAsync(CancellationToken cancellationToken = default)
     {
-        return GetAsync<List<TagTreeModel>>(
+        const string cacheKey = "main-site:tag-tree";
+        if (memoryCache.TryGetValue(cacheKey, out List<TagTreeModel>? cached) && cached is not null)
+        {
+            return SdkResult<List<TagTreeModel>>.Ok(cached);
+        }
+
+        var result = await GetAsync<List<TagTreeModel>>(
             "api/tags/GetTagsTreeView",
             "TAG_TREE",
             "标签树",
             cancellationToken);
+
+        if (result.Success && result.Data is not null)
+        {
+            memoryCache.Set(cacheKey, result.Data, CacheDuration);
+        }
+
+        return result;
     }
 
-    public Task<SdkResult<TagIndexViewModel>> GetTagDetailAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<SdkResult<TagIndexViewModel>> GetTagDetailAsync(int id, CancellationToken cancellationToken = default)
     {
-        return GetSingleAsync<TagIndexViewModel, TagIndexViewModel>(
+        var cacheKey = $"main-site:tag-detail:{id}";
+        if (memoryCache.TryGetValue(cacheKey, out TagIndexViewModel? cached) && cached is not null)
+        {
+            return SdkResult<TagIndexViewModel>.Ok(cached);
+        }
+
+        var result = await GetSingleAsync<TagIndexViewModel, TagIndexViewModel>(
             $"api/tags/gettag/{id}",
             dto => dto,
             "TAG",
             "标签",
             id,
             cancellationToken);
+
+        if (result.Success && result.Data is not null)
+        {
+            memoryCache.Set(cacheKey, result.Data, CacheDuration);
+        }
+
+        return result;
     }
 
     public async Task<SdkResult<CVThematicPageViewModel>> GetCVThematicPageAsync(CancellationToken cancellationToken = default)
@@ -59,7 +85,7 @@ public sealed class TagQueryService(
                 result.Error?.StatusCode);
         }
 
-        memoryCache.Set(cacheKey, result.Data, CvPageCacheDuration);
+        memoryCache.Set(cacheKey, result.Data, CacheDuration);
 
         return SdkResult<CVThematicPageViewModel>.Ok(result.Data);
     }

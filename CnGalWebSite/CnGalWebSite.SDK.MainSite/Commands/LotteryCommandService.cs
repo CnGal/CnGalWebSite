@@ -3,12 +3,14 @@ using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class LotteryCommandService(
     HttpClient httpClient,
+    IMemoryCache memoryCache,
     ILogger<LotteryCommandService> logger) : CommandServiceBase(httpClient), ILotteryCommandService
 {
     protected override ILogger Logger => logger;
@@ -54,6 +56,8 @@ public sealed class LotteryCommandService(
 
             if (result?.Successful == true && long.TryParse(result.Error, out var newId))
             {
+                memoryCache.Remove("main-site:lottery-cards");
+                memoryCache.Remove("main-site:square-summary");
                 return SdkResult<long>.Ok(newId);
             }
 
@@ -75,6 +79,9 @@ public sealed class LotteryCommandService(
 
             if (result?.Successful == true)
             {
+                memoryCache.Remove($"main-site:lottery-detail:{model.Id}");
+                memoryCache.Remove("main-site:lottery-cards");
+                memoryCache.Remove("main-site:square-summary");
                 return SdkResult<long>.Ok(model.Id);
             }
 

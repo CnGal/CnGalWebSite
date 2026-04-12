@@ -124,23 +124,53 @@ public sealed class ExamineQueryService(HttpClient httpClient, IMemoryCache memo
 
     // ─── 编辑记录概览 ───
 
-    public Task<SdkResult<ExaminesOverviewViewModel>> GetExaminesOverviewAsync(
+    public async Task<SdkResult<ExaminesOverviewViewModel>> GetExaminesOverviewAsync(
         long examineId, CancellationToken cancellationToken = default)
-        => GetAsync<ExaminesOverviewViewModel>(
+    {
+        var cacheKey = $"main-site:examine-overview:{examineId}";
+        if (memoryCache.TryGetValue(cacheKey, out ExaminesOverviewViewModel? cached) && cached is not null)
+        {
+            return SdkResult<ExaminesOverviewViewModel>.Ok(cached);
+        }
+
+        var result = await GetAsync<ExaminesOverviewViewModel>(
             $"api/examines/GetExaminesOverview/{examineId}",
             "EXAMINE_OVERVIEW",
             "编辑记录概览",
             cancellationToken);
 
+        if (result.Success && result.Data is not null)
+        {
+            memoryCache.Set(cacheKey, result.Data, ListCacheDuration);
+        }
+
+        return result;
+    }
+
     // ─── 单条审核详情 ───
 
-    public Task<SdkResult<ExamineViewModel>> GetExamineDetailAsync(
+    public async Task<SdkResult<ExamineViewModel>> GetExamineDetailAsync(
         long examineId, CancellationToken cancellationToken = default)
-        => GetAsync<ExamineViewModel>(
+    {
+        var cacheKey = $"main-site:examine-detail:{examineId}";
+        if (memoryCache.TryGetValue(cacheKey, out ExamineViewModel? cached) && cached is not null)
+        {
+            return SdkResult<ExamineViewModel>.Ok(cached);
+        }
+
+        var result = await GetAsync<ExamineViewModel>(
             $"api/examines/GetExamineView/{examineId}",
             "EXAMINE_DETAIL",
             "审核详情",
             cancellationToken);
+
+        if (result.Success && result.Data is not null)
+        {
+            memoryCache.Set(cacheKey, result.Data, ListCacheDuration);
+        }
+
+        return result;
+    }
 
     // ─── 对比审核（两个版本的 Before/After） ───
 

@@ -1,4 +1,4 @@
-using CnGalWebSite.HealthCheck.Models;
+﻿using CnGalWebSite.HealthCheck.Models;
 using CnGalWebSite.MainSite.Components;
 using CnGalWebSite.MainSite.Shared;
 using CnGalWebSite.SDK.MainSite.Extensions;
@@ -15,19 +15,22 @@ var taskApiBaseAddress = builder.Configuration["MainSiteApi:TaskApiPath"];
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents(options =>
     {
-        // 将真实异常信息发送到客户端浏览器控制台（开发 / 排查时打开）
-        options.DetailedErrors = builder.Environment.IsDevelopment();
+        // 将真实异常信息发送到客户端浏览器控制台
+        options.DetailedErrors = true;
     });
+// 增大 SignalR 消息上限，避免 Blazor 渲染批次过大导致断连循环
+// 默认 32KB 不足以承载页面初始渲染，提升至 512KB
+builder.Services.AddSignalR(options =>
+{
+    options.MaximumReceiveMessageSize = 512 * 1024; // 512 KB
+});
+
 builder.Services.AddMainSiteOidcAuthentication(builder.Configuration);
 builder.Services.AddMainSiteSdk(apiBaseAddress!, imageApiBaseAddress!, taskApiBaseAddress!);
 builder.Services.AddMainSiteSharedServices();
 //添加状态检查
 builder.Services.AddHealthChecks();
 builder.Services.AddScoped<CircuitHandler, IdleCircuitHandler>();
-
-// 打开 Blazor Circuit 内部日志，帮助定位断连原因
-builder.Logging.AddFilter("Microsoft.AspNetCore.Components.Server.Circuits", LogLevel.Debug);
-builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
 
 var app = builder.Build();
 //设置请求来源

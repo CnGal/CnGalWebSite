@@ -281,9 +281,8 @@ else if (Model is not null)
 else
 {
     <section class="entry-loading" aria-label="加载中">
-        <div class="entry-loading-block"></div>
-        <div class="entry-loading-block entry-loading-block--wide"></div>
-        <div class="entry-loading-block"></div>
+        <CgProgressRing Size="lg" Color="var(--cg-color-primary)" />
+        <span class="entry-loading-text">加载中...</span>
     </section>
 }
 
@@ -300,6 +299,18 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
+        if (Model?.Id == Id)
+        {
+            return;
+        }
+
+        Model = null;
+        ScoreOverview = null;
+        PeripheryOverview = null;
+        RelateFolders = null;
+        EditRecords = null;
+        ErrorMessage = null;
+
         // 并行请求词条详情、周边概览、相关目录、编辑记录
         // 注意：评分概览仅对游戏类型有效，延迟到确认类型后再请求
         var entryTask = EntryQueryService.GetEntryDetailAsync(Id);

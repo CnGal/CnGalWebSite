@@ -3,6 +3,7 @@ using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
@@ -10,7 +11,7 @@ namespace CnGalWebSite.SDK.MainSite.Commands;
 /// <summary>
 /// 评论写操作服务实现。
 /// </summary>
-public sealed class CommentCommandService(HttpClient httpClient, ILogger<CommentCommandService> logger)
+public sealed class CommentCommandService(HttpClient httpClient, IMemoryCache memoryCache, ILogger<CommentCommandService> logger)
     : CommandServiceBase(httpClient), ICommentCommandService
 {
     protected override ILogger Logger { get; } = logger;
@@ -44,6 +45,7 @@ public sealed class CommentCommandService(HttpClient httpClient, ILogger<Comment
                 return SdkResult<bool>.Fail("COMMENT_PUBLISH_FAILED", result.Error ?? "发表评论失败");
             }
 
+            InvalidateCommentCache(type, objectId);
             return SdkResult<bool>.Ok(true);
         }
         catch (Exception ex)
@@ -51,6 +53,11 @@ public sealed class CommentCommandService(HttpClient httpClient, ILogger<Comment
             Logger.LogError(ex, "发表评论异常。Type={Type}; ObjectId={ObjectId}", type, objectId);
             return SdkResult<bool>.Fail("COMMENT_PUBLISH_EXCEPTION", "发表评论时发生异常");
         }
+    }
+
+    private void InvalidateCommentCache(CommentType type, string objectId)
+    {
+        memoryCache.Remove($"main-site:comments:{(int)type}:{objectId}");
     }
 
     public async Task<SdkResult<bool>> DeleteCommentAsync(
