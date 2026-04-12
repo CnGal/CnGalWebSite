@@ -1,0 +1,47 @@
+/*
+ * CgAtmosphere — 页面背景氛围图
+ *
+ * 使用 absolute 定位覆盖父页面容器（父容器需 position:relative）。
+ * 通过 mask-image 渐隐 + 低 opacity 保证内容可读性。
+ * top 使用负值以向上扩展到页眉区域。
+ *
+ * 默认仅显示大背景图；小背景图隐藏，页面可通过
+ * 响应式媒体查询覆盖 .cg-atmosphere-bg--small 的
+ * display 属性来启用。
+ */
+
+.cg-atmosphere {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.cg-atmosphere-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 30%, black 70%, transparent 100%);
+}
+
+.cg-atmosphere-bg--small {
+    display: none;
+}
+
+/* 小屏：显示小背景图，隐藏大背景图 */
+@media (max-width: 767px) {
+    .cg-atmosphere-bg:not(.cg-atmosphere-bg--small) {
+        display: none;
+    }
+
+    .cg-atmosphere-bg--small {
+        display: block;
+    }
+}

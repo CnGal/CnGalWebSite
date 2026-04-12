@@ -139,7 +139,7 @@
     align-items: center;
     justify-content: space-between;
     padding: var(--cg-spacing-3) var(--cg-spacing-5);
-    background: color-mix(in srgb, var(--cg-color-surface) 85%, transparent);
+    background: var(--cg-color-surface);
     border-bottom: 1px solid color-mix(in srgb, var(--cg-color-border) 50%, transparent);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
     backdrop-filter: blur(16px);

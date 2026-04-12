@@ -22,6 +22,11 @@
 else if (_model is not null)
 {
     <article class="article-page">
+        @if (HasAtmosphere())
+        {
+            <CgAtmosphere BackgroundPicture="@_model.BackgroundPicture" SmallBackgroundPicture="@_model.SmallBackgroundPicture" />
+        }
+
         <header class="article-header">
             <ArticleHero Title="@GetDisplayTitle()"
                          BriefIntroduction="@_model.BriefIntroduction"
@@ -177,5 +182,16 @@ else
     private static string GetTypeText(ArticleType type)
     {
         return type.GetDisplayName();
+    }
+
+    private bool HasAtmosphere()
+    {
+        if (_model is null)
+        {
+            return false;
+        }
+
+        return string.IsNullOrWhiteSpace(_model.BackgroundPicture) is false
+            || string.IsNullOrWhiteSpace(_model.SmallBackgroundPicture) is false;
     }
 }
