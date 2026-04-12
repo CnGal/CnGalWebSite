@@ -6,15 +6,31 @@
 {
     <div class="edit-record-detail">
         <div class="edit-record-detail__header">
-            <h3 class="edit-record-detail__title">
-                <CgMdiIcon Name="mdiFileDocumentOutline" aria-hidden="true" />
-                <span>@($"#{Model.Id:00000}") — @Model.Operation.GetDisplayName()</span>
-            </h3>
+            <div class="edit-record-detail__header-top">
+                <h3 class="edit-record-detail__title">
+                    <CgMdiIcon Name="mdiFileDocumentOutline" aria-hidden="true" />
+                    <span>@($"#{Model.Id:00000}") — @Model.Operation.GetDisplayName()</span>
+                </h3>
+                <a class="edit-record-detail__action-link" href="/examine?Id=@Model.Id">
+                    <CgMdiIcon Name="mdiMagnify" aria-hidden="true" />
+                    查看审核详情
+                </a>
+            </div>
             <div class="edit-record-detail__meta">
-                <span class="edit-record-detail__meta-item">
-                    <CgMdiIcon Name="mdiAccountOutline" aria-hidden="true" />
-                    @(Model.UserName ?? "—")
-                </span>
+                @if (!string.IsNullOrWhiteSpace(Model.UserId))
+                {
+                    <a class="edit-record-detail__meta-item edit-record-detail__meta-link" href="/space/index/@Model.UserId">
+                        <CgMdiIcon Name="mdiAccountOutline" aria-hidden="true" />
+                        @(Model.UserName ?? "—")
+                    </a>
+                }
+                else
+                {
+                    <span class="edit-record-detail__meta-item">
+                        <CgMdiIcon Name="mdiAccountOutline" aria-hidden="true" />
+                        @(Model.UserName ?? "—")
+                    </span>
+                }
                 <span class="edit-record-detail__meta-item">
                     <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" />
                     @Model.ApplyTime.ToString("yyyy-MM-dd HH:mm")
@@ -72,12 +88,7 @@
             </div>
         }
 
-        <div class="edit-record-detail__actions">
-            <a class="edit-record-detail__action-link" href="/examine?Id=@Model.Id">
-                <CgMdiIcon Name="mdiMagnify" aria-hidden="true" />
-                查看审核详情
-            </a>
-        </div>
+
     </div>
 }
 

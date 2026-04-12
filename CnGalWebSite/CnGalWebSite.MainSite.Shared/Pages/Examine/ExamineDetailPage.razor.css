@@ -1,7 +1,20 @@
+/* ═══════════════════════════════════════════════════
+   ExamineDetailPage — 审核详情页面
+   ═══════════════════════════════════════════════════ */
+
 .examine-detail-page {
-    max-width: 960px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: var(--cg-spacing-5) var(--cg-spacing-4);
+    padding: 1.5rem 1rem 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    animation: edp-fade-in 0.35s ease-out;
+}
+
+@keyframes edp-fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ── Header ── */
@@ -9,24 +22,25 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: var(--cg-spacing-5);
     flex-wrap: wrap;
     gap: var(--cg-spacing-3);
+    padding-bottom: var(--cg-spacing-4);
+    border-bottom: 1px solid var(--cg-color-border);
 }
 
 .examine-detail-page__title {
     display: flex;
     align-items: center;
-    gap: var(--cg-spacing-2);
-    font-size: var(--cg-font-size-2xl);
+    gap: var(--cg-spacing-3);
+    font-size: var(--cg-font-size-xl);
     font-weight: var(--cg-font-weight-bold);
     color: var(--cg-color-text);
     margin: 0;
 }
 
 ::deep .examine-detail-page__title .cg-mdi-icon {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     color: var(--cg-color-primary);
 }
 
@@ -38,23 +52,26 @@
 .examine-detail-page__back {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--cg-spacing-1);
     font-size: var(--cg-font-size-sm);
-    color: var(--cg-color-link);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-primary);
     text-decoration: none;
     padding: var(--cg-spacing-2) var(--cg-spacing-3);
-    border-radius: var(--cg-radius-md);
-    transition: background var(--cg-transition-fast);
+    border-radius: var(--cg-radius-full);
+    border: 1px solid color-mix(in srgb, var(--cg-color-primary) 20%, transparent);
+    transition: background var(--cg-transition-fast), border-color var(--cg-transition-fast);
 }
 
 .examine-detail-page__back:hover {
-    background: var(--cg-color-hover-overlay);
+    background: color-mix(in srgb, var(--cg-color-primary) 8%, transparent);
+    border-color: color-mix(in srgb, var(--cg-color-primary) 35%, transparent);
     text-decoration: none;
 }
 
 ::deep .examine-detail-page__back .cg-mdi-icon {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
 }
 
 /* ── Loading / Error ── */
@@ -80,12 +97,19 @@
 }
 
 ::deep .examine-detail-page__error .cg-mdi-icon {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     color: var(--cg-color-error);
 }
 
 .examine-detail-page__error p {
     font-size: var(--cg-font-size-base);
     margin: 0;
+}
+
+/* ── Responsive ── */
+@media (min-width: 768px) {
+    .examine-detail-page {
+        padding: 2rem 1.5rem 4rem;
+    }
 }

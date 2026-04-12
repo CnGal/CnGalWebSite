@@ -11,6 +11,7 @@
 <PageTitle>编辑记录 - CnGal资料站</PageTitle>
 
 <div class="edit-record-page">
+    @* ── 页面标题 ── *@
     <header class="edit-record-page__header">
         <h1 class="edit-record-page__title">
             <CgMdiIcon Name="mdiHistory" aria-hidden="true"/>
@@ -36,11 +37,11 @@
     }
     else if (_overview is not null)
     {
-        @* ── 对象信息标题栏 ── *@
+        @* ── 对象信息卡片 ── *@
         <div class="edit-record-page__object-banner">
             @if (!string.IsNullOrWhiteSpace(_overview.Image))
             {
-                <img class="edit-record-page__object-image" src="@_overview.Image" alt="@_overview.ObjectName" loading="lazy"/>
+                <img class="edit-record-page__object-image" src="@_overview.Image" alt="@_overview.ObjectName" loading="lazy" />
             }
             <div class="edit-record-page__object-info">
                 <h2 class="edit-record-page__object-name">@($"『{_overview.ObjectName}』历史编辑记录总览")</h2>
@@ -71,27 +72,17 @@
                 <div class="edit-record-page__contrast-bar">
                     <div class="edit-record-page__contrast-selector">
                         <label class="edit-record-page__contrast-label">
-                            <CgMdiIcon Name="mdiHistory" aria-hidden="true"/>
+                            <CgMdiIcon Name="mdiFileRestoreOutline" aria-hidden="true"/>
                             对比版本
                         </label>
-                        <select class="edit-record-page__contrast-select" value="@_contrastId" @onchange="OnContrastChanged">
-                            @foreach (var item in _overview.Examines)
-                            {
-                                <option value="@item.Id">@($"#{item.Id:00000} — {item.ApplyTime:yyyy-MM-dd HH:mm}")</option>
-                            }
-                        </select>
+                        <CgSelect Value="@_contrastIdStr" ValueChanged="OnContrastChanged" Options="@_examineOptions" />
                     </div>
                     <div class="edit-record-page__contrast-selector">
                         <label class="edit-record-page__contrast-label">
-                            <CgMdiIcon Name="mdiHistory" aria-hidden="true"/>
+                            <CgMdiIcon Name="mdiFileDocumentCheckOutline" aria-hidden="true"/>
                             当前版本
                         </label>
-                        <select class="edit-record-page__contrast-select" value="@_currentId" @onchange="OnCurrentChanged">
-                            @foreach (var item in _overview.Examines)
-                            {
-                                <option value="@item.Id">@($"#{item.Id:00000} — {item.ApplyTime:yyyy-MM-dd HH:mm}")</option>
-                            }
-                        </select>
+                        <CgSelect Value="@_currentIdStr" ValueChanged="OnCurrentChanged" Options="@_examineOptions" />
                     </div>
                     <CgButton Variant="primary" OnClick="LoadContrastAsync" Disabled="_isContrastLoading">
                         <CgMdiIcon Name="mdiMagnify" aria-hidden="true"/>
@@ -153,6 +144,10 @@
     private EditRecordAloneViewModel? _selectedRecord;
     private ExamineViewModel? _contrastModel;
     private long _selectedId;
+    private string _contrastIdStr = "";
+    private string _currentIdStr = "";
+
+    private IEnumerable<KeyValuePair<string, string>> _examineOptions = [];
     private long _contrastId;
     private long _currentId;
     private bool _isLoading = true;
@@ -200,9 +195,14 @@
         {
             _overview = result.Data;
 
-            // 初始化对比 ID
+            // 初始化对比 ID 与选择器选项
             _contrastId = ContrastId;
             _currentId = CurrentId > 0 ? CurrentId : _overview.Examines.LastOrDefault()?.Id ?? ContrastId;
+            _contrastIdStr = _contrastId.ToString();
+            _currentIdStr = _currentId.ToString();
+            _examineOptions = _overview.Examines
+                .Select(e => new KeyValuePair<string, string>(e.Id.ToString(), $"#{e.Id:00000} — {e.ApplyTime:yyyy-MM-dd HH:mm}"))
+                .ToList();
 
             // 定位选中项：优先选 ContrastId 对应的记录，其次选 IsSelected=true 的
             _selectedRecord = _overview.Examines.FirstOrDefault(e => e.Id == ContrastId)
@@ -253,20 +253,24 @@
         return Task.CompletedTask;
     }
 
-    private void OnContrastChanged(ChangeEventArgs e)
+    private Task OnContrastChanged(string? value)
     {
-        if (long.TryParse(e.Value?.ToString(), out var id))
+        if (long.TryParse(value, out var id))
         {
             _contrastId = id;
+            _contrastIdStr = value!;
         }
+        return Task.CompletedTask;
     }
 
-    private void OnCurrentChanged(ChangeEventArgs e)
+    private Task OnCurrentChanged(string? value)
     {
-        if (long.TryParse(e.Value?.ToString(), out var id))
+        if (long.TryParse(value, out var id))
         {
             _currentId = id;
+            _currentIdStr = value!;
         }
+        return Task.CompletedTask;
     }
 
     private string? GetObjectUrl()

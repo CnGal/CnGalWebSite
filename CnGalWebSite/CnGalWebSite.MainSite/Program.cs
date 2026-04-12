@@ -40,6 +40,20 @@ if (!app.Environment.IsDevelopment())
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 
+// 拒绝 Content-Type 为空或不合法的 POST 请求，防止 Blazor SSR antiforgery 解析表单时崩溃
+// 排除 /_blazor（SignalR）等非页面端点
+app.Use(async (context, next) =>
+{
+    if (HttpMethods.IsPost(context.Request.Method)
+        && !context.Request.Path.StartsWithSegments("/_blazor")
+        && string.IsNullOrWhiteSpace(context.Request.ContentType))
+    {
+        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        return;
+    }
+    await next();
+});
+
 //转发Ip
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {

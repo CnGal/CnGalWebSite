@@ -1,27 +1,48 @@
+/* ═══════════════════════════════════════════════════
+   EditRecordPage — 编辑记录页面
+   ═══════════════════════════════════════════════════ */
+
 .edit-record-page {
-    max-width: 1200px;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: var(--cg-spacing-5) var(--cg-spacing-4);
+    padding: 1.5rem 1rem 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    animation: erp-fade-in 0.35s ease-out;
+}
+
+@keyframes erp-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ── Header ── */
 .edit-record-page__header {
-    margin-bottom: var(--cg-spacing-5);
+    padding-bottom: var(--cg-spacing-4);
+    border-bottom: 1px solid var(--cg-color-border);
 }
 
 .edit-record-page__title {
     display: flex;
     align-items: center;
-    gap: var(--cg-spacing-2);
-    font-size: var(--cg-font-size-2xl);
+    gap: var(--cg-spacing-3);
+    font-size: var(--cg-font-size-xl);
     font-weight: var(--cg-font-weight-bold);
     color: var(--cg-color-text);
     margin: 0;
 }
 
 ::deep .edit-record-page__title .cg-mdi-icon {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     color: var(--cg-color-primary);
 }
 
@@ -48,8 +69,8 @@
 }
 
 ::deep .edit-record-page__error .cg-mdi-icon {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     color: var(--cg-color-error);
 }
 
@@ -63,19 +84,30 @@
     display: flex;
     align-items: center;
     gap: var(--cg-spacing-4);
-    padding: var(--cg-spacing-4);
-    background: var(--cg-color-surface);
-    border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-lg);
-    margin-bottom: var(--cg-spacing-5);
+    padding: 1.25rem 1.5rem;
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    border-radius: var(--cg-radius-xl);
+    box-shadow: var(--cg-shadow-sm);
+    transition: box-shadow var(--cg-transition-normal);
+}
+
+.edit-record-page__object-banner:hover {
+    box-shadow: var(--cg-shadow-md);
 }
 
 .edit-record-page__object-image {
-    width: 72px;
-    height: 72px;
+    width: auto;
+    height: auto;
+    max-width: 140px;
+    aspect-ratio: 460 / 215;
     object-fit: cover;
-    border-radius: var(--cg-radius-md);
+    border-radius: var(--cg-radius-lg);
     flex-shrink: 0;
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    box-shadow: var(--cg-shadow-sm);
 }
 
 .edit-record-page__object-info {
@@ -105,12 +137,17 @@
     align-items: center;
     gap: 4px;
     font-size: var(--cg-font-size-sm);
-    color: var(--cg-color-link);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-primary);
     text-decoration: none;
+    padding: var(--cg-spacing-1) var(--cg-spacing-2);
+    border-radius: var(--cg-radius-full);
+    transition: background var(--cg-transition-fast);
 }
 
 .edit-record-page__object-link:hover {
-    text-decoration: underline;
+    background: color-mix(in srgb, var(--cg-color-primary) 8%, transparent);
+    text-decoration: none;
 }
 
 ::deep .edit-record-page__object-link .cg-mdi-icon {
@@ -122,7 +159,7 @@
 .edit-record-page__body {
     display: grid;
     grid-template-columns: 320px 1fr;
-    gap: var(--cg-spacing-5);
+    gap: 1.5rem;
     align-items: start;
 }
 
@@ -134,9 +171,12 @@
 
 /* ── Sidebar ── */
 .edit-record-page__sidebar {
-    background: var(--cg-color-surface);
-    border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-lg);
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    border-radius: var(--cg-radius-xl);
+    box-shadow: var(--cg-shadow-sm);
     overflow: hidden;
     position: sticky;
     top: calc(var(--cg-header-height, 64px) + var(--cg-spacing-4));
@@ -165,6 +205,9 @@
     min-height: 300px;
     min-width: 0;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
 .edit-record-page__no-selection {
@@ -176,24 +219,32 @@
     padding: var(--cg-spacing-10);
     color: var(--cg-color-text-muted);
     font-size: var(--cg-font-size-sm);
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    border: 1px dashed var(--cg-color-border);
+    border-radius: var(--cg-radius-xl);
 }
 
 ::deep .edit-record-page__no-selection .cg-mdi-icon {
-    width: 40px;
-    height: 40px;
-    opacity: 0.5;
+    width: 48px;
+    height: 48px;
+    opacity: 0.4;
+    color: var(--cg-color-primary);
 }
 
 /* ── Contrast Bar ── */
 .edit-record-page__contrast-bar {
+    position: relative;
+    z-index: 2;
     display: flex;
     align-items: flex-end;
     gap: var(--cg-spacing-3);
-    padding: var(--cg-spacing-3) var(--cg-spacing-4);
-    background: var(--cg-color-surface);
-    border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-lg);
-    margin-bottom: var(--cg-spacing-4);
+    padding: 1.25rem 1.5rem;
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    border-radius: var(--cg-radius-xl);
+    box-shadow: var(--cg-shadow-sm);
     flex-wrap: wrap;
 }
 
@@ -221,30 +272,11 @@
     height: 14px;
 }
 
-.edit-record-page__contrast-select {
-    width: 100%;
-    padding: var(--cg-spacing-2) var(--cg-spacing-3);
-    font-size: var(--cg-font-size-sm);
-    color: var(--cg-color-text);
-    background: var(--cg-color-bg);
-    border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-md);
-    outline: none;
-    transition: border-color 0.15s ease;
-    cursor: pointer;
-    appearance: auto;
-}
-
-.edit-record-page__contrast-select:focus {
-    border-color: var(--cg-color-primary);
-}
-
 /* ── Contrast View ── */
 .edit-record-page__contrast-view {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--cg-spacing-4);
-    margin-bottom: var(--cg-spacing-4);
 }
 
 @media (max-width: 768px) {
@@ -269,7 +301,7 @@
     color: var(--cg-color-text);
     margin: 0;
     padding: var(--cg-spacing-2) var(--cg-spacing-3);
-    border-radius: var(--cg-radius-md);
+    border-radius: var(--cg-radius-lg);
 }
 
 .edit-record-page__contrast-column-title--before {
@@ -278,8 +310,8 @@
 }
 
 .edit-record-page__contrast-column-title--after {
-    background: color-mix(in srgb, var(--cg-color-success, #22c55e) 10%, var(--cg-color-surface));
-    border: 1px solid color-mix(in srgb, var(--cg-color-success, #22c55e) 25%, transparent);
+    background: color-mix(in srgb, var(--cg-color-success) 10%, var(--cg-color-surface));
+    border: 1px solid color-mix(in srgb, var(--cg-color-success) 25%, transparent);
 }
 
 ::deep .edit-record-page__contrast-column-title .cg-mdi-icon {
@@ -292,5 +324,12 @@
 }
 
 .edit-record-page__contrast-column-title--after ::deep .cg-mdi-icon {
-    color: var(--cg-color-success, #22c55e);
+    color: var(--cg-color-success);
+}
+
+/* ── Responsive ── */
+@media (min-width: 768px) {
+    .edit-record-page {
+        padding: 2rem 1.5rem 4rem;
+    }
 }
