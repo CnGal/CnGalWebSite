@@ -63,6 +63,8 @@ public sealed class VideoCommandService(
             };
 
             // 设置 Id 以便后续提交
+            model.Data.Id = id;
+            model.Data.Name = model.Data.Main.Name;
             model.Data.Main.Id = id;
             model.Data.Images.Id = id;
             model.Data.Relevances.Id = id;

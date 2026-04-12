@@ -55,6 +55,8 @@ public sealed class TagCommandService(
             };
 
             // 从 Main 同步 Id 和 Name 到顶层
+            model.Data.Id = id;
+            model.Data.Name = model.Data.Main.Name;
             model.Data.Main.Id = id;
 
             return SdkResult<TagEditViewModel>.Ok(model);

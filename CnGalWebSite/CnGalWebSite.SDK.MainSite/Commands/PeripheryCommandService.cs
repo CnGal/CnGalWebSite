@@ -57,6 +57,8 @@ public sealed class PeripheryCommandService(
             };
 
             // 设置 Id 和 Name 以便后续提交
+            model.Data.Id = id;
+            model.Data.Name = model.Data.Main.Name;
             model.Data.Main.Id = id;
             model.Data.Images.Id = id;
             model.Data.Entries.Id = id;
