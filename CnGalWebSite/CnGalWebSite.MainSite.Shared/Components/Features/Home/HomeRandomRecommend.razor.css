@@ -35,9 +35,9 @@
     line-height: 1;
     padding: 0.2rem 0.5rem;
     border-radius: var(--cg-radius-full);
-    color: var(--cg-color-secondary);
-    background: color-mix(in oklab, var(--cg-color-secondary) 10%, transparent);
-    border: 1px solid color-mix(in oklab, var(--cg-color-secondary) 18%, transparent);
+    color: color-mix(in oklab, var(--cg-color-secondary) 80%, black);
+    background: color-mix(in oklab, var(--cg-color-secondary) 15%, transparent);
+    border: 1px solid color-mix(in oklab, var(--cg-color-secondary) 25%, transparent);
     white-space: nowrap;
 }
 
