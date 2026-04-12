@@ -1,0 +1,126 @@
+@page "/square"
+@inject IHomeQueryService HomeQueryService
+@using CnGalWebSite.MainSite.Shared.Components.Features.Home
+
+
+<PageTitle>广场 - CnGal</PageTitle>
+
+@if (ErrorMessage is not null)
+{
+    <HomeError Message="@ErrorMessage" />
+}
+else
+{
+    <div class="square-page">
+        <header class="square-page__header">
+            <h1 class="square-page__title">
+                <CgMdiIcon Name="mdiViewDashboardOutline" aria-hidden="true" />
+                广场
+            </h1>
+            <p class="square-page__desc">查看编辑概览、抽奖、投票、随机展示、数据汇总等众多内容</p>
+        </header>
+
+        <section class="square-section">
+            <SquareNavLinks />
+        </section>
+
+        @if (Model.EditOverview is not null)
+        {
+            <HomeSection Title="编辑概览" Icon="mdiChartLineVariant" IconColor="var(--cg-color-secondary)">
+                <HeaderAppendContent>
+                    <a href="/perfections" class="square-section-more-link">
+                        查看更多
+                        <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
+                    </a>
+                </HeaderAppendContent>
+                <ChildContent>
+                    <SquareEditOverviewCard />
+                </ChildContent>
+            </HomeSection>
+        }
+
+        @if (TagsWithImages.Any())
+        {
+            <HomeSection Title="随机标签推荐" Icon="mdiTagMultipleOutline" IconColor="var(--cg-color-secondary)">
+                <ul class="square-tag-grid">
+                    @foreach (var tag in TagsWithImages)
+                    {
+                        <li>
+                            <SquareTagCard Model="tag" />
+                        </li>
+                    }
+                </ul>
+            </HomeSection>
+        }
+
+        @if (Model.Lotteries.Any())
+        {
+            <HomeSection Title="抽奖活动" Icon="mdiGiftOpenOutline" IconColor="#ec4899">
+                <HeaderAppendContent>
+                    <a href="/lotteries" class="square-section-more-link">
+                        查看更多
+                        <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
+                    </a>
+                </HeaderAppendContent>
+                <ChildContent>
+                    <ul class="square-lottery-grid">
+                        @foreach (var lottery in Model.Lotteries.Take(4))
+                        {
+                            <SquareLotteryCard Model="lottery" />
+                        }
+                    </ul>
+                </ChildContent>
+            </HomeSection>
+        }
+
+        @if (Model.Votes.Any())
+        {
+            <HomeSection Title="投票活动" Icon="mdiVote" IconColor="var(--cg-color-primary)">
+                <ul class="square-vote-grid">
+                    @foreach (var vote in Model.Votes)
+                    {
+                        <SquareVoteCard Model="vote" />
+                    }
+                </ul>
+            </HomeSection>
+        }
+
+        @if (Model.Warnings.Any())
+        {
+            <HomeWarning Warnings="@Model.Warnings" />
+        }
+    </div>
+}
+
+@code {
+    private SquareSummaryViewModel Model = new()
+    {
+        RandomTags = [],
+        Lotteries = [],
+        Votes = [],
+        Warnings = [],
+    };
+
+    private string? ErrorMessage;
+
+    /// <summary>
+    /// 仅保留至少包含一个有主图条目的标签
+    /// </summary>
+    private IReadOnlyList<SquareRandomTagModel> TagsWithImages =>
+        Model.RandomTags
+            .Where(t => t.Entries.Any(e => !string.IsNullOrWhiteSpace(e.MainImage)))
+            .Take(8)
+            .ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await HomeQueryService.GetSquareSummaryAsync();
+        if (result.Success && result.Data is not null)
+        {
+            Model = result.Data;
+            return;
+        }
+
+        ErrorMessage = result.Error?.Message ?? "请稍后重试";
+    }
+}

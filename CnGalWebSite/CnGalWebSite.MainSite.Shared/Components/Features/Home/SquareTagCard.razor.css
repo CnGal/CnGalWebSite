@@ -1,0 +1,161 @@
+/* ═══════════════════════════════════════════════════
+   SquareTagCard — 随机标签卡片
+   ═══════════════════════════════════════════════════ */
+
+.square-tag-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-4);
+    border-radius: var(--cg-radius-xl);
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    box-shadow: var(--cg-shadow-sm);
+    color: inherit;
+    overflow: hidden;
+    z-index: 1;
+    transition:
+        border-color var(--cg-transition-fast),
+        box-shadow var(--cg-transition-fast),
+        transform var(--cg-transition-fast);
+    height: 100%;
+}
+
+/* 渐变发光背景 */
+.square-tag-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top left, color-mix(in oklab, var(--cg-color-primary) 8%, transparent) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity var(--cg-transition-normal);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.square-tag-card:hover {
+    border-color: color-mix(in oklab, var(--cg-color-primary) 30%, var(--cg-color-border));
+    box-shadow: var(--cg-shadow-card-hover);
+    transform: translateY(-3px);
+    text-decoration: none;
+}
+
+.square-tag-card:hover::before {
+    opacity: 1;
+}
+
+/* ── Title link ── */
+
+.square-tag-card-title-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.square-tag-card-title-link:hover {
+    text-decoration: none;
+}
+
+/* ── Title ── */
+
+.square-tag-card-title {
+    margin: 0;
+    font-size: var(--cg-font-size-base);
+    font-weight: var(--cg-font-weight-bold);
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    line-height: 1.3;
+    transition: color var(--cg-transition-fast);
+}
+
+.square-tag-card-title ::deep .cg-mdi-icon {
+    width: 1.15rem;
+    height: 1.15rem;
+    color: var(--cg-color-primary);
+    flex-shrink: 0;
+}
+
+.square-tag-card:hover .square-tag-card-title {
+    color: var(--cg-color-primary);
+}
+
+/* ── Entry thumbnails ── */
+
+.square-tag-entries {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--cg-spacing-2);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.square-tag-entry {
+    display: block;
+    aspect-ratio: 460 / 215;
+    border-radius: var(--cg-radius-md);
+    overflow: hidden;
+    background: var(--cg-color-bg);
+    border: 1px solid var(--cg-color-border);
+    transition: border-color var(--cg-transition-fast), transform var(--cg-transition-fast);
+}
+
+.square-tag-entry:hover {
+    border-color: var(--cg-color-primary);
+    transform: scale(1.04);
+}
+
+.square-tag-entry img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease-in-out;
+}
+
+.square-tag-entry:hover img {
+    transform: scale(1.08);
+}
+
+/* 角色 / Staff 使用 1:1 头像比例，一行放 4 个 */
+.square-tag-entries--portrait {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.square-tag-entry--portrait {
+    aspect-ratio: 1 / 1;
+}
+
+
+
+
+/* ── More link ── */
+
+.square-tag-card-more {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-muted);
+    text-decoration: none;
+    margin-top: auto;
+    transition: color var(--cg-transition-fast), gap var(--cg-transition-fast);
+}
+
+.square-tag-card-more:hover {
+    text-decoration: none;
+}
+
+.square-tag-card:hover .square-tag-card-more {
+    color: var(--cg-color-primary);
+    gap: var(--cg-spacing-2);
+}
+
+.square-tag-card-more ::deep .cg-mdi-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+}

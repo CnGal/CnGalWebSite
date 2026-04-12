@@ -1,0 +1,59 @@
+@* SquareEditOverviewCard — 编辑概览折线图卡片（交互岛）
+   CgLineChart 依赖 Canvas + JS Interop，必须在交互模式下渲染。
+   组件自行通过 SDK 获取数据，避免 SSR→Interactive 参数序列化问题。 *@
+@rendermode InteractiveServer
+@inject IHomeQueryService HomeQueryService
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+
+<div class="square-edit-overview-card">
+    <div class="square-edit-overview-card__body">
+        @if (_loading)
+        {
+            <div class="square-edit-overview-card__placeholder">
+                <CgProgressRing Size="32" />
+                <span>加载编辑趋势数据…</span>
+            </div>
+        }
+        else if (_labels is not null && _series is not null)
+        {
+            <CgLineChart Title="近 30 天编辑趋势"
+                         Labels="@_labels"
+                         Series="@_series"
+                         Height="280" />
+        }
+        else
+        {
+            <div class="square-edit-overview-card__placeholder">
+                <span>暂无数据</span>
+            </div>
+        }
+    </div>
+    <div class="square-edit-overview-card__footer">
+        <a href="/perfections" class="square-edit-overview-card__link">
+            查看完善度详情
+            <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
+        </a>
+    </div>
+</div>
+
+@code {
+    private bool _loading = true;
+    private IReadOnlyList<string>? _labels;
+    private IReadOnlyList<CgLineChartSeries>? _series;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await HomeQueryService.GetSquareSummaryAsync();
+        if (result.Success && result.Data?.EditOverview is { } overview)
+        {
+            _labels = overview.Labels;
+            _series = overview.Series.Select(s => new CgLineChartSeries
+            {
+                Name = s.Name,
+                Data = s.Data,
+            }).ToList();
+        }
+
+        _loading = false;
+    }
+}
