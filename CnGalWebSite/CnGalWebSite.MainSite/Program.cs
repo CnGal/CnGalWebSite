@@ -13,13 +13,21 @@ var taskApiBaseAddress = builder.Configuration["MainSiteApi:TaskApiPath"];
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents(options =>
+    {
+        // 将真实异常信息发送到客户端浏览器控制台（开发 / 排查时打开）
+        options.DetailedErrors = builder.Environment.IsDevelopment();
+    });
 builder.Services.AddMainSiteOidcAuthentication(builder.Configuration);
 builder.Services.AddMainSiteSdk(apiBaseAddress!, imageApiBaseAddress!, taskApiBaseAddress!);
 builder.Services.AddMainSiteSharedServices();
 //添加状态检查
 builder.Services.AddHealthChecks();
 builder.Services.AddScoped<CircuitHandler, IdleCircuitHandler>();
+
+// 打开 Blazor Circuit 内部日志，帮助定位断连原因
+builder.Logging.AddFilter("Microsoft.AspNetCore.Components.Server.Circuits", LogLevel.Debug);
+builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
 
 var app = builder.Build();
 //设置请求来源
