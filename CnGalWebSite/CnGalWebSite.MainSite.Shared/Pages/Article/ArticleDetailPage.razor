@@ -9,7 +9,7 @@
 @using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 @using CnGalWebSite.MainSite.Shared.Services
 
-<PageTitle>@(_model is null ? "文章详情" : $"{GetDisplayTitle()} - 文章详情")</PageTitle>
+<CgPageMeta Title="@(_model is null ? null : GetDisplayTitle())" Description="@(_model?.BriefIntroduction)" Image="@(_model?.MainPicture)" />
 
 @if (_errorMessage is not null)
 {

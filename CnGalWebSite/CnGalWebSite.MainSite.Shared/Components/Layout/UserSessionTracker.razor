@@ -12,9 +12,28 @@
 @inject ICgToastService ToastService
 @inject ILogger<UserSessionTracker> Logger
 
+<CgModal IsOpen="_showSignInModal"
+         OnClose="CloseSignInModal"
+         Width="320px">
+    <ChildContent>
+        <div class="sign-in-modal-content">
+            <CgMdiIcon Name="mdiCalendarCheck" Class="sign-in-icon" aria-hidden="true"/>
+            <h3 class="sign-in-title">已连续签到 @_signInDays 天</h3>
+            <p class="sign-in-reward">经验值 <span>+5</span> 🎉</p>
+
+            <div class="sign-in-actions">
+                <CgButton Variant="primary" OnClick="CloseSignInModal">我知道了</CgButton>
+            </div>
+        </div>
+    </ChildContent>
+</CgModal>
+
 @code {
     private CancellationTokenSource? _cts;
     private Task? _heartbeatLoop;
+
+    private bool _showSignInModal;
+    private int _signInDays;
 
     protected override async Task OnInitializedAsync()
     {
@@ -94,14 +113,22 @@
             var result = await SpaceCommandService.SignInAsync(_cts?.Token ?? default);
             if (result.Success)
             {
-                var days = (taskResult.Data?.SignInDays ?? 0) + 1;
-                ToastService.Show("签到成功", $"已连续签到 {days} 天，经验值+5 🎉", "success");
+                _signInDays = (taskResult.Data?.SignInDays ?? 0) + 1;
+                _showSignInModal = true;
+                StateHasChanged();
             }
         }
         catch (Exception ex)
         {
             Logger.LogWarning(ex, "自动签到失败");
         }
+    }
+
+    private Task CloseSignInModal()
+    {
+        _showSignInModal = false;
+        StateHasChanged();
+        return Task.CompletedTask;
     }
 
     public async ValueTask DisposeAsync()
@@ -124,4 +151,5 @@
             }
         }
     }
+
 }

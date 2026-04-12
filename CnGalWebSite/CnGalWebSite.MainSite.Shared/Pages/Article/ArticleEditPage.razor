@@ -18,7 +18,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @implements IDisposable
 
-<PageTitle>@(IsCreate ? "发表文章" : "编辑文章")</PageTitle>
+<CgPageMeta Title="@(IsCreate ? "发表文章" : "编辑文章")" />
 
 @if (IsLoading)
 {

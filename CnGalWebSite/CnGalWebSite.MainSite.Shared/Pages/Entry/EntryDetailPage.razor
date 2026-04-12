@@ -15,7 +15,7 @@
 @using CnGalWebSite.Extensions
 @using CnGalWebSite.SDK.MainSite.Infrastructure
 
-<PageTitle>@(Model is null ? "条目详情" : $"{Model.Name} - 词条详情")</PageTitle>
+<CgPageMeta Title="@(Model?.Name)" Description="@(Model?.BriefIntroduction)" Image="@(Model?.MainPicture)" />
 
 @if (ErrorMessage is not null)
 {

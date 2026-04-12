@@ -7,7 +7,7 @@
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 
-<PageTitle>@(_model is null ? "周边详情" : $"{GetDisplayTitle()} - 周边详情")</PageTitle>
+<CgPageMeta Title="@(_model is null ? null : GetDisplayTitle())" Description="@(_model?.BriefIntroduction)" Image="@(_model?.MainPicture)" />
 
 @if (_errorMessage is not null)
 {

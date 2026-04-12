@@ -4,7 +4,7 @@
 @using CnGalWebSite.MainSite.Shared.Components.Features.Lottery.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 
-<PageTitle>@(_model is null ? "抽奖详情" : $"{GetDisplayTitle()} - 抽奖详情")</PageTitle>
+<CgPageMeta Title="@(_model is null ? null : GetDisplayTitle())" Description="@(_model?.BriefIntroduction)" Image="@(_model?.MainPicture)" />
 
 @if (_errorMessage is not null)
 {

@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.DataModel.ViewModel;
+using System.Collections;
+using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
@@ -34,54 +35,62 @@ public sealed class HomeQueryService(
             return SdkResult<HomeSummaryViewModel>.Ok(cached);
         }
 
-        var warnings = new List<SdkErrorModel>();
+        var warnings = new ThreadSafeWarnings();
         const int totalRequests = 20;
 
-        var tableResult = await GetResultSafeAsync<TableViewModel>("api/tables/GetTableView", "HOME_TABLE_FAILED",
+        // 并行启动所有请求
+        var tableTask = GetResultSafeAsync<TableViewModel>("api/tables/GetTableView", "HOME_TABLE_FAILED",
             warnings, cancellationToken);
-
-        var carouselsResult = await GetListSafeAsync<CarouselViewModel>("api/home/GetHomeCarouselsView",
+        var carouselsTask = GetListSafeAsync<CarouselViewModel>("api/home/GetHomeCarouselsView",
             "HOME_CAROUSELS_FAILED", warnings, cancellationToken);
-        var hotRecommendsResult = await GetListSafeAsync<HotRecommendItemModel>("api/home/ListHotRecommends",
+        var hotRecommendsTask = GetListSafeAsync<HotRecommendItemModel>("api/home/ListHotRecommends",
             "HOME_HOT_RECOMMENDS_FAILED", warnings, cancellationToken);
-        var publishedGamesResult = await GetListSafeAsync<PublishedGameItemModel>("api/home/ListPublishedGames",
+        var publishedGamesTask = GetListSafeAsync<PublishedGameItemModel>("api/home/ListPublishedGames",
             "HOME_PUBLISHED_GAMES_FAILED", warnings, cancellationToken);
-        var recentlyDemoGamesResult = await GetListSafeAsync<RecentlyDemoGameItemModel>(
+        var recentlyDemoGamesTask = GetListSafeAsync<RecentlyDemoGameItemModel>(
             "api/home/ListRecentlyDemoGames", "HOME_RECENTLY_DEMO_GAMES_FAILED", warnings, cancellationToken);
-        var upcomingGamesResult = await GetListSafeAsync<UpcomingGameItemModel>("api/home/ListUpcomingGames",
+        var upcomingGamesTask = GetListSafeAsync<UpcomingGameItemModel>("api/home/ListUpcomingGames",
             "HOME_UPCOMING_GAMES_FAILED", warnings, cancellationToken);
-        var activityCarouselsResult = await GetListSafeAsync<CarouselViewModel>("api/home/GetActivityCarouselsView",
+        var activityCarouselsTask = GetListSafeAsync<CarouselViewModel>("api/home/GetActivityCarouselsView",
             "HOME_ACTIVITY_CAROUSELS_FAILED", warnings, cancellationToken);
-        var homeNewsResult = await GetListSafeAsync<HomeNewsAloneViewModel>("api/home/GetHomeNewsView",
+        var homeNewsTask = GetListSafeAsync<HomeNewsAloneViewModel>("api/home/GetHomeNewsView",
             "HOME_NEWS_FAILED", warnings, cancellationToken);
-        var weeklyNewsResult = await GetListSafeAsync<ArticleInforTipViewModel>("api/news/GetWeeklyNewsOverview",
+        var weeklyNewsTask = GetListSafeAsync<ArticleInforTipViewModel>("api/news/GetWeeklyNewsOverview",
             "HOME_WEEKLY_NEWS_FAILED", warnings, cancellationToken);
-        var latestArticlesResult = await GetListSafeAsync<LatestArticleItemModel>("api/home/ListLatestArticles",
+        var latestArticlesTask = GetListSafeAsync<LatestArticleItemModel>("api/home/ListLatestArticles",
             "HOME_LATEST_ARTICLES_FAILED", warnings, cancellationToken);
-        var latestVideosResult = await GetListSafeAsync<LatestVideoItemModel>("api/home/ListLatestVideos",
+        var latestVideosTask = GetListSafeAsync<LatestVideoItemModel>("api/home/ListLatestVideos",
             "HOME_LATEST_VIDEOS_FAILED", warnings, cancellationToken);
-        var friendLinksResult = await GetListSafeAsync<FriendLinkItemModel>("api/home/ListFriendLinks",
+        var friendLinksTask = GetListSafeAsync<FriendLinkItemModel>("api/home/ListFriendLinks",
             "HOME_FRIEND_LINKS_FAILED", warnings, cancellationToken);
-        var birthdaysResult = await GetListSafeAsync<RoleBrithdayViewModel>(
+        var birthdaysTask = GetListSafeAsync<RoleBrithdayViewModel>(
             $"api/entries/GetRoleBirthdaysByTime?month={DateTime.Now.Month}&day={DateTime.Now.Day}",
             "HOME_BIRTHDAYS_FAILED",
             warnings,
             cancellationToken);
-        var announcementsResult = await GetListSafeAsync<AnnouncementItemModel>("api/home/ListAnnouncements",
+        var announcementsTask = GetListSafeAsync<AnnouncementItemModel>("api/home/ListAnnouncements",
             "HOME_ANNOUNCEMENTS_FAILED", warnings, cancellationToken);
-        var recentlyEditedGamesResult = await GetListSafeAsync<RecentlyEditedGameItemModel>(
+        var recentlyEditedGamesTask = GetListSafeAsync<RecentlyEditedGameItemModel>(
             "api/home/ListRecentlyEditedGames", "HOME_RECENTLY_EDITED_GAMES_FAILED", warnings, cancellationToken);
-        var evaluationsResult = await GetListSafeAsync<EvaluationItemModel>("api/home/ListEvaluations",
+        var evaluationsTask = GetListSafeAsync<EvaluationItemModel>("api/home/ListEvaluations",
             "HOME_EVALUATIONS_FAILED", warnings, cancellationToken);
-        var hotTagsResult = await GetListSafeAsync<HotTagItemModel>("api/home/ListHotTags", "HOME_HOT_TAGS_FAILED",
+        var hotTagsTask = GetListSafeAsync<HotTagItemModel>("api/home/ListHotTags", "HOME_HOT_TAGS_FAILED",
             warnings, cancellationToken);
-        var latestCommentsResult = await GetListSafeAsync<LatestCommentItemModel>(
+        var latestCommentsTask = GetListSafeAsync<LatestCommentItemModel>(
             "api/home/ListLatestComments?renderMarkdown=true", "HOME_LATEST_COMMENTS_FAILED", warnings,
             cancellationToken);
-        var freeGamesResult = await GetListSafeAsync<FreeGameItemModel>("api/home/ListFreeGames",
+        var freeGamesTask = GetListSafeAsync<FreeGameItemModel>("api/home/ListFreeGames",
             "HOME_FREE_GAMES_FAILED", warnings, cancellationToken);
-        var discountGamesResult = await GetListSafeAsync<DiscountGameItemModel>("api/home/ListDiscountGames",
+        var discountGamesTask = GetListSafeAsync<DiscountGameItemModel>("api/home/ListDiscountGames",
             "HOME_DISCOUNT_GAMES_FAILED", warnings, cancellationToken);
+
+        // 等待所有请求完成
+        await Task.WhenAll(
+            tableTask, carouselsTask, hotRecommendsTask, publishedGamesTask,
+            recentlyDemoGamesTask, upcomingGamesTask, activityCarouselsTask,
+            homeNewsTask, weeklyNewsTask, latestArticlesTask, latestVideosTask,
+            friendLinksTask, birthdaysTask, announcementsTask, recentlyEditedGamesTask,
+            evaluationsTask, hotTagsTask, latestCommentsTask, freeGamesTask, discountGamesTask);
 
         if (warnings.Count == totalRequests)
         {
@@ -92,29 +101,29 @@ public sealed class HomeQueryService(
         {
             HeroTitle = "CnGal 资料站",
             HeroSubtitle = "愿每一个 CnGal 创作者的作品都能不被忘记",
-            Carousels = NormalizeCarouselLinks(carouselsResult),
-            HotRecommends = NormalizeHomeItemUrls(hotRecommendsResult),
-            PublishedGames = NormalizeHomeItemUrls(publishedGamesResult),
-            RecentlyDemoGames = NormalizeHomeItemUrls(recentlyDemoGamesResult),
-            UpcomingGames = NormalizeHomeItemUrls(upcomingGamesResult),
-            ActivityCarousels = NormalizeCarouselLinks(activityCarouselsResult),
-            HomeNews = NormalizeHomeNews(homeNewsResult),
-            WeeklyNews = weeklyNewsResult,
-            LatestArticles = NormalizeHomeItemUrls(latestArticlesResult),
-            LatestVideos = NormalizeHomeItemUrls(latestVideosResult),
-            FriendLinks = NormalizeHomeItemUrls(friendLinksResult),
-            Birthdays = birthdaysResult,
-            Announcements = NormalizeHomeItemUrls(announcementsResult),
-            RecentlyEditedGames = NormalizeHomeItemUrls(recentlyEditedGamesResult),
+            Carousels = NormalizeCarouselLinks(carouselsTask.Result),
+            HotRecommends = NormalizeHomeItemUrls(hotRecommendsTask.Result),
+            PublishedGames = NormalizeHomeItemUrls(publishedGamesTask.Result),
+            RecentlyDemoGames = NormalizeHomeItemUrls(recentlyDemoGamesTask.Result),
+            UpcomingGames = NormalizeHomeItemUrls(upcomingGamesTask.Result),
+            ActivityCarousels = NormalizeCarouselLinks(activityCarouselsTask.Result),
+            HomeNews = NormalizeHomeNews(homeNewsTask.Result),
+            WeeklyNews = weeklyNewsTask.Result,
+            LatestArticles = NormalizeHomeItemUrls(latestArticlesTask.Result),
+            LatestVideos = NormalizeHomeItemUrls(latestVideosTask.Result),
+            FriendLinks = NormalizeHomeItemUrls(friendLinksTask.Result),
+            Birthdays = birthdaysTask.Result,
+            Announcements = NormalizeHomeItemUrls(announcementsTask.Result),
+            RecentlyEditedGames = NormalizeHomeItemUrls(recentlyEditedGamesTask.Result),
             CommunityLinks = CreateCommunityLinks(),
-            Evaluations = NormalizeHomeItemUrls(evaluationsResult),
+            Evaluations = NormalizeHomeItemUrls(evaluationsTask.Result),
             SupportLink = CreateSupportLink(),
-            HotTags = NormalizeHomeItemUrls(hotTagsResult),
-            LatestComments = NormalizeHomeItemUrls(latestCommentsResult),
-            FreeGames = NormalizeHomeItemUrls(freeGamesResult),
-            DiscountGames = NormalizeHomeItemUrls(discountGamesResult),
-            CommunityStats = tableResult ?? new TableViewModel(),
-            Warnings = warnings
+            HotTags = NormalizeHomeItemUrls(hotTagsTask.Result),
+            LatestComments = NormalizeHomeItemUrls(latestCommentsTask.Result),
+            FreeGames = NormalizeHomeItemUrls(freeGamesTask.Result),
+            DiscountGames = NormalizeHomeItemUrls(discountGamesTask.Result),
+            CommunityStats = tableTask.Result ?? new TableViewModel(),
+            Warnings = warnings.ToList()
         };
 
         memoryCache.Set(cacheKey, model, HomeCacheDuration);
@@ -343,5 +352,28 @@ public sealed class HomeQueryService(
             warnings.Add(new SdkErrorModel { Code = "SQUARE_EDIT_OVERVIEW_EXCEPTION", Message = "编辑概览图表加载异常", });
             return null;
         }
+    }
+
+    /// <summary>
+    /// 最小化的线程安全 ICollection 封装，用于并行请求中收集 warnings。
+    /// </summary>
+    private sealed class ThreadSafeWarnings : ICollection<SdkErrorModel>
+    {
+        private readonly List<SdkErrorModel> _list = [];
+        private readonly Lock _lock = new();
+
+        public int Count { get { lock (_lock) return _list.Count; } }
+        public bool IsReadOnly => false;
+
+        public void Add(SdkErrorModel item) { lock (_lock) _list.Add(item); }
+        public List<SdkErrorModel> ToList() { lock (_lock) return [.. _list]; }
+
+        // 以下方法仅为满足接口约束，并行聚合场景不使用
+        public void Clear() { lock (_lock) _list.Clear(); }
+        public bool Contains(SdkErrorModel item) { lock (_lock) return _list.Contains(item); }
+        public void CopyTo(SdkErrorModel[] array, int arrayIndex) { lock (_lock) _list.CopyTo(array, arrayIndex); }
+        public bool Remove(SdkErrorModel item) { lock (_lock) return _list.Remove(item); }
+        public IEnumerator<SdkErrorModel> GetEnumerator() { lock (_lock) return ToList().GetEnumerator(); }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

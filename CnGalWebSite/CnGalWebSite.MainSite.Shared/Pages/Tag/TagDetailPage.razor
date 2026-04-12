@@ -6,7 +6,7 @@
 @using CnGalWebSite.MainSite.Shared.Components.Features.Tag.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 
-<PageTitle>@(_model is null ? "标签详情" : $"{_model.Name} - 标签详情")</PageTitle>
+<CgPageMeta Title="@(_model?.Name)" Description="@(_model?.BriefIntroduction)" Image="@(_model?.MainPicture)" />
 
 @if (_errorMessage is not null)
 {

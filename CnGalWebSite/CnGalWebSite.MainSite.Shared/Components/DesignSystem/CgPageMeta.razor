@@ -1,0 +1,41 @@
+@* 统一页面标题与 SEO meta 标签，对齐旧站 TitleTip 组件行为 *@
+
+<PageTitle>@ComputedTitle</PageTitle>
+<HeadContent>
+    <meta name="description" content="@ComputedDescription">
+    <meta itemprop="name" content="@ComputedTitle" />
+    <meta itemprop="image" content="@ComputedImage" />
+</HeadContent>
+
+@code {
+    private const string SiteName = "CnGal 中文GalGame资料站";
+    private const string DefaultDescription = "CnGal资料站的建站目的是收集，索引国产gal及中文化galgame资料、文章、攻略，为galgame同好们提供方便。";
+    private const string DefaultImage = "https://app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png";
+
+    /// <summary>
+    /// 页面标题。为空时使用默认站名。
+    /// </summary>
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// 页面简介，用于 meta description。为空时使用默认简介。
+    /// </summary>
+    [Parameter]
+    public string? Description { get; set; }
+
+    /// <summary>
+    /// 页面主图 URL，用于 itemprop image。为空时使用默认 logo。
+    /// </summary>
+    [Parameter]
+    public string? Image { get; set; }
+
+    private string ComputedTitle =>
+        string.IsNullOrWhiteSpace(Title) ? SiteName : $"{Title} - {SiteName}";
+
+    private string ComputedDescription =>
+        string.IsNullOrWhiteSpace(Description) ? DefaultDescription : Description;
+
+    private string ComputedImage =>
+        string.IsNullOrWhiteSpace(Image) ? DefaultImage : Image;
+}

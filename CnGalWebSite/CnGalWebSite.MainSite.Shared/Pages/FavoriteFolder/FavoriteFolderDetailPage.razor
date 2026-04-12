@@ -18,7 +18,7 @@
 }
 else if (_model != null)
 {
-    <PageTitle>@($"目录 - {_model.Name} - CnGal资料站")</PageTitle>
+    <CgPageMeta Title="@($"目录 - {_model.Name}")" Description="@(_model.BriefIntroduction)" Image="@(_model.MainPicture)" />
 
     <article class="cg-ff-page">
         <FavoriteFolderHero Model="_model" />
