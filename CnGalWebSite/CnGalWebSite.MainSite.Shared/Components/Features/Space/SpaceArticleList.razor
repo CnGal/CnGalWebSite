@@ -1,0 +1,67 @@
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.DataModel.ViewModel.Search
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+
+@if (Model is null || Model.Items.Count == 0)
+{
+    <div class="cg-space-tab-empty">
+        <CgMdiIcon Name="mdiNewspaperVariantMultipleOutline" aria-hidden="true" />
+        <p>暂无文章</p>
+    </div>
+}
+else
+{
+    <div class="cg-space-article-grid">
+        @foreach (var article in Model.Items)
+        {
+            <a class="cg-space-article-item" href="@($"/articles/index/{article.Id}")">
+                @if (!string.IsNullOrWhiteSpace(article.MainImage))
+                {
+                    <div class="cg-space-article-cover">
+                        <img src="@article.MainImage" alt="@article.Name" loading="lazy" />
+                    </div>
+                }
+                <div class="cg-space-article-info">
+                    <h3 class="cg-space-article-title">@(article.DisplayName ?? article.Name)</h3>
+                    @if (!string.IsNullOrWhiteSpace(article.BriefIntroduction))
+                    {
+                        <p class="cg-space-article-brief">@article.BriefIntroduction</p>
+                    }
+                    <div class="cg-space-article-meta">
+                        <span>
+                            <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+                            @article.ReaderCount
+                        </span>
+                        <span>
+                            <CgMdiIcon Name="mdiThumbUpOutline" aria-hidden="true" />
+                            @article.ThumbsUpCount
+                        </span>
+                        <span>
+                            <CgMdiIcon Name="mdiCommentOutline" aria-hidden="true" />
+                            @article.CommentCount
+                        </span>
+                        <span class="cg-space-article-date">@article.LastEditTime.ToString("yyyy-MM-dd")</span>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <CgPagination CurrentPage="Model.CurrentPage"
+                      TotalPages="Model.TotalPages"
+                      HrefTemplate="@PaginationHrefTemplate" />
+    }
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public required UserArticlesViewModel? Model { get; set; }
+
+    /// <summary>
+    /// 分页链接模板，供 SSR 模式使用。例如: "/space/index/abc?articlesPage={0}"
+    /// </summary>
+    [Parameter]
+    public string? PaginationHrefTemplate { get; set; }
+}

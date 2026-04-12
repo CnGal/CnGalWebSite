@@ -1,0 +1,55 @@
+<div class="task-card @(IsFinished ? "task-card--finished" : "")">
+    <div class="task-card__icon">
+        <CgMdiIcon Name="@IconName" aria-hidden="true" />
+    </div>
+    <div class="task-card__body">
+        <h3 class="task-card__title">@Title</h3>
+        <p class="task-card__desc">@Description</p>
+        <span class="task-card__reward">
+            <CgMdiIcon Name="mdiGiftOutline" aria-hidden="true" />
+            @Reward
+        </span>
+    </div>
+    <div class="task-card__action">
+        @if (IsFinished)
+        {
+            <span class="task-card__done-badge">
+                <CgMdiIcon Name="mdiCheckCircle" aria-hidden="true" />
+                <span>已完成</span>
+            </span>
+        }
+        else
+        {
+            <CgButton Variant="primary" OnClick="OnClick">
+                <CgMdiIcon Name="@ButtonIconName" aria-hidden="true" />
+                <span>@ButtonText</span>
+            </CgButton>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string IconName { get; set; } = "mdiCheckboxMarkedCircleOutline";
+
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Description { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Reward { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool IsFinished { get; set; }
+
+    [Parameter]
+    public string ButtonText { get; set; } = "前往";
+
+    [Parameter]
+    public string ButtonIconName { get; set; } = "mdiArrowRight";
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+}

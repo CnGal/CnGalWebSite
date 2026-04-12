@@ -14,7 +14,7 @@
     z-index: 50;
     white-space: nowrap;
     border-bottom: 1px solid var(--cg-color-border);
-    background: color-mix(in oklab, var(--cg-color-surface) 80%, transparent);
+    background: var(--cg-color-surface);
     backdrop-filter: blur(12px);
     padding: 0.75rem 1.5rem;
 }
@@ -28,6 +28,7 @@
 .cg-layout__main {
     flex: 1;
     width: 100%;
+    isolation: isolate;
 }
 
 .cg-layout__container {
@@ -271,7 +272,8 @@
     border-top: 1px solid var(--cg-color-border);
     margin-top: 3rem;
     padding-top: 4rem;
-    padding-bottom: 2rem;
+    padding-bottom: 2rem;    
+    z-index: 1;
 }
 
 .cg-footer-main {
@@ -456,7 +458,7 @@
     gap: var(--cg-spacing-3);
     padding: var(--cg-spacing-4) var(--cg-spacing-5);
 
-    background: color-mix(in oklab, var(--cg-color-surface) 85%, transparent);
+    background: var(--cg-color-surface);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--cg-color-border);
@@ -573,7 +575,7 @@
     gap: var(--cg-spacing-3);
     padding: var(--cg-spacing-4) var(--cg-spacing-5);
 
-    background: color-mix(in oklab, var(--cg-color-surface) 85%, transparent);
+    background: var(--cg-color-surface);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--cg-color-border);
@@ -605,7 +607,7 @@
     display: flex;
 }
 
-/* State: reconnected â€” hide everything */
+/* State: reconnected â€?hide everything */
 #components-reconnect-modal.components-reconnect-hide {
     display: none;
 }
@@ -625,7 +627,7 @@
     animation: reconnect-spin 0.8s linear infinite;
 }
 
-/* Shared inner styles â€” reuse blazor-error tokens */
+/* Shared inner styles â€?reuse blazor-error tokens */
 #components-reconnect-modal .blazor-error-icon {
     flex-shrink: 0;
     width: 1.75rem;

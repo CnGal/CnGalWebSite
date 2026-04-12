@@ -1,7 +1,7 @@
 .entry-card {
     border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
     border-radius: var(--cg-radius-xl);
-    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    background: var(--cg-color-surface);
     padding: 1.5rem;
 }
 

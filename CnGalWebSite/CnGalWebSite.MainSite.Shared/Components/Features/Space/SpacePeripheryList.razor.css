@@ -1,0 +1,206 @@
+/* ── Empty state ── */
+.cg-space-tab-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--cg-spacing-8);
+    color: var(--cg-color-text-muted);
+    gap: var(--cg-spacing-2);
+}
+
+.cg-space-tab-empty ::deep .cg-mdi-icon {
+    width: 48px;
+    height: 48px;
+    opacity: 0.5;
+}
+
+/* ── Sections container ── */
+.cg-space-periphery-sections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-5);
+}
+
+/* ── Group card (glass-card style aligned with PeripheryOverviewSection) ── */
+.cg-space-periphery-group {
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    border-radius: var(--cg-radius-xl);
+    padding: 1.25rem;
+    background: var(--cg-color-surface);
+}
+
+.cg-space-periphery-group + .cg-space-periphery-group {
+    margin-top: 0;
+}
+
+/* ── Group header (game info, clickable) ── */
+.cg-space-periphery-group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    text-decoration: none;
+    color: inherit;
+    border-radius: var(--cg-radius-lg);
+    padding: 0.35rem;
+    margin: -0.35rem -0.35rem 0.65rem;
+    transition: background var(--cg-transition-fast);
+}
+
+.cg-space-periphery-group-header:hover {
+    background: var(--cg-color-hover-overlay);
+}
+
+.cg-space-periphery-group-image {
+    width: 80px;
+    aspect-ratio: 460 / 215;
+    border-radius: var(--cg-radius-md);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.cg-space-periphery-group-image--round {
+    aspect-ratio: 1;
+    border-radius: var(--cg-radius-full);
+    width: 48px;
+}
+
+.cg-space-periphery-group-info {
+    min-width: 0;
+}
+
+.cg-space-periphery-group-info h3 {
+    margin: 0;
+    font-size: var(--cg-font-size-base);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+}
+
+.cg-space-periphery-group-info p {
+    margin: 0.15rem 0 0;
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Periphery item grid ── */
+.cg-space-periphery-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+/* ── Periphery item (card link) ── */
+.cg-space-periphery-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem;
+    border-radius: var(--cg-radius-lg);
+    text-decoration: none;
+    color: inherit;
+    transition: background var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
+}
+
+.cg-space-periphery-item:hover {
+    background: var(--cg-color-hover-overlay);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+/* ── Item image ── */
+.cg-space-periphery-item-image {
+    width: 100%;
+    aspect-ratio: 460 / 215;
+    border-radius: var(--cg-radius-md);
+    overflow: hidden;
+    background: color-mix(in oklab, var(--cg-color-bg) 95%, white);
+    flex-shrink: 0;
+    position: relative;
+}
+
+.cg-space-periphery-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ── Placeholder for missing images ── */
+.cg-space-periphery-item-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cg-color-text-muted);
+}
+
+.cg-space-periphery-item-placeholder ::deep .cg-mdi-icon {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* ── Collected badge ── */
+.cg-space-periphery-collected-badge {
+    position: absolute;
+    top: 0.35rem;
+    right: 0.35rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: var(--cg-radius-full);
+    background: color-mix(in oklab, var(--cg-color-primary) 85%, transparent);
+    color: var(--cg-color-on-primary);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.cg-space-periphery-collected-badge ::deep .cg-mdi-icon {
+    width: 0.85rem;
+    height: 0.85rem;
+}
+
+/* ── Item text ── */
+.cg-space-periphery-item-name {
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+.cg-space-periphery-item-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+}
+
+.cg-space-periphery-item-stat ::deep .cg-mdi-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
+/* ── Responsive breakpoints (matching PeripheryOverviewSection) ── */
+@media (min-width: 640px) {
+    .cg-space-periphery-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .cg-space-periphery-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}

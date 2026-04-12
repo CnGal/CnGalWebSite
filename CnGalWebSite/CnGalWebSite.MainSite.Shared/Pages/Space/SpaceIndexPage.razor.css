@@ -144,3 +144,8 @@
 .cg-space-comment-wrapper {
     margin-top: var(--cg-spacing-8);
 }
+
+/* ── Heatmap section spacing ── */
+.cg-space-heatmap-section {
+    margin-top: var(--cg-spacing-4);
+}

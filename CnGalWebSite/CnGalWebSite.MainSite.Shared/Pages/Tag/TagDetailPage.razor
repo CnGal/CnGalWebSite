@@ -19,6 +19,11 @@
 else if (_model is not null)
 {
     <article class="tag-page">
+        @if (HasAtmosphere())
+        {
+            <CgAtmosphere BackgroundPicture="@_model.BackgroundPicture" SmallBackgroundPicture="@_model.SmallBackgroundPicture" />
+        }
+
         <header class="tag-header">
             <TagBreadcrumb TagLevels="_model.Taglevels" />
 
@@ -90,5 +95,16 @@ else
         _model = null;
         _editRecords = null;
         _errorMessage = result.Error?.Message ?? "请稍后重试";
+    }
+
+    private bool HasAtmosphere()
+    {
+        if (_model is null)
+        {
+            return false;
+        }
+
+        return string.IsNullOrWhiteSpace(_model.BackgroundPicture) is false
+            || string.IsNullOrWhiteSpace(_model.SmallBackgroundPicture) is false;
     }
 }

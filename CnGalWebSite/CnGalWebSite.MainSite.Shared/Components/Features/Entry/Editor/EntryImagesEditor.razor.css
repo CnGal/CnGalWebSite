@@ -68,7 +68,7 @@
 
 /* give ghost buttons on the overlay a subtle backdrop so icons stay visible on any image */
 .cg-image-card__actions ::deep .cg-btn {
-    background: color-mix(in oklab, var(--cg-color-surface) 80%, transparent);
+    background: var(--cg-color-surface);
     backdrop-filter: blur(4px);
     border-radius: var(--cg-radius-md);
 }

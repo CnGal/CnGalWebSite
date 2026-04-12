@@ -21,6 +21,11 @@
 else if (Model is not null)
 {
     <article class="video-page">
+        @if (HasAtmosphere())
+        {
+            <CgAtmosphere BackgroundPicture="@Model.BackgroundPicture" SmallBackgroundPicture="@Model.SmallBackgroundPicture" />
+        }
+
         <header class="video-header">
             <VideoHero Title="@GetDisplayTitle()"
                        BriefIntroduction="@Model.BriefIntroduction"
@@ -187,5 +192,16 @@ else
         }
 
         return Model.Type;
+    }
+
+    private bool HasAtmosphere()
+    {
+        if (Model is null)
+        {
+            return false;
+        }
+
+        return string.IsNullOrWhiteSpace(Model.BackgroundPicture) is false
+            || string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) is false;
     }
 }

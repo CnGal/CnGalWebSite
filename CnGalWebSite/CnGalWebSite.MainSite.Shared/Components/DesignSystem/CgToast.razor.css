@@ -20,7 +20,7 @@
     gap: var(--cg-spacing-3);
     padding: var(--cg-spacing-4) var(--cg-spacing-5);
 
-    background: color-mix(in oklab, var(--cg-color-surface) 85%, transparent);
+    background: var(--cg-color-surface);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--cg-color-border);

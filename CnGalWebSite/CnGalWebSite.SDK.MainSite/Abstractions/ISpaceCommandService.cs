@@ -24,4 +24,14 @@ public interface ISpaceCommandService
     /// 将当前用户所有消息标记为已读。
     /// </summary>
     Task<SdkResult<string>> ReadAllMessagesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 执行每日签到。
+    /// </summary>
+    Task<SdkResult<string>> SignInAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 上报用户在线状态（心跳），建议每 10 分钟调用一次。
+    /// </summary>
+    Task<SdkResult<string>> MakeUserOnlineAsync(CancellationToken cancellationToken = default);
 }

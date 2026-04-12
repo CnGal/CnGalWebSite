@@ -1,55 +1,93 @@
-@* CgTabs — 通用 Tab 切换组件，纯 CSS/SSR 友好 *@
-@* 两种视觉 Variant：pill（药丸填充）/ underline（底部下划线） *@
-@* 通过 radio + label + :checked 实现，无需 JS 交互 *@
+@* CgTabs — 通用 Tab 切换组件
+   两种视觉 Variant：pill（药丸填充）/ underline（底部下划线）
+   两种交互模式：
+   1. CSS radio 模式（默认）：纯 CSS radio + label + :checked，无需 JS
+   2. 链接模式（SSR 友好）：当设置 HrefTemplate 时，Tab 标签渲染为 <a> 链接 *@
 
 <div class="cg-tabs cg-tabs--@Variant" id="@_resolvedId">
-    @* ── Hidden radio inputs (驱动 CSS 状态) ── *@
-    @for (var i = 0; i < Items.Count; i++)
+    @if (_useLinks)
     {
-        var item = Items[i];
-        var isDefault = item.Key == _activeKey;
-        <input type="radio"
-               name="@_resolvedId"
-               id="@GetRadioId(item.Key)"
-               class="cg-tabs__radio"
-               checked="@isDefault"
-               @onchange="() => OnRadioChanged(item.Key)"
-               aria-hidden="true" />
-    }
+        @* ─── Link mode (SSR): 无 radio，直接通过 class 控制激活状态 ─── *@
+        <nav class="cg-tabs__bar" role="tablist" aria-label="@AriaLabel">
+            @for (var i = 0; i < Items.Count; i++)
+            {
+                var item = Items[i];
+                var isActive = item.Key == _activeKey;
+                <a class="cg-tabs__tab @(isActive ? "cg-tabs__tab--active" : "")"
+                   href="@GetTabHref(item.Key)"
+                   role="tab"
+                   aria-selected="@(isActive ? "true" : "false")">
+                    @if (!string.IsNullOrEmpty(item.Icon))
+                    {
+                        <CgMdiIcon Name="@item.Icon" aria-hidden="true" />
+                    }
+                    <span>@item.Label</span>
+                    @if (!string.IsNullOrEmpty(item.Badge))
+                    {
+                        <span class="cg-tabs__badge">@item.Badge</span>
+                    }
+                </a>
+            }
+        </nav>
 
-    @* ── Tab 栏 ── *@
-    <nav class="cg-tabs__bar" role="tablist" aria-label="@AriaLabel">
-        @for (var i = 0; i < Items.Count; i++)
+        @* 面板区：只渲染激活的面板 *@
+        @if (PanelTemplate != null)
         {
-            var item = Items[i];
-            <label for="@GetRadioId(item.Key)"
-                   class="cg-tabs__tab"
-                   role="tab">
-                @if (!string.IsNullOrEmpty(item.Icon))
-                {
-                    <CgMdiIcon Name="@item.Icon" aria-hidden="true" />
-                }
-                <span>@item.Label</span>
-                @if (!string.IsNullOrEmpty(item.Badge))
-                {
-                    <span class="cg-tabs__badge">@item.Badge</span>
-                }
-            </label>
-        }
-    </nav>
-
-    @* ── 面板区 ── *@
-    @if (PanelTemplate != null)
-    {
-        @for (var i = 0; i < Items.Count; i++)
-        {
-            var item = Items[i];
-            <section class="cg-tabs__panel"
+            <section class="cg-tabs__panel cg-tabs__panel--active"
                      role="tabpanel"
-                     id="@($"{_resolvedId}-panel-{item.Key}")"
-                     aria-labelledby="@GetRadioId(item.Key)">
-                @PanelTemplate(item.Key)
+                     id="@($"{_resolvedId}-panel-{_activeKey}")">
+                @PanelTemplate(_activeKey)
             </section>
+        }
+    }
+    else
+    {
+        @* ─── CSS radio mode（原始模式） ─── *@
+        @for (var i = 0; i < Items.Count; i++)
+        {
+            var item = Items[i];
+            var isDefault = item.Key == _activeKey;
+            <input type="radio"
+                   name="@_resolvedId"
+                   id="@GetRadioId(item.Key)"
+                   class="cg-tabs__radio"
+                   checked="@isDefault"
+                   @onchange="() => OnRadioChanged(item.Key)"
+                   aria-hidden="true" />
+        }
+
+        <nav class="cg-tabs__bar" role="tablist" aria-label="@AriaLabel">
+            @for (var i = 0; i < Items.Count; i++)
+            {
+                var item = Items[i];
+                <label for="@GetRadioId(item.Key)"
+                       class="cg-tabs__tab"
+                       role="tab">
+                    @if (!string.IsNullOrEmpty(item.Icon))
+                    {
+                        <CgMdiIcon Name="@item.Icon" aria-hidden="true" />
+                    }
+                    <span>@item.Label</span>
+                    @if (!string.IsNullOrEmpty(item.Badge))
+                    {
+                        <span class="cg-tabs__badge">@item.Badge</span>
+                    }
+                </label>
+            }
+        </nav>
+
+        @if (PanelTemplate != null)
+        {
+            @for (var i = 0; i < Items.Count; i++)
+            {
+                var item = Items[i];
+                <section class="cg-tabs__panel"
+                         role="tabpanel"
+                         id="@($"{_resolvedId}-panel-{item.Key}")"
+                         aria-labelledby="@GetRadioId(item.Key)">
+                    @PanelTemplate(item.Key)
+                </section>
+            }
         }
     }
 </div>
@@ -98,6 +136,15 @@
     [Parameter]
     public EventCallback<string> ActiveKeyChanged { get; set; }
 
+    /// <summary>
+    /// SSR 链接模式模板，例如 "/space/index/abc?tab={0}"。
+    /// 设置此属性后 Tab 标签渲染为 &lt;a&gt; 链接，且仅渲染激活面板。
+    /// </summary>
+    [Parameter]
+    public string? HrefTemplate { get; set; }
+
+    private bool _useLinks => !string.IsNullOrEmpty(HrefTemplate);
+
     private string _resolvedId = string.Empty;
     private string _activeKey = string.Empty;
 
@@ -106,6 +153,17 @@
         _resolvedId = Id ?? $"cg-tabs-{Guid.NewGuid():N}";
         _activeKey = DefaultActiveKey ?? (Items.Count > 0 ? Items[0].Key : string.Empty);
     }
+
+    protected override void OnParametersSet()
+    {
+        // 链接模式下，DefaultActiveKey 可能因 URL 参数变化而更新
+        if (!string.IsNullOrEmpty(DefaultActiveKey))
+        {
+            _activeKey = DefaultActiveKey;
+        }
+    }
+
+    private string GetTabHref(string key) => string.Format(HrefTemplate!, key);
 
     private async Task OnRadioChanged(string key)
     {

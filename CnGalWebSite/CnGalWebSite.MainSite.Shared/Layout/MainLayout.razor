@@ -49,6 +49,7 @@
     </header>
 
     <main class="cg-layout__main">
+        <UserAtmosphere @rendermode="InteractiveServer" />
         <div class="cg-layout__container">
             <article class="content">
                 @Body
@@ -128,6 +129,7 @@
 <AuthorizeView>
     <Authorized>
         <CgToast @rendermode="InteractiveServer" />
+        <CnGalWebSite.MainSite.Shared.Components.Layout.UserSessionTracker @rendermode="InteractiveServer" />
     </Authorized>
 </AuthorizeView>
 

@@ -1,0 +1,61 @@
+/* ══════════════════════════════════════════
+   Periphery Collection Button
+   ══════════════════════════════════════════ */
+.periphery-collect-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    border-radius: var(--cg-radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all var(--cg-transition-fast);
+    border: 1px solid var(--cg-color-border);
+    background: transparent;
+    color: var(--cg-color-text-secondary);
+}
+
+.periphery-collect-btn:hover:not(:disabled) {
+    border-color: var(--cg-color-primary);
+    color: var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 8%, transparent);
+}
+
+.periphery-collect-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Active (collected) state */
+.periphery-collect-btn--active {
+    border-color: var(--cg-color-primary);
+    color: var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 8%, transparent);
+}
+
+.periphery-collect-btn--active:hover:not(:disabled) {
+    background: color-mix(in oklab, var(--cg-color-primary) 14%, transparent);
+}
+
+/* Icon sizing */
+.periphery-collect-btn ::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+    transition: transform var(--cg-transition-fast);
+}
+
+.periphery-collect-btn:hover:not(:disabled) ::deep .cg-mdi-icon {
+    transform: scale(1.15);
+}
+
+/* Loading spin animation */
+.periphery-collect-btn ::deep .periphery-collect-btn-spin {
+    animation: periphery-collect-spin 0.8s linear infinite;
+}
+
+@keyframes periphery-collect-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

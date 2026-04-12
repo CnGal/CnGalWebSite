@@ -1,0 +1,23 @@
+@*
+    CgAtmosphere — 页面背景氛围图组件
+    在详情页顶部叠加一层半透明背景图,
+    支持大/小两张背景图（大屏 / 小屏响应切换）
+*@
+<div class="cg-atmosphere" aria-hidden="true">
+    @if (string.IsNullOrWhiteSpace(BackgroundPicture) is false)
+    {
+        <div class="cg-atmosphere-bg" style="@($"background-image:url('{BackgroundPicture}')")"></div>
+    }
+    @if (string.IsNullOrWhiteSpace(SmallBackgroundPicture) is false)
+    {
+        <div class="cg-atmosphere-bg cg-atmosphere-bg--small" style="@($"background-image:url('{SmallBackgroundPicture}')")"></div>
+    }
+</div>
+
+@code {
+    /// <summary>大背景图 URL（桌面端显示）</summary>
+    [Parameter] public string? BackgroundPicture { get; set; }
+
+    /// <summary>小背景图 URL（移动端显示，默认隐藏）</summary>
+    [Parameter] public string? SmallBackgroundPicture { get; set; }
+}

@@ -1,0 +1,42 @@
+@*
+    CgAtmosphereUser — 获取并渲染用户自定义背景图
+    通过 SpaceQueryService 获取用户的 MBgImage（大屏背景）和 SBgImage（小屏背景），
+    然后委托 CgAtmosphere 渲染。
+*@
+@inject ISpaceQueryService SpaceQueryService
+
+@if (!string.IsNullOrWhiteSpace(_bgImage) || !string.IsNullOrWhiteSpace(_smallBgImage))
+{
+    <CgAtmosphere BackgroundPicture="@_bgImage" SmallBackgroundPicture="@_smallBgImage" />
+}
+
+@code {
+    [Parameter] public string? UserId { get; set; }
+
+    private string? _bgImage;
+    private string? _smallBgImage;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (string.IsNullOrWhiteSpace(UserId))
+        {
+            _bgImage = null;
+            _smallBgImage = null;
+            return;
+        }
+
+        try
+        {
+            var result = await SpaceQueryService.GetSpaceDetailAsync(UserId);
+            if (result.Success && result.Data is not null)
+            {
+                _bgImage = result.Data.MBgImage;
+                _smallBgImage = result.Data.SBgImage;
+            }
+        }
+        catch
+        {
+            // 获取用户背景失败时静默降级
+        }
+    }
+}

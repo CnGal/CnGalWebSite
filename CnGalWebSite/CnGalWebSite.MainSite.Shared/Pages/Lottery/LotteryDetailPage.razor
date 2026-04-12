@@ -17,6 +17,11 @@
 else if (_model is not null)
 {
     <article class="lottery-page">
+        @if (HasAtmosphere())
+        {
+            <CgAtmosphere BackgroundPicture="@_model.BackgroundPicture" SmallBackgroundPicture="@_model.SmallBackgroundPicture" />
+        }
+
         <LotteryHero DisplayName="@GetDisplayTitle()"
                      BriefIntroduction="@_model.BriefIntroduction"
                      MainPicture="@_model.MainPicture"
@@ -155,5 +160,16 @@ else
         }
 
         return string.IsNullOrWhiteSpace(_model.DisplayName) ? _model.Name : _model.DisplayName;
+    }
+
+    private bool HasAtmosphere()
+    {
+        if (_model is null)
+        {
+            return false;
+        }
+
+        return string.IsNullOrWhiteSpace(_model.BackgroundPicture) is false
+            || string.IsNullOrWhiteSpace(_model.SmallBackgroundPicture) is false;
     }
 }

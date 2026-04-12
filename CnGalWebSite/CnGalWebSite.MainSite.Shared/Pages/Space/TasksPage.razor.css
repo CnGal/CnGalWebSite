@@ -1,0 +1,116 @@
+/* ── TasksPage ── */
+
+.tasks-page {
+    max-width: 800px;
+    margin: var(--cg-spacing-6) auto;
+    padding: 0 var(--cg-spacing-4);
+}
+
+/* ── Header ── */
+
+.tasks-page__header {
+    margin-bottom: var(--cg-spacing-5);
+    padding-bottom: var(--cg-spacing-4);
+    border-bottom: 1px solid var(--cg-color-border);
+}
+
+.tasks-page__title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    font-size: var(--cg-font-size-xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+.tasks-page__title ::deep .cg-mdi-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--cg-color-primary);
+}
+
+/* ── Sections ── */
+
+.tasks-page__section {
+    margin-bottom: var(--cg-spacing-6);
+}
+
+.tasks-page__section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    margin-bottom: var(--cg-spacing-3);
+}
+
+.tasks-page__section-header ::deep .cg-mdi-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--cg-color-text-muted);
+}
+
+.tasks-page__section-title {
+    margin: 0;
+    font-size: var(--cg-font-size-base);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+}
+
+/* ── Task list ── */
+
+.tasks-page__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+}
+
+/* ── Loading ── */
+
+.tasks-page__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--cg-spacing-10) 0;
+    gap: var(--cg-spacing-3);
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+}
+
+/* ── Error ── */
+
+.tasks-page__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--cg-spacing-10) 0;
+    gap: var(--cg-spacing-3);
+    text-align: center;
+}
+
+.tasks-page__error ::deep .cg-mdi-icon {
+    width: 48px;
+    height: 48px;
+    color: var(--cg-color-error);
+    opacity: 0.7;
+}
+
+.tasks-page__error p {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    margin: 0;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 768px) {
+    .tasks-page {
+        margin: var(--cg-spacing-3) auto;
+        padding: 0 var(--cg-spacing-3);
+    }
+
+    .tasks-page__title {
+        font-size: var(--cg-font-size-lg);
+    }
+}

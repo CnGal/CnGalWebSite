@@ -56,4 +56,6 @@ public sealed class SpaceDetailViewModel
     public required bool CanComment { get; init; }
 
     public required bool IsShowFavorites { get; init; }
+
+    public required bool IsShowGameRecord { get; init; }
 }

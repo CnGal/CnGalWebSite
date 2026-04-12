@@ -1,0 +1,137 @@
+.cg-heatmap {
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    padding: var(--cg-spacing-4);
+    border: 1px solid var(--cg-color-border);
+    box-shadow: var(--cg-shadow-sm);
+    overflow-x: auto;
+}
+
+.cg-heatmap__title {
+    font-weight: 600;
+    font-size: 0.8125rem;
+    color: var(--cg-color-text-primary);
+    margin-bottom: var(--cg-spacing-3);
+}
+
+.cg-heatmap__body {
+    min-width: 680px;
+}
+
+.cg-heatmap__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    color: var(--cg-color-text-muted);
+    font-size: 0.875rem;
+}
+
+/* --- Grid layout --- */
+.cg-heatmap__grid-wrapper {
+    display: flex;
+    gap: 4px;
+}
+
+.cg-heatmap__day-labels {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-top: 18px; /* align with grid cells below month row */
+    flex-shrink: 0;
+}
+
+.cg-heatmap__day-label {
+    height: 13px;
+    line-height: 13px;
+    font-size: 10px;
+    color: var(--cg-color-text-muted);
+    text-align: right;
+    padding-right: 4px;
+    min-width: 16px;
+}
+
+.cg-heatmap__scroll-area {
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.cg-heatmap__month-row {
+    display: grid;
+    gap: 3px;
+    height: 15px;
+    margin-bottom: 3px;
+}
+
+.cg-heatmap__month-label {
+    font-size: 10px;
+    color: var(--cg-color-text-muted);
+    line-height: 15px;
+    white-space: nowrap;
+}
+
+.cg-heatmap__grid {
+    display: grid;
+    grid-template-rows: repeat(7, 13px);
+    grid-auto-flow: column;
+    gap: 3px;
+}
+
+/* --- Cells --- */
+.cg-heatmap__cell {
+    width: 13px;
+    height: 13px;
+    border-radius: 2px;
+    transition: outline 0.15s ease;
+}
+
+.cg-heatmap__cell:not(.cg-heatmap__cell--empty):hover {
+    outline: 2px solid var(--cg-color-text-muted);
+    outline-offset: -1px;
+}
+
+.cg-heatmap__cell--empty {
+    background: transparent;
+}
+
+.cg-heatmap__cell--lv0 {
+    background: #ebedf0;
+}
+
+.cg-heatmap__cell--lv1 {
+    background: #9be9a8;
+}
+
+.cg-heatmap__cell--lv2 {
+    background: #40c463;
+}
+
+.cg-heatmap__cell--lv3 {
+    background: #30a14e;
+}
+
+.cg-heatmap__cell--lv4 {
+    background: #216e39;
+}
+
+/* --- Legend --- */
+.cg-heatmap__legend {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: var(--cg-spacing-3);
+    padding-left: 20px;
+}
+
+.cg-heatmap__legend-text {
+    font-size: 10px;
+    color: var(--cg-color-text-muted);
+    margin: 0 2px;
+}
+
+.cg-heatmap__legend-cell {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+}
