@@ -1,3 +1,7 @@
+/* ═══════════════════════════════════════════════════
+   EditRecordTimeline — 编辑记录时间线
+   ═══════════════════════════════════════════════════ */
+
 .edit-record-timeline {
     display: flex;
     flex-direction: column;
@@ -7,13 +11,14 @@
     padding: var(--cg-spacing-2);
 }
 
+/* ── Timeline Item ── */
 .edit-record-timeline__item {
     display: flex;
     align-items: flex-start;
     gap: var(--cg-spacing-3);
     padding: var(--cg-spacing-3) var(--cg-spacing-4);
     border: 1px solid transparent;
-    border-radius: var(--cg-radius-md);
+    border-radius: var(--cg-radius-lg);
     background: transparent;
     cursor: pointer;
     transition: all var(--cg-transition-fast);
@@ -21,6 +26,7 @@
     width: 100%;
     font-family: inherit;
     font-size: inherit;
+    position: relative;
 }
 
 .edit-record-timeline__item:hover {
@@ -28,10 +34,11 @@
 }
 
 .edit-record-timeline__item--active {
-    background: color-mix(in srgb, var(--cg-color-primary) 10%, transparent);
-    border-color: var(--cg-color-primary);
+    background: color-mix(in srgb, var(--cg-color-primary) 8%, transparent);
+    border-color: color-mix(in srgb, var(--cg-color-primary) 25%, transparent);
 }
 
+/* ── Timeline Marker ── */
 .edit-record-timeline__marker {
     flex-shrink: 0;
     width: 10px;
@@ -39,14 +46,26 @@
     border-radius: var(--cg-radius-full);
     background: var(--cg-color-border);
     margin-top: 6px;
-    transition: background var(--cg-transition-fast);
+    transition: all var(--cg-transition-fast);
+}
+
+.edit-record-timeline__item:hover .edit-record-timeline__marker {
+    background: color-mix(in srgb, var(--cg-color-primary) 50%, var(--cg-color-border));
 }
 
 .edit-record-timeline__item--active .edit-record-timeline__marker {
     background: var(--cg-color-primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--cg-color-primary) 25%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--cg-color-primary) 20%, transparent);
+    animation: ert-pulse 2s infinite;
 }
 
+@keyframes ert-pulse {
+    0%   { box-shadow: 0 0 0 3px color-mix(in srgb, var(--cg-color-primary) 20%, transparent); }
+    50%  { box-shadow: 0 0 0 6px color-mix(in srgb, var(--cg-color-primary) 8%, transparent); }
+    100% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--cg-color-primary) 20%, transparent); }
+}
+
+/* ── Content ── */
 .edit-record-timeline__content {
     flex: 1;
     min-width: 0;
@@ -72,6 +91,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    padding: 1px var(--cg-spacing-2);
+    background: color-mix(in srgb, var(--cg-color-primary) 6%, transparent);
+    border-radius: var(--cg-radius-full);
 }
 
 .edit-record-timeline__meta {

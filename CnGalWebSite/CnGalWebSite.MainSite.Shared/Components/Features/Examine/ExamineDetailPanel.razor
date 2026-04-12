@@ -59,22 +59,23 @@
     @* ── 对象链接 ── *@
     @if (!string.IsNullOrWhiteSpace(Model.ObjectName))
     {
-        <section class="examine-detail-panel__section">
-            <div class="examine-detail-panel__object-card">
-                @if (!string.IsNullOrWhiteSpace(Model.Image))
+        <div class="examine-detail-panel__object-card">
+            @if (!string.IsNullOrWhiteSpace(Model.Image))
+            {
+                <img class="examine-detail-panel__object-image" src="@Model.Image" alt="@Model.ObjectName" loading="lazy" />
+            }
+            <div class="examine-detail-panel__object-info">
+                <h3 class="examine-detail-panel__object-name">@Model.ObjectName</h3>
+                @if (!string.IsNullOrWhiteSpace(Model.ObjectBriefIntroduction))
                 {
-                    <img class="examine-detail-panel__object-image" src="@Model.Image" alt="@Model.ObjectName" loading="lazy" />
+                    <p class="examine-detail-panel__object-desc">@Model.ObjectBriefIntroduction</p>
                 }
-                <div class="examine-detail-panel__object-info">
-                    <h3 class="examine-detail-panel__object-name">@Model.ObjectName</h3>
-                    @if (!string.IsNullOrWhiteSpace(Model.ObjectBriefIntroduction))
-                    {
-                        <p class="examine-detail-panel__object-desc">@Model.ObjectBriefIntroduction</p>
-                    }
-                    <a class="examine-detail-panel__object-link" href="@GetObjectUrl()">查看详情 →</a>
-                </div>
+                <a class="examine-detail-panel__object-link" href="@GetObjectUrl()">
+                    <CgMdiIcon Name="mdiOpenInNew" aria-hidden="true"/>
+                    查看详情
+                </a>
             </div>
-        </section>
+        </div>
     }
 
     @* ── 编辑概览 ── *@

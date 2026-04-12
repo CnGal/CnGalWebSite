@@ -10,10 +10,12 @@ namespace CnGalWebSite.MainSite.Services;
 public sealed class IdleCircuitHandler : CircuitHandler
 {
     private readonly ICircuitHandlerService _circuitHandlerService;
+    private readonly ILogger<IdleCircuitHandler> _logger;
 
-    public IdleCircuitHandler(ICircuitHandlerService circuitHandlerService)
+    public IdleCircuitHandler(ICircuitHandlerService circuitHandlerService, ILogger<IdleCircuitHandler> logger)
     {
         _circuitHandlerService = circuitHandlerService;
+        _logger = logger;
     }
 
     public override Task OnCircuitOpenedAsync(Circuit circuit, CancellationToken cancellationToken)
@@ -43,10 +45,18 @@ public sealed class IdleCircuitHandler : CircuitHandler
     public override Func<CircuitInboundActivityContext, Task> CreateInboundActivityHandler(
         Func<CircuitInboundActivityContext, Task> next)
     {
-        return context =>
+        return async context =>
         {
             _circuitHandlerService.ActiveCircuit(context.Circuit.Id);
-            return next(context);
+            try
+            {
+                await next(context);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "线路内发生未处理异常 CircuitId={CircuitId}", context.Circuit.Id);
+                throw;
+            }
         };
     }
 }
