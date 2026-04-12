@@ -112,7 +112,7 @@
 
     private Task OnProcCompleted()
     {
-        StateHasChanged();
+        NavigationManager.NavigateTo("/usercenter");
         return Task.CompletedTask;
     }
 }

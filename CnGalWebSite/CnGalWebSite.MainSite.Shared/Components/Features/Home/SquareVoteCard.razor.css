@@ -1,0 +1,177 @@
+/* ═══════════════════════════════════════════════════
+   SquareVoteCard — 投票卡片
+   ═══════════════════════════════════════════════════ */
+
+.square-vote-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    border-radius: var(--cg-radius-xl);
+    overflow: hidden;
+    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    box-shadow: var(--cg-shadow-sm);
+    height: 100%;
+    z-index: 1;
+    transition:
+        border-color var(--cg-transition-fast),
+        box-shadow var(--cg-transition-fast),
+        transform var(--cg-transition-fast);
+}
+
+/* 渐变发光背景 */
+.square-vote-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top left, color-mix(in oklab, var(--cg-color-primary) 8%, transparent) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity var(--cg-transition-normal);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.square-vote-card:hover {
+    border-color: color-mix(in oklab, var(--cg-color-primary) 30%, var(--cg-color-border));
+    box-shadow: var(--cg-shadow-card-hover);
+    transform: translateY(-3px);
+    text-decoration: none;
+}
+
+.square-vote-card:hover::before {
+    opacity: 1;
+}
+
+/* ── Image ── */
+
+.square-vote-card-image-wrapper {
+    position: relative;
+    aspect-ratio: 460 / 215;
+    overflow: hidden;
+    background: var(--cg-color-bg);
+    margin: 0;
+}
+
+.square-vote-card-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease-in-out;
+}
+
+.square-vote-card:hover .square-vote-card-image-wrapper img {
+    transform: scale(1.06);
+}
+
+/* ── Body ── */
+
+.square-vote-card-body {
+    padding: var(--cg-spacing-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+    flex: 1;
+}
+
+/* ── Header ── */
+
+.square-vote-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--cg-spacing-2);
+}
+
+.square-vote-card-title {
+    margin: 0;
+    font-size: var(--cg-font-size-base);
+    font-weight: var(--cg-font-weight-bold);
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color var(--cg-transition-fast);
+}
+
+.square-vote-card:hover .square-vote-card-title {
+    color: var(--cg-color-primary);
+}
+
+/* ── Status badge ── */
+
+.square-vote-card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--cg-radius-full);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.square-vote-card-badge ::deep .cg-mdi-icon {
+    width: 0.8rem;
+    height: 0.8rem;
+}
+
+.square-vote-card-badge--active {
+    color: var(--cg-color-success);
+    background: color-mix(in oklab, var(--cg-color-success) 12%, transparent);
+    border: 1px solid color-mix(in oklab, var(--cg-color-success) 24%, transparent);
+}
+
+.square-vote-card-badge--ended {
+    color: var(--cg-color-text-muted);
+    background: color-mix(in oklab, var(--cg-color-text-muted) 8%, transparent);
+    border: 1px solid color-mix(in oklab, var(--cg-color-text-muted) 16%, transparent);
+}
+
+.square-vote-card-badge--upcoming {
+    color: var(--cg-color-warning);
+    background: color-mix(in oklab, var(--cg-color-warning) 12%, transparent);
+    border: 1px solid color-mix(in oklab, var(--cg-color-warning) 24%, transparent);
+}
+
+/* ── Description ── */
+
+.square-vote-card-desc {
+    margin: 0;
+    font-size: var(--cg-font-size-sm);
+    line-height: 1.5;
+    color: var(--cg-color-text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ── Meta ── */
+
+.square-vote-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-3);
+    margin-top: auto;
+}
+
+.square-vote-card-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+}
+
+.square-vote-card-meta-item ::deep .cg-mdi-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+    opacity: 0.7;
+}

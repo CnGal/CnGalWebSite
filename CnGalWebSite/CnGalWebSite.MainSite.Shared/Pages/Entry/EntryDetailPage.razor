@@ -83,18 +83,22 @@ else if (Model is not null)
 
                 <EntryPeripheryCard Model="PeripheryOverview" />
 
-                @* 登录用户使用交互式评分区域（支持编辑后实时刷新），未登录用户使用静态渲染 *@
-                <AuthorizeView>
-                    <Authorized>
-                        <EntryScoreSection EntryId="Id" />
-                    </Authorized>
-                    <NotAuthorized>
-                        @if (ScoreOverview is not null)
-                        {
-                            <EntryScoreOverview Model="ScoreOverview" />
-                        }
-                    </NotAuthorized>
-                </AuthorizeView>
+                @* 仅游戏类词条显示评分区域 *@
+                @if (Model.Type == EntryType.Game)
+                {
+                    @* 登录用户使用交互式评分区域（支持编辑后实时刷新），未登录用户使用静态渲染 *@
+                    <AuthorizeView>
+                        <Authorized>
+                            <EntryScoreSection EntryId="Id" />
+                        </Authorized>
+                        <NotAuthorized>
+                            @if (ScoreOverview is not null)
+                            {
+                                <EntryScoreOverview Model="ScoreOverview" />
+                            }
+                        </NotAuthorized>
+                    </AuthorizeView>
+                }
 
                 <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
                     Type="CommentType.CommentEntries"
@@ -296,9 +300,9 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
-        // 并行请求词条详情、评分概览、周边概览、相关目录、编辑记录
+        // 并行请求词条详情、周边概览、相关目录、编辑记录
+        // 注意：评分概览仅对游戏类型有效，延迟到确认类型后再请求
         var entryTask = EntryQueryService.GetEntryDetailAsync(Id);
-        var scoreTask = PlayedGameQueryService.GetOverviewAsync(Id);
         var peripheryTask = PeripheryQueryService.GetEntryOverviewPeripheriesAsync(Id);
         var catalogTask = FavoriteFolderQueryService.GetRelateFavoriteFoldersAsync(FavoriteObjectType.Entry, Id);
         var editRecordsTask = ExamineQueryService.GetEntryEditRecordsAsync(Id);
@@ -312,7 +316,7 @@ else
             // 仅游戏类词条加载评分概览
             if (Model.Type == EntryType.Game)
             {
-                var scoreResult = await scoreTask;
+                var scoreResult = await PlayedGameQueryService.GetOverviewAsync(Id);
                 ScoreOverview = scoreResult.Success ? scoreResult.Data : null;
             }
             else

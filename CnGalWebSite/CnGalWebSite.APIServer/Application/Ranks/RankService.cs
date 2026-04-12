@@ -1,4 +1,4 @@
-﻿
+
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
@@ -41,7 +41,13 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             if (levelRank != "Lv " + level)
             {
                 //删除旧头衔
-                await _rankUserRepository.DeleteAsync(s => s.ApplicationUserId == user.Id && s.Rank.Name.Contains("Lv "));
+                var oldRankIds = await _rankUserRepository.GetAll()
+                    .Where(s => s.ApplicationUserId == user.Id && s.Rank.Name.Contains("Lv "))
+                    .Select(s => s.Id).ToListAsync();
+                if(oldRankIds.Any())
+                {
+                    await _rankUserRepository.GetAll().Where(s => oldRankIds.Contains(s.Id)).ExecuteDeleteAsync();
+                }
                 //获取新头衔
                 var rank = await _rankRepository.GetAll().FirstOrDefaultAsync(s => s.Name == "Lv " + level);
                 if (rank == null)
@@ -121,7 +127,13 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             else
             {
                 //删除旧头衔
-                await _rankUserRepository.DeleteAsync(s => s.ApplicationUserId == user.Id && s.Rank.Name.Contains("编辑者"));
+                var editorRankIds = await _rankUserRepository.GetAll()
+                    .Where(s => s.ApplicationUserId == user.Id && s.Rank.Name.Contains("编辑者"))
+                    .Select(s => s.Id).ToListAsync();
+                if (editorRankIds.Any())
+                {
+                    await _rankUserRepository.GetAll().Where(s => editorRankIds.Contains(s.Id)).ExecuteDeleteAsync();
+                }
             }
 
             //去重
@@ -131,7 +143,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
             {
                 if (ranks.Count(s => s.Rank.Name == rank.Rank.Name) > 1)
                 {
-                    await _rankUserRepository.DeleteAsync(rank);
+                    await _rankUserRepository.GetAll().Where(s => s.Id == rank.Id).ExecuteDeleteAsync();
                     _ = ranks.Remove(rank);
                 }
             }

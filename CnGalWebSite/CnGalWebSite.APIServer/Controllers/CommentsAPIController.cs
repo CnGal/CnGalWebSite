@@ -191,7 +191,15 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     var temp = new Comment
                     {
-                        ApplicationUser = user,
+                        ApplicationUser = new ApplicationUser
+                        {
+                            Id = user.Id,
+                            UserName = user.UserName,
+                            PersonalSignature = user.PersonalSignature,
+                            PhotoPath = user.PhotoPath,
+                            DisplayIntegral = user.DisplayIntegral,
+                            IsPassedVerification = user.IsPassedVerification
+                        },
                         InverseParentCodeNavigation = new List<Comment>(),
                         Id = item.CommentId.Value
                     };

@@ -222,6 +222,7 @@ else if (Model != null)
             if (result.Success)
             {
                 await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);
+                ToastService.Show("提交成功", "已提交，等待审核通过...", "success");
                 NavigationManager.NavigateTo($"/entries/index/{result.Data}");
             }
             else

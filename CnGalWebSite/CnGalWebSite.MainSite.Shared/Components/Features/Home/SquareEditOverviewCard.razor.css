@@ -1,0 +1,81 @@
+/* ═══════════════════════════════════════════════════
+   SquareEditOverviewCard — 编辑概览折线图卡片
+   ═══════════════════════════════════════════════════ */
+
+.square-edit-overview-card {
+    background: color-mix(in oklab, var(--cg-color-surface) 85%, transparent);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    overflow: hidden;
+    transition: box-shadow var(--cg-transition-normal), border-color var(--cg-transition-normal);
+}
+
+.square-edit-overview-card:hover {
+    border-color: color-mix(in oklab, var(--cg-color-primary) 30%, var(--cg-color-border));
+    box-shadow: var(--cg-shadow-md);
+}
+
+.square-edit-overview-card__body {
+    padding: var(--cg-spacing-4);
+    min-height: 320px;
+}
+
+/* CgLineChart 内部边框在卡片中不需要 */
+.square-edit-overview-card__body ::deep .cg-line-chart {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+}
+
+.square-edit-overview-card__placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-3);
+    min-height: 280px;
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+}
+
+.square-edit-overview-card__footer {
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    border-top: 1px solid var(--cg-color-border);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.square-edit-overview-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-primary);
+    text-decoration: none;
+    transition: gap var(--cg-transition-fast), color var(--cg-transition-fast);
+}
+
+.square-edit-overview-card__link:hover {
+    gap: 0.5rem;
+    color: var(--cg-color-primary-hover);
+    text-decoration: none;
+}
+
+.square-edit-overview-card__link ::deep .cg-mdi-icon {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 640px) {
+    .square-edit-overview-card__body {
+        padding: var(--cg-spacing-3);
+        min-height: 260px;
+    }
+
+    .square-edit-overview-card__footer {
+        padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    }
+}

@@ -1,8 +1,13 @@
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
+using CnGalWebSite.DataModel.ViewModel.Lotteries;
+using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Tables;
+using CnGalWebSite.DataModel.ViewModel.Tags;
+using CnGalWebSite.DataModel.ViewModel.Votes;
+using CnGalWebSite.Extensions;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
@@ -120,6 +125,84 @@ public sealed class HomeQueryService(
         return result;
     }
 
+    public async Task<SdkResult<SquareSummaryViewModel>> GetSquareSummaryAsync(CancellationToken cancellationToken = default)
+    {
+        const string cacheKey = "main-site:square-summary";
+        if (memoryCache.TryGetValue(cacheKey, out SquareSummaryViewModel? cached) && cached is not null)
+        {
+            return SdkResult<SquareSummaryViewModel>.Ok(cached);
+        }
+
+        var warnings = new List<SdkErrorModel>();
+        const int totalRequests = 4;
+
+        var randomTagsResult = await GetListSafeAsync<RandomTagModel>("api/tags/GetRandomTags", "SQUARE_RANDOM_TAGS_FAILED", warnings, cancellationToken);
+        var lotteriesResult = await GetListSafeAsync<LotteryCardViewModel>("api/lotteries/GetLotteryCards", "SQUARE_LOTTERIES_FAILED", warnings, cancellationToken);
+        var votesResult = await GetListSafeAsync<VoteCardViewModel>("api/votes/GetVoteCards", "SQUARE_VOTES_FAILED", warnings, cancellationToken);
+
+        // 编辑概览折线图（公开接口，无需授权）
+        var editOverview = await GetEditOverviewChartSafeAsync(warnings, cancellationToken);
+
+        if (warnings.Count == totalRequests)
+        {
+            return SdkResult<SquareSummaryViewModel>.Fail("SQUARE_ALL_REQUESTS_FAILED", "广场数据加载失败，请稍后重试");
+        }
+
+        var model = new SquareSummaryViewModel
+        {
+            RandomTags = randomTagsResult.Select(tag => new SquareRandomTagModel
+            {
+                Id = tag.Id,
+                Name = tag.Name ?? string.Empty,
+                Entries = tag.Entries?.Select(e => new SquareRandomEntryModel
+                {
+                    Id = e.Id,
+                    Name = e.Name ?? string.Empty,
+                    MainImage = e.MainImage ?? string.Empty,
+                    Type = e.Type,
+                }).ToList() ?? [],
+            }).ToList(),
+            Lotteries = lotteriesResult.Select(dto =>
+            {
+                var now = DateTime.Now;
+                return new LotteryCardItemModel
+                {
+                    Id = dto.Id,
+                    Name = dto.Name ?? string.Empty,
+                    BriefIntroduction = dto.BriefIntroduction ?? string.Empty,
+                    MainPicture = dto.MainPicture ?? string.Empty,
+                    Thumbnail = dto.Thumbnail ?? string.Empty,
+                    BeginTime = dto.BeginTime,
+                    EndTime = dto.EndTime,
+                    Count = dto.Count,
+                    ConditionType = dto.ConditionType,
+                    IsEnd = dto.EndTime < now,
+                    GameSteamId = dto.GameSteamId ?? string.Empty,
+                };
+            }).ToList(),
+            Votes = votesResult.Select(dto =>
+            {
+                var now = DateTime.Now;
+                return new VoteCardItemModel
+                {
+                    Id = dto.Id,
+                    Name = dto.Name ?? string.Empty,
+                    BriefIntroduction = dto.BriefIntroduction ?? string.Empty,
+                    MainPicture = dto.MainPicture ?? string.Empty,
+                    BeginTime = dto.BeginTime,
+                    EndTime = dto.EndTime,
+                    Count = dto.Count,
+                    IsEnd = dto.EndTime < now,
+                };
+            }).ToList(),
+            Warnings = warnings,
+            EditOverview = editOverview,
+        };
+
+        memoryCache.Set(cacheKey, model, HomeCacheDuration);
+        return SdkResult<SquareSummaryViewModel>.Ok(model);
+    }
+
     private static IReadOnlyList<TItem> NormalizeHomeItemUrls<TItem>(IReadOnlyList<TItem> source)
         where TItem : HomeItemModel
     {
@@ -214,5 +297,57 @@ public sealed class HomeQueryService(
         }
 
         return url.StartsWith("http", StringComparison.OrdinalIgnoreCase) ? url : $"/{url.TrimStart('/')}";
+    }
+
+    /// <summary>
+    /// 安全获取编辑概览折线图数据，失败时返回 null 并记录 warning。
+    /// </summary>
+    private async Task<SquareEditOverviewModel?> GetEditOverviewChartSafeAsync(
+        List<SdkErrorModel> warnings, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var beforeTime = DateTime.Now.Date.AddDays(1);
+            var afterTime = beforeTime.AddDays(-30);
+            var afterMs = afterTime.ToUnixTimeMilliseconds();
+            var beforeMs = beforeTime.ToUnixTimeMilliseconds();
+
+            var result = await GetAsync<LineChartModel>(
+                $"api/perfections/GetPerfectionLineChart?type=Edit&afterTime={afterMs}&beforeTime={beforeMs}",
+                "SQUARE_EDIT_OVERVIEW",
+                "编辑概览图表",
+                cancellationToken);
+
+            if (!result.Success || result.Data is null)
+            {
+                warnings.Add(new SdkErrorModel
+                {
+                    Code = "SQUARE_EDIT_OVERVIEW_FAILED",
+                    Message = result.Error?.Message ?? "编辑概览图表加载失败",
+                });
+                return null;
+            }
+
+            var chart = result.Data;
+            return new SquareEditOverviewModel
+            {
+                Labels = chart.Options.XAxis.Data,
+                Series = chart.Options.Series.Select(s => new SquareEditOverviewSeriesModel
+                {
+                    Name = s.Name,
+                    Data = s.Data,
+                }).ToList(),
+            };
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "广场页编辑概览图表加载异常");
+            warnings.Add(new SdkErrorModel
+            {
+                Code = "SQUARE_EDIT_OVERVIEW_EXCEPTION",
+                Message = "编辑概览图表加载异常",
+            });
+            return null;
+        }
     }
 }

@@ -165,7 +165,11 @@
         </div>
     </NotAuthorized>
 </AuthorizeView>
-
+<AuthorizeView>
+    <Authorized>
+        <CgToast @rendermode="InteractiveServer"/>
+    </Authorized>
+</AuthorizeView>
 @code {
     private string CurrentReturnUrl => new Uri(NavigationManager.Uri).PathAndQuery;
 

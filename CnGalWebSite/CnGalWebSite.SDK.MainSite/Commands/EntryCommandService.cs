@@ -86,6 +86,8 @@ public sealed class EntryCommandService(
             
             // 确保类型统一
             model.Data.Type = model.Data.Main.Type;
+            model.Data.Id = id;
+            model.Data.Name = model.Data.Main.Name;
             
             return SdkResult<EntryEditViewModel>.Ok(model);
         }

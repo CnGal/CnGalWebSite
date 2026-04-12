@@ -141,6 +141,7 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<IStoreInfoQueryService, StoreInfoQueryService>(services, apiBase, withAuth: false);
         RegisterSdkHttpClient<ICommentQueryService, CommentQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<ITableQueryService, TableQueryService>(services, apiBase, withAuth: false);
+        RegisterSdkHttpClient<IVoteQueryService, VoteQueryService>(services, apiBase, withAuth: false);
         RegisterSdkHttpClient<IFavoriteFolderQueryService, FavoriteFolderQueryService>(services, apiBase, withAuth: true);
 
         // Command 服务
