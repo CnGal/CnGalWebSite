@@ -4,7 +4,6 @@ using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Stores;
-using HtmlAgilityPack;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 
@@ -217,31 +216,22 @@ namespace CnGalWebSite.APIServer.Application.Stores
         {
             try
             {
-                var content = await (await _httpService.GetClientAsync()).GetStringAsync("https://store.steampowered.com/app/" + storeInfo.Link);
-
-                var document = new HtmlDocument();
-                document.LoadHtml(content);
-
-                var node = document.GetElementbyId("userReviews");
-                if (node == null)
+                var json = await (await _httpService.GetClientAsync()).GetStringAsync("https://store.steampowered.com/appreviews/" + storeInfo.Link + "?json=1&language=all&purchase_type=all&num_per_page=0");
+                var re = JObject.Parse(json);
+                if (re["success"]?.Value<int>() != 1 || re["query_summary"] == null)
                 {
                     _logger.LogError("获取 {name} - {id} Steam商店页面数据失败", storeInfo.Name, storeInfo.Link);
                     return;
                 }
-                var text = node.ChildNodes.Count > 3
-                    ? node.ChildNodes[3].ChildNodes[3].ChildNodes[5].InnerText
-                    : node.ChildNodes[1].ChildNodes[3].ChildNodes[5].InnerText;
-                var countStr = ToolHelper.MidStrEx(text, "the ", " ").Replace(",", "");
-                var rateStr = ToolHelper.MidStrEx(text, " ", "% ");
 
-                if (int.TryParse(countStr, out int evaluationCount))
-                {
-                    storeInfo.EvaluationCount ??= evaluationCount;
+                var summary = re["query_summary"];
+                var totalReviews = summary["total_reviews"].Value<int>();
+                var totalPositive = summary["total_positive"].Value<int>();
 
-                }
-                if (int.TryParse(rateStr, out int recommendationRate))
+                if (totalReviews > 0)
                 {
-                    storeInfo.RecommendationRate ??= recommendationRate;
+                    storeInfo.EvaluationCount ??= totalReviews;
+                    storeInfo.RecommendationRate ??= (int)((double)totalPositive / totalReviews * 100);
                 }
             }
             catch (Exception ex)
