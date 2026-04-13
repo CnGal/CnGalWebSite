@@ -53,13 +53,24 @@
 }
 
 .home-card--community a {
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    gap: 0.625rem;
+    justify-content: center;
+    gap: 0.25rem;
     color: inherit;
-    padding: 0.5rem 0.75rem;
+    padding: 0.5rem 0.25rem;
     border-radius: var(--cg-radius-md);
     transition: background-color var(--cg-transition-fast);
+    text-align: center;
+}
+
+@media (min-width: 640px) {
+    .home-card--community a {
+        flex-direction: row;
+        gap: 0.625rem;
+        padding: 0.5rem 0.75rem;
+        text-align: left;
+    }
 }
 
 .home-card--community a:hover {
@@ -68,8 +79,8 @@
 }
 
 .home-card-community-icon {
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 2rem;
+    height: 2rem;
     border-radius: var(--cg-radius-md);
     display: inline-flex;
     align-items: center;
@@ -78,17 +89,38 @@
     transition: background-color var(--cg-transition-fast), color var(--cg-transition-fast);
 }
 
+@media (min-width: 640px) {
+    .home-card-community-icon {
+        width: 2.25rem;
+        height: 2.25rem;
+    }
+}
+
 .home-card-community-icon ::deep .cg-mdi-icon {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1.125rem;
+    height: 1.125rem;
+}
+
+@media (min-width: 640px) {
+    .home-card-community-icon ::deep .cg-mdi-icon {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
 }
 
 .home-card--community strong {
-    font-size: 0.8125rem;
+    font-size: 0.6875rem;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+    .home-card--community strong {
+        font-size: 0.8125rem;
+    }
 }
 
 /* ── 色调变体 ── */

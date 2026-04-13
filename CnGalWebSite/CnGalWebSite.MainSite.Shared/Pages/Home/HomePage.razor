@@ -134,6 +134,7 @@ else
                 </ul>
             </HomeSection>
 
+            <div class="home-evaluations-section">
             <HomeSection Title="专题推荐" Icon="mdiTextBoxOutline" IconColor="var(--cg-color-primary)">
                 <ul class="home-articles-grid">
                     @foreach (var item in Model.Evaluations.Take(6))
@@ -142,6 +143,7 @@ else
                     }
                 </ul>
             </HomeSection>
+            </div>
         </div>
 
         <div class="home-grid-sidebar">
