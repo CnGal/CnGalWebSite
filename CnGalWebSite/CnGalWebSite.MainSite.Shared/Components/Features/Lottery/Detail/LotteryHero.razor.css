@@ -8,6 +8,8 @@
 }
 
 .lottery-hero-image-wrapper {
+    flex-shrink: 0;
+    max-width: 50%;
     aspect-ratio: 460 / 215;
     overflow: hidden;
 }

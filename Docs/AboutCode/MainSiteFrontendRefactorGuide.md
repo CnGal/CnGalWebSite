@@ -155,6 +155,10 @@
 | `TableSummaryPage` | Tab 切换、分页排序搜索、JSON/CSV 数据导出需要即时状态管理 |
 | `SearchPage` | 搜索框输入、筛选面板联动、排序切换和搜索结果实时更新 |
 | `*EditPage` 系列 | 表单编辑、自动保存、侧边栏实时验证反馈等重交互场景 |
+| `UserCenterPage` | Tab 切换、分页数据表格、审核操作（通过/驳回）等交互 |
+| `EditRecordPage` | 编辑记录时间线选择、详情动态切换 |
+| `ExamineDetailPage` | 审核操作（通过/驳回）、批注输入等管理员交互 |
+| `MessagePage` | 消息列表 Tab 切换、标记已读等交互 |
 
 ### 5.1 当前 SDK 目录结构
 
@@ -256,7 +260,11 @@ CnGalWebSite.SDK.MainSite
 - [x] 视频编辑页已按页启用 `@rendermode InteractiveServer`。
 - [x] 标签编辑页已按页启用 `@rendermode InteractiveServer`。
 - [x] 编辑页包含完整交互功能（自动保存草稿、丢弃草稿、类型联动、表单校验、提交审核）。
-- [ ] 其他需交互页面（如登录、个人中心编辑）待按需增加。
+- [x] 用户内容中心（`UserCenterPage`）— InteractiveServer（概览、审核列表、审阅记录、监控列表）。
+- [x] 编辑记录页面（`EditRecordPage`）— InteractiveServer（编辑记录时间线 + 详情展示）。
+- [x] 审核详情页面（`ExamineDetailPage`）— InteractiveServer（审核详情 + 管理员通过/驳回）。
+- [x] 消息中心（`MessagePage`）— InteractiveServer（消息列表分类展示）。
+- [ ] 其他需交互页面（如登录）待按需增加。
 - [ ] 统一异常提示机制进一步完善。
 
 ### 阶段 D：收尾与治理
@@ -332,9 +340,21 @@ CnGalWebSite.MainSite.Shared
 │  │  │  └─ Editor/           # 标签编辑（4 个组件）
 │  │  ├─ Home/                # 首页（14 个组件）
 │  │  ├─ Space/               # 个人空间（4 个组件）
-│  │  └─ Lottery/             # 抽奖
-│  │     ├─ Detail/           # 抽奖详情（4 个组件）
-│  │     └─ Home/             # 抽奖主页（1 个组件）
+│  │  ├─ Lottery/             # 抽奖
+│  │  │  ├─ Detail/           # 抽奖详情（4 个组件）
+│  │  │  └─ Home/             # 抽奖主页（1 个组件）
+│  │  ├─ Examine/             # 审核/编辑记录（10 个组件）
+│  │  │  ├─ UserContentOverview.razor  # 用户内容中心概览
+│  │  │  ├─ ExamineListPanel.razor     # 审核列表（CgDataTable）
+│  │  │  ├─ ReviewRecordListPanel.razor # 审阅记录列表
+│  │  │  ├─ MonitorListPanel.razor     # 监控列表
+│  │  │  ├─ ExamineStatusBadge.razor   # 审核状态徽章
+│  │  │  ├─ ReviewStateBadge.razor     # 审阅状态徽章
+│  │  │  ├─ EntryTypeBadge.razor       # 词条类型徽章
+│  │  │  ├─ EditRecordTimeline.razor   # 编辑记录时间线
+│  │  │  ├─ EditRecordDetail.razor     # 编辑记录详情
+│  │  │  └─ ExamineDetailPanel.razor   # 审核详情面板（含管理员操作）
+│  │  └─ Message/             # 消息
 │  └─ Layout/
 │     └─ UserMenu.razor / .razor.css
 ├─ Layout/
@@ -354,8 +374,15 @@ CnGalWebSite.MainSite.Shared
 │  ├─ Tag/
 │  │  ├─ TagDetailPage.razor / .razor.css
 │  │  └─ TagEditPage.razor / .razor.css
-│  └─ Space/
-│     └─ SpaceIndexPage.razor / .razor.css
+│  ├─ Space/
+│  │  └─ SpaceIndexPage.razor / .razor.css
+│  ├─ Examine/
+│  │  ├─ EditRecordPage.razor / .razor.css
+│  │  └─ ExamineDetailPage.razor / .razor.css
+│  ├─ Message/
+│  │  └─ MessagePage.razor / .razor.css
+│  └─ UserCenter/
+│     └─ UserCenterPage.razor / .razor.css
 ├─ wwwroot/
 │  ├─ styles/
 │  │  └─ design-tokens.css    # 全局设计变量

@@ -2,6 +2,8 @@
 @page "/space/index"
 
 @using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Peripheries
+@using CnGalWebSite.DataModel.ViewModel.Space
 @using CnGalWebSite.SDK.MainSite.Abstractions
 @using CnGalWebSite.SDK.MainSite.Models
 @using CnGalWebSite.MainSite.Shared.Components.Features.Space
@@ -12,6 +14,7 @@
 @inject ISpaceQueryService SpaceQueryService
 @inject IPlayedGameQueryService PlayedGameQueryService
 @inject IFavoriteFolderQueryService FavoriteFolderQueryService
+@inject IPeripheryQueryService PeripheryQueryService
 @inject NavigationManager NavigationManager
 
 @if (_isNotFound)
@@ -24,7 +27,7 @@
 }
 else if (_model != null)
 {
-    <PageTitle>@($"{_model.Name} - 个人空间 - CnGal资料站")</PageTitle>
+    <CgPageMeta Title="@($"{_model.Name} - 个人空间")" Description="@(_model.PersonalSignature)" Image="@(_model.PhotoPath)" />
 
     <div class="cg-space-container">
         <div class="cg-space-layout-row">
@@ -55,7 +58,8 @@ else if (_model != null)
             </div>
             
             <div class="cg-space-layout-main">
-                <CgTabs Variant="underline" Items="GetSpaceTabs()" DefaultActiveKey="home" Id="space-tabs" AriaLabel="个人空间">
+                <CgTabs Variant="underline" Items="GetSpaceTabs()" DefaultActiveKey="@_activeTab" Id="space-tabs" AriaLabel="个人空间"
+                        HrefTemplate="@GetTabHref()">
                     <PanelTemplate Context="tabKey">
                         @switch (tabKey)
                         {
@@ -64,12 +68,38 @@ else if (_model != null)
                                     <SpaceMainPage Model="_model" />
                                 </div>
 
+                                @if (_signInHeatMap is not null)
+                                {
+                                    <div class="cg-space-heatmap-section">
+                                        <CgHeatMap Title="签到记录" Data="_signInHeatMap.Data" MaxCount="_signInHeatMap.MaxCount" Height="180" />
+                                    </div>
+                                }
+
+                                @if (_editHeatMap is not null)
+                                {
+                                    <div class="cg-space-heatmap-section">
+                                        <CgHeatMap Title="编辑概览" Data="_editHeatMap.Data" MaxCount="_editHeatMap.MaxCount" Height="180" />
+                                    </div>
+                                }
+
                                 <div class="cg-space-comment-wrapper">
                                     <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
                                         Type="CommentType.CommentUser"
                                         ObjectId="@_model.Id"
                                         CanComment="_model.CanComment" />
                                 </div>
+                                break;
+
+                            case "editrecords":
+                                <SpaceEditRecordList Model="_editRecords" PaginationHrefTemplate="@GetPaginationHref("editRecordsPage")" />
+                                break;
+
+                            case "articles":
+                                <SpaceArticleList Model="_articles" PaginationHrefTemplate="@GetPaginationHref("articlesPage")" />
+                                break;
+
+                            case "videos":
+                                <SpaceVideoList Model="_videos" />
                                 break;
 
                             case "records":
@@ -96,6 +126,10 @@ else if (_model != null)
                                     <SpaceFavoriteFolderList Folders="_favoriteFolders" IsCurrentUser="_model.IsCurrentUser" />
                                 }
                                 break;
+
+                            case "peripheries":
+                                <SpacePeripheryList Model="_peripheries" />
+                                break;
                         }
                     </PanelTemplate>
                 </CgTabs>
@@ -121,36 +155,74 @@ else
     [Parameter]
     public string? Id { get; set; }
 
+    [SupplyParameterFromQuery(Name = "tab")]
+    public string? Tab { get; set; }
+
+    [SupplyParameterFromQuery(Name = "articlesPage")]
+    public int ArticlesPage { get; set; } = 1;
+
+    [SupplyParameterFromQuery(Name = "editRecordsPage")]
+    public int EditRecordsPage { get; set; } = 1;
+
+    private string _activeTab => string.IsNullOrWhiteSpace(Tab) ? "home" : Tab;
+
     private SpaceDetailViewModel? _model;
     private UserGameRecordsViewModel? _gameRecords;
     private IReadOnlyList<SteamUserInfoItem> _steamUsers = [];
     private IReadOnlyList<FavoriteFolderSummaryItem>? _favoriteFolders;
+    private UserArticlesViewModel? _articles;
+    private UserVideosViewModel? _videos;
+    private UserEditRecordsViewModel? _editRecords;
+    private IReadOnlyList<GameOverviewPeripheryListModel>? _peripheries;
+    private UserHeatMapViewModel? _signInHeatMap;
+    private UserHeatMapViewModel? _editHeatMap;
     private bool _isNotFound;
     private bool _isError;
     private string _errorMessage = string.Empty;
 
+    private bool _showGameRecordTab => _model is not null && (_model.IsCurrentUser || _model.IsShowGameRecord);
     private bool _showFavoritesTab => _model is not null && (_model.IsCurrentUser || _model.IsShowFavorites);
 
     private IReadOnlyList<CgTabItem> GetSpaceTabs()
     {
-        var recordCount = _gameRecords?.Records.Count(r => !r.IsHidden && (r.ShowPublicly || _model!.IsCurrentUser));
         var tabs = new List<CgTabItem>
         {
             new CgTabItem("home", "主页", "mdiHomeOutline"),
-            new CgTabItem("records", "游玩记录", "mdiControllerClassicOutline", recordCount?.ToString()),
+            new CgTabItem("editrecords", "编辑记录", "mdiScriptTextOutline"),
         };
+
+        if (_model is not null && _model.ArticleCount > 0)
+        {
+            tabs.Add(new CgTabItem("articles", "文章", "mdiNewspaperVariantMultipleOutline", _model.ArticleCount.ToString()));
+        }
+
+        if (_model is not null && _model.VideoCount > 0)
+        {
+            tabs.Add(new CgTabItem("videos", "视频", "mdiAnimationPlay", _model.VideoCount.ToString()));
+        }
+
+        if (_showGameRecordTab)
+        {
+            tabs.Add(new CgTabItem("records", "游玩记录", "mdiControllerClassicOutline"));
+        }
 
         if (_showFavoritesTab)
         {
-            var favCount = _favoriteFolders?.Count;
-            tabs.Add(new CgTabItem("favorites", "收藏夹", "mdiHeartMultiple", favCount > 0 ? favCount.ToString() : null));
+            tabs.Add(new CgTabItem("favorites", "收藏夹", "mdiHeartMultiple"));
         }
+
+        tabs.Add(new CgTabItem("peripheries", "周边", "mdiBasketOutline"));
 
         return tabs;
     }
 
+    private int _prevArticlesPage;
+    private int _prevEditRecordsPage;
+
     protected override async Task OnInitializedAsync()
     {
+        _prevArticlesPage = ArticlesPage;
+        _prevEditRecordsPage = EditRecordsPage;
         await LoadDataAsync();
     }
 
@@ -158,7 +230,33 @@ else
     {
         if (_model != null && !string.IsNullOrWhiteSpace(Id) && _model.Id != Id)
         {
+            _prevArticlesPage = ArticlesPage;
+            _prevEditRecordsPage = EditRecordsPage;
             await LoadDataAsync();
+            return;
+        }
+
+        // 仅分页参数变化时，只重载对应数据
+        if (_model != null)
+        {
+            var tasks = new List<Task>();
+
+            if (ArticlesPage != _prevArticlesPage)
+            {
+                _prevArticlesPage = ArticlesPage;
+                tasks.Add(LoadArticlesAsync());
+            }
+
+            if (EditRecordsPage != _prevEditRecordsPage)
+            {
+                _prevEditRecordsPage = EditRecordsPage;
+                tasks.Add(LoadEditRecordsAsync());
+            }
+
+            if (tasks.Count > 0)
+            {
+                await Task.WhenAll(tasks);
+            }
         }
     }
 
@@ -169,6 +267,12 @@ else
         _model = null;
         _gameRecords = null;
         _favoriteFolders = null;
+        _articles = null;
+        _videos = null;
+        _editRecords = null;
+        _peripheries = null;
+        _signInHeatMap = null;
+        _editHeatMap = null;
 
         var targetId = Id ?? string.Empty;
         var result = await SpaceQueryService.GetSpaceDetailAsync(targetId);
@@ -179,16 +283,34 @@ else
 
             var tasks = new List<Task>();
 
-            // 非当前用户：静态加载游玩记录（当前用户由 SpaceGameRecordSection 交互式加载）
-            if (!_model.IsCurrentUser)
+            // 按当前 Tab 加载对应数据
+            switch (_activeTab)
             {
-                tasks.Add(LoadGameRecordsAsync());
-            }
-
-            // 加载收藏夹列表（条件：当前用户或允许展示）
-            if (_model.IsCurrentUser || _model.IsShowFavorites)
-            {
-                tasks.Add(LoadFavoriteFoldersAsync());
+                case "home":
+                    tasks.Add(LoadHeatMapsAsync());
+                    break;
+                case "editrecords":
+                    tasks.Add(LoadEditRecordsAsync());
+                    break;
+                case "articles":
+                    if (_model.ArticleCount > 0)
+                        tasks.Add(LoadArticlesAsync());
+                    break;
+                case "videos":
+                    if (_model.VideoCount > 0)
+                        tasks.Add(LoadVideosAsync());
+                    break;
+                case "records":
+                    if (!_model.IsCurrentUser && _model.IsShowGameRecord)
+                        tasks.Add(LoadGameRecordsAsync());
+                    break;
+                case "favorites":
+                    if (_model.IsCurrentUser || _model.IsShowFavorites)
+                        tasks.Add(LoadFavoriteFoldersAsync());
+                    break;
+                case "peripheries":
+                    tasks.Add(LoadPeripheriesAsync());
+                    break;
             }
 
             await Task.WhenAll(tasks);
@@ -222,13 +344,66 @@ else
 
     private async Task LoadFavoriteFoldersAsync()
     {
-        // For the current user, use the owner API that includes hidden folders.
-        // For other users, use the public API that only returns visible folders.
         var foldersResult = _model!.IsCurrentUser
             ? await FavoriteFolderQueryService.GetAllUserFavoriteFoldersAsync(_model.Id)
             : await FavoriteFolderQueryService.GetUserFavoriteFoldersAsync(_model.Id);
         _favoriteFolders = foldersResult.Success && foldersResult.Data is not null
             ? foldersResult.Data
             : [];
+    }
+
+    private async Task LoadArticlesAsync()
+    {
+        var page = Math.Max(1, ArticlesPage);
+        var result = await SpaceQueryService.GetUserArticlesAsync(_model!.Id, currentPage: page);
+        _articles = result.Success ? result.Data : null;
+    }
+
+    private async Task LoadVideosAsync()
+    {
+        var result = await SpaceQueryService.GetUserVideosAsync(_model!.Id);
+        _videos = result.Success ? result.Data : null;
+    }
+
+    private async Task LoadEditRecordsAsync()
+    {
+        var page = Math.Max(1, EditRecordsPage);
+        var result = await SpaceQueryService.GetUserEditRecordsAsync(_model!.Id, currentPage: page);
+        _editRecords = result.Success ? result.Data : null;
+    }
+
+    private string _basePath => string.IsNullOrWhiteSpace(Id) ? "/space/index" : $"/space/index/{Id}";
+
+    /// <summary>
+    /// 生成 Tab 切换的 URL 模板（{0} 为 tab key）。
+    /// </summary>
+    private string GetTabHref()
+    {
+        return $"{_basePath}?tab={{0}}";
+    }
+
+    /// <summary>
+    /// 生成分页 URL 模板，保留当前 tab 参数。
+    /// </summary>
+    private string GetPaginationHref(string pageParamName)
+    {
+        return $"{_basePath}?tab={_activeTab}&{pageParamName}={{0}}";
+    }
+
+    private async Task LoadPeripheriesAsync()
+    {
+        var result = await PeripheryQueryService.GetUserOverviewPeripheriesAsync(_model!.Id);
+        _peripheries = result.Success ? result.Data : null;
+    }
+
+    private async Task LoadHeatMapsAsync()
+    {
+        var signInTask = SpaceQueryService.GetUserHeatMapAsync(_model!.Id, UserHeatMapType.SignInDays);
+        var editTask = SpaceQueryService.GetUserHeatMapAsync(_model.Id, UserHeatMapType.EditRecords);
+
+        await Task.WhenAll(signInTask, editTask);
+
+        _signInHeatMap = signInTask.Result.Success ? signInTask.Result.Data : null;
+        _editHeatMap = editTask.Result.Success ? editTask.Result.Data : null;
     }
 }

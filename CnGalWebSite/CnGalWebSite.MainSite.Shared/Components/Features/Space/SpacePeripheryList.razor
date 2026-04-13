@@ -1,0 +1,82 @@
+@using CnGalWebSite.DataModel.ViewModel.Peripheries
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+
+@if (Model is null || Model.Count == 0)
+{
+    <div class="cg-space-tab-empty">
+        <CgMdiIcon Name="mdiBasketOutline" aria-hidden="true" />
+        <p>暂无周边收藏</p>
+    </div>
+}
+else
+{
+    <div class="cg-space-periphery-sections">
+        @foreach (var group in Model)
+        {
+            <div class="cg-space-periphery-group">
+                <a class="cg-space-periphery-group-header" href="@GetGroupUrl(group)">
+                    @if (!string.IsNullOrWhiteSpace(group.Image))
+                    {
+                        <img class="cg-space-periphery-group-image @(group.IsThumbnail ? "cg-space-periphery-group-image--round" : "")" src="@group.Image" alt="@group.Name" loading="lazy" />
+                    }
+                    <div class="cg-space-periphery-group-info">
+                        <h3>@group.Name</h3>
+                        @if (!string.IsNullOrWhiteSpace(group.BriefIntroduction))
+                        {
+                            <p>@group.BriefIntroduction</p>
+                        }
+                    </div>
+                </a>
+
+                @if (group.Peripheries.Count > 0)
+                {
+                    <ul class="cg-space-periphery-grid">
+                        @foreach (var item in group.Peripheries)
+                        {
+                            <li>
+                                <a class="cg-space-periphery-item" href="@($"/peripheries/index/{item.Id}")">
+                                    <div class="cg-space-periphery-item-image">
+                                        @if (!string.IsNullOrWhiteSpace(item.Image))
+                                        {
+                                            <img src="@item.Image" alt="@item.Name" loading="lazy" decoding="async" />
+                                        }
+                                        else
+                                        {
+                                            <div class="cg-space-periphery-item-placeholder">
+                                                <CgMdiIcon Name="mdiGiftOutline" />
+                                            </div>
+                                        }
+                                        @if (item.IsCollected)
+                                        {
+                                            <span class="cg-space-periphery-collected-badge" title="已收集">
+                                                <CgMdiIcon Name="mdiBasket" />
+                                            </span>
+                                        }
+                                    </div>
+                                    <span class="cg-space-periphery-item-name">@item.Name</span>
+                                    <span class="cg-space-periphery-item-stat">
+                                        <CgMdiIcon Name="mdiAccountMultipleOutline" aria-hidden="true" />
+                                        @item.CollectedCount
+                                    </span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<GameOverviewPeripheryListModel>? Model { get; set; }
+
+    private static string GetGroupUrl(GameOverviewPeripheryListModel group) => group.Type switch
+    {
+        PeripheryOverviewType.Entry => $"/entries/index/{group.ObjectId}",
+        PeripheryOverviewType.Periphery => $"/peripheries/index/{group.ObjectId}",
+        PeripheryOverviewType.User => $"/space/index/{group.ObjectId}",
+        _ => "#"
+    };
+}

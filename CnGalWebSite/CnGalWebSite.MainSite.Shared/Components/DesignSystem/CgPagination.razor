@@ -1,35 +1,93 @@
-<nav class="cg-pagination" aria-label="Pagination">
-    <button class="cg-pagination__btn cg-pagination__nav"
-            disabled="@(CurrentPage <= 1)"
-            @onclick="GoPreviousAsync"
-            aria-label="上一页">
-        <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
-    </button>
+@* CgPagination — 支持两种模式：
+   1. 交互模式（默认）：通过 EventCallback 回调
+   2. 链接模式（SSR 友好）：当设置 HrefTemplate 时，生成 <a> 链接导航
+   HrefTemplate 示例: "/space/index/abc?articlesPage={0}" — {0} 会被替换为页码
+*@
 
-    @foreach (var item in GetPageItems())
-    {
-        @if (item.Page == -1)
+@if (TotalPages > 1)
+{
+    <nav class="cg-pagination" aria-label="Pagination">
+        @if (_useLinks)
         {
-            <span class="cg-pagination__ellipsis">…</span>
+            @* ─── Link mode (SSR) ─── *@
+            @if (CurrentPage <= 1)
+            {
+                <span class="cg-pagination__btn cg-pagination__nav cg-pagination__btn--disabled" aria-disabled="true" aria-label="上一页">
+                    <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
+                </span>
+            }
+            else
+            {
+                <a class="cg-pagination__btn cg-pagination__nav" href="@GetHref(CurrentPage - 1)" aria-label="上一页">
+                    <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
+                </a>
+            }
+
+            @foreach (var item in GetPageItems())
+            {
+                @if (item.Page == -1)
+                {
+                    <span class="cg-pagination__ellipsis">…</span>
+                }
+                else if (item.Page == CurrentPage)
+                {
+                    <span class="cg-pagination__btn cg-pagination__btn--active @item.CssClass" aria-current="page">@item.Page</span>
+                }
+                else
+                {
+                    <a class="cg-pagination__btn @item.CssClass" href="@GetHref(item.Page)" aria-label="@($"第 {item.Page} 页")">@item.Page</a>
+                }
+            }
+
+            @if (CurrentPage >= TotalPages)
+            {
+                <span class="cg-pagination__btn cg-pagination__nav cg-pagination__btn--disabled" aria-disabled="true" aria-label="下一页">
+                    <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+                </span>
+            }
+            else
+            {
+                <a class="cg-pagination__btn cg-pagination__nav" href="@GetHref(CurrentPage + 1)" aria-label="下一页">
+                    <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+                </a>
+            }
         }
         else
         {
-            <button class="cg-pagination__btn @(item.Page == CurrentPage ? "cg-pagination__btn--active" : "") @item.CssClass"
-                    @onclick="() => GoToPageAsync(item.Page)"
-                    aria-label="@($"第 {item.Page} 页")"
-                    aria-current="@(item.Page == CurrentPage ? "page" : null)">
-                @item.Page
+            @* ─── Interactive mode ─── *@
+            <button class="cg-pagination__btn cg-pagination__nav"
+                    disabled="@(CurrentPage <= 1)"
+                    @onclick="GoPreviousAsync"
+                    aria-label="上一页">
+                <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
+            </button>
+
+            @foreach (var item in GetPageItems())
+            {
+                @if (item.Page == -1)
+                {
+                    <span class="cg-pagination__ellipsis">…</span>
+                }
+                else
+                {
+                    <button class="cg-pagination__btn @(item.Page == CurrentPage ? "cg-pagination__btn--active" : "") @item.CssClass"
+                            @onclick="() => GoToPageAsync(item.Page)"
+                            aria-label="@($"第 {item.Page} 页")"
+                            aria-current="@(item.Page == CurrentPage ? "page" : null)">
+                        @item.Page
+                    </button>
+                }
+            }
+
+            <button class="cg-pagination__btn cg-pagination__nav"
+                    disabled="@(CurrentPage >= TotalPages)"
+                    @onclick="GoNextAsync"
+                    aria-label="下一页">
+                <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
             </button>
         }
-    }
-
-    <button class="cg-pagination__btn cg-pagination__nav"
-            disabled="@(CurrentPage >= TotalPages)"
-            @onclick="GoNextAsync"
-            aria-label="下一页">
-        <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
-    </button>
-</nav>
+    </nav>
+}
 
 @code {
     [Parameter]
@@ -42,10 +100,21 @@
     public EventCallback<int> CurrentPageChanged { get; set; }
 
     /// <summary>
+    /// SSR 链接模式模板，例如 "/space/index/abc?articlesPage={0}"。
+    /// 设置此属性后组件输出 &lt;a&gt; 标签而非按钮。
+    /// </summary>
+    [Parameter]
+    public string? HrefTemplate { get; set; }
+
+    private bool _useLinks => !string.IsNullOrEmpty(HrefTemplate);
+
+    /// <summary>
     /// Maximum siblings to show around the current page.
     /// Extra siblings beyond 1 get CSS classes so they can be hidden on narrow viewports.
     /// </summary>
     private const int MaxSiblings = 3;
+
+    private string GetHref(int page) => string.Format(HrefTemplate!, page);
 
     private Task GoPreviousAsync()
     {

@@ -1,0 +1,146 @@
+@page "/tasks"
+@attribute [Authorize]
+@rendermode InteractiveServer
+
+@using CnGalWebSite.DataModel.ViewModel.Space
+@using CnGalWebSite.MainSite.Shared.Components.Features.Space
+
+@inject ISpaceQueryService SpaceQueryService
+@inject ISpaceCommandService SpaceCommandService
+@inject ICgToastService ToastService
+
+<CgPageMeta Title="每日任务" />
+
+<div class="tasks-page">
+    <div class="tasks-page__header">
+        <h1 class="tasks-page__title">
+            <CgMdiIcon Name="mdiClipboardCheckOutline" aria-hidden="true" />
+            <span>每日任务</span>
+        </h1>
+    </div>
+
+    @if (_isLoading)
+    {
+        <div class="tasks-page__loading">
+            <CgProgressRing />
+            <span>加载任务列表中...</span>
+        </div>
+    }
+    else if (_isError)
+    {
+        <div class="tasks-page__error">
+            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
+            <p>@_errorMessage</p>
+            <CgButton Variant="primary" OnClick="LoadDataAsync">重试</CgButton>
+        </div>
+    }
+    else if (_model is not null)
+    {
+        @* ── 日常任务 ── *@
+        <section class="tasks-page__section">
+            <div class="tasks-page__section-header">
+                <CgMdiIcon Name="mdiCalendarCheckOutline" aria-hidden="true" />
+                <h2 class="tasks-page__section-title">日常任务</h2>
+            </div>
+            <div class="tasks-page__list">
+                <TaskCard IconName="mdiCalendarCheck"
+                          Title="每日签到"
+                          Description="@(_model.IsSignIn ? $"连续签到 {_model.SignInDays} 天" : "快来签到吧~")"
+                          Reward="经验值+5"
+                          IsFinished="_model.IsSignIn"
+                          ButtonText="签到"
+                          ButtonIconName="mdiCheck"
+                          OnClick="SignInAsync" />
+            </div>
+        </section>
+
+        @* ── 新手任务 ── *@
+        <section class="tasks-page__section">
+            <div class="tasks-page__section-header">
+                <CgMdiIcon Name="mdiSchoolOutline" aria-hidden="true" />
+                <h2 class="tasks-page__section-title">新手任务</h2>
+            </div>
+            <div class="tasks-page__list">
+                <TaskCard IconName="mdiSteam"
+                          Title="绑定Steam账号"
+                          Description="可以导入Steam库存，还可以分享游玩记录"
+                          Reward="G币+10"
+                          IsFinished="_model.IsBindSteamId"
+                          ButtonText="绑定"
+                          ButtonIconName="mdiLinkVariant"
+                          OnClick="OpenSteamBindModal" />
+            </div>
+        </section>
+    }
+</div>
+
+@* ── Steam 绑定弹窗 ── *@
+<SpaceSteamEditModal @bind-Visible="_showSteamModal" OnSaved="OnSteamBindSaved" />
+
+@code {
+    private UserTaskModel? _model;
+    private bool _isLoading = true;
+    private bool _isError;
+    private string _errorMessage = string.Empty;
+    private bool _showSteamModal;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        _isLoading = true;
+        _isError = false;
+        _model = null;
+        StateHasChanged();
+
+        var result = await SpaceQueryService.GetUserTasksAsync();
+
+        if (result.Success && result.Data is not null)
+        {
+            _model = result.Data;
+        }
+        else
+        {
+            _isError = true;
+            _errorMessage = result.Error?.Message ?? "获取任务列表失败";
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task SignInAsync()
+    {
+        var result = await SpaceCommandService.SignInAsync();
+
+        if (result.Success && _model is not null)
+        {
+            _model.IsSignIn = true;
+            _model.SignInDays++;
+            ToastService.Show("签到成功", $"已连续签到 {_model.SignInDays} 天", "success");
+        }
+        else
+        {
+            ToastService.Show("签到失败", result.Error?.Message ?? "请稍后重试", "error");
+        }
+    }
+
+    private void OpenSteamBindModal()
+    {
+        _showSteamModal = true;
+    }
+
+    private async Task OnSteamBindSaved()
+    {
+        // 重新加载任务状态以刷新绑定状态
+        var result = await SpaceQueryService.GetUserTasksAsync();
+        if (result.Success && result.Data is not null)
+        {
+            _model = result.Data;
+        }
+
+        ToastService.Show("绑定成功", "Steam 账号已绑定", "success");
+    }
+}

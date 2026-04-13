@@ -141,6 +141,7 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<IStoreInfoQueryService, StoreInfoQueryService>(services, apiBase, withAuth: false);
         RegisterSdkHttpClient<ICommentQueryService, CommentQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<ITableQueryService, TableQueryService>(services, apiBase, withAuth: false);
+        RegisterSdkHttpClient<IVoteQueryService, VoteQueryService>(services, apiBase, withAuth: false);
         RegisterSdkHttpClient<IFavoriteFolderQueryService, FavoriteFolderQueryService>(services, apiBase, withAuth: true);
 
         // Command 服务
@@ -159,6 +160,10 @@ public static class ServiceCollectionExtensions
         // Admin 服务（需认证）
         RegisterSdkHttpClient<IAdminQueryService, AdminQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IAdminCommandService, AdminCommandService>(services, apiBase, withAuth: true);
+
+        // Examine 服务（需认证，审核/审阅/监控）
+        RegisterSdkHttpClient<IExamineQueryService, ExamineQueryService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<IExamineCommandService, ExamineCommandService>(services, apiBase, withAuth: true);
 
         // 外部服务（DrawingBed / TimedTask，认证）
         RegisterSdkHttpClient<IFileQueryService, FileQueryService>(services, imageApiBase, withAuth: true);

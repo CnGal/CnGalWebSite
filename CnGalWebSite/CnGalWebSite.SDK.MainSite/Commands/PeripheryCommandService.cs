@@ -4,12 +4,14 @@ using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.PeripheryEdit;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class PeripheryCommandService(
     HttpClient httpClient,
+    IMemoryCache memoryCache,
     ILogger<PeripheryCommandService> logger) : CommandServiceBase(httpClient), IPeripheryCommandService
 {
     protected override ILogger Logger => logger;
@@ -57,6 +59,8 @@ public sealed class PeripheryCommandService(
             };
 
             // 设置 Id 和 Name 以便后续提交
+            model.Data.Id = id;
+            model.Data.Name = model.Data.Main.Name;
             model.Data.Main.Id = id;
             model.Data.Images.Id = id;
             model.Data.Entries.Id = id;
@@ -115,6 +119,7 @@ public sealed class PeripheryCommandService(
 
                 if (result?.Successful == true && long.TryParse(result.Error, out var newId))
                 {
+                    InvalidatePeripheryCaches(newId);
                     return SdkResult<long>.Ok(newId);
                 }
 
@@ -144,6 +149,7 @@ public sealed class PeripheryCommandService(
                     return SdkResult<long>.Fail("PERIPHERY_EDIT_PARTIAL_FAILED", string.Join("；", errors));
                 }
 
+                InvalidatePeripheryCaches(request.Data.Main.Id);
                 return SdkResult<long>.Ok(request.Data.Main.Id);
             }
         }
@@ -157,5 +163,70 @@ public sealed class PeripheryCommandService(
     private Task<Result?> SubmitPartAsync<T>(string path, T model, CancellationToken cancellationToken)
     {
         return PostAsJsonAsync<T, Result>(path, model, cancellationToken);
+    }
+
+    public async Task<SdkResult<bool>> CheckIsCollectedAsync(long peripheryId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await GetFromJsonAsync<CheckPeripheryIsCollectedModel>(
+                $"api/peripheries/CheckPeripheryIsCollected/{peripheryId}", cancellationToken);
+
+            return SdkResult<bool>.Ok(result?.IsCollected ?? false);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "检查周边收集状态异常。PeripheryId={PeripheryId}; BaseAddress={BaseAddress}", peripheryId, HttpClient.BaseAddress);
+            return SdkResult<bool>.Fail("PERIPHERY_CHECK_COLLECTED_EXCEPTION", "检查周边收集状态时发生异常");
+        }
+    }
+
+    public async Task<SdkResult<bool>> CollectAsync(long peripheryId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await GetFromJsonAsync<Result>(
+                $"api/peripheries/CollectPeriphery/{peripheryId}", cancellationToken);
+
+            if (result is { Successful: true })
+            {
+                return SdkResult<bool>.Ok(true);
+            }
+
+            return SdkResult<bool>.Fail("PERIPHERY_COLLECT_FAILED", result?.Error ?? "收集周边失败");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "收集周边异常。PeripheryId={PeripheryId}; BaseAddress={BaseAddress}", peripheryId, HttpClient.BaseAddress);
+            return SdkResult<bool>.Fail("PERIPHERY_COLLECT_EXCEPTION", "收集周边时发生异常");
+        }
+    }
+
+    public async Task<SdkResult<bool>> UnCollectAsync(long peripheryId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await GetFromJsonAsync<Result>(
+                $"api/peripheries/UnCollectPeriphery/{peripheryId}", cancellationToken);
+
+            if (result is { Successful: true })
+            {
+                return SdkResult<bool>.Ok(true);
+            }
+
+            return SdkResult<bool>.Fail("PERIPHERY_UNCOLLECT_FAILED", result?.Error ?? "取消收集周边失败");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "取消收集周边异常。PeripheryId={PeripheryId}; BaseAddress={BaseAddress}", peripheryId, HttpClient.BaseAddress);
+            return SdkResult<bool>.Fail("PERIPHERY_UNCOLLECT_EXCEPTION", "取消收集周边时发生异常");
+        }
+    }
+
+    private void InvalidatePeripheryCaches(long peripheryId)
+    {
+        memoryCache.Remove($"main-site:periphery-detail:{peripheryId}");
+        memoryCache.Remove($"main-site:periphery-edit-records:{peripheryId}");
+        memoryCache.Remove("main-site:user-content-center");
     }
 }

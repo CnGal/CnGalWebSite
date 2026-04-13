@@ -1,0 +1,290 @@
+@page "/home/editrecord"
+@rendermode InteractiveServer
+
+@using CnGalWebSite.DataModel.ViewModel.Home
+@using CnGalWebSite.DataModel.ViewModel.Admin
+@using CnGalWebSite.MainSite.Shared.Components.Features.Examine
+
+@inject IExamineQueryService ExamineQueryService
+@inject NavigationManager NavigationManager
+
+<CgPageMeta Title="编辑记录" />
+
+<div class="edit-record-page">
+    @* ── 页面标题 ── *@
+    <header class="edit-record-page__header">
+        <h1 class="edit-record-page__title">
+            <CgMdiIcon Name="mdiHistory" aria-hidden="true"/>
+            <span>编辑记录</span>
+        </h1>
+    </header>
+
+    @if (_isLoading)
+    {
+        <div class="edit-record-page__loading">
+            <CgProgressRing/>
+            <span>加载编辑记录中...</span>
+        </div>
+    }
+    else if (_isError)
+    {
+        <div class="edit-record-page__error">
+            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true"/>
+            <p>@_errorMessage</p>
+            <CgButton Variant="primary" OnClick="LoadDataAsync">重试</CgButton>
+            <a href="/" class="cg-btn cg-btn--secondary">返回首页</a>
+        </div>
+    }
+    else if (_overview is not null)
+    {
+        @* ── 对象信息卡片 ── *@
+        <div class="edit-record-page__object-banner">
+            @if (!string.IsNullOrWhiteSpace(_overview.Image))
+            {
+                <img class="edit-record-page__object-image" src="@_overview.Image" alt="@_overview.ObjectName" loading="lazy" />
+            }
+            <div class="edit-record-page__object-info">
+                <h2 class="edit-record-page__object-name">@($"『{_overview.ObjectName}』历史编辑记录总览")</h2>
+                @if (!string.IsNullOrWhiteSpace(_overview.ObjectBriefIntroduction))
+                {
+                    <p class="edit-record-page__object-desc">@_overview.ObjectBriefIntroduction</p>
+                }
+                <a class="edit-record-page__object-link" href="@GetObjectUrl()">
+                    <CgMdiIcon Name="mdiOpenInNew" aria-hidden="true"/>
+                    查看详情
+                </a>
+            </div>
+        </div>
+
+        @* ── 主体：左侧时间线 + 右侧详情/对比 ── *@
+        <div class="edit-record-page__body">
+            <aside class="edit-record-page__sidebar">
+                <div class="edit-record-page__sidebar-header">
+                    <CgMdiIcon Name="mdiFormatListBulleted" aria-hidden="true"/>
+                    <span>编辑记录 (@_overview.Examines.Count)</span>
+                </div>
+                <EditRecordTimeline Items="@_overview.Examines"
+                                    SelectedId="@_selectedId"
+                                    OnSelected="OnTimelineItemSelected"/>
+            </aside>
+            <main class="edit-record-page__main">
+                @* ── 对比视图选择器 ── *@
+                <div class="edit-record-page__contrast-bar">
+                    <div class="edit-record-page__contrast-selector">
+                        <label class="edit-record-page__contrast-label">
+                            <CgMdiIcon Name="mdiFileRestoreOutline" aria-hidden="true"/>
+                            对比版本
+                        </label>
+                        <CgSelect Value="@_contrastIdStr" ValueChanged="OnContrastChanged" Options="@_examineOptions" />
+                    </div>
+                    <div class="edit-record-page__contrast-selector">
+                        <label class="edit-record-page__contrast-label">
+                            <CgMdiIcon Name="mdiFileDocumentCheckOutline" aria-hidden="true"/>
+                            当前版本
+                        </label>
+                        <CgSelect Value="@_currentIdStr" ValueChanged="OnCurrentChanged" Options="@_examineOptions" />
+                    </div>
+                    <CgButton Variant="primary" OnClick="LoadContrastAsync" Disabled="_isContrastLoading">
+                        <CgMdiIcon Name="mdiMagnify" aria-hidden="true"/>
+                        对比
+                    </CgButton>
+                </div>
+
+                @* ── 对比视图内容 ── *@
+                @if (_isContrastLoading)
+                {
+                    <div class="edit-record-page__loading">
+                        <CgProgressRing/>
+                        <span>加载对比数据中...</span>
+                    </div>
+                }
+                else if (_contrastModel is not null)
+                {
+                    <section class="edit-record-page__contrast-view">
+                        <div class="edit-record-page__contrast-column">
+                            <h3 class="edit-record-page__contrast-column-title edit-record-page__contrast-column-title--before">
+                                <CgMdiIcon Name="mdiFileRestoreOutline" aria-hidden="true"/>
+                                对比版本 (#@_contrastId)
+                            </h3>
+                            <ExaminePreDataView Model="@_contrastModel.BeforeModel"/>
+                        </div>
+                        <div class="edit-record-page__contrast-column">
+                            <h3 class="edit-record-page__contrast-column-title edit-record-page__contrast-column-title--after">
+                                <CgMdiIcon Name="mdiFileDocumentCheckOutline" aria-hidden="true"/>
+                                当前版本 (#@_currentId)
+                            </h3>
+                            <ExaminePreDataView Model="@_contrastModel.AfterModel"/>
+                        </div>
+                    </section>
+                }
+
+                @* ── 编辑记录详情 ── *@
+                @if (_selectedRecord is not null)
+                {
+                    <EditRecordDetail Model="@_selectedRecord"/>
+                }
+                else if (_contrastModel is null)
+                {
+                    <div class="edit-record-page__no-selection">
+                        <CgMdiIcon Name="mdiCursorDefaultClickOutline" aria-hidden="true"/>
+                        <span>请在左侧选择一条编辑记录查看详情</span>
+                    </div>
+                }
+            </main>
+        </div>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery] [Parameter] public long ContrastId { get; set; }
+
+    [SupplyParameterFromQuery] [Parameter] public long CurrentId { get; set; }
+
+    private ExaminesOverviewViewModel? _overview;
+    private EditRecordAloneViewModel? _selectedRecord;
+    private ExamineViewModel? _contrastModel;
+    private long _selectedId;
+    private string _contrastIdStr = "";
+    private string _currentIdStr = "";
+
+    private IEnumerable<KeyValuePair<string, string>> _examineOptions = [];
+    private long _contrastId;
+    private long _currentId;
+    private bool _isLoading = true;
+    private bool _isContrastLoading;
+    private bool _isError;
+    private string _errorMessage = string.Empty;
+    private bool _initialized;
+    private bool _selfNavigating;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Only reload on first render or self-initiated navigation.
+        // When navigating away, Blazor resets query params and fires this method;
+        // _selfNavigating is false in that case, so we skip the reload.
+        if (_initialized && !_selfNavigating)
+        {
+            return;
+        }
+        _selfNavigating = false;
+        _initialized = true;
+
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        if (ContrastId <= 0)
+        {
+            _isError = true;
+            _errorMessage = "缺少必要的编辑记录ID参数";
+            _isLoading = false;
+            return;
+        }
+
+        _isLoading = true;
+        _isError = false;
+        _overview = null;
+        _selectedRecord = null;
+        _contrastModel = null;
+        StateHasChanged();
+
+        var result = await ExamineQueryService.GetExaminesOverviewAsync(ContrastId);
+
+        if (result.Success && result.Data is not null)
+        {
+            _overview = result.Data;
+
+            // 初始化对比 ID 与选择器选项
+            _contrastId = ContrastId;
+            _currentId = CurrentId > 0 ? CurrentId : _overview.Examines.LastOrDefault()?.Id ?? ContrastId;
+            _contrastIdStr = _contrastId.ToString();
+            _currentIdStr = _currentId.ToString();
+            _examineOptions = _overview.Examines
+                .Select(e => new KeyValuePair<string, string>(e.Id.ToString(), $"#{e.Id:00000} — {e.ApplyTime:yyyy-MM-dd HH:mm}"))
+                .ToList();
+
+            // 定位选中项：优先选 ContrastId 对应的记录，其次选 IsSelected=true 的
+            _selectedRecord = _overview.Examines.FirstOrDefault(e => e.Id == ContrastId)
+                              ?? _overview.Examines.FirstOrDefault(e => e.IsSelected)
+                              ?? _overview.Examines.FirstOrDefault();
+
+            _selectedId = _selectedRecord?.Id ?? 0;
+
+            // 如果有 CurrentId，自动加载对比视图
+            if (CurrentId > 0)
+            {
+                await LoadContrastAsync();
+            }
+        }
+        else
+        {
+            _isError = true;
+            _errorMessage = result.Error?.Message ?? "获取编辑记录概览失败";
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task LoadContrastAsync()
+    {
+        if (_contrastId <= 0 || _currentId <= 0 || _contrastId > _currentId)
+        {
+            return;
+        }
+
+        _isContrastLoading = true;
+        StateHasChanged();
+
+        var result = await ExamineQueryService.GetContrastExamineAsync(_contrastId, _currentId);
+        if (result.Success && result.Data is not null)
+        {
+            _contrastModel = result.Data;
+        }
+
+        _isContrastLoading = false;
+    }
+
+    private Task OnTimelineItemSelected(EditRecordAloneViewModel item)
+    {
+        _selectedRecord = item;
+        _selectedId = item.Id;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private Task OnContrastChanged(string? value)
+    {
+        if (long.TryParse(value, out var id))
+        {
+            _contrastId = id;
+            _contrastIdStr = value!;
+        }
+        return Task.CompletedTask;
+    }
+
+    private Task OnCurrentChanged(string? value)
+    {
+        if (long.TryParse(value, out var id))
+        {
+            _currentId = id;
+            _currentIdStr = value!;
+        }
+        return Task.CompletedTask;
+    }
+
+    private string? GetObjectUrl()
+    {
+        if (_overview is null) return null;
+        return _overview.Type switch
+        {
+            ExaminedNormalListModelType.Entry => $"/entries/index/{_overview.ObjectId}",
+            ExaminedNormalListModelType.Article => $"/articles/index/{_overview.ObjectId}",
+            ExaminedNormalListModelType.Periphery => $"/peripheries/index/{_overview.ObjectId}",
+            ExaminedNormalListModelType.Tag => $"/tags/index/{_overview.ObjectId}",
+            ExaminedNormalListModelType.Video => $"/videos/index/{_overview.ObjectId}",
+            _ => null
+        };
+    }
+
+}

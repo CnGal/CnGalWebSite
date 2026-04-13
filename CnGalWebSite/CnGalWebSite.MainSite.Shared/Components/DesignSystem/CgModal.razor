@@ -3,9 +3,12 @@
     <div class="cg-modal-mask @(_isClosing ? "cg-modal-closing" : "")" @onclick="OnMaskClick">
         <section class="cg-modal-panel @(_isClosing ? "cg-modal-panel-closing" : "")" style="@(Width != null ? $"width: {Width}; max-width: 92vw;": "")" @onclick:stopPropagation="true" role="dialog" aria-modal="true">
             <CgRenderFreeze Freeze="_isClosing">
-                <header class="cg-modal-header">
-                    <h3>@Title</h3>
-                </header>
+                @if (!string.IsNullOrWhiteSpace(Title))
+                {
+                    <header class="cg-modal-header">
+                        <h3>@Title</h3>
+                    </header>
+                }
                 <div class="cg-modal-content">
                     @ChildContent
                 </div>

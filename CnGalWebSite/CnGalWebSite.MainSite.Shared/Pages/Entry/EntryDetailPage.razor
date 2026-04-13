@@ -3,8 +3,10 @@
 @inject IPlayedGameQueryService PlayedGameQueryService
 @inject IPeripheryQueryService PeripheryQueryService
 @inject IFavoriteFolderQueryService FavoriteFolderQueryService
+@inject IExamineQueryService ExamineQueryService
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.ViewModel.Search
 @using CnGalWebSite.DataModel.ViewModel.Peripheries
 @using CnGalWebSite.DataModel.ViewModel.Favorites
@@ -13,7 +15,7 @@
 @using CnGalWebSite.Extensions
 @using CnGalWebSite.SDK.MainSite.Infrastructure
 
-<PageTitle>@(Model is null ? "条目详情" : $"{Model.Name} - 词条详情")</PageTitle>
+<CgPageMeta Title="@(Model?.Name)" Description="@(Model?.BriefIntroduction)" Image="@(Model?.MainPicture)" />
 
 @if (ErrorMessage is not null)
 {
@@ -81,18 +83,22 @@ else if (Model is not null)
 
                 <EntryPeripheryCard Model="PeripheryOverview" />
 
-                @* 登录用户使用交互式评分区域（支持编辑后实时刷新），未登录用户使用静态渲染 *@
-                <AuthorizeView>
-                    <Authorized>
-                        <EntryScoreSection EntryId="Id" />
-                    </Authorized>
-                    <NotAuthorized>
-                        @if (ScoreOverview is not null)
-                        {
-                            <EntryScoreOverview Model="ScoreOverview" />
-                        }
-                    </NotAuthorized>
-                </AuthorizeView>
+                @* 仅游戏类词条显示评分区域 *@
+                @if (Model.Type == EntryType.Game)
+                {
+                    @* 登录用户使用交互式评分区域（支持编辑后实时刷新），未登录用户使用静态渲染 *@
+                    <AuthorizeView>
+                        <Authorized>
+                            <EntryScoreSection EntryId="Id" />
+                        </Authorized>
+                        <NotAuthorized>
+                            @if (ScoreOverview is not null)
+                            {
+                                <EntryScoreOverview Model="ScoreOverview" />
+                            }
+                        </NotAuthorized>
+                    </AuthorizeView>
+                }
 
                 <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
                     Type="CommentType.CommentEntries"
@@ -137,6 +143,8 @@ else if (Model is not null)
                                       GetExternalLinkDescription="ExternalLinkHelper.GetExternalLinkDescription"
                                       DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
                 </EntrySection>
+
+                <EntryEditRecordCard Records="EditRecords" />
 
                 <EntryCatalogCard Folders="RelateFolders" />
             </aside>
@@ -252,6 +260,8 @@ else if (Model is not null)
                                               DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
                         </EntrySection>
 
+                        <EntryEditRecordCard Records="EditRecords" />
+
                         <EntryCatalogCard Folders="RelateFolders" />
                     </section>
 
@@ -271,9 +281,8 @@ else if (Model is not null)
 else
 {
     <section class="entry-loading" aria-label="加载中">
-        <div class="entry-loading-block"></div>
-        <div class="entry-loading-block entry-loading-block--wide"></div>
-        <div class="entry-loading-block"></div>
+        <CgProgressRing Size="lg" Color="var(--cg-color-primary)" />
+        <span class="entry-loading-text">加载中...</span>
     </section>
 }
 
@@ -285,15 +294,29 @@ else
     private PlayedGameOverviewViewModel? ScoreOverview;
     private GameOverviewPeripheryListModel? PeripheryOverview;
     private IReadOnlyList<FavoriteFolderOverviewModel>? RelateFolders;
+    private IReadOnlyList<ExaminedNormalListModel>? EditRecords;
     private string? ErrorMessage;
 
     protected override async Task OnParametersSetAsync()
     {
-        // 并行请求词条详情、评分概览、周边概览、相关目录
+        if (Model?.Id == Id)
+        {
+            return;
+        }
+
+        Model = null;
+        ScoreOverview = null;
+        PeripheryOverview = null;
+        RelateFolders = null;
+        EditRecords = null;
+        ErrorMessage = null;
+
+        // 并行请求词条详情、周边概览、相关目录、编辑记录
+        // 注意：评分概览仅对游戏类型有效，延迟到确认类型后再请求
         var entryTask = EntryQueryService.GetEntryDetailAsync(Id);
-        var scoreTask = PlayedGameQueryService.GetOverviewAsync(Id);
         var peripheryTask = PeripheryQueryService.GetEntryOverviewPeripheriesAsync(Id);
         var catalogTask = FavoriteFolderQueryService.GetRelateFavoriteFoldersAsync(FavoriteObjectType.Entry, Id);
+        var editRecordsTask = ExamineQueryService.GetEntryEditRecordsAsync(Id);
 
         var result = await entryTask;
         if (result.Success && result.Data is not null)
@@ -304,7 +327,7 @@ else
             // 仅游戏类词条加载评分概览
             if (Model.Type == EntryType.Game)
             {
-                var scoreResult = await scoreTask;
+                var scoreResult = await PlayedGameQueryService.GetOverviewAsync(Id);
                 ScoreOverview = scoreResult.Success ? scoreResult.Data : null;
             }
             else
@@ -320,6 +343,10 @@ else
             var catalogResult = await catalogTask;
             RelateFolders = catalogResult.Success ? catalogResult.Data : null;
 
+            // 加载编辑记录
+            var editRecordsResult = await editRecordsTask;
+            EditRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
+
             return;
         }
 
@@ -327,6 +354,7 @@ else
         ScoreOverview = null;
         PeripheryOverview = null;
         RelateFolders = null;
+        EditRecords = null;
         ErrorMessage = result.Error?.Message ?? "请稍后重试";
     }
 

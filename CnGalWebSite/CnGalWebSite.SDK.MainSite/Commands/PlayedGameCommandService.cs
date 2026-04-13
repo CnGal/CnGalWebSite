@@ -2,6 +2,8 @@ using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
@@ -9,6 +11,8 @@ namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class PlayedGameCommandService(
     HttpClient httpClient,
+    IMemoryCache memoryCache,
+    IHttpContextAccessor httpContextAccessor,
     ILogger<PlayedGameCommandService> logger) : CommandServiceBase(httpClient), IPlayedGameCommandService
 {
     protected override ILogger Logger => logger;
@@ -53,6 +57,7 @@ public sealed class PlayedGameCommandService(
                 return SdkResult<bool>.Fail("PLAYED_GAME_SAVE_FAILED", result.Error ?? "保存游玩记录失败");
             }
 
+            InvalidatePlayedGameCaches(model.GameId);
             return SdkResult<bool>.Ok(true);
         }
         catch (HttpRequestException ex)
@@ -89,6 +94,7 @@ public sealed class PlayedGameCommandService(
                 return SdkResult<bool>.Fail("PLAYED_GAME_HIDDEN_FAILED", result.Error ?? "修改隐藏状态失败");
             }
 
+            InvalidatePlayedGameCaches(gameId);
             return SdkResult<bool>.Ok(true);
         }
         catch (HttpRequestException ex)
@@ -101,6 +107,16 @@ public sealed class PlayedGameCommandService(
         {
             logger.LogError(ex, "修改游玩记录隐藏状态异常。GameId={GameId}; BaseAddress={BaseAddress}", gameId, HttpClient.BaseAddress);
             return SdkResult<bool>.Fail("PLAYED_GAME_HIDDEN_EXCEPTION", "修改隐藏状态时发生异常");
+        }
+    }
+
+    private void InvalidatePlayedGameCaches(int gameId)
+    {
+        memoryCache.Remove($"main-site:played-game-overview:{gameId}");
+        var userId = httpContextAccessor.HttpContext?.User.FindFirst("sub")?.Value;
+        if (!string.IsNullOrEmpty(userId))
+        {
+            memoryCache.Remove($"main-site:user-game-records:{userId}");
         }
     }
 }

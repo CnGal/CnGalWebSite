@@ -1,0 +1,282 @@
+@using CnGalWebSite.DataModel.ViewModel.Admin
+@using CnGalWebSite.DataModel.Model
+
+@inject IExamineCommandService ExamineCommandService
+@inject ICgToastService ToastService
+
+@* 审核详情面板 — 展示单条审核记录的详细内容与管理员操作区 *@
+
+<div class="examine-detail-panel">
+    @* ── 基本信息 ── *@
+    <div class="examine-detail-panel__info-grid">
+        <div class="examine-detail-panel__info-item">
+            <span class="examine-detail-panel__info-label">审核 ID</span>
+            <span class="examine-detail-panel__info-value">@Model.Id</span>
+        </div>
+        <div class="examine-detail-panel__info-item">
+            <span class="examine-detail-panel__info-label">操作类型</span>
+            <span class="examine-detail-panel__info-value">@Model.Operation.GetDisplayName()</span>
+        </div>
+        <div class="examine-detail-panel__info-item">
+            <span class="examine-detail-panel__info-label">状态</span>
+            <span class="examine-detail-panel__info-value">
+                <ExamineStatusBadge IsPassed="@Model.IsPassed" />
+            </span>
+        </div>
+        <div class="examine-detail-panel__info-item">
+            <span class="examine-detail-panel__info-label">申请人</span>
+            <a class="examine-detail-panel__info-link" href="/space/index/@Model.UserId">@(Model.UserName ?? "—")</a>
+        </div>
+        <div class="examine-detail-panel__info-item">
+            <span class="examine-detail-panel__info-label">申请时间</span>
+            <span class="examine-detail-panel__info-value">@Model.ApplyTime.ToString("yyyy-MM-dd HH:mm")</span>
+        </div>
+        @if (Model.PassedTime.HasValue)
+        {
+            <div class="examine-detail-panel__info-item">
+                <span class="examine-detail-panel__info-label">处理时间</span>
+                <span class="examine-detail-panel__info-value">@Model.PassedTime.Value.ToString("yyyy-MM-dd HH:mm")</span>
+            </div>
+        }
+        @if (!string.IsNullOrWhiteSpace(Model.PassedAdminName))
+        {
+            <div class="examine-detail-panel__info-item">
+                <span class="examine-detail-panel__info-label">处理人</span>
+                <span class="examine-detail-panel__info-value">@Model.PassedAdminName</span>
+            </div>
+        }
+        @if (Model.PrepositionExamineId > 0)
+        {
+            <div class="examine-detail-panel__info-item">
+                <span class="examine-detail-panel__info-label">前置审核</span>
+                <a class="examine-detail-panel__info-link" href="/examine?Id=@Model.PrepositionExamineId">
+                    #@Model.PrepositionExamineId
+                </a>
+            </div>
+        }
+    </div>
+
+    @* ── 对象链接 ── *@
+    @if (!string.IsNullOrWhiteSpace(Model.ObjectName))
+    {
+        <div class="examine-detail-panel__object-card">
+            @if (!string.IsNullOrWhiteSpace(Model.Image))
+            {
+                <img class="examine-detail-panel__object-image" src="@Model.Image" alt="@Model.ObjectName" loading="lazy" />
+            }
+            <div class="examine-detail-panel__object-info">
+                <h3 class="examine-detail-panel__object-name">@Model.ObjectName</h3>
+                @if (!string.IsNullOrWhiteSpace(Model.ObjectBriefIntroduction))
+                {
+                    <p class="examine-detail-panel__object-desc">@Model.ObjectBriefIntroduction</p>
+                }
+                <a class="examine-detail-panel__object-link" href="@GetObjectUrl()">
+                    <CgMdiIcon Name="mdiOpenInNew" aria-hidden="true"/>
+                    查看详情
+                </a>
+            </div>
+        </div>
+    }
+
+    @* ── 编辑概览 ── *@
+    @if (!string.IsNullOrWhiteSpace(Model.EditOverview))
+    {
+        <section class="examine-detail-panel__section">
+            <h4 class="examine-detail-panel__section-title">
+                <CgMdiIcon Name="mdiTextBoxOutline" aria-hidden="true" />
+                编辑概览
+            </h4>
+            <div class="examine-detail-panel__section-body">
+                <CgHtmlContent Content="@Model.EditOverview" />
+            </div>
+        </section>
+    }
+
+    @* ── 批注 ── *@
+    @if (!string.IsNullOrWhiteSpace(Model.Comments))
+    {
+        <section class="examine-detail-panel__section examine-detail-panel__section--comments">
+            <h4 class="examine-detail-panel__section-title">
+                <CgMdiIcon Name="mdiCommentTextOutline" aria-hidden="true" />
+                批注
+            </h4>
+            <div class="examine-detail-panel__section-body">
+                <p class="examine-detail-panel__text-block">@Model.Comments</p>
+            </div>
+        </section>
+    }
+
+    @* ── 备注 ── *@
+    @if (!string.IsNullOrWhiteSpace(Model.Note))
+    {
+        <section class="examine-detail-panel__section">
+            <h4 class="examine-detail-panel__section-title">
+                <CgMdiIcon Name="mdiNoteTextOutline" aria-hidden="true" />
+                备注
+            </h4>
+            <div class="examine-detail-panel__section-body">
+                <p class="examine-detail-panel__text-block">@Model.Note</p>
+            </div>
+        </section>
+    }
+
+    @* ── 前置审核警告 ── *@
+    @if (Model.PrepositionExamineId > 0 && Model.IsPassed == null)
+    {
+        <div class="examine-detail-panel__preposition-alert">
+            <CgMdiIcon Name="mdiAlertOutline" aria-hidden="true" />
+            <span>当前审核拥有一个前置审核，请先</span>
+            <a href="/examine?Id=@Model.PrepositionExamineId">审核前置审核 #@Model.PrepositionExamineId</a>
+        </div>
+    }
+
+    @* ── 修改前/修改后对比 ── *@
+    @if (HasBeforeOrAfterData())
+    {
+        <section class="examine-detail-panel__contrast">
+            <div class="examine-detail-panel__contrast-column">
+                <h4 class="examine-detail-panel__contrast-title examine-detail-panel__contrast-title--before">
+                    <CgMdiIcon Name="mdiFileRestoreOutline" aria-hidden="true" />
+                    @(Model.IsPassed == null ? "修改前" : "编辑后")
+                </h4>
+                <ExaminePreDataView Model="@Model.BeforeModel" />
+            </div>
+            <div class="examine-detail-panel__contrast-column">
+                <h4 class="examine-detail-panel__contrast-title examine-detail-panel__contrast-title--after">
+                    <CgMdiIcon Name="mdiFileDocumentCheckOutline" aria-hidden="true" />
+                    @(Model.IsPassed == null ? "修改后" : "当前状态")
+                </h4>
+                <ExaminePreDataView Model="@Model.AfterModel" />
+            </div>
+        </section>
+    }
+
+    @* ── 敏感词列表 ── *@
+    @if (Model.SensitiveWords is { Count: > 0 })
+    {
+        <section class="examine-detail-panel__section examine-detail-panel__section--sensitive">
+            <h4 class="examine-detail-panel__section-title">
+                <CgMdiIcon Name="mdiShieldAlertOutline" aria-hidden="true" />
+                敏感词检测 (@Model.SensitiveWords.Count)
+            </h4>
+            <div class="examine-detail-panel__section-body">
+                <div class="examine-detail-panel__sensitive-words">
+                    @foreach (var word in Model.SensitiveWords)
+                    {
+                        <span class="examine-detail-panel__sensitive-word">@word</span>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+
+    @* ── 贡献值 ── *@
+    @if (Model.ContributionValue > 0)
+    {
+        <div class="examine-detail-panel__contribution">
+            <CgMdiIcon Name="mdiStarOutline" aria-hidden="true" />
+            <span>附加贡献值：<strong>@Model.ContributionValue</strong></span>
+        </div>
+    }
+
+    @* ── 编辑记录链接 ── *@
+    @if (Model.IsPassed == true)
+    {
+        <div class="examine-detail-panel__edit-record-link">
+            <a href="/home/editrecord?ContrastId=@Model.Id&CurrentId=0" class="cg-btn cg-btn--secondary">
+                <CgMdiIcon Name="mdiHistory" aria-hidden="true" />
+                查看编辑记录
+            </a>
+        </div>
+    }
+
+    @* ── 管理员操作区 ── *@
+    @if (Model.IsAdmin && Model.IsPassed == null)
+    {
+        <section class="examine-detail-panel__admin-actions">
+            <h4 class="examine-detail-panel__section-title">
+                <CgMdiIcon Name="mdiShieldCheckOutline" aria-hidden="true" />
+                审核操作
+            </h4>
+            <div class="examine-detail-panel__action-body">
+                <div class="examine-detail-panel__action-input">
+                    <label for="examine-comments">批注</label>
+                    <CgTextarea @bind-Value="_comments" Placeholder="可选，输入审核批注..." />
+                </div>
+                <div class="examine-detail-panel__action-buttons">
+                    <CgButton Variant="primary" OnClick="() => HandleProc(true)" Disabled="_processing">
+                        <CgMdiIcon Name="mdiCheck" aria-hidden="true" />
+                        通过
+                    </CgButton>
+                    <CgButton Variant="danger" OnClick="() => HandleProc(false)" Disabled="_processing">
+                        <CgMdiIcon Name="mdiClose" aria-hidden="true" />
+                        驳回
+                    </CgButton>
+                </div>
+            </div>
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public ExamineViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnProcCompleted { get; set; }
+
+    private string _comments = "";
+    private bool _processing;
+
+    private string? GetObjectUrl()
+    {
+        return Model.Type switch
+        {
+            ExaminedNormalListModelType.Entry => $"/entries/index/{Model.ObjectId}",
+            ExaminedNormalListModelType.Article => $"/articles/index/{Model.ObjectId}",
+            ExaminedNormalListModelType.Periphery => $"/peripheries/index/{Model.ObjectId}",
+            ExaminedNormalListModelType.Tag => $"/tags/index/{Model.ObjectId}",
+            ExaminedNormalListModelType.Video => $"/videos/index/{Model.ObjectId}",
+            _ => null
+        };
+    }
+
+    private bool HasBeforeOrAfterData()
+    {
+        return HasData(Model.BeforeModel) || HasData(Model.AfterModel);
+
+        static bool HasData(ExaminePreDataModel? m)
+        {
+            if (m is null) return false;
+            return !string.IsNullOrWhiteSpace(m.MainPage)
+                   || m.Pictures.Count > 0
+                   || m.Texts.Count > 0
+                   || m.Relevances.Count > 0
+                   || m.Outlinks.Count > 0
+                   || m.Audio.Count > 0;
+        }
+    }
+
+    private async Task HandleProc(bool isPassed)
+    {
+        _processing = true;
+        StateHasChanged();
+
+        var label = isPassed ? "通过" : "驳回";
+        var result = await ExamineCommandService.ProcExamineAsync(Model.Id, isPassed, _comments);
+
+        if (result.Success)
+        {
+            ToastService.Show($"审核{label}成功", variant: "success");
+            Model.IsPassed = isPassed;
+            Model.Comments = _comments;
+            await OnProcCompleted.InvokeAsync();
+        }
+        else
+        {
+            ToastService.Show($"审核{label}失败", result.Error?.Message, "error");
+        }
+
+        _processing = false;
+    }
+}

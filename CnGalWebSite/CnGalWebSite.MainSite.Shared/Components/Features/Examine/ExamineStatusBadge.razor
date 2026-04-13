@@ -1,0 +1,32 @@
+@* 审核状态标签：已通过 / 未通过 / 待审核 *@
+
+<span class="examine-status-badge @GetVariantClass()">
+    <CgMdiIcon Name="@GetIconName()" class="examine-status-badge__icon" aria-hidden="true" />
+    <span>@GetText()</span>
+</span>
+
+@code {
+    [Parameter]
+    public bool? IsPassed { get; set; }
+
+    private string GetVariantClass() => IsPassed switch
+    {
+        true => "examine-status-badge--passed",
+        false => "examine-status-badge--rejected",
+        null => "examine-status-badge--pending"
+    };
+
+    private string GetIconName() => IsPassed switch
+    {
+        true => "mdiCheckBold",
+        false => "mdiAlertCircle",
+        null => "mdiClockOutline"
+    };
+
+    private string GetText() => IsPassed switch
+    {
+        true => "已通过",
+        false => "未通过",
+        null => "待审核"
+    };
+}

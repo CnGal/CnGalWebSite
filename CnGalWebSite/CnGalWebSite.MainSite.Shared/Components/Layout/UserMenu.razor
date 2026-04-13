@@ -65,6 +65,18 @@
                     <span class="cg-badge cg-badge--inline" aria-label="@($"{_unreadCount} 条未读")">@FormatBadge(_unreadCount)</span>
                 }
             </a>
+            <a class="cg-menu-item" href="/usercenter">
+                <span class="cg-menu-item__icon cg-menu-item__icon--teal">
+                    <CgMdiIcon Name="mdiViewDashboardOutline" aria-hidden="true" />
+                </span>
+                <span class="cg-menu-item__text">内容中心</span>
+            </a>
+            <a class="cg-menu-item" href="/tasks">
+                <span class="cg-menu-item__icon cg-menu-item__icon--emerald">
+                    <CgMdiIcon Name="mdiClipboardCheckOutline" aria-hidden="true" />
+                </span>
+                <span class="cg-menu-item__text">每日任务</span>
+            </a>
             <AuthorizeView Roles="Admin">
                 <Authorized>
                     <a class="cg-menu-item" href="/admin">

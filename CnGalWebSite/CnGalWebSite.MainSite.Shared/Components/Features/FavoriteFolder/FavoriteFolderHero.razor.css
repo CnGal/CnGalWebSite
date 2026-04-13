@@ -1,7 +1,7 @@
-/* ── Hero 容器 —— 对齐 .entry-hero ── */
+/* ── Hero 容器 —�?对齐 .entry-hero ── */
 .cg-ff-hero {
     border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
-    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    background: var(--cg-color-surface);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: var(--cg-radius-xl);
@@ -13,7 +13,7 @@
     align-items: center;
 }
 
-/* ── 封面区 ── */
+/* ── 封面�?── */
 .cg-ff-hero-side {
     display: flex;
     flex-direction: column;
@@ -51,7 +51,7 @@
     opacity: 0.4;
 }
 
-/* ── 信息区 ── */
+/* ── 信息�?── */
 .cg-ff-hero-main {
     display: flex;
     flex-direction: column;
@@ -109,7 +109,7 @@
     font-size: 0.95rem;
 }
 
-/* ── 标签芯片 —— 对齐 .entry-people-chips ── */
+/* ── 标签芯片 —�?对齐 .entry-people-chips ── */
 .cg-ff-hero-chips {
     display: flex;
     flex-wrap: wrap;
@@ -145,7 +145,7 @@
     object-fit: cover;
 }
 
-/* ── 操作按钮 —— 对齐 .entry-edit-btn ── */
+/* ── 操作按钮 —�?对齐 .entry-edit-btn ── */
 .cg-ff-hero-actions {
     display: flex;
     gap: 0.5rem;
@@ -176,7 +176,7 @@
     height: 16px;
 }
 
-/* ── 响应式 ── */
+/* ── 响应�?── */
 @media (min-width: 768px) {
     .cg-ff-hero {
         gap: 2.5rem;

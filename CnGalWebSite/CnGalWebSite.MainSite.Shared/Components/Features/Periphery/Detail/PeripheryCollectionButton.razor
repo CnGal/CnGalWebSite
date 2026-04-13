@@ -1,0 +1,73 @@
+@rendermode InteractiveServer
+@inject IPeripheryCommandService PeripheryCommandService
+@inject ICgToastService ToastService
+
+<button class="periphery-collect-btn @(_isCollected ? "periphery-collect-btn--active" : "")"
+        @onclick="ToggleCollectionAsync"
+        disabled="@_isLoading"
+        title="@(_isCollected ? "取消收集" : "收集周边")"
+        aria-label="@(_isCollected ? "取消收集" : "收集周边")">
+    @if (_isLoading)
+    {
+        <CgMdiIcon Name="mdiLoading" Class="periphery-collect-btn-spin" />
+    }
+    else
+    {
+        <CgMdiIcon Name="@(_isCollected ? "mdiBasket" : "mdiBasketPlusOutline")" />
+    }
+    <span>@(_isCollected ? "已收集" : "收集")</span>
+</button>
+
+@code {
+    [Parameter]
+    public long PeripheryId { get; set; }
+
+    private bool _isCollected;
+    private bool _isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var result = await PeripheryCommandService.CheckIsCollectedAsync(PeripheryId);
+            _isCollected = result.Success && result.Data;
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleCollectionAsync()
+    {
+        if (_isLoading) return;
+        _isLoading = true;
+
+        if (_isCollected)
+        {
+            var result = await PeripheryCommandService.UnCollectAsync(PeripheryId);
+            if (result.Success)
+            {
+                _isCollected = false;
+                ToastService.Show("已取消收集", null, "success");
+            }
+            else
+            {
+                ToastService.Show(result.Error?.Message ?? "取消收集失败", null, "error");
+            }
+        }
+        else
+        {
+            var result = await PeripheryCommandService.CollectAsync(PeripheryId);
+            if (result.Success)
+            {
+                _isCollected = true;
+                ToastService.Show("已收集该周边", null, "success");
+            }
+            else
+            {
+                ToastService.Show(result.Error?.Message ?? "收集失败", null, "error");
+            }
+        }
+
+        _isLoading = false;
+    }
+}

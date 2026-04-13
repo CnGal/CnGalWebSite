@@ -1,6 +1,6 @@
 .entry-hero {
     border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
-    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    background: var(--cg-color-surface);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: var(--cg-radius-xl);

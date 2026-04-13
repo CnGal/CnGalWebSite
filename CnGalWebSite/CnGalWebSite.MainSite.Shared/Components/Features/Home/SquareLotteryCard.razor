@@ -1,0 +1,48 @@
+<li>
+    <a href="@($"/lotteries/index/{Model.Id}")" class="square-lottery-card">
+        @if (!string.IsNullOrWhiteSpace(Model.MainPicture))
+        {
+            <figure class="square-lottery-card-image-wrapper">
+                <img src="@Model.MainPicture" alt="@Model.Name" loading="lazy" decoding="async" />
+            </figure>
+        }
+
+        <div class="square-lottery-card-body">
+            <div class="square-lottery-card-header">
+                <h3 class="square-lottery-card-title">@Model.Name</h3>
+                <span class="square-lottery-card-badge square-lottery-card-badge--@StatusCss">
+                    <CgMdiIcon Name="@StatusIcon" aria-hidden="true" />
+                    @StatusText
+                </span>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.BriefIntroduction))
+            {
+                <p class="square-lottery-card-desc">@Model.BriefIntroduction</p>
+            }
+
+            <div class="square-lottery-card-meta">
+                <span class="square-lottery-card-meta-item">
+                    <CgMdiIcon Name="mdiAccountGroup" aria-hidden="true" />
+                    @Model.Count 人参与
+                </span>
+                <span class="square-lottery-card-meta-item">
+                    <CgMdiIcon Name="mdiCalendarClock" aria-hidden="true" />
+                    @Model.EndTime.ToString("yyyy年M月d日")
+                </span>
+            </div>
+        </div>
+    </a>
+</li>
+
+@code {
+    [Parameter, EditorRequired]
+    public LotteryCardItemModel Model { get; set; } = default!;
+
+    private bool IsEnded => Model.IsEnd || DateTime.Now > Model.EndTime;
+    private bool IsUpcoming => DateTime.Now < Model.BeginTime;
+
+    private string StatusText => IsEnded ? "已结束" : (IsUpcoming ? "未开始" : "进行中");
+    private string StatusCss => IsEnded ? "ended" : (IsUpcoming ? "upcoming" : "active");
+    private string StatusIcon => IsEnded ? "mdiCheckCircleOutline" : (IsUpcoming ? "mdiClockOutline" : "mdiPlayCircleOutline");
+}

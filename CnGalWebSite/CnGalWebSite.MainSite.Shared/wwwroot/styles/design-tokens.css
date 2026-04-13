@@ -104,6 +104,27 @@
     --cg-color-badge-video-text: #b45309;
     --cg-color-badge-periphery: #d1fae5;
     --cg-color-badge-periphery-text: #065f46;
+
+    /* ── 断点约定（文档级，用于 @media 查询） ── */
+    /* sm: 640px   大手机/手机横屏 */
+    /* md: 768px   平板竖屏 */
+    /* lg: 1024px  平板横屏/小笔记本 */
+    /* xl: 1440px  桌面 */
+
+    /* ── 响应式间距（mobile-first 默认值） ── */
+    --cg-page-gutter: 1rem;
+    --cg-section-gap: 2rem;
+
+    /* ── 底部导航栏 ── */
+    --cg-bottom-nav-height: 56px;
+}
+
+@media (min-width: 768px) {
+    :root {
+        --cg-page-gutter: 2.5rem;
+        --cg-section-gap: 3rem;
+        --cg-bottom-nav-height: 0px;
+    }
 }
 
 /* ── 全局重置 ── */

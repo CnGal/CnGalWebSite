@@ -130,4 +130,44 @@ public sealed class SpaceCommandService(
             return SdkResult<string>.Fail("MESSAGE_READ_ALL_EXCEPTION", "标记消息已读时发生异常");
         }
     }
+
+    public async Task<SdkResult<string>> SignInAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await GetFromJsonAsync<Result>("api/space/signIn", cancellationToken);
+
+            if (result is { Successful: true })
+            {
+                return SdkResult<string>.Ok("签到成功");
+            }
+
+            return SdkResult<string>.Fail("SIGN_IN_FAILED", result?.Error ?? "签到失败");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "每日签到异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
+            return SdkResult<string>.Fail("SIGN_IN_EXCEPTION", "签到时发生异常");
+        }
+    }
+
+    public async Task<SdkResult<string>> MakeUserOnlineAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await GetFromJsonAsync<Result>("api/account/MakeUserOnline", cancellationToken);
+
+            if (result is { Successful: true })
+            {
+                return SdkResult<string>.Ok("在线状态已更新");
+            }
+
+            return SdkResult<string>.Fail("MAKE_ONLINE_FAILED", result?.Error ?? "更新在线状态失败");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "更新在线状态异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
+            return SdkResult<string>.Fail("MAKE_ONLINE_EXCEPTION", "更新在线状态时发生异常");
+        }
+    }
 }

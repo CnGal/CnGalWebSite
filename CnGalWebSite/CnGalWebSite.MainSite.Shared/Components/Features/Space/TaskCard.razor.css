@@ -1,0 +1,143 @@
+/* ── TaskCard ── */
+
+.task-card {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-4);
+    padding: var(--cg-spacing-4) var(--cg-spacing-5);
+    border-radius: var(--cg-radius-lg);
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    transition: box-shadow var(--cg-transition-fast), border-color var(--cg-transition-fast);
+}
+
+.task-card:hover {
+    box-shadow: var(--cg-shadow-md);
+    border-color: color-mix(in oklab, var(--cg-color-primary) 30%, var(--cg-color-border));
+}
+
+.task-card--finished {
+    background: var(--cg-color-bg);
+}
+
+.task-card--finished:hover {
+    box-shadow: none;
+    border-color: var(--cg-color-border);
+}
+
+/* ── Icon ── */
+
+.task-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--cg-radius-md);
+    background: color-mix(in oklab, var(--cg-color-primary) 12%, transparent);
+    flex-shrink: 0;
+}
+
+.task-card__icon ::deep .cg-mdi-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--cg-color-primary);
+}
+
+.task-card--finished .task-card__icon {
+    background: color-mix(in oklab, var(--cg-color-success) 12%, transparent);
+}
+
+.task-card--finished .task-card__icon ::deep .cg-mdi-icon {
+    color: var(--cg-color-success);
+}
+
+/* ── Body ── */
+
+.task-card__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.task-card__title {
+    margin: 0;
+    font-size: var(--cg-font-size-base);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    line-height: 1.4;
+}
+
+.task-card__desc {
+    margin: var(--cg-spacing-1) 0 0;
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    line-height: 1.4;
+}
+
+.task-card__reward {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    margin-top: var(--cg-spacing-2);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-primary);
+}
+
+.task-card__reward ::deep .cg-mdi-icon {
+    width: 14px;
+    height: 14px;
+}
+
+/* ── Action ── */
+
+.task-card__action {
+    flex-shrink: 0;
+}
+
+.task-card__action ::deep .cg-btn {
+    white-space: nowrap;
+}
+
+.task-card__done-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-success);
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    border-radius: var(--cg-radius-full);
+    background: color-mix(in oklab, var(--cg-color-success) 10%, transparent);
+}
+
+.task-card__done-badge ::deep .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 640px) {
+    .task-card {
+        flex-wrap: wrap;
+        gap: var(--cg-spacing-3);
+        padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    }
+
+    .task-card__icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .task-card__icon ::deep .cg-mdi-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .task-card__action {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+}

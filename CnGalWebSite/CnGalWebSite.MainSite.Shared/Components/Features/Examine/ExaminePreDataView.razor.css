@@ -1,0 +1,210 @@
+/* ═══════════════════════════════════════════════════
+   ExaminePreDataView — 审核修改前/后数据展示
+   ═══════════════════════════════════════════════════ */
+
+.examine-pre-data-view {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+}
+
+/* ── Section ── */
+.examine-pre-data-view__section {
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--cg-shadow-sm);
+    transition: box-shadow var(--cg-transition-fast);
+}
+
+.examine-pre-data-view__section:hover {
+    box-shadow: var(--cg-shadow-md);
+}
+
+.examine-pre-data-view__section-title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    margin: 0;
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    border-bottom: 1px solid var(--cg-color-border);
+    background: linear-gradient(135deg,
+        color-mix(in srgb, var(--cg-color-surface) 60%, var(--cg-color-bg) 40%),
+        color-mix(in srgb, var(--cg-color-surface) 80%, var(--cg-color-bg) 20%));
+}
+
+::deep .examine-pre-data-view__section-title .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--cg-color-primary);
+}
+
+.examine-pre-data-view__section-body {
+    padding: var(--cg-spacing-3);
+    max-height: 400px;
+    overflow-y: auto;
+    font-size: var(--cg-font-size-sm);
+    line-height: 1.6;
+}
+
+.examine-pre-data-view__group-title {
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-muted);
+    padding: var(--cg-spacing-2) 0 var(--cg-spacing-1);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ── Table ── */
+.examine-pre-data-view__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--cg-font-size-xs);
+}
+
+.examine-pre-data-view__table th,
+.examine-pre-data-view__table td {
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    text-align: left;
+    border-bottom: 1px solid var(--cg-color-border);
+    word-break: break-word;
+}
+
+.examine-pre-data-view__table th {
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-muted);
+    background: color-mix(in srgb, var(--cg-color-bg) 50%, var(--cg-color-surface) 50%);
+}
+
+.examine-pre-data-view__table td {
+    color: var(--cg-color-text);
+}
+
+.examine-pre-data-view__table tbody tr {
+    transition: background var(--cg-transition-fast);
+}
+
+.examine-pre-data-view__table tbody tr:nth-child(even) {
+    background: color-mix(in srgb, var(--cg-color-bg) 30%, transparent);
+}
+
+.examine-pre-data-view__table tbody tr:hover {
+    background: var(--cg-color-hover-overlay);
+}
+
+/* ── Image Grid ── */
+.examine-pre-data-view__image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--cg-spacing-2);
+}
+
+.examine-pre-data-view__image-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.examine-pre-data-view__image-item img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--cg-radius-md);
+    border: 1px solid var(--cg-color-border);
+    transition: transform var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
+}
+
+.examine-pre-data-view__image-item img:hover {
+    transform: scale(1.05);
+    box-shadow: var(--cg-shadow-md);
+}
+
+.examine-pre-data-view__image-note {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Tag List ── */
+.examine-pre-data-view__tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-1);
+}
+
+.examine-pre-data-view__tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--cg-spacing-2);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-primary);
+    background: color-mix(in srgb, var(--cg-color-primary) 8%, transparent);
+    border-radius: var(--cg-radius-full);
+    border: 1px solid color-mix(in srgb, var(--cg-color-primary) 18%, transparent);
+    transition: background var(--cg-transition-fast), border-color var(--cg-transition-fast);
+}
+
+.examine-pre-data-view__tag:hover {
+    background: color-mix(in srgb, var(--cg-color-primary) 15%, transparent);
+    border-color: color-mix(in srgb, var(--cg-color-primary) 30%, transparent);
+}
+
+/* ── Audio ── */
+.examine-pre-data-view__audio-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-2) 0;
+    border-bottom: 1px solid var(--cg-color-border);
+    font-size: var(--cg-font-size-xs);
+    transition: background var(--cg-transition-fast);
+}
+
+.examine-pre-data-view__audio-item:hover {
+    background: var(--cg-color-hover-overlay);
+}
+
+.examine-pre-data-view__audio-item:last-child {
+    border-bottom: none;
+}
+
+.examine-pre-data-view__audio-item a {
+    color: var(--cg-color-link);
+    text-decoration: none;
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-medium);
+    padding: 2px var(--cg-spacing-2);
+    border-radius: var(--cg-radius-full);
+    transition: background var(--cg-transition-fast);
+}
+
+.examine-pre-data-view__audio-item a:hover {
+    background: color-mix(in srgb, var(--cg-color-primary) 8%, transparent);
+    text-decoration: none;
+}
+
+/* ── Empty ── */
+.examine-pre-data-view__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-6);
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+}
+
+::deep .examine-pre-data-view__empty .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+}

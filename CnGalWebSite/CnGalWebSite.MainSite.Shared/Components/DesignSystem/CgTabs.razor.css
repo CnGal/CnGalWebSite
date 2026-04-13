@@ -34,6 +34,8 @@
     cursor: pointer;
     user-select: none;
     font-family: var(--cg-font-family);
+    text-decoration: none;
+    color: inherit;
     transition: color var(--cg-transition-fast),
                 background-color var(--cg-transition-fast),
                 box-shadow var(--cg-transition-fast);
@@ -62,6 +64,12 @@
 .cg-tabs__panel {
     display: none;
 }
+
+/* ── Link mode: active panel always visible ── */
+.cg-tabs__panel--active {
+    display: block;
+}
+
 
 /* ═══════════════════════════════════════════════
    Variant: pill（药丸填充）
@@ -233,6 +241,43 @@
 .cg-tabs > .cg-tabs__radio:nth-of-type(9):checked ~ .cg-tabs__panel:nth-of-type(9),
 .cg-tabs > .cg-tabs__radio:nth-of-type(10):checked ~ .cg-tabs__panel:nth-of-type(10) {
     display: block;
+}
+
+/* ═══════════════════════════════════════════════
+   Link mode: class-based active tab styles
+   Must come AFTER variant base styles for correct cascade
+   ═══════════════════════════════════════════════ */
+
+/* ── Pill variant: link-mode active ── */
+.cg-tabs--pill .cg-tabs__tab--active {
+    background-color: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.cg-tabs--pill .cg-tabs__tab--active:hover {
+    background-color: var(--cg-color-primary-hover);
+    color: var(--cg-color-on-primary);
+}
+
+.cg-tabs--pill .cg-tabs__tab--active .cg-tabs__badge {
+    background-color: color-mix(in oklab, var(--cg-color-on-primary) 25%, transparent);
+    color: var(--cg-color-on-primary);
+}
+
+/* ── Underline variant: link-mode active ── */
+.cg-tabs--underline .cg-tabs__tab--active,
+.cg-tabs--underline .cg-tabs__tab--active:hover {
+    color: var(--cg-color-primary);
+}
+
+.cg-tabs--underline .cg-tabs__tab--active::after {
+    transform: scaleX(1);
+}
+
+.cg-tabs--underline .cg-tabs__tab--active .cg-tabs__badge {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 15%, transparent);
+    color: var(--cg-color-primary);
 }
 
 /* ═══════════════════════════════════════════════

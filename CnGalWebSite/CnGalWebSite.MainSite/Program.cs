@@ -1,4 +1,4 @@
-using CnGalWebSite.HealthCheck.Models;
+﻿using CnGalWebSite.HealthCheck.Models;
 using CnGalWebSite.MainSite.Components;
 using CnGalWebSite.MainSite.Shared;
 using CnGalWebSite.SDK.MainSite.Extensions;
@@ -13,7 +13,18 @@ var taskApiBaseAddress = builder.Configuration["MainSiteApi:TaskApiPath"];
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents(options =>
+    {
+        // 将真实异常信息发送到客户端浏览器控制台
+        options.DetailedErrors = true;
+    });
+// 增大 SignalR 消息上限，避免 Blazor 渲染批次过大导致断连循环
+// 默认 32KB 不足以承载页面初始渲染，提升至 512KB
+builder.Services.AddSignalR(options =>
+{
+    options.MaximumReceiveMessageSize = 512 * 1024; // 512 KB
+});
+
 builder.Services.AddMainSiteOidcAuthentication(builder.Configuration);
 builder.Services.AddMainSiteSdk(apiBaseAddress!, imageApiBaseAddress!, taskApiBaseAddress!);
 builder.Services.AddMainSiteSharedServices();
@@ -39,6 +50,20 @@ if (!app.Environment.IsDevelopment())
 
 }
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+
+// 拒绝 Content-Type 为空或不合法的 POST 请求，防止 Blazor SSR antiforgery 解析表单时崩溃
+// 排除 /_blazor（SignalR）等非页面端点
+app.Use(async (context, next) =>
+{
+    if (HttpMethods.IsPost(context.Request.Method)
+        && !context.Request.Path.StartsWithSegments("/_blazor")
+        && string.IsNullOrWhiteSpace(context.Request.ContentType))
+    {
+        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        return;
+    }
+    await next();
+});
 
 //转发Ip
 app.UseForwardedHeaders(new ForwardedHeadersOptions

@@ -4,12 +4,14 @@ using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.VideoEdit;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class VideoCommandService(
     HttpClient httpClient,
+    IMemoryCache memoryCache,
     ILogger<VideoCommandService> logger) : CommandServiceBase(httpClient), IVideoCommandService
 {
     protected override ILogger Logger => logger;
@@ -63,6 +65,8 @@ public sealed class VideoCommandService(
             };
 
             // 设置 Id 以便后续提交
+            model.Data.Id = id;
+            model.Data.Name = model.Data.Main.Name;
             model.Data.Main.Id = id;
             model.Data.Images.Id = id;
             model.Data.Relevances.Id = id;
@@ -123,6 +127,7 @@ public sealed class VideoCommandService(
 
                 if (result?.Successful == true && long.TryParse(result.Error, out var newId))
                 {
+                    InvalidateVideoCaches(newId);
                     return SdkResult<long>.Ok(newId);
                 }
 
@@ -152,6 +157,7 @@ public sealed class VideoCommandService(
                     return SdkResult<long>.Fail("VIDEO_EDIT_PARTIAL_FAILED", string.Join("；", errors));
                 }
 
+                InvalidateVideoCaches(request.Data.Main.Id);
                 return SdkResult<long>.Ok(request.Data.Main.Id);
             }
         }
@@ -165,5 +171,13 @@ public sealed class VideoCommandService(
     private Task<Result?> SubmitPartAsync<T>(string path, T model, CancellationToken cancellationToken)
     {
         return PostAsJsonAsync<T, Result>(path, model, cancellationToken);
+    }
+
+    private void InvalidateVideoCaches(long videoId)
+    {
+        memoryCache.Remove($"main-site:video-detail:{videoId}");
+        memoryCache.Remove($"main-site:video-edit-records:{videoId}");
+        memoryCache.Remove("main-site:user-content-center");
+        memoryCache.Remove("main-site:home-summary");
     }
 }

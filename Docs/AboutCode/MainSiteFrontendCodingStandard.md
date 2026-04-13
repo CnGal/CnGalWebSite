@@ -107,7 +107,7 @@
 
 - `Components/DesignSystem/`：基础组件（Button/Input/Modal/Pagination...），不包含业务术语，前缀 `Cg`。
 - `Components/Features/{Domain}/`：业务组件（如词条卡片、文章摘要、评分区），按领域分组。
-  - 当前领域：`Entry`（词条，含 `Detail/` 详情子目录与 `Editor/` 编辑子目录）、`Article`（文章，含 `Detail/` 与 `Editor/`）、`Video`（视频，含 `Detail/` 与 `Editor/`）、`Tag`（标签，含 `Detail/` 与 `Editor/`）、`Home`（首页）、`Space`（个人空间）。
+  - 当前领域：`Entry`（词条，含 `Detail/` 详情子目录与 `Editor/` 编辑子目录）、`Article`（文章，含 `Detail/` 与 `Editor/`）、`Video`（视频，含 `Detail/` 与 `Editor/`）、`Tag`（标签，含 `Detail/` 与 `Editor/`）、`Home`（首页）、`Space`（个人空间）、`Examine`（审核/编辑记录）、`Message`（消息）。
 - `Components/Layout/`：非全局壳的布局辅助组件（如 `UserMenu`）。
 - `Layout/`：全局壳与导航（`MainLayout`），不承载业务查询逻辑。
 
@@ -180,6 +180,22 @@
 - 组件样式中若需从父组件调整 `CgMdiIcon` 尺寸/颜色，需遵循 CSS 隔离规则，使用 `::deep .cg-mdi-icon` 进行穿透，避免样式失效。
 - 图标默认应标记 `aria-hidden="true"`；若图标承担语义信息，必须提供等价可读文本（可见文本或 `aria-label`）。
 
+### 5.6 响应式设计规范（MUST）
+
+- 统一使用 **mobile-first**（`min-width`）断点方向，从小屏写起、逐步增强。
+- 统一断点约定（定义在 `design-tokens.css` 注释中）：
+  - `sm`：`640px`（大手机/手机横屏）
+  - `md`：`768px`（平板竖屏）
+  - `lg`：`1024px`（平板横屏/小笔记本）
+  - `xl`：`1440px`（桌面）
+- **禁止使用 C# 条件渲染区分设备类型**（如旧站 `MiniModeContainer`），必须使用 CSS `@media` 查询实现响应式适配。
+- 页面级、组件级均需验证 **360px 最小宽度** 下的基本可用性。
+- 可交互元素最小触控区域 **44×44px**（遵循 WCAG 2.5.5）。
+- 布局网格、卡片列表等必须提供至少一个移动端断点的列数适配。
+- 间距使用 `--cg-page-gutter`、`--cg-section-gap` 等响应式 Token，禁止在页面/组件中硬编码与断点相关的重复 padding 值。
+- `MainLayout` 中 Footer 在移动端（`< 768px`）隐藏，底部导航栏仅在 `HomePage` 移动端显示。
+- 新增页面 PR 必须附带移动端视窗截图（至少 375px 宽度）。
+
 ---
 
 ## 6. 命名、目录与代码风格
@@ -187,15 +203,15 @@
 ### 6.1 目录规范（MUST）
 
 - `MainSite.Shared` 当前结构：
-  - `Pages/{Domain}/`（如 `Pages/Home/`、`Pages/Entry/`、`Pages/Article/`、`Pages/Video/`、`Pages/Tag/`、`Pages/Space/`）
+  - `Pages/{Domain}/`（如 `Pages/Home/`、`Pages/Entry/`、`Pages/Article/`、`Pages/Video/`、`Pages/Tag/`、`Pages/Space/`、`Pages/Examine/`、`Pages/Message/`、`Pages/UserCenter/`）
   - `Layout/`（`MainLayout`）
   - `Components/DesignSystem/`（基础组件）
-  - `Components/Features/{Domain}/`（业务组件，如 `Entry/Detail/`、`Entry/Editor/`、`Article/Detail/`、`Article/Editor/`、`Video/Detail/`、`Video/Editor/`、`Tag/Detail/`、`Tag/Editor/`、`Home/`、`Space/`）
+  - `Components/Features/{Domain}/`（业务组件，如 `Entry/Detail/`、`Entry/Editor/`、`Article/Detail/`、`Article/Editor/`、`Video/Detail/`、`Video/Editor/`、`Tag/Detail/`、`Tag/Editor/`、`Home/`、`Space/`、`Examine/`、`Message/`）
   - `Components/Layout/`（布局辅助组件，如 `UserMenu`）
   - `Services/`（前端服务接口与实现，如 `ICgToastService`、`CgToastService`；共享帮助方法，如 `ExternalLinkHelper`）
   - `Extensions/`（DI 注册扩展，如 `ServiceCollectionExtensions.AddMainSiteSharedServices`）
 - `SDK.MainSite` 当前结构：
-  - `Abstractions/`（12 个接口：`IHomeQueryService`、`IEntryQueryService`、`ISpaceQueryService`、`ITagQueryService`、`IArticleQueryService`、`IVideoQueryService`、`IEntryCommandService`、`IArticleCommandService`、`IVideoCommandService`、`ITagCommandService`、`IFileCommandService`、`IMainSiteAuthRequestService`）
+  - `Abstractions/`（14 个接口：`IHomeQueryService`、`IEntryQueryService`、`ISpaceQueryService`、`ITagQueryService`、`IArticleQueryService`、`IVideoQueryService`、`IEntryCommandService`、`IArticleCommandService`、`IVideoCommandService`、`ITagCommandService`、`IFileCommandService`、`IMainSiteAuthRequestService`、`IExamineQueryService`、`IExamineCommandService`）
   - `Queries/`（6 个查询服务：`Home`、`Entry`、`Space`、`Tag`、`Article`、`Video`）
   - `Commands/`（5 个命令服务：`Entry`、`Article`、`Video`、`Tag`、`File`）
   - `Auth/`

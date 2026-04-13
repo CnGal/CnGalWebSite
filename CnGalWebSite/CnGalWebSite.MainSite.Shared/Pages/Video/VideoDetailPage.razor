@@ -1,11 +1,14 @@
 @page "/videos/index/{Id:long}"
 @inject IVideoQueryService VideoQueryService
+@inject IExamineQueryService ExamineQueryService
 @using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.MainSite.Shared.Components.Features.Video.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+@using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 @using CnGalWebSite.MainSite.Shared.Services
 
-<PageTitle>@(Model is null ? "视频详情" : $"{GetDisplayTitle()} - 视频详情")</PageTitle>
+<CgPageMeta Title="@(Model is null ? null : GetDisplayTitle())" Description="@(Model?.BriefIntroduction)" Image="@(Model?.MainPicture)" />
 
 @if (ErrorMessage is not null)
 {
@@ -18,6 +21,11 @@
 else if (Model is not null)
 {
     <article class="video-page">
+        @if (HasAtmosphere())
+        {
+            <CgAtmosphere BackgroundPicture="@Model.BackgroundPicture" SmallBackgroundPicture="@Model.SmallBackgroundPicture" />
+        }
+
         <header class="video-header">
             <VideoHero Title="@GetDisplayTitle()"
                        BriefIntroduction="@Model.BriefIntroduction"
@@ -111,6 +119,8 @@ else if (Model is not null)
                                   DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
             </EntrySection>
 
+            <EditRecordListCard Records="_editRecords" />
+
             <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
                 Type="CommentType.CommentVideo"
                 ObjectId="@Model.Id.ToString()"
@@ -121,9 +131,8 @@ else if (Model is not null)
 else
 {
     <section class="video-loading" aria-label="加载中">
-        <div class="video-loading-block video-loading-block--wide"></div>
-        <div class="video-loading-block"></div>
-        <div class="video-loading-block"></div>
+        <CgProgressRing Size="lg" Color="var(--cg-color-primary)" />
+        <span class="video-loading-text">加载中...</span>
     </section>
 }
 
@@ -132,19 +141,36 @@ else
     public long Id { get; set; }
 
     private VideoDetailViewModel? Model;
+    private IReadOnlyList<ExaminedNormalListModel>? _editRecords;
     private string? ErrorMessage;
 
     protected override async Task OnParametersSetAsync()
     {
-        var result = await VideoQueryService.GetVideoDetailAsync(Id);
-        if (result.Success && result.Data is not null)
+        if (Model?.Id == Id)
         {
-            ErrorMessage = null;
-            Model = result.Data;
             return;
         }
 
         Model = null;
+        _editRecords = null;
+        ErrorMessage = null;
+
+        var videoTask = VideoQueryService.GetVideoDetailAsync(Id);
+        var editRecordsTask = ExamineQueryService.GetVideoEditRecordsAsync(Id);
+
+        var result = await videoTask;
+        if (result.Success && result.Data is not null)
+        {
+            ErrorMessage = null;
+            Model = result.Data;
+
+            var editRecordsResult = await editRecordsTask;
+            _editRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
+            return;
+        }
+
+        Model = null;
+        _editRecords = null;
         ErrorMessage = result.Error?.Message ?? "请稍后重试";
     }
 
@@ -166,5 +192,16 @@ else
         }
 
         return Model.Type;
+    }
+
+    private bool HasAtmosphere()
+    {
+        if (Model is null)
+        {
+            return false;
+        }
+
+        return string.IsNullOrWhiteSpace(Model.BackgroundPicture) is false
+            || string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) is false;
     }
 }

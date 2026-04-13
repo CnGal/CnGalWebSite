@@ -6,11 +6,11 @@
 @inject NavigationManager NavigationManager
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
 
-<PageTitle>@PageTitle - CnGal</PageTitle>
+<CgPageMeta Title="@PageHeadTitle" Description="@PageDescription" />
 
 <div class="publish-times-page">
     <div class="publish-times-header">
-        <h1 class="publish-times-title">@PageTitle</h1>
+        <h1 class="publish-times-title">@PageHeadTitle</h1>
         <p class="publish-times-desc">@PageDescription</p>
 
         <div class="publish-times-controls">
@@ -147,7 +147,7 @@
     private bool _initialized;
     private bool _selfNavigating;
 
-    private string PageTitle => Mode == 1 ? "游戏试玩时间汇总" : "游戏发布时间汇总";
+    private string PageHeadTitle => Mode == 1 ? "游戏试玩时间汇总" : "游戏发布时间汇总";
     private string PageDescription => Mode == 1 ? "可以查看每月游戏试玩日期列表" : "可以查看每月发售游戏列表";
 
     protected override async Task OnParametersSetAsync()

@@ -1,4 +1,5 @@
 @inherits LayoutComponentBase
+@attribute [StreamRendering]
 @inject NavigationManager NavigationManager
 @inject IMainSiteAuthRequestService AuthRequestService
 
@@ -6,6 +7,13 @@
     <header class="cg-layout__header">
         <div class="cg-topbar">
             <div class="cg-topbar__left">
+                @* 汉堡菜单按钮 — 仅 < 1024px 显示 *@
+                <button class="cg-topbar__menu-toggle"
+                        aria-label="打开导航菜单"
+                        onclick="document.getElementById('cg-drawer').classList.add('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.add('cg-drawer-backdrop--visible')">
+                    <CgMdiIcon Name="mdiMenu" aria-hidden="true" />
+                </button>
+
                 <a class="cg-brand" href="/">
                     <img class="cg-brand__icon" src="favicon.ico" alt="CnGal" />
                     <h2 class="cg-brand__text">CnGal资料站</h2>
@@ -14,19 +22,24 @@
                 <nav class="cg-topbar__nav" aria-label="主导航">
                     <a href="/discount">游戏折扣</a>
                     <a href="/lotteries/home">抽奖</a>
-                    <a href="#">周报</a>
+                    <a href="/square">广场</a>
                     <a href="/sharegames">分享游玩记录</a>
                 </nav>
             </div>
 
             <div class="cg-topbar__right">
-                <a href="/search" class="cg-topbar__search" aria-label="搜索内容">
+                <a href="/search" class="cg-topbar__search" aria-label="搜索词条、制作组">
                     <div class="cg-topbar__search-inner">
                         <div class="cg-topbar__search-icon">
                             <CgMdiIcon Name="mdiMagnify" aria-hidden="true" />
                         </div>
                         <span class="cg-topbar__search-placeholder">搜索词条、制作组...</span>
                     </div>
+                </a>
+
+                @* 移动端搜索图标 — 仅 < 768px 显示 *@
+                <a href="/search" class="cg-topbar__search-mobile" aria-label="搜索">
+                    <CgMdiIcon Name="mdiMagnify" aria-hidden="true" />
                 </a>
 
                 <div class="cg-topbar__actions">
@@ -47,7 +60,67 @@
         </div>
     </header>
 
+    @* ── 移动端抽屉导航 ── *@
+    <div id="cg-drawer-backdrop" class="cg-drawer-backdrop"
+         onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');this.classList.remove('cg-drawer-backdrop--visible')"></div>
+    <nav id="cg-drawer" class="cg-drawer" aria-label="移动端导航">
+        <div class="cg-drawer__header">
+            <a class="cg-brand" href="/">
+                <img class="cg-brand__icon" src="favicon.ico" alt="CnGal" />
+                <h2 class="cg-brand__text">CnGal资料站</h2>
+            </a>
+            <button class="cg-drawer__close" aria-label="关闭导航菜单"
+                    onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                <CgMdiIcon Name="mdiClose" aria-hidden="true" />
+            </button>
+        </div>
+        <div class="cg-drawer__links">
+            <a href="/" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                <CgMdiIcon Name="mdiHomeOutline" aria-hidden="true" />
+                <span>主页</span>
+            </a>
+            <a href="/search" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                <CgMdiIcon Name="mdiMagnify" aria-hidden="true" />
+                <span>搜索</span>
+            </a>
+            <a href="/discount" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                <CgMdiIcon Name="mdiSale" aria-hidden="true" />
+                <span>游戏折扣</span>
+            </a>
+            <a href="/lotteries/home" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                <CgMdiIcon Name="mdiGiftOutline" aria-hidden="true" />
+                <span>抽奖</span>
+            </a>
+            <a href="/square" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                <CgMdiIcon Name="mdiShapeOutline" aria-hidden="true" />
+                <span>广场</span>
+            </a>
+            <a href="/sharegames" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                <CgMdiIcon Name="mdiControllerClassicOutline" aria-hidden="true" />
+                <span>分享游玩记录</span>
+            </a>
+        </div>
+        <div class="cg-drawer__divider"></div>
+        <div class="cg-drawer__footer">
+            <AuthorizeView>
+                <Authorized>
+                    <a class="cg-drawer__user-link" href="@($"/space/index/{context.User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value}")">
+                        <CgMdiIcon Name="mdiAccountCircleOutline" aria-hidden="true" />
+                        <span>@context.User.Identity?.Name</span>
+                    </a>
+                </Authorized>
+                <NotAuthorized>
+                    <a class="cg-drawer__login-link" href="@AuthRequestService.BuildLoginUrl(CurrentReturnUrl)">
+                        <CgMdiIcon Name="mdiLogin" aria-hidden="true" />
+                        <span>登录 / 注册</span>
+                    </a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </nav>
+
     <main class="cg-layout__main">
+        <UserAtmosphere @rendermode="InteractiveServer" />
         <div class="cg-layout__container">
             <article class="content">
                 @Body
@@ -79,7 +152,7 @@
 
             <div class="cg-footer-links">
                 <section>
-                        <h4>社交平台</h4>
+                        <h3>社交平台</h3>
                     <ul>
                             <li><a href="https://weibo.com/cngalorg" target="_blank" rel="noopener noreferrer">新浪微博</a></li>
                             <li><a href="https://space.bilibili.com/145239325" target="_blank" rel="noopener noreferrer">Bilibili</a></li>
@@ -88,7 +161,7 @@
                 </section>
 
                 <section>
-                        <h4>关于我们</h4>
+                        <h3>关于我们</h3>
                     <ul>
                             <li><a href="/about">概述</a></li>
                             <li><a href="/structure">组织架构</a></li>
@@ -98,7 +171,7 @@
                 </section>
 
                 <section>
-                        <h4>其他</h4>
+                        <h3>其他</h3>
                     <ul>
                             <li><a href="https://open.cngal.org/" target="_blank" rel="noopener noreferrer">开放平台</a></li>
                             <li><a href="https://app.cngal.org/" target="_blank" rel="noopener noreferrer">PWA 应用</a></li>
@@ -127,6 +200,7 @@
 <AuthorizeView>
     <Authorized>
         <CgToast @rendermode="InteractiveServer" />
+        <CnGalWebSite.MainSite.Shared.Components.Layout.UserSessionTracker @rendermode="InteractiveServer" />
     </Authorized>
 </AuthorizeView>
 

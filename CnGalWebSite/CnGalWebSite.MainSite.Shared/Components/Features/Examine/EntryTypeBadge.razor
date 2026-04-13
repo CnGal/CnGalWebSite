@@ -1,0 +1,31 @@
+@using CnGalWebSite.DataModel.Model
+
+@* 词条类型标签：游戏 / 制作组 / 角色 / Staff *@
+
+<span class="entry-type-badge @GetVariantClass()">
+    <CgMdiIcon Name="@GetIconName()" class="entry-type-badge__icon" aria-hidden="true" />
+    <span>@Type.GetDisplayName()</span>
+</span>
+
+@code {
+    [Parameter]
+    public EntryType Type { get; set; }
+
+    private string GetVariantClass() => Type switch
+    {
+        EntryType.Game => "entry-type-badge--game",
+        EntryType.ProductionGroup => "entry-type-badge--group",
+        EntryType.Role => "entry-type-badge--role",
+        EntryType.Staff => "entry-type-badge--staff",
+        _ => "entry-type-badge--other"
+    };
+
+    private string GetIconName() => Type switch
+    {
+        EntryType.Game => "mdiControllerClassicOutline",
+        EntryType.ProductionGroup => "mdiAccountGroupOutline",
+        EntryType.Role => "mdiAccountOutline",
+        EntryType.Staff => "mdiAccountTieOutline",
+        _ => "mdiHelpCircleOutline"
+    };
+}

@@ -7,10 +7,10 @@
         @foreach (var group in OverviewModels)
         {
             <div class="periphery-overview-group">
-                <div class="periphery-overview-group-header">
+                <a class="periphery-overview-group-header" href="@GetGroupUrl(group)">
                     @if (!string.IsNullOrWhiteSpace(group.Image))
                     {
-                        <img class="periphery-overview-group-image" src="@group.Image" alt="@group.Name" loading="lazy" />
+                        <img class="periphery-overview-group-image @(group.IsThumbnail ? "periphery-overview-group-image--round" : "")" src="@group.Image" alt="@group.Name" loading="lazy" />
                     }
                     <div class="periphery-overview-group-info">
                         <h3>@group.Name</h3>
@@ -19,7 +19,7 @@
                             <p>@group.BriefIntroduction</p>
                         }
                     </div>
-                </div>
+                </a>
 
                 @if (group.Peripheries.Count > 0)
                 {
@@ -57,4 +57,12 @@
 
 @code {
     [Parameter] public IReadOnlyList<GameOverviewPeripheryListModel> OverviewModels { get; set; } = [];
+
+    private static string GetGroupUrl(GameOverviewPeripheryListModel group) => group.Type switch
+    {
+        PeripheryOverviewType.Entry => $"/entries/index/{group.ObjectId}",
+        PeripheryOverviewType.Periphery => $"/peripheries/index/{group.ObjectId}",
+        PeripheryOverviewType.User => $"/space/index/{group.ObjectId}",
+        _ => "#"
+    };
 }

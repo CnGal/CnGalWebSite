@@ -1,0 +1,42 @@
+@using CnGalWebSite.SDK.MainSite.Models
+@using CnGalWebSite.DataModel.ViewModel.Search
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+
+@if (Model is null || Model.Items.Count == 0)
+{
+    <div class="cg-space-tab-empty">
+        <CgMdiIcon Name="mdiAnimationPlayOutline" aria-hidden="true" />
+        <p>暂无视频</p>
+    </div>
+}
+else
+{
+    <div class="cg-space-video-grid">
+        @foreach (var video in Model.Items)
+        {
+            <a class="cg-space-video-item" href="@($"/videos/index/{video.Id}")">
+                @if (!string.IsNullOrWhiteSpace(video.MainImage))
+                {
+                    <div class="cg-space-video-cover">
+                        <img src="@video.MainImage" alt="@video.Name" loading="lazy" />
+                    </div>
+                }
+                <div class="cg-space-video-info">
+                    <h3 class="cg-space-video-title">@(video.DisplayName ?? video.Name)</h3>
+                    @if (!string.IsNullOrWhiteSpace(video.BriefIntroduction))
+                    {
+                        <p class="cg-space-video-brief">@video.BriefIntroduction</p>
+                    }
+                    <div class="cg-space-video-meta">
+                        <span class="cg-space-video-date">@video.LastEditTime.ToString("yyyy-MM-dd")</span>
+                    </div>
+                </div>
+            </a>
+        }
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public required UserVideosViewModel? Model { get; set; }
+}

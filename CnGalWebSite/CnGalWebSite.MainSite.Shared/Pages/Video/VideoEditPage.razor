@@ -17,7 +17,7 @@
 @inject ICgToastService ToastService
 @implements IDisposable
 
-<PageTitle>@(IsCreate ? "发布视频" : "编辑视频")</PageTitle>
+<CgPageMeta Title="@(IsCreate ? "发布视频" : "编辑视频")" />
 
 @if (IsLoading)
 {

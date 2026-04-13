@@ -1,0 +1,56 @@
+@using CnGalWebSite.DataModel.Model
+
+@if (EntriesWithImage.Any())
+{
+    <div class="square-tag-card">
+        <a href="@($"/tags/index/{Model.Id}")" class="square-tag-card-title-link">
+            <h3 class="square-tag-card-title">
+                <CgMdiIcon Name="mdiTagOutline" aria-hidden="true" />
+                @Model.Name
+            </h3>
+        </a>
+        <ul class="square-tag-entries @(HasPortraitEntries ? "square-tag-entries--portrait" : "")">
+            @foreach (var entry in EntriesWithImage)
+            {
+                <li>
+                    <a href="@($"/entries/index/{entry.Id}")"
+                       class="square-tag-entry @(IsPortrait(entry) ? "square-tag-entry--portrait" : "")"
+                       title="@entry.Name">
+                        <img src="@entry.MainImage" alt="@entry.Name" loading="lazy" decoding="async" />
+                    </a>
+                </li>
+            }
+        </ul>
+        <a href="@($"/tags/index/{Model.Id}")" class="square-tag-card-more">
+            查看标签
+            <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
+        </a>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public SquareRandomTagModel Model { get; set; } = default!;
+
+    /// <summary>
+    /// 标签下的条目是否主要是头像类（角色/Staff）
+    /// </summary>
+    private bool HasPortraitEntries =>
+        Model.Entries.Any(e => !string.IsNullOrWhiteSpace(e.MainImage))
+        && Model.Entries.Where(e => !string.IsNullOrWhiteSpace(e.MainImage)).All(IsPortrait);
+
+    /// <summary>
+    /// 仅显示有主图的条目，头像类最多 8 张，其他最多 4 张
+    /// </summary>
+    private IReadOnlyList<SquareRandomEntryModel> EntriesWithImage =>
+        Model.Entries
+            .Where(e => !string.IsNullOrWhiteSpace(e.MainImage))
+            .Take(HasPortraitEntries ? 8 : 4)
+            .ToList();
+
+    /// <summary>
+    /// 角色和Staff使用1:1头像比例
+    /// </summary>
+    private static bool IsPortrait(SquareRandomEntryModel entry) =>
+        entry.Type is EntryType.Role or EntryType.Staff;
+}

@@ -1,0 +1,155 @@
+@*
+    UserSessionTracker — 已登录用户后台任务
+    1. 定时心跳：每 10 分钟调用 MakeUserOnlineAsync 上报在线状态
+    2. 自动签到：首次加载时检查签到状态，未签到则自动签到并通知用户
+    在 MainLayout 的 AuthorizeView 内渲染，需要 InteractiveServer。
+*@
+@using Microsoft.Extensions.Logging
+@implements IAsyncDisposable
+
+@inject ISpaceCommandService SpaceCommandService
+@inject ISpaceQueryService SpaceQueryService
+@inject ICgToastService ToastService
+@inject ILogger<UserSessionTracker> Logger
+
+<CgModal IsOpen="_showSignInModal"
+         OnClose="CloseSignInModal"
+         Width="320px">
+    <ChildContent>
+        <div class="sign-in-modal-content">
+            <CgMdiIcon Name="mdiCalendarCheck" Class="sign-in-icon" aria-hidden="true"/>
+            <h3 class="sign-in-title">已连续签到 @_signInDays 天</h3>
+            <p class="sign-in-reward">经验值 <span>+5</span> 🎉</p>
+
+            <div class="sign-in-actions">
+                <CgButton Variant="primary" OnClick="CloseSignInModal">我知道了</CgButton>
+            </div>
+        </div>
+    </ChildContent>
+</CgModal>
+
+@code {
+    private CancellationTokenSource? _cts;
+    private Task? _heartbeatLoop;
+
+    private bool _showSignInModal;
+    private int _signInDays;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _cts = new CancellationTokenSource();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && _cts is not null)
+        {
+            // 延迟 5 秒后启动，避免影响首屏渲染
+            _heartbeatLoop = RunDelayedStartAsync(_cts.Token);
+        }
+    }
+
+    private async Task RunDelayedStartAsync(CancellationToken ct)
+    {
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(5), ct);
+
+            // 首次心跳
+            await InvokeAsync(SafeMakeOnlineAsync);
+
+            // 自动签到
+            await InvokeAsync(AutoSignInAsync);
+
+            // 启动定时心跳循环
+            await RunHeartbeatLoopAsync(ct);
+        }
+        catch (OperationCanceledException)
+        {
+            // 正常退出
+        }
+    }
+
+    private async Task RunHeartbeatLoopAsync(CancellationToken ct)
+    {
+        using var timer = new PeriodicTimer(TimeSpan.FromMinutes(10));
+        try
+        {
+            while (await timer.WaitForNextTickAsync(ct))
+            {
+                await InvokeAsync(SafeMakeOnlineAsync);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // 正常退出
+        }
+    }
+
+    private async Task SafeMakeOnlineAsync()
+    {
+        try
+        {
+            await SpaceCommandService.MakeUserOnlineAsync(_cts?.Token ?? default);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "心跳上报失败");
+        }
+    }
+
+    private async Task AutoSignInAsync()
+    {
+        try
+        {
+            // 先检查今日是否已签到，避免每次加载都弹 Toast
+            var taskResult = await SpaceQueryService.GetUserTasksAsync(_cts?.Token ?? default);
+            if (taskResult.Success && taskResult.Data?.IsSignIn == true)
+            {
+                return; // 今日已签到，静默跳过
+            }
+
+            // 执行签到
+            var result = await SpaceCommandService.SignInAsync(_cts?.Token ?? default);
+            if (result.Success)
+            {
+                _signInDays = (taskResult.Data?.SignInDays ?? 0) + 1;
+                _showSignInModal = true;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex, "自动签到失败");
+        }
+    }
+
+    private Task CloseSignInModal()
+    {
+        _showSignInModal = false;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_cts is not null)
+        {
+            await _cts.CancelAsync();
+            _cts.Dispose();
+        }
+
+        if (_heartbeatLoop is not null)
+        {
+            try
+            {
+                await _heartbeatLoop;
+            }
+            catch
+            {
+                // 忽略取消异常
+            }
+        }
+    }
+
+}

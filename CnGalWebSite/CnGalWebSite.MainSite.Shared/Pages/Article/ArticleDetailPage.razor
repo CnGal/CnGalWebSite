@@ -1,12 +1,15 @@
 @page "/articles/index/{Id:long}"
 @inject IArticleQueryService ArticleQueryService
+@inject IExamineQueryService ExamineQueryService
 @using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.ViewModel.Search
 @using CnGalWebSite.MainSite.Shared.Components.Features.Article.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
+@using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 @using CnGalWebSite.MainSite.Shared.Services
 
-<PageTitle>@(_model is null ? "文章详情" : $"{GetDisplayTitle()} - 文章详情")</PageTitle>
+<CgPageMeta Title="@(_model is null ? null : GetDisplayTitle())" Description="@(_model?.BriefIntroduction)" Image="@(_model?.MainPicture)" />
 
 @if (_errorMessage is not null)
 {
@@ -19,6 +22,11 @@
 else if (_model is not null)
 {
     <article class="article-page">
+        @if (HasAtmosphere())
+        {
+            <CgAtmosphere BackgroundPicture="@_model.BackgroundPicture" SmallBackgroundPicture="@_model.SmallBackgroundPicture" />
+        }
+
         <header class="article-header">
             <ArticleHero Title="@GetDisplayTitle()"
                          BriefIntroduction="@_model.BriefIntroduction"
@@ -106,6 +114,8 @@ else if (_model is not null)
                 </ul>
             </EntrySection>
 
+            <EditRecordListCard Records="_editRecords" />
+
             <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
                 Type="CommentType.CommentArticle"
                 ObjectId="@_model.Id.ToString()"
@@ -116,9 +126,8 @@ else if (_model is not null)
 else
 {
     <section class="article-loading" aria-label="加载中">
-        <div class="article-loading-block article-loading-block--wide"></div>
-        <div class="article-loading-block"></div>
-        <div class="article-loading-block"></div>
+        <CgProgressRing Size="lg" Color="var(--cg-color-primary)" />
+        <span class="article-loading-text">加载中...</span>
     </section>
 }
 
@@ -127,19 +136,36 @@ else
     public long Id { get; set; }
 
     private ArticleDetailViewModel? _model;
+    private IReadOnlyList<ExaminedNormalListModel>? _editRecords;
     private string? _errorMessage;
 
     protected override async Task OnParametersSetAsync()
     {
-        var result = await ArticleQueryService.GetArticleDetailAsync(Id);
-        if (result.Success && result.Data is not null)
+        if (_model?.Id == Id)
         {
-            _errorMessage = null;
-            _model = result.Data;
             return;
         }
 
         _model = null;
+        _editRecords = null;
+        _errorMessage = null;
+
+        var articleTask = ArticleQueryService.GetArticleDetailAsync(Id);
+        var editRecordsTask = ExamineQueryService.GetArticleEditRecordsAsync(Id);
+
+        var result = await articleTask;
+        if (result.Success && result.Data is not null)
+        {
+            _errorMessage = null;
+            _model = result.Data;
+
+            var editRecordsResult = await editRecordsTask;
+            _editRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
+            return;
+        }
+
+        _model = null;
+        _editRecords = null;
         _errorMessage = result.Error?.Message ?? "请稍后重试";
     }
 
@@ -156,5 +182,16 @@ else
     private static string GetTypeText(ArticleType type)
     {
         return type.GetDisplayName();
+    }
+
+    private bool HasAtmosphere()
+    {
+        if (_model is null)
+        {
+            return false;
+        }
+
+        return string.IsNullOrWhiteSpace(_model.BackgroundPicture) is false
+            || string.IsNullOrWhiteSpace(_model.SmallBackgroundPicture) is false;
     }
 }

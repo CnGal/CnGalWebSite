@@ -1,9 +1,12 @@
 @page "/tags/index/{Id:int}"
 @inject ITagQueryService TagQueryService
+@inject IExamineQueryService ExamineQueryService
+@using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.ViewModel.Tags
 @using CnGalWebSite.MainSite.Shared.Components.Features.Tag.Detail
+@using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 
-<PageTitle>@(_model is null ? "标签详情" : $"{_model.Name} - 标签详情")</PageTitle>
+<CgPageMeta Title="@(_model?.Name)" Description="@(_model?.BriefIntroduction)" Image="@(_model?.MainPicture)" />
 
 @if (_errorMessage is not null)
 {
@@ -16,6 +19,11 @@
 else if (_model is not null)
 {
     <article class="tag-page">
+        @if (HasAtmosphere())
+        {
+            <CgAtmosphere BackgroundPicture="@_model.BackgroundPicture" SmallBackgroundPicture="@_model.SmallBackgroundPicture" />
+        }
+
         <header class="tag-header">
             <TagBreadcrumb TagLevels="_model.Taglevels" />
 
@@ -34,19 +42,20 @@ else if (_model is not null)
             </CgAlert>
         }
 
-        <footer class="tag-footer-related">
+        <section class="tag-footer-related" aria-label="相关内容">
             <TagChildTags Tags="_model.ChildrenTags" />
 
             <TagChildEntries Entries="_model.ChildrenEntries" />
-        </footer>
+
+            <EditRecordListCard Records="_editRecords" />
+        </section>
     </article>
 }
 else
 {
     <section class="tag-loading" aria-label="加载中">
-        <div class="tag-loading-block tag-loading-block--wide"></div>
-        <div class="tag-loading-block"></div>
-        <div class="tag-loading-block"></div>
+        <CgProgressRing Size="lg" Color="var(--cg-color-primary)" />
+        <span class="tag-loading-text">加载中...</span>
     </section>
 }
 
@@ -55,19 +64,47 @@ else
     public int Id { get; set; }
 
     private TagIndexViewModel? _model;
+    private IReadOnlyList<ExaminedNormalListModel>? _editRecords;
     private string? _errorMessage;
 
     protected override async Task OnParametersSetAsync()
     {
-        var result = await TagQueryService.GetTagDetailAsync(Id);
-        if (result.Success && result.Data is not null)
+        if (_model?.Id == Id)
         {
-            _errorMessage = null;
-            _model = result.Data;
             return;
         }
 
         _model = null;
+        _editRecords = null;
+        _errorMessage = null;
+
+        var tagTask = TagQueryService.GetTagDetailAsync(Id);
+        var editRecordsTask = ExamineQueryService.GetTagEditRecordsAsync(Id);
+
+        var result = await tagTask;
+        if (result.Success && result.Data is not null)
+        {
+            _errorMessage = null;
+            _model = result.Data;
+
+            var editRecordsResult = await editRecordsTask;
+            _editRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
+            return;
+        }
+
+        _model = null;
+        _editRecords = null;
         _errorMessage = result.Error?.Message ?? "请稍后重试";
+    }
+
+    private bool HasAtmosphere()
+    {
+        if (_model is null)
+        {
+            return false;
+        }
+
+        return string.IsNullOrWhiteSpace(_model.BackgroundPicture) is false
+            || string.IsNullOrWhiteSpace(_model.SmallBackgroundPicture) is false;
     }
 }

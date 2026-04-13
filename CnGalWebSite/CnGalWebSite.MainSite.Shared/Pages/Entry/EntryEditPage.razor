@@ -20,7 +20,7 @@
 @inject ICgToastService ToastService
 @implements IDisposable
 
-<PageTitle>@(IsCreate ? "创建词条" : $"编辑词条")</PageTitle>
+<CgPageMeta Title="@(IsCreate ? "创建词条" : "编辑词条")" />
 
 @if (IsLoading)
 {
@@ -222,6 +222,7 @@ else if (Model != null)
             if (result.Success)
             {
                 await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);
+                ToastService.Show("提交成功", "已提交，等待审核通过...", "success");
                 NavigationManager.NavigateTo($"/entries/index/{result.Data}");
             }
             else

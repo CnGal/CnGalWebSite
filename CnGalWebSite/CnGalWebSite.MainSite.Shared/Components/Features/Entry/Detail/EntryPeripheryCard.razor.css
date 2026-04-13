@@ -8,7 +8,7 @@
     padding: 1rem 1.25rem;
     border: 1px solid color-mix(in oklab, var(--cg-color-border) 40%, transparent);
     border-radius: var(--cg-radius-lg);
-    background: color-mix(in oklab, var(--cg-color-surface) 95%, transparent);
+    background: var(--cg-color-surface);
     box-shadow: var(--cg-shadow-sm);
     text-decoration: none;
     color: var(--cg-color-text);

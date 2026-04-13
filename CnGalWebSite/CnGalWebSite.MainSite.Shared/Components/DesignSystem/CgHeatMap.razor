@@ -1,0 +1,208 @@
+@* CgHeatMap — 纯 HTML/CSS 热力图组件，兼容 Static SSR *@
+@using CnGalWebSite.SDK.MainSite.Models
+
+<div class="cg-heatmap @CssClass" style="@Style">
+    @if (!string.IsNullOrWhiteSpace(Title))
+    {
+        <div class="cg-heatmap__title">@Title</div>
+    }
+
+    <div class="cg-heatmap__body">
+        @if (_cells.Count == 0)
+        {
+            <div class="cg-heatmap__empty">暂无数据</div>
+        }
+        else
+        {
+            <div class="cg-heatmap__grid-wrapper">
+                @* 星期标签 *@
+                <div class="cg-heatmap__day-labels">
+                    <span class="cg-heatmap__day-label"></span>
+                    <span class="cg-heatmap__day-label">一</span>
+                    <span class="cg-heatmap__day-label"></span>
+                    <span class="cg-heatmap__day-label">三</span>
+                    <span class="cg-heatmap__day-label"></span>
+                    <span class="cg-heatmap__day-label">五</span>
+                    <span class="cg-heatmap__day-label"></span>
+                </div>
+
+                <div class="cg-heatmap__scroll-area">
+                    @* 月份标签行 *@
+                    <div class="cg-heatmap__month-row" style="grid-template-columns: repeat(@_totalWeeks, 1fr);">
+                        @foreach (var ml in _monthLabels)
+                        {
+                            <span class="cg-heatmap__month-label" style="grid-column: @(ml.StartCol + 1);">@ml.Label</span>
+                        }
+                    </div>
+
+                    @* 格子网格：7行 x N列 *@
+                    <div class="cg-heatmap__grid" style="grid-template-columns: repeat(@_totalWeeks, 1fr);">
+                        @foreach (var cell in _cells)
+                        {
+                            @if (cell.IsPlaceholder)
+                            {
+                                <span class="cg-heatmap__cell cg-heatmap__cell--empty"
+                                      style="grid-row: @(cell.Row + 1); grid-column: @(cell.Col + 1);"></span>
+                            }
+                            else
+                            {
+                                <span class="cg-heatmap__cell cg-heatmap__cell--lv@(cell.Level)"
+                                      style="grid-row: @(cell.Row + 1); grid-column: @(cell.Col + 1);"
+                                      title="@cell.Date：@cell.Count 次"></span>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @* 图例 *@
+            <div class="cg-heatmap__legend">
+                <span class="cg-heatmap__legend-text">少</span>
+                <span class="cg-heatmap__cell cg-heatmap__cell--lv0 cg-heatmap__legend-cell"></span>
+                <span class="cg-heatmap__cell cg-heatmap__cell--lv1 cg-heatmap__legend-cell"></span>
+                <span class="cg-heatmap__cell cg-heatmap__cell--lv2 cg-heatmap__legend-cell"></span>
+                <span class="cg-heatmap__cell cg-heatmap__cell--lv3 cg-heatmap__legend-cell"></span>
+                <span class="cg-heatmap__cell cg-heatmap__cell--lv4 cg-heatmap__legend-cell"></span>
+                <span class="cg-heatmap__legend-text">多</span>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// 图表标题。
+    /// </summary>
+    [Parameter]
+    public string? Title { get; set; }
+
+    /// <summary>
+    /// 热力图数据点集合。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<HeatMapDataPoint>? Data { get; set; }
+
+    /// <summary>
+    /// 色阶最大值。
+    /// </summary>
+    [Parameter]
+    public int MaxCount { get; set; } = 10;
+
+    /// <summary>
+    /// 图表高度（px）。
+    /// </summary>
+    [Parameter]
+    public int Height { get; set; } = 180;
+
+    /// <summary>
+    /// 附加 CSS 类名。
+    /// </summary>
+    [Parameter]
+    public string? CssClass { get; set; }
+
+    /// <summary>
+    /// 附加行内样式。
+    /// </summary>
+    [Parameter]
+    public string? Style { get; set; }
+
+    private List<CellInfo> _cells = [];
+    private List<MonthLabel> _monthLabels = [];
+    private int _totalWeeks;
+
+    protected override void OnParametersSet()
+    {
+        BuildGrid();
+    }
+
+    private void BuildGrid()
+    {
+        _cells = [];
+        _monthLabels = [];
+
+        // 构建日期 → 计数 lookup
+        var lookup = new Dictionary<string, int>();
+        if (Data is not null)
+        {
+            foreach (var dp in Data)
+            {
+                lookup[dp.Date] = dp.Count;
+            }
+        }
+
+        // 计算日期范围：近 365 天
+        var today = DateTime.Today;
+        var startDate = today.AddDays(-364);
+
+        // 对齐到周日
+        while (startDate.DayOfWeek != DayOfWeek.Sunday)
+        {
+            startDate = startDate.AddDays(-1);
+        }
+
+        var maxVal = MaxCount > 0 ? MaxCount : 10;
+        var col = 0;
+        var lastMonth = -1;
+        var cur = startDate;
+
+        while (cur <= today)
+        {
+            var dayOfWeek = (int)cur.DayOfWeek; // Sunday=0
+            var dateStr = cur.ToString("yyyy-MM-dd");
+            var count = lookup.GetValueOrDefault(dateStr, 0);
+            var level = GetLevel(count, maxVal);
+
+            _cells.Add(new CellInfo
+            {
+                Row = dayOfWeek,
+                Col = col,
+                Date = dateStr,
+                Count = count,
+                Level = level,
+                IsPlaceholder = false,
+            });
+
+            // 月份标签
+            var month = cur.Month;
+            if (month != lastMonth && cur.Day <= 7)
+            {
+                _monthLabels.Add(new MonthLabel { StartCol = col, Label = $"{month}月" });
+                lastMonth = month;
+            }
+
+            cur = cur.AddDays(1);
+            if (cur.DayOfWeek == DayOfWeek.Sunday)
+            {
+                col++;
+            }
+        }
+
+        _totalWeeks = col + 1;
+    }
+
+    private static int GetLevel(int count, int max)
+    {
+        if (count <= 0) return 0;
+        var ratio = (double)count / max;
+        if (ratio <= 0.25) return 1;
+        if (ratio <= 0.5) return 2;
+        if (ratio <= 0.75) return 3;
+        return 4;
+    }
+
+    private sealed class CellInfo
+    {
+        public int Row { get; init; }
+        public int Col { get; init; }
+        public string Date { get; init; } = "";
+        public int Count { get; init; }
+        public int Level { get; init; }
+        public bool IsPlaceholder { get; init; }
+    }
+
+    private sealed class MonthLabel
+    {
+        public int StartCol { get; init; }
+        public string Label { get; init; } = "";
+    }
+}

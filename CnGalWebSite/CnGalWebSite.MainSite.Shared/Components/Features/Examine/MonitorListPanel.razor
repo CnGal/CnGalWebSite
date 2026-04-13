@@ -1,0 +1,98 @@
+@using CnGalWebSite.DataModel.ViewModel.EditRecords
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.Core.Models
+
+@inject IExamineQueryService ExamineQueryService
+@inject IExamineCommandService ExamineCommandService
+@inject ICgToastService ToastService
+@inject NavigationManager NavigationManager
+
+@* 监控列表面板（服务端分页） *@
+
+<CgDataTable TItem="UserMonitorOverviewModel"
+             Title="关注的词条"
+             OnServerQuery="LoadMonitorsAsync"
+             DefaultSortField="@nameof(UserMonitorOverviewModel.CreateTime)"
+             DefaultSortDesc="true"
+             @ref="_dataTable">
+
+    <CgDataTableColumn TItem="UserMonitorOverviewModel" Title="添加时间" Field="@nameof(UserMonitorOverviewModel.CreateTime)">
+        <ChildContent Context="item">
+            @item.CreateTime.ToString("yyyy-MM-dd HH:mm")
+        </ChildContent>
+    </CgDataTableColumn>
+
+    <CgDataTableColumn TItem="UserMonitorOverviewModel" Title="名称" Sortable="false">
+        <ChildContent Context="item">
+            @(item.EntryName ?? "—")
+        </ChildContent>
+    </CgDataTableColumn>
+
+    <CgDataTableColumn TItem="UserMonitorOverviewModel" Title="类型" Sortable="false">
+        <ChildContent Context="item">
+            <EntryTypeBadge Type="@item.Type" />
+        </ChildContent>
+    </CgDataTableColumn>
+
+    <CgDataTableColumn TItem="UserMonitorOverviewModel" Title="操作" Sortable="false" Width="100px">
+        <ChildContent Context="item">
+            <div class="examine-actions">
+                <button class="examine-action-btn examine-action-btn--view" title="查看" @onclick="() => LookItem(item)">
+                    <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+                </button>
+                <button class="examine-action-btn examine-action-btn--delete" title="取消关注" @onclick="() => DeleteItem(item)">
+                    <CgMdiIcon Name="mdiHeartOffOutline" aria-hidden="true" />
+                </button>
+            </div>
+        </ChildContent>
+    </CgDataTableColumn>
+
+</CgDataTable>
+
+@code {
+    private CgDataTable<UserMonitorOverviewModel>? _dataTable;
+
+    private async Task<CgDataTableResult<UserMonitorOverviewModel>> LoadMonitorsAsync(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? "",
+            SortBy = string.IsNullOrWhiteSpace(request.SortField) ? new[] { "CreateTime" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await ExamineQueryService.GetUserMonitorsAsync(parameter);
+        if (result.Success && result.Data != null)
+        {
+            return new CgDataTableResult<UserMonitorOverviewModel>(
+                result.Data.Items.ToList(),
+                result.Data.Total);
+        }
+
+        return new CgDataTableResult<UserMonitorOverviewModel>([], 0);
+    }
+
+    private void LookItem(UserMonitorOverviewModel model)
+    {
+        NavigationManager.NavigateTo($"/entries/index/{model.EntryId}");
+    }
+
+    private async Task DeleteItem(UserMonitorOverviewModel model)
+    {
+        var result = await ExamineCommandService.EditUserMonitorsAsync(new[] { model.EntryId }, false);
+        if (result.Success)
+        {
+            ToastService.Show("取消关注成功", variant: "success");
+            if (_dataTable != null)
+            {
+                await _dataTable.RefreshAsync();
+            }
+        }
+        else
+        {
+            ToastService.Show("取消关注失败", result.Error?.Message, "error");
+        }
+    }
+}

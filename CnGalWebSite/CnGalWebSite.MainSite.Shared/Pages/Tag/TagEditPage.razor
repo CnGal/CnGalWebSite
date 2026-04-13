@@ -19,7 +19,7 @@
 @inject ICgToastService ToastService
 @implements IDisposable
 
-<PageTitle>@(IsCreate ? "创建标签" : "编辑标签")</PageTitle>
+<CgPageMeta Title="@(IsCreate ? "创建标签" : "编辑标签")" />
 
 @if (IsLoading)
 {
