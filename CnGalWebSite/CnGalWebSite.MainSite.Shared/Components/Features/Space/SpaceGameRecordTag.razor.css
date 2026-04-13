@@ -1,15 +1,25 @@
+/* ══════════════════════════════════════════════════════════
+   SpaceGameRecordTag.razor.css — Mobile-first
+   ══════════════════════════════════════════════════════════ */
+
 .space-game-record-tag {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--cg-spacing-1);
+    gap: 0.1875rem;
+}
+
+@media (min-width: 768px) {
+    .space-game-record-tag {
+        gap: 0.25rem;
+    }
 }
 
 .space-game-record-tag__chip {
     display: inline-flex;
     align-items: center;
-    gap: 3px;
-    padding: 2px var(--cg-spacing-2);
-    font-size: var(--cg-font-size-xs);
+    gap: 2px;
+    padding: 1px 0.375rem;
+    font-size: 0.5625rem;
     font-weight: var(--cg-font-weight-medium);
     color: var(--cg-color-text-secondary);
     background: var(--cg-color-bg);
@@ -17,10 +27,25 @@
     line-height: 1.4;
 }
 
+@media (min-width: 768px) {
+    .space-game-record-tag__chip {
+        gap: 3px;
+        padding: 2px 0.5rem;
+        font-size: 0.6875rem;
+    }
+}
+
 .space-game-record-tag__chip ::deep .cg-mdi-icon {
-    width: 13px;
-    height: 13px;
+    width: 10px;
+    height: 10px;
     fill: currentColor;
+}
+
+@media (min-width: 768px) {
+    .space-game-record-tag__chip ::deep .cg-mdi-icon {
+        width: 13px;
+        height: 13px;
+    }
 }
 
 .space-game-record-tag__chip--steam {

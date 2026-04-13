@@ -2,6 +2,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: var(--cg-spacing-4);
+    padding-bottom: calc(var(--cg-spacing-4) + var(--cg-bottom-nav-height, 0px));
 }
 
 .cg-space-layout-row {

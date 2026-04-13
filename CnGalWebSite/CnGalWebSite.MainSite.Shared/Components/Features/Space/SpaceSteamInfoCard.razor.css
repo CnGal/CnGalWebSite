@@ -1,38 +1,64 @@
+/* ══════════════════════════════════════════════════════════
+   SpaceSteamInfoCard.razor.css — Mobile-first
+   ══════════════════════════════════════════════════════════ */
+
 .space-steam-info-card {
     display: flex;
     flex-direction: column;
-    gap: var(--cg-spacing-4);
-    padding: var(--cg-spacing-5);
+    gap: 0.75rem;
+    padding: 0.75rem;
     background: var(--cg-color-surface);
-    border-radius: var(--cg-radius-xl);
+    border-radius: var(--cg-radius-lg);
     border: 1px solid var(--cg-color-border);
     margin-bottom: var(--cg-spacing-4);
     box-shadow: var(--cg-shadow-sm);
     transition: box-shadow var(--cg-transition-normal);
 }
 
+@media (min-width: 768px) {
+    .space-steam-info-card {
+        gap: 1rem;
+        padding: 1.25rem;
+        border-radius: var(--cg-radius-xl);
+    }
+}
+
 .space-steam-info-card:hover {
     box-shadow: var(--cg-shadow-md);
 }
 
-/* Account list */
+/* ── Account list ── */
 .space-steam-info-card__accounts {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--cg-spacing-3);
+    gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+    .space-steam-info-card__accounts {
+        gap: 0.75rem;
+    }
 }
 
 .space-steam-info-card__account {
     display: inline-flex;
     align-items: center;
-    gap: var(--cg-spacing-2);
-    padding: var(--cg-spacing-1) var(--cg-spacing-3) var(--cg-spacing-1) var(--cg-spacing-1);
+    gap: 0.375rem;
+    padding: 0.1875rem 0.625rem 0.1875rem 0.1875rem;
     background: var(--cg-color-bg);
     border-radius: var(--cg-radius-full);
     text-decoration: none;
     color: var(--cg-color-text);
     border: 1px solid var(--cg-color-border);
     transition: all var(--cg-transition-fast);
+    min-height: 36px;
+}
+
+@media (min-width: 768px) {
+    .space-steam-info-card__account {
+        gap: 0.5rem;
+        padding: 0.25rem 0.75rem 0.25rem 0.25rem;
+    }
 }
 
 .space-steam-info-card__account:hover {
@@ -43,75 +69,141 @@
 }
 
 .space-steam-info-card__avatar {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: var(--cg-radius-full);
     object-fit: cover;
     flex-shrink: 0;
     box-shadow: var(--cg-shadow-sm);
 }
 
+@media (min-width: 768px) {
+    .space-steam-info-card__avatar {
+        width: 32px;
+        height: 32px;
+    }
+}
+
 .space-steam-info-card__name {
-    font-size: var(--cg-font-size-sm);
+    font-size: 0.75rem;
     font-weight: var(--cg-font-weight-medium);
 }
 
+@media (min-width: 768px) {
+    .space-steam-info-card__name {
+        font-size: 0.8125rem;
+    }
+}
+
 .space-steam-info-card__account ::deep .cg-mdi-icon {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     fill: var(--cg-color-text-muted);
     transition: fill var(--cg-transition-fast);
+}
+
+@media (min-width: 768px) {
+    .space-steam-info-card__account ::deep .cg-mdi-icon {
+        width: 14px;
+        height: 14px;
+    }
 }
 
 .space-steam-info-card__account:hover ::deep .cg-mdi-icon {
     fill: var(--cg-color-primary);
 }
 
-/* Stats row */
+/* ── Stats row ── */
 .space-steam-info-card__stats {
-    display: flex;
-    gap: var(--cg-spacing-6);
-    flex-wrap: wrap;
-    padding-top: var(--cg-spacing-3);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    padding-top: 0.625rem;
     border-top: 1px dashed var(--cg-color-border);
+}
+
+@media (min-width: 640px) {
+    .space-steam-info-card__stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding-top: 0.75rem;
+    }
 }
 
 .space-steam-info-card__stat {
     display: flex;
     align-items: center;
-    gap: var(--cg-spacing-3);
+    gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+    .space-steam-info-card__stat {
+        gap: 0.75rem;
+    }
 }
 
 .space-steam-info-card__stat-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 38px;
-    height: 38px;
+    width: 30px;
+    height: 30px;
     background: color-mix(in srgb, var(--cg-color-primary) 10%, var(--cg-color-bg));
     border-radius: var(--cg-radius-md);
     color: var(--cg-color-primary);
+    flex-shrink: 0;
+}
+
+@media (min-width: 768px) {
+    .space-steam-info-card__stat-icon {
+        width: 38px;
+        height: 38px;
+    }
 }
 
 .space-steam-info-card__stat-icon ::deep .cg-mdi-icon {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     fill: currentColor;
+}
+
+@media (min-width: 768px) {
+    .space-steam-info-card__stat-icon ::deep .cg-mdi-icon {
+        width: 20px;
+        height: 20px;
+    }
 }
 
 .space-steam-info-card__stat-content {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
 .space-steam-info-card__stat-value {
-    font-size: var(--cg-font-size-lg);
+    font-size: 0.9375rem;
     font-weight: var(--cg-font-weight-bold);
     color: var(--cg-color-text);
     line-height: 1.2;
 }
 
+@media (min-width: 768px) {
+    .space-steam-info-card__stat-value {
+        font-size: 1.0625rem;
+    }
+}
+
 .space-steam-info-card__stat-label {
-    font-size: var(--cg-font-size-xs);
+    font-size: 0.625rem;
     color: var(--cg-color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (min-width: 768px) {
+    .space-steam-info-card__stat-label {
+        font-size: 0.6875rem;
+    }
 }

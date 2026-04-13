@@ -1,0 +1,31 @@
+@* 移动端底部导航栏 — 仅 < 768px 显示，所有主 tab 页面共享 *@
+<nav class="cg-bottom-nav" aria-label="底部导航">
+    <a href="/" class="cg-bottom-nav__item @(ActiveTab == "home" ? "cg-bottom-nav__item--active" : "")">
+        <CgMdiIcon Name="mdiHome" aria-hidden="true"/>
+        <span>主页</span>
+    </a>
+    <a href="/search" class="cg-bottom-nav__item @(ActiveTab == "search" ? "cg-bottom-nav__item--active" : "")">
+        <CgMdiIcon Name="mdiMagnify" aria-hidden="true"/>
+        <span>探索</span>
+    </a>
+    <a href="/sharegames" class="cg-bottom-nav__item @(ActiveTab == "sharegames" ? "cg-bottom-nav__item--active" : "")">
+        <CgMdiIcon Name="mdiControllerClassicOutline" aria-hidden="true"/>
+        <span>游玩记录</span>
+    </a>
+    <a href="/square" class="cg-bottom-nav__item @(ActiveTab == "square" ? "cg-bottom-nav__item--active" : "")">
+        <CgMdiIcon Name="mdiShapeOutline" aria-hidden="true"/>
+        <span>广场</span>
+    </a>
+    <a href="/space/index" class="cg-bottom-nav__item @(ActiveTab == "space" ? "cg-bottom-nav__item--active" : "")">
+        <CgMdiIcon Name="mdiAccountOutline" aria-hidden="true"/>
+        <span>空间</span>
+    </a>
+</nav>
+
+@code {
+    /// <summary>
+    /// 当前激活的 tab 标识。可选值: "home" | "search" | "sharegames" | "square" | "space"
+    /// </summary>
+    [Parameter]
+    public string ActiveTab { get; set; } = "";
+}
