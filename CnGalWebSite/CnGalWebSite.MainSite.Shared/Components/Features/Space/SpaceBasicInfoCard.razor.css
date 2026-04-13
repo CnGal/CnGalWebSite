@@ -2,8 +2,14 @@
     background-color: var(--cg-color-surface);
     border-radius: var(--cg-radius-lg);
     box-shadow: var(--cg-shadow-sm);
-    margin-bottom: var(--cg-spacing-4);
     overflow: hidden;
+    border: 1px solid var(--cg-color-border);
+}
+
+@media (min-width: 640px) {
+    .cg-space-card {
+        border: none;
+    }
 }
 
 .cg-space-card-header {

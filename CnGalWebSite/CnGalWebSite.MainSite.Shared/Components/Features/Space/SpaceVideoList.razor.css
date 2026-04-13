@@ -16,8 +16,27 @@
 
 .cg-space-video-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: var(--cg-spacing-3);
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+    .cg-space-video-grid {
+        gap: 0.75rem;
+    }
+}
+
+@media (min-width: 768px) {
+    .cg-space-video-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .cg-space-video-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
 }
 
 .cg-space-video-item {

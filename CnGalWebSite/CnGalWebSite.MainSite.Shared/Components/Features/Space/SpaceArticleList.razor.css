@@ -38,11 +38,17 @@
 }
 
 .cg-space-article-cover {
-    width: 160px;
+    width: 100px;
     flex-shrink: 0;
     aspect-ratio: 460 / 215;
     border-radius: var(--cg-radius-sm);
     overflow: hidden;
+}
+
+@media (min-width: 640px) {
+    .cg-space-article-cover {
+        width: 160px;
+    }
 }
 
 .cg-space-article-cover img {
@@ -101,10 +107,4 @@
 
 .cg-space-article-date {
     margin-left: auto;
-}
-
-@media (max-width: 600px) {
-    .cg-space-article-cover {
-        width: 100px;
-    }
 }

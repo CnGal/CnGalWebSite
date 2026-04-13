@@ -64,6 +64,23 @@
     height: 4px;
     border-radius: var(--cg-radius-full);
     background: var(--cg-color-primary);
+    animation: cg-dot-scale 0.3s ease-out;
+}
+
+@keyframes cg-dot-scale {
+    0% { transform: translateX(-50%) scale(0); opacity: 0; }
+    100% { transform: translateX(-50%) scale(1); opacity: 1; }
+}
+
+/* Icon pop animation */
+.cg-bottom-nav__item--active ::deep .cg-mdi-icon {
+    animation: cg-bottom-nav-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes cg-bottom-nav-pop {
+    0% { transform: scale(0.85); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
 }
 
 .cg-bottom-nav__item ::deep .cg-mdi-icon {
