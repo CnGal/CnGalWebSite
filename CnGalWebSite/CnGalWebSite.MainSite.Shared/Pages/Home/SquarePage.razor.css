@@ -1,15 +1,22 @@
-/* ═══════════════════════════════════════════════════
-   SquarePage — 广场页面
-   ═══════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════
+   SquarePage.razor.css — Mobile-first 广场页面
+   ══════════════════════════════════════════════════════════ */
 
 .square-page {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 1.5rem 1rem 3rem;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.25rem;
+    padding-bottom: calc(var(--cg-bottom-nav-height, 0px));
     animation: square-fade-in 0.35s ease-out;
+}
+
+@media (min-width: 768px) {
+    .square-page {
+        gap: 2rem;
+        padding: 2rem 1.5rem 4rem;
+    }
 }
 
 @keyframes square-fade-in {
@@ -17,32 +24,48 @@
         opacity: 0;
         transform: translateY(8px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-.square-page ::deep .home-section{
+.square-page ::deep .home-section {
     margin: 0;
 }
 
 /* ── Header ── */
 
 .square-page__header {
-    padding-bottom: var(--cg-spacing-4);
-    border-bottom: 1px solid var(--cg-color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+@media (min-width: 768px) {
+    .square-page__header {
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--cg-color-border);
+        gap: 0.5rem;
+    }
 }
 
 .square-page__title {
     display: flex;
     align-items: center;
-    gap: var(--cg-spacing-3);
-    font-size: var(--cg-font-size-xl);
-    font-weight: var(--cg-font-weight-bold);
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
     color: var(--cg-color-text);
     margin: 0;
+}
+
+@media (min-width: 768px) {
+    .square-page__title {
+        font-size: 1.75rem;
+        gap: 0.75rem;
+    }
 }
 
 .square-page__title ::deep .cg-mdi-icon {
@@ -51,11 +74,24 @@
     color: var(--cg-color-primary);
 }
 
+@media (min-width: 768px) {
+    .square-page__title ::deep .cg-mdi-icon {
+        width: 32px;
+        height: 32px;
+    }
+}
+
 .square-page__desc {
-    margin: var(--cg-spacing-2) 0 0;
-    font-size: var(--cg-font-size-sm);
+    margin: 0;
+    font-size: 0.8125rem;
     color: var(--cg-color-text-muted);
-    line-height: 1.6;
+    line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+    .square-page__desc {
+        font-size: 0.9375rem;
+    }
 }
 
 /* ── Section spacing ── */
@@ -69,22 +105,38 @@
 
 .square-tag-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--cg-spacing-4);
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
     list-style: none;
     padding: 0;
     margin: 0;
+}
+
+.square-tag-grid ::deep > li:nth-child(n+4) {
+    display: none;
+}
+
+@media (min-width: 640px) {
+    .square-tag-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
+    }
 }
 
 @media (min-width: 768px) {
     .square-tag-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
+
+    .square-tag-grid ::deep > li:nth-child(n+4) {
+        display: list-item;
+    }
 }
 
 @media (min-width: 1024px) {
     .square-tag-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1.25rem;
     }
 }
 
@@ -92,8 +144,8 @@
 
 .square-lottery-grid {
     display: grid;
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-    gap: var(--cg-spacing-4);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
     list-style: none;
     padding: 0;
     margin: 0;
@@ -101,13 +153,14 @@
 
 @media (min-width: 640px) {
     .square-lottery-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
     }
 }
 
 @media (min-width: 1024px) {
     .square-lottery-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1.25rem;
     }
 }
 
@@ -115,8 +168,8 @@
 
 .square-vote-grid {
     display: grid;
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-    gap: var(--cg-spacing-4);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
     list-style: none;
     padding: 0;
     margin: 0;
@@ -124,13 +177,14 @@
 
 @media (min-width: 640px) {
     .square-vote-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem;
     }
 }
 
 @media (min-width: 1024px) {
     .square-vote-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.25rem;
     }
 }
 
@@ -139,18 +193,39 @@
 .square-section-more-link {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.25rem;
-    font-size: var(--cg-font-size-sm);
-    font-weight: var(--cg-font-weight-semibold);
+    font-size: 0.75rem;
+    font-weight: var(--cg-font-weight-bold);
     color: var(--cg-color-text-muted);
     text-decoration: none;
-    transition: color var(--cg-transition-fast), gap var(--cg-transition-fast);
+    min-height: 44px; /* Touch target size for mobile */
+    min-width: 44px;
+    padding: 0 0.5rem;
+    border-radius: var(--cg-radius-md);
+    transition: all var(--cg-transition-fast);
+}
+
+@media (min-width: 768px) {
+    .square-section-more-link {
+        font-size: 0.8125rem;
+        min-height: auto;
+        min-width: auto;
+        padding: 0;
+    }
 }
 
 .square-section-more-link:hover {
     color: var(--cg-color-primary);
     gap: 0.5rem;
     text-decoration: none;
+    background: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+}
+
+@media (min-width: 768px) {
+    .square-section-more-link:hover {
+        background: transparent;
+    }
 }
 
 .square-section-more-link ::deep .cg-mdi-icon {
@@ -158,33 +233,9 @@
     height: 1rem;
 }
 
-/* ── Responsive ── */
-
 @media (min-width: 768px) {
-    .square-page {
-        padding: 2rem 1.5rem 4rem;
-    }
-}
-
-@media (max-width: 640px) {
-    .square-page {
-        padding: var(--cg-spacing-4) var(--cg-spacing-3);
-        gap: var(--cg-spacing-4);
-    }
-
-    .square-page__title {
-        font-size: var(--cg-font-size-lg);
-    }
-
-    .square-tag-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .square-vote-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .square-lottery-grid {
-        grid-template-columns: 1fr;
+    .square-section-more-link ::deep .cg-mdi-icon {
+        width: 1.125rem;
+        height: 1.125rem;
     }
 }

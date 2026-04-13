@@ -1,4 +1,4 @@
-@*
+﻿@*
     UserSessionTracker — 已登录用户后台任务
     1. 定时心跳：每 10 分钟调用 MakeUserOnlineAsync 上报在线状态
     2. 自动签到：首次加载时检查签到状态，未签到则自动签到并通知用户
@@ -53,7 +53,7 @@
     {
         try
         {
-            await Task.Delay(TimeSpan.FromSeconds(5), ct);
+            await Task.Delay(TimeSpan.FromSeconds(1), ct);
 
             // 首次心跳
             await InvokeAsync(SafeMakeOnlineAsync);

@@ -356,7 +356,8 @@ CnGalWebSite.MainSite.Shared
 │  │  │  └─ ExamineDetailPanel.razor   # 审核详情面板（含管理员操作）
 │  │  └─ Message/             # 消息
 │  └─ Layout/
-│     └─ UserMenu.razor / .razor.css
+│     ├─ UserMenu.razor / .razor.css
+│     └─ CgBottomNav.razor / .razor.css   # 移动端底部导航栏（all tab pages）
 ├─ Layout/
 │  └─ MainLayout.razor / .razor.css
 ├─ Pages/

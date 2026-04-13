@@ -95,6 +95,9 @@ else
     </div>
 }
 
+@* 移动端底部导航栏 — 仅 < 768px 显示 *@
+<CgBottomNav ActiveTab="sharegames" />
+
 @code {
     private SteamGamesOverviewViewModel? _overview;
     private IReadOnlyList<RandomReviewItem> _reviews = [];

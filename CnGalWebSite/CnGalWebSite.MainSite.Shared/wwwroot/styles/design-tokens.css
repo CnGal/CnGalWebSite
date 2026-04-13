@@ -115,8 +115,8 @@
     --cg-page-gutter: 1rem;
     --cg-section-gap: 2rem;
 
-    /* ── 底部导航栏 ── */
-    --cg-bottom-nav-height: 56px;
+    /* ── 底部导航栏（含 safe-area） ── */
+    --cg-bottom-nav-height: calc(56px + env(safe-area-inset-bottom, 0px));
 }
 
 @media (min-width: 768px) {

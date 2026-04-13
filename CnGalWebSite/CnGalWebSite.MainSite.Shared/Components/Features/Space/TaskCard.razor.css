@@ -3,12 +3,21 @@
 .task-card {
     display: flex;
     align-items: center;
-    gap: var(--cg-spacing-4);
-    padding: var(--cg-spacing-4) var(--cg-spacing-5);
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
     border-radius: var(--cg-radius-lg);
     background: var(--cg-color-surface);
     border: 1px solid var(--cg-color-border);
     transition: box-shadow var(--cg-transition-fast), border-color var(--cg-transition-fast);
+}
+
+@media (min-width: 640px) {
+    .task-card {
+        flex-wrap: nowrap;
+        gap: var(--cg-spacing-4);
+        padding: var(--cg-spacing-4) var(--cg-spacing-5);
+    }
 }
 
 .task-card:hover {
@@ -31,17 +40,31 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     border-radius: var(--cg-radius-md);
     background: color-mix(in oklab, var(--cg-color-primary) 12%, transparent);
     flex-shrink: 0;
 }
 
+@media (min-width: 640px) {
+    .task-card__icon {
+        width: 48px;
+        height: 48px;
+    }
+}
+
 .task-card__icon ::deep .cg-mdi-icon {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     color: var(--cg-color-primary);
+}
+
+@media (min-width: 640px) {
+    .task-card__icon ::deep .cg-mdi-icon {
+        width: 24px;
+        height: 24px;
+    }
 }
 
 .task-card--finished .task-card__icon {
@@ -93,6 +116,15 @@
 
 .task-card__action {
     flex-shrink: 0;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+@media (min-width: 640px) {
+    .task-card__action {
+        width: auto;
+    }
 }
 
 .task-card__action ::deep .cg-btn {
@@ -114,30 +146,4 @@
 .task-card__done-badge ::deep .cg-mdi-icon {
     width: 18px;
     height: 18px;
-}
-
-/* ── Responsive ── */
-
-@media (max-width: 640px) {
-    .task-card {
-        flex-wrap: wrap;
-        gap: var(--cg-spacing-3);
-        padding: var(--cg-spacing-3) var(--cg-spacing-4);
-    }
-
-    .task-card__icon {
-        width: 40px;
-        height: 40px;
-    }
-
-    .task-card__icon ::deep .cg-mdi-icon {
-        width: 20px;
-        height: 20px;
-    }
-
-    .task-card__action {
-        width: 100%;
-        display: flex;
-        justify-content: flex-end;
-    }
 }

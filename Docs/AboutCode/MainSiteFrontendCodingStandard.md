@@ -193,7 +193,7 @@
 - 可交互元素最小触控区域 **44×44px**（遵循 WCAG 2.5.5）。
 - 布局网格、卡片列表等必须提供至少一个移动端断点的列数适配。
 - 间距使用 `--cg-page-gutter`、`--cg-section-gap` 等响应式 Token，禁止在页面/组件中硬编码与断点相关的重复 padding 值。
-- `MainLayout` 中 Footer 在移动端（`< 768px`）隐藏，底部导航栏仅在 `HomePage` 移动端显示。
+- `MainLayout` 中 Footer 在移动端（`< 768px`）隐藏，底部导航栏（`CgBottomNav`）在所有主 tab 页面（HomePage、SearchPage、SquarePage、ShareGamesPage、SpaceIndexPage）的移动端显示。
 - 新增页面 PR 必须附带移动端视窗截图（至少 375px 宽度）。
 
 ---

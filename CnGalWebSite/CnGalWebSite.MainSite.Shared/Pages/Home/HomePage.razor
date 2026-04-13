@@ -13,6 +13,7 @@ else
 {
     <div class="home-page">
     <HomeHero Carousels="@Model.Carousels"/>
+    <HomeMobileButtonGroup />
 
     <div class="home-community-action-section">
         <div class="home-community-left">
@@ -134,6 +135,7 @@ else
                 </ul>
             </HomeSection>
 
+            <div class="home-evaluations-section">
             <HomeSection Title="专题推荐" Icon="mdiTextBoxOutline" IconColor="var(--cg-color-primary)">
                 <ul class="home-articles-grid">
                     @foreach (var item in Model.Evaluations.Take(6))
@@ -142,6 +144,7 @@ else
                     }
                 </ul>
             </HomeSection>
+            </div>
         </div>
 
         <div class="home-grid-sidebar">
@@ -374,28 +377,7 @@ else
     </div>
 
     @* 移动端底部导航栏 — 仅 < 768px 显示 *@
-    <nav class="home-bottom-nav" aria-label="底部导航">
-        <a href="/" class="home-bottom-nav__item home-bottom-nav__item--active">
-            <CgMdiIcon Name="mdiHome" aria-hidden="true"/>
-            <span>主页</span>
-        </a>
-        <a href="/search" class="home-bottom-nav__item">
-            <CgMdiIcon Name="mdiMagnify" aria-hidden="true"/>
-            <span>探索</span>
-        </a>
-        <a href="/sharegames" class="home-bottom-nav__item">
-            <CgMdiIcon Name="mdiControllerClassicOutline" aria-hidden="true"/>
-            <span>游玩记录</span>
-        </a>
-        <a href="/square" class="home-bottom-nav__item">
-            <CgMdiIcon Name="mdiShapeOutline" aria-hidden="true"/>
-            <span>广场</span>
-        </a>
-        <a href="/space" class="home-bottom-nav__item">
-            <CgMdiIcon Name="mdiAccountOutline" aria-hidden="true"/>
-            <span>空间</span>
-        </a>
-    </nav>
+    <CgBottomNav ActiveTab="home" />
 }
 
 @code {

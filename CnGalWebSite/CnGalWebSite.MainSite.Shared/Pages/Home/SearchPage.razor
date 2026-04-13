@@ -75,6 +75,10 @@
         }
         else
         {
+            <p class="search-page__results-info">
+                找到 @SearchResult.pagedResultDto.TotalCount 条结果
+            </p>
+
             <div class="search-page__results">
                 @foreach (var item in SearchResult.pagedResultDto.Data)
                 {
@@ -91,6 +95,9 @@
         }
     }
 </div>
+
+@* 移动端底部导航栏 — 仅 < 768px 显示 *@
+<CgBottomNav ActiveTab="search" />
 
 @code {
     // ── URL query parameters ──

@@ -1,16 +1,26 @@
-/* ── ShareGamesReviewCard ── */
+/* ══════════════════════════════════════════════════════════
+   ShareGamesReviewCard.razor.css — Mobile-first
+   ══════════════════════════════════════════════════════════ */
 
 .share-games-review-card {
     display: flex;
     flex-direction: column;
-    gap: var(--cg-spacing-3);
-    padding: var(--cg-spacing-4);
+    gap: 0.5rem;
+    padding: 0.75rem;
     background: var(--cg-color-surface);
     border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-xl);
+    border-radius: var(--cg-radius-lg);
     text-decoration: none;
     color: inherit;
     transition: box-shadow var(--cg-transition-fast), transform var(--cg-transition-fast);
+}
+
+@media (min-width: 768px) {
+    .share-games-review-card {
+        gap: 0.75rem;
+        padding: 1rem;
+        border-radius: var(--cg-radius-xl);
+    }
 }
 
 .share-games-review-card:hover {
@@ -18,20 +28,33 @@
     transform: translateY(-2px);
 }
 
-/* Header */
+/* ── Header ── */
 .share-games-review-card__header {
     display: flex;
     align-items: center;
-    gap: var(--cg-spacing-3);
+    gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+    .share-games-review-card__header {
+        gap: 0.75rem;
+    }
 }
 
 .share-games-review-card__avatar {
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
     border-radius: var(--cg-radius-full);
     object-fit: cover;
     flex-shrink: 0;
     border: 2px solid var(--cg-color-border);
+}
+
+@media (min-width: 768px) {
+    .share-games-review-card__avatar {
+        width: 36px;
+        height: 36px;
+    }
 }
 
 .share-games-review-card__user-info {
@@ -42,7 +65,7 @@
 }
 
 .share-games-review-card__user-name {
-    font-size: var(--cg-font-size-sm);
+    font-size: 0.75rem;
     font-weight: var(--cg-font-weight-semibold);
     color: var(--cg-color-text);
     white-space: nowrap;
@@ -50,64 +73,110 @@
     text-overflow: ellipsis;
 }
 
+@media (min-width: 768px) {
+    .share-games-review-card__user-name {
+        font-size: 0.8125rem;
+    }
+}
+
 .share-games-review-card__game-name {
-    font-size: var(--cg-font-size-xs);
+    font-size: 0.6875rem;
     color: var(--cg-color-text-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* Score badge */
+/* ── Score badge ── */
 .share-games-review-card__score {
     display: inline-flex;
     align-items: center;
-    gap: var(--cg-spacing-1);
-    padding: var(--cg-spacing-1) var(--cg-spacing-2);
+    gap: 0.1875rem;
+    padding: 0.1875rem 0.375rem;
     background: color-mix(in srgb, var(--cg-color-warning) 15%, var(--cg-color-bg));
     border-radius: var(--cg-radius-md);
-    font-size: var(--cg-font-size-sm);
+    font-size: 0.75rem;
     font-weight: var(--cg-font-weight-bold);
     color: var(--cg-color-warning);
     flex-shrink: 0;
 }
 
+@media (min-width: 768px) {
+    .share-games-review-card__score {
+        font-size: 0.8125rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+
 .share-games-review-card__score ::deep .cg-mdi-icon {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     fill: currentColor;
 }
 
-/* Play impressions */
+@media (min-width: 768px) {
+    .share-games-review-card__score ::deep .cg-mdi-icon {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+/* ── Play impressions ── */
 .share-games-review-card__text {
-    font-size: var(--cg-font-size-sm);
+    font-size: 0.75rem;
     color: var(--cg-color-text);
     line-height: 1.6;
     margin: 0;
     display: -webkit-box;
-    -webkit-line-clamp: 4;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     white-space: pre-line;
 }
 
-/* Score breakdown */
+@media (min-width: 768px) {
+    .share-games-review-card__text {
+        font-size: 0.8125rem;
+        -webkit-line-clamp: 4;
+    }
+}
+
+/* ── Score breakdown ── */
 .share-games-review-card__scores {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--cg-spacing-2);
-    font-size: var(--cg-font-size-xs);
+    gap: 0.25rem;
+    font-size: 0.625rem;
     color: var(--cg-color-text-muted);
 }
 
+@media (min-width: 768px) {
+    .share-games-review-card__scores {
+        gap: 0.375rem;
+        font-size: 0.6875rem;
+    }
+}
+
 .share-games-review-card__scores span {
-    padding: 2px var(--cg-spacing-2);
+    padding: 1px 0.375rem;
     background: var(--cg-color-bg);
     border-radius: var(--cg-radius-sm);
 }
 
-/* Time */
+@media (min-width: 768px) {
+    .share-games-review-card__scores span {
+        padding: 2px 0.5rem;
+    }
+}
+
+/* ── Time ── */
 .share-games-review-card__time {
-    font-size: var(--cg-font-size-xs);
+    font-size: 0.625rem;
     color: var(--cg-color-text-muted);
+}
+
+@media (min-width: 768px) {
+    .share-games-review-card__time {
+        font-size: 0.6875rem;
+    }
 }

@@ -1,0 +1,81 @@
+/* Mobile Button Group CSS (Only displayed on < 768px screens) */
+
+.home-mobile-button-group-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0;
+}
+
+@media (min-width: 768px) {
+    .home-mobile-button-group-card {
+        display: none;
+    }
+}
+
+.home-mobile-button-group {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1.25rem 0.5rem;
+}
+
+.home-mobile-button-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.home-mobile-button-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--cg-radius-full);
+    transition: transform var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
+}
+
+.home-mobile-button-item:active .home-mobile-button-icon {
+    transform: scale(0.92);
+}
+
+.home-mobile-button-icon ::deep .cg-mdi-icon {
+    width: 1.375rem;
+    height: 1.375rem;
+}
+
+.home-mobile-button-name {
+    font-size: 0.75rem;
+    color: var(--cg-color-text);
+    text-align: center;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.home-mobile-community-buttons {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.home-mobile-community-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: var(--cg-radius-full);
+    text-decoration: none;
+    transition: transform var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.home-mobile-community-btn:active {
+    transform: scale(0.92);
+}
+
+.home-mobile-community-btn ::deep .cg-mdi-icon {
+    width: 2rem;
+    height: 2rem;
+}
