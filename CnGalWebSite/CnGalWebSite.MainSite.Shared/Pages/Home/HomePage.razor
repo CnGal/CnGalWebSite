@@ -13,6 +13,7 @@ else
 {
     <div class="home-page">
     <HomeHero Carousels="@Model.Carousels"/>
+    <HomeMobileButtonGroup />
 
     <div class="home-community-action-section">
         <div class="home-community-left">
@@ -135,14 +136,14 @@ else
             </HomeSection>
 
             <div class="home-evaluations-section">
-                <HomeSection Title="专题推荐" Icon="mdiTextBoxOutline" IconColor="var(--cg-color-primary)">
-                    <ul class="home-articles-grid">
-                        @foreach (var item in Model.Evaluations.Take(6))
-                        {
-                            <HomeEvaluationCard Url="@item.Url" Name="@item.Name" Image="@item.Image" Articles="@item.Articles.Take(4)"/>
-                        }
-                    </ul>
-                </HomeSection>
+            <HomeSection Title="专题推荐" Icon="mdiTextBoxOutline" IconColor="var(--cg-color-primary)">
+                <ul class="home-articles-grid">
+                    @foreach (var item in Model.Evaluations.Take(6))
+                    {
+                        <HomeEvaluationCard Url="@item.Url" Name="@item.Name" Image="@item.Image" Articles="@item.Articles.Take(4)"/>
+                    }
+                </ul>
+            </HomeSection>
             </div>
         </div>
 
@@ -376,7 +377,7 @@ else
     </div>
 
     @* 移动端底部导航栏 — 仅 < 768px 显示 *@
-    <CnGalWebSite.MainSite.Shared.Components.Layout.CgBottomNav ActiveTab="home"/>
+    <CnGalWebSite.MainSite.Shared.Components.Layout.CgBottomNav ActiveTab="home" />
 }
 
 @code {
