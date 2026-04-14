@@ -1,29 +1,58 @@
+/* ═══════════════════════════════════════════════
+   EntryCard — mobile-first
+   ═══════════════════════════════════════════════ */
 .entry-card {
     border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
-    border-radius: var(--cg-radius-xl);
+    border-radius: var(--cg-radius-lg);
     background: var(--cg-color-surface);
-    padding: 1.5rem;
+    padding: 1rem;
 }
 
 .entry-card > h2 {
-    margin: 0 0 1.25rem;
-    font-size: 1.15rem;
+    margin: 0 0 0.85rem;
+    font-size: 1rem;
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.6rem;
     color: var(--cg-color-text);
 }
 
 .entry-card > h2 ::deep .cg-mdi-icon {
-    width: 2rem;
-    height: 2rem;
+    width: 1.5rem;
+    height: 1.5rem;
     color: var(--cg-color-primary);
+    flex-shrink: 0;
 }
 
 .entry-card > p {
-    margin: 0 0 1rem 0;
+    margin: 0 0 0.85rem 0;
     color: var(--cg-color-text-muted);
-    line-height: 1.7;
-    font-size: 0.9rem;
+    line-height: 1.6;
+    font-size: 0.85rem;
+}
+
+/* ── Tablet (≥ 768px) ── */
+@media (min-width: 768px) {
+    .entry-card {
+        padding: 1.5rem;
+        border-radius: var(--cg-radius-xl);
+    }
+
+    .entry-card > h2 {
+        margin: 0 0 1.25rem;
+        font-size: 1.15rem;
+        gap: 1rem;
+    }
+
+    .entry-card > h2 ::deep .cg-mdi-icon {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .entry-card > p {
+        margin: 0 0 1rem 0;
+        font-size: 0.9rem;
+        line-height: 1.7;
+    }
 }

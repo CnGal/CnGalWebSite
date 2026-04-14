@@ -1,7 +1,10 @@
+/* ═══════════════════════════════════════════════
+   EntryImageGrid — mobile-first
+   ═══════════════════════════════════════════════ */
 .entry-image-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
+    gap: 0.5rem;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -11,7 +14,7 @@
     width: 100%;
     aspect-ratio: 16 / 9;
     object-fit: cover;
-    border-radius: var(--cg-radius-md);
+    border-radius: var(--cg-radius-sm);
     border: 1px solid color-mix(in oklab, var(--cg-color-primary) 5%, transparent);
     transition: opacity var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
 }
@@ -21,8 +24,14 @@
     box-shadow: 0 0 0 2px var(--cg-color-primary);
 }
 
+/* ── Tablet (≥ 768px) ── */
 @media (min-width: 768px) {
     .entry-image-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .entry-image-grid img {
+        border-radius: var(--cg-radius-md);
     }
 }

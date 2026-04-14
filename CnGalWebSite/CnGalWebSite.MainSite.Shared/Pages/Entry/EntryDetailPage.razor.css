@@ -1,11 +1,15 @@
+/* ═══════════════════════════════════════════════
+   EntryDetailPage — mobile-first layout
+   ═══════════════════════════════════════════════ */
+
 .entry-page {
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--cg-spacing-3);
     max-width: 1280px;
     margin: 0 auto;
-    padding: 1.5rem 1rem 3rem;
+    padding: 0;
 }
 
 .entry-layout {
@@ -22,69 +26,49 @@
 .entry-mobile-panel {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--cg-spacing-3);
 }
 
+/* ── Mobile layout ── */
 .entry-layout--mobile {
     display: block;
 }
 
-.entry-mobile-tabs input[type="radio"] {
-    display: none;
+/* Make the CgTabs bar sticky on mobile for quick tab access */
+.entry-layout--mobile ::deep .cg-tabs__bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
-.entry-mobile-tab-nav {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
+/* Panel fade-in animation for mobile tab switching */
+.entry-layout--mobile ::deep .cg-tabs__panel {
+    animation: entry-panel-fadein 0.2s ease-out;
 }
 
-.entry-mobile-tab-nav label {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid transparent;
-    border-radius: var(--cg-radius-lg);
-    min-height: 2.5rem;
-    font-size: 0.85rem;
-    font-weight: 700;
-    background: transparent;
-    color: var(--cg-color-text-muted);
-    cursor: pointer;
-    transition: var(--cg-transition-fast);
-}
-
-#entry-tab-home:checked ~ .entry-mobile-tab-nav label[for="entry-tab-home"],
-#entry-tab-related:checked ~ .entry-mobile-tab-nav label[for="entry-tab-related"],
-#entry-tab-staff:checked ~ .entry-mobile-tab-nav label[for="entry-tab-staff"] {
-    background: var(--cg-color-surface);
-    border-color: color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
-    box-shadow: var(--cg-shadow-sm);
-    color: var(--cg-color-primary);
-}
-
-.entry-mobile-panel {
-    display: none;
-}
-
-#entry-tab-home:checked ~ .entry-mobile-panels .entry-mobile-panel--home,
-#entry-tab-related:checked ~ .entry-mobile-panels .entry-mobile-panel--related,
-#entry-tab-staff:checked ~ .entry-mobile-panels .entry-mobile-panel--staff {
-    display: flex;
+@keyframes entry-panel-fadein {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .entry-card--empty p {
     color: var(--cg-color-text-muted);
 }
 
+/* ── Loading state ── */
 .entry-loading {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
-    min-height: 40vh;
+    gap: var(--cg-spacing-3);
+    min-height: 30vh;
 }
 
 .entry-loading-text {
@@ -93,15 +77,17 @@
     font-weight: var(--cg-font-weight-medium);
 }
 
+/* ── Error state ── */
 .entry-not-found a {
     color: var(--cg-color-link);
 }
 
+/* ── Action buttons ── */
 .entry-actions {
     display: flex;
     gap: 0.75rem;
     flex-wrap: wrap;
-    margin-top: 0.5rem;
+    margin-top: var(--cg-spacing-2);
 }
 
 .entry-action-btn {
@@ -111,7 +97,7 @@
     background: var(--cg-color-primary);
     text-decoration: none;
     padding: 0.6rem 1.25rem;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
@@ -119,6 +105,8 @@
     gap: 0.5rem;
     transition: var(--cg-transition-fast);
     box-shadow: var(--cg-shadow-sm);
+    min-height: 44px;
+    min-width: 44px;
 }
 
 .entry-action-btn:hover {
@@ -137,10 +125,13 @@
     background: color-mix(in oklab, var(--cg-color-bg) 80%, black);
 }
 
+/* ═══════════════════════════════════════════════
+   Tablet breakpoint (≥ 768px)
+   ═══════════════════════════════════════════════ */
 @media (min-width: 768px) {
     .entry-page {
-        padding: 2rem 1.5rem 4rem;
-        gap: 2rem;
+        padding: var(--cg-spacing-6) var(--cg-spacing-5) var(--cg-spacing-10);
+        gap: var(--cg-spacing-6);
     }
 
     .entry-layout--mobile {
@@ -150,10 +141,22 @@
     .entry-layout--desktop {
         display: grid;
         grid-template-columns: minmax(0, 1fr);
-        gap: 2rem;
+        gap: var(--cg-spacing-6);
+    }
+
+    .entry-main-col,
+    .entry-side-col {
+        gap: var(--cg-spacing-6);
+    }
+
+    .entry-loading {
+        min-height: 40vh;
     }
 }
 
+/* ═══════════════════════════════════════════════
+   Desktop breakpoint (≥ 1024px)
+   ═══════════════════════════════════════════════ */
 @media (min-width: 1024px) {
     .entry-layout--desktop {
         grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);

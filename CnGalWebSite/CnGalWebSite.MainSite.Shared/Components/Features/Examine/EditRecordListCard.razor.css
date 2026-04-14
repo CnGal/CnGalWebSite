@@ -1,24 +1,28 @@
+/* ═══════════════════════════════════════════════
+   EditRecordListCard — mobile-first
+   ═══════════════════════════════════════════════ */
 .edit-record-list-card {
     border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
-    border-radius: var(--cg-radius-xl);
+    border-radius: var(--cg-radius-lg);
     background: var(--cg-color-surface);
-    padding: 1.5rem;
+    padding: 1rem;
 }
 
 .edit-record-list-card > h2 {
-    margin: 0 0 1.25rem;
-    font-size: 1.15rem;
+    margin: 0 0 0.85rem;
+    font-size: 1rem;
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.6rem;
     color: var(--cg-color-text);
 }
 
 .edit-record-list-card > h2 ::deep .cg-mdi-icon {
-    width: 2rem;
-    height: 2rem;
+    width: 1.5rem;
+    height: 1.5rem;
     color: var(--cg-color-primary);
+    flex-shrink: 0;
 }
 
 .edit-record-list-card__list {
@@ -27,23 +31,16 @@
     gap: 2px;
 }
 
-@media (min-width: 640px) {
-    .edit-record-list-card__list--two-col {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 2px 1rem;
-    }
-}
-
 .edit-record-list-card__item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.6rem 0.5rem;
+    gap: 0.6rem;
+    padding: 0.5rem 0.35rem;
     border-radius: var(--cg-radius-md);
     text-decoration: none;
     color: inherit;
     transition: background var(--cg-transition-fast);
+    min-height: 44px;
 }
 
 .edit-record-list-card__item:hover {
@@ -52,8 +49,8 @@
 
 ::deep .edit-record-list-card__item > .cg-mdi-icon {
     flex-shrink: 0;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     color: var(--cg-color-primary);
     opacity: 0.5;
     transition: opacity var(--cg-transition-fast);
@@ -69,8 +66,8 @@
 
 .edit-record-list-card__avatar {
     flex-shrink: 0;
-    width: 34px;
-    height: 34px;
+    width: 28px;
+    height: 28px;
     border-radius: var(--cg-radius-full);
     overflow: hidden;
     background: color-mix(in srgb, var(--cg-color-primary) 8%, var(--cg-color-bg));
@@ -86,8 +83,8 @@
 }
 
 ::deep .edit-record-list-card__avatar .cg-mdi-icon {
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
     color: var(--cg-color-text-muted);
 }
 
@@ -99,12 +96,12 @@
 .edit-record-list-card__header {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 2px;
+    gap: 0.4rem;
+    margin-bottom: 1px;
 }
 
 .edit-record-list-card__user {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--cg-color-text);
     white-space: nowrap;
@@ -113,7 +110,7 @@
 }
 
 .edit-record-list-card__op {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     color: var(--cg-color-text-muted);
     white-space: nowrap;
     overflow: hidden;
@@ -124,24 +121,24 @@
     display: inline-flex;
     align-items: center;
     gap: 2px;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     color: var(--cg-color-text-muted);
     font-variant-numeric: tabular-nums;
 }
 
 ::deep .edit-record-list-card__time .cg-mdi-icon {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
 }
 
 .edit-record-list-card__more {
     display: inline-flex;
     align-items: center;
     align-self: flex-start;
-    gap: 0.35rem;
-    margin-top: 0.75rem;
-    padding: 0.4rem 0.6rem;
-    font-size: 0.85rem;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.8rem;
     font-weight: 500;
     color: var(--cg-color-primary);
     text-decoration: none;
@@ -154,6 +151,85 @@
 }
 
 ::deep .edit-record-list-card__more .cg-mdi-icon {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
+}
+
+/* ── Tablet (≥ 768px) ── */
+@media (min-width: 768px) {
+    .edit-record-list-card {
+        padding: 1.5rem;
+        border-radius: var(--cg-radius-xl);
+    }
+
+    .edit-record-list-card > h2 {
+        margin: 0 0 1.25rem;
+        font-size: 1.15rem;
+        gap: 1rem;
+    }
+
+    .edit-record-list-card > h2 ::deep .cg-mdi-icon {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .edit-record-list-card__list--two-col {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 2px 1rem;
+    }
+
+    .edit-record-list-card__item {
+        gap: 0.75rem;
+        padding: 0.6rem 0.5rem;
+    }
+
+    ::deep .edit-record-list-card__item > .cg-mdi-icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    .edit-record-list-card__avatar {
+        width: 34px;
+        height: 34px;
+    }
+
+    ::deep .edit-record-list-card__avatar .cg-mdi-icon {
+        width: 22px;
+        height: 22px;
+    }
+
+    .edit-record-list-card__header {
+        gap: 0.5rem;
+        margin-bottom: 2px;
+    }
+
+    .edit-record-list-card__user {
+        font-size: 0.875rem;
+    }
+
+    .edit-record-list-card__op {
+        font-size: 0.75rem;
+    }
+
+    .edit-record-list-card__time {
+        font-size: 0.75rem;
+    }
+
+    ::deep .edit-record-list-card__time .cg-mdi-icon {
+        width: 14px;
+        height: 14px;
+    }
+
+    .edit-record-list-card__more {
+        margin-top: 0.75rem;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.85rem;
+        gap: 0.35rem;
+    }
+
+    ::deep .edit-record-list-card__more .cg-mdi-icon {
+        width: 16px;
+        height: 16px;
+    }
 }
