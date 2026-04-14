@@ -1,25 +1,9 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.IdentityServer.Models.DataModels.Account;
 using CnGalWebSite.IdentityServer.Models.DataModels.Geetest;
-using CnGalWebSite.IdentityServer.Services.Account;
 using CnGalWebSite.IdentityServer.Services.Geetest;
-using CnGalWebSite.IdentityServer.Services.Messages;
-using IdentityModel;
-using IdentityServer4.Services;
-using IdentityServer4.Stores;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Security.Claims;
+using System;
 using System.Threading.Tasks;
-using static IdentityServer4.IdentityServerConstants;
 
 namespace CnGalWebSite.IdentityServer.APIControllers
 {
@@ -36,9 +20,13 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         }
 
         [HttpGet]
-        public async Task<GeetestCodeModel> GetGeetestCode()
+        public async Task<GeetestCodeModel> GetGeetestCode([FromQuery] string scenario = "Login")
         {
-            return await Task.FromResult(_geetestService.GetGeetestCode(this));
+            if (!Enum.TryParse<GeetestScenario>(scenario, true, out var geetestScenario))
+            {
+                geetestScenario = GeetestScenario.Login;
+            }
+            return await Task.FromResult(_geetestService.GetGeetestCode(geetestScenario));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
@@ -90,6 +90,23 @@ namespace CnGalWebSite.IdentityServer
                     // enable ssl or tls
                     Security = true
                 });
+            });
+
+            //注册极验配置
+            services.Configure<CnGalWebSite.IdentityServer.Models.DataModels.Geetest.GeetestOptions>(options =>
+            {
+                // 优先使用结构化配置 Geetest:Default:Id / Geetest:Default:Key
+                Configuration.GetSection(CnGalWebSite.IdentityServer.Models.DataModels.Geetest.GeetestOptions.SectionName).Bind(options);
+
+                // 回落到旧的平铺配置 GEETEST_ID / GEETEST_KEY
+                if (string.IsNullOrEmpty(options.Default?.Id))
+                {
+                    options.Default = new CnGalWebSite.IdentityServer.Models.DataModels.Geetest.GeetestCredential
+                    {
+                        Id = Configuration["GEETEST_ID"],
+                        Key = Configuration["GEETEST_KEY"]
+                    };
+                }
             });
 
             //自动注入服务到依赖注入容器

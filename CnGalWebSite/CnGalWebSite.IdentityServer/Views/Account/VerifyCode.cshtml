@@ -1,4 +1,4 @@
-﻿@model VerifyCodeViewModel
+@model VerifyCodeViewModel
 
 <div class="account-page">
     <div class="verify-code-card mdl-card mdl-shadow--2dp">
@@ -21,9 +21,10 @@
                 <input type="hidden" asp-for="Email" />
 
                 <!--极验-->
-                <input id="geetestResult-validate" type="hidden" asp-for="VerifyResult.Validate" />
-                <input id="geetestResult-seccode" type="hidden" asp-for="VerifyResult.Seccode" />
-                <input id="geetestResult-challenge" type="hidden" asp-for="VerifyResult.Challenge" />
+                <input id="geetestResult-lotNumber" type="hidden" asp-for="VerifyResult.LotNumber" />
+                <input id="geetestResult-captchaOutput" type="hidden" asp-for="VerifyResult.CaptchaOutput" />
+                <input id="geetestResult-passToken" type="hidden" asp-for="VerifyResult.PassToken" />
+                <input id="geetestResult-genTime" type="hidden" asp-for="VerifyResult.GenTime" />
 
                 <div id="captcha-box"></div>
                 <button class="d-none" id="repost-submit-button" name="button" value="repost" type="submit"></button>
@@ -35,7 +36,7 @@
                         <input class="mdl-textfield__input" asp-for="Code" autofocus autocomplete="off">
                         <label class="mdl-textfield__label" asp-for="Code">验证码</label>
                     </div>
-                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" id="repost" name="button" value="repost" type="button" onclick="return callGeetest('repost-submit-button')">重新发送</button>
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" id="repost" name="button" value="repost" type="button" onclick="return callGeetest('repost-submit-button', 'SendCode')">重新发送</button>
                 </div>
 
                 <div class="action">
