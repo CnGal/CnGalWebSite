@@ -1,5 +1,5 @@
-.tag-breadcrumb {
-    padding: 0.5rem 0;
+﻿.tag-breadcrumb {
+    padding: var(--cg-spacing-2) 0;
 }
 
 .tag-breadcrumb ol {
@@ -9,13 +9,13 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--cg-spacing-1);
 }
 
 .tag-breadcrumb li {
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--cg-spacing-1);
     font-size: var(--cg-font-size-sm);
 }
 

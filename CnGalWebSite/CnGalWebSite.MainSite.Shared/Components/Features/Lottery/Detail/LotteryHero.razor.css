@@ -1,6 +1,7 @@
 .lottery-hero {
     display: flex;
-    gap: 1.5rem;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
     border-radius: var(--cg-radius-xl);
     background: var(--cg-color-surface);
     overflow: hidden;
@@ -9,7 +10,7 @@
 
 .lottery-hero-image-wrapper {
     flex-shrink: 0;
-    max-width: 50%;
+    width: 100%;
     aspect-ratio: 460 / 215;
     overflow: hidden;
 }
@@ -22,15 +23,15 @@
 }
 
 .lottery-hero--no-image {
-    padding: 2rem;
+    padding: var(--cg-spacing-5);
 }
 
 .lottery-hero-content {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    padding: 1.5rem 1.5rem 1.5rem 0;
+    gap: var(--cg-spacing-3);
+    padding: 0 var(--cg-spacing-5) var(--cg-spacing-5);
     justify-content: center;
 }
 
@@ -40,7 +41,7 @@
 
 .lottery-hero-status {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--cg-spacing-2);
 }
 
 .lottery-status-badge {
@@ -90,8 +91,8 @@
 
 .lottery-hero-stats {
     display: flex;
-    gap: 1rem;
-    margin-top: 0.25rem;
+    gap: var(--cg-spacing-4);
+    margin-top: var(--cg-spacing-1);
 }
 
 .lottery-hero-stat {
@@ -109,18 +110,18 @@
 
 .lottery-hero-actions {
     display: flex;
-    gap: 0.5rem;
-    margin-top: 0.25rem;
+    gap: var(--cg-spacing-2);
+    margin-top: var(--cg-spacing-1);
 }
 
 .lottery-hero-edit-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.45rem 1rem;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-2) var(--cg-spacing-4);
     border-radius: var(--cg-radius-full);
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
     text-decoration: none;
     transition: var(--cg-transition-fast);
     border: 1px solid var(--cg-color-primary);
@@ -137,16 +138,22 @@
     height: 16px;
 }
 
-@media (max-width: 767px) {
+@media (min-width: 768px) {
     .lottery-hero {
-        flex-direction: column;
+        flex-direction: row;
+        gap: var(--cg-spacing-6);
     }
 
     .lottery-hero-image-wrapper {
         flex: none;
+        max-width: 50%;
+    }
+
+    .lottery-hero--no-image {
+        padding: var(--cg-spacing-8);
     }
 
     .lottery-hero-content {
-        padding: 0 1.25rem 1.25rem;
+        padding: var(--cg-spacing-6) var(--cg-spacing-6) var(--cg-spacing-6) 0;
     }
 }

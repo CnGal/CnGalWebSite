@@ -2,7 +2,7 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 1rem;
+    gap: var(--cg-spacing-2) var(--cg-spacing-3);
     padding: 0;
     background: transparent;
     border: none;
@@ -12,18 +12,27 @@
 .article-meta-item {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    font-size: var(--cg-font-size-sm);
+    gap: var(--cg-spacing-1);
+    font-size: var(--cg-font-size-xs);
     color: var(--cg-color-text-muted);
 }
 
 ::deep .cg-mdi-icon {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
 }
 
-@media (max-width: 640px) {
+@media (min-width: 768px) {
     .article-meta {
-        gap: 0.5rem 1rem;
+        gap: var(--cg-spacing-4);
+    }
+
+    .article-meta-item {
+        font-size: var(--cg-font-size-sm);
+    }
+
+    ::deep .cg-mdi-icon {
+        width: 16px;
+        height: 16px;
     }
 }

@@ -1,0 +1,9 @@
+@page "/free"
+@inject NavigationManager NavigationManager
+
+@code {
+    protected override void OnInitialized()
+    {
+        NavigationManager.NavigateTo("/tags/index/8");
+    }
+}

@@ -2,48 +2,54 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--cg-spacing-3);
     max-width: 1280px;
     margin: 0 auto;
-    padding: 1.5rem 1rem 3rem;
+    padding: 0;
 }
 
+/* ── Layout containers ── */
 .tag-header {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--cg-spacing-3);
 }
 
 .tag-main-content {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--cg-spacing-3);
 }
 
 .tag-footer-related {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--cg-spacing-3);
 }
 
 .tag-hidden-alert {
+    margin-top: var(--cg-spacing-2);
     margin-bottom: 0;
 }
 
 .tag-not-found {
     text-align: center;
-    padding: 4rem 1rem;
+    padding: var(--cg-spacing-10) var(--cg-spacing-4);
 }
 
 .tag-not-found h1 {
     font-size: var(--cg-font-size-xl);
     color: var(--cg-color-text);
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--cg-spacing-2);
 }
 
 .tag-not-found p {
     color: var(--cg-color-text-muted);
-    margin-bottom: 1rem;
+    margin-bottom: var(--cg-spacing-4);
 }
 
 .tag-not-found a {
@@ -55,7 +61,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
+    gap: var(--cg-spacing-4);
     min-height: 40vh;
 }
 
@@ -65,13 +71,24 @@
     font-weight: var(--cg-font-weight-medium);
 }
 
+/* ═══════════════════════════════════════════════
+   Tablet breakpoint (≥ 768px)
+   ═══════════════════════════════════════════════ */
 @media (min-width: 768px) {
     .tag-page {
-        padding: 2rem 1.5rem 4rem;
-        gap: 2rem;
+        padding: var(--cg-spacing-6) var(--cg-spacing-5) var(--cg-spacing-10);
+        gap: var(--cg-spacing-6);
+    }
+
+    .tag-header {
+        gap: var(--cg-spacing-6);
+    }
+
+    .tag-main-content {
+        gap: var(--cg-spacing-6);
     }
 
     .tag-footer-related {
-        gap: 2rem;
+        gap: var(--cg-spacing-6);
     }
 }

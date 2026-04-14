@@ -1,7 +1,7 @@
 .lottery-info-card {
     border-radius: var(--cg-radius-xl);
     background: var(--cg-color-surface);
-    padding: 1.25rem;
+    padding: var(--cg-spacing-5);
     box-shadow: var(--cg-shadow-sm);
 }
 
@@ -9,10 +9,10 @@
     font-size: var(--cg-font-size-base);
     font-weight: var(--cg-font-weight-semibold);
     color: var(--cg-color-text);
-    margin: 0 0 1rem;
+    margin: 0 0 var(--cg-spacing-4);
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: var(--cg-spacing-2);
 }
 
 ::deep .lottery-info-card-title .cg-mdi-icon {
@@ -32,7 +32,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.6rem 0;
+    padding: var(--cg-spacing-3) 0;
     border-bottom: 1px solid var(--cg-color-border);
 }
 

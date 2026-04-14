@@ -1,7 +1,7 @@
 .lottery-winner-list {
     border-radius: var(--cg-radius-xl);
     background: var(--cg-color-surface);
-    padding: 1.25rem;
+    padding: var(--cg-spacing-5);
     box-shadow: var(--cg-shadow-sm);
 }
 
@@ -9,10 +9,10 @@
     font-size: var(--cg-font-size-base);
     font-weight: var(--cg-font-weight-semibold);
     color: var(--cg-color-text);
-    margin: 0 0 1rem;
+    margin: 0 0 var(--cg-spacing-4);
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: var(--cg-spacing-2);
 }
 
 ::deep .lottery-winner-list-title .cg-mdi-icon {
@@ -24,15 +24,15 @@
 .lottery-winner-groups {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--cg-spacing-4);
 }
 
 .lottery-winner-group-title {
     font-size: var(--cg-font-size-sm);
     font-weight: var(--cg-font-weight-semibold);
     color: var(--cg-color-text);
-    margin: 0 0 0.5rem;
-    padding-bottom: 0.4rem;
+    margin: 0 0 var(--cg-spacing-2);
+    padding-bottom: var(--cg-spacing-2);
     border-bottom: 1px solid var(--cg-color-border);
 }
 
@@ -42,14 +42,14 @@
     padding: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: var(--cg-spacing-2);
 }
 
 .lottery-winner-user {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.3rem 0.6rem;
+    gap: var(--cg-spacing-1);
+    padding: var(--cg-spacing-1) var(--cg-spacing-2);
     border-radius: var(--cg-radius-full);
     background: var(--cg-color-bg);
     transition: var(--cg-transition-fast);

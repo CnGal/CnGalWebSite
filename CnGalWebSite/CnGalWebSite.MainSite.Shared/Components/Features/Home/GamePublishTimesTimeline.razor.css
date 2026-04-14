@@ -16,25 +16,30 @@
     gap: 0;
 }
 
+/* Ensure mobile-first layout */
 .publish-times-timeline__item {
     display: grid;
-    grid-template-columns: 32px 130px 1fr;
-    gap: var(--cg-spacing-3);
+    /* 2 columns on mobile: line/dot and content */
+    grid-template-columns: 24px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: var(--cg-spacing-3);
     min-height: 80px;
     animation: publish-times-fadeInUp 0.4s ease-out both;
 }
 
 /* ── Dot & line ── */
 .publish-times-timeline__dot-col {
+    grid-column: 1;
+    grid-row: 1 / 3; /* Spans both time and content rows on mobile */
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: var(--cg-spacing-4);
+    padding-top: 5px; /* align dot visually with text */
 }
 
 .publish-times-timeline__dot {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     border-radius: var(--cg-radius-full);
     flex-shrink: 0;
     background: var(--cg-color-primary);
@@ -61,21 +66,34 @@
 
 /* ── Time column ── */
 .publish-times-timeline__time-col {
+    grid-column: 2;
+    grid-row: 1;
     display: flex;
-    align-items: flex-start;
-    padding-top: var(--cg-spacing-4);
+    align-items: center;
+    padding-bottom: var(--cg-spacing-2);
 }
 
 .publish-times-timeline__time {
-    font-size: var(--cg-font-size-sm);
-    color: var(--cg-color-text-muted);
-    font-weight: var(--cg-font-weight-medium);
-    white-space: normal;
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-primary);
+    font-weight: var(--cg-font-weight-bold);
+    background: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+    padding: var(--cg-spacing-1) var(--cg-spacing-3);
+    border-radius: var(--cg-radius-full);
+    display: inline-block;
+}
+
+.publish-times-timeline__item:nth-child(even) .publish-times-timeline__time {
+    color: var(--cg-color-secondary);
+    background: color-mix(in oklab, var(--cg-color-secondary) 10%, transparent);
 }
 
 /* ── Content card ── */
 .publish-times-timeline__content {
+    grid-column: 2;
+    grid-row: 2;
     display: flex;
+    flex-direction: column;
     gap: var(--cg-spacing-3);
     background: var(--cg-color-surface);
     border-radius: var(--cg-radius-lg);
@@ -83,21 +101,21 @@
     text-decoration: none;
     color: inherit;
     padding: var(--cg-spacing-3);
-    margin-bottom: var(--cg-spacing-4);
+    margin-bottom: var(--cg-spacing-6);
     border: 1px solid var(--cg-color-border);
     box-shadow: var(--cg-shadow-sm);    
-    align-items: center;
     transition: transform var(--cg-transition-fast), box-shadow var(--cg-transition-fast), border-color var(--cg-transition-fast);
 }
 
 .publish-times-timeline__content:hover {
     transform: translateY(-2px);
     box-shadow: var(--cg-shadow-card-hover);
-    border-color: color-mix(in oklab, var(--cg-color-primary) 40%, transparent);
+    border-color: color-mix(in oklab, var(--cg-color-primary) 30%, transparent);
 }
 
 .publish-times-timeline__image {
-        width: 165px;
+    width: 100%;
+    height: auto;
     aspect-ratio: 460 / 215;
     border-radius: var(--cg-radius-md);
     object-fit: cover;
@@ -119,9 +137,10 @@
     margin: 0;
     color: var(--cg-color-text);
     display: -webkit-box;
-    -webkit-line-clamp: 1;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    line-height: 1.4;
 }
 
 .publish-times-timeline__desc {
@@ -132,26 +151,75 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    line-height: 1.6;
+    line-height: 1.5;
 }
 
 /* ── Responsive ── */
-@media (max-width: 640px) {
+@media (min-width: 640px) {
+    .publish-times-timeline__content {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    .publish-times-timeline__image {
+        width: 140px;
+    }
+
+    .publish-times-timeline__name {
+        -webkit-line-clamp: 1;
+    }
+}
+
+@media (min-width: 768px) {
     .publish-times-timeline__item {
-        grid-template-columns: 24px 1fr;
+        /* 3 columns on desktop: Time - Dot - Content */
+        grid-template-columns: 140px 32px minmax(0, 1fr);
+        grid-template-rows: auto;
     }
 
     .publish-times-timeline__time-col {
-        display: none;
+        grid-column: 1;
+        grid-row: 1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-start;
+        padding-top: calc(var(--cg-spacing-4) - 2px);
+        padding-bottom: 0;
+        text-align: right;
+    }
+
+    .publish-times-timeline__time {
+        font-size: var(--cg-font-size-md);
+        color: var(--cg-color-text-muted);
+        font-weight: var(--cg-font-weight-medium);
+        background: transparent;
+        padding: 0;
+        border-radius: 0;
+    }
+    
+    .publish-times-timeline__item:nth-child(even) .publish-times-timeline__time {
+        color: var(--cg-color-text-muted);
+        background: transparent;
+    }
+
+    .publish-times-timeline__dot-col {
+        grid-column: 2;
+        grid-row: 1;
+        padding-top: var(--cg-spacing-4);
+    }
+    
+    .publish-times-timeline__dot {
+        width: 14px;
+        height: 14px;
     }
 
     .publish-times-timeline__content {
-        flex-direction: column;
+        grid-column: 3;
+        grid-row: 1;
+        margin-bottom: var(--cg-spacing-6);
     }
-
+    
     .publish-times-timeline__image {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 460 / 215;
+        width: 180px;
     }
 }
