@@ -1,12 +1,14 @@
+/* ═══════════════════════════════════════════════
+   EntryCardItem — mobile-first
+   ═══════════════════════════════════════════════ */
 .entry-card-item {
     display: flex;
     flex-direction: column;
-    border-radius: var(--cg-radius-lg);
+    border-radius: var(--cg-radius-md);
     background-color: var(--cg-color-surface);
     overflow: hidden;
     text-decoration: none;
     color: var(--cg-color-text);
-    /* Soft border instead of harsh solid color */
     border: 1px solid color-mix(in oklab, var(--cg-color-border) 40%, transparent);
     box-shadow: var(--cg-shadow-sm);
     transition: all var(--cg-transition-normal);
@@ -56,7 +58,7 @@
 }
 
 .entry-card-item:hover .entry-card-item-image img.main-img {
-    transform: scale(1.05) translateZ(0); /* translateZ forces hardware accel */
+    transform: scale(1.05) translateZ(0);
 }
 
 /* --- Square Cover Variant (Role/Staff) --- */
@@ -79,18 +81,18 @@
 
 .entry-card-item-image.is-square img.main-img {
     width: auto;
-    height: calc(100% - 1.5rem);
+    height: calc(100% - 1rem);
     aspect-ratio: 1 / 1;
     object-fit: cover;
     border-radius: var(--cg-radius-full);
     box-shadow: var(--cg-shadow-md);
-    background-color: var(--cg-color-surface); /* if transparent pngs exist */
+    background-color: var(--cg-color-surface);
     position: relative;
     z-index: 1;
 }
 
 .entry-card-item:hover .entry-card-item-image.is-square img.main-img {
-    transform: scale(1.08) translateZ(0); /* slightly larger pop for avatar */
+    transform: scale(1.08) translateZ(0);
 }
 
 /* 覆盖图标 */
@@ -111,8 +113,8 @@
 }
 
 .entry-card-item-icon ::deep .cg-mdi-icon {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 2rem;
+    height: 2rem;
     color: white;
     filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
     transition: transform var(--cg-transition-normal) cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -124,7 +126,7 @@
 
 /* 内容区域 */
 .entry-card-item-content {
-    padding: 0.75rem 1rem;
+    padding: 0.5rem 0.6rem;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -134,9 +136,9 @@
 }
 
 .entry-card-item-title {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     font-weight: var(--cg-font-weight-medium, 500);
-    line-height: 1.4;
+    line-height: 1.35;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -148,4 +150,29 @@
 
 .entry-card-item:hover .entry-card-item-title {
     color: var(--cg-color-primary);
+}
+
+/* ── Tablet (≥ 640px) ── */
+@media (min-width: 640px) {
+    .entry-card-item {
+        border-radius: var(--cg-radius-lg);
+    }
+
+    .entry-card-item-content {
+        padding: 0.75rem 1rem;
+    }
+
+    .entry-card-item-title {
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+
+    .entry-card-item-icon ::deep .cg-mdi-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .entry-card-item-image.is-square img.main-img {
+        height: calc(100% - 1.5rem);
+    }
 }

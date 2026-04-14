@@ -2,10 +2,9 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--cg-spacing-4);
     max-width: 1280px;
     margin: 0 auto;
-    padding: 1.5rem 1rem 3rem;
 }
 
 .lottery-layout {
@@ -21,30 +20,30 @@
 .lottery-side-col {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--cg-spacing-4);
 }
 
 .lottery-layout--mobile {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--cg-spacing-4);
 }
 
 .lottery-not-found {
     max-width: 600px;
-    margin: 4rem auto;
+    margin: var(--cg-spacing-10) auto;
     text-align: center;
 }
 
 .lottery-not-found h1 {
     font-size: var(--cg-font-size-xl);
     color: var(--cg-color-text);
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--cg-spacing-2);
 }
 
 .lottery-not-found p {
     color: var(--cg-color-text-muted);
-    margin-bottom: 1rem;
+    margin-bottom: var(--cg-spacing-4);
 }
 
 .lottery-not-found a {
@@ -54,9 +53,9 @@
 .lottery-loading {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--cg-spacing-4);
     max-width: 920px;
-    margin: 2rem auto;
+    margin: var(--cg-spacing-8) auto;
 }
 
 .lottery-loading-block {
@@ -81,32 +80,12 @@
     to { background-position: -200% 0; }
 }
 
-.lottery-action-btn {
-    border-radius: var(--cg-radius-lg);
-    border: 1px solid var(--cg-color-primary);
-    color: white;
-    background: var(--cg-color-primary);
-    text-decoration: none;
-    padding: 0.6rem 1.25rem;
-    font-size: 0.9rem;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    transition: var(--cg-transition-fast);
-    box-shadow: var(--cg-shadow-sm);
-}
 
-.lottery-action-btn:hover {
-    background: var(--cg-color-primary-hover);
-    border-color: var(--cg-color-primary-hover);
-}
 
 @media (min-width: 768px) {
     .lottery-page {
-        padding: 2rem 1.5rem 4rem;
-        gap: 2rem;
+        padding: var(--cg-spacing-8) var(--cg-spacing-6) var(--cg-spacing-10);
+        gap: var(--cg-spacing-8);
     }
 
     .lottery-layout--mobile {
@@ -116,14 +95,18 @@
     .lottery-layout--desktop {
         display: grid;
         grid-template-columns: minmax(0, 1fr);
-        gap: 2rem;
+        gap: var(--cg-spacing-6);
+    }
+
+    .lottery-main-col,
+    .lottery-side-col {
+        gap: var(--cg-spacing-6);
     }
 }
 
 @media (min-width: 1024px) {
     .lottery-layout--desktop {
         grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
-        gap: 2rem;
         align-items: start;
     }
 }

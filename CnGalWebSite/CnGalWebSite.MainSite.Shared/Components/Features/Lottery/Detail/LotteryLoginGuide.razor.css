@@ -30,7 +30,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--cg-spacing-2);
-    padding: 0.6rem 1.25rem;
+    padding: var(--cg-spacing-3) var(--cg-spacing-5);
     border-radius: var(--cg-radius-lg);
     background: var(--cg-color-primary);
     color: white;

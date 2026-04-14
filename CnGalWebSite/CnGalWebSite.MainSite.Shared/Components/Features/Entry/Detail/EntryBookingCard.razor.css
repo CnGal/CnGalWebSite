@@ -1,13 +1,16 @@
+/* ═══════════════════════════════════════════════
+   EntryBookingCard — mobile-first
+   ═══════════════════════════════════════════════ */
 .entry-card {
     border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
-    border-radius: var(--cg-radius-xl);
+    border-radius: var(--cg-radius-lg);
     background: var(--cg-color-surface);
-    padding: 1.5rem;
+    padding: 1rem;
 }
 
 .entry-card > h2 {
-    margin: 0 0 1.25rem;
-    font-size: 1.15rem;
+    margin: 0 0 0.85rem;
+    font-size: 1rem;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -16,21 +19,22 @@
 }
 
 .entry-card > h2 ::deep .cg-mdi-icon {
-    width: 2rem;
-    height: 2rem;
+    width: 1.5rem;
+    height: 1.5rem;
     color: var(--cg-color-primary);
 }
 
 .entry-booking-count {
-    margin-bottom: 1rem !important;
+    margin-bottom: 0.75rem !important;
     font-weight: 600;
     color: var(--cg-color-text) !important;
+    font-size: 0.85rem;
 }
 
 .entry-goal-list {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0.45rem;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -42,9 +46,10 @@
     align-items: center;
     border: 1px solid var(--cg-color-border);
     border-radius: var(--cg-radius-md);
-    padding: 0.5rem 0.75rem;
-    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
     background: color-mix(in oklab, var(--cg-color-bg) 50%, transparent);
+    min-height: 40px;
 }
 
 .entry-goal--done {
@@ -58,7 +63,43 @@
 }
 
 .entry-booking-status {
-    margin-top: 1rem !important;
-    font-size: 0.85rem;
+    margin-top: 0.75rem !important;
+    font-size: 0.8rem;
     font-weight: 700;
+}
+
+/* ── Tablet (≥ 768px) ── */
+@media (min-width: 768px) {
+    .entry-card {
+        padding: 1.5rem;
+        border-radius: var(--cg-radius-xl);
+    }
+
+    .entry-card > h2 {
+        margin: 0 0 1.25rem;
+        font-size: 1.15rem;
+    }
+
+    .entry-card > h2 ::deep .cg-mdi-icon {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .entry-booking-count {
+        margin-bottom: 1rem !important;
+    }
+
+    .entry-goal-list {
+        gap: 0.6rem;
+    }
+
+    .entry-goal {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .entry-booking-status {
+        margin-top: 1rem !important;
+        font-size: 0.85rem;
+    }
 }

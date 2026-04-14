@@ -1,7 +1,7 @@
 .lottery-award-list {
     border-radius: var(--cg-radius-xl);
     background: var(--cg-color-surface);
-    padding: 1.25rem;
+    padding: var(--cg-spacing-5);
     box-shadow: var(--cg-shadow-sm);
 }
 
@@ -9,10 +9,10 @@
     font-size: var(--cg-font-size-base);
     font-weight: var(--cg-font-weight-semibold);
     color: var(--cg-color-text);
-    margin: 0 0 1rem;
+    margin: 0 0 var(--cg-spacing-4);
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: var(--cg-spacing-2);
 }
 
 ::deep .lottery-award-list-title .cg-mdi-icon {
@@ -24,7 +24,7 @@
 .lottery-award-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 0.75rem;
+    gap: var(--cg-spacing-3);
 }
 
 .lottery-award-card {
@@ -60,16 +60,16 @@
 }
 
 .lottery-award-body {
-    padding: 0.75rem 1rem;
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: var(--cg-spacing-2);
 }
 
 .lottery-award-header {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--cg-spacing-2);
     flex-wrap: wrap;
 }
 
@@ -91,7 +91,7 @@
 
 .lottery-award-meta {
     display: flex;
-    gap: 0.75rem;
+    gap: var(--cg-spacing-3);
     flex-wrap: wrap;
     font-size: var(--cg-font-size-xs);
     color: var(--cg-color-text-muted);

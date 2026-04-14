@@ -1,18 +1,24 @@
 /* ── Page layout ── */
 .discount-page {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: var(--cg-spacing-6) var(--cg-spacing-4);
     display: flex;
     flex-direction: column;
-    gap: var(--cg-spacing-6);
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .discount-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: var(--cg-spacing-6) var(--cg-spacing-4);
+        gap: var(--cg-spacing-6);
+    }
 }
 
 /* ── Header (card style, matching GamePublishTimesPage) ── */
 .discount-page__header {
     background: var(--cg-color-surface);
-    border-radius: var(--cg-radius-xl);
-    padding: var(--cg-spacing-8) var(--cg-spacing-6);
+    border-radius: var(--cg-radius-lg);
+    padding: var(--cg-spacing-6) var(--cg-spacing-4);
     border: 1px solid var(--cg-color-border);
     box-shadow: var(--cg-shadow-sm);
     display: flex;
@@ -22,11 +28,24 @@
     text-align: center;
 }
 
+@media (min-width: 768px) {
+    .discount-page__header {
+        border-radius: var(--cg-radius-xl);
+        padding: var(--cg-spacing-8) var(--cg-spacing-6);
+    }
+}
+
 .discount-page__title {
-    font-size: var(--cg-font-size-2xl);
+    font-size: var(--cg-font-size-xl);
     font-weight: var(--cg-font-weight-bold);
     color: var(--cg-color-text);
     margin: 0;
+}
+
+@media (min-width: 768px) {
+    .discount-page__title {
+        font-size: var(--cg-font-size-2xl);
+    }
 }
 
 .discount-page__desc {
@@ -39,7 +58,13 @@
 .discount-page__loading {
     display: flex;
     justify-content: center;
-    padding: var(--cg-spacing-10) 0;
+    padding: var(--cg-spacing-8) 0;
+}
+
+@media (min-width: 768px) {
+    .discount-page__loading {
+        padding: var(--cg-spacing-10) 0;
+    }
 }
 
 /* ── Error (card container with pill button) ── */
@@ -48,12 +73,18 @@
     flex-direction: column;
     align-items: center;
     gap: var(--cg-spacing-3);
-    padding: var(--cg-spacing-10) var(--cg-spacing-4);
+    padding: var(--cg-spacing-8) var(--cg-spacing-4);
     text-align: center;
     background: var(--cg-color-surface);
     border-radius: var(--cg-radius-lg);
     border: 1px solid var(--cg-color-border);
     box-shadow: var(--cg-shadow-sm);
+}
+
+@media (min-width: 768px) {
+    .discount-page__error {
+        padding: var(--cg-spacing-10) var(--cg-spacing-6);
+    }
 }
 
 ::deep .discount-page__error .cg-mdi-icon {
@@ -71,6 +102,8 @@
 .discount-page__error-link {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    min-height: 44px;
     padding: var(--cg-spacing-2) var(--cg-spacing-5);
     background: var(--cg-color-primary);
     color: var(--cg-color-on-primary);
@@ -79,6 +112,12 @@
     font-size: var(--cg-font-size-sm);
     font-weight: var(--cg-font-weight-medium);
     transition: all var(--cg-transition-fast);
+}
+
+@media (min-width: 768px) {
+    .discount-page__error-link {
+        min-height: auto;
+    }
 }
 
 .discount-page__error-link:hover {
@@ -94,11 +133,17 @@
     flex-direction: column;
     align-items: center;
     gap: var(--cg-spacing-3);
-    padding: var(--cg-spacing-10) var(--cg-spacing-4);
+    padding: var(--cg-spacing-8) var(--cg-spacing-4);
     text-align: center;
     background: var(--cg-color-surface);
     border-radius: var(--cg-radius-lg);
     border: 1px dashed var(--cg-color-border);
+}
+
+@media (min-width: 768px) {
+    .discount-page__empty {
+        padding: var(--cg-spacing-10) var(--cg-spacing-6);
+    }
 }
 
 ::deep .discount-page__empty .cg-mdi-icon {
@@ -117,22 +162,13 @@
 /* ── Card grid ── */
 .discount-page__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: var(--cg-spacing-5);
+    grid-template-columns: 1fr;
+    gap: var(--cg-spacing-4);
 }
 
-/* ── Responsive ── */
-@media (max-width: 640px) {
-    .discount-page {
-        padding: var(--cg-spacing-4) var(--cg-spacing-3);
-    }
-
-    .discount-page__header {
-        padding: var(--cg-spacing-6) var(--cg-spacing-4);
-        border-radius: var(--cg-radius-lg);
-    }
-
+@media (min-width: 640px) {
     .discount-page__grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: var(--cg-spacing-5);
     }
 }

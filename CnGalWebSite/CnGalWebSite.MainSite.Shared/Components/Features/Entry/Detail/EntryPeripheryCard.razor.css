@@ -1,11 +1,13 @@
 /* ══════════════════════════════════════════
-   Header card (collection overview)
+   EntryPeripheryCard — mobile-first
    ══════════════════════════════════════════ */
+
+/* ── Header card (collection overview) ── */
 .periphery-header-card {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.25rem;
+    gap: 0.75rem;
+    padding: 0.75rem;
     border: 1px solid color-mix(in oklab, var(--cg-color-border) 40%, transparent);
     border-radius: var(--cg-radius-lg);
     background: var(--cg-color-surface);
@@ -31,14 +33,14 @@
 }
 
 .header-cover-img--round {
-    width: 64px;
-    height: 64px;
+    width: 48px;
+    height: 48px;
     border-radius: var(--cg-radius-full);
     box-shadow: var(--cg-shadow-sm);
 }
 
 .header-cover-img--wide {
-    width: 120px;
+    width: 80px;
     aspect-ratio: 460 / 215;
     border-radius: var(--cg-radius-md);
     box-shadow: var(--cg-shadow-sm);
@@ -49,18 +51,18 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.25rem;
 }
 
 .periphery-header-title-row {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.4rem;
 }
 
 .periphery-header-name {
-    font-size: var(--cg-font-size-lg);
+    font-size: var(--cg-font-size-base);
     font-weight: var(--cg-font-weight-bold);
     margin: 0;
     overflow: hidden;
@@ -73,8 +75,8 @@
 .periphery-progress-badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.3rem;
-    padding: 0.15rem 0.6rem;
+    gap: 0.25rem;
+    padding: 0.1rem 0.5rem;
     border-radius: var(--cg-radius-full);
     background: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
     color: var(--cg-color-primary);
@@ -85,28 +87,28 @@
 }
 
 .periphery-progress-badge ::deep .cg-mdi-icon {
-    width: 0.9rem;
-    height: 0.9rem;
+    width: 0.8rem;
+    height: 0.8rem;
 }
 
 .periphery-header-desc {
-    font-size: var(--cg-font-size-sm);
+    font-size: var(--cg-font-size-xs);
     color: var(--cg-color-text-secondary);
     margin: 0;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    line-height: 1.5;
+    line-height: 1.45;
 }
 
 /* Progress bar */
 .periphery-progress-track {
-    height: 4px;
+    height: 3px;
     background: color-mix(in oklab, var(--cg-color-primary) 12%, var(--cg-color-bg));
     border-radius: 2px;
     overflow: hidden;
-    margin-top: 0.2rem;
+    margin-top: 0.15rem;
 }
 
 .periphery-progress-fill {
@@ -116,27 +118,18 @@
     transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* ══════════════════════════════════════════
-   Periphery items grid
-   ══════════════════════════════════════════ */
+/* ── Periphery items grid ── */
 .periphery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 0.85rem;
-}
-
-@media (min-width: 640px) {
-    .periphery-grid {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 1rem;
-    }
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
 }
 
 /* ── Single item card ── */
 .periphery-item-card {
     display: flex;
     flex-direction: column;
-    border-radius: var(--cg-radius-lg);
+    border-radius: var(--cg-radius-md);
     background-color: var(--cg-color-surface);
     overflow: hidden;
     text-decoration: none;
@@ -192,28 +185,28 @@
 /* Collected badge */
 .periphery-collected-badge {
     position: absolute;
-    top: 0.4rem;
-    right: 0.4rem;
+    top: 0.3rem;
+    right: 0.3rem;
     z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 1.6rem;
-    height: 1.6rem;
+    width: 1.4rem;
+    height: 1.4rem;
     border-radius: var(--cg-radius-full);
     background: var(--cg-color-success);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
 .periphery-collected-badge ::deep .cg-mdi-icon {
-    width: 1rem;
-    height: 1rem;
+    width: 0.85rem;
+    height: 0.85rem;
     color: white;
 }
 
 /* Body */
 .periphery-item-body {
-    padding: 0.55rem 0.7rem 0.65rem;
+    padding: 0.4rem 0.55rem 0.5rem;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -222,7 +215,7 @@
 .periphery-item-name {
     font-size: var(--cg-font-size-xs);
     font-weight: var(--cg-font-weight-medium);
-    line-height: 1.4;
+    line-height: 1.35;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -232,4 +225,74 @@
 
 .periphery-item-card:hover .periphery-item-name {
     color: var(--cg-color-primary);
+}
+
+/* ── Tablet (≥ 640px) ── */
+@media (min-width: 640px) {
+    .periphery-header-card {
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+    }
+
+    .header-cover-img--round {
+        width: 64px;
+        height: 64px;
+    }
+
+    .header-cover-img--wide {
+        width: 120px;
+    }
+
+    .periphery-header-name {
+        font-size: var(--cg-font-size-lg);
+    }
+
+    .periphery-header-desc {
+        font-size: var(--cg-font-size-sm);
+        line-height: 1.5;
+    }
+
+    .periphery-progress-badge {
+        gap: 0.3rem;
+        padding: 0.15rem 0.6rem;
+    }
+
+    .periphery-progress-badge ::deep .cg-mdi-icon {
+        width: 0.9rem;
+        height: 0.9rem;
+    }
+
+    .periphery-progress-track {
+        height: 4px;
+        margin-top: 0.2rem;
+    }
+
+    .periphery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 1rem;
+    }
+
+    .periphery-item-card {
+        border-radius: var(--cg-radius-lg);
+    }
+
+    .periphery-collected-badge {
+        top: 0.4rem;
+        right: 0.4rem;
+        width: 1.6rem;
+        height: 1.6rem;
+    }
+
+    .periphery-collected-badge ::deep .cg-mdi-icon {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .periphery-item-body {
+        padding: 0.55rem 0.7rem 0.65rem;
+    }
+
+    .periphery-item-name {
+        line-height: 1.4;
+    }
 }

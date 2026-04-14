@@ -46,11 +46,11 @@
             <div class="publish-times-nav">
                 <button class="publish-times-nav-btn" @onclick="OnClickLeft" aria-label="上个月">
                     <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
-                    <span>上个月</span>
+                    <span class="publish-times-nav-btn-text">上个月</span>
                 </button>
                 <span class="publish-times-nav-label">@CurrentDate.ToString("yyyy年M月")</span>
                 <button class="publish-times-nav-btn" @onclick="OnClickRight" aria-label="下个月">
-                    <span>下个月</span>
+                    <span class="publish-times-nav-btn-text">下个月</span>
                     <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
                 </button>
             </div>

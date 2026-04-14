@@ -1,16 +1,20 @@
+/* ═══════════════════════════════════════════════
+   EntryCatalogCard — mobile-first
+   ═══════════════════════════════════════════════ */
+
 /* ── List container ── */
 .catalog-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
 }
 
 /* ── Horizontal card (image left, text right) ── */
 .catalog-card {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 0.75rem;
+    gap: 0.75rem;
+    padding: 0.6rem;
     border: 1px solid color-mix(in oklab, var(--cg-color-border) 40%, transparent);
     border-radius: var(--cg-radius-lg);
     background: var(--cg-color-surface);
@@ -18,6 +22,7 @@
     text-decoration: none;
     color: var(--cg-color-text);
     transition: all var(--cg-transition-normal);
+    min-height: 44px;
 }
 
 .catalog-card:hover {
@@ -29,7 +34,7 @@
 /* ── Cover (left side) ── */
 .catalog-card-cover {
     flex-shrink: 0;
-    width: 100px;
+    width: 72px;
     aspect-ratio: 460 / 215;
     border-radius: var(--cg-radius-md);
     overflow: hidden;
@@ -54,13 +59,13 @@
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.15rem;
 }
 
 .catalog-card-name {
-    font-size: var(--cg-font-size-sm);
+    font-size: var(--cg-font-size-xs);
     font-weight: var(--cg-font-weight-semibold);
-    line-height: 1.4;
+    line-height: 1.35;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -72,11 +77,41 @@
 }
 
 .catalog-card-desc {
-    font-size: var(--cg-font-size-xs);
+    font-size: 0.65rem;
     color: var(--cg-color-text-muted);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    line-height: 1.45;
+    line-height: 1.4;
+}
+
+/* ── Tablet (≥ 768px) ── */
+@media (min-width: 768px) {
+    .catalog-list {
+        gap: 0.75rem;
+    }
+
+    .catalog-card {
+        gap: 1rem;
+        padding: 0.75rem;
+    }
+
+    .catalog-card-cover {
+        width: 100px;
+    }
+
+    .catalog-card-body {
+        gap: 0.25rem;
+    }
+
+    .catalog-card-name {
+        font-size: var(--cg-font-size-sm);
+        line-height: 1.4;
+    }
+
+    .catalog-card-desc {
+        font-size: var(--cg-font-size-xs);
+        line-height: 1.45;
+    }
 }

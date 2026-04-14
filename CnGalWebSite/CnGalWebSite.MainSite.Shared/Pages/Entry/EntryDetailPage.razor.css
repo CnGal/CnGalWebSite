@@ -1,90 +1,73 @@
+/* ═══════════════════════════════════════════════
+   EntryDetailPage — single responsive layout
+   Mobile: display:contents flattens columns, order reorders cells
+   Desktop: independent flex columns, cards pack tightly
+   ═══════════════════════════════════════════════ */
+
 .entry-page {
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--cg-spacing-3);
     max-width: 1280px;
     margin: 0 auto;
-    padding: 1.5rem 1rem 3rem;
+    padding: 0;
 }
 
+/* ── Grid container ── */
 .entry-layout {
     position: relative;
     z-index: 1;
-}
-
-.entry-layout--desktop {
-    display: none;
-}
-
-.entry-main-col,
-.entry-side-col,
-.entry-mobile-panel {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--cg-spacing-3);
 }
 
-.entry-layout--mobile {
-    display: block;
+/* ── Mobile: flatten column wrappers so all cells participate in order ── */
+.entry-main-col,
+.entry-side-col {
+    display: contents;
 }
 
-.entry-mobile-tabs input[type="radio"] {
+/* ── Each content block ── */
+.entry-cell {
+    min-width: 0; /* prevent blowout */
+}
+
+/* Collapse cells whose child component rendered nothing (Show=false / empty data) */
+.entry-cell:not(:has(> *)) {
     display: none;
 }
 
-.entry-mobile-tab-nav {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-}
+/* ── Mobile order ── */
+.entry-cell--pictures   { order: 1; }
+.entry-cell--booking    { order: 2; }
+.entry-cell--info       { order: 3; }
+.entry-cell--tags       { order: 4; }
+.entry-cell--release    { order: 5; }
+.entry-cell--staff      { order: 6; }
+.entry-cell--audio      { order: 7; }
+.entry-cell--mainpage   { order: 8; }
+.entry-cell--news       { order: 9; }
+.entry-cell--score      { order: 10; }
+.entry-cell--videos     { order: 11; }
+.entry-cell--relevances { order: 12; }
+.entry-cell--articles   { order: 13; }
+.entry-cell--periphery  { order: 14; }
+.entry-cell--roles      { order: 15; }
+.entry-cell--outlinks   { order: 16; }
+.entry-cell--records    { order: 17; }
+.entry-cell--catalog    { order: 18; }
+.entry-cell--comment    { order: 19; }
 
-.entry-mobile-tab-nav label {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid transparent;
-    border-radius: var(--cg-radius-lg);
-    min-height: 2.5rem;
-    font-size: 0.85rem;
-    font-weight: 700;
-    background: transparent;
-    color: var(--cg-color-text-muted);
-    cursor: pointer;
-    transition: var(--cg-transition-fast);
-}
-
-#entry-tab-home:checked ~ .entry-mobile-tab-nav label[for="entry-tab-home"],
-#entry-tab-related:checked ~ .entry-mobile-tab-nav label[for="entry-tab-related"],
-#entry-tab-staff:checked ~ .entry-mobile-tab-nav label[for="entry-tab-staff"] {
-    background: var(--cg-color-surface);
-    border-color: color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
-    box-shadow: var(--cg-shadow-sm);
-    color: var(--cg-color-primary);
-}
-
-.entry-mobile-panel {
-    display: none;
-}
-
-#entry-tab-home:checked ~ .entry-mobile-panels .entry-mobile-panel--home,
-#entry-tab-related:checked ~ .entry-mobile-panels .entry-mobile-panel--related,
-#entry-tab-staff:checked ~ .entry-mobile-panels .entry-mobile-panel--staff {
-    display: flex;
-}
-
-.entry-card--empty p {
-    color: var(--cg-color-text-muted);
-}
-
+/* ── Loading state ── */
 .entry-loading {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 1rem;
-    min-height: 40vh;
+    gap: var(--cg-spacing-3);
+    min-height: 30vh;
 }
 
 .entry-loading-text {
@@ -93,15 +76,17 @@
     font-weight: var(--cg-font-weight-medium);
 }
 
+/* ── Error state ── */
 .entry-not-found a {
     color: var(--cg-color-link);
 }
 
+/* ── Action buttons ── */
 .entry-actions {
     display: flex;
     gap: 0.75rem;
     flex-wrap: wrap;
-    margin-top: 0.5rem;
+    margin-top: var(--cg-spacing-2);
 }
 
 .entry-action-btn {
@@ -111,7 +96,7 @@
     background: var(--cg-color-primary);
     text-decoration: none;
     padding: 0.6rem 1.25rem;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
@@ -119,6 +104,8 @@
     gap: 0.5rem;
     transition: var(--cg-transition-fast);
     box-shadow: var(--cg-shadow-sm);
+    min-height: 44px;
+    min-width: 44px;
 }
 
 .entry-action-btn:hover {
@@ -137,27 +124,59 @@
     background: color-mix(in oklab, var(--cg-color-bg) 80%, black);
 }
 
+.entry-card--empty p {
+    color: var(--cg-color-text-muted);
+}
+
+/* ═══════════════════════════════════════════════
+   Tablet breakpoint (≥ 768px)
+   ═══════════════════════════════════════════════ */
 @media (min-width: 768px) {
     .entry-page {
-        padding: 2rem 1.5rem 4rem;
-        gap: 2rem;
+        padding: var(--cg-spacing-6) var(--cg-spacing-5) var(--cg-spacing-10);
+        gap: var(--cg-spacing-6);
     }
 
-    .entry-layout--mobile {
-        display: none;
+    .entry-layout {
+        gap: var(--cg-spacing-6);
     }
 
-    .entry-layout--desktop {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        gap: 2rem;
+    /* Reset mobile order */
+    .entry-cell {
+        order: unset;
+    }
+
+    .entry-loading {
+        min-height: 40vh;
     }
 }
 
+/* ═══════════════════════════════════════════════
+   Desktop breakpoint (≥ 1024px)
+   Two independent flex columns: main(2fr) + sidebar(1fr)
+   Each column packs tightly — no cross-column row sync
+   ═══════════════════════════════════════════════ */
 @media (min-width: 1024px) {
-    .entry-layout--desktop {
-        grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+    .entry-layout {
+        flex-direction: row;
         gap: 2rem;
         align-items: start;
+    }
+
+    /* Restore column wrappers as real flex containers */
+    .entry-main-col {
+        display: flex;
+        flex-direction: column;
+        gap: var(--cg-spacing-6);
+        flex: 2;
+        min-width: 0;
+    }
+
+    .entry-side-col {
+        display: flex;
+        flex-direction: column;
+        gap: var(--cg-spacing-6);
+        flex: 1;
+        min-width: 320px;
     }
 }

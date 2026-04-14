@@ -103,8 +103,15 @@
     background-color: var(--cg-color-surface);
     border-radius: var(--cg-radius-lg);
     box-shadow: var(--cg-shadow-sm);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
     position: relative;
+}
+
+.cg-tabs--underline > .cg-tabs__bar::-webkit-scrollbar {
+    display: none;
 }
 
 .cg-tabs--underline .cg-tabs__tab {
