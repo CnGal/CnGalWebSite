@@ -1,13 +1,11 @@
-﻿using CnGalWebSite.IdentityServer.Models.DataModels.Geetest;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+using CnGalWebSite.IdentityServer.Models.DataModels.Geetest;
 
 namespace CnGalWebSite.IdentityServer.Services.Geetest
 {
     public interface IGeetestService
     {
-        GeetestCodeModel GetGeetestCode(ControllerBase controller);
+        GeetestCodeModel GetGeetestCode(GeetestScenario scenario);
 
-        bool CheckRecaptcha(HumanMachineVerificationResult model);
+        bool CheckRecaptcha(HumanMachineVerificationResult model, GeetestScenario scenario);
     }
 }

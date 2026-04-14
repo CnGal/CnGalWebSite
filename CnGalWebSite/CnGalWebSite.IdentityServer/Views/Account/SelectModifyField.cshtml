@@ -1,4 +1,4 @@
-﻿@model SelectModifyFieldViewModel
+@model SelectModifyFieldViewModel
 
 <div class="select-field-page account-page">
     <div class="select-bind-card mdl-card mdl-shadow--2dp">
@@ -19,13 +19,14 @@
 
 
                 <div class="action">
-                    <form asp-route="SelectModifyField" onsubmit="return callGeetest()">
+                    <form asp-route="SelectModifyField" onsubmit="return callGeetest('geetestCode-submit-button', 'SendCode')">
                         <input type="hidden" asp-for="ReturnUrl" />
 
                         <!--极验-->
-                        <input id="geetestResult-validate" type="hidden" asp-for="VerifyResult.Validate" />
-                        <input id="geetestResult-seccode" type="hidden" asp-for="VerifyResult.Seccode" />
-                        <input id="geetestResult-challenge" type="hidden" asp-for="VerifyResult.Challenge" />
+                        <input id="geetestResult-lotNumber" type="hidden" asp-for="VerifyResult.LotNumber" />
+                        <input id="geetestResult-captchaOutput" type="hidden" asp-for="VerifyResult.CaptchaOutput" />
+                        <input id="geetestResult-passToken" type="hidden" asp-for="VerifyResult.PassToken" />
+                        <input id="geetestResult-genTime" type="hidden" asp-for="VerifyResult.GenTime" />
 
                         <div id="captcha-box"></div>
                         <button class="d-none" id="geetestCode-submit-button" type="submit"></button>

@@ -1,4 +1,4 @@
-﻿@model LoginViewModel
+@model LoginViewModel
 
 <div class="account-page">
     <div class="login-card mdl-card mdl-shadow--2dp">
@@ -24,13 +24,14 @@
         @if (Model.EnableLocalLogin)
         {
             <div class="mdl-card__supporting-text">
-                <form asp-route="Login" onsubmit="return callGeetest()">
+                <form asp-route="Login" onsubmit="return callGeetest('geetestCode-submit-button', 'Login')">
                     <input type="hidden" asp-for="ReturnUrl" />
 
                     <!--极验-->
-                    <input id="geetestResult-validate" type="hidden" asp-for="VerifyResult.Validate" />
-                    <input id="geetestResult-seccode" type="hidden" asp-for="VerifyResult.Seccode" />
-                    <input id="geetestResult-challenge" type="hidden" asp-for="VerifyResult.Challenge" />
+                    <input id="geetestResult-lotNumber" type="hidden" asp-for="VerifyResult.LotNumber" />
+                    <input id="geetestResult-captchaOutput" type="hidden" asp-for="VerifyResult.CaptchaOutput" />
+                    <input id="geetestResult-passToken" type="hidden" asp-for="VerifyResult.PassToken" />
+                    <input id="geetestResult-genTime" type="hidden" asp-for="VerifyResult.GenTime" />
 
                     <div id="captcha-box"></div>
                     <button class="d-none" id="geetestCode-submit-button" type="submit"></button>

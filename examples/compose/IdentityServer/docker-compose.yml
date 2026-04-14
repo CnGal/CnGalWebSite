@@ -46,8 +46,19 @@ services:
       # 信任的第三方登录
       TrustedExternalAuthProviders: ${TrustedExternalAuthProviders}
       # 极验验证码
-      GEETEST_KEY: ${GEETEST_KEY}
-      GEETEST_ID: ${GEETEST_ID}
+      Geetest__Default__Id: ${GEETEST_ID}
+      Geetest__Default__Key: ${GEETEST_KEY}
+      # 按场景配置（可选，不配置则使用 Default）
+      Geetest__Scenarios__Login__Id: ${GEETEST_LOGIN_ID:-}
+      Geetest__Scenarios__Login__Key: ${GEETEST_LOGIN_KEY:-}
+      Geetest__Scenarios__Register__Id: ${GEETEST_REGISTER_ID:-}
+      Geetest__Scenarios__Register__Key: ${GEETEST_REGISTER_KEY:-}
+      Geetest__Scenarios__ResetPassword__Id: ${GEETEST_RESETPASSWORD_ID:-}
+      Geetest__Scenarios__ResetPassword__Key: ${GEETEST_RESETPASSWORD_KEY:-}
+      Geetest__Scenarios__SendCode__Id: ${GEETEST_SENDCODE_ID:-}
+      Geetest__Scenarios__SendCode__Key: ${GEETEST_SENDCODE_KEY:-}
+      Geetest__Scenarios__AccountModify__Id: ${GEETEST_ACCOUNTMODIFY_ID:-}
+      Geetest__Scenarios__AccountModify__Key: ${GEETEST_ACCOUNTMODIFY_KEY:-}
       # 外部身份验证
       GoogleClientId: ${GoogleClientId}
       GoogleClientSecret: ${GoogleClientSecret}

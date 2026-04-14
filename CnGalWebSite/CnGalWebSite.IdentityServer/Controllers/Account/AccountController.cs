@@ -1,4 +1,4 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
@@ -31,6 +31,7 @@ using Microsoft.Extensions.Configuration;
 using static IdentityServer4.IdentityServerConstants;
 using static IdentityServer4.Events.TokenIssuedSuccessEvent;
 using CnGalWebSite.IdentityServer.Services.Geetest;
+using CnGalWebSite.IdentityServer.Models.DataModels.Geetest;
 using CnGalWebSite.IdentityServer.Models.InputModels.Account;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Account;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
@@ -157,7 +158,7 @@ namespace IdentityServerHost.Quickstart.UI
             }
 
             //提前判断是否通过人机验证
-            if (_geetestService.CheckRecaptcha(model.VerifyResult) == false)
+            if (_geetestService.CheckRecaptcha(model.VerifyResult, GeetestScenario.Login) == false)
             {
                 ModelState.AddModelError(string.Empty, "人机验证失败");
                 return View(await BuildLoginViewModelAsync(model));
@@ -332,7 +333,7 @@ namespace IdentityServerHost.Quickstart.UI
             }
 
             //提前判断是否通过人机验证
-            if (_geetestService.CheckRecaptcha(model.VerifyResult) == false)
+            if (_geetestService.CheckRecaptcha(model.VerifyResult, GeetestScenario.Register) == false)
             {
                 ModelState.AddModelError(string.Empty, "人机验证失败");
                 return View(BuildRegisterViewModel(model));
@@ -432,7 +433,7 @@ namespace IdentityServerHost.Quickstart.UI
             if (button == "repost")
             {
                 //提前判断是否通过人机验证
-                if (_geetestService.CheckRecaptcha(model.VerifyResult) == false)
+                if (_geetestService.CheckRecaptcha(model.VerifyResult, GeetestScenario.SendCode) == false)
                 {
                     ModelState.AddModelError(string.Empty, "人机验证失败");
                     return View(BuildVerifyCodeViewModel(model));
@@ -591,7 +592,7 @@ namespace IdentityServerHost.Quickstart.UI
                 return View(BuildAddPhoneNumberViewModel(model));
             }
             //提前判断是否通过人机验证
-            if (_geetestService.CheckRecaptcha(model.VerifyResult) == false)
+            if (_geetestService.CheckRecaptcha(model.VerifyResult, GeetestScenario.AccountModify) == false)
             {
                 ModelState.AddModelError(string.Empty, "人机验证失败");
                 return View(BuildAddPhoneNumberViewModel(model));
@@ -682,7 +683,7 @@ namespace IdentityServerHost.Quickstart.UI
                 return View(BuildResetPasswordViewModel(model));
             }
             //提前判断是否通过人机验证
-            if (_geetestService.CheckRecaptcha(model.VerifyResult) == false)
+            if (_geetestService.CheckRecaptcha(model.VerifyResult, GeetestScenario.ResetPassword) == false)
             {
                 ModelState.AddModelError(string.Empty, "人机验证失败");
                 return View(BuildResetPasswordViewModel(model));
@@ -796,7 +797,7 @@ namespace IdentityServerHost.Quickstart.UI
                 return RedirectToAction("Login", new { model.ReturnUrl });
             }
             //提前判断是否通过人机验证
-            if (_geetestService.CheckRecaptcha(model.VerifyResult) == false)
+            if (_geetestService.CheckRecaptcha(model.VerifyResult, GeetestScenario.SendCode) == false)
             {
                 ModelState.AddModelError(string.Empty, "人机验证失败");
                 return View(await BuildSelectModifyFieldViewModel(user, model.ReturnUrl, model.SecondCode));
@@ -879,7 +880,7 @@ namespace IdentityServerHost.Quickstart.UI
             }
 
             //提前判断是否通过人机验证
-            if (_geetestService.CheckRecaptcha(model.VerifyResult) == false)
+            if (_geetestService.CheckRecaptcha(model.VerifyResult, GeetestScenario.AccountModify) == false)
             {
                 ModelState.AddModelError(string.Empty, "人机验证失败");
                 return View(BuildChangeEmailViewModel(model));
@@ -937,7 +938,7 @@ namespace IdentityServerHost.Quickstart.UI
             }
 
             //提前判断是否通过人机验证
-            if (_geetestService.CheckRecaptcha(model.VerifyResult) == false)
+            if (_geetestService.CheckRecaptcha(model.VerifyResult, GeetestScenario.AccountModify) == false)
             {
                 ModelState.AddModelError(string.Empty, "人机验证失败");
                 return View(BuildChangePhoneNumberViewModel(model));
