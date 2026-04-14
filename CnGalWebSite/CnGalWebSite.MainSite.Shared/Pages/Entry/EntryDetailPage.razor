@@ -40,243 +40,156 @@ else if (Model is not null)
 
         <EntrySpecialTips IsHidden="Model.IsHidden" Type="Model.Type" />
 
-        <section class="entry-layout entry-layout--desktop" aria-label="桌面详情布局">
-            <main class="entry-main-col">
-                <EntryCard Title="音频" Icon="mdiMusicCircleOutline" Show="Model.Audio.Count > 0">
-                    <EntryAudioList Audio="Model.Audio" MaxCount="6" />
-                </EntryCard>
+        <section class="entry-layout" aria-label="详情布局">
+            @* 移动端：两个容器 display:contents，所有 cell 参与统一 order 排序
+               桌面端：两个容器变为独立 flex 列，各列卡片紧密堆叠 *@
 
-                <EntrySection Title="图片" Icon="mdiImageOutline" Show="Model.Pictures.Count > 0">
-                    <EntryImageGrid Pictures="Model.Pictures" MaxCount="12" EntryName="@Model.Name" DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
-                </EntrySection>
+            <div class="entry-main-col">
+                <div class="entry-cell entry-cell--audio">
+                    <EntryCard Title="音频" Icon="mdiMusicCircleOutline" Show="Model.Audio.Count > 0">
+                        <EntryAudioList Audio="Model.Audio" MaxCount="6" />
+                    </EntryCard>
+                </div>
 
-                <EntryCard Title="正文主页" Icon="mdiTextBoxOutline" Show="!string.IsNullOrWhiteSpace(Model.MainPage)">
-                    <CgHtmlContent Content="@Model.MainPage" />
-                </EntryCard>
+                <div class="entry-cell entry-cell--pictures">
+                    <EntrySection Title="图片" Icon="mdiImageOutline" Show="Model.Pictures.Count > 0">
+                        <EntryImageGrid Pictures="Model.Pictures" MaxCount="12" EntryName="@Model.Name" DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
+                    </EntrySection>
+                </div>
 
-                <EntryCard Title="动态时间线" Icon="mdiTimelineTextOutline" Show="Model.NewsOfEntry.Count > 0">
-                    <EntryNewsList News="Model.NewsOfEntry" MaxCount="10" GetNewsLink="GetNewsLink" GetTarget="ExternalLinkHelper.GetTarget" />
-                </EntryCard>
+                <div class="entry-cell entry-cell--mainpage">
+                    <EntryCard Title="正文主页" Icon="mdiTextBoxOutline" Show="!string.IsNullOrWhiteSpace(Model.MainPage)">
+                        <CgHtmlContent Content="@Model.MainPage" />
+                    </EntryCard>
+                </div>
 
-                <EntrySection Title="相关视频" Icon="mdiAnimationPlayOutline" Show="Model.VideoRelevances.Count > 0">
-                    <EntryCardList LimitCount="9" ShowExpandButton="Model.VideoRelevances.Count > 9">
-                        @foreach (var item in Model.VideoRelevances)
-                        {
-                            <li>
-                                <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" Icon="mdiPlayCircleOutline" />
-                            </li>
-                        }
-                    </EntryCardList>
-                </EntrySection>
-                
-                @RenderRelevancesBlocks
-                <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.ArticleRelevances.Count > 0">
-                    <EntryCardList LimitCount="9" ShowExpandButton="Model.ArticleRelevances.Count > 9">
-                        @foreach (var item in Model.ArticleRelevances)
-                        {
-                            <li>
-                                <EntryCardItem Url="@($"/articles/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
-                            </li>
-                        }
-                    </EntryCardList>
-                </EntrySection>
+                <div class="entry-cell entry-cell--news">
+                    <EntryCard Title="动态时间线" Icon="mdiTimelineTextOutline" Show="Model.NewsOfEntry.Count > 0">
+                        <EntryNewsList News="Model.NewsOfEntry" MaxCount="10" GetNewsLink="GetNewsLink" GetTarget="ExternalLinkHelper.GetTarget" />
+                    </EntryCard>
+                </div>
 
-                <EntryPeripheryCard Model="PeripheryOverview" />
-
-                @* 仅游戏类词条显示评分区域 *@
-                @if (Model.Type == EntryType.Game)
-                {
-                    @* 登录用户使用交互式评分区域（支持编辑后实时刷新），未登录用户使用静态渲染 *@
-                    <AuthorizeView>
-                        <Authorized>
-                            <EntryScoreSection EntryId="Id" />
-                        </Authorized>
-                        <NotAuthorized>
-                            @if (ScoreOverview is not null)
+                <div class="entry-cell entry-cell--videos">
+                    <EntrySection Title="相关视频" Icon="mdiAnimationPlayOutline" Show="Model.VideoRelevances.Count > 0">
+                        <EntryCardList LimitCount="9" ShowExpandButton="Model.VideoRelevances.Count > 9">
+                            @foreach (var item in Model.VideoRelevances)
                             {
-                                <EntryScoreOverview Model="ScoreOverview" />
+                                <li>
+                                    <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" Icon="mdiPlayCircleOutline" />
+                                </li>
                             }
-                        </NotAuthorized>
-                    </AuthorizeView>
-                }
+                        </EntryCardList>
+                    </EntrySection>
+                </div>
 
-                <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
-                    Type="CommentType.CommentEntries"
-                    ObjectId="@Model.Id.ToString()"
-                    CanComment="Model.CanComment" />
-            </main>
+                <div class="entry-cell entry-cell--relevances">
+                    @RenderRelevancesBlocks
+                </div>
 
-            <aside class="entry-side-col">
-                <EntryBookingCard Booking="Model.Booking" ShowGoals="true" />
+                <div class="entry-cell entry-cell--articles">
+                    <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.ArticleRelevances.Count > 0">
+                        <EntryCardList LimitCount="9" ShowExpandButton="Model.ArticleRelevances.Count > 9">
+                            @foreach (var item in Model.ArticleRelevances)
+                            {
+                                <li>
+                                    <EntryCardItem Url="@($"/articles/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
+                                </li>
+                            }
+                        </EntryCardList>
+                    </EntrySection>
+                </div>
 
-                <EntryCard Title="基础信息" Icon="mdiInformationOutline" Show="Model.Information.Count > 0">
-                    <EntryInfoList Information="Model.Information" />
-                </EntryCard>
+                <div class="entry-cell entry-cell--periphery">
+                    <EntryPeripheryCard Model="PeripheryOverview" />
+                </div>
 
-                <EntryCard Title="标签" Icon="mdiTagMultipleOutline" Show="Model.Tags.Count > 0">
-                    <EntryTagList Tags="Model.Tags" MaxCount="24" />
-                </EntryCard>
-
-                <EntryCard Title="Staff" Icon="mdiAccountGroupOutline" Show="Model.Staffs.Count > 0">
-                    <EntryStaffGroupList Staffs="Model.Staffs" MaxGroupCount="8" MaxPositionCount="5" />
-                </EntryCard>
-
-                <EntrySection Title="发行信息" Icon="mdiCalendarClockOutline" Show="Model.Releases.Count > 0">
-                    <EntryReleaseCards Releases="Model.Releases"
-                                       GetPlatformIcon="GetPlatformIcon"
-                                       GetPlatformImage="GetPlatformImage"
-                                       GetPublishPlatformName="GetPublishPlatformName"
-                                       GetReleaseTypeText="GetReleaseTypeText"
-                                       GetCurrencyPrefix="GetCurrencyPrefix"
-                                       GetGamePlatformName="GetGamePlatformName" />
-                </EntrySection>
-
-                <EntrySection Title="登场角色" Icon="mdiAccountStarOutline" Show="Model.Roles.Count > 0">
-                    <EntryRoleList Roles="Model.Roles" MaxCount="8" BuildEntryUrl="BuildEntryUrl" />
-                </EntrySection>
-
-                <EntrySection Title="外部链接" Icon="mdiLinkVariant" Show="Model.IsHideOutlink == false && Model.OtherRelevances.Count > 0">
-                    <EntryOutlinkList Links="Model.OtherRelevances"
-                                      MaxCount="8"
-                                      GetExternalLinkIcon="ExternalLinkHelper.GetExternalLinkIcon"
-                                      GetExternalLinkImage="ExternalLinkHelper.GetExternalLinkImage"
-                                      GetExternalLinkDescription="ExternalLinkHelper.GetExternalLinkDescription"
-                                      DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
-                </EntrySection>
-
-                <EntryEditRecordCard Records="EditRecords" />
-
-                <EntryCatalogCard Folders="RelateFolders" />
-            </aside>
-        </section>
-
-        <section class="entry-layout entry-layout--mobile" aria-label="移动端详情布局">
-            <CgTabs Items="GetMobileTabItems()" Variant="underline" AriaLabel="详情页标签" Id="entry-mobile-tabs">
-                <PanelTemplate>
-                    @switch (context)
+                <div class="entry-cell entry-cell--score">
+                    @* 仅游戏类词条显示评分区域 *@
+                    @if (Model.Type == EntryType.Game)
                     {
-                        case "home":
-                            <div class="entry-mobile-panel">
-                                <EntryBookingCard Booking="Model.Booking" ShowGoals="false" />
-
-                                <EntryCard Title="基础信息" Icon="mdiInformationOutline" Show="Model.Information.Count > 0">
-                                    <EntryInfoList Information="Model.Information" MaxCount="12" />
-                                </EntryCard>
-
-                                <EntryCard Title="标签" Icon="mdiTagMultipleOutline" Show="Model.Tags.Count > 0">
-                                    <EntryTagList Tags="Model.Tags" MaxCount="24" />
-                                </EntryCard>
-
-                                <EntrySection Title="发行信息" Icon="mdiCalendarClockOutline" Show="Model.Releases.Count > 0">
-                                    <EntryReleaseCards Releases="Model.Releases"
-                                                       GetPlatformIcon="GetPlatformIcon"
-                                                       GetPlatformImage="GetPlatformImage"
-                                                       GetPublishPlatformName="GetPublishPlatformName"
-                                                       GetReleaseTypeText="GetReleaseTypeText"
-                                                       GetCurrencyPrefix="GetCurrencyPrefix"
-                                                       GetGamePlatformName="GetGamePlatformName" />
-                                </EntrySection>
-
-                                <EntryCard Title="音频" Icon="mdiMusicCircleOutline" Show="Model.Audio.Count > 0">
-                                    <EntryAudioList Audio="Model.Audio" MaxCount="6" />
-                                </EntryCard>
-
-                                <EntrySection Title="图片" Icon="mdiImageOutline" Show="Model.Pictures.Count > 0">
-                                    <EntryImageGrid Pictures="Model.Pictures" MaxCount="12" EntryName="@Model.Name" DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
-                                </EntrySection>
-
-                                <EntryCard Title="正文主页" Icon="mdiTextBoxOutline" Show="!string.IsNullOrWhiteSpace(Model.MainPage)">
-                                    <CgHtmlContent Content="@Model.MainPage" />
-                                </EntryCard>
-
-                                <EntryCard Title="动态时间线" Icon="mdiTimelineTextOutline" Show="Model.NewsOfEntry.Count > 0">
-                                    <EntryNewsList News="Model.NewsOfEntry" MaxCount="10" GetNewsLink="GetNewsLink" GetTarget="ExternalLinkHelper.GetTarget" />
-                                </EntryCard>
-
-                                @* 仅游戏类词条显示评分区域 *@
-                                @if (Model.Type == EntryType.Game)
+                        @* 登录用户使用交互式评分区域（支持编辑后实时刷新），未登录用户使用静态渲染 *@
+                        <AuthorizeView>
+                            <Authorized>
+                                <EntryScoreSection EntryId="Id" />
+                            </Authorized>
+                            <NotAuthorized>
+                                @if (ScoreOverview is not null)
                                 {
-                                    <AuthorizeView>
-                                        <Authorized Context="authContext">
-                                            <EntryScoreSection EntryId="Id" />
-                                        </Authorized>
-                                        <NotAuthorized Context="authContext">
-                                            @if (ScoreOverview is not null)
-                                            {
-                                                <EntryScoreOverview Model="ScoreOverview" />
-                                            }
-                                        </NotAuthorized>
-                                    </AuthorizeView>
+                                    <EntryScoreOverview Model="ScoreOverview" />
                                 }
-
-                                <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
-                                    Type="CommentType.CommentEntries"
-                                    ObjectId="@Model.Id.ToString()"
-                                    CanComment="Model.CanComment" />
-                            </div>
-                            break;
-
-                        case "related":
-                            <div class="entry-mobile-panel">
-                                <EntrySection Title="相关视频" Icon="mdiAnimationPlayOutline" Show="Model.VideoRelevances.Count > 0">
-                                    <EntryCardList LimitCount="9" ShowExpandButton="Model.VideoRelevances.Count > 9">
-                                        @foreach (var item in Model.VideoRelevances)
-                                        {
-                                            <li>
-                                                <EntryCardItem Url="@($"/videos/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" Icon="mdiPlayCircleOutline" />
-                                            </li>
-                                        }
-                                    </EntryCardList>
-                                </EntrySection>
-
-                                @RenderRelevancesBlocks
-
-                                <EntrySection Title="相关文章" Icon="mdiTextBoxOutline" Show="Model.ArticleRelevances.Count > 0">
-                                    <EntryCardList LimitCount="9" ShowExpandButton="Model.ArticleRelevances.Count > 9">
-                                        @foreach (var item in Model.ArticleRelevances)
-                                        {
-                                            <li>
-                                                <EntryCardItem Url="@($"/articles/index/{item.Id}")" Image="@item.MainImage" Title="@item.Name" />
-                                            </li>
-                                        }
-                                    </EntryCardList>
-                                </EntrySection>
-
-                                <EntryPeripheryCard Model="PeripheryOverview" />
-
-                                <EntryCard Title="相关内容" Icon="mdiLinkVariant" Class="entry-card--empty" Show="!HasRelatedContent() && Model.Roles.Count == 0 && (Model.IsHideOutlink || Model.OtherRelevances.Count == 0)">
-                                    <p>暂无相关内容。</p>
-                                </EntryCard>
-
-                                <EntrySection Title="登场角色" Icon="mdiAccountStarOutline" Show="Model.Roles.Count > 0">
-                                    <EntryRoleList Roles="Model.Roles" MaxCount="8" BuildEntryUrl="BuildEntryUrl" />
-                                </EntrySection>
-
-                                <EntrySection Title="外部链接" Icon="mdiLinkVariant" Show="Model.IsHideOutlink == false && Model.OtherRelevances.Count > 0">
-                                    <EntryOutlinkList Links="Model.OtherRelevances"
-                                                      MaxCount="8"
-                                                      GetExternalLinkIcon="ExternalLinkHelper.GetExternalLinkIcon"
-                                                      GetExternalLinkImage="ExternalLinkHelper.GetExternalLinkImage"
-                                                      GetExternalLinkDescription="ExternalLinkHelper.GetExternalLinkDescription"
-                                                      DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
-                                </EntrySection>
-
-                                <EntryEditRecordCard Records="EditRecords" />
-
-                                <EntryCatalogCard Folders="RelateFolders" />
-                            </div>
-                            break;
-
-                        case "staff":
-                            <div class="entry-mobile-panel">
-                                <EntryCard Title="Staff" Icon="mdiAccountGroupOutline">
-                                    <EntryStaffGroupList Staffs="Model.Staffs" />
-                                </EntryCard>
-                            </div>
-                            break;
+                            </NotAuthorized>
+                        </AuthorizeView>
                     }
-                </PanelTemplate>
-            </CgTabs>
+                </div>
+
+                <div class="entry-cell entry-cell--comment">
+                    <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
+                        Type="CommentType.CommentEntries"
+                        ObjectId="@Model.Id.ToString()"
+                        CanComment="Model.CanComment" />
+                </div>
+            </div>
+
+            <div class="entry-side-col">
+                <div class="entry-cell entry-cell--booking">
+                    <EntryBookingCard Booking="Model.Booking" ShowGoals="true" />
+                </div>
+
+                <div class="entry-cell entry-cell--info">
+                    <EntryCard Title="基础信息" Icon="mdiInformationOutline" Show="Model.Information.Count > 0">
+                        <EntryInfoList Information="Model.Information" />
+                    </EntryCard>
+                </div>
+
+                <div class="entry-cell entry-cell--tags">
+                    <EntryCard Title="标签" Icon="mdiTagMultipleOutline" Show="Model.Tags.Count > 0">
+                        <EntryTagList Tags="Model.Tags" MaxCount="24" />
+                    </EntryCard>
+                </div>
+
+                <div class="entry-cell entry-cell--release">
+                    <EntrySection Title="发行信息" Icon="mdiCalendarClockOutline" Show="Model.Releases.Count > 0">
+                        <EntryReleaseCards Releases="Model.Releases"
+                                           GetPlatformIcon="GetPlatformIcon"
+                                           GetPlatformImage="GetPlatformImage"
+                                           GetPublishPlatformName="GetPublishPlatformName"
+                                           GetReleaseTypeText="GetReleaseTypeText"
+                                           GetCurrencyPrefix="GetCurrencyPrefix"
+                                           GetGamePlatformName="GetGamePlatformName" />
+                    </EntrySection>
+                </div>
+
+                <div class="entry-cell entry-cell--staff">
+                    <EntryCard Title="Staff" Icon="mdiAccountGroupOutline" Show="Model.Staffs.Count > 0">
+                        <EntryStaffGroupList Staffs="Model.Staffs" MaxGroupCount="8" MaxPositionCount="5" />
+                    </EntryCard>
+                </div>
+
+                <div class="entry-cell entry-cell--roles">
+                    <EntrySection Title="登场角色" Icon="mdiAccountStarOutline" Show="Model.Roles.Count > 0">
+                        <EntryRoleList Roles="Model.Roles" MaxCount="8" BuildEntryUrl="BuildEntryUrl" />
+                    </EntrySection>
+                </div>
+
+                <div class="entry-cell entry-cell--outlinks">
+                    <EntrySection Title="外部链接" Icon="mdiLinkVariant" Show="Model.IsHideOutlink == false && Model.OtherRelevances.Count > 0">
+                        <EntryOutlinkList Links="Model.OtherRelevances"
+                                          MaxCount="8"
+                                          GetExternalLinkIcon="ExternalLinkHelper.GetExternalLinkIcon"
+                                          GetExternalLinkImage="ExternalLinkHelper.GetExternalLinkImage"
+                                          GetExternalLinkDescription="ExternalLinkHelper.GetExternalLinkDescription"
+                                          DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
+                    </EntrySection>
+                </div>
+
+                <div class="entry-cell entry-cell--records">
+                    <EntryEditRecordCard Records="EditRecords" />
+                </div>
+
+                <div class="entry-cell entry-cell--catalog">
+                    <EntryCatalogCard Folders="RelateFolders" />
+                </div>
+            </div>
         </section>
     </article>
 }
@@ -360,19 +273,6 @@ else
         ErrorMessage = result.Error?.Message ?? "请稍后重试";
     }
 
-    private IReadOnlyList<CgTabItem> GetMobileTabItems()
-    {
-        var items = new List<CgTabItem>
-        {
-            new("home", "首页", "mdiHomeOutline"),
-            new("related", "相关", "mdiLinkVariant")
-        };
-        if (Model?.Staffs.Count > 0)
-        {
-            items.Add(new("staff", "Staff", "mdiAccountGroupOutline"));
-        }
-        return items;
-    }
 
     private bool HasAtmosphere()
     {
