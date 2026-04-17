@@ -1,4 +1,4 @@
-@page "/peripheries/index/{Id:long}"
+﻿@page "/peripheries/index/{Id:long}"
 @inject IPeripheryQueryService PeripheryQueryService
 @inject IExamineQueryService ExamineQueryService
 @using CnGalWebSite.DataModel.Model
@@ -71,7 +71,9 @@ else if (_model is not null)
 
                 <PeripheryRelatedPeripheries Peripheries="_model.Peripheries" />
 
-                <EditRecordListCard Records="_editRecords" Columns="1" />
+                <CgMiniModeContainer>
+                    <EditRecordListCard Records="_editRecords" Columns="1" />
+                </CgMiniModeContainer>
             </aside>
         </section>
 
@@ -99,7 +101,9 @@ else if (_model is not null)
 
             <PeripheryRelatedPeripheries Peripheries="_model.Peripheries" />
 
-            <EditRecordListCard Records="_editRecords" Columns="1" />
+            <CgMiniModeContainer>
+                <EditRecordListCard Records="_editRecords" Columns="1" />
+            </CgMiniModeContainer>
 
             <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
                 Type="CommentType.CommentPeriphery"

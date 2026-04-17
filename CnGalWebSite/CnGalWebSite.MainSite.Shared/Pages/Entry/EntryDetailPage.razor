@@ -104,22 +104,24 @@ else if (Model is not null)
                 </div>
 
                 <div class="entry-cell entry-cell--score">
-                    @* 仅游戏类词条显示评分区域 *@
-                    @if (Model.Type == EntryType.Game)
-                    {
-                        @* 登录用户使用交互式评分区域（支持编辑后实时刷新），未登录用户使用静态渲染 *@
-                        <AuthorizeView>
-                            <Authorized>
-                                <EntryScoreSection EntryId="Id" />
-                            </Authorized>
-                            <NotAuthorized>
-                                @if (ScoreOverview is not null)
-                                {
-                                    <EntryScoreOverview Model="ScoreOverview" />
-                                }
-                            </NotAuthorized>
-                        </AuthorizeView>
-                    }
+                    <CgMiniModeContainer>
+                        @* 仅游戏类词条显示评分区域 *@
+                        @if (Model.Type == EntryType.Game)
+                        {
+                            @* 登录用户使用交互式评分区域（支持编辑后实时刷新），未登录用户使用静态渲染 *@
+                            <AuthorizeView>
+                                <Authorized>
+                                    <EntryScoreSection EntryId="Id" />
+                                </Authorized>
+                                <NotAuthorized>
+                                    @if (ScoreOverview is not null)
+                                    {
+                                        <EntryScoreOverview Model="ScoreOverview" />
+                                    }
+                                </NotAuthorized>
+                            </AuthorizeView>
+                        }
+                    </CgMiniModeContainer>
                 </div>
 
                 <div class="entry-cell entry-cell--comment">
@@ -187,7 +189,9 @@ else if (Model is not null)
                 </div>
 
                 <div class="entry-cell entry-cell--records">
-                    <EntryEditRecordCard Records="EditRecords" />
+                    <CgMiniModeContainer>
+                        <EntryEditRecordCard Records="EditRecords" />
+                    </CgMiniModeContainer>
                 </div>
 
                 <div class="entry-cell entry-cell--catalog">

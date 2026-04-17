@@ -47,7 +47,9 @@ else if (_model is not null)
 
             <TagChildEntries Entries="_model.ChildrenEntries" />
 
-            <EditRecordListCard Records="_editRecords" />
+            <CgMiniModeContainer>
+                <EditRecordListCard Records="_editRecords" />
+            </CgMiniModeContainer>
         </section>
     </article>
 }

@@ -119,7 +119,9 @@ else if (Model is not null)
                                   DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
             </EntrySection>
 
-            <EditRecordListCard Records="_editRecords" />
+            <CgMiniModeContainer>
+                <EditRecordListCard Records="_editRecords" />
+            </CgMiniModeContainer>
 
             <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
                 Type="CommentType.CommentVideo"
