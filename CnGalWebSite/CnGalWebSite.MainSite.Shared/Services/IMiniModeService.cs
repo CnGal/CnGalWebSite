@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.MainSite.Shared.Services;
@@ -16,7 +16,12 @@ public interface IMiniModeService
     /// <summary>
     /// 是否为迷你模式
     /// </summary>
-    bool IsMiniMode { get; set; }
+    bool IsMiniMode { get; }
+
+    /// <summary>
+    /// 设置迷你模式并同步持久化状态
+    /// </summary>
+    Task SetMiniModeAsync(bool isMiniMode);
 
     /// <summary>
     /// 触发状态变化事件
@@ -24,7 +29,7 @@ public interface IMiniModeService
     void OnMiniModeChanged();
 
     /// <summary>
-    /// 检查并同步本地存储中的迷你模式状态
+    /// 检查并同步客户端持久化状态
     /// </summary>
     Task CheckAsync();
 }
