@@ -60,11 +60,11 @@
         @if (_record is not null && IsCurrentUser)
         {
             <div class="space-game-record-view__footer">
-                <CgButton Variant="CgButton.ButtonVariant.Text" OnClick="OnToggleHidden">
+                <CgButton Variant="ghost" OnClick="OnToggleHidden">
                     <CgMdiIcon Name="@(_record.IsHidden ? "mdiEyeOutline" : "mdiEyeOffOutline")" />
                     @(_record.IsHidden ? "显示" : "隐藏")
                 </CgButton>
-                <CgButton Variant="CgButton.ButtonVariant.Primary" OnClick="OnEditClick">
+                <CgButton Variant="primary" OnClick="OnEditClick">
                     <CgMdiIcon Name="mdiPencilOutline" /> 编辑游玩记录
                 </CgButton>
             </div>

@@ -6,7 +6,10 @@
 }
 
 .comment-reply-form--child {
-    background: var(--cg-color-bg);
+    background: transparent;
+    border-color: transparent;
+    padding: 0;
+    margin-top: var(--cg-spacing-3);
 }
 
 .comment-reply-form__actions {

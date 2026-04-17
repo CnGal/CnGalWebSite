@@ -1,4 +1,4 @@
-/* ═══════════════════════════════════════════════
+﻿/* ═══════════════════════════════════════════════
    EntryUserScoreCard — mobile-first
    ═══════════════════════════════════════════════ */
 .entry-user-score-card {
@@ -123,6 +123,7 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     white-space: pre-wrap;
+    word-break: break-all;
 }
 
 .entry-user-score-card__expand-toggle:checked ~ .entry-user-score-card__impressions-text {

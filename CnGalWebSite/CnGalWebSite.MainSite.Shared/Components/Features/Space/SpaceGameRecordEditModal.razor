@@ -1,4 +1,4 @@
-@* 游玩记录编辑/添加弹窗 *@
+﻿@* 游玩记录编辑/添加弹窗 *@
 
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.PlayedGames
@@ -71,8 +71,8 @@
 
     <Footer>
         <div class="space-game-record-edit__footer">
-            <CgButton Variant="CgButton.ButtonVariant.Text" OnClick="CloseAsync">取消</CgButton>
-            <CgButton Variant="CgButton.ButtonVariant.Primary" OnClick="SaveAsync" Disabled="_isSaving">
+            <CgButton Variant="secondary" OnClick="CloseAsync">取消</CgButton>
+            <CgButton Variant="primary" OnClick="SaveAsync" Disabled="_isSaving">
                 @(_isSaving ? "保存中..." : "保存")
             </CgButton>
         </div>

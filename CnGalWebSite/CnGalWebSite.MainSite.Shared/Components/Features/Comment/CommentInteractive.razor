@@ -37,7 +37,7 @@
     {
         <div class="comment-interactive__error">
             <p>@_errorMessage</p>
-            <CgButton Variant="CgButton.ButtonVariant.Text" OnClick="RefreshAsync">重试</CgButton>
+            <CgButton Variant="ghost" OnClick="RefreshAsync">重试</CgButton>
         </div>
     }
 </div>
@@ -160,7 +160,7 @@
         <div class="comment-interactive__action-row">
             @if (_replyingToId == comment.Id)
             {
-                <CgButton Variant="CgButton.ButtonVariant.Text"
+                <CgButton Variant="ghost" Size="sm"
                           OnClick="@(() => OnReplyClick(comment))">
                     <CgMdiIcon Name="mdiClose" />
                     取消回复
@@ -168,7 +168,7 @@
             }
             else
             {
-                <CgButton Variant="CgButton.ButtonVariant.Text"
+                <CgButton Variant="ghost" Size="sm"
                           OnClick="@(() => OnReplyClick(comment))">
                     <CgMdiIcon Name="mdiReply" />
                     回复
@@ -177,7 +177,7 @@
 
             @if (CanDelete)
             {
-                <CgButton Variant="CgButton.ButtonVariant.Text"
+                <CgButton Variant="ghost-danger" Size="sm"
                           OnClick="@(async (_) => await OnDeleteClick(comment))">
                     <CgMdiIcon Name="mdiDeleteOutline" />
                     删除

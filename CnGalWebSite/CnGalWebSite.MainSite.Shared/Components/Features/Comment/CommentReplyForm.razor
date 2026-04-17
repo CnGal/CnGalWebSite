@@ -18,25 +18,26 @@
     }
 
     <div class="comment-reply-form__actions">
-        <CgButton Variant="CgButton.ButtonVariant.Primary"
+        <CgButton Variant="primary"
                   Async
                   Disabled="_isSubmitting"
                   OnClick="OnSubmitAsync">
             @(_isSubmitting ? "发送中..." : "发表评论")
         </CgButton>
 
-        <CgButton Variant="CgButton.ButtonVariant.Text"
+        <CgButton Variant="ghost"
                   OnClick="OnToggleEditor">
             @(UseMarkdown ? "切换纯文本" : "切换 Markdown")
         </CgButton>
 
         <CgImageUpload Text="上传图片"
+                       Variant="ghost"
                        ShowPreview="false"
                        OnImageUploaded="OnImageUploaded" />
 
         @if (ShowCancel)
         {
-            <CgButton Variant="CgButton.ButtonVariant.Text"
+            <CgButton Variant="ghost"
                       OnClick="OnCancelAsync">
                 取消
             </CgButton>

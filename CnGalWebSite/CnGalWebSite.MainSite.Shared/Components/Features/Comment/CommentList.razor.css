@@ -35,34 +35,3 @@
     flex-wrap: wrap;
 }
 
-.comment-list__page-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 36px;
-    height: 36px;
-    padding: 0 var(--cg-spacing-2);
-    border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-md);
-    background: var(--cg-color-surface);
-    color: var(--cg-color-text);
-    font-size: var(--cg-font-size-sm);
-    cursor: pointer;
-    transition: all var(--cg-transition-fast);
-}
-
-.comment-list__page-btn:hover {
-    background: var(--cg-color-hover-overlay);
-    border-color: var(--cg-color-primary);
-}
-
-.comment-list__page-btn--active {
-    background: var(--cg-color-primary);
-    color: var(--cg-color-on-primary);
-    border-color: var(--cg-color-primary);
-    font-weight: var(--cg-font-weight-semibold);
-}
-
-.comment-list__page-btn--active:hover {
-    background: var(--cg-color-primary-hover);
-}
