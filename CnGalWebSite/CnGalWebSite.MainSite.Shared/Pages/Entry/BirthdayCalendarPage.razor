@@ -1,4 +1,4 @@
-@page "/entries/birthdaycalendar"
+﻿@page "/entries/birthdaycalendar"
 @page "/birthday"
 @inject IEntryQueryService EntryQueryService
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
@@ -18,6 +18,8 @@
 }
 else if (_loaded)
 {
+    var monthRoleCount = _items.Count(r => r.BirthdayMonth == _displayDate.Month);
+
     <article class="birthday-cal">
         <header class="birthday-cal-header">
             <div class="birthday-cal-header-text">
@@ -26,6 +28,10 @@ else if (_loaded)
                     角色生日日历
                 </h1>
                 <p class="birthday-cal-subtitle">按月份查看所有角色的生日</p>
+                <div class="birthday-cal-header-meta">
+                    <span class="birthday-cal-meta-pill">@_displayDate.Year 年 @_displayDate.Month 月</span>
+                    <span class="birthday-cal-meta-pill birthday-cal-meta-pill--muted">本月 @monthRoleCount 位角色生日</span>
+                </div>
             </div>
         </header>
 
@@ -43,55 +49,57 @@ else if (_loaded)
         </nav>
 
         @* ── Calendar Grid ── *@
-        <div class="birthday-cal-grid" role="grid" aria-label="@(_displayDate.Year)年@(_displayDate.Month)月 角色生日日历">
-            @* Weekday headers *@
-            <div class="birthday-cal-weekday" role="columnheader">日</div>
-            <div class="birthday-cal-weekday" role="columnheader">一</div>
-            <div class="birthday-cal-weekday" role="columnheader">二</div>
-            <div class="birthday-cal-weekday" role="columnheader">三</div>
-            <div class="birthday-cal-weekday" role="columnheader">四</div>
-            <div class="birthday-cal-weekday" role="columnheader">五</div>
-            <div class="birthday-cal-weekday" role="columnheader">六</div>
+        <div class="birthday-cal-grid-shell">
+            <div class="birthday-cal-grid" role="grid" aria-label="@(_displayDate.Year)年@(_displayDate.Month)月 角色生日日历">
+                @* Weekday headers *@
+                <div class="birthday-cal-weekday" role="columnheader">日</div>
+                <div class="birthday-cal-weekday" role="columnheader">一</div>
+                <div class="birthday-cal-weekday" role="columnheader">二</div>
+                <div class="birthday-cal-weekday" role="columnheader">三</div>
+                <div class="birthday-cal-weekday" role="columnheader">四</div>
+                <div class="birthday-cal-weekday" role="columnheader">五</div>
+                <div class="birthday-cal-weekday" role="columnheader">六</div>
 
-            @* Empty cells before first day *@
-            @for (var i = 0; i < _firstDayOffset; i++)
-            {
-                <div class="birthday-cal-cell birthday-cal-cell--empty" role="gridcell"></div>
-            }
+                @* Empty cells before first day *@
+                @for (var i = 0; i < _firstDayOffset; i++)
+                {
+                    <div class="birthday-cal-cell birthday-cal-cell--empty" role="gridcell"></div>
+                }
 
-            @* Day cells *@
-            @for (var day = 1; day <= _daysInMonth; day++)
-            {
-                var currentDay = day;
-                var isToday = _displayDate.Year == _today.Year && _displayDate.Month == _today.Month && currentDay == _today.Day;
-                var rolesForDay = _items.Where(r => r.BirthdayMonth == _displayDate.Month && r.BirthdayDay == currentDay).ToList();
-                var hasRoles = rolesForDay.Count > 0;
+                @* Day cells *@
+                @for (var day = 1; day <= _daysInMonth; day++)
+                {
+                    var currentDay = day;
+                    var isToday = _displayDate.Year == _today.Year && _displayDate.Month == _today.Month && currentDay == _today.Day;
+                    var rolesForDay = _items.Where(r => r.BirthdayMonth == _displayDate.Month && r.BirthdayDay == currentDay).ToList();
+                    var hasRoles = rolesForDay.Count > 0;
 
-                <div class="birthday-cal-cell @(isToday ? "birthday-cal-cell--today" : "") @(hasRoles ? "birthday-cal-cell--has-roles" : "")" role="gridcell">
-                    <div class="birthday-cal-day-num @(isToday ? "birthday-cal-day-num--today" : "")">
-                        @currentDay
-                    </div>
-                    @if (hasRoles)
-                    {
-                        <div class="birthday-cal-day-roles">
-                            @foreach (var role in rolesForDay)
-                            {
-                                <BirthdayRoleChip Id="@role.Id" Name="@role.Name" Image="@role.Image" />
-                            }
+                    <div class="birthday-cal-cell @(isToday ? "birthday-cal-cell--today" : "") @(hasRoles ? "birthday-cal-cell--has-roles" : "")" role="gridcell">
+                        <div class="birthday-cal-day-num @(isToday ? "birthday-cal-day-num--today" : "")">
+                            @currentDay
                         </div>
-                    }
-                </div>
-            }
+                        @if (hasRoles)
+                        {
+                            <div class="birthday-cal-day-roles">
+                                @foreach (var role in rolesForDay)
+                                {
+                                    <BirthdayRoleChip Id="@role.Id" Name="@role.Name" Image="@role.Image" />
+                                }
+                            </div>
+                        }
+                    </div>
+                }
 
-            @* Empty cells after last day *@
-            @{
-                var totalCells = _firstDayOffset + _daysInMonth;
-                var remaining = (7 - totalCells % 7) % 7;
-            }
-            @for (var i = 0; i < remaining; i++)
-            {
-                <div class="birthday-cal-cell birthday-cal-cell--empty" role="gridcell"></div>
-            }
+                @* Empty cells after last day *@
+                @{
+                    var totalCells = _firstDayOffset + _daysInMonth;
+                    var remaining = (7 - totalCells % 7) % 7;
+                }
+                @for (var i = 0; i < remaining; i++)
+                {
+                    <div class="birthday-cal-cell birthday-cal-cell--empty" role="gridcell"></div>
+                }
+            </div>
         </div>
 
         @* ── Today's birthdays summary ── *@
