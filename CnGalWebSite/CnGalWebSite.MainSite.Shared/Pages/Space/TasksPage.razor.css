@@ -6,14 +6,6 @@
     padding: 0 var(--cg-spacing-4);
 }
 
-/* ── Header ── */
-
-.tasks-page__header {
-    margin-bottom: var(--cg-spacing-5);
-    padding-bottom: var(--cg-spacing-4);
-    border-bottom: 1px solid var(--cg-color-border);
-}
-
 .tasks-page__title {
     display: flex;
     align-items: center;
@@ -37,23 +29,7 @@
 }
 
 .tasks-page__section-header {
-    display: flex;
-    align-items: center;
-    gap: var(--cg-spacing-2);
     margin-bottom: var(--cg-spacing-3);
-}
-
-.tasks-page__section-header ::deep .cg-mdi-icon {
-    width: 20px;
-    height: 20px;
-    color: var(--cg-color-text-muted);
-}
-
-.tasks-page__section-title {
-    margin: 0;
-    font-size: var(--cg-font-size-base);
-    font-weight: var(--cg-font-weight-semibold);
-    color: var(--cg-color-text);
 }
 
 /* ── Task list ── */
