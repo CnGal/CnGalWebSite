@@ -2,7 +2,7 @@
 @page "/peripheries/create"
 @page "/peripheries/edit/{Id:long}"
 
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
 @using CnGalWebSite.DataModel.ViewModel.Peripheries
 @using CnGalWebSite.MainSite.Shared.Components.Features.Periphery.Editor

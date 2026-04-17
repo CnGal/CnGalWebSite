@@ -1,7 +1,7 @@
 @page "/articles/create"
 @page "/articles/edit/{Id:long}"
 
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @attribute [Authorize]
 @using CnGalWebSite.DataModel.ViewModel.Articles
 @using CnGalWebSite.MainSite.Shared.Components.Features.Article.Editor

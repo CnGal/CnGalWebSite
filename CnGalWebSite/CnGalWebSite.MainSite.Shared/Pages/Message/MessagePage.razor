@@ -1,6 +1,6 @@
 @page "/space/messages"
 @attribute [Authorize]
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.MainSite.Shared.Components.Features.Message

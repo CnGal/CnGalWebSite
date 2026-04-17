@@ -1,6 +1,6 @@
 ﻿@page "/tasks"
 @attribute [Authorize]
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @using CnGalWebSite.DataModel.ViewModel.Space
 @using CnGalWebSite.MainSite.Shared.Components.Features.Space
