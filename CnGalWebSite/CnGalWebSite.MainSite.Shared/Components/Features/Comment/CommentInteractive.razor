@@ -91,11 +91,13 @@
 
     private async Task RefreshAsync(MouseEventArgs _)
     {
+        CommentQueryService.InvalidateCache(Type, ObjectId);
         await LoadDataAsync();
     }
 
     private async Task OnCommentSubmittedAsync()
     {
+        CommentQueryService.InvalidateCache(Type, ObjectId);
         await LoadDataAsync();
         _commentList?.GoToLastPage();
         await OnChanged.InvokeAsync();
@@ -105,6 +107,7 @@
     {
         _replyingToId = null;
         _replyingToName = null;
+        CommentQueryService.InvalidateCache(Type, ObjectId);
         await LoadDataAsync();
         await OnChanged.InvokeAsync();
     }
@@ -146,6 +149,7 @@
         if (result.Success)
         {
             ToastService.Show("删除评论成功", null, "success");
+            CommentQueryService.InvalidateCache(Type, ObjectId);
             await LoadDataAsync();
             await OnChanged.InvokeAsync();
         }

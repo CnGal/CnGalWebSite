@@ -13,4 +13,9 @@ public interface ICommentQueryService
     /// 获取指定对象的评论列表。
     /// </summary>
     Task<SdkResult<CommentListViewModel>> GetCommentsAsync(CommentType type, string objectId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 清除指定对象的评论列表缓存。
+    /// </summary>
+    void InvalidateCache(CommentType type, string objectId);
 }
