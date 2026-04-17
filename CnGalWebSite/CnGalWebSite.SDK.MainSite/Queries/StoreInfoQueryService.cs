@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.DataModel.ViewModel.Stores;
 using CnGalWebSite.SDK.MainSite.Abstractions;
@@ -93,5 +94,44 @@ public sealed class StoreInfoQueryService(
         memoryCache.Set(cacheKey, result.Data, StoreInfoCacheDuration);
 
         return SdkResult<GameRevenueInfoViewModel>.Ok(result.Data);
+    }
+
+    public async Task<SdkResult<IReadOnlyList<CnGalGenerationYearItem>>> GetCnGalGenerationAsync(
+        CancellationToken cancellationToken = default)
+    {
+        const string cacheKey = "main-site:cngal-generation";
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<CnGalGenerationYearItem>? cached) && cached is not null)
+        {
+            return SdkResult<IReadOnlyList<CnGalGenerationYearItem>>.Ok(cached);
+        }
+
+        var result = await GetAsync<List<CnGalGenerationYearModel>>(
+            "api/storeinfo/GetCnGalGeneration",
+            "CNGAL_GENERATION",
+            "CnGal 世代列表",
+            cancellationToken);
+
+        if (!result.Success || result.Data is null)
+        {
+            return SdkResult<IReadOnlyList<CnGalGenerationYearItem>>.Fail(
+                result.Error?.Code ?? "CNGAL_GENERATION_FAILED",
+                result.Error?.Message ?? "获取 CnGal 世代数据失败",
+                result.Error?.StatusCode);
+        }
+
+        IReadOnlyList<CnGalGenerationYearItem> items = [.. result.Data
+            .OrderBy(year => year.Year)
+            .Select(year => new CnGalGenerationYearItem
+            {
+                Year = year.Year,
+                Games = [.. (year.Games ?? []).Select(game => new CnGalGenerationGameItem
+                {
+                    Name = game?.Name ?? string.Empty,
+                })],
+            })];
+
+        memoryCache.Set(cacheKey, items, StoreInfoCacheDuration);
+
+        return SdkResult<IReadOnlyList<CnGalGenerationYearItem>>.Ok(items);
     }
 }

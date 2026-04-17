@@ -1,0 +1,16 @@
+@using CnGalWebSite.DataModel.Model
+
+<EntryCard Title="@(Type == EntryType.Role ? "立绘" : "主图")" Icon="mdiImageOutline" Show="(Type == EntryType.Role || Type == EntryType.Staff) && !string.IsNullOrWhiteSpace(Image)">
+    <img src="@Image" alt="@Name" class="entry-drawing-img" />
+</EntryCard>
+
+@code {
+    [Parameter]
+    public EntryType Type { get; set; }
+
+    [Parameter]
+    public string? Image { get; set; }
+
+    [Parameter]
+    public string? Name { get; set; }
+}

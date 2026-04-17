@@ -1,7 +1,7 @@
 @page "/admin/tools"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
 @using CnGalWebSite.MainSite.Shared.Components.Features.Admin

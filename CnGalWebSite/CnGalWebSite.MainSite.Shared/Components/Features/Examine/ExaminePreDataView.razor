@@ -1,4 +1,4 @@
-@using CnGalWebSite.DataModel.ViewModel.Admin
+﻿@using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.ViewModel.Search
 
 @* 展示 ExaminePreDataModel 的结构化内容 — 正文、图片、文本信息、关联、外链、音频 *@
@@ -95,9 +95,17 @@
                         @foreach (var rel in Model.Relevances)
                         {
                             var name = GetRelevanceName(rel);
+                            var url = GetRelevanceUrl(rel);
                             if (!string.IsNullOrWhiteSpace(name))
                             {
-                                <span class="examine-pre-data-view__tag">@name</span>
+                                @if (!string.IsNullOrWhiteSpace(url))
+                                {
+                                    <a class="examine-pre-data-view__tag" href="@url" target="_blank" rel="noopener noreferrer">@name</a>
+                                }
+                                else
+                                {
+                                    <span class="examine-pre-data-view__tag">@name</span>
+                                }
                             }
                         }
                     </div>
@@ -126,7 +134,31 @@
                             {
                                 <tr>
                                     <td>@link.DisplayName</td>
-                                    <td>@link.DisplayValue</td>
+                                    <td>
+                                        @{
+                                            var url = !string.IsNullOrWhiteSpace(link.Link) ? link.Link : null;
+                                            var display = link.DisplayValue;
+
+                                            if (string.IsNullOrWhiteSpace(url) && !string.IsNullOrWhiteSpace(display) && 
+                                                (display.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || display.StartsWith("https://", StringComparison.OrdinalIgnoreCase)))
+                                            {
+                                                url = display;
+                                            }
+                                            
+                                            if (string.IsNullOrWhiteSpace(display))
+                                            {
+                                                display = url;
+                                            }
+                                        }
+                                        @if (!string.IsNullOrWhiteSpace(url) && (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || url.StartsWith("https://", StringComparison.OrdinalIgnoreCase)))
+                                        {
+                                            <a href="@url" target="_blank" rel="noopener noreferrer">@display</a>
+                                        }
+                                        else
+                                        {
+                                            @(string.IsNullOrWhiteSpace(display) ? "—" : display)
+                                        }
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -182,6 +214,17 @@
         if (model.video is not null) return model.video.DisplayName ?? model.video.Name;
         if (model.periphery is not null) return model.periphery.Name;
         if (model.user is not null) return model.user.UserName ?? "用户";
+        return null;
+    }
+
+    private static string? GetRelevanceUrl(SearchAloneModel model)
+    {
+        if (model.entry is not null) return $"/entries/index/{model.entry.Id}";
+        if (model.article is not null) return $"/articles/index/{model.article.Id}";
+        if (model.tag is not null) return $"/tags/index/{model.tag.Id}";
+        if (model.video is not null) return $"/videos/index/{model.video.Id}";
+        if (model.periphery is not null) return $"/peripheries/index/{model.periphery.Id}";
+        if (model.user is not null) return $"/space/index/{model.user.Id}";
         return null;
     }
 }

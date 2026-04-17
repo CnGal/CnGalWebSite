@@ -1,4 +1,4 @@
-@using CnGalWebSite.SDK.MainSite.Models
+﻿@using CnGalWebSite.SDK.MainSite.Models
 
 <div class="entry-user-score-card">
     <div class="entry-user-score-card__header">
@@ -39,8 +39,20 @@
 
     @if (!string.IsNullOrWhiteSpace(Model.PlayImpressions))
     {
+        var isLong = Model.PlayImpressions.Length > 150 || Model.PlayImpressions.Count(c => c == '\n') >= 3;
+        var toggleId = $"expand_{Model.UserId ?? Guid.NewGuid().ToString("N")}";
         <div class="entry-user-score-card__impressions">
-            <p>@TruncateText(Model.PlayImpressions, 200)</p>
+            @if (isLong)
+            {
+                <input type="checkbox" id="@toggleId" class="entry-user-score-card__expand-toggle" hidden />
+            }
+            <p class="entry-user-score-card__impressions-text">
+                @Model.PlayImpressions
+            </p>
+            @if (isLong)
+            {
+                <label for="@toggleId" class="entry-user-score-card__expand-btn"></label>
+            }
         </div>
     }
 
@@ -64,13 +76,4 @@
 
     [Parameter]
     public bool IsDubbing { get; set; }
-
-    private static string TruncateText(string text, int maxLength)
-    {
-        if (string.IsNullOrEmpty(text) || text.Length <= maxLength)
-        {
-            return text;
-        }
-        return text[..maxLength] + "...";
-    }
 }

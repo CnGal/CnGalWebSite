@@ -1,0 +1,251 @@
+﻿@page "/sedai"
+@page "/entries/sedai"
+
+@rendermode InteractiveServer
+
+@using Microsoft.JSInterop
+@using CnGalWebSite.MainSite.Shared.Services
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@using CnGalWebSite.SDK.MainSite.Models
+
+@inject IStoreInfoQueryService StoreInfoQueryService
+@inject IJSRuntime JS
+@inject ICgToastService ToastService
+@implements IAsyncDisposable
+
+<CgPageMeta Title="CnGal 世代"
+            Description="历年关注最多的国产 Galgame，点击选择你玩过的作品。" />
+
+<div class="sedai-page">
+    <header class="sedai-page__header">
+        <h1 class="sedai-page__title">
+            <CgMdiIcon Name="mdiControllerClassicOutline" aria-hidden="true" />
+            CnGal 世代
+        </h1>
+        <p class="sedai-page__subtitle">点击选择你玩过的国产 Galgame，一键导出图片分享。</p>
+    </header>
+
+    @if (_errorMessage is not null)
+    {
+        <section class="sedai-page__error" role="alert">
+            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
+            <h2>加载失败</h2>
+            <p>@_errorMessage</p>
+            <div class="sedai-page__error-actions">
+                <CgButton Variant="primary" Async OnClick="LoadAsync">重试</CgButton>
+                <CgButton Variant="secondary" Href="/">返回首页</CgButton>
+            </div>
+        </section>
+    }
+    else if (_years is null)
+    {
+        <section class="sedai-page__loading" aria-label="加载中">
+            <CgProgressRing />
+            <p>正在加载历年数据...</p>
+        </section>
+    }
+    else
+    {
+        <section class="sedai-card cg-sedai-card--mobile" id="@CaptureElementId">
+            <header class="sedai-card__banner">
+                <div class="sedai-card__banner-text">
+                    <p class="sedai-card__brand">CnGal 世代 · 点击选择你玩过的国产 Galgame</p>
+                    <p class="sedai-card__site">www.cngal.org/sedai</p>
+                </div>
+                <div class="sedai-card__progress" aria-live="polite">
+                    @($"我玩过 {SelectedCount}/{TotalCount} 部国产 Galgame")
+                </div>
+            </header>
+
+            <div class="sedai-card__grid" role="list">
+                @foreach (var year in _years)
+                {
+                    <div class="sedai-card__row" role="listitem">
+                        <div class="sedai-card__year">@year.Year</div>
+                        <div class="sedai-card__games">
+                            @foreach (var game in year.Games)
+                            {
+                                var isSelected = _selected.Contains(GameKey(year.Year, game));
+                                <button type="button"
+                                        class="sedai-card__game @(isSelected ? "sedai-card__game--active" : "")"
+                                        aria-pressed="@(isSelected ? "true" : "false")"
+                                        @onclick="() => ToggleGame(year.Year, game)">
+                                    <span class="sedai-card__game-text">@game.Name</span>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <footer class="sedai-card__banner sedai-card__banner--footer">
+                <div class="sedai-card__banner-text">
+                    <p class="sedai-card__brand">CnGal 世代 · 点击选择你玩过的国产 Galgame</p>
+                    <p class="sedai-card__site">www.cngal.org/sedai</p>
+                </div>
+                <div class="sedai-card__progress">
+                    @($"我玩过 {SelectedCount}/{TotalCount} 部国产 Galgame")
+                </div>
+            </footer>
+        </section>
+
+        <section class="sedai-page__actions" aria-label="操作">
+            <CgButton Variant="secondary" OnClick="SelectAll">
+                <CgMdiIcon Name="mdiCheckboxMultipleOutline" aria-hidden="true" />
+                <span>全选</span>
+            </CgButton>
+            <CgButton Variant="secondary" OnClick="ClearAll">
+                <CgMdiIcon Name="mdiCloseBoxMultipleOutline" aria-hidden="true" />
+                <span>清除</span>
+            </CgButton>
+            <CgButton Variant="primary" Async OnClick="CopyAsImage">
+                <CgMdiIcon Name="mdiContentCopy" aria-hidden="true" />
+                <span>复制图片</span>
+            </CgButton>
+            <CgButton Variant="primary" Async OnClick="DownloadAsImage">
+                <CgMdiIcon Name="mdiDownload" aria-hidden="true" />
+                <span>下载图片</span>
+            </CgButton>
+        </section>
+
+        <section class="sedai-page__about">
+            <p>历年关注最多的国产 Galgame 作品，数据来自 <a href="https://www.cngal.org" target="_blank" rel="noopener">cngal.org</a>。</p>
+            <p>如有年份错误或作品遗漏，欢迎同好们前来反馈勘误：<a href="https://space.bilibili.com/145239325" target="_blank" rel="noopener">@@CnGal资料站</a>。</p>
+            <p>
+                本项目参考自
+                <a href="https://x.com/localhost_4173" target="_blank" rel="noopener">低空飞行</a>
+                制作的"动画世代"，
+                <a href="https://github.com/egoist/anime-sedai" target="_blank" rel="noopener">查看代码</a>；
+                本项目同样已开源，
+                <a href="https://github.com/CnGal/CnGalWebSite" target="_blank" rel="noopener">查看代码</a>。
+            </p>
+        </section>
+    }
+</div>
+
+@code {
+    private const string CaptureElementId = "sedai-capture-target";
+    private const string ImageFileName = "CnGal世代";
+
+    private IReadOnlyList<CnGalGenerationYearItem>? _years;
+    private string? _errorMessage;
+
+    // 使用不可变的 (year, index) 键记录选中状态，避免同名游戏冲突。
+    private readonly HashSet<string> _selected = new(StringComparer.Ordinal);
+
+    private IJSObjectReference? _jsModule;
+
+    private int SelectedCount => _selected.Count;
+
+    private int TotalCount => _years?.Sum(year => year.Games.Count) ?? 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _errorMessage = null;
+        _years = null;
+        _selected.Clear();
+
+        var result = await StoreInfoQueryService.GetCnGalGenerationAsync();
+        if (result.Success && result.Data is not null)
+        {
+            _years = result.Data;
+            return;
+        }
+
+        _errorMessage = result.Error?.Message ?? "请稍后重试";
+    }
+
+    private static string GameKey(int year, CnGalGenerationGameItem game)
+    {
+        return $"{year}::{game.Name}";
+    }
+
+    private void ToggleGame(int year, CnGalGenerationGameItem game)
+    {
+        var key = GameKey(year, game);
+        if (!_selected.Add(key))
+        {
+            _selected.Remove(key);
+        }
+    }
+
+    private void SelectAll()
+    {
+        if (_years is null)
+        {
+            return;
+        }
+
+        _selected.Clear();
+        foreach (var year in _years)
+        {
+            foreach (var game in year.Games)
+            {
+                _selected.Add(GameKey(year.Year, game));
+            }
+        }
+    }
+
+    private void ClearAll()
+    {
+        _selected.Clear();
+    }
+
+    private async Task<IJSObjectReference> GetModuleAsync()
+    {
+        return _jsModule ??= await JS.InvokeAsync<IJSObjectReference>(
+            "import",
+            "./_content/CnGalWebSite.MainSite.Shared/scripts/cg-save-image.js");
+    }
+
+    private async Task DownloadAsImage()
+    {
+        try
+        {
+            var module = await GetModuleAsync();
+            await module.InvokeVoidAsync("saveDivAsImage", CaptureElementId, ImageFileName, false);
+        }
+        catch (Exception ex)
+        {
+            ToastService.Show("下载图片失败", ex.Message, "error");
+        }
+    }
+
+    private async Task CopyAsImage()
+    {
+        try
+        {
+            var module = await GetModuleAsync();
+            await module.InvokeVoidAsync("saveDivAsImage", CaptureElementId, ImageFileName, true);
+            ToastService.Show("复制成功", "图片已复制到剪贴板", "success");
+        }
+        catch (JSException ex) when (ex.Message.Contains("CLIPBOARD_UNSUPPORTED", StringComparison.Ordinal))
+        {
+            ToastService.Show("当前浏览器不支持复制图片", "已改为下载图片", "warning");
+        }
+        catch (Exception ex)
+        {
+            ToastService.Show("复制图片失败", ex.Message, "error");
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_jsModule is not null)
+        {
+            try
+            {
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit 已断开，忽略。
+            }
+        }
+    }
+}

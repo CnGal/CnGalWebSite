@@ -27,8 +27,11 @@
     display: flex;
     gap: var(--cg-spacing-2);
     flex-wrap: wrap;
+    justify-content: flex-end;
+    margin-top: var(--cg-spacing-1);
 }
 
 .comment-interactive__inline-reply {
-    margin-top: var(--cg-spacing-2);
+    margin-top: var(--cg-spacing-3);
+    margin-bottom: var(--cg-spacing-2);
 }

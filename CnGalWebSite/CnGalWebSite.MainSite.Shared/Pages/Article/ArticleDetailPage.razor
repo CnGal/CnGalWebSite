@@ -114,7 +114,9 @@ else if (_model is not null)
                 </ul>
             </EntrySection>
 
-            <EditRecordListCard Records="_editRecords" />
+            <CgMiniModeContainer>
+                <EditRecordListCard Records="_editRecords" />
+            </CgMiniModeContainer>
 
             <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
                 Type="CommentType.CommentArticle"

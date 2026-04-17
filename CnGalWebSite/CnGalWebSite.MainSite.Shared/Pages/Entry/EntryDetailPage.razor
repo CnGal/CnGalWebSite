@@ -1,4 +1,4 @@
-@page "/entries/index/{Id:int}"
+﻿@page "/entries/index/{Id:int}"
 @inject IEntryQueryService EntryQueryService
 @inject IPlayedGameQueryService PlayedGameQueryService
 @inject IPeripheryQueryService PeripheryQueryService
@@ -104,22 +104,24 @@ else if (Model is not null)
                 </div>
 
                 <div class="entry-cell entry-cell--score">
-                    @* 仅游戏类词条显示评分区域 *@
-                    @if (Model.Type == EntryType.Game)
-                    {
-                        @* 登录用户使用交互式评分区域（支持编辑后实时刷新），未登录用户使用静态渲染 *@
-                        <AuthorizeView>
-                            <Authorized>
-                                <EntryScoreSection EntryId="Id" />
-                            </Authorized>
-                            <NotAuthorized>
-                                @if (ScoreOverview is not null)
-                                {
-                                    <EntryScoreOverview Model="ScoreOverview" />
-                                }
-                            </NotAuthorized>
-                        </AuthorizeView>
-                    }
+                    <CgMiniModeContainer>
+                        @* 仅游戏类词条显示评分区域 *@
+                        @if (Model.Type == EntryType.Game)
+                        {
+                            @* 登录用户使用交互式评分区域（支持编辑后实时刷新），未登录用户使用静态渲染 *@
+                            <AuthorizeView>
+                                <Authorized>
+                                    <EntryScoreSection EntryId="Id" />
+                                </Authorized>
+                                <NotAuthorized>
+                                    @if (ScoreOverview is not null)
+                                    {
+                                        <EntryScoreOverview Model="ScoreOverview" />
+                                    }
+                                </NotAuthorized>
+                            </AuthorizeView>
+                        }
+                    </CgMiniModeContainer>
                 </div>
 
                 <div class="entry-cell entry-cell--comment">
@@ -159,6 +161,10 @@ else if (Model is not null)
                     </EntrySection>
                 </div>
 
+                <div class="entry-cell entry-cell--drawing">
+                    <EntryVerticalDrawingCard Type="Model.Type" Image="@Model.MainPicture" Name="@Model.Name" />
+                </div>
+
                 <div class="entry-cell entry-cell--staff">
                     <EntryCard Title="Staff" Icon="mdiAccountGroupOutline" Show="Model.Staffs.Count > 0">
                         <EntryStaffGroupList Staffs="Model.Staffs" MaxGroupCount="8" MaxPositionCount="5" />
@@ -183,7 +189,9 @@ else if (Model is not null)
                 </div>
 
                 <div class="entry-cell entry-cell--records">
-                    <EntryEditRecordCard Records="EditRecords" />
+                    <CgMiniModeContainer>
+                        <EntryEditRecordCard Records="EditRecords" />
+                    </CgMiniModeContainer>
                 </div>
 
                 <div class="entry-cell entry-cell--catalog">

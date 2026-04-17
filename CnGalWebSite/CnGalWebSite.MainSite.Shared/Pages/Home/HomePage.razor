@@ -1,4 +1,4 @@
-@page "/"
+﻿@page "/"
 @inject IHomeQueryService HomeQueryService
 @using CnGalWebSite.DataModel.ViewModel.Home
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
@@ -15,35 +15,39 @@ else
     <HomeHero Carousels="@Model.Carousels"/>
     <HomeMobileButtonGroup />
 
-    <div class="home-community-action-section">
-        <div class="home-community-left">
-            <ul class="home-community-grid">
-                @foreach (var item in Model.CommunityLinks.Take(6).Select((value, index) => new { value, index }))
-                {
-                    <HomeLinkCard Url="@item.value.Link"
-                                  Title="@item.value.Title"
-                                  Text="@item.value.Text"
-                                  Target="_blank"
-                                  CommunityStyle="true"
-                                  Icon="@GetCommunityIcon(item.index)"
-                                  IconTone="@GetCommunityTone(item.index)"/>
-                }
-            </ul>
+    <CgMiniModeContainer>
+        <div class="home-community-action-section">
+            <div class="home-community-left">
+                <ul class="home-community-grid">
+                    @foreach (var item in Model.CommunityLinks.Take(6).Select((value, index) => new { value, index }))
+                    {
+                        <HomeLinkCard Url="@item.value.Link"
+                                      Title="@item.value.Title"
+                                      Text="@item.value.Text"
+                                      Target="_blank"
+                                      CommunityStyle="true"
+                                      Icon="@GetCommunityIcon(item.index)"
+                                      IconTone="@GetCommunityTone(item.index)"/>
+                    }
+                </ul>
+            </div>
+            <div class="home-community-right">
+                <a href="/entries/create" class="home-action-btn home-action-btn--primary">
+                    <CgMdiIcon Name="mdiPencilPlus" aria-hidden="true"/>
+                    <span>贡献词条</span>
+                </a>
+                <a href="/articles/create" class="home-action-btn home-action-btn--secondary">
+                    <CgMdiIcon Name="mdiNotePlus" aria-hidden="true"/>
+                    <span>发布文章</span>
+                </a>
+            </div>
         </div>
-        <div class="home-community-right">
-            <a href="/entries/create" class="home-action-btn home-action-btn--primary">
-                <CgMdiIcon Name="mdiPencilPlus" aria-hidden="true"/>
-                <span>贡献词条</span>
-            </a>
-            <a href="/articles/create" class="home-action-btn home-action-btn--secondary">
-                <CgMdiIcon Name="mdiNotePlus" aria-hidden="true"/>
-                <span>发布文章</span>
-            </a>
-        </div>
-    </div>
+    </CgMiniModeContainer>
 
     <div class="home-games-section">
-        <HomeRandomRecommend HotRecommends="@Model.HotRecommends"/>
+        <CgMiniModeContainer>
+            <HomeRandomRecommend HotRecommends="@Model.HotRecommends"/>
+        </CgMiniModeContainer>
 
         <HomeSection Title="近期新作" Icon="mdiRocketLaunch" IconColor="var(--cg-color-primary)">
             <HeaderAppendContent>
@@ -82,14 +86,16 @@ else
 
         @if (Model.ActivityCarousels.Any())
         {
-            <HomeSection>
-                <ul class="home-carousel-grid">
-                    @foreach (var item in Model.ActivityCarousels.Take(3))
-                    {
-                        <HomeCarouselCard Link="@item.Link" Image="@item.Image" Note="@item.Note"/>
-                    }
-                </ul>
-            </HomeSection>
+            <CgMiniModeContainer>
+                <HomeSection>
+                    <ul class="home-carousel-grid">
+                        @foreach (var item in Model.ActivityCarousels.Take(3))
+                        {
+                            <HomeCarouselCard Link="@item.Link" Image="@item.Image" Note="@item.Note"/>
+                        }
+                    </ul>
+                </HomeSection>
+            </CgMiniModeContainer>
         }
 
         <HomeSection Title="即将发布" Icon="mdiCalendarClock" IconColor="var(--cg-color-primary)">
@@ -126,73 +132,79 @@ else
                 </ul>
             </HomeSection>
 
-            <HomeSection Title="最新视频" Icon="mdiPlayCircle" IconColor="var(--cg-color-primary)">
-                <ul class="home-articles-grid">
-                    @foreach (var item in Model.LatestVideos.Take(6))
-                    {
-                        <HomeNewsCard Url="@item.Url" Title="@item.Name" Time="@($"{item.OriginalAuthor} · {item.PublishTime}")" Image="@item.Image" Category="视频"/>
-                    }
-                </ul>
-            </HomeSection>
+            <CgMiniModeContainer>
+                <HomeSection Title="最新视频" Icon="mdiPlayCircle" IconColor="var(--cg-color-primary)">
+                    <ul class="home-articles-grid">
+                        @foreach (var item in Model.LatestVideos.Take(6))
+                        {
+                            <HomeNewsCard Url="@item.Url" Title="@item.Name" Time="@($"{item.OriginalAuthor} · {item.PublishTime}")" Image="@item.Image" Category="视频"/>
+                        }
+                    </ul>
+                </HomeSection>
+            </CgMiniModeContainer>
 
-            <div class="home-evaluations-section">
-            <HomeSection Title="专题推荐" Icon="mdiTextBoxOutline" IconColor="var(--cg-color-primary)">
-                <ul class="home-articles-grid">
-                    @foreach (var item in Model.Evaluations.Take(6))
-                    {
-                        <HomeEvaluationCard Url="@item.Url" Name="@item.Name" Image="@item.Image" Articles="@item.Articles.Take(4)"/>
-                    }
-                </ul>
-            </HomeSection>
-            </div>
+            <CgMiniModeContainer>
+                <div class="home-evaluations-section">
+                    <HomeSection Title="专题推荐" Icon="mdiTextBoxOutline" IconColor="var(--cg-color-primary)">
+                        <ul class="home-articles-grid">
+                            @foreach (var item in Model.Evaluations.Take(6))
+                            {
+                                <HomeEvaluationCard Url="@item.Url" Name="@item.Name" Image="@item.Image" Articles="@item.Articles.Take(4)"/>
+                            }
+                        </ul>
+                    </HomeSection>
+                </div>
+            </CgMiniModeContainer>
         </div>
 
         <div class="home-grid-sidebar">
-            <div class="home-support-row">
-                @if (Model.SupportLink is not null)
-                {
-                    <a href="@Model.SupportLink.Link" target="_blank" rel="noopener noreferrer" class="home-support-card">
-                        <span class="home-support-card__icon">
-                            <CgMdiIcon Name="mdiFlash" aria-hidden="true"/>
-                        </span>
-                        <strong class="home-support-card__title">@Model.SupportLink.Title</strong>
-                        @if (!string.IsNullOrWhiteSpace(Model.SupportLink.Text))
-                        {
-                            <p class="home-support-card__desc">@Model.SupportLink.Text</p>
-                        }
-                        <span class="home-support-card__action">
-                            前往支持
-                            <CgMdiIcon Name="mdiArrowRight" aria-hidden="true"/>
+            <CgMiniModeContainer>
+                <div class="home-support-row">
+                    @if (Model.SupportLink is not null)
+                    {
+                        <a href="@Model.SupportLink.Link" target="_blank" rel="noopener noreferrer" class="home-support-card">
+                            <span class="home-support-card__icon">
+                                <CgMdiIcon Name="mdiFlash" aria-hidden="true"/>
+                            </span>
+                            <strong class="home-support-card__title">@Model.SupportLink.Title</strong>
+                            @if (!string.IsNullOrWhiteSpace(Model.SupportLink.Text))
+                            {
+                                <p class="home-support-card__desc">@Model.SupportLink.Text</p>
+                            }
+                            <span class="home-support-card__action">
+                                前往支持
+                                <CgMdiIcon Name="mdiArrowRight" aria-hidden="true"/>
+                            </span>
+                        </a>
+                    }
+
+
+                    <a href="/tables" class="home-stats-card">
+                        <h3 class="home-stats-card__title">CnGal资料站数据</h3>
+                        <div class="home-stats-card__grid">
+                            <div class="home-stats-card__item">
+                                <span class="home-stats-card__label">游戏</span>
+                                <span class="home-stats-card__value">@Model.CommunityStats.GamesCount.ToString("N0")</span>
+                            </div>
+                            <div class="home-stats-card__item">
+                                <span class="home-stats-card__label">制作组/发行商</span>
+                                <span class="home-stats-card__value">@Model.CommunityStats.GroupsCount.ToString("N0")</span>
+                            </div>
+                            <div class="home-stats-card__item">
+                                <span class="home-stats-card__label">角色</span>
+                                <span class="home-stats-card__value">@Model.CommunityStats.RolesCount.ToString("N0")</span>
+                            </div>
+                            <div class="home-stats-card__item">
+                                <span class="home-stats-card__label">制作人员</span>
+                                <span class="home-stats-card__value">@Model.CommunityStats.StaffsCount.ToString("N0")</span>
+                            </div>
+                        </div>
+                        <span class="home-stats-card__decor">
+                            <CgMdiIcon Name="mdiAccountGroup" aria-hidden="true"/>
                         </span>
                     </a>
-                }
-
-
-                <a href="/tables" class="home-stats-card">
-                    <h3 class="home-stats-card__title">CnGal资料站数据</h3>
-                    <div class="home-stats-card__grid">
-                        <div class="home-stats-card__item">
-                            <span class="home-stats-card__label">游戏</span>
-                            <span class="home-stats-card__value">@Model.CommunityStats.GamesCount.ToString("N0")</span>
-                        </div>
-                        <div class="home-stats-card__item">
-                            <span class="home-stats-card__label">制作组/发行商</span>
-                            <span class="home-stats-card__value">@Model.CommunityStats.GroupsCount.ToString("N0")</span>
-                        </div>
-                        <div class="home-stats-card__item">
-                            <span class="home-stats-card__label">角色</span>
-                            <span class="home-stats-card__value">@Model.CommunityStats.RolesCount.ToString("N0")</span>
-                        </div>
-                        <div class="home-stats-card__item">
-                            <span class="home-stats-card__label">制作人员</span>
-                            <span class="home-stats-card__value">@Model.CommunityStats.StaffsCount.ToString("N0")</span>
-                        </div>
-                    </div>
-                    <span class="home-stats-card__decor">
-                        <CgMdiIcon Name="mdiAccountGroup" aria-hidden="true"/>
-                    </span>
-                </a>
-            </div>
+                </div>
+            </CgMiniModeContainer>
 
 
             <HomeSection Title="角色生日" Icon="mdiCake" IconColor="var(--cg-color-secondary)">
@@ -226,52 +238,58 @@ else
                 }
             </HomeSection>
 
-            <HomeSection Title="每周速报" Icon="mdiTextLong" IconColor="var(--cg-color-primary)">
-                @{
-                    var latestWeekly = Model.WeeklyNews.FirstOrDefault();
-                }
-                @if (latestWeekly is not null)
-                {
-                    <a href="@($"/articles/index/{latestWeekly.Id}")" class="home-weekly-digest-card">
-                        <h3>
-                            <CgMdiIcon Name="mdiNewspaper" aria-hidden="true"/>
-                            CnGal 周报
-                        </h3>
-                        <p>@TrimWeeklyNewsTitle(latestWeekly.Name)</p>
-                        <span class="home-weekly-digest-action">立即阅读</span>
-                    </a>
-                }
-                else
-                {
-                    <div class="home-weekly-digest-card">
-                        <h3>
-                            <CgMdiIcon Name="mdiNewspaper" aria-hidden="true"/>
-                            CnGal 周报
-                        </h3>
-                        <p>暂无最新周报内容</p>
-                        <span class="home-weekly-digest-action">敬请期待</span>
-                    </div>
-                }
-            </HomeSection>
-
-            <HomeSection Title="制作组动态" Icon="mdiAccountGroupOutline" IconColor="var(--cg-color-primary)">
-                <ul class="home-list home-list-connected">
-                    @foreach (var item in Model.HomeNews.Take(6))
-                    {
-                        <HomeNewsCard Url="@GetNewsLink(item)" Target="@GetNewsTarget(item)" Title="@item.Title" Text="@item.Text" Time="@FormatRelativeTime(item.Time)" Image="@item.Image" Category="@item.Type" DevStyle="true"/>
+            <CgMiniModeContainer>
+                <HomeSection Title="每周速报" Icon="mdiTextLong" IconColor="var(--cg-color-primary)">
+                    @{
+                        var latestWeekly = Model.WeeklyNews.FirstOrDefault();
                     }
-                </ul>
-            </HomeSection>
-
-
-            <HomeSection Title="公告" Icon="mdiBullhornOutline" IconColor="#f59e0b">
-                <ul class="home-list home-list-connected">
-                    @foreach (var item in Model.Announcements.Take(12))
+                    @if (latestWeekly is not null)
                     {
-                        <HomeLinkCard Url="@item.Url" Title="@item.Name" Text="@item.BriefIntroduction"/>
+                        <a href="@($"/articles/index/{latestWeekly.Id}")" class="home-weekly-digest-card">
+                            <h3>
+                                <CgMdiIcon Name="mdiNewspaper" aria-hidden="true"/>
+                                CnGal 周报
+                            </h3>
+                            <p>@TrimWeeklyNewsTitle(latestWeekly.Name)</p>
+                            <span class="home-weekly-digest-action">立即阅读</span>
+                        </a>
                     }
-                </ul>
-            </HomeSection>
+                    else
+                    {
+                        <div class="home-weekly-digest-card">
+                            <h3>
+                                <CgMdiIcon Name="mdiNewspaper" aria-hidden="true"/>
+                                CnGal 周报
+                            </h3>
+                            <p>暂无最新周报内容</p>
+                            <span class="home-weekly-digest-action">敬请期待</span>
+                        </div>
+                    }
+                </HomeSection>
+            </CgMiniModeContainer>
+
+            <CgMiniModeContainer>
+                <HomeSection Title="制作组动态" Icon="mdiAccountGroupOutline" IconColor="var(--cg-color-primary)">
+                    <ul class="home-list home-list-connected">
+                        @foreach (var item in Model.HomeNews.Take(6))
+                        {
+                            <HomeNewsCard Url="@GetNewsLink(item)" Target="@GetNewsTarget(item)" Title="@item.Title" Text="@item.Text" Time="@FormatRelativeTime(item.Time)" Image="@item.Image" Category="@item.Type" DevStyle="true"/>
+                        }
+                    </ul>
+                </HomeSection>
+            </CgMiniModeContainer>
+
+
+            <CgMiniModeContainer>
+                <HomeSection Title="公告" Icon="mdiBullhornOutline" IconColor="#f59e0b">
+                    <ul class="home-list home-list-connected">
+                        @foreach (var item in Model.Announcements.Take(12))
+                        {
+                            <HomeLinkCard Url="@item.Url" Title="@item.Name" Text="@item.BriefIntroduction"/>
+                        }
+                    </ul>
+                </HomeSection>
+            </CgMiniModeContainer>
 
             <HomeSection Title="近期编辑" Icon="mdiHistory" IconColor="var(--cg-color-primary)">
                 <ul class="home-list home-list-connected">
@@ -287,87 +305,99 @@ else
                 </ul>
             </HomeSection>
 
-            <HomeSection Title="近期留言" Icon="mdiChat" IconColor="var(--cg-color-primary)">
-                <ul class="home-list">
-                    @foreach (var item in Model.LatestComments.Take(6))
-                    {
-                        <HomeCommentCard Url="@item.Url" UserName="@item.UserName" UserImage="@item.UserImage" Content="@item.Content" Time="@item.Time"/>
-                    }
-                </ul>
-            </HomeSection>
-
-            <div class="home-support-tags-panel">
-                <HomeSection Title="热门标签" Icon="mdiTagMultipleOutline" IconColor="var(--cg-color-secondary)">
-                    <ul class="home-hot-tags">
-                        @foreach (var (item, i) in Model.HotTags.Take(20).Select((v, i) => (v, i)))
+            <CgMiniModeContainer>
+                <HomeSection Title="近期留言" Icon="mdiChat" IconColor="var(--cg-color-primary)">
+                    <ul class="home-list">
+                        @foreach (var item in Model.LatestComments.Take(6))
                         {
-                            <li style="--_tag-hue: @(200 + i * 17 % 160)">
-                                <a href="@item.Url">@item.Name</a>
-                            </li>
+                            <HomeCommentCard Url="@item.Url" UserName="@item.UserName" UserImage="@item.UserImage" Content="@item.Content" Time="@item.Time"/>
                         }
                     </ul>
                 </HomeSection>
-            </div>
+            </CgMiniModeContainer>
+
+            <CgMiniModeContainer>
+                <div class="home-support-tags-panel">
+                    <HomeSection Title="热门标签" Icon="mdiTagMultipleOutline" IconColor="var(--cg-color-secondary)">
+                        <ul class="home-hot-tags">
+                            @foreach (var (item, i) in Model.HotTags.Take(20).Select((v, i) => (v, i)))
+                            {
+                                <li style="--_tag-hue: @(200 + i * 17 % 160)">
+                                    <a href="@item.Url">@item.Name</a>
+                                </li>
+                            }
+                        </ul>
+                    </HomeSection>
+                </div>
+            </CgMiniModeContainer>
         </div>
     </div>
 
-    <HomeKanban/>
+    <CgMiniModeContainer>
+        <HomeKanban/>
+    </CgMiniModeContainer>
 
-    <HomeSection Title="免费游玩" Icon="mdiGiftOutline" IconColor="#10b981">
-        <HeaderAppendContent>
-            <a href="/tags/index/8" class="home-section-more-link">
-                查看更多
-                <CgMdiIcon Name="mdiArrowRight" aria-hidden="true"/>
-            </a>
-        </HeaderAppendContent>
-        <ChildContent>
-            <ul class="home-bottom-game-grid">
-                @foreach (var item in Model.FreeGames.Take(5))
+    <CgMiniModeContainer>
+        <HomeSection Title="免费游玩" Icon="mdiGiftOutline" IconColor="#10b981">
+            <HeaderAppendContent>
+                <a href="/tags/index/8" class="home-section-more-link">
+                    查看更多
+                    <CgMdiIcon Name="mdiArrowRight" aria-hidden="true"/>
+                </a>
+            </HeaderAppendContent>
+            <ChildContent>
+                <ul class="home-bottom-game-grid">
+                    @foreach (var item in Model.FreeGames.Take(5))
+                    {
+                        <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" Tags="@item.Tags"/>
+                    }
+                </ul>
+            </ChildContent>
+        </HomeSection>
+    </CgMiniModeContainer>
+
+    <CgMiniModeContainer>
+        <HomeSection Title="折扣中" Icon="mdiSale" IconColor="#f59e0b">
+            <HeaderAppendContent>
+                <a href="/discount" class="home-section-more-link">
+                    查看更多
+                    <CgMdiIcon Name="mdiArrowRight" aria-hidden="true"/>
+                </a>
+            </HeaderAppendContent>
+            <ChildContent>
+                <ul class="home-bottom-game-grid">
+                    @foreach (var item in Model.DiscountGames.Take(5))
+                    {
+                        <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction">
+                            <div class="home-discount-label">
+                                <span class="home-discount-cut">-@item.Cut%</span>
+                                <span class="home-discount-price">¥ @item.Price.ToString("0.00")</span>
+                            </div>
+                        </HomeGameCard>
+                    }
+                </ul>
+            </ChildContent>
+        </HomeSection>
+    </CgMiniModeContainer>
+
+    <CgMiniModeContainer>
+        <HomeSection Title="友情链接" Icon="mdiLink" IconColor="var(--cg-color-text-muted)">
+            <ul class="home-friend-link-grid">
+                @foreach (var item in Model.FriendLinks.Take(20))
                 {
-                    <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" Tags="@item.Tags"/>
+                    <li style="display: flex;">
+                        <a href="@item.Url" target="_blank" rel="noopener noreferrer" class="home-friend-link-card" style="width: 100%;">
+                            @if (!string.IsNullOrWhiteSpace(item.Image))
+                            {
+                                <img Src="@item.Image" alt="@item.Name" loading="lazy" decoding="async"/>
+                            }
+                            <span>@item.Name</span>
+                        </a>
+                    </li>
                 }
             </ul>
-        </ChildContent>
-    </HomeSection>
-
-    <HomeSection Title="折扣中" Icon="mdiSale" IconColor="#f59e0b">
-        <HeaderAppendContent>
-            <a href="/discount" class="home-section-more-link">
-                查看更多
-                <CgMdiIcon Name="mdiArrowRight" aria-hidden="true"/>
-            </a>
-        </HeaderAppendContent>
-        <ChildContent>
-            <ul class="home-bottom-game-grid">
-                @foreach (var item in Model.DiscountGames.Take(5))
-                {
-                    <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction">
-                        <div class="home-discount-label">
-                            <span class="home-discount-cut">-@item.Cut%</span>
-                            <span class="home-discount-price">¥ @item.Price.ToString("0.00")</span>
-                        </div>
-                    </HomeGameCard>
-                }
-            </ul>
-        </ChildContent>
-    </HomeSection>
-
-    <HomeSection Title="友情链接" Icon="mdiLink" IconColor="var(--cg-color-text-muted)">
-        <ul class="home-friend-link-grid">
-            @foreach (var item in Model.FriendLinks.Take(20))
-            {
-                <li style="display: flex;">
-                    <a href="@item.Url" target="_blank" rel="noopener noreferrer" class="home-friend-link-card" style="width: 100%;">
-                        @if (!string.IsNullOrWhiteSpace(item.Image))
-                        {
-                            <img Src="@item.Image" alt="@item.Name" loading="lazy" decoding="async"/>
-                        }
-                        <span>@item.Name</span>
-                    </a>
-                </li>
-            }
-        </ul>
-    </HomeSection>
+        </HomeSection>
+    </CgMiniModeContainer>
 
 
     @if (Model.Warnings.Count > 0)

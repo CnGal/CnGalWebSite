@@ -1,4 +1,4 @@
-@inherits LayoutComponentBase
+﻿@inherits LayoutComponentBase
 @attribute [StreamRendering]
 @inject NavigationManager NavigationManager
 @inject IMainSiteAuthRequestService AuthRequestService
@@ -8,11 +8,13 @@
         <div class="cg-topbar">
             <div class="cg-topbar__left">
                 @* 汉堡菜单按钮 — 仅 < 1024px 显示 *@
-                <button class="cg-topbar__menu-toggle"
-                        aria-label="打开导航菜单"
-                        onclick="document.getElementById('cg-drawer').classList.add('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.add('cg-drawer-backdrop--visible')">
-                    <CgMdiIcon Name="mdiMenu" aria-hidden="true" />
-                </button>
+                <CgMiniModeContainer>
+                    <button class="cg-topbar__menu-toggle"
+                            aria-label="打开导航菜单"
+                            onclick="document.getElementById('cg-drawer').classList.add('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.add('cg-drawer-backdrop--visible')">
+                        <CgMdiIcon Name="mdiMenu" aria-hidden="true" />
+                    </button>
+                </CgMiniModeContainer>
 
                 <a class="cg-brand" href="/">
                     <img class="cg-brand__icon" src="favicon.ico" alt="CnGal" />
@@ -61,108 +63,110 @@
     </header>
 
     @* ── 移动端抽屉导航 ── *@
-    <div id="cg-drawer-backdrop" class="cg-drawer-backdrop"
-         onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');this.classList.remove('cg-drawer-backdrop--visible')"></div>
-    <nav id="cg-drawer" class="cg-drawer" aria-label="移动端导航">
-        <div class="cg-drawer__header">
-            <a class="cg-brand" href="/">
-                <img class="cg-brand__icon" src="favicon.ico" alt="CnGal" />
-                <h2 class="cg-brand__text">CnGal资料站</h2>
-            </a>
-            <button class="cg-drawer__close" aria-label="关闭导航菜单"
-                    onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
-                <CgMdiIcon Name="mdiClose" aria-hidden="true" />
-            </button>
-        </div>
-        <div class="cg-drawer__links">
-            <a href="/" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
-                <CgMdiIcon Name="mdiHomeOutline" aria-hidden="true" />
-                <span>主页</span>
-            </a>
-        </div>
+    <CgMiniModeContainer>
+        <div id="cg-drawer-backdrop" class="cg-drawer-backdrop"
+             onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');this.classList.remove('cg-drawer-backdrop--visible')"></div>
+        <nav id="cg-drawer" class="cg-drawer" aria-label="移动端导航">
+            <div class="cg-drawer__header">
+                <a class="cg-brand" href="/">
+                    <img class="cg-brand__icon" src="favicon.ico" alt="CnGal" />
+                    <h2 class="cg-brand__text">CnGal资料站</h2>
+                </a>
+                <button class="cg-drawer__close" aria-label="关闭导航菜单"
+                        onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                    <CgMdiIcon Name="mdiClose" aria-hidden="true" />
+                </button>
+            </div>
+            <div class="cg-drawer__links">
+                <a href="/" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                    <CgMdiIcon Name="mdiHomeOutline" aria-hidden="true" />
+                    <span>主页</span>
+                </a>
+            </div>
 
-        <AuthorizeView>
-            <Authorized>
-                @* ── 我的 ── *@
-                <div class="cg-drawer__divider"></div>
-                <div class="cg-drawer__section-title">我的</div>
-                <div class="cg-drawer__links">
-                    <a href="@($"/space/index/{context.User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value}")" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
-                        <CgMdiIcon Name="mdiAccountCircleOutline" aria-hidden="true" />
-                        <span>@context.User.Identity?.Name</span>
-                    </a>
-                    <a href="/space/messages" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
-                        <CgMdiIcon Name="mdiBellOutline" aria-hidden="true" />
-                        <span>消息通知</span>
-                    </a>
-                    <a href="/usercenter" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
-                        <CgMdiIcon Name="mdiViewDashboardOutline" aria-hidden="true" />
-                        <span>内容中心</span>
-                    </a>
-                    <a href="/tasks" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
-                        <CgMdiIcon Name="mdiClipboardCheckOutline" aria-hidden="true" />
-                        <span>每日任务</span>
-                    </a>
-                    <AuthorizeView Roles="Admin">
-                        <Authorized Context="adminContext">
-                            <a href="/admin" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
-                                <CgMdiIcon Name="mdiShieldCrownOutline" aria-hidden="true" />
-                                <span>管理后台</span>
-                            </a>
-                        </Authorized>
-                    </AuthorizeView>
-                </div>
-                @* ── 创建内容 ── *@
-                <div class="cg-drawer__divider"></div>
-                <div class="cg-drawer__section-title">创建内容</div>
-                <div class="cg-drawer__links">
-                    <a href="/entries/create" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
-                        <CgMdiIcon Name="mdiGamepadVariantOutline" aria-hidden="true" />
-                        <span>创建词条</span>
-                    </a>
-                    <a href="/articles/create" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
-                        <CgMdiIcon Name="mdiFileDocumentOutline" aria-hidden="true" />
-                        <span>创建文章</span>
-                    </a>
-                    <a href="/tags/create" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
-                        <CgMdiIcon Name="mdiTagOutline" aria-hidden="true" />
-                        <span>创建标签</span>
-                    </a>
-                    <a href="/videos/create" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
-                        <CgMdiIcon Name="mdiVideoOutline" aria-hidden="true" />
-                        <span>发布视频</span>
-                    </a>
-                    <a href="/peripheries/create" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
-                        <CgMdiIcon Name="mdiGiftOpenOutline" aria-hidden="true" />
-                        <span>创建周边</span>
-                    </a>
-                    <a href="/lotteries/createlottery" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
-                        <CgMdiIcon Name="mdiGiftOutline" aria-hidden="true" />
-                        <span>创建抽奖</span>
-                    </a>
-                </div>
+            <AuthorizeView>
+                <Authorized>
+                    @* ── 我的 ── *@
+                    <div class="cg-drawer__divider"></div>
+                    <div class="cg-drawer__section-title">我的</div>
+                    <div class="cg-drawer__links">
+                        <a href="@($"/space/index/{context.User.Claims.FirstOrDefault(c => c.Type == "sub")?.Value}")" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                            <CgMdiIcon Name="mdiAccountCircleOutline" aria-hidden="true" />
+                            <span>@context.User.Identity?.Name</span>
+                        </a>
+                        <a href="/space/messages" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                            <CgMdiIcon Name="mdiBellOutline" aria-hidden="true" />
+                            <span>消息通知</span>
+                        </a>
+                        <a href="/usercenter" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                            <CgMdiIcon Name="mdiViewDashboardOutline" aria-hidden="true" />
+                            <span>内容中心</span>
+                        </a>
+                        <a href="/tasks" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                            <CgMdiIcon Name="mdiClipboardCheckOutline" aria-hidden="true" />
+                            <span>每日任务</span>
+                        </a>
+                        <AuthorizeView Roles="Admin">
+                            <Authorized Context="adminContext">
+                                <a href="/admin" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                                    <CgMdiIcon Name="mdiShieldCrownOutline" aria-hidden="true" />
+                                    <span>管理后台</span>
+                                </a>
+                            </Authorized>
+                        </AuthorizeView>
+                    </div>
+                    @* ── 创建内容 ── *@
+                    <div class="cg-drawer__divider"></div>
+                    <div class="cg-drawer__section-title">创建内容</div>
+                    <div class="cg-drawer__links">
+                        <a href="/entries/create" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                            <CgMdiIcon Name="mdiGamepadVariantOutline" aria-hidden="true" />
+                            <span>创建词条</span>
+                        </a>
+                        <a href="/articles/create" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                            <CgMdiIcon Name="mdiFileDocumentOutline" aria-hidden="true" />
+                            <span>创建文章</span>
+                        </a>
+                        <a href="/tags/create" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                            <CgMdiIcon Name="mdiTagOutline" aria-hidden="true" />
+                            <span>创建标签</span>
+                        </a>
+                        <a href="/videos/create" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                            <CgMdiIcon Name="mdiVideoOutline" aria-hidden="true" />
+                            <span>发布视频</span>
+                        </a>
+                        <a href="/peripheries/create" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                            <CgMdiIcon Name="mdiGiftOpenOutline" aria-hidden="true" />
+                            <span>创建周边</span>
+                        </a>
+                        <a href="/lotteries/createlottery" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                            <CgMdiIcon Name="mdiGiftOutline" aria-hidden="true" />
+                            <span>创建抽奖</span>
+                        </a>
+                    </div>
 
 
-                @* ── 退出登录 ── *@
-                <div class="cg-drawer__divider"></div>
-                <div class="cg-drawer__footer">
-                    <a class="cg-drawer__logout-link" href="@AuthRequestService.BuildLogoutUrl(CurrentReturnUrl)">
-                        <CgMdiIcon Name="mdiLogout" aria-hidden="true" />
-                        <span>退出登录</span>
-                    </a>
-                </div>
-            </Authorized>
-            <NotAuthorized>
-                <div class="cg-drawer__divider"></div>
-                <div class="cg-drawer__footer">
-                    <a class="cg-drawer__login-link" href="@AuthRequestService.BuildLoginUrl(CurrentReturnUrl)">
-                        <CgMdiIcon Name="mdiLogin" aria-hidden="true" />
-                        <span>登录 / 注册</span>
-                    </a>
-                </div>
-            </NotAuthorized>
-        </AuthorizeView>
-    </nav>
+                    @* ── 退出登录 ── *@
+                    <div class="cg-drawer__divider"></div>
+                    <div class="cg-drawer__footer">
+                        <a class="cg-drawer__logout-link" href="@AuthRequestService.BuildLogoutUrl(CurrentReturnUrl)">
+                            <CgMdiIcon Name="mdiLogout" aria-hidden="true" />
+                            <span>退出登录</span>
+                        </a>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <div class="cg-drawer__divider"></div>
+                    <div class="cg-drawer__footer">
+                        <a class="cg-drawer__login-link" href="@AuthRequestService.BuildLoginUrl(CurrentReturnUrl)">
+                            <CgMdiIcon Name="mdiLogin" aria-hidden="true" />
+                            <span>登录 / 注册</span>
+                        </a>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+        </nav>
+    </CgMiniModeContainer>
 
     <main class="cg-layout__main">
         <UserAtmosphere @rendermode="InteractiveServer" />

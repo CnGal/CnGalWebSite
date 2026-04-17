@@ -45,23 +45,25 @@
         }
         @if (EntryId > 0)
         {
-            <div class="entry-hero-actions">
-                <AuthorizeView>
-                    <Authorized>
-                        <EntryFavoriteButton ObjectId="EntryId" />
-                        <a class="entry-edit-btn" href="/entries/edit/@EntryId">
-                            <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
-                            <span>编辑词条</span>
-                        </a>
-                    </Authorized>
-                    <NotAuthorized>
-                        <a class="entry-edit-btn entry-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/entries/edit/{EntryId}")">
-                            <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
-                            <span>登录后编辑</span>
-                        </a>
-                    </NotAuthorized>
-                </AuthorizeView>
-            </div>
+            <CgMiniModeContainer>
+                <div class="entry-hero-actions">
+                    <AuthorizeView>
+                        <Authorized>
+                            <EntryFavoriteButton ObjectId="EntryId" />
+                            <a class="entry-edit-btn" href="/entries/edit/@EntryId">
+                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                <span>编辑词条</span>
+                            </a>
+                        </Authorized>
+                        <NotAuthorized>
+                            <a class="entry-edit-btn entry-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/entries/edit/{EntryId}")">
+                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                <span>登录后编辑</span>
+                            </a>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </div>
+            </CgMiniModeContainer>
         }
     </div>
 </header>

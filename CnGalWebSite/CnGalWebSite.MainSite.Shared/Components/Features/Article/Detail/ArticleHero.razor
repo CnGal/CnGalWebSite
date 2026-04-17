@@ -19,23 +19,25 @@
             }
             @if (ArticleId > 0)
             {
-                <div class="article-hero-actions">
-                    <AuthorizeView>
-                        <Authorized>
-                            <CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail.EntryFavoriteButton ObjectId="ArticleId" ObjectType="CnGalWebSite.DataModel.Model.FavoriteObjectType.Article" />
-                            <a class="article-edit-btn" href="/articles/edit/@ArticleId">
-                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
-                                <span>编辑文章</span>
-                            </a>
-                        </Authorized>
-                        <NotAuthorized>
-                            <a class="article-edit-btn article-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/articles/edit/{ArticleId}")">
-                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
-                                <span>登录后编辑</span>
-                            </a>
-                        </NotAuthorized>
-                    </AuthorizeView>
-                </div>
+                <CgMiniModeContainer>
+                    <div class="article-hero-actions">
+                        <AuthorizeView>
+                            <Authorized>
+                                <CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail.EntryFavoriteButton ObjectId="ArticleId" ObjectType="CnGalWebSite.DataModel.Model.FavoriteObjectType.Article" />
+                                <a class="article-edit-btn" href="/articles/edit/@ArticleId">
+                                    <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                    <span>编辑文章</span>
+                                </a>
+                            </Authorized>
+                            <NotAuthorized>
+                                <a class="article-edit-btn article-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/articles/edit/{ArticleId}")">
+                                    <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                    <span>登录后编辑</span>
+                                </a>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </div>
+                </CgMiniModeContainer>
             }
         </div>
     </section>

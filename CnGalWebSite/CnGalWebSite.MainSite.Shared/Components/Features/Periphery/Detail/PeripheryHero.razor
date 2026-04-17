@@ -38,24 +38,26 @@
 
             @if (PeripheryId > 0)
             {
-                <div class="periphery-hero-actions">
-                    <AuthorizeView>
-                        <Authorized>
-                            <PeripheryCollectionButton PeripheryId="PeripheryId" />
-                            <CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail.EntryFavoriteButton ObjectId="PeripheryId" ObjectType="CnGalWebSite.DataModel.Model.FavoriteObjectType.Periphery" />
-                            <a class="periphery-edit-btn" href="/peripheries/edit/@PeripheryId">
-                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
-                                <span>编辑周边</span>
-                            </a>
-                        </Authorized>
-                        <NotAuthorized>
-                            <a class="periphery-edit-btn periphery-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/peripheries/edit/{PeripheryId}")">
-                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
-                                <span>登录后编辑</span>
-                            </a>
-                        </NotAuthorized>
-                    </AuthorizeView>
-                </div>
+                <CgMiniModeContainer>
+                    <div class="periphery-hero-actions">
+                        <AuthorizeView>
+                            <Authorized>
+                                <PeripheryCollectionButton PeripheryId="PeripheryId" />
+                                <CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail.EntryFavoriteButton ObjectId="PeripheryId" ObjectType="CnGalWebSite.DataModel.Model.FavoriteObjectType.Periphery" />
+                                <a class="periphery-edit-btn" href="/peripheries/edit/@PeripheryId">
+                                    <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                    <span>编辑周边</span>
+                                </a>
+                            </Authorized>
+                            <NotAuthorized>
+                                <a class="periphery-edit-btn periphery-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/peripheries/edit/{PeripheryId}")">
+                                    <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                    <span>登录后编辑</span>
+                                </a>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </div>
+                </CgMiniModeContainer>
             }
         </div>
     </header>

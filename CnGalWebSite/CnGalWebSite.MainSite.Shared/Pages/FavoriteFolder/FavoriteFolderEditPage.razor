@@ -1,7 +1,7 @@
 @page "/favoritefolders/edit/{Id:long}"
 @page "/favoritefolders/create"
 
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Favorites

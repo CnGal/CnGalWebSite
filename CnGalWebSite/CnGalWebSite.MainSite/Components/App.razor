@@ -66,6 +66,28 @@
         a.remove();
         URL.revokeObjectURL(url);
     };
+
+    window.cngalMiniMode = {
+        set: function (isMiniMode) {
+            if (isMiniMode) {
+                document.cookie = 'cg-mini-mode=true; path=/; max-age=31536000; samesite=lax';
+                localStorage.setItem('IsMiniMode', 'true');
+                return;
+            }
+
+            document.cookie = 'cg-mini-mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=lax';
+            localStorage.removeItem('IsMiniMode');
+        },
+        getCookie: function () {
+            return document.cookie
+                .split(';')
+                .map(function (item) { return item.trim(); })
+                .some(function (item) { return item === 'cg-mini-mode=true'; });
+        },
+        getLegacy: function () {
+            return localStorage.getItem('IsMiniMode') === 'true';
+        }
+    };
 </script>
 </body>
 

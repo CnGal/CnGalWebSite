@@ -57,7 +57,7 @@
     else
     {
         <div class="cg-image-upload__actions">
-            <label class="cg-image-upload__upload-btn @(Disabled || _isUploading ? "cg-image-upload__upload-btn--disabled" : string.Empty)"
+            <label class="cg-image-upload__upload-btn cg-image-upload__upload-btn--@(Variant) @(Disabled || _isUploading ? "cg-image-upload__upload-btn--disabled" : string.Empty)"
                    for="@_inputId">
                 @if (_isUploading)
                 {
@@ -170,6 +170,9 @@
 
     [Parameter]
     public bool Multiple { get; set; }
+
+    [Parameter]
+    public string Variant { get; set; } = "primary";
 
     [Parameter]
     public string Text { get; set; } = "上传图片";

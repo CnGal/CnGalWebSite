@@ -30,15 +30,9 @@ else
         @if (TotalPages > 1)
         {
             <div class="comment-list__pagination">
-                @for (var i = 1; i <= TotalPages; i++)
-                {
-                    var page = i;
-                    <button type="button"
-                            class="comment-list__page-btn @(page == CurrentPage ? "comment-list__page-btn--active" : "")"
-                            @onclick="() => OnPageChanged(page)">
-                        @(page)
-                    </button>
-                }
+                <CgPagination CurrentPage="CurrentPage"
+                              TotalPages="TotalPages"
+                              CurrentPageChanged="OnPageChanged" />
             </div>
         }
     </div>

@@ -1,24 +1,22 @@
-@* 词条详情页中的"添加/编辑游玩记录"交互按钮 *@
+﻿@* 词条详情页中的"添加/编辑游玩记录"交互按钮 *@
 @* 此组件声明为 InteractiveServer，嵌套在静态页中，被 AuthorizeView 包裹 *@
 
 @rendermode InteractiveServer
 
 @using CnGalWebSite.MainSite.Shared.Components.Features.Space
 
-<div class="entry-score-action">
-    @if (IsCurrentUserScoreExist)
-    {
-        <CgButton Variant="CgButton.ButtonVariant.Text" OnClick="OnEditClick">
-            <CgMdiIcon Name="mdiPencilOutline" /> 编辑我的记录
-        </CgButton>
-    }
-    else
-    {
-        <CgButton Variant="CgButton.ButtonVariant.Text" OnClick="OnEditClick">
-            <CgMdiIcon Name="mdiPlus" /> 添加游玩记录
-        </CgButton>
-    }
-</div>
+@if (IsCurrentUserScoreExist)
+{
+    <CgButton Variant="@Variant" OnClick="OnEditClick">
+        <CgMdiIcon Name="mdiPencilOutline" /> 编辑我的记录
+    </CgButton>
+}
+else
+{
+    <CgButton Variant="@Variant" OnClick="OnEditClick">
+        <CgMdiIcon Name="mdiPlus" /> 添加游玩记录
+    </CgButton>
+}
 
 <SpaceGameRecordEditModal @ref="_editModal" OnSaved="OnSaved" />
 
@@ -31,6 +29,9 @@
 
     [Parameter]
     public bool IsCurrentUserScoreExist { get; set; }
+
+    [Parameter]
+    public string Variant { get; set; } = "outline";
 
     [Parameter]
     public EventCallback OnDataChanged { get; set; }

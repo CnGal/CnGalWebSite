@@ -37,7 +37,7 @@
     {
         <div class="comment-interactive__error">
             <p>@_errorMessage</p>
-            <CgButton Variant="CgButton.ButtonVariant.Text" OnClick="RefreshAsync">重试</CgButton>
+            <CgButton Variant="ghost" OnClick="RefreshAsync">重试</CgButton>
         </div>
     }
 </div>
@@ -91,11 +91,13 @@
 
     private async Task RefreshAsync(MouseEventArgs _)
     {
+        CommentQueryService.InvalidateCache(Type, ObjectId);
         await LoadDataAsync();
     }
 
     private async Task OnCommentSubmittedAsync()
     {
+        CommentQueryService.InvalidateCache(Type, ObjectId);
         await LoadDataAsync();
         _commentList?.GoToLastPage();
         await OnChanged.InvokeAsync();
@@ -105,6 +107,7 @@
     {
         _replyingToId = null;
         _replyingToName = null;
+        CommentQueryService.InvalidateCache(Type, ObjectId);
         await LoadDataAsync();
         await OnChanged.InvokeAsync();
     }
@@ -146,6 +149,7 @@
         if (result.Success)
         {
             ToastService.Show("删除评论成功", null, "success");
+            CommentQueryService.InvalidateCache(Type, ObjectId);
             await LoadDataAsync();
             await OnChanged.InvokeAsync();
         }
@@ -160,7 +164,7 @@
         <div class="comment-interactive__action-row">
             @if (_replyingToId == comment.Id)
             {
-                <CgButton Variant="CgButton.ButtonVariant.Text"
+                <CgButton Variant="ghost" Size="sm"
                           OnClick="@(() => OnReplyClick(comment))">
                     <CgMdiIcon Name="mdiClose" />
                     取消回复
@@ -168,7 +172,7 @@
             }
             else
             {
-                <CgButton Variant="CgButton.ButtonVariant.Text"
+                <CgButton Variant="ghost" Size="sm"
                           OnClick="@(() => OnReplyClick(comment))">
                     <CgMdiIcon Name="mdiReply" />
                     回复
@@ -177,7 +181,7 @@
 
             @if (CanDelete)
             {
-                <CgButton Variant="CgButton.ButtonVariant.Text"
+                <CgButton Variant="ghost-danger" Size="sm"
                           OnClick="@(async (_) => await OnDeleteClick(comment))">
                     <CgMdiIcon Name="mdiDeleteOutline" />
                     删除

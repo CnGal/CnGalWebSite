@@ -1,6 +1,6 @@
-@page "/tasks"
+﻿@page "/tasks"
 @attribute [Authorize]
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @using CnGalWebSite.DataModel.ViewModel.Space
 @using CnGalWebSite.MainSite.Shared.Components.Features.Space
@@ -12,13 +12,6 @@
 <CgPageMeta Title="每日任务" />
 
 <div class="tasks-page">
-    <div class="tasks-page__header">
-        <h1 class="tasks-page__title">
-            <CgMdiIcon Name="mdiClipboardCheckOutline" aria-hidden="true" />
-            <span>每日任务</span>
-        </h1>
-    </div>
-
     @if (_isLoading)
     {
         <div class="tasks-page__loading">
@@ -39,8 +32,10 @@
         @* ── 日常任务 ── *@
         <section class="tasks-page__section">
             <div class="tasks-page__section-header">
-                <CgMdiIcon Name="mdiCalendarCheckOutline" aria-hidden="true" />
-                <h2 class="tasks-page__section-title">日常任务</h2>
+                <h2 class="tasks-page__title">
+                    <CgMdiIcon Name="mdiCalendarCheckOutline" aria-hidden="true" />
+                    <span>日常任务</span>
+                </h2>
             </div>
             <div class="tasks-page__list">
                 <TaskCard IconName="mdiCalendarCheck"
@@ -57,8 +52,10 @@
         @* ── 新手任务 ── *@
         <section class="tasks-page__section">
             <div class="tasks-page__section-header">
-                <CgMdiIcon Name="mdiSchoolOutline" aria-hidden="true" />
-                <h2 class="tasks-page__section-title">新手任务</h2>
+                <h2 class="tasks-page__title">
+                    <CgMdiIcon Name="mdiSchoolOutline" aria-hidden="true" />
+                    <span>新手任务</span>
+                </h2>
             </div>
             <div class="tasks-page__list">
                 <TaskCard IconName="mdiSteam"

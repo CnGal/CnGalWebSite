@@ -1,7 +1,7 @@
 @page "/admin/listfiles"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @inject IFileQueryService FileQueryService
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DrawingBed.Models.ViewModels

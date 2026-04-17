@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<ICgToastService, CgToastService>();
         services.AddScoped<ICgDeviceIdentificationService, CgDeviceIdentificationService>();
+        services.AddScoped<IMiniModeService, MiniModeService>();
         services.AddSingleton<ICircuitHandlerService, CircuitHandlerService>();
         return services;
     }

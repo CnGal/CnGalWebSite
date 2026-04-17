@@ -54,18 +54,6 @@
 
 .comment-section__login-btn {
     margin-left: auto;
-    padding: var(--cg-spacing-2) var(--cg-spacing-4);
-    background: var(--cg-color-primary);
-    color: var(--cg-color-on-primary);
-    border-radius: var(--cg-radius-md);
-    text-decoration: none;
-    font-size: var(--cg-font-size-sm);
-    font-weight: var(--cg-font-weight-medium);
-    transition: background var(--cg-transition-fast);
-}
-
-.comment-section__login-btn:hover {
-    background: var(--cg-color-primary-hover);
 }
 
 @media (max-width: 640px) {
@@ -76,6 +64,6 @@
     .comment-section__login-btn {
         margin-left: 0;
         width: 100%;
-        text-align: center;
+        justify-content: center;
     }
 }

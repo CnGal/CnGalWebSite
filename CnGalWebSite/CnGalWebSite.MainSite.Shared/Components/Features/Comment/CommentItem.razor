@@ -41,11 +41,9 @@
         <CgHtmlContent Content="@Model.Text" />
     </div>
 
-    @if (ShowActions)
+    @if (ShowActions && ActionContent is not null)
     {
-        <div class="comment-item__actions">
-            @ActionContent
-        </div>
+        @ActionContent
     }
 
     @* 子评论递归展示 *@

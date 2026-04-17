@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.Helper.ViewModel.Comments;
 using CnGalWebSite.SDK.MainSite.Abstractions;
@@ -46,6 +46,12 @@ public sealed class CommentQueryService(HttpClient httpClient, IMemoryCache memo
         }
 
         return result;
+    }
+
+    public void InvalidateCache(CommentType type, string objectId)
+    {
+        var cacheKey = $"main-site:comments:{(int)type}:{objectId}";
+        memoryCache.Remove(cacheKey);
     }
 
     private static CommentListViewModel MapToViewModel(CommentCacheModel dto)

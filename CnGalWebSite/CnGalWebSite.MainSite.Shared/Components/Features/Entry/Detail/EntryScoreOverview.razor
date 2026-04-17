@@ -1,4 +1,4 @@
-@using CnGalWebSite.SDK.MainSite.Models
+﻿@using CnGalWebSite.SDK.MainSite.Models
 
 <section class="entry-score-overview" aria-label="评分概览">
     <header class="entry-score-header">
@@ -73,8 +73,13 @@
     else
     {
         <div class="entry-score-empty">
-            <CgMdiIcon Name="mdiStarOutline" />
+            <div class="entry-score-empty-icon">
+                <CgMdiIcon Name="mdiStarOutline" />
+            </div>
             <p>暂无评分，快来成为第一个评分的人吧！</p>
+            <div class="entry-score-empty-action">
+                @ActionContent("primary")
+            </div>
         </div>
     }
 
@@ -93,20 +98,12 @@
         </div>
     }
 
-    @* 添加/编辑游玩记录按钮（仅登录用户可见） *@
-    <AuthorizeView>
-        <Authorized>
-            <EntryScoreAction GameId="Model.GameId"
-                              IsDubbing="Model.IsDubbing"
-                              IsCurrentUserScoreExist="Model.IsCurrentUserScoreExist"
-                              OnDataChanged="OnDataChanged" />
-        </Authorized>
-        <NotAuthorized>
-            <div class="entry-score-login-hint">
-                <a href="/authentication/login">登录后添加游玩记录</a>
-            </div>
-        </NotAuthorized>
-    </AuthorizeView>
+    @if (Model.TotalScores.IsScored)
+    {
+        <div class="entry-score-footer-action">
+            @ActionContent("outline")
+        </div>
+    }
 </section>
 
 @code {
@@ -122,4 +119,22 @@
     private IReadOnlyList<UserScoreItem> ScoredUsers => Model.UserScores
         .Where(s => s.IsScored || !string.IsNullOrWhiteSpace(s.PlayImpressions))
         .ToList();
+
+    private RenderFragment ActionContent(string variant) => __builder =>
+    {
+        <AuthorizeView>
+            <Authorized>
+                <EntryScoreAction GameId="Model.GameId"
+                                  IsDubbing="Model.IsDubbing"
+                                  IsCurrentUserScoreExist="Model.IsCurrentUserScoreExist"
+                                  Variant="@variant"
+                                  OnDataChanged="OnDataChanged" />
+            </Authorized>
+            <NotAuthorized>
+                <CgButton Href="/authentication/login" Variant="@variant">
+                    <CgMdiIcon Name="mdiLogin" /> 登录后添加游玩记录
+                </CgButton>
+            </NotAuthorized>
+        </AuthorizeView>
+    };
 }

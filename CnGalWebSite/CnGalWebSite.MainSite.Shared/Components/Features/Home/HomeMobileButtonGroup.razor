@@ -1,33 +1,35 @@
-@namespace CnGalWebSite.MainSite.Shared.Components.Features.Home
+﻿@namespace CnGalWebSite.MainSite.Shared.Components.Features.Home
 
-<div class="home-mobile-button-group-card">
-    <div class="home-mobile-button-group">
-        @foreach (var item in _items)
-        {
-            <a href="@item.Url" class="home-mobile-button-item" aria-label="@item.Name" @onclick="@(()=>OnClick(item))" @onclick:preventDefault="@(item.Url == null)">
-                <div class="home-mobile-button-icon" style="background-color: @item.BgColor; color: @item.Color;">
-                    <CgMdiIcon Name="@item.Icon" aria-hidden="true" />
-                </div>
-                <div class="home-mobile-button-name">@item.Name</div>
+<CgMiniModeContainer>
+    <div class="home-mobile-button-group-card">
+        <div class="home-mobile-button-group">
+            @foreach (var item in _items)
+            {
+                <a href="@item.Url" class="home-mobile-button-item" aria-label="@item.Name" @onclick="@(()=>OnClick(item))" @onclick:preventDefault="@(item.Url == null)">
+                    <div class="home-mobile-button-icon" style="background-color: @item.BgColor; color: @item.Color;">
+                        <CgMdiIcon Name="@item.Icon" aria-hidden="true" />
+                    </div>
+                    <div class="home-mobile-button-name">@item.Name</div>
+                </a>
+            }
+        </div>
+
+        <div class="home-mobile-community-buttons">
+            <a href="http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=xDiiz0aB6eQcfYQnflSsKgOstQYewx0H&authKey=lHTWqnaM07S7E28d97f5T7ZfbmI7qCW5B8MVxooKMz84GPs28O6vZ13W%2FZ8N4CIl&noverify=0&group_code=948774838" target="_blank" rel="noopener noreferrer" class="home-mobile-community-btn" style="background: #E9F7FE; color: #74CFFE;" aria-label="QQ群">
+                <CgMdiIcon Name="mdiQqchat" />
             </a>
-        }
+            <a href="https://weibo.com/cngalorg" target="_blank" rel="noopener noreferrer" class="home-mobile-community-btn" style="background: #FEEEE6; color: #FE7A60;" aria-label="微博">
+                <CgMdiIcon Name="mdiSinaWeibo" />
+            </a>
+            <a href="https://space.bilibili.com/145239325" target="_blank" rel="noopener noreferrer" class="home-mobile-community-btn" style="background: #FAC7D9; color: #ff385b;" aria-label="Bilibili">
+                <CgMdiIcon Name="mdiTelevisionClassic" />
+            </a>
+            <a href="https://www.xiaoheihe.cn/app/user/profile/30519991" target="_blank" rel="noopener noreferrer" class="home-mobile-community-btn" style="background: #C0C0C0; color: #424242;" aria-label="小黑盒">
+                <CgMdiIcon Name="mdiPackageVariant" />
+            </a>
+        </div>
     </div>
-
-    <div class="home-mobile-community-buttons">
-        <a href="http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=xDiiz0aB6eQcfYQnflSsKgOstQYewx0H&authKey=lHTWqnaM07S7E28d97f5T7ZfbmI7qCW5B8MVxooKMz84GPs28O6vZ13W%2FZ8N4CIl&noverify=0&group_code=948774838" target="_blank" rel="noopener noreferrer" class="home-mobile-community-btn" style="background: #E9F7FE; color: #74CFFE;" aria-label="QQ群">
-            <CgMdiIcon Name="mdiQqchat" />
-        </a>
-        <a href="https://weibo.com/cngalorg" target="_blank" rel="noopener noreferrer" class="home-mobile-community-btn" style="background: #FEEEE6; color: #FE7A60;" aria-label="微博">
-            <CgMdiIcon Name="mdiSinaWeibo" />
-        </a>
-        <a href="https://space.bilibili.com/145239325" target="_blank" rel="noopener noreferrer" class="home-mobile-community-btn" style="background: #FAC7D9; color: #ff385b;" aria-label="Bilibili">
-            <CgMdiIcon Name="mdiTelevisionClassic" />
-        </a>
-        <a href="https://www.xiaoheihe.cn/app/user/profile/30519991" target="_blank" rel="noopener noreferrer" class="home-mobile-community-btn" style="background: #C0C0C0; color: #424242;" aria-label="小黑盒">
-            <CgMdiIcon Name="mdiPackageVariant" />
-        </a>
-    </div>
-</div>
+</CgMiniModeContainer>
 
 @code {
     private List<ButtonItem> _items = new()
@@ -40,8 +42,8 @@
         new ("mdiCalendarClockOutline", "时间线", "/times", "#efebe9", "#5d4037"),
         new ("mdiGiftOutline", "抽奖", "/lotteries", "#ffebee", "#c62828"),
         new ("mdiChartPieOutline", "数据汇总", "/data", "#e8eaf6", "#283593"),
-        new ("mdiPaletteOutline", "主题设置", null, "#fff3e0", "#e65100"),
-        new ("mdiInformationOutline", "关于我们", "/about", "#eceff1", "#455a64"),
+        new ("mdiMicrophoneOutline", "CV专题页", "/cv", "#fff3e0", "#e65100"),
+        new ("mdiInformationOutline", "关于我们", "/articles/index/767", "#eceff1", "#455a64"),
     };
 
     private void OnClick(ButtonItem item)

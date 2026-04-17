@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.HealthCheck.Models;
 using CnGalWebSite.MainSite.Components;
 using CnGalWebSite.MainSite.Shared;
+using CnGalWebSite.MainSite.Shared.Services;
 using CnGalWebSite.SDK.MainSite.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Components.Server.Circuits;
@@ -28,6 +29,7 @@ builder.Services.AddSignalR(options =>
 builder.Services.AddMainSiteOidcAuthentication(builder.Configuration);
 builder.Services.AddMainSiteSdk(apiBaseAddress!, imageApiBaseAddress!, taskApiBaseAddress!);
 builder.Services.AddMainSiteSharedServices();
+builder.Services.AddHttpContextAccessor();
 //添加状态检查
 builder.Services.AddHealthChecks();
 builder.Services.AddScoped<CircuitHandler, IdleCircuitHandler>();
@@ -84,11 +86,24 @@ app.Use(async (context, next) =>
     context.Response.OnStarting(() =>
     {
         var contentType = context.Response.ContentType;
+        var isMiniModeRequest = string.Equals(
+            context.Request.Cookies[MiniModeConstants.CookieName],
+            MiniModeConstants.CookieValue,
+            StringComparison.OrdinalIgnoreCase)
+            || string.Equals(
+                context.Request.Query[MiniModeConstants.QueryParameterName],
+                MiniModeConstants.QueryParameterValue,
+                StringComparison.OrdinalIgnoreCase);
         if (contentType != null
             && contentType.StartsWith("text/html", StringComparison.OrdinalIgnoreCase)
             && context.Response.StatusCode == 200)
         {
-            if (context.User.Identity?.IsAuthenticated != true)
+            if (isMiniModeRequest)
+            {
+                // 迷你模式会改变 SSR 输出，禁止共享缓存污染普通页面。
+                context.Response.Headers.CacheControl = "private, no-cache, no-store";
+            }
+            else if (context.User.Identity?.IsAuthenticated != true)
             {
                 // 未登录：CDN 可缓存 5 分钟，浏览器不缓存（避免登录后看到旧页面）
                 context.Response.Headers.CacheControl = "public, s-maxage=300, max-age=0, must-revalidate";
