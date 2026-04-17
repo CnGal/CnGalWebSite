@@ -113,7 +113,7 @@
     padding-top: var(--cg-spacing-2);
 }
 
-.entry-user-score-card__impressions p {
+.entry-user-score-card__impressions-text {
     font-size: var(--cg-font-size-xs);
     color: var(--cg-color-text-secondary);
     line-height: 1.5;
@@ -123,6 +123,33 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     white-space: pre-wrap;
+}
+
+.entry-user-score-card__expand-toggle:checked ~ .entry-user-score-card__impressions-text {
+    -webkit-line-clamp: unset;
+    display: block;
+}
+
+.entry-user-score-card__expand-btn {
+    display: inline-block;
+    margin-top: var(--cg-spacing-1);
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-primary);
+    cursor: pointer;
+    user-select: none;
+}
+
+.entry-user-score-card__expand-btn:hover {
+    color: var(--cg-color-primary-hover);
+    text-decoration: underline;
+}
+
+.entry-user-score-card__expand-toggle:not(:checked) ~ .entry-user-score-card__expand-btn::after {
+    content: '展开';
+}
+
+.entry-user-score-card__expand-toggle:checked ~ .entry-user-score-card__expand-btn::after {
+    content: '收起';
 }
 
 /* ── Tablet (≥ 768px) ── */
@@ -163,9 +190,13 @@
         padding-top: var(--cg-spacing-3);
     }
 
-    .entry-user-score-card__impressions p {
+    .entry-user-score-card__impressions-text {
         font-size: var(--cg-font-size-sm);
         line-height: 1.6;
         -webkit-line-clamp: 4;
+    }
+
+    .entry-user-score-card__expand-btn {
+        font-size: var(--cg-font-size-sm);
     }
 }
