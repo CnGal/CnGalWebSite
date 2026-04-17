@@ -1,0 +1,37 @@
+@inject CnGalWebSite.MainSite.Shared.Services.IMiniModeService _miniModeService
+@implements IDisposable
+
+@if (_miniModeService.IsMiniMode == false)
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _miniModeService.MiniModeChanged -= OnMiniModeChanged;
+        _miniModeService.MiniModeChanged += OnMiniModeChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await _miniModeService.CheckAsync();
+        }
+    }
+
+    private void OnMiniModeChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        _miniModeService.MiniModeChanged -= OnMiniModeChanged;
+        GC.SuppressFinalize(this);
+    }
+}
