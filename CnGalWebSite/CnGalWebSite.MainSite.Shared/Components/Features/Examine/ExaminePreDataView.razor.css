@@ -151,6 +151,7 @@
     border-radius: var(--cg-radius-full);
     border: 1px solid color-mix(in srgb, var(--cg-color-primary) 18%, transparent);
     transition: background var(--cg-transition-fast), border-color var(--cg-transition-fast);
+    text-decoration: none;
 }
 
 .examine-pre-data-view__tag:hover {

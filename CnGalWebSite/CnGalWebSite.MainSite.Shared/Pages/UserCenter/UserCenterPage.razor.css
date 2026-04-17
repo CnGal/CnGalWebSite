@@ -1,7 +1,6 @@
-.user-center-page {
+﻿.user-center-page {
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--cg-spacing-6) var(--cg-spacing-4);
 }
 
 /* ── 页头 ── */
