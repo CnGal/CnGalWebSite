@@ -28,23 +28,25 @@
 
             @if (TagId > 0)
             {
-                <div class="tag-hero-actions">
-                    <AuthorizeView>
-                        <Authorized>
-                            <CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail.EntryFavoriteButton ObjectId="TagId" ObjectType="CnGalWebSite.DataModel.Model.FavoriteObjectType.Tag" />
-                            <a class="tag-edit-btn" href="/tags/edit/@TagId">
-                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
-                                <span>编辑标签</span>
-                            </a>
-                        </Authorized>
-                        <NotAuthorized>
-                            <a class="tag-edit-btn tag-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/tags/edit/{TagId}")">
-                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
-                                <span>登录后编辑</span>
-                            </a>
-                        </NotAuthorized>
-                    </AuthorizeView>
-                </div>
+                <CgMiniModeContainer>
+                    <div class="tag-hero-actions">
+                        <AuthorizeView>
+                            <Authorized>
+                                <CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail.EntryFavoriteButton ObjectId="TagId" ObjectType="CnGalWebSite.DataModel.Model.FavoriteObjectType.Tag" />
+                                <a class="tag-edit-btn" href="/tags/edit/@TagId">
+                                    <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                    <span>编辑标签</span>
+                                </a>
+                            </Authorized>
+                            <NotAuthorized>
+                                <a class="tag-edit-btn tag-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/tags/edit/{TagId}")">
+                                    <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                    <span>登录后编辑</span>
+                                </a>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </div>
+                </CgMiniModeContainer>
             }
         </div>
     </header>

@@ -9,44 +9,46 @@
 
 @inject ICommentQueryService CommentQueryService
 
-<section class="comment-section" aria-label="评论区">
-    <h2>
-        <CgMdiIcon Name="mdiCommentTextMultipleOutline" /> 留言板
-        @if (_totalCount > 0)
+<CgMiniModeContainer>
+    <section class="comment-section" aria-label="评论区">
+        <h2>
+            <CgMdiIcon Name="mdiCommentTextMultipleOutline" /> 留言板
+            @if (_totalCount > 0)
+            {
+                <span class="comment-section__count">@_totalCount</span>
+            }
+        </h2>
+
+        @if (!CanComment)
         {
-            <span class="comment-section__count">@_totalCount</span>
+            <CommentClosedTip />
         }
-    </h2>
+        else
+        {
+            @* 登录用户使用交互式评论区（独立获取数据，支持回复/删除/刷新） *@
+            <AuthorizeView>
+                <Authorized>
+                    <CommentInteractive Type="Type"
+                                        ObjectId="@ObjectId"
+                                        CanDelete="CanDelete" />
+                </Authorized>
+                <NotAuthorized>
+                    @* 未登录用户：纯静态只读评论列表 *@
+                    @if (_items is not null)
+                    {
+                        <CommentList Items="_items" ShowActions="false" />
+                    }
 
-    @if (!CanComment)
-    {
-        <CommentClosedTip />
-    }
-    else
-    {
-        @* 登录用户使用交互式评论区（独立获取数据，支持回复/删除/刷新） *@
-        <AuthorizeView>
-            <Authorized>
-                <CommentInteractive Type="Type"
-                                    ObjectId="@ObjectId"
-                                    CanDelete="CanDelete" />
-            </Authorized>
-            <NotAuthorized>
-                @* 未登录用户：纯静态只读评论列表 *@
-                @if (_items is not null)
-                {
-                    <CommentList Items="_items" ShowActions="false" />
-                }
-
-                <div class="comment-section__login-prompt">
-                    <CgMdiIcon Name="mdiLoginVariant" />
-                    <span>登入后可以发表评论</span>
-                    <CgButton Variant="primary" Href="/account/login" class="comment-section__login-btn">去登录</CgButton>
-                </div>
-            </NotAuthorized>
-        </AuthorizeView>
-    }
-</section>
+                    <div class="comment-section__login-prompt">
+                        <CgMdiIcon Name="mdiLoginVariant" />
+                        <span>登入后可以发表评论</span>
+                        <CgButton Variant="primary" Href="/account/login" class="comment-section__login-btn">去登录</CgButton>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+        }
+    </section>
+</CgMiniModeContainer>
 
 @code {
     /// <summary>

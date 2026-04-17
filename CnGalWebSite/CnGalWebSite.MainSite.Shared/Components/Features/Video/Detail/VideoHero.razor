@@ -23,33 +23,35 @@
             {
                 <p class="video-hero-intro">@BriefIntroduction</p>
             }
-            <div class="video-hero-actions">
-                @if (!string.IsNullOrWhiteSpace(WatchUrl))
-                {
-                    <a class="video-action-btn-primary" href="@WatchUrl" target="_blank" rel="noopener noreferrer">
-                        <CgMdiIcon Name="mdiPlayCircleOutline" aria-hidden="true" />
-                        <span>前往观看</span>
-                    </a>
-                }
-                @if (VideoId > 0)
-                {
-                    <AuthorizeView>
-                        <Authorized>
-                            <CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail.EntryFavoriteButton ObjectId="VideoId" ObjectType="CnGalWebSite.DataModel.Model.FavoriteObjectType.Video" />
-                            <a class="video-edit-btn" href="/videos/edit/@VideoId">
-                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
-                                <span>编辑视频</span>
-                            </a>
-                        </Authorized>
-                        <NotAuthorized>
-                            <a class="video-edit-btn video-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/videos/edit/{VideoId}")">
-                                <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
-                                <span>登录后编辑</span>
-                            </a>
-                        </NotAuthorized>
-                    </AuthorizeView>
-                }
-            </div>
+            <CgMiniModeContainer>
+                <div class="video-hero-actions">
+                    @if (!string.IsNullOrWhiteSpace(WatchUrl))
+                    {
+                        <a class="video-action-btn-primary" href="@WatchUrl" target="_blank" rel="noopener noreferrer">
+                            <CgMdiIcon Name="mdiPlayCircleOutline" aria-hidden="true" />
+                            <span>前往观看</span>
+                        </a>
+                    }
+                    @if (VideoId > 0)
+                    {
+                        <AuthorizeView>
+                            <Authorized>
+                                <CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail.EntryFavoriteButton ObjectId="VideoId" ObjectType="CnGalWebSite.DataModel.Model.FavoriteObjectType.Video" />
+                                <a class="video-edit-btn" href="/videos/edit/@VideoId">
+                                    <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                    <span>编辑视频</span>
+                                </a>
+                            </Authorized>
+                            <NotAuthorized>
+                                <a class="video-edit-btn video-edit-btn--login" href="@AuthRequestService.BuildLoginUrl($"/videos/edit/{VideoId}")">
+                                    <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                    <span>登录后编辑</span>
+                                </a>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    }
+                </div>
+            </CgMiniModeContainer>
         </div>
     </section>
 }

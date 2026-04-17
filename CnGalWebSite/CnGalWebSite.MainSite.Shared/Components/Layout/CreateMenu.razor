@@ -1,72 +1,74 @@
 @rendermode InteractiveServer
 
-<CgPopupMenu>
-    <TriggerContent>
-        <button class="cg-action-btn" aria-label="创建内容">
-            <CgMdiIcon Name="mdiPlusCircleOutline" aria-hidden="true" />
-            <span>创建</span>
-        </button>
-    </TriggerContent>
-    <ChildContent>
-        <div class="cg-menu-header cg-menu-header--create">
-            <span class="cg-menu-header__title">创建内容</span>
-        </div>
-        <div class="cg-menu-divider"></div>
-        <div class="cg-menu-list">
-            <a class="cg-menu-item" href="/entries/create">
-                <span class="cg-menu-item__icon cg-menu-item__icon--blue">
-                    <CgMdiIcon Name="mdiGamepadVariantOutline" aria-hidden="true" />
-                </span>
-                <div class="cg-menu-item__content">
-                    <span class="cg-menu-item__text">创建词条</span>
-                    <span class="cg-menu-item__desc">添加游戏、制作组等</span>
-                </div>
-            </a>
-            <a class="cg-menu-item" href="/articles/create">
-                <span class="cg-menu-item__icon cg-menu-item__icon--green">
-                    <CgMdiIcon Name="mdiFileDocumentOutline" aria-hidden="true" />
-                </span>
-                <div class="cg-menu-item__content">
-                    <span class="cg-menu-item__text">创建文章</span>
-                    <span class="cg-menu-item__desc">撰写攻略、评测等</span>
-                </div>
-            </a>
-            <a class="cg-menu-item" href="/tags/create">
-                <span class="cg-menu-item__icon cg-menu-item__icon--amber">
-                    <CgMdiIcon Name="mdiTagOutline" aria-hidden="true" />
-                </span>
-                <div class="cg-menu-item__content">
-                    <span class="cg-menu-item__text">创建标签</span>
-                    <span class="cg-menu-item__desc">建立分类标签</span>
-                </div>
-            </a>
-            <a class="cg-menu-item" href="/videos/create">
-                <span class="cg-menu-item__icon cg-menu-item__icon--pink">
-                    <CgMdiIcon Name="mdiVideoOutline" aria-hidden="true" />
-                </span>
-                <div class="cg-menu-item__content">
-                    <span class="cg-menu-item__text">发布视频</span>
-                    <span class="cg-menu-item__desc">分享相关视频</span>
-                </div>
-            </a>
-            <a class="cg-menu-item" href="/peripheries/create">
-                <span class="cg-menu-item__icon cg-menu-item__icon--teal">
-                    <CgMdiIcon Name="mdiGiftOpenOutline" aria-hidden="true" />
-                </span>
-                <div class="cg-menu-item__content">
-                    <span class="cg-menu-item__text">创建周边</span>
-                    <span class="cg-menu-item__desc">添加周边商品信息</span>
-                </div>
-            </a>
-            <a class="cg-menu-item" href="/lotteries/createlottery">
-                <span class="cg-menu-item__icon cg-menu-item__icon--purple">
-                    <CgMdiIcon Name="mdiGiftOutline" aria-hidden="true" />
-                </span>
-                <div class="cg-menu-item__content">
-                    <span class="cg-menu-item__text">创建抽奖</span>
-                    <span class="cg-menu-item__desc">发起抽奖活动</span>
-                </div>
-            </a>
-        </div>
-    </ChildContent>
-</CgPopupMenu>
+<CgMiniModeContainer>
+    <CgPopupMenu>
+        <TriggerContent>
+            <button class="cg-action-btn" aria-label="创建内容">
+                <CgMdiIcon Name="mdiPlusCircleOutline" aria-hidden="true" />
+                <span>创建</span>
+            </button>
+        </TriggerContent>
+        <ChildContent>
+            <div class="cg-menu-header cg-menu-header--create">
+                <span class="cg-menu-header__title">创建内容</span>
+            </div>
+            <div class="cg-menu-divider"></div>
+            <div class="cg-menu-list">
+                <a class="cg-menu-item" href="/entries/create">
+                    <span class="cg-menu-item__icon cg-menu-item__icon--blue">
+                        <CgMdiIcon Name="mdiGamepadVariantOutline" aria-hidden="true" />
+                    </span>
+                    <div class="cg-menu-item__content">
+                        <span class="cg-menu-item__text">创建词条</span>
+                        <span class="cg-menu-item__desc">添加游戏、制作组等</span>
+                    </div>
+                </a>
+                <a class="cg-menu-item" href="/articles/create">
+                    <span class="cg-menu-item__icon cg-menu-item__icon--green">
+                        <CgMdiIcon Name="mdiFileDocumentOutline" aria-hidden="true" />
+                    </span>
+                    <div class="cg-menu-item__content">
+                        <span class="cg-menu-item__text">创建文章</span>
+                        <span class="cg-menu-item__desc">撰写攻略、评测等</span>
+                    </div>
+                </a>
+                <a class="cg-menu-item" href="/tags/create">
+                    <span class="cg-menu-item__icon cg-menu-item__icon--amber">
+                        <CgMdiIcon Name="mdiTagOutline" aria-hidden="true" />
+                    </span>
+                    <div class="cg-menu-item__content">
+                        <span class="cg-menu-item__text">创建标签</span>
+                        <span class="cg-menu-item__desc">建立分类标签</span>
+                    </div>
+                </a>
+                <a class="cg-menu-item" href="/videos/create">
+                    <span class="cg-menu-item__icon cg-menu-item__icon--pink">
+                        <CgMdiIcon Name="mdiVideoOutline" aria-hidden="true" />
+                    </span>
+                    <div class="cg-menu-item__content">
+                        <span class="cg-menu-item__text">发布视频</span>
+                        <span class="cg-menu-item__desc">分享相关视频</span>
+                    </div>
+                </a>
+                <a class="cg-menu-item" href="/peripheries/create">
+                    <span class="cg-menu-item__icon cg-menu-item__icon--teal">
+                        <CgMdiIcon Name="mdiGiftOpenOutline" aria-hidden="true" />
+                    </span>
+                    <div class="cg-menu-item__content">
+                        <span class="cg-menu-item__text">创建周边</span>
+                        <span class="cg-menu-item__desc">添加周边商品信息</span>
+                    </div>
+                </a>
+                <a class="cg-menu-item" href="/lotteries/createlottery">
+                    <span class="cg-menu-item__icon cg-menu-item__icon--purple">
+                        <CgMdiIcon Name="mdiGiftOutline" aria-hidden="true" />
+                    </span>
+                    <div class="cg-menu-item__content">
+                        <span class="cg-menu-item__text">创建抽奖</span>
+                        <span class="cg-menu-item__desc">发起抽奖活动</span>
+                    </div>
+                </a>
+            </div>
+        </ChildContent>
+    </CgPopupMenu>
+</CgMiniModeContainer>

@@ -8,99 +8,101 @@
 @inject IMainSiteAuthRequestService AuthRequestService
 @inject ISpaceQueryService SpaceQueryService
 
-<CgPopupMenu>
-    <TriggerContent>
-        <button class="cg-action-btn" aria-label="用户菜单">
-            @if (_avatarReady)
-            {
-                <img class="cg-user-menu-avatar"
-                     src="@_avatarUrl"
-                     alt="@($"{UserName ?? "用户"}头像")" />
-            }
-            else
-            {
-                <CgMdiIcon Name="mdiAccountCircleOutline" aria-hidden="true" />
-            }
-            @if (_unreadCount > 0)
-            {
-                <span class="cg-badge" aria-label="@($"{_unreadCount} 条未读消息")">@FormatBadge(_unreadCount)</span>
-            }
-        </button>
-    </TriggerContent>
-    <ChildContent>
-        <div class="cg-menu-header">
-            <div class="cg-menu-header__avatar">
+<CgMiniModeContainer>
+    <CgPopupMenu>
+        <TriggerContent>
+            <button class="cg-action-btn" aria-label="用户菜单">
                 @if (_avatarReady)
                 {
-                    <img src="@_avatarUrl" alt="" />
+                    <img class="cg-user-menu-avatar"
+                         src="@_avatarUrl"
+                         alt="@($"{UserName ?? "用户"}头像")" />
                 }
                 else
                 {
                     <CgMdiIcon Name="mdiAccountCircleOutline" aria-hidden="true" />
                 }
-            </div>
-            <div class="cg-menu-header__info">
-                <div class="cg-menu-header__name">@UserName</div>
-                @if (!string.IsNullOrWhiteSpace(_personalSignature))
-                {
-                    <div class="cg-menu-header__hint">@_personalSignature</div>
-                }
-            </div>
-        </div>
-        <div class="cg-menu-divider"></div>
-        <div class="cg-menu-list">
-            <a class="cg-menu-item" href="@($"/space/index/{UserId}")">
-                <span class="cg-menu-item__icon cg-menu-item__icon--blue">
-                    <CgMdiIcon Name="mdiHomeOutline" aria-hidden="true" />
-                </span>
-                <span class="cg-menu-item__text">个人空间</span>
-            </a>
-            <a class="cg-menu-item" href="/space/messages">
-                <span class="cg-menu-item__icon cg-menu-item__icon--amber">
-                    <CgMdiIcon Name="mdiBellOutline" aria-hidden="true" />
-                </span>
-                <span class="cg-menu-item__text">消息通知</span>
                 @if (_unreadCount > 0)
                 {
-                    <span class="cg-badge cg-badge--inline" aria-label="@($"{_unreadCount} 条未读")">@FormatBadge(_unreadCount)</span>
+                    <span class="cg-badge" aria-label="@($"{_unreadCount} 条未读消息")">@FormatBadge(_unreadCount)</span>
                 }
-            </a>
-            <a class="cg-menu-item" href="/usercenter">
-                <span class="cg-menu-item__icon cg-menu-item__icon--teal">
-                    <CgMdiIcon Name="mdiViewDashboardOutline" aria-hidden="true" />
-                </span>
-                <span class="cg-menu-item__text">内容中心</span>
-            </a>
-            <a class="cg-menu-item" href="/tasks">
-                <span class="cg-menu-item__icon cg-menu-item__icon--emerald">
-                    <CgMdiIcon Name="mdiClipboardCheckOutline" aria-hidden="true" />
-                </span>
-                <span class="cg-menu-item__text">每日任务</span>
-            </a>
-            <AuthorizeView Roles="Admin">
-                <Authorized>
-                    <a class="cg-menu-item" href="/admin">
-                        <span class="cg-menu-item__icon cg-menu-item__icon--purple">
-                            <CgMdiIcon Name="mdiShieldCrownOutline" aria-hidden="true" />
-                        </span>
-                        <span class="cg-menu-item__text">管理后台</span>
-                    </a>
-                </Authorized>
-            </AuthorizeView>
-        </div>
-        <div class="cg-menu-divider"></div>
-        <div class="cg-menu-list">
-            <form class="cg-menu-form" method="post" action="@AuthRequestService.BuildLogoutUrl(CurrentReturnUrl)">
-                <button class="cg-menu-item cg-menu-item--danger" type="submit">
-                    <span class="cg-menu-item__icon cg-menu-item__icon--red">
-                        <CgMdiIcon Name="mdiLogout" aria-hidden="true" />
+            </button>
+        </TriggerContent>
+        <ChildContent>
+            <div class="cg-menu-header">
+                <div class="cg-menu-header__avatar">
+                    @if (_avatarReady)
+                    {
+                        <img src="@_avatarUrl" alt="" />
+                    }
+                    else
+                    {
+                        <CgMdiIcon Name="mdiAccountCircleOutline" aria-hidden="true" />
+                    }
+                </div>
+                <div class="cg-menu-header__info">
+                    <div class="cg-menu-header__name">@UserName</div>
+                    @if (!string.IsNullOrWhiteSpace(_personalSignature))
+                    {
+                        <div class="cg-menu-header__hint">@_personalSignature</div>
+                    }
+                </div>
+            </div>
+            <div class="cg-menu-divider"></div>
+            <div class="cg-menu-list">
+                <a class="cg-menu-item" href="@($"/space/index/{UserId}")">
+                    <span class="cg-menu-item__icon cg-menu-item__icon--blue">
+                        <CgMdiIcon Name="mdiHomeOutline" aria-hidden="true" />
                     </span>
-                    <span class="cg-menu-item__text">退出登录</span>
-                </button>
-            </form>
-        </div>
-    </ChildContent>
-</CgPopupMenu>
+                    <span class="cg-menu-item__text">个人空间</span>
+                </a>
+                <a class="cg-menu-item" href="/space/messages">
+                    <span class="cg-menu-item__icon cg-menu-item__icon--amber">
+                        <CgMdiIcon Name="mdiBellOutline" aria-hidden="true" />
+                    </span>
+                    <span class="cg-menu-item__text">消息通知</span>
+                    @if (_unreadCount > 0)
+                    {
+                        <span class="cg-badge cg-badge--inline" aria-label="@($"{_unreadCount} 条未读")">@FormatBadge(_unreadCount)</span>
+                    }
+                </a>
+                <a class="cg-menu-item" href="/usercenter">
+                    <span class="cg-menu-item__icon cg-menu-item__icon--teal">
+                        <CgMdiIcon Name="mdiViewDashboardOutline" aria-hidden="true" />
+                    </span>
+                    <span class="cg-menu-item__text">内容中心</span>
+                </a>
+                <a class="cg-menu-item" href="/tasks">
+                    <span class="cg-menu-item__icon cg-menu-item__icon--emerald">
+                        <CgMdiIcon Name="mdiClipboardCheckOutline" aria-hidden="true" />
+                    </span>
+                    <span class="cg-menu-item__text">每日任务</span>
+                </a>
+                <AuthorizeView Roles="Admin">
+                    <Authorized>
+                        <a class="cg-menu-item" href="/admin">
+                            <span class="cg-menu-item__icon cg-menu-item__icon--purple">
+                                <CgMdiIcon Name="mdiShieldCrownOutline" aria-hidden="true" />
+                            </span>
+                            <span class="cg-menu-item__text">管理后台</span>
+                        </a>
+                    </Authorized>
+                </AuthorizeView>
+            </div>
+            <div class="cg-menu-divider"></div>
+            <div class="cg-menu-list">
+                <form class="cg-menu-form" method="post" action="@AuthRequestService.BuildLogoutUrl(CurrentReturnUrl)">
+                    <button class="cg-menu-item cg-menu-item--danger" type="submit">
+                        <span class="cg-menu-item__icon cg-menu-item__icon--red">
+                            <CgMdiIcon Name="mdiLogout" aria-hidden="true" />
+                        </span>
+                        <span class="cg-menu-item__text">退出登录</span>
+                    </button>
+                </form>
+            </div>
+        </ChildContent>
+    </CgPopupMenu>
+</CgMiniModeContainer>
 
 @code {
     [Parameter] public string? UserName { get; set; }
