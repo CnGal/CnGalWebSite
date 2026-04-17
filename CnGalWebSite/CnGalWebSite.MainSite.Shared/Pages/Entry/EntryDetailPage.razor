@@ -1,4 +1,4 @@
-@page "/entries/index/{Id:int}"
+﻿@page "/entries/index/{Id:int}"
 @inject IEntryQueryService EntryQueryService
 @inject IPlayedGameQueryService PlayedGameQueryService
 @inject IPeripheryQueryService PeripheryQueryService
@@ -157,6 +157,10 @@ else if (Model is not null)
                                            GetCurrencyPrefix="GetCurrencyPrefix"
                                            GetGamePlatformName="GetGamePlatformName" />
                     </EntrySection>
+                </div>
+
+                <div class="entry-cell entry-cell--drawing">
+                    <EntryVerticalDrawingCard Type="Model.Type" Image="@Model.MainPicture" Name="@Model.Name" />
                 </div>
 
                 <div class="entry-cell entry-cell--staff">

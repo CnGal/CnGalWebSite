@@ -1,0 +1,6 @@
+.entry-drawing-img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--cg-radius-md);
+    display: block;
+}
