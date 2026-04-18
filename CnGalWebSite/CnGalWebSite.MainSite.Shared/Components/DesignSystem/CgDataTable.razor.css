@@ -7,7 +7,40 @@
     background: var(--cg-color-surface);
     border-radius: var(--cg-radius-lg);
     box-shadow: var(--cg-shadow-md);
-    overflow: hidden;
+    /* overflow: hidden; 已移除以避免下拉框被截断 */
+}
+
+/* 确保内部元素不溢出圆角 */
+.cg-datatable__toolbar:first-child {
+    border-top-left-radius: var(--cg-radius-lg);
+    border-top-right-radius: var(--cg-radius-lg);
+}
+
+.cg-datatable__footer:last-child {
+    border-bottom-left-radius: var(--cg-radius-lg);
+    border-bottom-right-radius: var(--cg-radius-lg);
+}
+
+.cg-datatable__body:last-child .cg-datatable__table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: var(--cg-radius-lg);
+}
+
+.cg-datatable__body:last-child .cg-datatable__table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: var(--cg-radius-lg);
+}
+
+.cg-datatable__loading:last-child,
+.cg-datatable__empty:last-child {
+    border-bottom-left-radius: var(--cg-radius-lg);
+    border-bottom-right-radius: var(--cg-radius-lg);
+}
+
+.cg-datatable__body:first-child .cg-datatable__th:first-child {
+    border-top-left-radius: var(--cg-radius-lg);
+}
+
+.cg-datatable__body:first-child .cg-datatable__th:last-child {
+    border-top-right-radius: var(--cg-radius-lg);
 }
 
 /* ── 工具栏 ── */

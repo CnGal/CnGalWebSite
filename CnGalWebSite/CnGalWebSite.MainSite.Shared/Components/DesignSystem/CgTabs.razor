@@ -147,19 +147,25 @@
 
     private string _resolvedId = string.Empty;
     private string _activeKey = string.Empty;
+    private string? _prevDefaultActiveKey;
 
     protected override void OnInitialized()
     {
         _resolvedId = Id ?? $"cg-tabs-{Guid.NewGuid():N}";
         _activeKey = DefaultActiveKey ?? (Items.Count > 0 ? Items[0].Key : string.Empty);
+        _prevDefaultActiveKey = DefaultActiveKey;
     }
 
     protected override void OnParametersSet()
     {
-        // 链接模式下，DefaultActiveKey 可能因 URL 参数变化而更新
-        if (!string.IsNullOrEmpty(DefaultActiveKey))
+        // 链接模式下，或者当父组件显式更改了 DefaultActiveKey 时，更新当前激活项
+        if (DefaultActiveKey != _prevDefaultActiveKey)
         {
-            _activeKey = DefaultActiveKey;
+            _prevDefaultActiveKey = DefaultActiveKey;
+            if (!string.IsNullOrEmpty(DefaultActiveKey))
+            {
+                _activeKey = DefaultActiveKey;
+            }
         }
     }
 

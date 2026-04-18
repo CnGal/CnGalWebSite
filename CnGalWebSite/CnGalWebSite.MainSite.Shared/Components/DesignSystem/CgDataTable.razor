@@ -112,7 +112,8 @@
                 <span class="cg-datatable__page-size-label">每页</span>
                 <CgSelect Value="@_pageSizeStr"
                           ValueChanged="OnPageSizeChanged"
-                          Options="@_pageSizeOptions" />
+                          Options="@_pageSizeOptions"
+                          DropUp="true" />
             </div>
 
             <CgPagination CurrentPage="@_currentPage"
