@@ -1,4 +1,4 @@
-<div class="cg-select @ClassName">
+<div class="cg-select @(DropUp ? "cg-select--dropup" : string.Empty) @ClassName">
     <button type="button"
             class="cg-select__trigger"
             disabled="@Disabled"
@@ -59,6 +59,9 @@
 
     [Parameter]
     public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool DropUp { get; set; }
 
     [Parameter]
     public string ClassName { get; set; } = string.Empty;
