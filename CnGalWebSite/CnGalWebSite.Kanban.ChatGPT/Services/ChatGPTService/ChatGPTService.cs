@@ -209,15 +209,26 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
 
             string? reply = null;
 
-            // 检查余额
-            var balance = await CheckBalance();
-            if (balance <= 1)
+            // 检查余额（仅 DeepSeek 官方 API 时）
+            var apiUrl = _configuration["ChatGPTApiUrl"] ?? "";
+            if (apiUrl.Contains("api.deepseek.com"))
             {
-                return new ChatGPTSendMessageResult
+                try
                 {
-                    Success = true,
-                    Message = "看板娘已进入冬眠模式"
-                };
+                    var balance = await CheckBalance();
+                    if (balance <= 1)
+                    {
+                        return new ChatGPTSendMessageResult
+                        {
+                            Success = true,
+                            Message = "看板娘已进入冬眠模式"
+                        };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "检查余额失败，跳过余额检查");
+                }
             }
 
             // 检查敏感词 如果属于递归调用，不对内部输入检查敏感词
