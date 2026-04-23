@@ -11,13 +11,13 @@ jobs:
           uses: actions/checkout@master
 
         - name: Set up QEMU
-          uses: docker/setup-qemu-action@v2
+          uses: docker/setup-qemu-action@v3
 
         - name: Set up Docker Buildx
-          uses: docker/setup-buildx-action@v1
+          uses: docker/setup-buildx-action@v3
 
         - name: Login to DockerHub
-          uses: docker/login-action@v1
+          uses: docker/login-action@v3
           with:
             username: ${{ secrets.DOCKERHUB_USERNAME }}
             password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -26,7 +26,7 @@ jobs:
           run: echo "tag=$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
                
         - name: build Server and push to Dockerhub
-          uses: docker/build-push-action@v3
+          uses: docker/build-push-action@v6
           with:
             context: .
             file: ./CnGalWebSite/CnGalWebSite.Kanban.ChatGPT/Dockerfile # Dockerfile 位置
@@ -35,3 +35,5 @@ jobs:
             tags: |
               littlefishtentears/cngalwebsitekanbangpt:latest
               littlefishtentears/cngalwebsitekanbangpt:${{ steps.timestamp.outputs.tag }}
+            cache-from: type=gha
+            cache-to: type=gha,mode=max
