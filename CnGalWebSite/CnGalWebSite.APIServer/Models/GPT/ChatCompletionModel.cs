@@ -10,6 +10,7 @@ namespace CnGalWebSite.RobotClient.DataModels.GPT
     {
         public string Model { get; set; } = "gpt-3.5-turbo";
         public List<ChatCompletionMessage> Messages { get; set; }=new List<ChatCompletionMessage>();
+        public Dictionary<string, string> thinking { get; set; } = new() { ["type"] = "disabled" };
     }
 
     public class ChatCompletionMessage

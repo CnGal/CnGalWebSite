@@ -12,6 +12,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Models.GPT
         public List<ChatCompletionMessage> Messages { get; set; } = [];
         public List<ChatCompletionTool>? Tools { get; set; }
         public double temperature { get; set; } = 1.3;
+        public Dictionary<string, string> thinking { get; set; } = new() { ["type"] = "disabled" };
     }
 
     public class ChatCompletionMessage
