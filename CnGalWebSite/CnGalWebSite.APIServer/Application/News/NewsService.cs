@@ -68,15 +68,16 @@ namespace CnGalWebSite.APIServer.Application.News
             var weiboTime = await _gameNewsRepository.GetAll().AnyAsync(s => s.RSS.Type == OriginalRSSType.Weibo) ?
                 await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.RSS.Type == OriginalRSSType.Weibo).MaxAsync(s => s.RSS.PublishTime) : DateTime.MinValue;
 
-            var bilibiliTime = await _gameNewsRepository.GetAll().AnyAsync(s => s.RSS.Type == OriginalRSSType.Bilibili) ?
-                await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.RSS.Type == OriginalRSSType.Bilibili).MaxAsync(s => s.RSS.PublishTime) : DateTime.MinValue;
+            //B站动态RSS源时间无序，不再依赖时间过滤，改用链接去重
+            //var bilibiliTime = await _gameNewsRepository.GetAll().AnyAsync(s => s.RSS.Type == OriginalRSSType.Bilibili) ?
+            //    await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.RSS.Type == OriginalRSSType.Bilibili).MaxAsync(s => s.RSS.PublishTime) : DateTime.MinValue;
 
             var heyBoxTime = await _gameNewsRepository.GetAll().AnyAsync(s => s.RSS.Type == OriginalRSSType.HeyBox) ?
                 await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.RSS.Type == OriginalRSSType.HeyBox).MaxAsync(s => s.RSS.PublishTime) : DateTime.MinValue;
 
             // 获取rss源
             var rss = await _rssHelper.GetOriginalWeibo(long.Parse(_configuration["RSSWeiboUserId"]), weiboTime);
-            rss.AddRange(await _rssHelper.GetOriginalBilibili(long.Parse(_configuration["RSSBilibiliUserId"]), bilibiliTime));
+            rss.AddRange(await _rssHelper.GetOriginalBilibili(long.Parse(_configuration["RSSBilibiliUserId"])));
             rss.AddRange(await _rssHelper.GetOriginalHeyBox(heyBoxTime));
 
             //var rss = await _rssHelper.GetOriginalBilibili(long.Parse(_configuration["RSSBilibiliUserId"]), time);
@@ -95,6 +96,12 @@ namespace CnGalWebSite.APIServer.Application.News
                 .ToListAsync());
             rss.RemoveAll(r => r.Type == OriginalRSSType.Bilibili && existingBilibiliLinks.Contains(r.Link));
             rss.Sort((a, b) => a.PublishTime.CompareTo(b.PublishTime));
+
+            //图床上传从RSSHelper移至此处，仅对去重后的新B站条目执行
+            foreach (var item in rss.Where(r => r.Type == OriginalRSSType.Bilibili))
+            {
+                item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
+            }
 
             if (rss.Count == 0)
             {

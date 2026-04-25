@@ -211,7 +211,7 @@ namespace CnGalWebSite.APIServer.Application.News
             return null;
         }
 
-        public async Task<List<OriginalRSS>> GetOriginalBilibili(long id, DateTime fromTime)
+        public async Task<List<OriginalRSS>> GetOriginalBilibili(long id)
         {
             try
             {
@@ -234,11 +234,11 @@ namespace CnGalWebSite.APIServer.Application.News
                     var pubDate = (XmlElement)item.SelectSingleNode("pubDate");
                     weibo.PublishTime = DateTime.Parse(pubDate.InnerText).ToUniversalTime();
 
-                    //B站动态时间是否早于起始时间
-                    if (weibo.PublishTime <= fromTime)
-                    {
-                        continue;
-                    }
+                    //B站动态RSS源时间无序，不再按时间过滤，改由调用方通过链接去重
+                    //if (weibo.PublishTime <= fromTime)
+                    //{
+                    //    continue;
+                    //}
                     var title = (XmlElement)item.SelectSingleNode("title");
                     weibo.Title = title.InnerText;
 
@@ -253,11 +253,11 @@ namespace CnGalWebSite.APIServer.Application.News
                     model.Add(weibo);
                 }
 
-                //将图片上传到图床
-                foreach (var item in model)
-                {
-                    item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
-                }
+                //图床上传移至NewsService中去重后执行，避免对已存在条目做无效上传
+                //foreach (var item in model)
+                //{
+                //    item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
+                //}
 
                 return model;
             }
