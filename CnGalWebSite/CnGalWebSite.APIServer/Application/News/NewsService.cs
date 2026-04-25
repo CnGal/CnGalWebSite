@@ -94,6 +94,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 .Select(s => s.RSS.Link)
                 .ToListAsync());
             rss.RemoveAll(r => r.Type == OriginalRSSType.Bilibili && existingBilibiliLinks.Contains(r.Link));
+            rss.Sort((a, b) => a.PublishTime.CompareTo(b.PublishTime));
 
             if (rss.Count == 0)
             {
