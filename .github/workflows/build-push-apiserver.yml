@@ -8,31 +8,29 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - name: Checkout
-          uses: actions/checkout@master
-
-        - name: Set up QEMU
-          uses: docker/setup-qemu-action@v2
+          uses: actions/checkout@v6
 
         - name: Set up Docker Buildx
-          uses: docker/setup-buildx-action@v1
+          uses: docker/setup-buildx-action@v4
 
         - name: Login to DockerHub
-          uses: docker/login-action@v1
+          uses: docker/login-action@v4
           with:
             username: ${{ secrets.DOCKERHUB_USERNAME }}
             password: ${{ secrets.DOCKERHUB_TOKEN }}
+
         - name: Generate timestamp tag
           id: timestamp
           run: echo "tag=$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
                
         - name: build API Server and push to Dockerhub
-          uses: docker/build-push-action@v3
+          uses: docker/build-push-action@v7
           with:
             context: .
             file: ./CnGalWebSite/CnGalWebSite.APIServer/Dockerfile # Dockerfile 位置
-            #platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
             push: true
+            cache-from: type=gha
+            cache-to: type=gha,mode=max
             tags: |
               littlefishtentears/cngalwebsiteapiserver:latest
               littlefishtentears/cngalwebsiteapiserver:${{ steps.timestamp.outputs.tag }}
-        
