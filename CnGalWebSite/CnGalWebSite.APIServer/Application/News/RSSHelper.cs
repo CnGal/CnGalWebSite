@@ -190,7 +190,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 weibo.Title = title.InnerText;
 
                 var author = (XmlElement)item.SelectSingleNode("author");
-                weibo.Author = author.InnerText;
+                weibo.Author = author?.InnerText ?? string.Empty;
 
                 var description = (XmlElement)item.SelectSingleNode("description");
                 weibo.Description = description.InnerText;
@@ -243,7 +243,7 @@ namespace CnGalWebSite.APIServer.Application.News
                     weibo.Title = title.InnerText;
 
                     var author = (XmlElement)item.SelectSingleNode("author");
-                    weibo.Author = author.InnerText;
+                    weibo.Author = author?.InnerText ?? string.Empty;
 
                     var description = (XmlElement)item.SelectSingleNode("description");
                     weibo.Description = description.InnerText;
