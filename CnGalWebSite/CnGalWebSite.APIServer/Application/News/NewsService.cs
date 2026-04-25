@@ -88,6 +88,14 @@ namespace CnGalWebSite.APIServer.Application.News
                 weekly = await GenerateNewestWeeklyNews();
             }
 
+            //过滤已存在的B站动态，避免重复处理和图床上传
+            var existingBilibiliLinks = new HashSet<string>(await _gameNewsRepository.GetAll().Include(s => s.RSS)
+                .Where(s => s.RSS.Type == OriginalRSSType.Bilibili)
+                .Select(s => s.RSS.Link)
+                .ToListAsync());
+            rss.RemoveAll(r => r.Type == OriginalRSSType.Bilibili && existingBilibiliLinks.Contains(r.Link));
+            rss.Sort((a, b) => a.PublishTime.CompareTo(b.PublishTime));
+
             if (rss.Count == 0)
             {
                 return;

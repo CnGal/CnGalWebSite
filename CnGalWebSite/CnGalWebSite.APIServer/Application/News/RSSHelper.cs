@@ -234,10 +234,10 @@ namespace CnGalWebSite.APIServer.Application.News
                     var pubDate = (XmlElement)item.SelectSingleNode("pubDate");
                     weibo.PublishTime = DateTime.Parse(pubDate.InnerText).ToUniversalTime();
 
-                    //微博时间是否早于起始时间
+                    //B站动态时间是否早于起始时间
                     if (weibo.PublishTime <= fromTime)
                     {
-                        return model;
+                        continue;
                     }
                     var title = (XmlElement)item.SelectSingleNode("title");
                     weibo.Title = title.InnerText;
