@@ -839,8 +839,9 @@ namespace CnGalWebSite.APIServer.Application.News
             var title = text.Split("\n").First();
 
             // 如果标题小于50字，在正文里吧标题去掉
+            // 新版RSS格式下Split不会命中，text == description，此时保留完整正文
             string brief;
-            if (title.Length > 50)
+            if (title.Length > 50 || text == description)
             {
                 brief = text;
             }
@@ -857,13 +858,20 @@ namespace CnGalWebSite.APIServer.Application.News
 
             var markdown = converter.Convert(brief).Replace("\\[\\]", "[]");
 
-            //去除 视频
+            //去除 视频（兼容bvid和aid两种格式）
             do
             {
                 var midStr = ToolHelper.MidStrEx(markdown, "<iframe ", "</iframe>");
                 var bvid = ToolHelper.MidStrEx(midStr, "bvid=", "\"");
+                var aid = ToolHelper.MidStrEx(midStr, "aid=", "\"");
 
-                markdown = markdown.Replace($"<iframe {midStr}</iframe>", $"\n[](https://www.bilibili.com/video/{bvid})\n");
+                var videoUrl = !string.IsNullOrWhiteSpace(bvid)
+                    ? $"https://www.bilibili.com/video/{bvid}"
+                    : !string.IsNullOrWhiteSpace(aid)
+                        ? $"https://www.bilibili.com/video/av{aid}"
+                        : "";
+
+                markdown = markdown.Replace($"<iframe {midStr}</iframe>", string.IsNullOrWhiteSpace(videoUrl) ? "" : $"\n[]({videoUrl})\n");
 
             } while (string.IsNullOrWhiteSpace(ToolHelper.MidStrEx(markdown, "<iframe ", "</iframe>")) == false);
 
@@ -885,17 +893,24 @@ namespace CnGalWebSite.APIServer.Application.News
 
         public async Task<GameNews> ProcessingBilibili(OriginalRSS originalRSS, List<string> entries, List<WeiboUserInfor> users)
         {
-            var authorString = GetBilibiliAuthor(originalRSS.Description);
+            //优先从RSS源获取作者，fallback到从description解析
+            var authorString = !string.IsNullOrWhiteSpace(originalRSS.Author)
+                ? originalRSS.Author
+                : GetBilibiliAuthor(originalRSS.Description);
+            var mainPage = GetBilibiliMainPage(originalRSS.Description, authorString);
             var model = new GameNews
             {
                 Type = ArticleType.News,
                 RSS = originalRSS,
-                Title = (GetBilibiliTitle(originalRSS.Description, authorString, 20)),
+                //优先从RSS源获取标题，fallback到从description解析
+                Title = !string.IsNullOrWhiteSpace(originalRSS.Title)
+                    ? _appHelper.GetStringAbbreviation(originalRSS.Title, 20)
+                    : GetBilibiliTitle(originalRSS.Description, authorString, 20),
                 BriefIntroduction = GetBilibiliBriefIntroduction(originalRSS.Description, authorString, 500),
                 Author = authorString,
-                MainPage = GetBilibiliMainPage(originalRSS.Description, authorString),
+                MainPage = mainPage,
                 Link = originalRSS.Link,
-                MainPicture = await GetBilibiliMainImage(GetBilibiliMainPage(originalRSS.Description, authorString)),
+                MainPicture = await GetBilibiliMainImage(mainPage),
                 PublishTime = originalRSS.PublishTime,
                 State = GameNewsState.Edit
             };
