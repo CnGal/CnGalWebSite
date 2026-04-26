@@ -8,6 +8,8 @@ services:
       - MainSiteApi__BaseAddress=${WebApiPath:-https://api.cngal.org/}
       # 图床API
       - MainSiteApi__ImageApiPath=${ImageApiPath:-https://api.cngal.top/}
+      # 定时任务API
+      - MainSiteApi__TaskApiPath=${TaskApiPath}
       # OIDC 鉴权
       - Oidc__Authority=${Authority:-https://oauth2.cngal.org}
       - Oidc__ClientId=${ClientId}
