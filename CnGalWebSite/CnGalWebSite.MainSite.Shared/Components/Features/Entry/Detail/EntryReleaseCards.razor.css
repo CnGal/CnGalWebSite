@@ -10,7 +10,7 @@
 .entry-release-card {
     border: 1px solid var(--cg-color-border);
     border-radius: var(--cg-radius-md);
-    background: color-mix(in oklab, var(--cg-color-surface) 60%, white);
+    background: color-mix(in oklab, var(--cg-color-surface) 92%, var(--cg-color-bg));
     overflow: hidden;
     transition: var(--cg-transition-fast);
 }

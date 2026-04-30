@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python mdi_extract.py)",
+      "Bash(dotnet build *)"
+    ]
+  }
+}

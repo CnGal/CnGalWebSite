@@ -119,6 +119,68 @@
     --cg-bottom-nav-height: calc(56px + env(safe-area-inset-bottom, 0px));
 }
 
+[data-theme="dark"] {
+    /* ── 基础色彩 ── */
+    --cg-color-bg: #0f1419;
+    --cg-color-surface: #1a2332;
+    --cg-color-border: #2d3d52;
+    --cg-color-text: #e6edf3;
+    --cg-color-text-muted: #8b949e;
+    --cg-color-text-primary: var(--cg-color-text);
+    --cg-color-text-secondary: var(--cg-color-text-muted);
+
+    /* ── 语义色彩 ── */
+    --cg-color-primary: #58a6ff;
+    --cg-color-primary-hover: #79b8ff;
+    --cg-color-secondary: #f778ba;
+    --cg-color-secondary-hover: #f99cd0;
+    --cg-color-error: #f85149;
+    --cg-color-danger: var(--cg-color-error);
+    --cg-color-success: #3fb950;
+    --cg-color-warning: #d29922;
+    --cg-color-link: #58a6ff;
+    --cg-color-on-primary: #ffffff;
+
+    /* ── 阴影（暗色模式下减轻） ── */
+    --cg-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --cg-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --cg-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+    --cg-shadow-card-hover: 0 8px 25px -5px rgba(0, 0, 0, 0.5), 0 4px 10px -5px rgba(0, 0, 0, 0.3);
+
+    /* ── 组件 Token ── */
+    --cg-color-section-bg: #151d28;
+    --cg-color-hover-overlay: rgba(255, 255, 255, 0.06);
+
+    /* ── 编辑器状态色 ── */
+    --cg-color-editor-warning-text: #e3b341;
+    --cg-color-editor-error-text: #f87171;
+    --cg-color-editor-error-bg: #3d1214;
+    --cg-color-editor-error-border: #5c1f22;
+
+    /* ── 覆盖层 ── */
+    --cg-color-overlay: rgba(0, 0, 0, 0.7);
+
+    /* ── 星标/徽章色 ── */
+    --cg-color-amber: #e3b341;
+    --cg-color-emerald: #3fb950;
+    --cg-color-emerald-subtle: rgba(63, 185, 80, 0.15);
+
+    /* ── 品牌色（保持亮色，品牌色不随主题变化） ── */
+    --cg-color-brand-zhihu: #e6edf3;
+
+    /* ── 分类标签色 ── */
+    --cg-color-badge-entry: #0c2d48;
+    --cg-color-badge-entry-text: #58a6ff;
+    --cg-color-badge-article: #3d1236;
+    --cg-color-badge-article-text: #f778ba;
+    --cg-color-badge-tag: #1c1a3d;
+    --cg-color-badge-tag-text: #8b8cff;
+    --cg-color-badge-video: #3d2900;
+    --cg-color-badge-video-text: #e3b341;
+    --cg-color-badge-periphery: #0d3321;
+    --cg-color-badge-periphery-text: #3fb950;
+}
+
 @media (min-width: 768px) {
     :root {
         --cg-page-gutter: 2.5rem;

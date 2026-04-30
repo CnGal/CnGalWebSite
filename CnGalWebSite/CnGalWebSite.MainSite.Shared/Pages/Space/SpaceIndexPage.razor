@@ -1,4 +1,4 @@
-@page "/space/index/{Id}"
+﻿@page "/space/index/{Id}"
 @page "/space/index"
 
 @using CnGalWebSite.DataModel.Model
@@ -15,9 +15,19 @@
 @inject IPlayedGameQueryService PlayedGameQueryService
 @inject IFavoriteFolderQueryService FavoriteFolderQueryService
 @inject IPeripheryQueryService PeripheryQueryService
+@inject IMainSiteAuthRequestService AuthRequestService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 
-@if (_isNotFound)
+@if (_isLoginRequired)
+{
+    <div class="cg-space-not-found">
+        <h1 class="cg-space-not-found-title">还没有登录哦</h1>
+        <div class="cg-space-not-found-text">登录后就可以查看和管理自己的个人空间啦</div>
+        <CgButton Variant="primary" Href="@AuthRequestService.BuildLoginUrl(LoginReturnUrl)">去登录</CgButton>
+    </div>
+}
+else if (_isNotFound)
 {
     <div class="cg-space-not-found">
         <h1 class="cg-space-not-found-title">找不到这个用户哦......</h1>
@@ -179,9 +189,11 @@ else
     private IReadOnlyList<GameOverviewPeripheryListModel>? _peripheries;
     private UserHeatMapViewModel? _signInHeatMap;
     private UserHeatMapViewModel? _editHeatMap;
+    private bool _isLoginRequired;
     private bool _isNotFound;
     private bool _isError;
     private string _errorMessage = string.Empty;
+    private const string LoginReturnUrl = "/space/index";
 
     private bool _showGameRecordTab => _model is not null && (_model.IsCurrentUser || _model.IsShowGameRecord);
     private bool _showFavoritesTab => _model is not null && (_model.IsCurrentUser || _model.IsShowFavorites);
@@ -265,6 +277,7 @@ else
 
     private async Task LoadDataAsync()
     {
+        _isLoginRequired = false;
         _isNotFound = false;
         _isError = false;
         _model = null;
@@ -277,8 +290,22 @@ else
         _signInHeatMap = null;
         _editHeatMap = null;
 
-        var targetId = Id ?? string.Empty;
-        var result = await SpaceQueryService.GetSpaceDetailAsync(targetId);
+        if (string.IsNullOrWhiteSpace(Id))
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var userId = authState.User.Claims.GetUserId();
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                NavigationManager.NavigateTo($"/space/index/{userId}", replace: true);
+                return;
+            }
+
+            _isLoginRequired = true;
+            return;
+        }
+
+        var result = await SpaceQueryService.GetSpaceDetailAsync(Id);
 
         if (result.Success && result.Data != null)
         {

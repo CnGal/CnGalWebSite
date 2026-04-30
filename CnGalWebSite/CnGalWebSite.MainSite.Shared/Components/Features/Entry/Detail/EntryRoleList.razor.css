@@ -1,4 +1,4 @@
-/* ═══════════════════════════════════════════════
+﻿/* ═══════════════════════════════════════════════
    EntryRoleList — mobile-first
    ═══════════════════════════════════════════════ */
 .entry-role-list {
@@ -16,7 +16,7 @@
     padding: 0.5rem;
     border: 1px solid var(--cg-color-border);
     border-radius: var(--cg-radius-md);
-    background: color-mix(in oklab, var(--cg-color-surface) 80%, white);
+    background: color-mix(in oklab, var(--cg-color-surface) 92%, var(--cg-color-bg));
     text-decoration: none;
     color: var(--cg-color-text);
     transition: var(--cg-transition-fast);
@@ -26,7 +26,7 @@
 
 .entry-role-item:hover {
     border-color: var(--cg-color-primary);
-    background: color-mix(in oklab, var(--cg-color-primary) 5%, white);
+    background: color-mix(in oklab, var(--cg-color-primary) 12%, var(--cg-color-surface));
 }
 
 .entry-role-avatar {
@@ -76,6 +76,7 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     overflow: hidden;
     line-height: 1.4;
 }

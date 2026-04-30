@@ -16,7 +16,7 @@
     align-items: center;
     justify-content: center;
     padding: 0.4rem 0.85rem;
-    background: color-mix(in oklab, var(--cg-color-bg) 80%, white);
+    background: color-mix(in oklab, var(--cg-color-surface) 88%, var(--cg-color-bg));
     border-radius: var(--cg-radius-md);
     font-size: 0.8rem;
     font-weight: 600;
@@ -26,6 +26,6 @@
 }
 
 .entry-link-list a:hover {
-    background: color-mix(in oklab, var(--cg-color-primary) 10%, white);
+    background: color-mix(in oklab, var(--cg-color-primary) 12%, var(--cg-color-surface));
     color: var(--cg-color-primary);
 }

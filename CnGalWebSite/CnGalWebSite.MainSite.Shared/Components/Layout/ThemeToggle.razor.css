@@ -1,0 +1,24 @@
+.cg-theme-toggle {
+    display: flex;
+    width: 2.5rem;
+    height: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--cg-radius-xl);
+    background-color: color-mix(in oklab, var(--cg-color-border) 40%, var(--cg-color-surface));
+    color: var(--cg-color-text-muted);
+    border: none;
+    cursor: pointer;
+    transition: all var(--cg-transition-fast);
+    flex-shrink: 0;
+}
+
+.cg-theme-toggle:hover {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+    color: var(--cg-color-primary);
+}
+
+.cg-theme-toggle ::deep .cg-mdi-icon {
+    width: 22px;
+    height: 22px;
+}
