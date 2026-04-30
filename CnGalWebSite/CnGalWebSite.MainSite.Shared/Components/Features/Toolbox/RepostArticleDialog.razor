@@ -1,0 +1,152 @@
+@implements IDisposable
+@inject IToolboxArticleRepostService ArticleService
+
+<CgModal IsOpen="IsOpen" Title="转载其他平台文章" Width="760px" OnClose="CloseAsync">
+    <ChildContent>
+        <div class="toolbox-dialog">
+            @if (_step == 1)
+            {
+                <CgAlert Variant="info">目前只支持知乎、B 站专栏文章。每行输入一个文章链接。</CgAlert>
+                <CgFormSection Title="输入要转载的文章链接" Icon="mdiFileDocumentOutline">
+                    <CgFormGroup Label="文章链接" Required>
+                        <CgTextarea @bind-Value="_urls" Rows="5" Placeholder="https://zhuanlan.zhihu.com/p/..." />
+                    </CgFormGroup>
+                    <CgFormGroup Label="自定义标题（可选，仅单个链接时建议填写）">
+                        <CgInput TValue="string" @bind-Value="_title" Placeholder="留空则使用原文标题" />
+                    </CgFormGroup>
+                    <CgFormGroup Label="文章类型">
+                        <CgEnumSelect TEnum="ArticleType" @bind-Value="_type" />
+                    </CgFormGroup>
+                    <CgCheckbox @bind-Value="_isCreatedByCurrentUser" Label="这是我本人创作的文章" />
+                </CgFormSection>
+            }
+            else if (_step == 2)
+            {
+                <CgAlert Variant="info">正在抓取并处理文章，请不要关闭弹窗。</CgAlert>
+                <ToolboxProgressPanel CurrentTask="_currentTask" CurrentIndex="_currentIndex" TotalCount="_tasks.Count" CurrentMessage="_message" />
+            }
+            else
+            {
+                <CgAlert Variant="@(_tasks.Any(s => s.Failed) ? "warning" : "success")">文章处理完成。</CgAlert>
+                <div class="toolbox-dialog__results">
+                    @foreach (var task in _tasks)
+                    {
+                        <div class="toolbox-dialog__result">
+                            <strong>@task.Url</strong>
+                            @if (task.Succeeded)
+                            {
+                                <span>已提交审核，Id：@task.Id</span>
+                            }
+                            else
+                            {
+                                <span class="toolbox-dialog__error">@task.Error</span>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </ChildContent>
+    <Footer>
+        <div class="toolbox-dialog__footer">
+            @if (_step == 1)
+            {
+                <CgButton Variant="secondary" OnClick="CloseAsync">取消</CgButton>
+                <CgButton OnClick="StartAsync" Async>开始处理</CgButton>
+            }
+            else if (_step == 2)
+            {
+                <CgButton Variant="secondary" Disabled>处理中</CgButton>
+            }
+            else
+            {
+                <CgButton Variant="secondary" OnClick="Retry">重新输入</CgButton>
+                <CgButton OnClick="CloseAsync">关闭</CgButton>
+            }
+        </div>
+    </Footer>
+</CgModal>
+
+@code {
+    [Parameter]
+    public bool IsOpen { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    private int _step = 1;
+    private string? _urls;
+    private string? _title;
+    private ArticleType _type = ArticleType.Evaluation;
+    private bool _isCreatedByCurrentUser;
+    private List<RepostArticleTaskModel> _tasks = [];
+    private RepostArticleTaskModel? _currentTask;
+    private int _currentIndex;
+    private string _message = "准备中";
+
+    protected override void OnInitialized()
+    {
+        ArticleService.ProgressUpdate += OnProgressUpdate;
+    }
+
+    private async Task StartAsync()
+    {
+        var urls = ParseLines(_urls);
+        if (urls.Count == 0)
+        {
+            _message = "请至少输入一个文章链接";
+            return;
+        }
+
+        _tasks = urls.Select(url => new RepostArticleTaskModel
+        {
+            Url = url,
+            Title = urls.Count == 1 ? _title?.Trim() ?? string.Empty : string.Empty,
+            Type = _type,
+            IsCreatedByCurrentUser = _isCreatedByCurrentUser
+        }).ToList();
+
+        _step = 2;
+        for (_currentIndex = 0; _currentIndex < _tasks.Count; _currentIndex++)
+        {
+            _currentTask = _tasks[_currentIndex];
+            await ArticleService.ProcessArticleAsync(_currentTask);
+        }
+
+        _step = 3;
+    }
+
+    private void Retry()
+    {
+        _step = 1;
+        _message = "准备中";
+    }
+
+    private Task CloseAsync()
+    {
+        return OnClose.InvokeAsync();
+    }
+
+    private void OnProgressUpdate(ToolboxProgressUpdate update)
+    {
+        _ = InvokeAsync(() =>
+        {
+            _message = update.Message;
+            StateHasChanged();
+        });
+    }
+
+    private static List<string> ParseLines(string? text)
+    {
+        return (text ?? string.Empty)
+            .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(s => !string.IsNullOrWhiteSpace(s))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+    }
+
+    public void Dispose()
+    {
+        ArticleService.ProgressUpdate -= OnProgressUpdate;
+    }
+}

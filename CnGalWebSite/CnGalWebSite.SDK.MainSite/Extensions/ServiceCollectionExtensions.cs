@@ -155,6 +155,7 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<IPlayedGameCommandService, PlayedGameCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<ICommentCommandService, CommentCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IFavoriteFolderCommandService, FavoriteFolderCommandService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<IToolboxCommandService, ToolboxCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IFileCommandService, FileCommandService>(services, imageApiBase, withAuth: false);
 
         // Admin 服务（需认证）

@@ -1,0 +1,28 @@
+.toolbox-progress-panel {
+    display: grid;
+    gap: var(--cg-spacing-2);
+}
+
+.toolbox-progress-panel__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--cg-spacing-3);
+    color: var(--cg-color-text);
+    font-size: var(--cg-font-size-sm);
+}
+
+.toolbox-progress-panel__bar {
+    height: 0.45rem;
+    overflow: hidden;
+    border-radius: var(--cg-radius-full);
+    background: color-mix(in oklab, var(--cg-color-border) 48%, transparent);
+}
+
+.toolbox-progress-panel__bar span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--cg-color-primary);
+    transition: width var(--cg-transition-normal);
+}

@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @attribute [StreamRendering]
+@using CnGalWebSite.MainSite.Shared.Components.Layout
 @inject NavigationManager NavigationManager
 @inject IMainSiteAuthRequestService AuthRequestService
 
@@ -258,6 +259,7 @@
             </div>
         </div>
     </footer>
+    <FloatingActionToolbar />
 </div>
 
 <AuthorizeView>

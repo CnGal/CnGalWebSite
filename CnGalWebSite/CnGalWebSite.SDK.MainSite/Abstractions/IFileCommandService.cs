@@ -17,4 +17,10 @@ public interface IFileCommandService
         Stream fileStream,
         string fileName,
         CancellationToken cancellationToken = default);
+
+    Task<SdkResult<string>> TransformImageUrlAsync(
+        string url,
+        double x = 0,
+        double y = 0,
+        CancellationToken cancellationToken = default);
 }

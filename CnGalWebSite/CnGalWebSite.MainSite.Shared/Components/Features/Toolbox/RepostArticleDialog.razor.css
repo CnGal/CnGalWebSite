@@ -1,0 +1,30 @@
+.toolbox-dialog {
+    display: grid;
+    gap: var(--cg-spacing-4);
+}
+
+.toolbox-dialog__footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--cg-spacing-2);
+}
+
+.toolbox-dialog__results {
+    display: grid;
+    gap: var(--cg-spacing-2);
+}
+
+.toolbox-dialog__result {
+    display: grid;
+    gap: var(--cg-spacing-1);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    padding: var(--cg-spacing-3);
+    background: var(--cg-color-surface);
+    word-break: break-word;
+}
+
+.toolbox-dialog__error {
+    color: var(--cg-color-error);
+}
