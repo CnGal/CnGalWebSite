@@ -117,56 +117,27 @@
 }
 
 .cg-topbar__search {
-    display: none;
-    flex-direction: column;
-    min-width: 10rem;
-    max-width: 16rem;
-    height: 2.5rem;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-@media (min-width: 768px) {
-    .cg-topbar__search {
-        display: flex;
-    }
-}
-
-.cg-topbar__search-inner {
-    display: flex;
-    width: 100%;
-    flex: 1;
-    align-items: stretch;
-    border-radius: var(--cg-radius-xl, 1.5rem);
-    height: 100%;
-    background-color: color-mix(in oklab, var(--cg-color-border) 40%, var(--cg-color-surface));
-    border: 1px solid transparent;
-    transition: all var(--cg-transition-fast);
-}
-
-.cg-topbar__search:hover .cg-topbar__search-inner {
-    border-color: color-mix(in oklab, var(--cg-color-primary) 50%, transparent);
-}
-
-.cg-topbar__search-icon {
-    color: var(--cg-color-text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-left: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--cg-radius-xl, 1.5rem);
+    background-color: color-mix(in oklab, var(--cg-color-border) 40%, var(--cg-color-surface));
+    color: var(--cg-color-text-muted);
+    text-decoration: none;
+    transition: all var(--cg-transition-fast);
+    flex-shrink: 0;
 }
 
-.cg-topbar__search-icon ::deep .cg-mdi-icon {
+.cg-topbar__search:hover {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
+    color: var(--cg-color-primary);
+}
+
+.cg-topbar__search ::deep .cg-mdi-icon {
     width: 22px;
     height: 22px;
-}
-
-.cg-topbar__search-placeholder {
-    display: flex;
-    align-items: center;
-    padding: 0 0.5rem;
-    font-size: 0.875rem;
-    color: var(--cg-color-text-secondary, #666);
 }
 
 .cg-topbar__actions {
@@ -279,38 +250,6 @@
         display: none;
     }
 }
-
-/* -- Mobile search icon -- */
-.cg-topbar__search-mobile {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: var(--cg-radius-xl, 1.5rem);
-    background-color: color-mix(in oklab, var(--cg-color-border) 40%, var(--cg-color-surface));
-    color: var(--cg-color-text-muted);
-    text-decoration: none;
-    transition: all var(--cg-transition-fast);
-    flex-shrink: 0;
-}
-
-.cg-topbar__search-mobile:hover {
-    background-color: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
-    color: var(--cg-color-primary);
-}
-
-.cg-topbar__search-mobile ::deep .cg-mdi-icon {
-    width: 22px;
-    height: 22px;
-}
-
-@media (min-width: 768px) {
-    .cg-topbar__search-mobile {
-        display: none;
-    }
-}
-
 
 /* -- Mobile: hide actions (user menu / login) -- */
 @media (max-width: 767px) {
