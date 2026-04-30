@@ -1,0 +1,39 @@
+.toolbox-dialog-host {
+    display: grid;
+    gap: var(--cg-spacing-2);
+}
+
+.toolbox-dialog-host__action {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    min-height: 2.75rem;
+    width: 100%;
+    border: 0;
+    border-radius: var(--cg-radius-lg);
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    background: color-mix(in oklab, var(--cg-color-border) 24%, transparent);
+    color: var(--cg-color-text);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color var(--cg-transition-fast), color var(--cg-transition-fast), transform var(--cg-transition-fast);
+}
+
+.toolbox-dialog-host__action:hover,
+.toolbox-dialog-host__action:focus-visible {
+    color: var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 12%, transparent);
+    transform: translateX(-2px);
+}
+
+.toolbox-dialog-host__action:focus-visible {
+    outline: 3px solid var(--cg-color-focus-ring);
+    outline-offset: 3px;
+}
+
+.toolbox-dialog-host__action ::deep .cg-mdi-icon {
+    width: 1.15rem;
+    height: 1.15rem;
+    flex-shrink: 0;
+    color: var(--cg-color-primary);
+}

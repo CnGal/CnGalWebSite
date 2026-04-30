@@ -15,13 +15,13 @@
     border-radius: var(--cg-radius-md);
     font-size: 0.75rem;
     font-weight: 600;
-    background: color-mix(in oklab, var(--cg-color-bg) 60%, white);
+    background: color-mix(in oklab, var(--cg-color-surface) 88%, var(--cg-color-bg));
     transition: var(--cg-transition-fast);
 }
 
 .entry-tags li:hover {
     border-color: var(--cg-color-primary);
-    background: color-mix(in oklab, var(--cg-color-primary) 8%, white);
+    background: color-mix(in oklab, var(--cg-color-primary) 12%, var(--cg-color-surface));
 }
 
 .entry-tags li a {

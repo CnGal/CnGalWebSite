@@ -1,0 +1,76 @@
+﻿@inject NavigationManager NavigationManager
+@inject IMainSiteAuthRequestService AuthRequestService
+
+<nav class="floating-action-toolbar" aria-label="浮动工具栏">
+    <div class="floating-action-toolbar__group">
+        <button class="floating-action-toolbar__button"
+                type="button"
+                aria-label="社区交流"
+                aria-haspopup="true">
+            <CgMdiIcon Name="mdiLink" aria-hidden="true" />
+            <span class="floating-action-toolbar__label">社区</span>
+        </button>
+        <div class="floating-action-toolbar__panel floating-action-toolbar__panel--community" role="group" aria-label="社区交流">
+            <div class="floating-action-toolbar__panel-header">
+                <CgMdiIcon Name="mdiWechat" aria-hidden="true" />
+                <span>社区交流</span>
+            </div>
+            <div class="floating-action-toolbar__qr-card">
+                <img src="https://image.cngal.org/images/2022/06/02/76142d8159b0.jpg" alt="CnGal 微信公众号二维码" />
+                <span>扫码加入微信公众号</span>
+            </div>
+            <div class="floating-action-toolbar__link-list">
+                <a class="floating-action-toolbar__link" href="https://weibo.com/cngalorg?sudaref=www.cngal.org" target="_blank" rel="noopener noreferrer">
+                    <CgMdiIcon Name="mdiSinaWeibo" aria-hidden="true" />
+                    <span>微博</span>
+                </a>
+                <a class="floating-action-toolbar__link" href="https://qm.qq.com/q/bgKC6yy5ri" target="_blank" rel="noopener noreferrer">
+                    <CgMdiIcon Name="mdiQqchat" aria-hidden="true" />
+                    <span>QQ 群</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="floating-action-toolbar__group">
+        <button class="floating-action-toolbar__button"
+                type="button"
+                aria-label="工具箱"
+                aria-haspopup="true">
+            <CgMdiIcon Name="mdiWrenchOutline" aria-hidden="true" />
+            <span class="floating-action-toolbar__label">工具</span>
+        </button>
+        <div class="floating-action-toolbar__panel floating-action-toolbar__panel--tools" role="group" aria-label="工具箱">
+            <div class="floating-action-toolbar__panel-header">
+                <CgMdiIcon Name="mdiHammerWrench" aria-hidden="true" />
+                <span>工具箱</span>
+            </div>
+
+            <AuthorizeView>
+                <Authorized>
+                    <div class="floating-action-toolbar__toolbox-actions">
+                        <ToolboxDialogHost @rendermode="InteractiveServer" />
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <a class="floating-action-toolbar__login" href="@AuthRequestService.BuildLoginUrl(CurrentReturnUrl)">
+                        <CgMdiIcon Name="mdiLogin" aria-hidden="true" />
+                        <span>登录后使用工具箱</span>
+                    </a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </div>
+
+    <button class="floating-action-toolbar__button"
+            type="button"
+            aria-label="回到顶部"
+            onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+        <CgMdiIcon Name="mdiArrowUp" aria-hidden="true" />
+        <span class="floating-action-toolbar__label">顶部</span>
+    </button>
+</nav>
+
+@code {
+    private string CurrentReturnUrl => new Uri(NavigationManager.Uri).PathAndQuery;
+}

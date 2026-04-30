@@ -1,8 +1,9 @@
-using CnGalWebSite.SDK.MainSite.Abstractions;
+﻿using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Auth;
 using CnGalWebSite.SDK.MainSite.Commands;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Queries;
+using CnGalWebSite.SDK.MainSite.Services.Toolbox;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
@@ -155,7 +156,15 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<IPlayedGameCommandService, PlayedGameCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<ICommentCommandService, CommentCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IFavoriteFolderCommandService, FavoriteFolderCommandService>(services, apiBase, withAuth: true);
+        RegisterSdkHttpClient<IToolboxCommandService, ToolboxCommandService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IFileCommandService, FileCommandService>(services, imageApiBase, withAuth: false);
+
+        // Toolbox 编排服务
+        services.AddScoped(typeof(IToolboxLocalRepository<>), typeof(ToolboxLocalRepository<>));
+        services.AddScoped<ToolboxImageService>();
+        services.AddScoped<IToolboxVideoRepostService, ToolboxVideoRepostService>();
+        services.AddScoped<IToolboxEntryMergeService, ToolboxEntryMergeService>();
+        services.AddHttpClient<IToolboxArticleRepostService, ToolboxArticleRepostService>();
 
         // Admin 服务（需认证）
         RegisterSdkHttpClient<IAdminQueryService, AdminQueryService>(services, apiBase, withAuth: true);

@@ -1,0 +1,52 @@
+@using CnGalWebSite.MainSite.Shared.Services
+@rendermode InteractiveServer
+@implements IDisposable
+
+@inject ICgThemeService ThemeService
+
+<button class="cg-theme-toggle" @onclick="ToggleTheme"
+        aria-label="@(_isDark ? "切换到亮色模式" : "切换到暗色模式")">
+    @if (_isDark)
+    {
+        <CgMdiIcon Name="mdiWeatherSunny" aria-hidden="true" />
+    }
+    else
+    {
+        <CgMdiIcon Name="mdiWeatherNight" aria-hidden="true" />
+    }
+</button>
+
+@code {
+    private bool _isDark;
+
+    protected override void OnInitialized()
+    {
+        _isDark = ThemeService.IsDarkMode;
+        ThemeService.ThemeChanged -= OnThemeChanged;
+        ThemeService.ThemeChanged += OnThemeChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await ThemeService.CheckAsync();
+        }
+    }
+
+    private async Task ToggleTheme()
+    {
+        await ThemeService.SetThemeModeAsync(!_isDark);
+    }
+
+    private void OnThemeChanged()
+    {
+        _isDark = ThemeService.IsDarkMode;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        ThemeService.ThemeChanged -= OnThemeChanged;
+    }
+}

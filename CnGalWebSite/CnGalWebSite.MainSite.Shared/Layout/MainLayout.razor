@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @attribute [StreamRendering]
+@using CnGalWebSite.MainSite.Shared.Components.Layout
 @inject NavigationManager NavigationManager
 @inject IMainSiteAuthRequestService AuthRequestService
 
@@ -31,19 +32,10 @@
 
             <div class="cg-topbar__right">
                 <a href="/search" class="cg-topbar__search" aria-label="搜索词条、制作组">
-                    <div class="cg-topbar__search-inner">
-                        <div class="cg-topbar__search-icon">
-                            <CgMdiIcon Name="mdiMagnify" aria-hidden="true" />
-                        </div>
-                        <span class="cg-topbar__search-placeholder">搜索词条、制作组...</span>
-                    </div>
-                </a>
-
-                @* 移动端搜索图标 — 仅 < 768px 显示 *@
-                <a href="/search" class="cg-topbar__search-mobile" aria-label="搜索">
                     <CgMdiIcon Name="mdiMagnify" aria-hidden="true" />
                 </a>
 
+                <CnGalWebSite.MainSite.Shared.Components.Layout.ThemeToggle />
                 <div class="cg-topbar__actions">
                     <AuthorizeView>
                         <Authorized>
@@ -82,6 +74,17 @@
                     <CgMdiIcon Name="mdiHomeOutline" aria-hidden="true" />
                     <span>主页</span>
                 </a>
+            </div>
+
+            <div class="cg-drawer__divider"></div>
+            <div class="cg-drawer__section-title">设置</div>
+            <div class="cg-drawer__links">
+                <button class="cg-drawer__theme-btn"
+                        onclick="var isDark = document.documentElement.getAttribute('data-theme') === 'dark'; window.cngalTheme.set(!isDark);"
+                        aria-label="切换颜色主题">
+                    <CgMdiIcon Name="mdiThemeLightDark" aria-hidden="true" />
+                    <span>夜间模式</span>
+                </button>
             </div>
 
             <AuthorizeView>
@@ -149,10 +152,12 @@
                     @* ── 退出登录 ── *@
                     <div class="cg-drawer__divider"></div>
                     <div class="cg-drawer__footer">
-                        <a class="cg-drawer__logout-link" href="@AuthRequestService.BuildLogoutUrl(CurrentReturnUrl)">
-                            <CgMdiIcon Name="mdiLogout" aria-hidden="true" />
-                            <span>退出登录</span>
-                        </a>
+                        <form class="cg-drawer__logout-form" method="post" action="@AuthRequestService.BuildLogoutUrl(CurrentReturnUrl)">
+                            <button class="cg-drawer__logout-link" type="submit">
+                                <CgMdiIcon Name="mdiLogout" aria-hidden="true" />
+                                <span>退出登录</span>
+                            </button>
+                        </form>
                     </div>
                 </Authorized>
                 <NotAuthorized>
@@ -244,6 +249,7 @@
             </div>
         </div>
     </footer>
+    <FloatingActionToolbar />
 </div>
 
 <AuthorizeView>

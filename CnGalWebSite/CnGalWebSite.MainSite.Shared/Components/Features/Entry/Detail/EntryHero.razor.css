@@ -27,7 +27,7 @@
     width: 100%;
     object-fit: cover;
     border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
-    background: color-mix(in oklab, var(--cg-color-bg) 90%, white);
+    background: color-mix(in oklab, var(--cg-color-bg) 90%, var(--cg-color-surface));
     box-shadow: var(--cg-shadow-md);
 }
 

@@ -1,0 +1,109 @@
+﻿.toolbox-dialog {
+    display: grid;
+    gap: var(--cg-spacing-5);
+}
+
+.toolbox-dialog__hint {
+    margin: 0;
+    text-align: center;
+    font-size: var(--cg-font-size-sm);
+    line-height: 1.55;
+    color: var(--cg-color-text-muted);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    border-radius: var(--cg-radius-md);
+    background: var(--cg-color-section-bg);
+    border: 1px solid var(--cg-color-border);
+}
+
+.toolbox-dialog__sample {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-primary);
+    word-break: break-all;
+}
+
+.toolbox-dialog__form {
+    display: grid;
+    gap: var(--cg-spacing-4);
+}
+
+.toolbox-dialog__row-split {
+    display: grid;
+    gap: var(--cg-spacing-4);
+}
+
+@media (min-width: 768px) {
+    .toolbox-dialog__row-split {
+        grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+        align-items: start;
+    }
+}
+
+.toolbox-dialog__footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--cg-spacing-3);
+}
+
+.toolbox-dialog__results {
+    display: grid;
+    gap: var(--cg-spacing-3);
+}
+
+.toolbox-dialog__result {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--cg-spacing-3);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    padding: var(--cg-spacing-4);
+    background: var(--cg-color-surface);
+    transition: background-color var(--cg-transition-fast), border-color var(--cg-transition-fast);
+}
+
+.toolbox-dialog__result--success {
+    border-color: color-mix(in oklab, var(--cg-color-success) 30%, transparent);
+    background: color-mix(in oklab, var(--cg-color-success) 5%, transparent);
+}
+
+.toolbox-dialog__result--error {
+    border-color: color-mix(in oklab, var(--cg-color-error) 30%, transparent);
+    background: color-mix(in oklab, var(--cg-color-error) 5%, transparent);
+}
+
+.toolbox-dialog__result ::deep .toolbox-dialog__result-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.toolbox-dialog__result--success ::deep .toolbox-dialog__result-icon {
+    color: var(--cg-color-success);
+}
+
+.toolbox-dialog__result--error ::deep .toolbox-dialog__result-icon {
+    color: var(--cg-color-error);
+}
+
+.toolbox-dialog__result-content {
+    display: grid;
+    gap: var(--cg-spacing-1);
+    word-break: break-word;
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+}
+
+.toolbox-dialog__result-content strong {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    font-size: var(--cg-font-size-base);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-primary);
+}
+
+.toolbox-dialog__error {
+    color: var(--cg-color-error);
+}

@@ -128,6 +128,10 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 {
                     item.IsInSteam = true;
                     item.PlayDuration = steamGames.games.FirstOrDefault(s => s.appid.ToString() == steamTemp.SteamId)?.playtime_forever ?? 0;
+                    if (item.Type == PlayedGameType.UnPlayed && item.PlayDuration > 0)
+                    {
+                        item.Type = PlayedGameType.Played;
+                    }
                 }
                 else
                 {

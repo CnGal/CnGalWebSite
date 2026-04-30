@@ -347,7 +347,7 @@ else
             </HeaderAppendContent>
             <ChildContent>
                 <ul class="home-bottom-game-grid">
-                    @foreach (var item in Model.FreeGames.Take(5))
+                    @foreach (var item in Model.FreeGames.Take(6))
                     {
                         <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction" Tags="@item.Tags"/>
                     }
@@ -366,7 +366,7 @@ else
             </HeaderAppendContent>
             <ChildContent>
                 <ul class="home-bottom-game-grid">
-                    @foreach (var item in Model.DiscountGames.Take(5))
+                    @foreach (var item in Model.DiscountGames.Take(6))
                     {
                         <HomeGameCard Url="@item.Url" Image="@item.Image" Name="@item.Name" BriefIntroduction="@item.BriefIntroduction">
                             <div class="home-discount-label">

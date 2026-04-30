@@ -1,4 +1,4 @@
-@using CnGalWebSite.DataModel.ViewModel.Stores
+﻿@using CnGalWebSite.DataModel.ViewModel.Stores
 @using CnGalWebSite.MainSite.Shared.Components.DesignSystem
 @inject NavigationManager NavigationManager
 
@@ -26,7 +26,7 @@
             </div>
             <div class="revenue-card__stat-item">
                 <span class="revenue-card__stat-label">好评率</span>
-                <span class="revenue-card__stat-value">@(Math.Round(Item.RecommendationRate * 100))%</span>
+                <span class="revenue-card__stat-value">@(Math.Round(Item.RecommendationRate))%</span>
             </div>
             <div class="revenue-card__stat-item">
                 <span class="revenue-card__stat-label">平均时长</span>

@@ -1,4 +1,4 @@
-@page "/cv"
+﻿@page "/cv"
 @rendermode InteractiveServer
 
 @inject ITagQueryService TagQueryService
@@ -93,6 +93,8 @@
 </div>
 
 @code {
+    private const char TagQuerySeparator = '\x1e';
+
     // ── URL query parameters ──
     [SupplyParameterFromQuery(Name = "sort")]
     public int QuerySortType { get; set; }
@@ -105,6 +107,12 @@
 
     [SupplyParameterFromQuery(Name = "pageSize")]
     public int QueryPageSize { get; set; }
+
+    [SupplyParameterFromQuery(Name = "tags")]
+    public string? QueryTags { get; set; }
+
+    [SupplyParameterFromQuery(Name = "unlabeled")]
+    public string? QueryUnlabeled { get; set; }
 
     // ── Raw data ──
     private List<CVInforViewModel> AllCVInfors = [];
@@ -146,6 +154,9 @@
 
         PageSize = QueryPageSize > 0 ? QueryPageSize : 18;
         if (CurrentPage < 1) CurrentPage = 1;
+
+        SelectedTags = ParseTagQuery(QueryTags);
+        UnlabeledTags = ParseTagQuery(QueryUnlabeled);
 
         IsLoading = true;
         ErrorMessage = null;
@@ -294,9 +305,18 @@
         Refresh();
     }
 
+    private static HashSet<string> ParseTagQuery(string? query)
+    {
+        if (string.IsNullOrEmpty(query))
+        {
+            return [];
+        }
+
+        return query.Split(TagQuerySeparator, StringSplitOptions.RemoveEmptyEntries).ToHashSet();
+    }
+
     private void Refresh()
     {
-        ApplyFilterAndSort();
         _selfNavigating = true;
         NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
         {
@@ -304,6 +324,8 @@
             ["search"] = string.IsNullOrWhiteSpace(SearchString) ? null : SearchString,
             ["pageSize"] = PageSize,
             ["page"] = CurrentPage,
+            ["tags"] = SelectedTags.Count > 0 ? string.Join(TagQuerySeparator, SelectedTags.OrderBy(t => t, StringComparer.Ordinal)) : null,
+            ["unlabeled"] = UnlabeledTags.Count > 0 ? string.Join(TagQuerySeparator, UnlabeledTags.OrderBy(t => t, StringComparer.Ordinal)) : null,
         }));
     }
 }

@@ -1,0 +1,32 @@
+<div class="toolbox-dialog-host">
+    <button class="toolbox-dialog-host__action" type="button" @onclick="() => Open(ToolboxDialogKind.MergeEntry)">
+        <CgMdiIcon Name="mdiGamepadVariantOutline" aria-hidden="true" />
+        <span>合并词条</span>
+    </button>
+    <button class="toolbox-dialog-host__action" type="button" @onclick="() => Open(ToolboxDialogKind.RepostArticle)">
+        <CgMdiIcon Name="mdiFileDocumentOutline" aria-hidden="true" />
+        <span>转载文章</span>
+    </button>
+    <button class="toolbox-dialog-host__action" type="button" @onclick="() => Open(ToolboxDialogKind.RepostVideo)">
+        <CgMdiIcon Name="mdiVideoOutline" aria-hidden="true" />
+        <span>转载视频</span>
+    </button>
+</div>
+
+<MergeEntryDialog IsOpen="@(_activeDialog == ToolboxDialogKind.MergeEntry)" OnClose="Close" />
+<RepostArticleDialog IsOpen="@(_activeDialog == ToolboxDialogKind.RepostArticle)" OnClose="Close" />
+<RepostVideoDialog IsOpen="@(_activeDialog == ToolboxDialogKind.RepostVideo)" OnClose="Close" />
+
+@code {
+    private ToolboxDialogKind _activeDialog;
+
+    private void Open(ToolboxDialogKind kind)
+    {
+        _activeDialog = kind;
+    }
+
+    private void Close()
+    {
+        _activeDialog = ToolboxDialogKind.None;
+    }
+}

@@ -1,40 +1,38 @@
-/* ── Page container ── */
-.revenue-page {
+﻿.revenue-page {
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--cg-spacing-6) var(--cg-spacing-4);
+    padding: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--cg-spacing-6);
+    gap: var(--cg-spacing-4);
 }
 
-/* ── Header (card style, unified with GamePublishTimesPage / DiscountPage) ── */
 .revenue-page__header {
     background: var(--cg-color-surface);
-    border-radius: var(--cg-radius-xl);
-    padding: var(--cg-spacing-8) var(--cg-spacing-6);
+    border-radius: var(--cg-radius-lg);
+    padding: var(--cg-spacing-4);
     border: 1px solid var(--cg-color-border);
     box-shadow: var(--cg-shadow-sm);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: var(--cg-spacing-4);
-    text-align: center;
+    align-items: stretch;
+    gap: var(--cg-spacing-3);
+    text-align: left;
 }
 
 .revenue-page__title {
-    font-size: var(--cg-font-size-2xl);
+    font-size: var(--cg-font-size-xl);
     font-weight: var(--cg-font-weight-bold);
     margin: 0;
     color: var(--cg-color-text);
+    line-height: 1.25;
 }
 
-/* ── Info card (legacy descriptive text) ── */
 .revenue-page__info {
     width: 100%;
     background: var(--cg-color-bg);
-    border-radius: var(--cg-radius-lg);
-    padding: var(--cg-spacing-4) var(--cg-spacing-6);
+    border-radius: var(--cg-radius-md);
+    padding: var(--cg-spacing-3);
     text-align: left;
 }
 
@@ -45,14 +43,15 @@
     display: flex;
     flex-direction: column;
     gap: var(--cg-spacing-2);
-    font-size: var(--cg-font-size-sm);
+    font-size: var(--cg-font-size-xs);
     color: var(--cg-color-text-muted);
-    line-height: 1.7;
+    line-height: 1.65;
 }
 
 .revenue-page__info-list li {
     position: relative;
-    padding-left: var(--cg-spacing-4);
+    padding-left: var(--cg-spacing-3);
+    overflow-wrap: anywhere;
 }
 
 .revenue-page__info-list li::before {
@@ -70,7 +69,7 @@
 
 .revenue-page__info-sub {
     display: block;
-    padding-left: var(--cg-spacing-2);
+    padding-left: 0;
     color: var(--cg-color-text-muted);
     opacity: 0.7;
     font-size: var(--cg-font-size-xs);
@@ -87,19 +86,27 @@
     text-decoration: underline;
 }
 
-/* ── Controls ── */
 .revenue-page__controls {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--cg-spacing-3);
-    justify-content: center;
-    align-items: center;
 }
 
-/* ── Toggle group (pill shape, matching other pages) ── */
+.revenue-page__controls ::deep .cg-select {
+    width: 100%;
+    min-width: 0;
+}
+
+.revenue-page__controls ::deep .cg-select__trigger {
+    min-height: 44px;
+    border-radius: var(--cg-radius-lg);
+}
+
 .revenue-page__toggle-group {
-    display: flex;
-    border-radius: var(--cg-radius-full);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    border-radius: var(--cg-radius-lg);
     overflow: hidden;
     border: 1px solid var(--cg-color-border);
     background: var(--cg-color-bg);
@@ -108,8 +115,10 @@
 .revenue-page__toggle {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: var(--cg-spacing-1);
-    padding: var(--cg-spacing-2) var(--cg-spacing-4);
+    min-height: 44px;
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
     border: none;
     background: transparent;
     color: var(--cg-color-text-muted);
@@ -118,7 +127,8 @@
     cursor: pointer;
     transition: all var(--cg-transition-fast);
     font-family: var(--cg-font-family);
-    border-radius: var(--cg-radius-full);
+    border-radius: var(--cg-radius-md);
+    white-space: nowrap;
 }
 
 .revenue-page__toggle:hover {
@@ -141,27 +151,24 @@
     height: 18px;
 }
 
-/* ── Card grid ── */
 .revenue-page__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: var(--cg-spacing-5);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--cg-spacing-2);
 }
 
-/* ── Loading ── */
 .revenue-page__loading {
     display: flex;
     justify-content: center;
-    padding: var(--cg-spacing-10) 0;
+    padding: var(--cg-spacing-8) 0;
 }
 
-/* ── Error (card container with pill button) ── */
 .revenue-page__error {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--cg-spacing-3);
-    padding: var(--cg-spacing-10) var(--cg-spacing-4);
+    padding: var(--cg-spacing-8) var(--cg-spacing-4);
     text-align: center;
     background: var(--cg-color-surface);
     border-radius: var(--cg-radius-lg);
@@ -170,8 +177,8 @@
 }
 
 ::deep .revenue-page__error .cg-mdi-icon {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     color: var(--cg-color-error);
 }
 
@@ -184,6 +191,8 @@
 .revenue-page__error-link {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    min-height: 44px;
     padding: var(--cg-spacing-2) var(--cg-spacing-5);
     background: var(--cg-color-primary);
     color: var(--cg-color-on-primary);
@@ -197,17 +206,15 @@
 .revenue-page__error-link:hover {
     background: var(--cg-color-primary-hover);
     color: var(--cg-color-on-primary);
-    transform: translateY(-1px);
     box-shadow: var(--cg-shadow-md);
 }
 
-/* ── Empty (dashed card with subtle icon) ── */
 .revenue-page__empty {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--cg-spacing-3);
-    padding: var(--cg-spacing-10) var(--cg-spacing-4);
+    padding: var(--cg-spacing-8) var(--cg-spacing-4);
     text-align: center;
     background: var(--cg-color-surface);
     border-radius: var(--cg-radius-lg);
@@ -215,8 +222,8 @@
 }
 
 ::deep .revenue-page__empty .cg-mdi-icon {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     color: var(--cg-color-text-muted);
     opacity: 0.5;
 }
@@ -227,18 +234,87 @@
     color: var(--cg-color-text-muted);
 }
 
-/* ── Responsive ── */
-@media (max-width: 640px) {
+@media (min-width: 640px) {
+    .revenue-page__controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .revenue-page__controls ::deep .cg-select {
+        width: 10rem;
+    }
+
+    .revenue-page__toggle-group {
+        width: auto;
+        border-radius: var(--cg-radius-full);
+    }
+
+    .revenue-page__toggle {
+        padding-right: var(--cg-spacing-4);
+        padding-left: var(--cg-spacing-4);
+        border-radius: var(--cg-radius-full);
+    }
+}
+
+@media (min-width: 768px) {
     .revenue-page {
-        padding: var(--cg-spacing-4) var(--cg-spacing-3);
+        padding: var(--cg-spacing-6) 0;
+        gap: var(--cg-spacing-6);
     }
 
     .revenue-page__header {
-        padding: var(--cg-spacing-6) var(--cg-spacing-4);
+        padding: var(--cg-spacing-8) var(--cg-spacing-6);
+        border-radius: var(--cg-radius-xl);
+        align-items: center;
+        gap: var(--cg-spacing-4);
+        text-align: center;
+    }
+
+    .revenue-page__title {
+        font-size: var(--cg-font-size-2xl);
+    }
+
+    .revenue-page__info {
         border-radius: var(--cg-radius-lg);
+        padding: var(--cg-spacing-4) var(--cg-spacing-6);
+    }
+
+    .revenue-page__info-list {
+        font-size: var(--cg-font-size-sm);
+        line-height: 1.7;
+    }
+
+    .revenue-page__info-list li {
+        padding-left: var(--cg-spacing-4);
+    }
+
+    .revenue-page__info-sub {
+        padding-left: var(--cg-spacing-2);
     }
 
     .revenue-page__grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: var(--cg-spacing-5);
+    }
+
+    .revenue-page__loading {
+        padding: var(--cg-spacing-10) 0;
+    }
+
+    .revenue-page__error,
+    .revenue-page__empty {
+        padding: var(--cg-spacing-10) var(--cg-spacing-4);
+    }
+
+    ::deep .revenue-page__error .cg-mdi-icon,
+    ::deep .revenue-page__empty .cg-mdi-icon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .revenue-page__error-link:hover {
+        transform: translateY(-1px);
     }
 }

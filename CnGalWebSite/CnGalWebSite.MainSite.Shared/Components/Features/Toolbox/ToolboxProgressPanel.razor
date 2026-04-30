@@ -1,0 +1,37 @@
+<div class="toolbox-progress-panel">
+    <div class="toolbox-progress-panel__row">
+        <span>@QueueLabel</span>
+        <CgProgressRing Value="@QueueProgress" Size="sm" />
+    </div>
+    <div class="toolbox-progress-panel__bar" aria-hidden="true">
+        <span style="width: @($"{QueueProgress}%")"></span>
+    </div>
+
+    @if (CurrentTask is not null)
+    {
+        <div class="toolbox-progress-panel__row">
+            <span>@CurrentMessage (@CurrentTask.CompleteTaskCount/@CurrentTask.TotalTaskCount)</span>
+            <CgProgressRing Value="@CurrentTask.Progress" Size="sm" />
+        </div>
+        <div class="toolbox-progress-panel__bar" aria-hidden="true">
+            <span style="width: @($"{CurrentTask.Progress}%")"></span>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public ToolboxTaskBase? CurrentTask { get; set; }
+
+    [Parameter]
+    public int CurrentIndex { get; set; }
+
+    [Parameter]
+    public int TotalCount { get; set; }
+
+    [Parameter]
+    public string CurrentMessage { get; set; } = "准备中";
+
+    private string QueueLabel => TotalCount <= 0 ? "队列进度" : $"队列进度 ({Math.Min(CurrentIndex + 1, TotalCount)}/{TotalCount})";
+    private double QueueProgress => TotalCount <= 0 ? 0 : Math.Clamp((CurrentIndex + 1) * 100.0 / TotalCount, 0, 100);
+}

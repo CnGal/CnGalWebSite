@@ -46,6 +46,9 @@ namespace CnGalWebSite.DataModel.ViewModel.ThematicPages
 
         public DateTime? LastUploadAudioTime { get; set; }
 
+        /// <summary>
+        /// 配音作品数量（与词条详情「配音作品」分组一致）。
+        /// </summary>
         public int WorkCount { get; set; }
 
         public bool IsCertificated { get; set; }
@@ -64,7 +67,7 @@ namespace CnGalWebSite.DataModel.ViewModel.ThematicPages
         Random,
         [Display(Name = "热度")]
         ReadCount,
-        [Display(Name = "参与作品数")]
+        [Display(Name = "配音作品数")]
         WorkCount,
         [Display(Name = "最近发布")]
         RecentlyPublish,

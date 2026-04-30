@@ -121,6 +121,48 @@ public sealed class FileCommandService(
         }
     }
 
+    public async Task<SdkResult<string>> TransformImageUrlAsync(
+        string url,
+        double x = 0,
+        double y = 0,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return SdkResult<string>.Fail("FILE_TRANSFORM_EMPTY_URL", "图片链接不能为空");
+            }
+
+            var requestUri = $"api/files/linkToImgUrl?url={Uri.EscapeDataString(url)}&x={x}&y={y}&type=0";
+            var response = await HttpClient.PostAsJsonAsync(requestUri, new { }, SdkJsonSerializerOptions.Default, cancellationToken);
+            if (!response.IsSuccessStatusCode)
+            {
+                logger.LogWarning("图片转存失败。Status={StatusCode}; Path={Path}; BaseAddress={BaseAddress}",
+                    (int)response.StatusCode, requestUri, HttpClient.BaseAddress);
+                return SdkResult<string>.Fail("FILE_TRANSFORM_HTTP_ERROR", $"图片转存失败（HTTP {(int)response.StatusCode}）");
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<UploadResultDto>(SdkJsonSerializerOptions.Default, cancellationToken);
+            if (result is null)
+            {
+                return SdkResult<string>.Fail("FILE_TRANSFORM_EMPTY_RESPONSE", "图片转存失败，服务未返回结果");
+            }
+
+            if (!result.Uploaded || string.IsNullOrWhiteSpace(result.Url))
+            {
+                return SdkResult<string>.Fail("FILE_TRANSFORM_FAILED", result.Error ?? "图片转存失败");
+            }
+
+            return SdkResult<string>.Ok(result.Url);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "图片转存异常。Url={Url}; BaseAddress={BaseAddress}", url, HttpClient.BaseAddress);
+            return SdkResult<string>.Fail("FILE_TRANSFORM_EXCEPTION", "转存图片时发生异常");
+        }
+    }
+
     private sealed class UploadResultDto
     {
         public bool Uploaded { get; set; }

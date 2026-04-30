@@ -16,10 +16,20 @@
         <CgMdiIcon Name="mdiShapeOutline" aria-hidden="true"/>
         <span>广场</span>
     </a>
-    <a href="/space/index" class="cg-bottom-nav__item @(ActiveTab == "space" ? "cg-bottom-nav__item--active" : "")">
-        <CgMdiIcon Name="mdiAccountOutline" aria-hidden="true"/>
-        <span>空间</span>
-    </a>
+    <AuthorizeView>
+        <Authorized Context="auth">
+            <a href="@GetSpaceHref(auth)" class="cg-bottom-nav__item @(ActiveTab == "space" ? "cg-bottom-nav__item--active" : "")">
+                <CgMdiIcon Name="mdiAccountOutline" aria-hidden="true"/>
+                <span>空间</span>
+            </a>
+        </Authorized>
+        <NotAuthorized>
+            <a href="/space/index" class="cg-bottom-nav__item @(ActiveTab == "space" ? "cg-bottom-nav__item--active" : "")">
+                <CgMdiIcon Name="mdiAccountOutline" aria-hidden="true"/>
+                <span>空间</span>
+            </a>
+        </NotAuthorized>
+    </AuthorizeView>
 </nav>
 
 @code {
@@ -28,4 +38,10 @@
     /// </summary>
     [Parameter]
     public string ActiveTab { get; set; } = "";
+
+    private string GetSpaceHref(AuthenticationState state)
+    {
+        var userId = state.User.Claims.GetUserId();
+        return string.IsNullOrEmpty(userId) ? "/space/index" : $"/space/index/{userId}";
+    }
 }

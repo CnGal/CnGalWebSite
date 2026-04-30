@@ -1,4 +1,4 @@
-/* ══════════════════════════════════════════════════════════
+﻿/* ══════════════════════════════════════════════════════════
    ShareGamesPage.razor.css — Mobile-first
    ══════════════════════════════════════════════════════════ */
 
@@ -181,7 +181,7 @@
 .share-games-tip a {
     color: var(--cg-color-link);
     text-decoration: none;
-    font-weight: var(--cg-font-weight-semibold);
+    font-weight: var(--cg-font-weight-semibold);word-break: keep-all;
 }
 
 .share-games-tip a:hover {

@@ -393,6 +393,10 @@
     .home-bottom-game-grid {
         grid-template-columns: repeat(5, minmax(0, 1fr));
     }
+
+    .home-bottom-game-grid ::deep > *:nth-child(n+6) {
+        display: none;
+    }
 }
 
 /* ── Discount / Free labels ── */

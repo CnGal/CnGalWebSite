@@ -1,4 +1,4 @@
-/* ══════════════════════════════════════════════════════════
+﻿/* ══════════════════════════════════════════════════════════
    ShareGamesReviewCard.razor.css — Mobile-first
    ══════════════════════════════════════════════════════════ */
 
@@ -131,7 +131,7 @@
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    white-space: pre-line;
+    white-space: pre-line;    word-break: break-all;
 }
 
 @media (min-width: 768px) {
