@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.JSInterop;
 
-namespace CnGalWebSite.MainSite.Shared.Services.Toolbox;
+namespace CnGalWebSite.SDK.MainSite.Services.Toolbox;
 
 public sealed class ToolboxLocalRepository<TEntity>(IJSRuntime jsRuntime) : IToolboxLocalRepository<TEntity>
     where TEntity : class

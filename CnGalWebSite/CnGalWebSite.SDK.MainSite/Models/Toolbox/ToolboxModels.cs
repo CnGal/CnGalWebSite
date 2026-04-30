@@ -1,6 +1,6 @@
 using CnGalWebSite.DataModel.Model;
 
-namespace CnGalWebSite.MainSite.Shared.Models.Toolbox;
+namespace CnGalWebSite.SDK.MainSite.Models.Toolbox;
 
 public enum ToolboxOutputLevel
 {

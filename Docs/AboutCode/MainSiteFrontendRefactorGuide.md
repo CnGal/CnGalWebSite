@@ -206,12 +206,15 @@ CnGalWebSite.SDK.MainSite
 │  ├─ ArticleEdit/        # 文章编辑相关模型
 │  ├─ VideoEdit/          # 视频编辑相关模型
 │  ├─ TagEdit/            # 标签编辑相关模型
-│  └─ Files/              # 文件上传相关模型（ImageAspectType、ImageCropRect、AudioUploadResult）
+│  ├─ Files/              # 文件上传相关模型（ImageAspectType、ImageCropRect、AudioUploadResult）
+│  └─ Toolbox/            # 工具箱任务模型与第三方平台信息模型
 ├─ Infrastructure/        # 基础设施
 │  ├─ QueryServiceBase    # 查询服务基类（HttpClient 封装、反序列化、日志截断）
 │  ├─ CommandServiceBase  # 命令服务基类（POST/GET + JSON 序列化辅助）
 │  ├─ SdkJsonSerializerOptions  # 全局统一 JSON 序列化配置
 │  └─ StaffBatchParser    # Staff 批量文本解析工具
+├─ Services/
+│  └─ Toolbox/            # 工具箱业务编排（文章/视频转载、词条合并、图片转存、本地历史）
 └─ Extensions/            # DI 注册扩展
    ├─ ServiceCollectionExtensions  # AddMainSiteSdk / AddMainSiteOidcAuthentication
    └─ EndpointRouteBuilderExtensions  # MapMainSiteAuthenticationEndpoints
@@ -394,6 +397,10 @@ CnGalWebSite.MainSite.Shared
 ├─ Services/
 │  ├─ ICgToastService.cs      # Toast 通知服务接口
 │  ├─ CgToastService.cs       # Toast 通知服务实现
+│  ├─ ICgThemeService.cs / CgThemeService.cs  # 主题状态服务
+│  ├─ IMiniModeService.cs / MiniModeService.cs # 迷你模式状态服务
+│  ├─ ICgDeviceIdentificationService.cs / CgDeviceIdentificationService.cs # 设备识别
+│  ├─ ICircuitHandlerService.cs / CircuitHandlerService.cs # Blazor Circuit 状态
 │  └─ ExternalLinkHelper.cs   # 外部链接共享帮助方法（图标/图片/描述映射）
 ├─ Extensions/
 │  └─ ServiceCollectionExtensions.cs  # AddMainSiteSharedServices

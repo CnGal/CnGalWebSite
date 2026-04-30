@@ -1,10 +1,10 @@
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Videos;
-using CnGalWebSite.MainSite.Shared.Models.Toolbox;
 using CnGalWebSite.SDK.MainSite.Abstractions;
+using CnGalWebSite.SDK.MainSite.Models.Toolbox;
 using CnGalWebSite.SDK.MainSite.Models.VideoEdit;
 
-namespace CnGalWebSite.MainSite.Shared.Services.Toolbox;
+namespace CnGalWebSite.SDK.MainSite.Services.Toolbox;
 
 public sealed class ToolboxVideoRepostService(
     IToolboxCommandService toolboxCommandService,

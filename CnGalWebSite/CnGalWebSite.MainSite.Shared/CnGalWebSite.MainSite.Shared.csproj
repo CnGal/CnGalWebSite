@@ -12,10 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
-    <PackageReference Include="Markdig" Version="0.43.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.1" />
-    <PackageReference Include="ReverseMarkdown" Version="4.7.1" />
   </ItemGroup>
 
   <ItemGroup>

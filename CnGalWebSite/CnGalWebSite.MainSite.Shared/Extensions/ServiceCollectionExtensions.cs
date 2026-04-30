@@ -1,5 +1,4 @@
 using CnGalWebSite.MainSite.Shared.Services;
-using CnGalWebSite.MainSite.Shared.Services.Toolbox;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CnGalWebSite.MainSite.Shared;
@@ -19,11 +18,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMiniModeService, MiniModeService>();
         services.AddScoped<ICgThemeService, CgThemeService>();
         services.AddSingleton<ICircuitHandlerService, CircuitHandlerService>();
-        services.AddScoped(typeof(IToolboxLocalRepository<>), typeof(ToolboxLocalRepository<>));
-        services.AddScoped<ToolboxImageService>();
-        services.AddScoped<IToolboxVideoRepostService, ToolboxVideoRepostService>();
-        services.AddScoped<IToolboxEntryMergeService, ToolboxEntryMergeService>();
-        services.AddHttpClient<IToolboxArticleRepostService, ToolboxArticleRepostService>();
         return services;
     }
 }

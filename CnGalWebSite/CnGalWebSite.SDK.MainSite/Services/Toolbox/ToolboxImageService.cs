@@ -1,7 +1,7 @@
-using CnGalWebSite.MainSite.Shared.Models.Toolbox;
 using CnGalWebSite.SDK.MainSite.Abstractions;
+using CnGalWebSite.SDK.MainSite.Models.Toolbox;
 
-namespace CnGalWebSite.MainSite.Shared.Services.Toolbox;
+namespace CnGalWebSite.SDK.MainSite.Services.Toolbox;
 
 public sealed class ToolboxImageService(
     IFileCommandService fileCommandService,

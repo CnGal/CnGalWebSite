@@ -208,14 +208,15 @@
   - `Components/DesignSystem/`（基础组件）
   - `Components/Features/{Domain}/`（业务组件，如 `Entry/Detail/`、`Entry/Editor/`、`Article/Detail/`、`Article/Editor/`、`Video/Detail/`、`Video/Editor/`、`Tag/Detail/`、`Tag/Editor/`、`Home/`、`Space/`、`Examine/`、`Message/`）
   - `Components/Layout/`（布局辅助组件，如 `UserMenu`）
-  - `Services/`（前端服务接口与实现，如 `ICgToastService`、`CgToastService`；共享帮助方法，如 `ExternalLinkHelper`）
+  - `Services/`（纯前端服务接口与实现，如 `ICgToastService`、`CgThemeService`、`MiniModeService`、`CgDeviceIdentificationService`、`CircuitHandlerService`；共享展示帮助方法，如 `ExternalLinkHelper`）
   - `Extensions/`（DI 注册扩展，如 `ServiceCollectionExtensions.AddMainSiteSharedServices`）
 - `SDK.MainSite` 当前结构：
   - `Abstractions/`（14 个接口：`IHomeQueryService`、`IEntryQueryService`、`ISpaceQueryService`、`ITagQueryService`、`IArticleQueryService`、`IVideoQueryService`、`IEntryCommandService`、`IArticleCommandService`、`IVideoCommandService`、`ITagCommandService`、`IFileCommandService`、`IMainSiteAuthRequestService`、`IExamineQueryService`、`IExamineCommandService`）
   - `Queries/`（6 个查询服务：`Home`、`Entry`、`Space`、`Tag`、`Article`、`Video`）
   - `Commands/`（5 个命令服务：`Entry`、`Article`、`Video`、`Tag`、`File`）
   - `Auth/`
-  - `Models/`（含子目录 `EntryEdit/`、`ArticleEdit/`、`VideoEdit/`、`TagEdit/`、`Files/`）
+  - `Models/`（含子目录 `EntryEdit/`、`ArticleEdit/`、`VideoEdit/`、`TagEdit/`、`Files/`、`Toolbox/`）
+  - `Services/Toolbox/`（工具箱业务编排、外站内容解析、图片转存、本地历史仓储）
   - `Infrastructure/`（含 `QueryServiceBase`、`CommandServiceBase`、`SdkJsonSerializerOptions`、`StaffBatchParser`）
   - `Extensions/`
 

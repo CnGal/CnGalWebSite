@@ -2,10 +2,11 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Videos;
-using CnGalWebSite.MainSite.Shared.Models.Toolbox;
 using CnGalWebSite.SDK.MainSite.Abstractions;
+using CnGalWebSite.SDK.MainSite.Models;
+using CnGalWebSite.SDK.MainSite.Models.Toolbox;
 
-namespace CnGalWebSite.MainSite.Shared.Services.Toolbox;
+namespace CnGalWebSite.SDK.MainSite.Services.Toolbox;
 
 public sealed class ToolboxEntryMergeService(
     IToolboxCommandService toolboxCommandService,
@@ -241,7 +242,7 @@ public sealed class ToolboxEntryMergeService(
         return true;
     }
 
-    private async Task<bool> SubmitAsync(MergeEntryTaskModel model, Task<CnGalWebSite.SDK.MainSite.Models.SdkResult<bool>> task)
+    private async Task<bool> SubmitAsync(MergeEntryTaskModel model, Task<SdkResult<bool>> task)
     {
         var result = await task;
         if (result.Success)

@@ -1,4 +1,4 @@
-namespace CnGalWebSite.MainSite.Shared.Services.Toolbox;
+namespace CnGalWebSite.SDK.MainSite.Services.Toolbox;
 
 public interface IToolboxLocalRepository<TEntity>
     where TEntity : class
