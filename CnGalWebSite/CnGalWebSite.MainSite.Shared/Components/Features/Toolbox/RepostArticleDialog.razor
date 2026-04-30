@@ -1,4 +1,4 @@
-@implements IDisposable
+﻿@implements IDisposable
 @inject IToolboxArticleRepostService ArticleService
 
 <CgModal IsOpen="IsOpen" Title="转载其他平台文章" Width="760px" OnClose="CloseAsync">
@@ -6,19 +6,26 @@
         <div class="toolbox-dialog">
             @if (_step == 1)
             {
-                <CgAlert Variant="info">目前只支持知乎、B 站专栏文章。每行输入一个文章链接。</CgAlert>
-                <CgFormSection Title="输入要转载的文章链接" Icon="mdiFileDocumentOutline">
-                    <CgFormGroup Label="文章链接" Required>
-                        <CgTextarea @bind-Value="_urls" Rows="5" Placeholder="https://zhuanlan.zhihu.com/p/..." />
+                <CgAlert Variant="info">目前只支持知乎、B 站专栏文章。</CgAlert>
+                <p class="toolbox-dialog__hint">
+                    每行一条链接。示例：<br />
+                    <span class="toolbox-dialog__sample">https://zhuanlan.zhihu.com/p/480692805</span>、
+                    <span class="toolbox-dialog__sample">https://www.bilibili.com/read/cv19750701</span>
+                </p>
+                <div class="toolbox-dialog__form">
+                    <div class="toolbox-dialog__row-split">
+                        <CgFormGroup Label="类型">
+                            <CgEnumSelect TEnum="ArticleType" @bind-Value="_type" />
+                        </CgFormGroup>
+                        <CgFormGroup Label="标题（可不填，将自动获取）">
+                            <CgInput TValue="string" @bind-Value="_title" Placeholder="仅单个链接时建议填写；多行时留空" />
+                        </CgFormGroup>
+                    </div>
+                    <CgFormGroup Label="链接" Required>
+                        <CgTextarea @bind-Value="_urls" Rows="5" Placeholder="每行一条，支持多行粘贴" />
                     </CgFormGroup>
-                    <CgFormGroup Label="自定义标题（可选，仅单个链接时建议填写）">
-                        <CgInput TValue="string" @bind-Value="_title" Placeholder="留空则使用原文标题" />
-                    </CgFormGroup>
-                    <CgFormGroup Label="文章类型">
-                        <CgEnumSelect TEnum="ArticleType" @bind-Value="_type" />
-                    </CgFormGroup>
-                    <CgCheckbox @bind-Value="_isCreatedByCurrentUser" Label="这是我本人创作的文章" />
-                </CgFormSection>
+                    <CgCheckbox @bind-Value="_isCreatedByCurrentUser" Label="本人创作" />
+                </div>
             }
             else if (_step == 2)
             {
@@ -31,16 +38,19 @@
                 <div class="toolbox-dialog__results">
                     @foreach (var task in _tasks)
                     {
-                        <div class="toolbox-dialog__result">
-                            <strong>@task.Url</strong>
-                            @if (task.Succeeded)
-                            {
-                                <span>已提交审核，Id：@task.Id</span>
-                            }
-                            else
-                            {
-                                <span class="toolbox-dialog__error">@task.Error</span>
-                            }
+                        <div class="toolbox-dialog__result toolbox-dialog__result--@(task.Succeeded ? "success" : "error")">
+                            <CgMdiIcon Name="@(task.Succeeded ? "mdiCheckCircleOutline" : "mdiAlertCircleOutline")" class="toolbox-dialog__result-icon" aria-hidden="true" />
+                            <div class="toolbox-dialog__result-content">
+                                <strong>@task.Url</strong>
+                                @if (task.Succeeded)
+                                {
+                                    <span>已成功提取，待审核 Id：@task.Id</span>
+                                }
+                                else
+                                {
+                                    <span class="toolbox-dialog__error">@task.Error</span>
+                                }
+                            </div>
                         </div>
                     }
                 </div>

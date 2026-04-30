@@ -8,20 +8,27 @@
             @if (_step == 1)
             {
                 <CgAlert Variant="warning">合并时会自动迁移关联信息，并提交多条审核记录。当前不支持合并游戏词条。</CgAlert>
-                <CgFormSection Title="输入要合并的词条" Icon="mdiGamepadVariantOutline">
-                    <CgFormGroup Label="主词条名称" Required>
-                        <CgAutoComplete @bind-Value="_hostName"
-                                        Items="_entryItems"
-                                        Placeholder="保留的词条名称"
-                                        Disabled="_isLoadingEntryItems" />
-                    </CgFormGroup>
-                    <CgFormGroup Label="从词条名称" Required>
-                        <CgAutoComplete @bind-Value="_subName"
-                                        Items="_entryItems"
-                                        Placeholder="需要合并并隐藏的词条名称"
-                                        Disabled="_isLoadingEntryItems" />
-                    </CgFormGroup>
-                </CgFormSection>
+                <p class="toolbox-dialog__hint">
+                    被合并的词条
+                    <span class="toolbox-dialog__hint-arrow" aria-hidden="true">→</span>
+                    合并到的词条
+                </p>
+                <div class="toolbox-dialog__form">
+                    <div class="toolbox-dialog__two-col">
+                        <CgFormGroup Label="被合并的词条" Required>
+                            <CgAutoComplete @bind-Value="_subName"
+                                            Items="_entryItems"
+                                            Placeholder="将被隐藏并迁移数据的词条"
+                                            Disabled="_isLoadingEntryItems" />
+                        </CgFormGroup>
+                        <CgFormGroup Label="合并到的词条" Required>
+                            <CgAutoComplete @bind-Value="_hostName"
+                                            Items="_entryItems"
+                                            Placeholder="保留的主词条名称"
+                                            Disabled="_isLoadingEntryItems" />
+                        </CgFormGroup>
+                    </div>
+                </div>
             }
             else if (_step == 2)
             {
@@ -34,16 +41,23 @@
                 @if (_currentTask is not null)
                 {
                     <div class="toolbox-dialog__results">
-                        <div class="toolbox-dialog__result">
-                            <strong>@_currentTask.SubName -> @_currentTask.HostName</strong>
-                            @if (_currentTask.Succeeded)
-                            {
-                                <span>已提交审核。</span>
-                            }
-                            else
-                            {
-                                <span class="toolbox-dialog__error">@_currentTask.Error</span>
-                            }
+                        <div class="toolbox-dialog__result toolbox-dialog__result--@(_currentTask.Succeeded ? "success" : "error")">
+                            <CgMdiIcon Name="@(_currentTask.Succeeded ? "mdiCheckCircleOutline" : "mdiAlertCircleOutline")" class="toolbox-dialog__result-icon" aria-hidden="true" />
+                            <div class="toolbox-dialog__result-content">
+                                <strong>
+                                    <span>@_currentTask.SubName</span>
+                                    <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
+                                    <span>@_currentTask.HostName</span>
+                                </strong>
+                                @if (_currentTask.Succeeded)
+                                {
+                                    <span>已成功提交审核。</span>
+                                }
+                                else
+                                {
+                                    <span class="toolbox-dialog__error">@_currentTask.Error</span>
+                                }
+                            </div>
                         </div>
                     </div>
                 }
@@ -117,7 +131,7 @@
     {
         if (string.IsNullOrWhiteSpace(_hostName) || string.IsNullOrWhiteSpace(_subName))
         {
-            _message = "请填写主词条和从词条名称";
+            _message = "请填写「被合并的词条」与「合并到的词条」";
             return;
         }
 
