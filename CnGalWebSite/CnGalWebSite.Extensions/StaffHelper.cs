@@ -1,9 +1,11 @@
-﻿using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.Extensions;
+using CnGalWebSite.DataModel.Model;
 using System;
 
-namespace CnGalWebSite.SDK.MainSite.Infrastructure;
+namespace CnGalWebSite.Extensions;
 
+/// <summary>
+/// 从职位展示文本推断通用职位类型（与词条详情 Staff 分组逻辑一致）。
+/// </summary>
 public static class StaffHelper
 {
     public static PositionGeneralType GetGeneralType(string text)
@@ -12,7 +14,7 @@ public static class StaffHelper
         {
             return PositionGeneralType.Other;
         }
-        
+
         foreach (var item in Enum.GetValues(typeof(PositionGeneralType)))
         {
             var temp = (PositionGeneralType)item;
@@ -26,12 +28,12 @@ public static class StaffHelper
         {
             return PositionGeneralType.FineArts;
         }
-        else if ((text.Contains("配音") || text.Contains("声优") || text.ToUpper().Contains("CV") || text.ToUpper().Contains("CAST")) 
+        else if ((text.Contains("配音") || text.Contains("声优") || text.ToUpperInvariant().Contains("CV") || text.ToUpperInvariant().Contains("CAST"))
             && !text.Contains("导演") && !text.Contains("监督") && !text.Contains("制作") && !text.Contains("后期") && !text.Contains("处理") && !text.Contains("后制"))
         {
             return PositionGeneralType.CV;
         }
-        else if (text.Contains("感谢") || text.ToUpper().Contains("鸣谢") || text.ToUpper().Contains("致谢"))
+        else if (text.Contains("感谢") || text.ToUpperInvariant().Contains("鸣谢") || text.ToUpperInvariant().Contains("致谢"))
         {
             return PositionGeneralType.SpecialThanks;
         }

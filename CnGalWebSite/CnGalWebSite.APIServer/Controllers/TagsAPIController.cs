@@ -904,6 +904,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var entry = await _tagRepository.GetAll()
                 .Include(s => s.Entries).ThenInclude(s => s.Audio)
                 .Include(s => s.Entries).ThenInclude(s => s.Tags)
+                .Include(s => s.Entries).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.EntryStaffFromEntryNavigation)
                 .Include(s => s.Entries).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation).ThenInclude(s => s.Examines)
                 .Include(s => s.Entries).ThenInclude(s => s.Examines)
                 .Include(s=>s.Entries).ThenInclude(s=>s.Certification)
@@ -923,12 +924,16 @@ namespace CnGalWebSite.APIServer.Controllers
                         s.Tags,
                         s.ReaderCount,
                         IsCertificated=s.Certification!=null,
-                        Entries = s.EntryRelationFromEntryNavigation.Select(s => new
-                        {
-                            s.ToEntryNavigation.Type,
-                            s.ToEntryNavigation.PubulishTime,
-
-                        }),
+                        Entries = s.EntryRelationFromEntryNavigation
+                            .Where(r => r.ToEntryNavigation.IsHidden == false)
+                            .Select(r => new
+                            {
+                                r.ToEntryNavigation.Type,
+                                r.ToEntryNavigation.PubulishTime,
+                                StaffRows = r.ToEntryNavigation.EntryStaffFromEntryNavigation
+                                    .Where(es => es.ToEntry == s.Id)
+                                    .Select(es => new { es.Modifier, es.PositionOfficial, es.PositionGeneral }),
+                            }),
                         Examines = s.Examines.Select(s => new
                         {
                             s.Operation,
@@ -965,7 +970,8 @@ namespace CnGalWebSite.APIServer.Controllers
                         }).OrderByDescending(s => s.Priority).ToList(),
                         LastUploadAudioTime = item.Examines.FirstOrDefault(s => s.Operation == Operation.EstablishAudio && s.IsPassed == true)?.ApplyTime,
                         LastPublishTime = item.Entries.FirstOrDefault(s => s.PubulishTime != null && s.PubulishTime < now)?.PubulishTime,
-                        WorkCount = item.Entries.Count(s => s.Type == EntryType.Game),
+                        WorkCount = item.Entries.Count(e => e.Type == EntryType.Game && StaffCastWorksHelper.IsCastWorkFromStaffTuples(
+                            e.StaffRows.Select(sr => (sr.Modifier, sr.PositionOfficial, sr.PositionGeneral)))),
                         IsCertificated=item.IsCertificated
                     };
                     foreach (var infor in item.Tags)

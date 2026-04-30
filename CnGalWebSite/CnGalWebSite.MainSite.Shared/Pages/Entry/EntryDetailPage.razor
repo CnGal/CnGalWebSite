@@ -13,7 +13,6 @@
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 @using CnGalWebSite.MainSite.Shared.Services
 @using CnGalWebSite.Extensions
-@using CnGalWebSite.SDK.MainSite.Infrastructure
 
 <CgPageMeta Title="@(Model?.Name)" Description="@(Model?.BriefIntroduction)" Image="@(Model?.MainPicture)" />
 
@@ -474,7 +473,7 @@ else
     private IEnumerable<EntryInforTipViewModel> GetCastWorks()
     {
         if (Model is null) return Array.Empty<EntryInforTipViewModel>();
-        return Model.StaffGames.Where(s => s.AddInfors != null && s.AddInfors.Any(a => a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.CV)));
+        return Model.StaffGames.Where(StaffCastWorksHelper.IsCastWork);
     }
 
     private IEnumerable<EntryInforTipViewModel> GetProductionGroupWorks()
@@ -493,8 +492,7 @@ else
     private IEnumerable<EntryInforTipViewModel> GetParticipationWorks()
     {
         if (Model is null) return Array.Empty<EntryInforTipViewModel>();
-        return Model.StaffGames.Where(s => s.AddInfors == null || s.AddInfors.Any(a => a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) != PositionGeneralType.CV && StaffHelper.GetGeneralType(c.DisplayName) != PositionGeneralType.SpecialThanks) &&
-            a.Contents.Any(c => StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.ProductionGroup || StaffHelper.GetGeneralType(c.DisplayName) == PositionGeneralType.Publisher) == false));
+        return Model.StaffGames.Where(StaffParticipationWorksHelper.IsParticipationWork);
     }
 
     private IEnumerable<EntryInforTipViewModel> GetAppreciatedParticWorks()

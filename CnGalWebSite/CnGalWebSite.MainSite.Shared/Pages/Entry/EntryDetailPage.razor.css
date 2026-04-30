@@ -1,4 +1,4 @@
-/* ═══════════════════════════════════════════════
+﻿/* ═══════════════════════════════════════════════
    EntryDetailPage — single responsive layout
    Mobile: display:contents flattens columns, order reorders cells
    Desktop: independent flex columns, cards pack tightly
@@ -60,6 +60,13 @@
 .entry-cell--records    { order: 18; }
 .entry-cell--catalog    { order: 19; }
 .entry-cell--comment    { order: 20; }
+
+
+.entry-cell--relevances{
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-6);
+}
 
 /* ── Loading state ── */
 .entry-loading {
