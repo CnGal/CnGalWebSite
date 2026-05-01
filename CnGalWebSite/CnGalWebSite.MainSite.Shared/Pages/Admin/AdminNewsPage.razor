@@ -6,6 +6,8 @@
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
 @inject IArticleCommandService ArticleCommandService
+@inject IFileCommandService FileCommandService
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Admin
@@ -345,6 +347,7 @@
 </CgModal>
 
 @code {
+    private CancellationTokenSource? _cts;
     private CgDataTable<GameNewsOverviewModel>? _gameNewsTable;
     private CgDataTable<WeeklyNewsOverviewModel>? _weeklyNewsTable;
 
@@ -380,15 +383,23 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var metaResult = await ArticleCommandService.GetArticleEditMetaOptionsAsync();
-        if (metaResult.Success && metaResult.Data != null)
+        _cts = new CancellationTokenSource();
+        try
         {
-            _allEntryNames = metaResult.Data.EntryGameItems
-                .Concat(metaResult.Data.EntryRoleItems)
-                .Concat(metaResult.Data.EntryGroupItems)
-                .Concat(metaResult.Data.EntryStaffItems)
-                .Distinct()
-                .ToList();
+            var metaResult = await ArticleCommandService.GetArticleEditMetaOptionsAsync(_cts.Token);
+            if (metaResult.Success && metaResult.Data != null)
+            {
+                _allEntryNames = metaResult.Data.EntryGameItems
+                    .Concat(metaResult.Data.EntryRoleItems)
+                    .Concat(metaResult.Data.EntryGroupItems)
+                    .Concat(metaResult.Data.EntryStaffItems)
+                    .Distinct()
+                    .ToList();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Component disposed, ignore
         }
     }
 
@@ -405,7 +416,7 @@
             SortDesc = new[] { request.SortDesc }
         };
 
-        var result = await AdminQueryService.GetGameNewsAsync(parameter);
+        var result = await AdminQueryService.GetGameNewsAsync(parameter, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data is not null)
         {
             return new CgDataTableResult<GameNewsOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
@@ -424,7 +435,7 @@
             SortDesc = new[] { request.SortDesc }
         };
 
-        var result = await AdminQueryService.GetWeeklyNewsAsync(parameter);
+        var result = await AdminQueryService.GetWeeklyNewsAsync(parameter, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data is not null)
         {
             return new CgDataTableResult<WeeklyNewsOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
@@ -450,7 +461,7 @@
     private async Task OpenEditGameNewsModal(long id)
     {
         _isAddingNews = false;
-        var result = await AdminQueryService.GetGameNewsEditAsync(id);
+        var result = await AdminQueryService.GetGameNewsEditAsync(id, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data is not null)
         {
             _editingGameNews = result.Data;
@@ -481,11 +492,11 @@
         SdkResult<bool> result;
         if (_isAddingNews)
         {
-            result = await AdminCommandService.AddCustomNewsAsync(_editingGameNews);
+            result = await AdminCommandService.AddCustomNewsAsync(_editingGameNews, _cts?.Token ?? CancellationToken.None);
         }
         else
         {
-            result = await AdminCommandService.EditGameNewsAsync(_editingGameNews);
+            result = await AdminCommandService.EditGameNewsAsync(_editingGameNews, _cts?.Token ?? CancellationToken.None);
         }
 
         if (result.Success)
@@ -502,7 +513,7 @@
 
     private async Task PublishGameNews(long id)
     {
-        var result = await AdminCommandService.PublishGameNewsAsync(id);
+        var result = await AdminCommandService.PublishGameNewsAsync(id, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {
             ToastService.Show("动态发布成功", variant: "success");
@@ -516,7 +527,7 @@
 
     private async Task IgnoreGameNews(long id, bool isIgnore)
     {
-        var result = await AdminCommandService.IgnoreGameNewsAsync(new[] { id }, isIgnore);
+        var result = await AdminCommandService.IgnoreGameNewsAsync(new[] { id }, isIgnore, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {
             ToastService.Show(isIgnore ? "已忽略该动态" : "已恢复该动态", variant: "success");
@@ -532,7 +543,7 @@
 
     private async Task OpenEditWeeklyNewsModal(long id)
     {
-        var result = await AdminQueryService.GetWeeklyNewsEditAsync(id);
+        var result = await AdminQueryService.GetWeeklyNewsEditAsync(id, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data is not null)
         {
             _editingWeeklyNews = result.Data;
@@ -565,7 +576,7 @@
             _editingWeeklyNews.CreateTime = _weeklyNewsCreateTime.Value;
         }
 
-        var result = await AdminCommandService.EditWeeklyNewsAsync(_editingWeeklyNews);
+        var result = await AdminCommandService.EditWeeklyNewsAsync(_editingWeeklyNews, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {
             ToastService.Show("周报保存成功", variant: "success");
@@ -580,7 +591,7 @@
 
     private async Task PublishWeeklyNews(long id)
     {
-        var result = await AdminCommandService.PublishWeeklyNewsAsync(id);
+        var result = await AdminCommandService.PublishWeeklyNewsAsync(id, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {
             ToastService.Show("周报发布成功", variant: "success");
@@ -597,7 +608,7 @@
         if (_editingWeeklyNews == null) return;
         
         var id = _editingWeeklyNews.Id;
-        var result = await AdminCommandService.ResetWeeklyNewsAsync(id);
+        var result = await AdminCommandService.ResetWeeklyNewsAsync(id, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {
             ToastService.Show("周报已重置", variant: "success");
@@ -612,7 +623,7 @@
 
     private async Task ResetWeeklyNews(long id)
     {
-        var result = await AdminCommandService.ResetWeeklyNewsAsync(id);
+        var result = await AdminCommandService.ResetWeeklyNewsAsync(id, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {
             ToastService.Show("周报已重置", variant: "success");
@@ -634,7 +645,7 @@
             return;
         }
 
-        var result = await AdminCommandService.AddWeiboNewsAsync(_weiboLink);
+        var result = await AdminCommandService.AddWeiboNewsAsync(_weiboLink, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {
             ToastService.Show("微博动态导入成功", variant: "success");
@@ -657,7 +668,7 @@
         _previewLoading = true;
         _showPreviewModal = true;
 
-        var result = await AdminQueryService.GetGameNewsPreviewAsync(id);
+        var result = await AdminQueryService.GetGameNewsPreviewAsync(id, _cts?.Token ?? CancellationToken.None);
         _previewLoading = false;
         if (result.Success && result.Data is not null)
         {
@@ -673,7 +684,7 @@
         _previewLoading = true;
         _showPreviewModal = true;
 
-        var result = await AdminQueryService.GetWeeklyNewsPreviewAsync(id);
+        var result = await AdminQueryService.GetWeeklyNewsPreviewAsync(id, _cts?.Token ?? CancellationToken.None);
         _previewLoading = false;
         if (result.Success && result.Data is not null)
         {
@@ -700,4 +711,10 @@
         OriginalRSSType.Custom => "admin-badge--rss-custom",
         _ => "admin-badge--neutral"
     };
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
 }

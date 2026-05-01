@@ -174,7 +174,11 @@
     </CgMiniModeContainer>
 
     <main class="cg-layout__main">
-        <UserAtmosphere @rendermode="InteractiveServer" />
+        <AuthorizeView>
+            <Authorized>
+                <UserAtmosphere/>
+            </Authorized>
+        </AuthorizeView>
         <div class="cg-layout__container">
             <article class="content">
                 @Body
@@ -245,7 +249,7 @@
                     <span>
                         <a href="https://icp.gov.moe/?keyword=20225899" target="_blank" rel="noopener noreferrer">萌ICP备20225899号</a>
                     </span>
-          
+
             </div>
         </div>
     </footer>

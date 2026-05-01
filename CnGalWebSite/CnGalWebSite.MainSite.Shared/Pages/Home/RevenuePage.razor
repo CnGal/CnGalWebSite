@@ -3,6 +3,7 @@
 
 @inject IStoreInfoQueryService StoreInfoQueryService
 @inject NavigationManager NavigationManager
+@implements IDisposable
 @using CnGalWebSite.DataModel.ViewModel.Stores
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
 
@@ -118,6 +119,7 @@
     private string? ErrorMessage;
     private bool _initialized;
     private bool _selfNavigating;
+    private CancellationTokenSource? _cts;
 
     private IEnumerable<KeyValuePair<string, string>> YearOptions = [];
 
@@ -148,18 +150,28 @@
         if (Max <= 0 || Max > 100) Max = 20;
         Order = Order == 1 ? 1 : 0; // 0 for Revenue, 1 for Owner
 
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
+
         IsLoading = true;
         ErrorMessage = null;
 
-        var result = await StoreInfoQueryService.GetGameRevenueInfoAsync(Year, CurrentPage - 1, Max, Order);
-        if (result.Success && result.Data is not null)
+        try
         {
-            Items = result.Data.Items;
-            TotalPages = result.Data.TotalPages;
+            var result = await StoreInfoQueryService.GetGameRevenueInfoAsync(Year, CurrentPage - 1, Max, Order, _cts!.Token);
+            if (result.Success && result.Data is not null)
+            {
+                Items = result.Data.Items;
+                TotalPages = result.Data.TotalPages;
+            }
+            else
+            {
+                ErrorMessage = result.Error?.Message ?? "获取游戏销量信息失败";
+            }
         }
-        else
+        catch (OperationCanceledException)
         {
-            ErrorMessage = result.Error?.Message ?? "获取游戏销量信息失败";
+            return;
         }
 
         IsLoading = false;
@@ -198,5 +210,11 @@
             ["max"] = Max,
             ["order"] = Order,
         }));
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

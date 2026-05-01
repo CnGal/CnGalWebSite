@@ -3,6 +3,7 @@
 @layout AdminLayout
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @inject IAdminQueryService AdminQueryService
+@implements IDisposable
 @using CnGalWebSite.DataModel.ViewModel.Others
 @using CnGalWebSite.MainSite.Shared.Components.DesignSystem
 
@@ -28,6 +29,7 @@
 </div>
 
 @code {
+    private CancellationTokenSource? _cts;
     private readonly LineChartType[] _chartTypes =
     [
         LineChartType.User,
@@ -48,11 +50,19 @@
     {
         if (firstRender)
         {
-            foreach (var ct in _chartTypes)
+            _cts = new CancellationTokenSource();
+            try
             {
-                await LoadChart(ct, 30);
+                foreach (var ct in _chartTypes)
+                {
+                    await LoadChart(ct, 30);
+                }
+                StateHasChanged();
             }
-            StateHasChanged();
+            catch (OperationCanceledException)
+            {
+                // Component disposed, ignore
+            }
         }
     }
 
@@ -79,10 +89,16 @@
         var beforeTime = DateTime.Now.Date.AddDays(1);
         var afterTime = days > 9999 ? new DateTime(100, 10, 10) : beforeTime.AddDays(-days);
 
-        var result = await AdminQueryService.GetLineChartAsync(chartType, afterTime, beforeTime);
+        var result = await AdminQueryService.GetLineChartAsync(chartType, afterTime, beforeTime, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data is not null)
         {
             _chartData[chartType] = result.Data;
         }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

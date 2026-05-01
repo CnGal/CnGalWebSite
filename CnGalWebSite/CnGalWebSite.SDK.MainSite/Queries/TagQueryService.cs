@@ -17,12 +17,12 @@ public sealed class TagQueryService(
 
     protected override ILogger Logger => logger;
 
-    public async Task<SdkResult<List<TagTreeModel>>> GetTagTreeAsync(CancellationToken cancellationToken = default)
+    public async Task<SdkResult<IReadOnlyList<TagTreeModel>>> GetTagTreeAsync(CancellationToken cancellationToken = default)
     {
         const string cacheKey = "main-site:tag-tree";
         if (memoryCache.TryGetValue(cacheKey, out List<TagTreeModel>? cached) && cached is not null)
         {
-            return SdkResult<List<TagTreeModel>>.Ok(cached);
+            return SdkResult<IReadOnlyList<TagTreeModel>>.Ok(cached);
         }
 
         var result = await GetAsync<List<TagTreeModel>>(
@@ -36,7 +36,9 @@ public sealed class TagQueryService(
             memoryCache.Set(cacheKey, result.Data, CacheDuration);
         }
 
-        return result;
+        return result.Success
+            ? SdkResult<IReadOnlyList<TagTreeModel>>.Ok(result.Data!)
+            : SdkResult<IReadOnlyList<TagTreeModel>>.Fail(result.Error!.Code, result.Error!.Message, result.Error!.StatusCode);
     }
 
     public async Task<SdkResult<TagIndexViewModel>> GetTagDetailAsync(int id, CancellationToken cancellationToken = default)

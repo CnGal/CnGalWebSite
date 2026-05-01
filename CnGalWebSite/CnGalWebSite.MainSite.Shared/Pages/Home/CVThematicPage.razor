@@ -3,6 +3,7 @@
 
 @inject ITagQueryService TagQueryService
 @inject NavigationManager NavigationManager
+@implements IDisposable
 @using CnGalWebSite.DataModel.ViewModel.ThematicPages
 @using CnGalWebSite.DataModel.ViewModel.Tags
 @using CnGalWebSite.DataModel.ViewModel.Home
@@ -137,6 +138,7 @@
     private string? ErrorMessage;
     private bool _initialized;
     private bool _selfNavigating;
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -158,22 +160,32 @@
         SelectedTags = ParseTagQuery(QueryTags);
         UnlabeledTags = ParseTagQuery(QueryUnlabeled);
 
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
+
         IsLoading = true;
         ErrorMessage = null;
 
-        var result = await TagQueryService.GetCVThematicPageAsync();
-        if (result.Success && result.Data is not null)
+        try
         {
-            AllCVInfors = result.Data.CVInfors;
-            News = result.Data.News;
-            Carousels = result.Data.Carousels;
-            TagGroups = result.Data.Tags;
-            PrepareCarousels();
-            ApplyFilterAndSort();
+            var result = await TagQueryService.GetCVThematicPageAsync(_cts!.Token);
+            if (result.Success && result.Data is not null)
+            {
+                AllCVInfors = result.Data.CVInfors;
+                News = result.Data.News;
+                Carousels = result.Data.Carousels;
+                TagGroups = result.Data.Tags;
+                PrepareCarousels();
+                ApplyFilterAndSort();
+            }
+            else
+            {
+                ErrorMessage = result.Error?.Message ?? "获取CV专题页数据失败";
+            }
         }
-        else
+        catch (OperationCanceledException)
         {
-            ErrorMessage = result.Error?.Message ?? "获取CV专题页数据失败";
+            return;
         }
 
         IsLoading = false;
@@ -327,5 +339,11 @@
             ["tags"] = SelectedTags.Count > 0 ? string.Join(TagQuerySeparator, SelectedTags.OrderBy(t => t, StringComparer.Ordinal)) : null,
             ["unlabeled"] = UnlabeledTags.Count > 0 ? string.Join(TagQuerySeparator, UnlabeledTags.OrderBy(t => t, StringComparer.Ordinal)) : null,
         }));
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

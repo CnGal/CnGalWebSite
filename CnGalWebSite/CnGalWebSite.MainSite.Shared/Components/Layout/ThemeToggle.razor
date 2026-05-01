@@ -1,52 +1,7 @@
-@using CnGalWebSite.MainSite.Shared.Services
-@rendermode InteractiveServer
-@implements IDisposable
+@* 纯静态实现：通过 JS onclick 直接调用 window.cngalTheme.set()，无需交互模式 *@
 
-@inject ICgThemeService ThemeService
-
-<button class="cg-theme-toggle" @onclick="ToggleTheme"
-        aria-label="@(_isDark ? "切换到亮色模式" : "切换到暗色模式")">
-    @if (_isDark)
-    {
-        <CgMdiIcon Name="mdiWeatherSunny" aria-hidden="true" />
-    }
-    else
-    {
-        <CgMdiIcon Name="mdiWeatherNight" aria-hidden="true" />
-    }
+<button class="cg-theme-toggle"
+        onclick="var isDark = document.documentElement.getAttribute('data-theme') === 'dark'; window.cngalTheme.set(!isDark);"
+        aria-label="切换颜色主题">
+    <CgMdiIcon Name="mdiThemeLightDark" aria-hidden="true" />
 </button>
-
-@code {
-    private bool _isDark;
-
-    protected override void OnInitialized()
-    {
-        _isDark = ThemeService.IsDarkMode;
-        ThemeService.ThemeChanged -= OnThemeChanged;
-        ThemeService.ThemeChanged += OnThemeChanged;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            await ThemeService.CheckAsync();
-        }
-    }
-
-    private async Task ToggleTheme()
-    {
-        await ThemeService.SetThemeModeAsync(!_isDark);
-    }
-
-    private void OnThemeChanged()
-    {
-        _isDark = ThemeService.IsDarkMode;
-        InvokeAsync(StateHasChanged);
-    }
-
-    public void Dispose()
-    {
-        ThemeService.ThemeChanged -= OnThemeChanged;
-    }
-}

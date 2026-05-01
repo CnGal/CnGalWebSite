@@ -5,6 +5,7 @@
 @inject IAdminQueryService AdminQueryService
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Tags
 
@@ -51,19 +52,26 @@
 </div>
 
 @code {
+    private CancellationTokenSource? _cts;
     private CgDataTable<TagOverviewModel>? _dataTable;
 
     private async Task<CgDataTableResult<TagOverviewModel>> OnServerQuery(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetTagsAsync(parameter);
+        var result = await AdminQueryService.GetTagsAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<TagOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<TagOverviewModel>([], 0);
     }
 
     private async Task ToggleHidden(TagOverviewModel item, bool hide)
     {
-        var r = await AdminCommandService.HideTagAsync(new[] { item.Id }, hide);
+        var r = await AdminCommandService.HideTagAsync(new[] { item.Id }, hide, _cts.Token);
         if (r.Success) { ToastService.Show(hide ? "已隐藏标签" : "已显示标签", variant: "success"); if (_dataTable is not null) await _dataTable.RefreshAsync(); }
         else { ToastService.Show(r.Error?.Message ?? "操作失败", variant: "error"); }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

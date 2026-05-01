@@ -4,6 +4,7 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @inject ITimedTaskService TimedTaskService
 @inject ICgToastService ToastService
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.TimedTask.Models.ViewModels
 @using CnGalWebSite.TimedTask.Models.DataModels
@@ -163,6 +164,7 @@
 </CgModal>
 
 @code {
+    private CancellationTokenSource? _cts;
     private CgDataTable<TimedTaskOverviewModel>? _table;
     private bool _showEditModal;
     private bool _isNew;
@@ -179,7 +181,7 @@
             SortDesc = new[] { request.SortDesc }
         };
 
-        var result = await TimedTaskService.GetTimedTasksAsync(parameter);
+        var result = await TimedTaskService.GetTimedTasksAsync(parameter, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data is not null)
         {
             return new CgDataTableResult<TimedTaskOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
@@ -202,7 +204,7 @@
         _showEditModal = true;
         StateHasChanged();
 
-        var result = await TimedTaskService.GetTimedTaskEditAsync(model.Id);
+        var result = await TimedTaskService.GetTimedTaskEditAsync(model.Id, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data != null)
         {
             _editModel = result.Data;
@@ -219,7 +221,7 @@
     {
         if (_editModel == null) return;
 
-        var result = await TimedTaskService.EditTimedTaskAsync(_editModel);
+        var result = await TimedTaskService.EditTimedTaskAsync(_editModel, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {
             ToastService.Show("定时任务已保存", variant: "success");
@@ -238,7 +240,7 @@
     private async Task RunTask(TimedTaskOverviewModel item)
     {
         ToastService.Show("正在运行任务…", variant: "info");
-        var result = await TimedTaskService.RunTimedTaskAsync(new[] { item.Id });
+        var result = await TimedTaskService.RunTimedTaskAsync(new[] { item.Id }, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {
             ToastService.Show("任务运行成功", variant: "success");
@@ -252,7 +254,7 @@
 
     private async Task PauseTask(TimedTaskOverviewModel item, bool isPause)
     {
-        var result = await TimedTaskService.PauseTimedTaskAsync(new[] { item.Id }, isPause);
+        var result = await TimedTaskService.PauseTimedTaskAsync(new[] { item.Id }, isPause, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {
             ToastService.Show(isPause ? "已暂停任务" : "已恢复任务", variant: "success");
@@ -262,5 +264,11 @@
         {
             ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error");
         }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

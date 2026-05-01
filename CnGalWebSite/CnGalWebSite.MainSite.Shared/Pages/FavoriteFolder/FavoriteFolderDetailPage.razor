@@ -7,6 +7,7 @@
 
 @inject IFavoriteFolderQueryService FavoriteFolderQueryService
 @inject NavigationManager NavigationManager
+@implements IDisposable
 
 @if (_isNotFound)
 {
@@ -65,6 +66,7 @@ else
     private bool _isNotFound;
     private bool _isError;
     private string _errorMessage = string.Empty;
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnInitializedAsync()
     {
@@ -81,24 +83,40 @@ else
 
     private async Task LoadDataAsync()
     {
-        _isNotFound = false;
-        _isError = false;
-        _model = null;
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
+        try
+        {
+            _isNotFound = false;
+            _isError = false;
+            _model = null;
 
-        var result = await FavoriteFolderQueryService.GetFavoriteFolderDetailAsync(Id);
+            var result = await FavoriteFolderQueryService.GetFavoriteFolderDetailAsync(Id, cancellationToken: _cts.Token);
 
-        if (result.Success && result.Data != null)
-        {
-            _model = result.Data;
+            if (result.Success && result.Data != null)
+            {
+                _model = result.Data;
+            }
+            else if (result.Error?.StatusCode == 404)
+            {
+                _isNotFound = true;
+            }
+            else
+            {
+                _isError = true;
+                _errorMessage = result.Error?.Message ?? "未知错误";
+            }
         }
-        else if (result.Error?.StatusCode == 404)
+        catch (OperationCanceledException)
         {
-            _isNotFound = true;
-        }
-        else
-        {
-            _isError = true;
-            _errorMessage = result.Error?.Message ?? "未知错误";
+            // Component disposed or parameters changed, ignore
         }
     }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+
 }

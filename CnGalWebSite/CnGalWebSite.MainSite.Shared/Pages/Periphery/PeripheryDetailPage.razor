@@ -1,6 +1,7 @@
 ﻿@page "/peripheries/index/{Id:long}"
 @inject IPeripheryQueryService PeripheryQueryService
 @inject IExamineQueryService ExamineQueryService
+@implements IDisposable
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.MainSite.Shared.Components.Features.Periphery.Detail
@@ -127,6 +128,7 @@ else
     private PeripheryDetailViewModel? _model;
     private IReadOnlyList<ExaminedNormalListModel>? _editRecords;
     private string? _errorMessage;
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -135,27 +137,36 @@ else
             return;
         }
 
-        _model = null;
-        _editRecords = null;
-        _errorMessage = null;
-
-        var peripheryTask = PeripheryQueryService.GetPeripheryDetailAsync(Id);
-        var editRecordsTask = ExamineQueryService.GetPeripheryEditRecordsAsync(Id);
-
-        var result = await peripheryTask;
-        if (result.Success && result.Data is not null)
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
+        try
         {
+            _model = null;
+            _editRecords = null;
             _errorMessage = null;
-            _model = result.Data;
 
-            var editRecordsResult = await editRecordsTask;
-            _editRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
-            return;
+            var peripheryTask = PeripheryQueryService.GetPeripheryDetailAsync(Id, cancellationToken: _cts.Token);
+            var editRecordsTask = ExamineQueryService.GetPeripheryEditRecordsAsync(Id, cancellationToken: _cts.Token);
+
+            var result = await peripheryTask;
+            if (result.Success && result.Data is not null)
+            {
+                _errorMessage = null;
+                _model = result.Data;
+
+                var editRecordsResult = await editRecordsTask;
+                _editRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
+                return;
+            }
+
+            _model = null;
+            _editRecords = null;
+            _errorMessage = result.Error?.Message ?? "请稍后重试";
         }
-
-        _model = null;
-        _editRecords = null;
-        _errorMessage = result.Error?.Message ?? "请稍后重试";
+        catch (OperationCanceledException)
+        {
+            // Component disposed or parameters changed, ignore
+        }
     }
 
     private string GetDisplayTitle()
@@ -178,4 +189,11 @@ else
         return string.IsNullOrWhiteSpace(_model.BackgroundPicture) is false
             || string.IsNullOrWhiteSpace(_model.SmallBackgroundPicture) is false;
     }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+
 }

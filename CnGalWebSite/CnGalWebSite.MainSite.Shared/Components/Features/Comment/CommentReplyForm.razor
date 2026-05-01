@@ -3,6 +3,7 @@
 @using CnGalWebSite.DataModel.Model
 
 @inject ICgToastService ToastService
+@inject IFileCommandService FileCommandService
 
 <div class="comment-reply-form @(IsChild ? "comment-reply-form--child" : "")">
     @if (UseMarkdown)
@@ -33,7 +34,8 @@
         <CgImageUpload Text="上传图片"
                        Variant="ghost"
                        ShowPreview="false"
-                       OnImageUploaded="OnImageUploaded" />
+                       OnImageUploaded="OnImageUploaded"
+                       OnUploadImageAsync="FileCommandService.UploadImageAsync" />
 
         @if (ShowCancel)
         {

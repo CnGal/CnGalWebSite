@@ -5,6 +5,7 @@
 @inject IAdminQueryService AdminQueryService
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Videos
 
@@ -63,22 +64,29 @@
 </div>
 
 @code {
+    private CancellationTokenSource? _cts;
     private CgDataTable<VideoOverviewModel>? _dataTable;
 
     private async Task<CgDataTableResult<VideoOverviewModel>> OnServerQuery(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetVideosAsync(parameter);
+        var result = await AdminQueryService.GetVideosAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<VideoOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<VideoOverviewModel>([], 0);
     }
 
-    private async Task EditPriority(VideoOverviewModel item, bool up) { var r = await AdminCommandService.EditVideoPriorityAsync(new[] { item.Id }, up ? 1 : -1); await HandleResult(r, up ? "已增加权重" : "已降低权重"); }
-    private async Task ToggleHidden(VideoOverviewModel item, bool hide) { var r = await AdminCommandService.HideVideoAsync(new[] { item.Id }, hide); await HandleResult(r, hide ? "已隐藏视频" : "已显示视频"); }
-    private async Task ToggleCanComment(VideoOverviewModel item, bool canComment) { var r = await AdminCommandService.EditVideoCanCommentAsync(new[] { item.Id }, canComment); await HandleResult(r, canComment ? "已开启留言板" : "已关闭留言板"); }
+    private async Task EditPriority(VideoOverviewModel item, bool up) { var r = await AdminCommandService.EditVideoPriorityAsync(new[] { item.Id }, up ? 1 : -1, _cts.Token); await HandleResult(r, up ? "已增加权重" : "已降低权重"); }
+    private async Task ToggleHidden(VideoOverviewModel item, bool hide) { var r = await AdminCommandService.HideVideoAsync(new[] { item.Id }, hide, _cts.Token); await HandleResult(r, hide ? "已隐藏视频" : "已显示视频"); }
+    private async Task ToggleCanComment(VideoOverviewModel item, bool canComment) { var r = await AdminCommandService.EditVideoCanCommentAsync(new[] { item.Id }, canComment, _cts.Token); await HandleResult(r, canComment ? "已开启留言板" : "已关闭留言板"); }
 
     private async Task HandleResult(SdkResult<bool> result, string successMessage)
     {
         if (result.Success) { ToastService.Show(successMessage, variant: "success"); if (_dataTable is not null) await _dataTable.RefreshAsync(); }
         else { ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error"); }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

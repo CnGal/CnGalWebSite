@@ -159,6 +159,19 @@
 | `EditRecordPage` | 编辑记录时间线选择、详情动态切换 |
 | `ExamineDetailPage` | 审核操作（通过/驳回）、批注输入等管理员交互 |
 | `MessagePage` | 消息列表 Tab 切换、标记已读等交互 |
+| `RevenuePage` | 交互式筛选控件（年份、排序、翻页） |
+| `GamePublishTimesPage` | 交互式日期筛选控件 |
+| `DiscountPage` | 交互式筛选面板 |
+| `CVThematicPage` | 交互式筛选/搜索 |
+| `CnGalGenerationPage` | 交互式游戏选择、图片导出 |
+| `TasksPage` | 签到、Steam绑定 |
+| `SpaceEditPage` | 资料编辑（含自动保存） |
+| `LotteryEditPage` | 抽奖编辑 |
+| `PeripheryEditPage` | 周边编辑 |
+| `FavoriteFolderEditPage` | 收藏夹编辑 |
+| `Admin/*` 系列 | 后台管理CRUD操作 |
+
+> **关于 CgMiniModeContainer**：`CgMiniModeContainer` 用于实现"和谐模式"（内容规避审查模式），**并非**用于移动端/桌面端的设备类型检测。设备响应式适配应通过 CSS `@media` 查询实现，禁止使用 C# 条件渲染区分设备类型。
 
 ### 5.1 当前 SDK 目录结构
 

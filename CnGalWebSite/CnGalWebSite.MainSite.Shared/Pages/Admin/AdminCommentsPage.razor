@@ -5,6 +5,7 @@
 @inject IAdminQueryService AdminQueryService
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.Model
@@ -102,6 +103,7 @@
 </div>
 
 @code {
+    private CancellationTokenSource? _cts;
     private CgDataTable<CommentOverviewModel>? _dataTable;
 
     private async Task<CgDataTableResult<CommentOverviewModel>> OnServerQuery(CgDataTableRequest request)
@@ -115,7 +117,7 @@
             SortDesc = new[] { request.SortDesc }
         };
 
-        var result = await AdminQueryService.GetCommentsAsync(parameter);
+        var result = await AdminQueryService.GetCommentsAsync(parameter, _cts.Token);
         if (result.Success && result.Data is not null)
         {
             return new CgDataTableResult<CommentOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
@@ -127,7 +129,7 @@
     private async Task EditPriority(CommentOverviewModel item, bool up)
     {
         var result = await AdminCommandService.EditCommentPriorityAsync(
-            new[] { item.Id }, up ? 1 : -1);
+            new[] { item.Id }, up ? 1 : -1, _cts.Token);
 
         if (result.Success)
         {
@@ -143,7 +145,7 @@
     private async Task ToggleHidden(CommentOverviewModel item, bool hide)
     {
         var result = await AdminCommandService.HideCommentAsync(
-            new[] { item.Id }, hide);
+            new[] { item.Id }, hide, _cts.Token);
 
         if (result.Success)
         {
@@ -188,5 +190,11 @@
             CommentType.ReplyComment => "回复",
             _ => "未知"
         };
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

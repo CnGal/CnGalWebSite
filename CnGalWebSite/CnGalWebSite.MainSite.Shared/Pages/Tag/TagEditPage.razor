@@ -70,6 +70,7 @@ else if (Model != null)
 
     private TagEditViewModel? Model;
 
+    private CancellationTokenSource? _cts;
     private System.Threading.Timer? _autoSaveTimer;
     private string DraftKey => IsCreate ? "TagDraft_Create" : $"TagDraft_Edit_{Id}";
 
@@ -78,6 +79,7 @@ else if (Model != null)
 
     protected override async Task OnInitializedAsync()
     {
+        _cts = new CancellationTokenSource();
         await LoadDataAsync();
         _autoSaveTimer = new System.Threading.Timer(AutoSaveCallback, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
     }
@@ -101,6 +103,8 @@ else if (Model != null)
     public void Dispose()
     {
         _autoSaveTimer?.Dispose();
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 
     private async Task LoadDataAsync()
@@ -114,11 +118,11 @@ else if (Model != null)
             SdkResult<TagEditViewModel> result;
             if (IsCreate)
             {
-                result = await TagCommandService.GetTagCreateTemplateAsync();
+                result = await TagCommandService.GetTagCreateTemplateAsync(_cts!.Token);
             }
             else
             {
-                result = await TagCommandService.GetTagEditAsync(Id!.Value);
+                result = await TagCommandService.GetTagEditAsync(Id!.Value, _cts!.Token);
             }
 
             if (result.Success && result.Data != null)
@@ -143,8 +147,8 @@ else if (Model != null)
                 catch { }
 
                 // 加载候选列表与标签树
-                var metaTask = TagCommandService.GetTagEditMetaOptionsAsync();
-                var tagTreeTask = TagQueryService.GetTagTreeAsync();
+                var metaTask = TagCommandService.GetTagEditMetaOptionsAsync(_cts!.Token);
+                var tagTreeTask = TagQueryService.GetTagTreeAsync(_cts!.Token);
                 await Task.WhenAll(metaTask, tagTreeTask);
 
                 var metaResult = metaTask.Result;
@@ -163,6 +167,10 @@ else if (Model != null)
             {
                 LoadErrorMessage = result.Error?.Message ?? "获取编辑数据失败";
             }
+        }
+        catch (OperationCanceledException)
+        {
+            // Cancelled, do nothing
         }
         catch (Exception ex)
         {
@@ -208,7 +216,7 @@ else if (Model != null)
                 Data = Model.Data
             };
 
-            var result = await TagCommandService.SubmitEditAsync(request);
+            var result = await TagCommandService.SubmitEditAsync(request, _cts!.Token);
             if (result.Success)
             {
                 await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);
@@ -218,6 +226,10 @@ else if (Model != null)
             {
                 ToastService.Show("提交失败", result.Error?.Message ?? "提交审核时出现问题", "error");
             }
+        }
+        catch (OperationCanceledException)
+        {
+            // Cancelled, do nothing
         }
         catch (Exception ex)
         {

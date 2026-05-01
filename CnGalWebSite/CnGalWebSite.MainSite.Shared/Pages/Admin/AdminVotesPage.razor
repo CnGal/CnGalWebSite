@@ -5,6 +5,7 @@
 @inject IAdminQueryService AdminQueryService
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Admin
 
@@ -56,22 +57,29 @@
 </div>
 
 @code {
+    private CancellationTokenSource? _cts;
     private CgDataTable<VoteOverviewModel>? _dataTable;
 
     private async Task<CgDataTableResult<VoteOverviewModel>> OnServerQuery(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetVotesAsync(parameter);
+        var result = await AdminQueryService.GetVotesAsync(parameter, _cts?.Token ?? CancellationToken.None);
         return result.Success && result.Data is not null ? new CgDataTableResult<VoteOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<VoteOverviewModel>([], 0);
     }
 
-    private async Task EditPriority(VoteOverviewModel item, bool up) { var r = await AdminCommandService.EditVotePriorityAsync(new[] { item.Id }, up ? 1 : -1); await HandleResult(r, up ? "已增加权重" : "已降低权重"); }
-    private async Task ToggleHidden(VoteOverviewModel item, bool hide) { var r = await AdminCommandService.HideVoteAsync(new[] { item.Id }, hide); await HandleResult(r, hide ? "已隐藏" : "已显示"); }
-    private async Task ToggleCanComment(VoteOverviewModel item, bool canComment) { var r = await AdminCommandService.EditVoteCanCommentAsync(new[] { item.Id }, canComment); await HandleResult(r, canComment ? "已开启留言板" : "已关闭留言板"); }
+    private async Task EditPriority(VoteOverviewModel item, bool up) { var r = await AdminCommandService.EditVotePriorityAsync(new[] { item.Id }, up ? 1 : -1, _cts?.Token ?? CancellationToken.None); await HandleResult(r, up ? "已增加权重" : "已降低权重"); }
+    private async Task ToggleHidden(VoteOverviewModel item, bool hide) { var r = await AdminCommandService.HideVoteAsync(new[] { item.Id }, hide, _cts?.Token ?? CancellationToken.None); await HandleResult(r, hide ? "已隐藏" : "已显示"); }
+    private async Task ToggleCanComment(VoteOverviewModel item, bool canComment) { var r = await AdminCommandService.EditVoteCanCommentAsync(new[] { item.Id }, canComment, _cts?.Token ?? CancellationToken.None); await HandleResult(r, canComment ? "已开启留言板" : "已关闭留言板"); }
 
     private async Task HandleResult(SdkResult<bool> result, string successMessage)
     {
         if (result.Success) { ToastService.Show(successMessage, variant: "success"); if (_dataTable is not null) await _dataTable.RefreshAsync(); }
         else { ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error"); }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

@@ -3,6 +3,7 @@
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
 
 @inject IPlayedGameQueryService PlayedGameQueryService
+@implements IDisposable
 
 <CgPageMeta Title="分享游戏库" />
 
@@ -102,13 +103,24 @@ else
     private SteamGamesOverviewViewModel? _overview;
     private IReadOnlyList<RandomReviewItem> _reviews = [];
     private string? _errorMessage;
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnInitializedAsync()
     {
-        var overviewTask = PlayedGameQueryService.GetSteamGamesOverviewAsync();
-        var reviewsTask = PlayedGameQueryService.GetRandomReviewsAsync();
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
 
-        await Task.WhenAll(overviewTask, reviewsTask);
+        var overviewTask = PlayedGameQueryService.GetSteamGamesOverviewAsync(_cts!.Token);
+        var reviewsTask = PlayedGameQueryService.GetRandomReviewsAsync(_cts!.Token);
+
+        try
+        {
+            await Task.WhenAll(overviewTask, reviewsTask);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
 
         var overviewResult = overviewTask.Result;
         if (overviewResult.Success && overviewResult.Data is not null)
@@ -128,4 +140,9 @@ else
         }
     }
 
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
 }

@@ -5,6 +5,7 @@
 @inject IAdminQueryService AdminQueryService
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Admin
@@ -245,6 +246,7 @@
 </CgModal>
 
 @code {
+    private CancellationTokenSource? _cts;
     private CgDataTable<EntryOverviewModel>? _dataTable;
     private CgDataTable<GameRecordOverviewModel>? _playedGameTable;
     private CgDataTable<EntryInformationTypeOverviewModel>? _infoTypeTable;
@@ -264,7 +266,7 @@
     private async Task<CgDataTableResult<EntryOverviewModel>> OnServerQuery(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetEntriesAsync(parameter);
+        var result = await AdminQueryService.GetEntriesAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<EntryOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<EntryOverviewModel>([], 0);
     }
 
@@ -273,7 +275,7 @@
     private async Task<CgDataTableResult<GameRecordOverviewModel>> OnQueryPlayedGames(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetPlayedGamesAsync(parameter);
+        var result = await AdminQueryService.GetPlayedGamesAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<GameRecordOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<GameRecordOverviewModel>([], 0);
     }
 
@@ -282,28 +284,28 @@
     private async Task<CgDataTableResult<EntryInformationTypeOverviewModel>> OnQueryInfoTypes(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetEntryInformationTypesAsync(parameter);
+        var result = await AdminQueryService.GetEntryInformationTypesAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<EntryInformationTypeOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<EntryInformationTypeOverviewModel>([], 0);
     }
 
     // ─── 词条操作 ───
 
-    private async Task EditPriority(EntryOverviewModel item, bool up) { var r = await AdminCommandService.EditEntryPriorityAsync(new[] { item.Id }, up ? 1 : -1); await HandleResult(r, up ? "已增加权重" : "已降低权重"); }
-    private async Task ToggleHidden(EntryOverviewModel item, bool hide) { var r = await AdminCommandService.HideEntryAsync(new[] { item.Id }, hide); await HandleResult(r, hide ? "已隐藏词条" : "已显示词条"); }
-    private async Task ToggleOutlink(EntryOverviewModel item, bool hide) { var r = await AdminCommandService.HideEntryOutlinkAsync(new[] { item.Id }, hide); await HandleResult(r, hide ? "已隐藏外链" : "已显示外链"); }
-    private async Task ToggleCanComment(EntryOverviewModel item, bool canComment) { var r = await AdminCommandService.EditEntryCanCommentAsync(new[] { item.Id }, canComment); await HandleResult(r, canComment ? "已开启留言板" : "已关闭留言板"); }
+    private async Task EditPriority(EntryOverviewModel item, bool up) { var r = await AdminCommandService.EditEntryPriorityAsync(new[] { item.Id }, up ? 1 : -1, _cts.Token); await HandleResult(r, up ? "已增加权重" : "已降低权重"); }
+    private async Task ToggleHidden(EntryOverviewModel item, bool hide) { var r = await AdminCommandService.HideEntryAsync(new[] { item.Id }, hide, _cts.Token); await HandleResult(r, hide ? "已隐藏词条" : "已显示词条"); }
+    private async Task ToggleOutlink(EntryOverviewModel item, bool hide) { var r = await AdminCommandService.HideEntryOutlinkAsync(new[] { item.Id }, hide, _cts.Token); await HandleResult(r, hide ? "已隐藏外链" : "已显示外链"); }
+    private async Task ToggleCanComment(EntryOverviewModel item, bool canComment) { var r = await AdminCommandService.EditEntryCanCommentAsync(new[] { item.Id }, canComment, _cts.Token); await HandleResult(r, canComment ? "已开启留言板" : "已关闭留言板"); }
 
     // ─── 游玩记录操作 ───
 
     private async Task TogglePlayedGameHidden(GameRecordOverviewModel item, bool hide)
     {
-        var r = await AdminCommandService.HidePlayedGameAsync(new[] { item.Id }, hide);
+        var r = await AdminCommandService.HidePlayedGameAsync(new[] { item.Id }, hide, _cts.Token);
         await HandlePlayedGameResult(r, hide ? "已隐藏记录" : "已显示记录");
     }
 
     private async Task ToggleShowPublicly(GameRecordOverviewModel item, bool showPublicly)
     {
-        var r = await AdminCommandService.ShowPubliclyPlayedGameAsync(new[] { item.Id }, showPublicly);
+        var r = await AdminCommandService.ShowPubliclyPlayedGameAsync(new[] { item.Id }, showPublicly, _cts.Token);
         await HandlePlayedGameResult(r, showPublicly ? "已设为公开" : "已设为私密");
     }
 
@@ -336,7 +338,7 @@
         _showInfoTypeModal = true;
         StateHasChanged();
 
-        var result = await AdminQueryService.GetEntryInformationTypeEditAsync(model.Id);
+        var result = await AdminQueryService.GetEntryInformationTypeEditAsync(model.Id, _cts.Token);
         if (result.Success && result.Data != null)
         {
             _infoTypeEditModel = result.Data;
@@ -353,7 +355,7 @@
     {
         if (_infoTypeEditModel == null) return;
 
-        var result = await AdminCommandService.EditEntryInformationTypeAsync(_infoTypeEditModel);
+        var result = await AdminCommandService.EditEntryInformationTypeAsync(_infoTypeEditModel, _cts.Token);
         if (result.Success)
         {
             ToastService.Show("基础信息类型已保存", variant: "success");
@@ -380,5 +382,11 @@
         {
             _infoTypeEditModel.Types.Remove(type);
         }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

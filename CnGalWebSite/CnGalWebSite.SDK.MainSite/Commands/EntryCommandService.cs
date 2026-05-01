@@ -193,17 +193,17 @@ public sealed class EntryCommandService(
         }
     }
 
-    public async Task<SdkResult<List<EditInformationModel>>> GetInformationFieldsAsync(EntryType type, CancellationToken cancellationToken = default)
+    public async Task<SdkResult<IReadOnlyList<EditInformationModel>>> GetInformationFieldsAsync(EntryType type, CancellationToken cancellationToken = default)
     {
         try
         {
             var informations = await GetFromJsonAsync<List<EditInformationModel>>($"api/entries/GetEditInformationModelList?type={(int)type}", cancellationToken);
-            return SdkResult<List<EditInformationModel>>.Ok(informations ?? []);
+            return SdkResult<IReadOnlyList<EditInformationModel>>.Ok(informations ?? []);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取词条基础信息字段列表异常。Type={Type}; BaseAddress={BaseAddress}", type, HttpClient.BaseAddress);
-            return SdkResult<List<EditInformationModel>>.Fail("ENTRY_INFORMATION_FIELDS_EXCEPTION", "请求词条基础信息字段列表时发生异常");
+            return SdkResult<IReadOnlyList<EditInformationModel>>.Fail("ENTRY_INFORMATION_FIELDS_EXCEPTION", "请求词条基础信息字段列表时发生异常");
         }
     }
 

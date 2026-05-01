@@ -3,6 +3,7 @@
 
 @inject IStoreInfoQueryService StoreInfoQueryService
 @inject NavigationManager NavigationManager
+@implements IDisposable
 @using CnGalWebSite.DataModel.ViewModel.Steam
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
 
@@ -112,6 +113,7 @@
     private string? ErrorMessage;
     private bool _initialized;
     private bool _selfNavigating;
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -135,18 +137,28 @@
         MaxOriginalPrice = QueryMaxOriginalPrice > 0 ? QueryMaxOriginalPrice : DiscountFilterPanel.MaxPriceLimit;
         if (CurrentPage < 1) CurrentPage = 1;
 
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
+
         IsLoading = true;
         ErrorMessage = null;
 
-        var result = await StoreInfoQueryService.GetAllGameStoreInfoAsync();
-        if (result.Success && result.Data is not null)
+        try
         {
-            AllItems = result.Data;
-            ApplyFilterAndSort();
+            var result = await StoreInfoQueryService.GetAllGameStoreInfoAsync(_cts!.Token);
+            if (result.Success && result.Data is not null)
+            {
+                AllItems = result.Data;
+                ApplyFilterAndSort();
+            }
+            else
+            {
+                ErrorMessage = result.Error?.Message ?? "获取 Steam 折扣游戏列表失败";
+            }
         }
-        else
+        catch (OperationCanceledException)
         {
-            ErrorMessage = result.Error?.Message ?? "获取 Steam 折扣游戏列表失败";
+            return;
         }
 
         IsLoading = false;
@@ -266,5 +278,11 @@
             ["minRate"] = MinRecommendationRate,
             ["page"] = CurrentPage,
         }));
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

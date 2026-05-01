@@ -15,17 +15,17 @@ public sealed class LotteryCommandService(
 {
     protected override ILogger Logger => logger;
 
-    public async Task<SdkResult<List<string>>> GetEntryGameItemsAsync(CancellationToken cancellationToken = default)
+    public async Task<SdkResult<IReadOnlyList<string>>> GetEntryGameItemsAsync(CancellationToken cancellationToken = default)
     {
         try
         {
             var items = await GetFromJsonAsync<List<string>>("api/entries/GetAllEntries/0", cancellationToken);
-            return SdkResult<List<string>>.Ok(items ?? []);
+            return SdkResult<IReadOnlyList<string>>.Ok(items ?? []);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取游戏词条列表异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<List<string>>.Fail("LOTTERY_ENTRY_ITEMS_EXCEPTION", "获取游戏词条列表时发生异常");
+            return SdkResult<IReadOnlyList<string>>.Fail("LOTTERY_ENTRY_ITEMS_EXCEPTION", "获取游戏词条列表时发生异常");
         }
     }
 

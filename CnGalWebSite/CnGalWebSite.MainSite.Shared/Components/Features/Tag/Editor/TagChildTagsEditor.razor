@@ -57,7 +57,7 @@
 @code {
     [Parameter] public EditTagChildTagsViewModel Model { get; set; } = default!;
     [Parameter] public IEnumerable<string> TagItems { get; set; } = [];
-    [Parameter] public List<TagTreeModel> TagTreeItems { get; set; } = [];
+    [Parameter] public IReadOnlyList<TagTreeModel> TagTreeItems { get; set; } = [];
 
     private void AddItem()
     {

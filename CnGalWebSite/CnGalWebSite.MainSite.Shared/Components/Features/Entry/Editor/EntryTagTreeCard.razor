@@ -29,7 +29,7 @@
     /// 标签树原始数据
     /// </summary>
     [Parameter]
-    public List<TagTreeModel> TreeItems { get; set; } = [];
+    public IReadOnlyList<TagTreeModel> TreeItems { get; set; } = [];
 
     /// <summary>
     /// 当前已选标签列表（引用传递，与 AutoComplete 编辑器共享）
@@ -64,7 +64,7 @@
             .ToList();
     }
 
-    private static List<CgTreeViewItem> ConvertToTreeItems(List<TagTreeModel> source)
+    private static List<CgTreeViewItem> ConvertToTreeItems(IReadOnlyList<TagTreeModel> source)
     {
         return source.Select(tag => new CgTreeViewItem
         {

@@ -87,7 +87,7 @@
     public EditBookingModel Booking { get; set; } = default!;
 
     [Parameter]
-    public List<string> LotteryItems { get; set; } = [];
+    public IReadOnlyList<string> LotteryItems { get; set; } = [];
 
     private bool _bookingGoalDialogOpen;
     private EditBookingGoalModel? _bookingGoalEditing;

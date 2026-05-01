@@ -1,9 +1,7 @@
-@using CnGalWebSite.SDK.MainSite.Abstractions
 @using CnGalWebSite.SDK.MainSite.Models.Files
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
 @implements IAsyncDisposable
-@inject IFileCommandService FileCommandService
 @inject IJSRuntime JSRuntime
 
 <div class="cg-image-upload @Class">
@@ -186,6 +184,9 @@
     [Parameter]
     public bool Disabled { get; set; }
 
+    [Parameter]
+    public Func<IBrowserFile, CancellationToken, Task<ImageUploadResult?>>? OnUploadImageAsync { get; set; }
+
 
     private string? CurrentImagePath => Value ?? ImagePath ?? _localImagePath;
     private string CropRectStyle =>
@@ -247,25 +248,24 @@
 
     private async Task UploadSingleFileAsync(IBrowserFile file, bool cropped, ImageCropRect? cropRect = null)
     {
+        if (OnUploadImageAsync is null)
+        {
+            _errorMessage = "上传功能未配置";
+            return;
+        }
+
         _isUploading = true;
         try
         {
-            IBrowserFile targetFile = file;
-            var aspectType = Type;
-            if (cropped)
+            using var cts = new CancellationTokenSource();
+            var result = await OnUploadImageAsync.Invoke(file, cts.Token);
+            if (result is null)
             {
-                aspectType = ImageAspectType.None;
-            }
-
-            await using var stream = targetFile.OpenReadStream(MaxUploadBytes);
-            var uploadResult = await FileCommandService.UploadImageAsync(stream, targetFile.Name, aspectType, Gallery, cropRect);
-            if (!uploadResult.Success || string.IsNullOrWhiteSpace(uploadResult.Data))
-            {
-                _errorMessage = uploadResult.Error?.Message ?? "上传失败";
+                _errorMessage = "上传失败";
                 return;
             }
 
-            await ChangeImageUrlAsync(uploadResult.Data);
+            await ChangeImageUrlAsync(result.Url);
             _errorMessage = null;
         }
         catch (IOException)

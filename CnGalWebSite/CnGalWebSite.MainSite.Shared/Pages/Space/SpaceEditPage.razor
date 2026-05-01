@@ -62,6 +62,7 @@ else if (Model != null)
     private SpaceEditViewModel? Model;
 
     private System.Threading.Timer? _autoSaveTimer;
+    private CancellationTokenSource? _cts;
     private const string DraftKey = "SpaceDraft_Edit";
 
     private bool HasDraftRecovered = false;
@@ -69,6 +70,7 @@ else if (Model != null)
 
     protected override async Task OnInitializedAsync()
     {
+        _cts = new CancellationTokenSource();
         await LoadDataAsync();
         _autoSaveTimer = new System.Threading.Timer(AutoSaveCallback, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
     }
@@ -92,6 +94,8 @@ else if (Model != null)
     public void Dispose()
     {
         _autoSaveTimer?.Dispose();
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 
     private async Task LoadDataAsync()
@@ -102,7 +106,7 @@ else if (Model != null)
 
         try
         {
-            var result = await SpaceCommandService.GetSpaceEditAsync();
+            var result = await SpaceCommandService.GetSpaceEditAsync(_cts?.Token ?? CancellationToken.None);
 
             if (result.Success && result.Data != null)
             {
@@ -176,7 +180,7 @@ else if (Model != null)
 
         try
         {
-            var result = await SpaceCommandService.SubmitEditAsync(Model);
+            var result = await SpaceCommandService.SubmitEditAsync(Model, _cts?.Token ?? CancellationToken.None);
             if (result.Success)
             {
                 await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);

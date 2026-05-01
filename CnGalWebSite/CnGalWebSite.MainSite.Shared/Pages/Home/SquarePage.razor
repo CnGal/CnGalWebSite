@@ -1,5 +1,6 @@
 @page "/square"
 @inject IHomeQueryService HomeQueryService
+@implements IDisposable
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
 
 
@@ -105,6 +106,7 @@ else
     };
 
     private string? ErrorMessage;
+    private CancellationTokenSource? _cts;
 
     /// <summary>
     /// 仅保留至少包含一个有主图条目的标签
@@ -117,13 +119,29 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await HomeQueryService.GetSquareSummaryAsync();
-        if (result.Success && result.Data is not null)
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
+
+        try
         {
-            Model = result.Data;
+            var result = await HomeQueryService.GetSquareSummaryAsync(_cts!.Token);
+            if (result.Success && result.Data is not null)
+            {
+                Model = result.Data;
+                return;
+            }
+
+            ErrorMessage = result.Error?.Message ?? "请稍后重试";
+        }
+        catch (OperationCanceledException)
+        {
             return;
         }
+    }
 
-        ErrorMessage = result.Error?.Message ?? "请稍后重试";
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

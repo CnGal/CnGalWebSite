@@ -8,6 +8,7 @@
 @inject ISpaceQueryService SpaceQueryService
 @inject ISpaceCommandService SpaceCommandService
 @inject ICgToastService ToastService
+@implements IDisposable
 
 <CgPageMeta Title="每日任务" />
 
@@ -80,10 +81,19 @@
     private bool _isError;
     private string _errorMessage = string.Empty;
     private bool _showSteamModal;
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadDataAsync();
+        _cts = new CancellationTokenSource();
+        try
+        {
+            await LoadDataAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            // Component disposed, ignore.
+        }
     }
 
     private async Task LoadDataAsync()
@@ -93,7 +103,7 @@
         _model = null;
         StateHasChanged();
 
-        var result = await SpaceQueryService.GetUserTasksAsync();
+        var result = await SpaceQueryService.GetUserTasksAsync(_cts!.Token);
 
         if (result.Success && result.Data is not null)
         {
@@ -110,7 +120,7 @@
 
     private async Task SignInAsync()
     {
-        var result = await SpaceCommandService.SignInAsync();
+        var result = await SpaceCommandService.SignInAsync(_cts!.Token);
 
         if (result.Success && _model is not null)
         {
@@ -129,10 +139,16 @@
         _showSteamModal = true;
     }
 
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+
     private async Task OnSteamBindSaved()
     {
         // 重新加载任务状态以刷新绑定状态
-        var result = await SpaceQueryService.GetUserTasksAsync();
+        var result = await SpaceQueryService.GetUserTasksAsync(_cts!.Token);
         if (result.Success && result.Data is not null)
         {
             _model = result.Data;

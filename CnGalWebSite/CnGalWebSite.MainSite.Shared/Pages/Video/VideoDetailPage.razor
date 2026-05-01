@@ -1,6 +1,7 @@
 @page "/videos/index/{Id:long}"
 @inject IVideoQueryService VideoQueryService
 @inject IExamineQueryService ExamineQueryService
+@implements IDisposable
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.MainSite.Shared.Components.Features.Video.Detail
@@ -145,6 +146,7 @@ else
     private VideoDetailViewModel? Model;
     private IReadOnlyList<ExaminedNormalListModel>? _editRecords;
     private string? ErrorMessage;
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -153,27 +155,36 @@ else
             return;
         }
 
-        Model = null;
-        _editRecords = null;
-        ErrorMessage = null;
-
-        var videoTask = VideoQueryService.GetVideoDetailAsync(Id);
-        var editRecordsTask = ExamineQueryService.GetVideoEditRecordsAsync(Id);
-
-        var result = await videoTask;
-        if (result.Success && result.Data is not null)
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
+        try
         {
+            Model = null;
+            _editRecords = null;
             ErrorMessage = null;
-            Model = result.Data;
 
-            var editRecordsResult = await editRecordsTask;
-            _editRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
-            return;
+var videoTask = VideoQueryService.GetVideoDetailAsync(Id, cancellationToken: _cts.Token);
+var editRecordsTask = ExamineQueryService.GetVideoEditRecordsAsync(Id, cancellationToken: _cts.Token);
+
+            var result = await videoTask;
+            if (result.Success && result.Data is not null)
+            {
+                ErrorMessage = null;
+                Model = result.Data;
+
+                var editRecordsResult = await editRecordsTask;
+                _editRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
+                return;
+            }
+
+            Model = null;
+            _editRecords = null;
+            ErrorMessage = result.Error?.Message ?? "请稍后重试";
         }
-
-        Model = null;
-        _editRecords = null;
-        ErrorMessage = result.Error?.Message ?? "请稍后重试";
+        catch (OperationCanceledException)
+        {
+            // Component disposed or parameters changed, ignore
+        }
     }
 
     private string GetDisplayTitle()
@@ -206,4 +217,11 @@ else
         return string.IsNullOrWhiteSpace(Model.BackgroundPicture) is false
             || string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) is false;
     }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+
 }

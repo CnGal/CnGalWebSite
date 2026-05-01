@@ -65,15 +65,17 @@ else if (Model != null)
 
     private EditLotteryModel? Model;
 
+    private CancellationTokenSource? _cts;
     private System.Threading.Timer? _autoSaveTimer;
     private string DraftKey => IsCreate ? "LotteryDraft_Create" : $"LotteryDraft_Edit_{Id}";
 
     private bool HasDraftRecovered = false;
     private EditLotteryModel? OriginalData;
-    private List<string> _entryGameItems = [];
+    private IReadOnlyList<string> _entryGameItems = [];
 
     protected override async Task OnInitializedAsync()
     {
+        _cts = new CancellationTokenSource();
         await LoadDataAsync();
         _autoSaveTimer = new System.Threading.Timer(AutoSaveCallback, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
     }
@@ -97,6 +99,8 @@ else if (Model != null)
     public void Dispose()
     {
         _autoSaveTimer?.Dispose();
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 
     private async Task LoadDataAsync()
@@ -108,7 +112,7 @@ else if (Model != null)
         try
         {
             // 获取游戏词条列表
-            var itemsResult = await LotteryCommandService.GetEntryGameItemsAsync();
+            var itemsResult = await LotteryCommandService.GetEntryGameItemsAsync(_cts!.Token);
             if (itemsResult.Success && itemsResult.Data != null)
             {
                 _entryGameItems = itemsResult.Data;
@@ -125,7 +129,7 @@ else if (Model != null)
             }
             else
             {
-                var result = await LotteryCommandService.GetLotteryEditAsync(Id!.Value);
+                var result = await LotteryCommandService.GetLotteryEditAsync(Id!.Value, _cts!.Token);
                 if (result.Success && result.Data != null)
                 {
                     Model = result.Data;
@@ -154,6 +158,10 @@ else if (Model != null)
                 }
             }
             catch { }
+        }
+        catch (OperationCanceledException)
+        {
+            // Cancelled, do nothing
         }
         catch (Exception ex)
         {
@@ -197,11 +205,11 @@ else if (Model != null)
 
             if (IsCreate)
             {
-                result = await LotteryCommandService.CreateLotteryAsync(Model);
+                result = await LotteryCommandService.CreateLotteryAsync(Model, _cts!.Token);
             }
             else
             {
-                result = await LotteryCommandService.EditLotteryAsync(Model);
+                result = await LotteryCommandService.EditLotteryAsync(Model, _cts!.Token);
             }
 
             if (result.Success)
@@ -213,6 +221,10 @@ else if (Model != null)
             {
                 ToastService.Show(IsCreate ? "创建失败" : "编辑失败", result.Error?.Message ?? "提交时出现问题", "error");
             }
+        }
+        catch (OperationCanceledException)
+        {
+            // Cancelled, do nothing
         }
         catch (Exception ex)
         {

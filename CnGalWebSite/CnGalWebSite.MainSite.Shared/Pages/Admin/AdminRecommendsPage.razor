@@ -6,6 +6,7 @@
 @inject IAdminCommandService CommandService
 @inject ICgToastService ToastService
 @inject NavigationManager NavigationManager
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Recommends
@@ -111,6 +112,7 @@
 </CgModal>
 
 @code {
+    private CancellationTokenSource? _cts;
     private CgDataTable<RecommendOverviewModel>? _table;
     private bool _showEditModal;
     private bool _isNew;
@@ -127,7 +129,7 @@
             SortDesc = new[] { request.SortDesc }
         };
 
-        var result = await QueryService.GetRecommendsAsync(parameter);
+        var result = await QueryService.GetRecommendsAsync(parameter, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data != null)
         {
             return new CgDataTableResult<RecommendOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
@@ -152,7 +154,7 @@
         _showEditModal = true;
         StateHasChanged();
 
-        var result = await QueryService.GetRecommendEditAsync(model.Id);
+        var result = await QueryService.GetRecommendEditAsync(model.Id, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data != null)
         {
             _editModel = result.Data;
@@ -169,7 +171,7 @@
     {
         if (_editModel == null) return;
 
-        var result = await CommandService.EditRecommendAsync(_editModel);
+        var result = await CommandService.EditRecommendAsync(_editModel, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {
             ToastService.Show("推荐已保存", variant: "success");
@@ -183,5 +185,11 @@
         {
             ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
         }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

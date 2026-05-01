@@ -3,7 +3,7 @@
 @layout AdminLayout
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @inject ICircuitHandlerService CircuitHandlerService
-
+@implements IDisposable
 
 <CgPageMeta Title="线路版块" />
 
@@ -57,6 +57,7 @@
 @code {
     private List<CircuitHandlerModel> _items = [];
     private CgDataTable<CircuitHandlerModel>? _table;
+    private CancellationTokenSource? _cts = new();
 
     protected override void OnInitialized()
     {
@@ -70,5 +71,11 @@
         {
             await _table.RefreshAsync();
         }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

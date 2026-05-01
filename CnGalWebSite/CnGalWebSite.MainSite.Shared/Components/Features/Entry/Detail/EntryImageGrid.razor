@@ -5,7 +5,7 @@
     {
         <li>
             <a href="@item.Url" target="_blank" rel="noopener noreferrer">
-                <img src="@item.Url" alt="@DisplayTextOrFallback(item.Note, EntryName)" loading="lazy" decoding="async" />
+                <img src="@item.Url" alt="@(DisplayTextOrFallback?.Invoke(item.Note, EntryName) ?? EntryName)" loading="lazy" decoding="async" />
             </a>
         </li>
     }
@@ -15,5 +15,6 @@
     [Parameter] public IReadOnlyList<PicturesAloneViewModel> Pictures { get; set; } = [];
     [Parameter] public int MaxCount { get; set; } = 12;
     [Parameter] public string EntryName { get; set; } = "";
-    [Parameter] public Func<string?, string, string> DisplayTextOrFallback { get; set; } = (value, fallback) => string.IsNullOrWhiteSpace(value) ? fallback : value;
+    // 渲染辅助函数，非事件回调
+    [Parameter] public Func<string?, string, string>? DisplayTextOrFallback { get; set; } = (value, fallback) => string.IsNullOrWhiteSpace(value) ? fallback : value;
 }

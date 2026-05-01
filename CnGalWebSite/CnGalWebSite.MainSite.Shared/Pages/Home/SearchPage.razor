@@ -3,6 +3,7 @@
 
 @inject IHomeQueryService HomeQueryService
 @inject NavigationManager NavigationManager
+@implements IDisposable
 @using CnGalWebSite.DataModel.ViewModel.Home
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
 
@@ -129,6 +130,7 @@
 
     private bool _initialized;
     private bool _selfNavigating;
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -157,21 +159,31 @@
 
     private async Task ExecuteSearchAsync()
     {
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
+
         IsLoading = true;
         ErrorMessage = null;
         StateHasChanged();
 
         var queryString = BuildQueryString();
-        var result = await HomeQueryService.SearchAsync(queryString);
+        try
+        {
+            var result = await HomeQueryService.SearchAsync(queryString, _cts!.Token);
 
-        if (result.Success && result.Data is not null)
-        {
-            SearchResult = result.Data;
+            if (result.Success && result.Data is not null)
+            {
+                SearchResult = result.Data;
+            }
+            else
+            {
+                ErrorMessage = result.Error?.Message ?? "获取搜索结果失败";
+                SearchResult = null;
+            }
         }
-        else
+        catch (OperationCanceledException)
         {
-            ErrorMessage = result.Error?.Message ?? "获取搜索结果失败";
-            SearchResult = null;
+            return;
         }
 
         IsLoading = false;
@@ -271,6 +283,12 @@
         }
 
         return parts.Count == 0 ? "" : "?" + string.Join("&", parts);
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }
 

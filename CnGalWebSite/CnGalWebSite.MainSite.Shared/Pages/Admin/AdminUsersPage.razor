@@ -5,6 +5,8 @@
 @inject IAdminQueryService AdminQueryService
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
+@inject IFileCommandService FileCommandService
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Admin
@@ -224,7 +226,8 @@
                 </CgFormGroup>
 
                 <CgFormGroup Label="图片">
-                    <CgImageUpload @bind-Value="_rankEditModel.Image" />
+                    <CgImageUpload @bind-Value="_rankEditModel.Image"
+                                   OnUploadImageAsync="FileCommandService.UploadImageAsync" />
                 </CgFormGroup>
 
                 <CgFormGroup Label="优先级">
@@ -262,6 +265,7 @@
 </CgModal>
 
 @code {
+    private CancellationTokenSource? _cts;
     private CgDataTable<UserOverviewModel>? _dataTable;
     private CgDataTable<RankOverviewModel>? _rankTable;
     private bool _showRankModal;
@@ -281,7 +285,7 @@
     private async Task<CgDataTableResult<UserOverviewModel>> OnServerQuery(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "RegistTime" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetUsersAsync(parameter);
+        var result = await AdminQueryService.GetUsersAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<UserOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<UserOverviewModel>([], 0);
     }
 
@@ -290,7 +294,7 @@
     private async Task<CgDataTableResult<RankOverviewModel>> OnQueryRanks(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetRanksAsync(parameter);
+        var result = await AdminQueryService.GetRanksAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<RankOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<RankOverviewModel>([], 0);
     }
 
@@ -299,7 +303,7 @@
     private async Task<CgDataTableResult<UserCertificationOverviewModel>> OnQueryCertifications(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetUserCertificationsAsync(parameter);
+        var result = await AdminQueryService.GetUserCertificationsAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<UserCertificationOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<UserCertificationOverviewModel>([], 0);
     }
 
@@ -308,7 +312,7 @@
     private async Task<CgDataTableResult<OperationRecordOverviewModel>> OnQueryOperationRecords(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetOperationRecordsAsync(parameter);
+        var result = await AdminQueryService.GetOperationRecordsAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<OperationRecordOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<OperationRecordOverviewModel>([], 0);
     }
 
@@ -316,7 +320,7 @@
 
     private async Task ToggleCanComment(UserOverviewModel item, bool canComment)
     {
-        var r = await AdminCommandService.EditSpaceCanCommentAsync(new[] { item.Id }, canComment);
+        var r = await AdminCommandService.EditSpaceCanCommentAsync(new[] { item.Id }, canComment, _cts.Token);
         if (r.Success) { ToastService.Show(canComment ? "已开启留言板" : "已关闭留言板", variant: "success"); if (_dataTable is not null) await _dataTable.RefreshAsync(); }
         else { ToastService.Show(r.Error?.Message ?? "操作失败", variant: "error"); }
     }
@@ -338,7 +342,7 @@
         _showRankModal = true;
         StateHasChanged();
 
-        var result = await AdminQueryService.GetRankEditAsync(model.Id);
+        var result = await AdminQueryService.GetRankEditAsync(model.Id, _cts.Token);
         if (result.Success && result.Data != null)
         {
             _rankEditModel = result.Data;
@@ -355,7 +359,7 @@
     {
         if (_rankEditModel == null) return;
 
-        var result = await AdminCommandService.EditRankAsync(_rankEditModel);
+        var result = await AdminCommandService.EditRankAsync(_rankEditModel, _cts.Token);
         if (result.Success)
         {
             ToastService.Show("头衔已保存", variant: "success");
@@ -373,7 +377,7 @@
 
     private async Task OnEditRankPriorityAsync(RankOverviewModel model, int plusPriority)
     {
-        var result = await AdminCommandService.EditRankPriorityAsync(new[] { model.Id }, plusPriority);
+        var result = await AdminCommandService.EditRankPriorityAsync(new[] { model.Id }, plusPriority, _cts.Token);
         if (result.Success)
         {
             ToastService.Show("已更新头衔优先级", variant: "success");
@@ -387,7 +391,7 @@
 
     private async Task OnToggleRankHiddenAsync(RankOverviewModel model, bool isHidden)
     {
-        var result = await AdminCommandService.HideRankAsync(new[] { model.Id }, isHidden);
+        var result = await AdminCommandService.HideRankAsync(new[] { model.Id }, isHidden, _cts.Token);
         if (result.Success)
         {
             ToastService.Show(isHidden ? "已隐藏头衔" : "已显示头衔", variant: "success");
@@ -397,5 +401,11 @@
         {
             ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error");
         }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

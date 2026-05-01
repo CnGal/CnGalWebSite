@@ -1,8 +1,5 @@
-@using CnGalWebSite.SDK.MainSite.Abstractions
 @using CnGalWebSite.SDK.MainSite.Models.Files
 @using Microsoft.AspNetCore.Components.Forms
-@inject IFileCommandService FileCommandService
-
 <div class="cg-audio-upload @Class">
     <div class="cg-audio-upload__actions">
         <label class="cg-audio-upload__upload-btn @(Disabled || _isUploading ? "cg-audio-upload__upload-btn--disabled" : string.Empty)"
@@ -44,6 +41,9 @@
     [Parameter] public bool Disabled { get; set; }
     [Parameter] public string? Class { get; set; }
 
+    [Parameter]
+    public Func<IBrowserFile, CancellationToken, Task<AudioUploadResult?>>? OnUploadAudioAsync { get; set; }
+
     private async Task OnFileChanged(InputFileChangeEventArgs args)
     {
         if (Disabled || _isUploading || args.FileCount == 0)
@@ -72,18 +72,24 @@
 
     private async Task UploadSingleFileAsync(IBrowserFile file)
     {
+        if (OnUploadAudioAsync is null)
+        {
+            _errorMessage = "上传功能未配置";
+            return;
+        }
+
         try
         {
-            await using var stream = file.OpenReadStream(MaxUploadBytes);
-            var result = await FileCommandService.UploadAudioAsync(stream, file.Name);
-            if (!result.Success || result.Data is null)
+            using var cts = new CancellationTokenSource();
+            var result = await OnUploadAudioAsync.Invoke(file, cts.Token);
+            if (result is null)
             {
-                _errorMessage = result.Error?.Message ?? "上传失败";
+                _errorMessage = "上传失败";
                 return;
             }
 
             _errorMessage = null;
-            await OnAudioUploaded.InvokeAsync(result.Data);
+            await OnAudioUploaded.InvokeAsync(result);
         }
         catch (IOException)
         {

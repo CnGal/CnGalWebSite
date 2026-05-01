@@ -3,6 +3,7 @@
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.SDK.MainSite.Models.Files
 @inject ICgToastService ToastService
+@inject IFileCommandService FileCommandService
 
 <section class="entry-editor-section" id="section-audio">
     <h2><CgMdiIcon Name="mdiMusicNoteOutline" Class="entry-section-icon" aria-hidden="true" />音频</h2>
@@ -17,7 +18,8 @@
         <CgFormSection Title="音频试听" Icon="mdiPlayCircleOutline" Flat>
             <HeaderActions>
                 <CgAudioUpload Multiple
-                               OnAudioUploaded="OnAudioUploaded" />
+                               OnAudioUploaded="OnAudioUploaded"
+                               OnUploadAudioAsync="FileCommandService.UploadAudioAsync" />
             </HeaderActions>
             <ChildContent>
                 <CgTable HasData="@Model.Audio.Any()" MaxHeight="400px">
@@ -81,7 +83,8 @@
                 <CgImageUpload @bind-Value="_editingItem.Thumbnail"
                                ShowCropper
                                Type="ImageAspectType._1_1"
-                               Text="上传缩略图" />
+                               Text="上传缩略图"
+                               OnUploadImageAsync="FileCommandService.UploadImageAsync" />
             </CgFormGroup>
 
             <CgFormGroup Label="音频预览">
@@ -91,7 +94,8 @@
                     </audio>
                     <CgAudioUpload Multiple="false"
                                    OnAudioUploaded="OnReUpload"
-                                   Text="重新上传" />
+                                   Text="重新上传"
+                                   OnUploadAudioAsync="FileCommandService.UploadAudioAsync" />
                 </div>
             </CgFormGroup>
 

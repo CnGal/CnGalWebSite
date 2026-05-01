@@ -4,6 +4,7 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
+@implements IDisposable
 @using CnGalWebSite.MainSite.Shared.Components.Features.Admin
 
 <CgPageMeta Title="管理工具" />
@@ -28,31 +29,47 @@
 </div>
 
 @code {
+    private CancellationTokenSource? _cts = new();
+
     private async Task OnRefreshSearchData()
     {
         ToastService.Show("正在刷新搜索缓存，请稍候…", variant: "info");
-        var result = await AdminCommandService.RefreshSearchDataAsync();
-        if (result.Success)
+        try
         {
-            ToastService.Show("成功刷新搜索缓存", variant: "success");
+            var result = await AdminCommandService.RefreshSearchDataAsync(_cts!.Token);
+            if (result.Success)
+            {
+                ToastService.Show("成功刷新搜索缓存", variant: "success");
+            }
+            else
+            {
+                ToastService.Show(result.Error?.Message ?? "刷新搜索缓存失败", variant: "error");
+            }
         }
-        else
-        {
-            ToastService.Show(result.Error?.Message ?? "刷新搜索缓存失败", variant: "error");
-        }
+        catch (OperationCanceledException) { }
     }
 
     private async Task OnRunTempFunction()
     {
         ToastService.Show("正在执行临时脚本，请稍候…", variant: "info");
-        var result = await AdminCommandService.RunTempFunctionAsync();
-        if (result.Success)
+        try
         {
-            ToastService.Show("成功执行临时脚本", variant: "success");
+            var result = await AdminCommandService.RunTempFunctionAsync(_cts!.Token);
+            if (result.Success)
+            {
+                ToastService.Show("成功执行临时脚本", variant: "success");
+            }
+            else
+            {
+                ToastService.Show(result.Error?.Message ?? "执行临时脚本失败", variant: "error");
+            }
         }
-        else
-        {
-            ToastService.Show(result.Error?.Message ?? "执行临时脚本失败", variant: "error");
-        }
+        catch (OperationCanceledException) { }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

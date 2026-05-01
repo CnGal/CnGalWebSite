@@ -18,6 +18,7 @@
 @inject IMainSiteAuthRequestService AuthRequestService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
+@implements IDisposable
 
 @if (_isLoginRequired)
 {
@@ -194,6 +195,7 @@ else
     private bool _isError;
     private string _errorMessage = string.Empty;
     private const string LoginReturnUrl = "/space/index";
+    private CancellationTokenSource? _cts;
 
     private bool _showGameRecordTab => _model is not null && (_model.IsCurrentUser || _model.IsShowGameRecord);
     private bool _showFavoritesTab => _model is not null && (_model.IsCurrentUser || _model.IsShowFavorites);
@@ -238,16 +240,27 @@ else
     {
         _prevArticlesPage = ArticlesPage;
         _prevEditRecordsPage = EditRecordsPage;
-        await LoadDataAsync();
+        _cts = new CancellationTokenSource();
+        try
+        {
+            await LoadDataAsync();
+        }
+        catch (OperationCanceledException) { }
     }
 
     protected override async Task OnParametersSetAsync()
     {
         if (_model != null && !string.IsNullOrWhiteSpace(Id) && _model.Id != Id)
         {
+            _cts?.Cancel();
+            _cts = new CancellationTokenSource();
             _prevArticlesPage = ArticlesPage;
             _prevEditRecordsPage = EditRecordsPage;
-            await LoadDataAsync();
+            try
+            {
+                await LoadDataAsync();
+            }
+            catch (OperationCanceledException) { }
             return;
         }
 
@@ -273,6 +286,12 @@ else
                 await Task.WhenAll(tasks);
             }
         }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 
     private async Task LoadDataAsync()
@@ -305,7 +324,7 @@ else
             return;
         }
 
-        var result = await SpaceQueryService.GetSpaceDetailAsync(Id);
+        var result = await SpaceQueryService.GetSpaceDetailAsync(Id, _cts!.Token);
 
         if (result.Success && result.Data != null)
         {
@@ -358,8 +377,8 @@ else
 
     private async Task LoadGameRecordsAsync()
     {
-        var recordsTask = PlayedGameQueryService.GetUserGameRecordsAsync(_model!.Id);
-        var steamInfoTask = PlayedGameQueryService.GetUserSteamInfoAsync(_model.Id);
+        var recordsTask = PlayedGameQueryService.GetUserGameRecordsAsync(_model!.Id, _cts!.Token);
+        var steamInfoTask = PlayedGameQueryService.GetUserSteamInfoAsync(_model.Id, _cts!.Token);
 
         await Task.WhenAll(recordsTask, steamInfoTask);
 
@@ -375,8 +394,8 @@ else
     private async Task LoadFavoriteFoldersAsync()
     {
         var foldersResult = _model!.IsCurrentUser
-            ? await FavoriteFolderQueryService.GetAllUserFavoriteFoldersAsync(_model.Id)
-            : await FavoriteFolderQueryService.GetUserFavoriteFoldersAsync(_model.Id);
+            ? await FavoriteFolderQueryService.GetAllUserFavoriteFoldersAsync(_model.Id, _cts!.Token)
+            : await FavoriteFolderQueryService.GetUserFavoriteFoldersAsync(_model.Id, _cts!.Token);
         _favoriteFolders = foldersResult.Success && foldersResult.Data is not null
             ? foldersResult.Data
             : [];
@@ -385,20 +404,20 @@ else
     private async Task LoadArticlesAsync()
     {
         var page = Math.Max(1, ArticlesPage);
-        var result = await SpaceQueryService.GetUserArticlesAsync(_model!.Id, currentPage: page);
+        var result = await SpaceQueryService.GetUserArticlesAsync(_model!.Id, currentPage: page, cancellationToken: _cts!.Token);
         _articles = result.Success ? result.Data : null;
     }
 
     private async Task LoadVideosAsync()
     {
-        var result = await SpaceQueryService.GetUserVideosAsync(_model!.Id);
+        var result = await SpaceQueryService.GetUserVideosAsync(_model!.Id, _cts!.Token);
         _videos = result.Success ? result.Data : null;
     }
 
     private async Task LoadEditRecordsAsync()
     {
         var page = Math.Max(1, EditRecordsPage);
-        var result = await SpaceQueryService.GetUserEditRecordsAsync(_model!.Id, currentPage: page);
+        var result = await SpaceQueryService.GetUserEditRecordsAsync(_model!.Id, currentPage: page, cancellationToken: _cts!.Token);
         _editRecords = result.Success ? result.Data : null;
     }
 
@@ -422,14 +441,14 @@ else
 
     private async Task LoadPeripheriesAsync()
     {
-        var result = await PeripheryQueryService.GetUserOverviewPeripheriesAsync(_model!.Id);
+        var result = await PeripheryQueryService.GetUserOverviewPeripheriesAsync(_model!.Id, _cts!.Token);
         _peripheries = result.Success ? result.Data : null;
     }
 
     private async Task LoadHeatMapsAsync()
     {
-        var signInTask = SpaceQueryService.GetUserHeatMapAsync(_model!.Id, UserHeatMapType.SignInDays);
-        var editTask = SpaceQueryService.GetUserHeatMapAsync(_model.Id, UserHeatMapType.EditRecords);
+        var signInTask = SpaceQueryService.GetUserHeatMapAsync(_model!.Id, UserHeatMapType.SignInDays, cancellationToken: _cts!.Token);
+        var editTask = SpaceQueryService.GetUserHeatMapAsync(_model.Id, UserHeatMapType.EditRecords, cancellationToken: _cts!.Token);
 
         await Task.WhenAll(signInTask, editTask);
 

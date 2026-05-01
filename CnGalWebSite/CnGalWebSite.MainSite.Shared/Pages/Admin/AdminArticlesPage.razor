@@ -5,6 +5,7 @@
 @inject IAdminQueryService AdminQueryService
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Admin
 
@@ -109,6 +110,7 @@
 </div>
 
 @code {
+    private CancellationTokenSource? _cts;
     private CgDataTable<ArticleOverviewModel>? _dataTable;
 
     private async Task<CgDataTableResult<ArticleOverviewModel>> OnServerQuery(CgDataTableRequest request)
@@ -121,7 +123,7 @@
             SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
             SortDesc = new[] { request.SortDesc }
         };
-        var result = await AdminQueryService.GetArticlesAsync(parameter);
+        var result = await AdminQueryService.GetArticlesAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null
             ? new CgDataTableResult<ArticleOverviewModel>(result.Data.Items.ToList(), result.Data.Total)
             : new CgDataTableResult<ArticleOverviewModel>([], 0);
@@ -129,19 +131,19 @@
 
     private async Task EditPriority(ArticleOverviewModel item, bool up)
     {
-        var r = await AdminCommandService.EditArticlePriorityAsync(new[] { item.Id }, up ? 1 : -1);
+        var r = await AdminCommandService.EditArticlePriorityAsync(new[] { item.Id }, up ? 1 : -1, _cts.Token);
         await HandleResult(r, up ? "已增加权重" : "已降低权重");
     }
 
     private async Task ToggleHidden(ArticleOverviewModel item, bool hide)
     {
-        var r = await AdminCommandService.HideArticleAsync(new[] { item.Id }, hide);
+        var r = await AdminCommandService.HideArticleAsync(new[] { item.Id }, hide, _cts.Token);
         await HandleResult(r, hide ? "已隐藏文章" : "已显示文章");
     }
 
     private async Task ToggleCanComment(ArticleOverviewModel item, bool canComment)
     {
-        var r = await AdminCommandService.EditArticleCanCommentAsync(new[] { item.Id }, canComment);
+        var r = await AdminCommandService.EditArticleCanCommentAsync(new[] { item.Id }, canComment, _cts.Token);
         await HandleResult(r, canComment ? "已开启留言板" : "已关闭留言板");
     }
 
@@ -149,5 +151,11 @@
     {
         if (result.Success) { ToastService.Show(successMessage, variant: "success"); if (_dataTable is not null) await _dataTable.RefreshAsync(); }
         else { ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error"); }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

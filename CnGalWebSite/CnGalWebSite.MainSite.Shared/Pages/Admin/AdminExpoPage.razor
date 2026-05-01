@@ -5,6 +5,8 @@
 @inject IAdminQueryService AdminQueryService
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
+@inject IFileCommandService FileCommandService
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Expo
 @using CnGalWebSite.SDK.MainSite.Models
@@ -213,6 +215,7 @@
 </CgModal>
 
 @code {
+    private CancellationTokenSource? _cts;
     private CgDataTable<ExpoActivityOverviewModel>? _activityTable;
     private CgDataTable<ExpoTicketOverviewModel>? _ticketTable;
     private bool _showActivityModal;
@@ -233,7 +236,7 @@
     private async Task<CgDataTableResult<ExpoActivityOverviewModel>> OnQueryActivities(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetExpoActivitiesAsync(parameter);
+        var result = await AdminQueryService.GetExpoActivitiesAsync(parameter, _cts?.Token ?? CancellationToken.None);
         return result.Success && result.Data is not null ? new CgDataTableResult<ExpoActivityOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<ExpoActivityOverviewModel>([], 0);
     }
 
@@ -242,7 +245,7 @@
     private async Task<CgDataTableResult<ExpoTicketOverviewModel>> OnQueryTickets(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetExpoTicketsAsync(parameter);
+        var result = await AdminQueryService.GetExpoTicketsAsync(parameter, _cts?.Token ?? CancellationToken.None);
         return result.Success && result.Data is not null ? new CgDataTableResult<ExpoTicketOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<ExpoTicketOverviewModel>([], 0);
     }
 
@@ -263,7 +266,7 @@
         _showActivityModal = true;
         StateHasChanged();
 
-        var result = await AdminQueryService.GetExpoActivityEditAsync(model.Id);
+        var result = await AdminQueryService.GetExpoActivityEditAsync(model.Id, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data != null)
         {
             _activityEditModel = result.Data;
@@ -280,7 +283,7 @@
     {
         if (_activityEditModel == null) return;
 
-        var result = await AdminCommandService.EditExpoActivityAsync(_activityEditModel);
+        var result = await AdminCommandService.EditExpoActivityAsync(_activityEditModel, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {
             ToastService.Show("活动已保存", variant: "success");
@@ -310,7 +313,7 @@
         _showTicketModal = true;
         StateHasChanged();
 
-        var result = await AdminQueryService.GetExpoTicketEditAsync(model.Id);
+        var result = await AdminQueryService.GetExpoTicketEditAsync(model.Id, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data != null)
         {
             _ticketEditModel = result.Data;
@@ -327,7 +330,7 @@
     {
         if (_ticketEditModel == null) return;
 
-        var result = await AdminCommandService.EditExpoTicketAsync(_ticketEditModel);
+        var result = await AdminCommandService.EditExpoTicketAsync(_ticketEditModel, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {
             ToastService.Show("票根已保存", variant: "success");
@@ -338,5 +341,11 @@
         {
             ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
         }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

@@ -1,9 +1,10 @@
-@* 
+﻿@*
     UserAtmosphere — 用户自定义背景图
     当页面本身没有设置背景图时，显示当前登录用户的自定义背景。
     在 MainLayout 中渲染，需要 InteractiveServer 以获取认证状态。
 *@
 @inject ISpaceQueryService SpaceQueryService
+@rendermode InteractiveServer
 
 <AuthorizeView>
     <Authorized>
