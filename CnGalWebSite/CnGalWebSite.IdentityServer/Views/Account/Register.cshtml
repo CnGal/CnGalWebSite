@@ -8,19 +8,8 @@
         </div>
         <partial name="_ValidationSummary" />
         <div class="mdl-card__supporting-text">
-            <form asp-route="Register" onsubmit="return callGeetest('geetestCode-submit-button', 'Register')">
+            <form id="register-form" asp-route="Register">
                 <input type="hidden" asp-for="ReturnUrl" />
-
-
-                <!--极验-->
-                <input id="geetestResult-lotNumber" type="hidden" asp-for="VerifyResult.LotNumber" />
-                <input id="geetestResult-captchaOutput" type="hidden" asp-for="VerifyResult.CaptchaOutput" />
-                <input id="geetestResult-passToken" type="hidden" asp-for="VerifyResult.PassToken" />
-                <input id="geetestResult-genTime" type="hidden" asp-for="VerifyResult.GenTime" />
-
-                <div id="captcha-box"></div>
-                <button class="d-none" id="geetestCode-submit-button" type="submit"></button>
-                <!--极验-->
 
 
                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
@@ -40,6 +29,15 @@
                     <label class="mdl-textfield__label" asp-for="ConfirmPassword">确认密码</label>
                 </div>
 
+                <!--极验-->
+                <input id="geetestResult-lotNumber" type="hidden" asp-for="VerifyResult.LotNumber" />
+                <input id="geetestResult-captchaOutput" type="hidden" asp-for="VerifyResult.CaptchaOutput" />
+                <input id="geetestResult-passToken" type="hidden" asp-for="VerifyResult.PassToken" />
+                <input id="geetestResult-genTime" type="hidden" asp-for="VerifyResult.GenTime" />
+
+                <div id="captcha-box"></div>
+                <!--极验-->
+
                 <div class="action">
                     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">注册</button>
                 </div>
@@ -48,3 +46,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>initGeetestCaptcha('register-form', 'Register');</script>
+}

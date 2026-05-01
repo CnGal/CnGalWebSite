@@ -8,9 +8,15 @@
         </div>
         <partial name="_ValidationSummary" />
         <div class="mdl-card__supporting-text">
-            <form asp-route="AddPhoneNumber" onsubmit="return callGeetest('geetestCode-submit-button', 'AccountModify')">
+            <form id="change-email-form" asp-route="AddPhoneNumber">
                 <input type="hidden" asp-for="ReturnUrl" />
                 <input type="hidden" asp-for="SecondCode" />
+
+
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <input class="mdl-textfield__input" type="email" asp-for="Email" autofocus>
+                    <label class="mdl-textfield__label" asp-for="Email">电子邮箱</label>
+                </div>
 
                 <!--极验-->
                 <input id="geetestResult-lotNumber" type="hidden" asp-for="VerifyResult.LotNumber" />
@@ -19,13 +25,7 @@
                 <input id="geetestResult-genTime" type="hidden" asp-for="VerifyResult.GenTime" />
 
                 <div id="captcha-box"></div>
-                <button class="d-none" id="geetestCode-submit-button" type="submit"></button>
                 <!--极验-->
-
-                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                    <input class="mdl-textfield__input" type="email" asp-for="Email" autofocus>
-                    <label class="mdl-textfield__label" asp-for="Email">电子邮箱</label>
-                </div>
 
                 <div class="action">
                     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">确定</button>
@@ -34,3 +34,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>initGeetestCaptcha('change-email-form', 'AccountModify');</script>
+}

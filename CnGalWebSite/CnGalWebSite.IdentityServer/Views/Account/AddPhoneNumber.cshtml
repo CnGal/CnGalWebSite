@@ -8,21 +8,12 @@
         </div>
         <partial name="_ValidationSummary" />
         <div class="mdl-card__supporting-text">
-            <form asp-route="AddPhoneNumber" onsubmit="return callGeetest('geetestCode-submit-button', 'AccountModify')">
+            <form id="add-phone-form" asp-route="AddPhoneNumber">
                 <input type="hidden" asp-for="ReturnUrl" />
                 <input type="hidden" asp-for="UserId" />
                 <input type="hidden" asp-for="Code" />
                 <input type="hidden" asp-for="SecondCode" />
 
-                <!--极验-->
-                <input id="geetestResult-lotNumber" type="hidden" asp-for="VerifyResult.LotNumber" />
-                <input id="geetestResult-captchaOutput" type="hidden" asp-for="VerifyResult.CaptchaOutput" />
-                <input id="geetestResult-passToken" type="hidden" asp-for="VerifyResult.PassToken" />
-                <input id="geetestResult-genTime" type="hidden" asp-for="VerifyResult.GenTime" />
-
-                <div id="captcha-box"></div>
-                <button class="d-none" id="geetestCode-submit-button" type="submit"></button>
-                <!--极验-->
 
                 <div class="input-phone-card">
                     <select asp-for="Country" asp-items="Model.Countries"></select>
@@ -34,6 +25,15 @@
 
                
 
+                <!--极验-->
+                <input id="geetestResult-lotNumber" type="hidden" asp-for="VerifyResult.LotNumber" />
+                <input id="geetestResult-captchaOutput" type="hidden" asp-for="VerifyResult.CaptchaOutput" />
+                <input id="geetestResult-passToken" type="hidden" asp-for="VerifyResult.PassToken" />
+                <input id="geetestResult-genTime" type="hidden" asp-for="VerifyResult.GenTime" />
+
+                <div id="captcha-box"></div>
+                <!--极验-->
+
                 <div class="action">
                     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">确定</button>
                 </div>
@@ -41,3 +41,7 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>initGeetestCaptcha('add-phone-form', 'AccountModify');</script>
+}

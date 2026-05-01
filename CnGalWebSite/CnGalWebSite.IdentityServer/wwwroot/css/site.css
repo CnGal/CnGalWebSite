@@ -147,6 +147,19 @@ footer {
         display: flex;
         justify-content: space-evenly;
         padding-top: 2rem;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .account-page .action #select-modify-field-form{
+        text-align: center;
+    }
+    .mdl-card{
+        overflow: visible;
+    }
+    .mdl-card__supporting-text{
+        overflow: visible;
     }
 
     .account-page button {
@@ -349,4 +362,8 @@ select {
     flex-direction: row;
     align-items: center;
     gap: 1rem;
+}
+
+#captcha-box {
+    padding-bottom: 20px;
 }
