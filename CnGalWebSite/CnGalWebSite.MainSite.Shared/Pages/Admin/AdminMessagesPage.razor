@@ -4,6 +4,7 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @inject IAdminQueryService AdminQueryService
 @inject NavigationManager NavigationManager
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Admin
 
@@ -59,10 +60,17 @@
 </div>
 
 @code {
+    private CancellationTokenSource? _cts;
     private async Task<CgDataTableResult<MessageOverviewModel>> OnServerQuery(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetMessagesAsync(parameter);
+        var result = await AdminQueryService.GetMessagesAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<MessageOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<MessageOverviewModel>([], 0);
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

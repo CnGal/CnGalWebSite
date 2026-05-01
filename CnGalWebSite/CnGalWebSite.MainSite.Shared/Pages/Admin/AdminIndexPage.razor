@@ -172,9 +172,11 @@
     private DateTime? _lastRefreshTime;
     private long? _apiLatencyMs;
     private Timer? _refreshTimer;
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnInitializedAsync()
     {
+        _cts = new CancellationTokenSource();
         // 首次加载所有数据
         await LoadStaticDataAsync();
         await RefreshRealTimeDataAsync();
@@ -190,8 +192,9 @@
     {
         try
         {
-            var apiStaticTask = AdminQueryService.GetServerOverviewAsync();
-            var userTask = AdminQueryService.GetUserDataOverviewAsync();
+            var ct = _cts?.Token ?? CancellationToken.None;
+            var apiStaticTask = AdminQueryService.GetServerOverviewAsync(ct);
+            var userTask = AdminQueryService.GetUserDataOverviewAsync(ct);
 
             await Task.WhenAll(apiStaticTask, userTask);
 
@@ -216,7 +219,7 @@
         try
         {
             var sw = System.Diagnostics.Stopwatch.StartNew();
-            var apiRtTask = AdminQueryService.GetServerRealTimeOverviewAsync();
+            var apiRtTask = AdminQueryService.GetServerRealTimeOverviewAsync(_cts?.Token ?? CancellationToken.None);
             await apiRtTask;
             sw.Stop();
             _apiLatencyMs = sw.ElapsedMilliseconds;
@@ -305,5 +308,7 @@
     public void Dispose()
     {
         _refreshTimer?.Dispose();
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

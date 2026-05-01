@@ -1,11 +1,14 @@
 @* ────────────────────────────────────────────────────────────
-    CgCarousel — 纯 CSS 交叉淡入淡出轮播图
-    ‑ 单张时不启用动画，直接展示
-    ‑ 多张时由 CSS animation + 动态 <style> 驱动自动循环
+    CgCarousel — SSR 首帧 + 渐进增强轮播图
+    ‑ 单张时：直接展示，无需脚本
+    ‑ 多张时：SSR 渲染第一张作为静态首帧
+      JS 增强后接管自动轮播、手动切换与恢复轮播
     ‑ 尊重 prefers-reduced-motion
    ──────────────────────────────────────────────────────────── *@
 
-<div class="cg-carousel" style="aspect-ratio: @AspectRatio;">
+<div class="cg-carousel"
+     style="aspect-ratio: @AspectRatio;"
+     data-cg-carousel-duration="@SlideDurationSeconds">
     @if (Items is not null && Items.Count > 0)
     {
         var count = Items.Count;
@@ -49,14 +52,28 @@
             @for (var i = 0; i < count; i++)
             {
                 var item = Items[i];
-                @if (!string.IsNullOrEmpty(item.Link))
-                {
-                    <a class="cg-carousel__slide"
-                       href="@item.Link"
-                       target="@(IsExternalLink(item.Link) ? "_blank" : null)"
-                       rel="@(IsExternalLink(item.Link) ? "noopener noreferrer" : null)"
-                       style="--slide-index: @i;"
-                       aria-label="@item.Alt">
+                var activeClass = i == 0 ? " cg-carousel__slide--active" : "";
+
+                <div class="cg-carousel__slide@(activeClass)">
+                    @if (!string.IsNullOrEmpty(item.Link))
+                    {
+                        <a class="cg-carousel__link"
+                           href="@item.Link"
+                           target="@(IsExternalLink(item.Link) ? "_blank" : null)"
+                           rel="@(IsExternalLink(item.Link) ? "noopener noreferrer" : null)"
+                           aria-label="@item.Alt">
+                            <img class="cg-carousel__image"
+                                 src="@item.Image"
+                                 alt="@item.Alt"
+                                 loading="@(i == 0 ? "eager" : "lazy")"
+                                 fetchpriority="@(i == 0 ? "high" : "low")"
+                                 decoding="async"
+                                 width="@ImageWidth"
+                                 height="@ImageHeight" />
+                        </a>
+                    }
+                    else
+                    {
                         <img class="cg-carousel__image"
                              src="@item.Image"
                              alt="@item.Alt"
@@ -65,52 +82,30 @@
                              decoding="async"
                              width="@ImageWidth"
                              height="@ImageHeight" />
-                    </a>
-                }
-                else
-                {
-                    <div class="cg-carousel__slide"
-                         style="--slide-index: @i;">
-                        <img class="cg-carousel__image"
-                             src="@item.Image"
-                             alt="@item.Alt"
-                             loading="@(i == 0 ? "eager" : "lazy")"
-                             fetchpriority="@(i == 0 ? "high" : "low")"
-                             decoding="async"
-                             width="@ImageWidth"
-                             height="@ImageHeight" />
-                    </div>
-                }
+                    }
+                </div>
             }
 
-            @*
-                交叉淡入淡出：当前幻灯片在自己时间窗口结束后仍短暂保持可见，
-                其淡出过程与下一张的淡入过程重叠，避免露出背景色。
-            *@
-            var totalDurationSec = count * SlideDurationSeconds;
-            var slidePercent = 100.0 / count;
-            var transPercent = slidePercent * 0.15;
-            var fadeInEnd = transPercent;
-            var holdEnd = slidePercent;
-            var fadeOutEnd = slidePercent + transPercent;
+            @* 导航按钮（位于幻灯片之上） *@
+            <button type="button"
+                    class="cg-carousel__btn cg-carousel__btn--prev"
+                    aria-label="上一张">
+                <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
+            </button>
 
-            <style>
-                .cg-carousel__slide {
-                    animation: cg-carousel-fade @(totalDurationSec)s infinite;
-                    animation-delay: calc(var(--slide-index) * @(SlideDurationSeconds)s);
-                }
-
-                @@keyframes cg-carousel-fade {
-                    0%                      { opacity: 0; visibility: hidden; }
-                    @($"{fadeInEnd:F1}")%    { opacity: 1; visibility: visible; }
-                    @($"{holdEnd:F1}")%      { opacity: 1; visibility: visible; }
-                    @($"{fadeOutEnd:F1}")%   { opacity: 0; visibility: hidden; }
-                    100%                     { opacity: 0; visibility: hidden; }
-                }
-            </style>
+            <button type="button"
+                    class="cg-carousel__btn cg-carousel__btn--next"
+                    aria-label="下一张">
+                <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+            </button>
         }
     }
 </div>
+
+@if (Items is not null && Items.Count > 1)
+{
+    <script src="_content/CnGalWebSite.MainSite.Shared/scripts/cg-carousel.js"></script>
+}
 
 @code {
     /// <summary>轮播项列表</summary>

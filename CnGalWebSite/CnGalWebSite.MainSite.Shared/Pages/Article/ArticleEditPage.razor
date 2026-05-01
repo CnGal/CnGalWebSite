@@ -76,13 +76,19 @@ else if (Model != null)
     private bool HasDraftRecovered = false;
     private CreateArticleViewModel? OriginalData;
     private bool _isAdmin;
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         _isAdmin = authState.User.IsInRole("Admin");
 
-        await LoadDataAsync();
+        _cts = new CancellationTokenSource();
+        try
+        {
+            await LoadDataAsync();
+        }
+        catch (OperationCanceledException) { }
         _autoSaveTimer = new System.Threading.Timer(AutoSaveCallback, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
     }
 
@@ -104,6 +110,8 @@ else if (Model != null)
 
     public void Dispose()
     {
+        _cts?.Cancel();
+        _cts?.Dispose();
         _autoSaveTimer?.Dispose();
     }
 
@@ -118,11 +126,11 @@ else if (Model != null)
             SdkResult<ArticleEditViewModel> result;
             if (IsCreate)
             {
-                result = await ArticleCommandService.GetArticleCreateTemplateAsync();
+                result = await ArticleCommandService.GetArticleCreateTemplateAsync(_cts!.Token);
             }
             else
             {
-                result = await ArticleCommandService.GetArticleEditAsync(Id!.Value);
+                result = await ArticleCommandService.GetArticleEditAsync(Id!.Value, _cts!.Token);
             }
 
             if (result.Success && result.Data != null)
@@ -147,7 +155,7 @@ else if (Model != null)
                 catch { }
 
                 // 获取关联候选列表
-                var metaResult = await ArticleCommandService.GetArticleEditMetaOptionsAsync();
+                var metaResult = await ArticleCommandService.GetArticleEditMetaOptionsAsync(_cts!.Token);
                 if (metaResult.Success && metaResult.Data != null)
                 {
                     Model.MetaOptions = metaResult.Data;
@@ -202,7 +210,7 @@ else if (Model != null)
                 Data = Model.Data
             };
 
-            var result = await ArticleCommandService.SubmitEditAsync(request);
+            var result = await ArticleCommandService.SubmitEditAsync(request, _cts!.Token);
             if (result.Success)
             {
                 await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);

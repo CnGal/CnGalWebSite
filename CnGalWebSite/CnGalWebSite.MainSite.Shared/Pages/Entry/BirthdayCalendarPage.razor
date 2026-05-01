@@ -1,6 +1,7 @@
 ﻿@page "/entries/birthdaycalendar"
 @page "/birthday"
 @inject IEntryQueryService EntryQueryService
+@implements IDisposable
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 
 <CgPageMeta Title="角色生日日历" />
@@ -171,6 +172,7 @@ else
     private DateTime _displayDate;
     private int _daysInMonth;
     private int _firstDayOffset;
+    private CancellationTokenSource? _cts;
 
     [SupplyParameterFromQuery]
     [Parameter]
@@ -182,6 +184,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        _cts = new CancellationTokenSource();
+        try
+        {
         _today = DateTime.Now.Date;
 
         // Determine display month from query parameters
@@ -204,9 +209,9 @@ else
 
         var tasks = new[]
         {
-            EntryQueryService.GetRoleBirthdaysByMonthAsync(currentMonth),
-            EntryQueryService.GetRoleBirthdaysByMonthAsync(prevMonth),
-            EntryQueryService.GetRoleBirthdaysByMonthAsync(nextMonth)
+            EntryQueryService.GetRoleBirthdaysByMonthAsync(currentMonth, _cts!.Token),
+            EntryQueryService.GetRoleBirthdaysByMonthAsync(prevMonth, _cts!.Token),
+            EntryQueryService.GetRoleBirthdaysByMonthAsync(nextMonth, _cts!.Token)
         };
 
         var results = await Task.WhenAll(tasks);
@@ -231,6 +236,17 @@ else
 
         _items = allItems;
         _loaded = true;
+        }
+        catch (OperationCanceledException)
+        {
+            // Component disposed, ignore.
+        }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 
     private static string GetMonthUrl(DateTime date)

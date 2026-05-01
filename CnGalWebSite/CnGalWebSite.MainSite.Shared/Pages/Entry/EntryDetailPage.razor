@@ -5,6 +5,7 @@
 @inject IFavoriteFolderQueryService FavoriteFolderQueryService
 @inject IExamineQueryService ExamineQueryService
 @using CnGalWebSite.DataModel.Model
+@implements IDisposable
 @using CnGalWebSite.DataModel.ViewModel
 @using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.ViewModel.Search
@@ -218,6 +219,7 @@ else
     private IReadOnlyList<FavoriteFolderOverviewModel>? RelateFolders;
     private IReadOnlyList<ExaminedNormalListModel>? EditRecords;
     private string? ErrorMessage;
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -226,6 +228,10 @@ else
             return;
         }
 
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
+        var ct = _cts.Token;
+
         Model = null;
         ScoreOverview = null;
         PeripheryOverview = null;
@@ -233,53 +239,62 @@ else
         EditRecords = null;
         ErrorMessage = null;
 
-        // 并行请求词条详情、周边概览、相关目录、编辑记录
-        // 注意：评分概览仅对游戏类型有效，延迟到确认类型后再请求
-        var entryTask = EntryQueryService.GetEntryDetailAsync(Id);
-        var peripheryTask = PeripheryQueryService.GetEntryOverviewPeripheriesAsync(Id);
-        var catalogTask = FavoriteFolderQueryService.GetRelateFavoriteFoldersAsync(FavoriteObjectType.Entry, Id);
-        var editRecordsTask = ExamineQueryService.GetEntryEditRecordsAsync(Id);
-
-        var result = await entryTask;
-        if (result.Success && result.Data is not null)
+        try
         {
-            ErrorMessage = null;
-            Model = result.Data;
+            // 并行请求词条详情、周边概览、相关目录、编辑记录
+            // 注意：评分概览仅对游戏类型有效，延迟到确认类型后再请求
+            var entryTask = EntryQueryService.GetEntryDetailAsync(Id, ct);
+            var peripheryTask = PeripheryQueryService.GetEntryOverviewPeripheriesAsync(Id, ct);
+            var catalogTask = FavoriteFolderQueryService.GetRelateFavoriteFoldersAsync(FavoriteObjectType.Entry, Id, ct);
+            var editRecordsTask = ExamineQueryService.GetEntryEditRecordsAsync(Id, ct);
 
-            // 仅游戏类词条加载评分概览
-            if (Model.Type == EntryType.Game)
+            var result = await entryTask;
+            if (result.Success && result.Data is not null)
             {
-                var scoreResult = await PlayedGameQueryService.GetOverviewAsync(Id);
-                ScoreOverview = scoreResult.Success ? scoreResult.Data : null;
+                ErrorMessage = null;
+                Model = result.Data;
+
+                // 仅游戏类词条加载评分概览
+                if (Model.Type == EntryType.Game)
+                {
+                    var scoreResult = await PlayedGameQueryService.GetOverviewAsync(Id, ct);
+                    ScoreOverview = scoreResult.Success ? scoreResult.Data : null;
+                }
+                else
+                {
+                    ScoreOverview = null;
+                }
+
+                // 加载周边概览
+                var peripheryResult = await peripheryTask;
+                PeripheryOverview = peripheryResult.Success ? peripheryResult.Data : null;
+
+                // 加载相关目录
+                var catalogResult = await catalogTask;
+                RelateFolders = catalogResult.Success ? catalogResult.Data : null;
+
+                // 加载编辑记录
+                var editRecordsResult = await editRecordsTask;
+                EditRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
+
+                return;
             }
-            else
-            {
-                ScoreOverview = null;
-            }
 
-            // 加载周边概览
-            var peripheryResult = await peripheryTask;
-            PeripheryOverview = peripheryResult.Success ? peripheryResult.Data : null;
-
-            // 加载相关目录
-            var catalogResult = await catalogTask;
-            RelateFolders = catalogResult.Success ? catalogResult.Data : null;
-
-            // 加载编辑记录
-            var editRecordsResult = await editRecordsTask;
-            EditRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
-
-            return;
+            Model = null;
+            ScoreOverview = null;
+            PeripheryOverview = null;
+            RelateFolders = null;
+            EditRecords = null;
+            ErrorMessage = result.Error?.Message ?? "请稍后重试";
         }
-
-        Model = null;
-        ScoreOverview = null;
-        PeripheryOverview = null;
-        RelateFolders = null;
-        EditRecords = null;
-        ErrorMessage = result.Error?.Message ?? "请稍后重试";
+        catch (OperationCanceledException) { }
     }
 
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
 
     private bool HasAtmosphere()
     {

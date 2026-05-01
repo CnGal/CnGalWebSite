@@ -1,5 +1,6 @@
 @page "/usercenter"
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
+@implements IDisposable
 
 @using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 
@@ -59,6 +60,7 @@
 </AuthorizeView>
 
 @code {
+    private CancellationTokenSource? _cts;
     private static readonly IReadOnlyList<CgTabItem> _tabs = new CgTabItem[]
     {
         new("overview", "概览", "mdiViewDashboardOutline"),
@@ -66,4 +68,10 @@
         new("reviews", "审阅记录", "mdiEmailCheckOutline"),
         new("monitors", "关注的词条", "mdiHeartOutline"),
     };
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
 }

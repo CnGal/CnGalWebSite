@@ -2,6 +2,7 @@
 @using CnGalWebSite.DataModel.ViewModel
 @using CnGalWebSite.Extensions
 @using CnGalWebSite.SDK.MainSite.Models.Files
+@inject IFileCommandService FileCommandService
 
 <section class="entry-editor-section" id="section-main">
     <h2><CgMdiIcon Name="mdiFileDocumentOutline" Class="entry-section-icon" aria-hidden="true"/>主要信息</h2>
@@ -31,24 +32,28 @@
                 <CgImageUpload @bind-Value="Model.MainPicture"
                                Text="上传主图"
                                ShowCropper
-                               Type="@(Model.Type is EntryType.Game or EntryType.ProductionGroup ? ImageAspectType._16_9 : ImageAspectType.None)"/>
+                               Type="@(Model.Type is EntryType.Game or EntryType.ProductionGroup ? ImageAspectType._16_9 : ImageAspectType.None)"
+                               OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
             </CgFormGroup>
             <CgFormGroup Label="@(Model.Type == EntryType.Staff ? "头像" : "缩略图")">
                 <CgImageUpload @bind-Value="Model.Thumbnail"
                                Text="@(Model.Type == EntryType.Staff ? "上传头像" : "上传缩略图")"
                                ShowCropper
-                               Type="ImageAspectType._1_1"/>
+                               Type="ImageAspectType._1_1"
+                               OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
             </CgFormGroup>
 
             <CgFormGroup Label="背景图">
                 <CgImageUpload @bind-Value="Model.BackgroundPicture"
                                Text="上传大背景图"
-                               Type="ImageAspectType.None"/>
+                               Type="ImageAspectType.None"
+                               OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
             </CgFormGroup>
             <CgFormGroup Label="小背景图">
                 <CgImageUpload @bind-Value="Model.SmallBackgroundPicture"
                                Text="上传小背景图"
-                               Type="ImageAspectType.None"/>
+                               Type="ImageAspectType.None"
+                               OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
             </CgFormGroup>
         </CgGrid>
        

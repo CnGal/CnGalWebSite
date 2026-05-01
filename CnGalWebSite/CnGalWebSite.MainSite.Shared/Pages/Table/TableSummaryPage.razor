@@ -14,6 +14,7 @@
 
 @inject ITableQueryService TableService
 @inject IJSRuntime JS
+@implements IDisposable
 
 <CgPageMeta Title="CnGal资料站数据汇总" />
 
@@ -371,6 +372,7 @@
     private string? _loadingError;
     private string _activeTab = "games";
     private bool _isExporting;
+    private CancellationTokenSource? _cts;
 
     // ── Tab 定义 ──
     private static readonly CgTabItem[] _tabs =
@@ -388,7 +390,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await TableService.GetTableSummaryAsync();
+        _cts = new CancellationTokenSource();
+        try
+        {
+        var result = await TableService.GetTableSummaryAsync(_cts!.Token);
         if (result.Success)
         {
             _summary = result.Data;
@@ -396,6 +401,11 @@
         else
         {
             _loadingError = result.Error?.Message ?? "加载失败";
+        }
+        }
+        catch (OperationCanceledException)
+        {
+            // Component disposed, ignore.
         }
     }
 
@@ -438,7 +448,7 @@
 
     // ── 通用查询适配 ──
 
-    private static async Task<CgDataTableResult<T>> ExecuteQueryAsync<T>(
+    private async Task<CgDataTableResult<T>> ExecuteQueryAsync<T>(
         CgDataTableRequest req,
         Func<QueryParameterModel, CancellationToken, Task<SdkResult<QueryResultModel<T>>>> queryFunc) where T : class
     {
@@ -451,7 +461,7 @@
             SortDesc = [req.SortDesc],
         };
 
-        var result = await queryFunc(model, CancellationToken.None);
+        var result = await queryFunc(model, _cts!.Token);
 
         if (result.Success && result.Data != null)
         {
@@ -574,6 +584,12 @@
     }
 
     // ── 格式化辅助 ──
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
 
     private static string FormatPrice(double? price)
     {

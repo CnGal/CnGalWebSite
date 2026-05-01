@@ -1,6 +1,7 @@
 @page "/lotteries/home"
 @page "/lotteries"
 @inject ILotteryQueryService LotteryQueryService
+@implements IDisposable
 @using CnGalWebSite.MainSite.Shared.Components.Features.Lottery.Home
 
 <CgPageMeta Title="抽奖板块" />
@@ -60,20 +61,35 @@ else
 }
 
 @code {
+    private CancellationTokenSource? _cts;
     private IReadOnlyList<LotteryCardItemModel>? _cards;
     private string? _errorMessage;
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await LotteryQueryService.GetLotteryCardsAsync();
-        if (result.Success && result.Data is not null)
+        _cts = new CancellationTokenSource();
+        try
         {
-            _errorMessage = null;
-            _cards = result.Data;
-            return;
-        }
+            var result = await LotteryQueryService.GetLotteryCardsAsync(_cts.Token);
+            if (result.Success && result.Data is not null)
+            {
+                _errorMessage = null;
+                _cards = result.Data;
+                return;
+            }
 
-        _cards = null;
-        _errorMessage = result.Error?.Message ?? "请稍后重试";
+            _cards = null;
+            _errorMessage = result.Error?.Message ?? "请稍后重试";
+        }
+        catch (OperationCanceledException)
+        {
+            // Cancelled, do nothing
+        }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

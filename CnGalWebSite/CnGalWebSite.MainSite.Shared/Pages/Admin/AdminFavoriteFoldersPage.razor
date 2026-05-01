@@ -4,6 +4,7 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @inject IAdminQueryService AdminQueryService
 @inject NavigationManager NavigationManager
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Favorites
 
@@ -72,10 +73,18 @@
 </div>
 
 @code {
+    private CancellationTokenSource? _cts;
+
     private async Task<CgDataTableResult<FavoriteFolderOverviewModel>> OnServerQuery(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetFavoriteFoldersAsync(parameter);
+        var result = await AdminQueryService.GetFavoriteFoldersAsync(parameter, _cts?.Token ?? CancellationToken.None);
         return result.Success && result.Data is not null ? new CgDataTableResult<FavoriteFolderOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<FavoriteFolderOverviewModel>([], 0);
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

@@ -7,6 +7,7 @@
 
 @inject IExamineQueryService ExamineQueryService
 @inject NavigationManager NavigationManager
+@implements IDisposable
 
 <CgPageMeta Title="编辑记录" />
 
@@ -156,6 +157,7 @@
     private string _errorMessage = string.Empty;
     private bool _initialized;
     private bool _selfNavigating;
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -169,7 +171,19 @@
         _selfNavigating = false;
         _initialized = true;
 
-        await LoadDataAsync();
+        // Cancel any in-flight operation and create new CTS for this parameter set
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+
+        try
+        {
+            await LoadDataAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            // Component disposed or parameters changed, ignore.
+        }
     }
 
     private async Task LoadDataAsync()
@@ -189,7 +203,7 @@
         _contrastModel = null;
         StateHasChanged();
 
-        var result = await ExamineQueryService.GetExaminesOverviewAsync(ContrastId);
+        var result = await ExamineQueryService.GetExaminesOverviewAsync(ContrastId, _cts!.Token);
 
         if (result.Success && result.Data is not null)
         {
@@ -236,7 +250,7 @@
         _isContrastLoading = true;
         StateHasChanged();
 
-        var result = await ExamineQueryService.GetContrastExamineAsync(_contrastId, _currentId);
+        var result = await ExamineQueryService.GetContrastExamineAsync(_contrastId, _currentId, _cts!.Token);
         if (result.Success && result.Data is not null)
         {
             _contrastModel = result.Data;
@@ -271,6 +285,12 @@
             _currentIdStr = value!;
         }
         return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 
     private string? GetObjectUrl()

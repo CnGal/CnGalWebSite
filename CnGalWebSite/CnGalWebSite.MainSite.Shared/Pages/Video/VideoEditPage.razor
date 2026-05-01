@@ -69,6 +69,7 @@ else if (Model != null)
 
     private VideoEditViewModel? Model;
 
+    private CancellationTokenSource? _cts;
     private System.Threading.Timer? _autoSaveTimer;
     private string DraftKey => IsCreate ? "VideoDraft_Create" : $"VideoDraft_Edit_{Id}";
 
@@ -77,6 +78,7 @@ else if (Model != null)
 
     protected override async Task OnInitializedAsync()
     {
+        _cts = new CancellationTokenSource();
         await LoadDataAsync();
         _autoSaveTimer = new System.Threading.Timer(AutoSaveCallback, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
     }
@@ -100,6 +102,8 @@ else if (Model != null)
     public void Dispose()
     {
         _autoSaveTimer?.Dispose();
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 
     private async Task LoadDataAsync()
@@ -113,11 +117,11 @@ else if (Model != null)
             SdkResult<VideoEditViewModel> result;
             if (IsCreate)
             {
-                result = await VideoCommandService.GetVideoCreateTemplateAsync();
+                result = await VideoCommandService.GetVideoCreateTemplateAsync(_cts!.Token);
             }
             else
             {
-                result = await VideoCommandService.GetVideoEditAsync(Id!.Value);
+                result = await VideoCommandService.GetVideoEditAsync(Id!.Value, _cts!.Token);
             }
 
             if (result.Success && result.Data != null)
@@ -142,7 +146,7 @@ else if (Model != null)
                 catch { }
 
                 // 加载候选列表
-                var metaResult = await VideoCommandService.GetVideoEditMetaOptionsAsync();
+                var metaResult = await VideoCommandService.GetVideoEditMetaOptionsAsync(_cts!.Token);
                 if (metaResult.Success && metaResult.Data != null)
                 {
                     Model.MetaOptions = metaResult.Data;
@@ -152,6 +156,10 @@ else if (Model != null)
             {
                 LoadErrorMessage = result.Error?.Message ?? "获取编辑数据失败";
             }
+        }
+        catch (OperationCanceledException)
+        {
+            // Cancelled, do nothing
         }
         catch (Exception ex)
         {
@@ -197,7 +205,7 @@ else if (Model != null)
                 Data = Model.Data
             };
 
-            var result = await VideoCommandService.SubmitEditAsync(request);
+            var result = await VideoCommandService.SubmitEditAsync(request, _cts!.Token);
             if (result.Success)
             {
                 await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);
@@ -207,6 +215,10 @@ else if (Model != null)
             {
                 ToastService.Show("提交失败", result.Error?.Message ?? "提交审核时出现问题", "error");
             }
+        }
+        catch (OperationCanceledException)
+        {
+            // Cancelled, do nothing
         }
         catch (Exception ex)
         {

@@ -86,10 +86,16 @@ else if (Model != null)
 
     private bool HasDraftRecovered = false;
     private EstablishEntryViewModel? OriginalData;
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadDataAsync();
+        _cts = new CancellationTokenSource();
+        try
+        {
+            await LoadDataAsync();
+        }
+        catch (OperationCanceledException) { }
         _autoSaveTimer = new System.Threading.Timer(AutoSaveCallback, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
     }
 
@@ -111,6 +117,8 @@ else if (Model != null)
 
     public void Dispose()
     {
+        _cts?.Cancel();
+        _cts?.Dispose();
         _autoSaveTimer?.Dispose();
     }
 
@@ -126,11 +134,11 @@ else if (Model != null)
             if (IsCreate)
             {
                 var entryType = Enum.TryParse<EntryType>(Type, true, out var t) ? t : EntryType.Game;
-                result = await EntryCommandService.GetEntryCreateTemplateAsync(entryType);
+                result = await EntryCommandService.GetEntryCreateTemplateAsync(entryType, _cts!.Token);
             }
             else
             {
-                result = await EntryCommandService.GetEntryEditAsync(Id!.Value);
+                result = await EntryCommandService.GetEntryEditAsync(Id!.Value, _cts!.Token);
             }
 
             if (result.Success && result.Data != null)
@@ -153,8 +161,8 @@ else if (Model != null)
                 }
                 catch { }
 
-                var metaTask = EntryCommandService.GetEntryEditMetaOptionsAsync();
-                var tagTreeTask = TagQueryService.GetTagTreeAsync();
+                var metaTask = EntryCommandService.GetEntryEditMetaOptionsAsync(_cts!.Token);
+                var tagTreeTask = TagQueryService.GetTagTreeAsync(_cts!.Token);
                 await Task.WhenAll(metaTask, tagTreeTask);
 
                 var metaResult = metaTask.Result;
@@ -218,7 +226,7 @@ else if (Model != null)
                 Data = Model.Data
             };
 
-            var result = await EntryCommandService.SubmitEditAsync(request);
+            var result = await EntryCommandService.SubmitEditAsync(request, _cts!.Token);
             if (result.Success)
             {
                 await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);

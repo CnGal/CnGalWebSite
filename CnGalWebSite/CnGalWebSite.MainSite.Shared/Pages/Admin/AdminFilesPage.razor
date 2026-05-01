@@ -3,6 +3,7 @@
 @layout AdminLayout
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @inject IFileQueryService FileQueryService
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DrawingBed.Models.ViewModels
 @using CnGalWebSite.DrawingBed.Models.DataModels
@@ -68,6 +69,7 @@
 </div>
 
 @code {
+    private CancellationTokenSource? _cts;
     private async Task<CgDataTableResult<UploadRecordOverviewModel>> OnQueryFiles(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel
@@ -79,11 +81,17 @@
             SortDesc = new[] { request.SortDesc }
         };
 
-        var result = await FileQueryService.GetUploadRecordsAsync(parameter);
+        var result = await FileQueryService.GetUploadRecordsAsync(parameter, _cts.Token);
         if (result.Success && result.Data is not null)
         {
             return new CgDataTableResult<UploadRecordOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
         }
         return new CgDataTableResult<UploadRecordOverviewModel>([], 0);
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

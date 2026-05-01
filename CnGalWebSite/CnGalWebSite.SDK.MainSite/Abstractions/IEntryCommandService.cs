@@ -11,5 +11,5 @@ public interface IEntryCommandService
     Task<SdkResult<EntryEditViewModel>> GetEntryEditAsync(int id, CancellationToken cancellationToken = default);
     Task<SdkResult<EntryEditMetaOptions>> GetEntryEditMetaOptionsAsync(CancellationToken cancellationToken = default);
     Task<SdkResult<long>> SubmitEditAsync(EntryEditRequest request, CancellationToken cancellationToken = default);
-    Task<SdkResult<List<EditInformationModel>>> GetInformationFieldsAsync(EntryType type, CancellationToken cancellationToken = default);
+    Task<SdkResult<IReadOnlyList<EditInformationModel>>> GetInformationFieldsAsync(EntryType type, CancellationToken cancellationToken = default);
 }

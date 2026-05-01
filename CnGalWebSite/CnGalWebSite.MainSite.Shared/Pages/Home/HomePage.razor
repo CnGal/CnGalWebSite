@@ -2,6 +2,7 @@
 @inject IHomeQueryService HomeQueryService
 @using CnGalWebSite.DataModel.ViewModel.Home
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
+@implements IDisposable
 
 <CgPageMeta/>
 
@@ -442,17 +443,29 @@ else
     };
 
     private string? ErrorMessage;
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await HomeQueryService.GetHomeSummaryAsync();
-        if (result.Success && result.Data is not null)
+        _cts = new CancellationTokenSource();
+        try
         {
-            Model = result.Data;
-            return;
-        }
+            var result = await HomeQueryService.GetHomeSummaryAsync(cancellationToken: _cts.Token);
+            if (result.Success && result.Data is not null)
+            {
+                Model = result.Data;
+                return;
+            }
 
-        ErrorMessage = result.Error?.Message ?? "请稍后重试";
+            ErrorMessage = result.Error?.Message ?? "请稍后重试";
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 
     private static string DisplayOrUnknown(string? value)

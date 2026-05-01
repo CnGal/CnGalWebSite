@@ -366,7 +366,7 @@ public sealed class HomeQueryService(
         public bool IsReadOnly => false;
 
         public void Add(SdkErrorModel item) { lock (_lock) _list.Add(item); }
-        public List<SdkErrorModel> ToList() { lock (_lock) return [.. _list]; }
+        public IReadOnlyList<SdkErrorModel> ToList() { lock (_lock) return [.. _list]; }
 
         // 以下方法仅为满足接口约束，并行聚合场景不使用
         public void Clear() { lock (_lock) _list.Clear(); }

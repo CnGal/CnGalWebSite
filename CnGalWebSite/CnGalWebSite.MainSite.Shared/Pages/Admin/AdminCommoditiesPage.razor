@@ -5,6 +5,7 @@
 @inject IAdminQueryService AdminQueryService
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Commodities
@@ -266,6 +267,7 @@
 </CgModal>
 
 @code {
+    private CancellationTokenSource? _cts;
     private CgDataTable<CommodityOverviewModel>? _commodityTable;
     private CgDataTable<CommodityCodeOverviewModel>? _codeTable;
 
@@ -299,7 +301,7 @@
     private async Task<CgDataTableResult<CommodityOverviewModel>> OnQueryCommodities(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetCommoditiesAsync(parameter);
+        var result = await AdminQueryService.GetCommoditiesAsync(parameter, _cts?.Token ?? CancellationToken.None);
         return result.Success && result.Data is not null ? new CgDataTableResult<CommodityOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<CommodityOverviewModel>([], 0);
     }
 
@@ -308,7 +310,7 @@
     private async Task<CgDataTableResult<CommodityCodeOverviewModel>> OnQueryCodes(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetCommodityCodesAsync(parameter);
+        var result = await AdminQueryService.GetCommodityCodesAsync(parameter, _cts?.Token ?? CancellationToken.None);
         return result.Success && result.Data is not null ? new CgDataTableResult<CommodityCodeOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<CommodityCodeOverviewModel>([], 0);
     }
 
@@ -329,7 +331,7 @@
         _showCommodityModal = true;
         StateHasChanged();
 
-        var result = await AdminQueryService.GetCommodityEditAsync(model.Id);
+        var result = await AdminQueryService.GetCommodityEditAsync(model.Id, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data != null)
         {
             _commodityEditModel = result.Data;
@@ -346,7 +348,7 @@
     {
         if (_commodityEditModel == null) return;
 
-        var result = await AdminCommandService.EditCommodityAsync(_commodityEditModel);
+        var result = await AdminCommandService.EditCommodityAsync(_commodityEditModel, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {
             ToastService.Show("商品已保存", variant: "success");
@@ -376,7 +378,7 @@
         _showCodeModal = true;
         StateHasChanged();
 
-        var result = await AdminQueryService.GetCommodityCodeEditAsync(model.Id);
+        var result = await AdminQueryService.GetCommodityCodeEditAsync(model.Id, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data != null)
         {
             _codeEditModel = result.Data;
@@ -393,7 +395,7 @@
     {
         if (_codeEditModel == null) return;
 
-        var result = await AdminCommandService.EditCommodityCodeAsync(_codeEditModel);
+        var result = await AdminCommandService.EditCommodityCodeAsync(_codeEditModel, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {
             ToastService.Show("兑换码已保存", variant: "success");
@@ -430,7 +432,7 @@
                 Hide = _importHide
             };
 
-            var result = await AdminCommandService.EditCommodityCodeAsync(model);
+            var result = await AdminCommandService.EditCommodityCodeAsync(model, _cts?.Token ?? CancellationToken.None);
             if (result.Success) successCount++;
             else failCount++;
         }
@@ -441,5 +443,11 @@
 
         ToastService.Show($"批量导入完成：成功 {successCount} 条，失败 {failCount} 条", variant: failCount > 0 ? "warning" : "success");
         if (_codeTable != null) await _codeTable.RefreshAsync();
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

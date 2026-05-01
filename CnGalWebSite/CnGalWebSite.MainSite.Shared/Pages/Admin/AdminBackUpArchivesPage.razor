@@ -5,6 +5,7 @@
 @inject IAdminQueryService AdminQueryService
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.BackUpArchives
 
@@ -62,18 +63,36 @@
 
 @code {
     private CgDataTable<BackUpArchiveOverviewModel>? _dataTable;
+    private CancellationTokenSource? _cts = new();
 
     private async Task<CgDataTableResult<BackUpArchiveOverviewModel>> OnServerQuery(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetBackUpArchivesAsync(parameter);
-        return result.Success && result.Data is not null ? new CgDataTableResult<BackUpArchiveOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<BackUpArchiveOverviewModel>([], 0);
+        try
+        {
+            var result = await AdminQueryService.GetBackUpArchivesAsync(parameter, _cts!.Token);
+            return result.Success && result.Data is not null ? new CgDataTableResult<BackUpArchiveOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<BackUpArchiveOverviewModel>([], 0);
+        }
+        catch (OperationCanceledException)
+        {
+            return new CgDataTableResult<BackUpArchiveOverviewModel>([], 0);
+        }
     }
 
     private async Task RunBackUp(BackUpArchiveOverviewModel item)
     {
-        var r = await AdminCommandService.RunBackUpArchiveAsync(new[] { item.Id });
-        if (r.Success) { ToastService.Show("备份任务已执行", variant: "success"); if (_dataTable is not null) await _dataTable.RefreshAsync(); }
-        else { ToastService.Show(r.Error?.Message ?? "执行备份失败", variant: "error"); }
+        try
+        {
+            var r = await AdminCommandService.RunBackUpArchiveAsync(new[] { item.Id }, _cts!.Token);
+            if (r.Success) { ToastService.Show("备份任务已执行", variant: "success"); if (_dataTable is not null) await _dataTable.RefreshAsync(); }
+            else { ToastService.Show(r.Error?.Message ?? "执行备份失败", variant: "error"); }
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

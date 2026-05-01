@@ -1,5 +1,6 @@
 @using CnGalWebSite.DataModel.ViewModel
 @using CnGalWebSite.DataModel.ViewModel.Videos
+@inject IFileCommandService FileCommandService
 
 <section class="entry-editor-section" id="section-images">
     <h2><CgMdiIcon Name="mdiImageOutline" Class="entry-section-icon" aria-hidden="true" />预览图</h2>
@@ -16,7 +17,8 @@
                 <CgImageUpload Multiple
                                ShowPreview="false"
                                Text="上传图片到图床"
-                               OnImageUploaded="OnImageUploaded"/>
+                               OnImageUploaded="OnImageUploaded"
+                               OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
             </HeaderActions>
             <ChildContent>
                 @if (Model.Images.Any())
@@ -62,7 +64,8 @@
         {
             <CgFormGroup Label="图片">
                 <CgImageUpload @bind-Value="_editingItem.Image"
-                               Text="上传替换图片"/>
+                               Text="上传替换图片"
+                               OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
             </CgFormGroup>
             <CgGrid>
                 <CgFormGroup Label="备注">

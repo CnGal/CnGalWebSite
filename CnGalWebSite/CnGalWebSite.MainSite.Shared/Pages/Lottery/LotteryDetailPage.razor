@@ -1,5 +1,6 @@
 @page "/lotteries/index/{Id:long}"
 @inject ILotteryQueryService LotteryQueryService
+@implements IDisposable
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.MainSite.Shared.Components.Features.Lottery.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
@@ -137,19 +138,29 @@ else
 
     private LotteryDetailViewModel? _model;
     private string? _errorMessage;
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnParametersSetAsync()
     {
-        var result = await LotteryQueryService.GetLotteryDetailAsync(Id);
-        if (result.Success && result.Data is not null)
+        _cts?.Cancel();
+        _cts = new CancellationTokenSource();
+        try
         {
-            _errorMessage = null;
-            _model = result.Data;
-            return;
-        }
+            var result = await LotteryQueryService.GetLotteryDetailAsync(Id, cancellationToken: _cts.Token);
+            if (result.Success && result.Data is not null)
+            {
+                _errorMessage = null;
+                _model = result.Data;
+                return;
+            }
 
-        _model = null;
-        _errorMessage = result.Error?.Message ?? "请稍后重试";
+            _model = null;
+            _errorMessage = result.Error?.Message ?? "请稍后重试";
+        }
+        catch (OperationCanceledException)
+        {
+            // Component disposed or parameters changed, ignore
+        }
     }
 
     private string GetDisplayTitle()
@@ -172,4 +183,11 @@ else
         return string.IsNullOrWhiteSpace(_model.BackgroundPicture) is false
             || string.IsNullOrWhiteSpace(_model.SmallBackgroundPicture) is false;
     }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+
 }

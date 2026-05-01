@@ -12,7 +12,7 @@ public static class StaffBatchParser
     /// <summary>
     /// 批量导入 Staff 信息
     /// </summary>
-    public static List<StaffModel> GetStaffsFromString(string text)
+    public static IReadOnlyList<StaffModel> GetStaffsFromString(string text)
     {
         var result = new List<StaffModel>();
 

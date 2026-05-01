@@ -4,9 +4,9 @@ namespace CnGalWebSite.SDK.MainSite.Models.TagEdit;
 
 public sealed class TagEditMetaOptions
 {
-    public List<string> TagItems { get; set; } = [];
+    public IReadOnlyList<string> TagItems { get; set; } = [];
 
-    public List<string> EntryItems { get; set; } = [];
+    public IReadOnlyList<string> EntryItems { get; set; } = [];
 
-    public List<TagTreeModel> TagTreeItems { get; set; } = [];
+    public IReadOnlyList<TagTreeModel> TagTreeItems { get; set; } = [];
 }

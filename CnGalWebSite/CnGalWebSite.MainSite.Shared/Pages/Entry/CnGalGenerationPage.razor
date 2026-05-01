@@ -134,6 +134,7 @@
     private readonly HashSet<string> _selected = new(StringComparer.Ordinal);
 
     private IJSObjectReference? _jsModule;
+    private CancellationTokenSource? _cts;
 
     private int SelectedCount => _selected.Count;
 
@@ -141,7 +142,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadAsync();
+        _cts = new CancellationTokenSource();
+        try
+        {
+            await LoadAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            // Component disposed, ignore.
+        }
     }
 
     private async Task LoadAsync()
@@ -150,7 +159,7 @@
         _years = null;
         _selected.Clear();
 
-        var result = await StoreInfoQueryService.GetCnGalGenerationAsync();
+        var result = await StoreInfoQueryService.GetCnGalGenerationAsync(_cts!.Token);
         if (result.Success && result.Data is not null)
         {
             _years = result.Data;
@@ -236,6 +245,12 @@
 
     public async ValueTask DisposeAsync()
     {
+        if (_cts is not null)
+        {
+            await _cts.CancelAsync();
+            _cts.Dispose();
+        }
+
         if (_jsModule is not null)
         {
             try

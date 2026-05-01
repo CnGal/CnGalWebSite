@@ -4,6 +4,7 @@
 
 @inject ISpaceCommandService SpaceCommandService
 @inject NavigationManager NavigationManager
+@implements IDisposable
 
 <CgPageMeta Title="绑定 Steam 账号" />
 
@@ -29,9 +30,11 @@ else
     private string? _statusMessage;
     private string _statusVariant = "info";
     private string _returnHref = "/";
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnInitializedAsync()
     {
+        _cts = new CancellationTokenSource();
         // 预先计算返回链接
         if (!string.IsNullOrWhiteSpace(ReturnUrl))
         {
@@ -67,7 +70,7 @@ else
 
             var steamId = ids.Last();
 
-            var editResult = await SpaceCommandService.GetSpaceEditAsync();
+            var editResult = await SpaceCommandService.GetSpaceEditAsync(_cts!.Token);
             if (!editResult.Success || editResult.Data == null)
             {
                 SetStatus(editResult.Error?.Message ?? "无法获取当前个人空间数据", "error");
@@ -84,12 +87,12 @@ else
 
             model.UserData.SteamIds.Add(steamId);
 
-            var submitResult = await SpaceCommandService.SubmitEditAsync(model);
+            var submitResult = await SpaceCommandService.SubmitEditAsync(model, _cts!.Token);
             if (submitResult.Success)
             {
                 // 绑定成功后，刷新 Steam 相关缓存以拉取最新游玩数据
                 var userId = model.UserData.Id ?? string.Empty;
-                var refreshResult = await SpaceCommandService.RefreshSteamInfoAsync(userId);
+                var refreshResult = await SpaceCommandService.RefreshSteamInfoAsync(userId, _cts!.Token);
                 if (refreshResult.Success)
                 {
                     SetStatus("已成功绑定 Steam 账号并刷新游玩数据", "success");
@@ -105,10 +108,20 @@ else
                 SetStatus(submitResult.Error?.Message ?? "保存 Steam 绑定信息失败", "error");
             }
         }
+        catch (OperationCanceledException)
+        {
+            // Component disposed, ignore.
+        }
         catch (Exception ex)
         {
             SetStatus($"发生未知错误：{ex.Message}", "error");
         }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 
     private void SetStatus(string message, string variant)

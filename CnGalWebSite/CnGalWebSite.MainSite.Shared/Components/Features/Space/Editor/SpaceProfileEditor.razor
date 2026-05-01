@@ -1,5 +1,6 @@
 ﻿@using CnGalWebSite.DataModel.ViewModel.Space
 @using CnGalWebSite.SDK.MainSite.Models.Files
+@inject IFileCommandService FileCommandService
 
 <section class="space-editor-section" id="section-profile">
     <h2><CgMdiIcon Name="mdiAccountOutline" Class="space-section-icon" aria-hidden="true"/>个人资料</h2>
@@ -12,22 +13,26 @@
                 <CgImageUpload @bind-Value="Model.PhotoName"
                                Text="上传头像"
                                ShowCropper
-                               Type="ImageAspectType._1_1"/>
+                               Type="ImageAspectType._1_1"
+                               OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
             </CgFormGroup>
             <CgFormGroup Label="背景图">
                 <CgImageUpload @bind-Value="Model.BackgroundName"
                                Text="上传背景图"
-                               Type="ImageAspectType.None"/>
+                               Type="ImageAspectType.None"
+                               OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
             </CgFormGroup>
             <CgFormGroup Label="大屏背景">
                 <CgImageUpload @bind-Value="Model.SBgImageName"
                                Text="上传大屏背景"
-                               Type="ImageAspectType.None"/>
+                               Type="ImageAspectType.None"
+                               OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
             </CgFormGroup>
             <CgFormGroup Label="小屏背景">
                 <CgImageUpload @bind-Value="Model.MBgImageName"
                                Text="上传小屏背景"
-                               Type="ImageAspectType.None"/>
+                               Type="ImageAspectType.None"
+                               OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
             </CgFormGroup>
         </CgGrid>
 

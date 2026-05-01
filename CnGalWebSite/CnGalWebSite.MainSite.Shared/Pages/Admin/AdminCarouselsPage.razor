@@ -5,6 +5,8 @@
 @inject IAdminQueryService QueryService
 @inject IAdminCommandService CommandService
 @inject ICgToastService ToastService
+@inject IFileCommandService FileCommandService
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Home
@@ -65,7 +67,8 @@
             @if (_editModel != null)
             {
                 <CgFormGroup Label="图片" Required="true">
-                    <CgImageUpload @bind-Value="_editModel.Image" />
+                    <CgImageUpload @bind-Value="_editModel.Image"
+                                   OnUploadImageAsync="FileCommandService.UploadImageAsync" />
                 </CgFormGroup>
                 
                 <CgFormGroup Label="类型">
@@ -106,6 +109,7 @@
     private bool _showEditModal;
     private bool _isNew;
     private CarouselEditModel? _editModel;
+    private CancellationTokenSource? _cts = new();
 
     private async Task<CgDataTableResult<CarouselOverviewModel>> OnQueryAsync(CgDataTableRequest request)
     {
@@ -118,31 +122,42 @@
             SortDesc = new[] { request.SortDesc }
         };
 
-        var result = await QueryService.GetCarouselsAsync(parameter);
-        if (result.Success && result.Data != null)
+        try
         {
-            return new CgDataTableResult<CarouselOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
-        }
+            var result = await QueryService.GetCarouselsAsync(parameter, _cts!.Token);
+            if (result.Success && result.Data != null)
+            {
+                return new CgDataTableResult<CarouselOverviewModel>(result.Data.Items.ToList(), result.Data.Total);
+            }
 
-        ToastService.Show(result.Error?.Message ?? "获取轮播图列表失败", variant: "error");
-        return new CgDataTableResult<CarouselOverviewModel>([], 0);
+            ToastService.Show(result.Error?.Message ?? "获取轮播图列表失败", variant: "error");
+            return new CgDataTableResult<CarouselOverviewModel>([], 0);
+        }
+        catch (OperationCanceledException)
+        {
+            return new CgDataTableResult<CarouselOverviewModel>([], 0);
+        }
     }
 
     private async Task OnEditPriorityAsync(CarouselOverviewModel model, int plusPriority)
     {
-        var result = await CommandService.EditCarouselPriorityAsync([model.Id], plusPriority);
-        if (result.Success)
+        try
         {
-            ToastService.Show("已更新轮播图权重", variant: "success");
-            if (_table != null)
+            var result = await CommandService.EditCarouselPriorityAsync([model.Id], plusPriority, _cts!.Token);
+            if (result.Success)
             {
-                await _table.RefreshAsync();
+                ToastService.Show("已更新轮播图权重", variant: "success");
+                if (_table != null)
+                {
+                    await _table.RefreshAsync();
+                }
+            }
+            else
+            {
+                ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error");
             }
         }
-        else
-        {
-            ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error");
-        }
+        catch (OperationCanceledException) { }
     }
 
     private async Task OnCreateAsync()
@@ -160,15 +175,22 @@
         _showEditModal = true;
         StateHasChanged();
 
-        var result = await QueryService.GetCarouselEditAsync(model.Id);
-        if (result.Success && result.Data != null)
+        try
         {
-            _editModel = result.Data;
-            StateHasChanged();
+            var result = await QueryService.GetCarouselEditAsync(model.Id, _cts!.Token);
+            if (result.Success && result.Data != null)
+            {
+                _editModel = result.Data;
+                StateHasChanged();
+            }
+            else
+            {
+                ToastService.Show(result.Error?.Message ?? "获取详情失败", variant: "error");
+                _showEditModal = false;
+            }
         }
-        else
+        catch (OperationCanceledException)
         {
-            ToastService.Show(result.Error?.Message ?? "获取详情失败", variant: "error");
             _showEditModal = false;
         }
     }
@@ -177,20 +199,24 @@
     {
         if (_editModel == null) return;
         
-        var result = await CommandService.EditCarouselAsync(_editModel);
-        if (result.Success)
+        try
         {
-            ToastService.Show("轮播图基本信息已保存", variant: "success");
-            _showEditModal = false;
-            if (_table != null)
+            var result = await CommandService.EditCarouselAsync(_editModel, _cts!.Token);
+            if (result.Success)
             {
-                await _table.RefreshAsync();
+                ToastService.Show("轮播图基本信息已保存", variant: "success");
+                _showEditModal = false;
+                if (_table != null)
+                {
+                    await _table.RefreshAsync();
+                }
+            }
+            else
+            {
+                ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
             }
         }
-        else
-        {
-            ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
-        }
+        catch (OperationCanceledException) { }
     }
 
     private string GetTypeColor(CarouselType type)
@@ -202,5 +228,11 @@
             CarouselType.AdvertisingApp => "admin-badge--hidden",
             _ => "admin-badge--neutral"
         };
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

@@ -4,6 +4,7 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @inject IAdminQueryService AdminQueryService
 @inject NavigationManager NavigationManager
+@implements IDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Almanacs
 
@@ -61,10 +62,25 @@
 </div>
 
 @code {
+    private CancellationTokenSource? _cts = new();
+
     private async Task<CgDataTableResult<AlmanacOverviewModel>> OnServerQuery(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
-        var result = await AdminQueryService.GetAlmanacsAsync(parameter);
-        return result.Success && result.Data is not null ? new CgDataTableResult<AlmanacOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<AlmanacOverviewModel>([], 0);
+        try
+        {
+            var result = await AdminQueryService.GetAlmanacsAsync(parameter, _cts!.Token);
+            return result.Success && result.Data is not null ? new CgDataTableResult<AlmanacOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<AlmanacOverviewModel>([], 0);
+        }
+        catch (OperationCanceledException)
+        {
+            return new CgDataTableResult<AlmanacOverviewModel>([], 0);
+        }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }

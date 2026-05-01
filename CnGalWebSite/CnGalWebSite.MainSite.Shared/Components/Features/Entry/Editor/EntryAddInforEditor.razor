@@ -48,7 +48,7 @@
                 .Where(i => !string.IsNullOrWhiteSpace(i.Value))
                 .ToDictionary(i => i.Name, i => i.Value);
 
-            Model.Informations = result.Data;
+            Model.Informations = result.Data.ToList();
             foreach (var info in Model.Informations)
             {
                 if (existingValues.TryGetValue(info.Name, out var value))

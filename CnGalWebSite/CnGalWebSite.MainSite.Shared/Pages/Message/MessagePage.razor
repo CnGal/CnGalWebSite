@@ -7,6 +7,7 @@
 
 @inject ISpaceQueryService SpaceQueryService
 @inject ISpaceCommandService SpaceCommandService
+@implements IDisposable
 
 <CgPageMeta Title="消息中心" />
 
@@ -75,9 +76,11 @@
     private bool _isError;
     private string _errorMessage = string.Empty;
     private string _defaultTab = "all";
+    private CancellationTokenSource? _cts;
 
     protected override async Task OnInitializedAsync()
     {
+        _cts = new CancellationTokenSource();
         await LoadDataAsync();
     }
 
@@ -88,7 +91,7 @@
         _model = null;
         StateHasChanged();
 
-        var result = await SpaceQueryService.GetUserMessagesAsync();
+        var result = await SpaceQueryService.GetUserMessagesAsync(_cts?.Token ?? CancellationToken.None);
 
         if (result.Success && result.Data is not null)
         {
@@ -113,7 +116,7 @@
             }
 
             // 后台标记全部已读
-            _ = SpaceCommandService.ReadAllMessagesAsync();
+            _ = SpaceCommandService.ReadAllMessagesAsync(_cts?.Token ?? CancellationToken.None);
         }
         else
         {
@@ -138,5 +141,11 @@
             new CgTabItem("passed", "审核通过", "mdiCheckCircleOutline", passedCount > 0 ? passedCount.ToString() : null),
             new CgTabItem("rejected", "审核驳回", "mdiAlertCircleOutline", rejectedCount > 0 ? rejectedCount.ToString() : null),
         ];
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 }
