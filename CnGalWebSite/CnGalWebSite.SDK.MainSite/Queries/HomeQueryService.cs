@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
@@ -22,7 +22,7 @@ public sealed class HomeQueryService(
     IMemoryCache memoryCache,
     ILogger<HomeQueryService> logger) : QueryServiceBase(httpClient), IHomeQueryService
 {
-    private static readonly TimeSpan HomeCacheDuration = TimeSpan.FromMinutes(2);
+    private static readonly TimeSpan HomeCacheDuration = TimeSpan.FromMinutes(5);
 
     protected override ILogger Logger => logger;
 

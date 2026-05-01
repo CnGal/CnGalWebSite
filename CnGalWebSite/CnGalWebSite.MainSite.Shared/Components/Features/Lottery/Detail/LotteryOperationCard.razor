@@ -2,6 +2,7 @@
 
 @inject ILotteryCommandService LotteryCommandService
 @inject ICgToastService ToastService
+@inject ICgDeviceIdentificationService DeviceIdentificationService
 @using CnGalWebSite.DataModel.ViewModel.Lotteries
 @using CnGalWebSite.DataModel.Model
 
@@ -147,7 +148,8 @@
 
         try
         {
-            var result = await LotteryCommandService.ParticipateInLotteryAsync(LotteryId);
+            var identification = await DeviceIdentificationService.GetIdentificationAsync();
+            var result = await LotteryCommandService.ParticipateInLotteryAsync(LotteryId, identification);
             if (result.Success)
             {
                 ToastService.Show("参与抽奖成功", variant: "success");
