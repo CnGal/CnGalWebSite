@@ -191,12 +191,34 @@ public static class ServiceCollectionExtensions
         var builder = services.AddHttpClient<TInterface, TImpl>(client =>
         {
             client.BaseAddress = baseAddress;
+            // 总超时 30 秒（远低于 .NET 默认的 100 秒），配合弹性策略后实际最多 2 次重试
+            client.Timeout = TimeSpan.FromSeconds(30);
+        })
+        .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
+        {
+            // 连接池生命周期：定期回收连接，避免陈旧连接拖死请求
+            PooledConnectionLifetime = TimeSpan.FromMinutes(5),
+            // 空闲连接 2 分钟后自动关闭
+            PooledConnectionIdleTimeout = TimeSpan.FromMinutes(2),
+            // 限制对同一 API 服务器的最大并发连接数
+            MaxConnectionsPerServer = 20,
+            // 允许 HTTP/2 多路复用（减少连接数，提升吞吐）
+            EnableMultipleHttp2Connections = true,
         });
 
         if (withAuth)
         {
             builder.AddHttpMessageHandler<AccessTokenHandler>();
         }
+
+        // 标准弹性策略：自动重试 + 熔断 + 单次尝试超时
+        builder.AddStandardResilienceHandler(options =>
+        {
+            // 单次 HTTP 尝试的超时（不是总超时，总超时由 HttpClient.Timeout 控制）
+            options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(12);
+            // 断路器：降低最小吞吐量阈值，使冷启动时也能触发保护
+            options.CircuitBreaker.MinimumThroughput = 4;
+        });
     }
 
     private static string EnsureTrailingSlash(string address)

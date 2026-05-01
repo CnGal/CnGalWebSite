@@ -101,6 +101,9 @@
             catch (JSException)
             {
             }
+            catch (TaskCanceledException)
+            {
+            }
         }
 
         _dotNetRef?.Dispose();

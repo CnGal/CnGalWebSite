@@ -112,13 +112,14 @@ public sealed class LotteryCommandService(
         }
     }
 
-    public async Task<SdkResult<bool>> ParticipateInLotteryAsync(long lotteryId, CancellationToken cancellationToken = default)
+    public async Task<SdkResult<bool>> ParticipateInLotteryAsync(long lotteryId, CnGalWebSite.Core.Models.DeviceIdentificationModel identification, CancellationToken cancellationToken = default)
     {
         try
         {
             var response = await PostAsJsonRawAsync("api/lotteries/ParticipateInLottery", new ParticipateInLotteryModel
             {
                 Id = lotteryId,
+                Identification = identification,
             }, cancellationToken);
             var result = await ReadResponseAsync<Result>(response, cancellationToken);
 
