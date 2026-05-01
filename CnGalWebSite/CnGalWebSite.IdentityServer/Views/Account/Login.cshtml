@@ -1,4 +1,4 @@
-@model LoginViewModel
+﻿@model LoginViewModel
 
 <div class="account-page">
     <div class="login-card mdl-card mdl-shadow--2dp">
@@ -24,18 +24,8 @@
         @if (Model.EnableLocalLogin)
         {
             <div class="mdl-card__supporting-text">
-                <form asp-route="Login" onsubmit="return callGeetest('geetestCode-submit-button', 'Login')">
+                <form id="login-form" asp-route="Login">
                     <input type="hidden" asp-for="ReturnUrl" />
-
-                    <!--极验-->
-                    <input id="geetestResult-lotNumber" type="hidden" asp-for="VerifyResult.LotNumber" />
-                    <input id="geetestResult-captchaOutput" type="hidden" asp-for="VerifyResult.CaptchaOutput" />
-                    <input id="geetestResult-passToken" type="hidden" asp-for="VerifyResult.PassToken" />
-                    <input id="geetestResult-genTime" type="hidden" asp-for="VerifyResult.GenTime" />
-
-                    <div id="captcha-box"></div>
-                    <button class="d-none" id="geetestCode-submit-button" type="submit"></button>
-                    <!--极验-->
 
 
                     <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
@@ -46,6 +36,14 @@
                         <input class="mdl-textfield__input" type="password" asp-for="Password" autocomplete="off">
                         <label class="mdl-textfield__label" asp-for="Password">密码</label>
                     </div>
+                    <!--极验-->
+                    <input id="geetestResult-lotNumber" type="hidden" asp-for="VerifyResult.LotNumber" />
+                    <input id="geetestResult-captchaOutput" type="hidden" asp-for="VerifyResult.CaptchaOutput" />
+                    <input id="geetestResult-passToken" type="hidden" asp-for="VerifyResult.PassToken" />
+                    <input id="geetestResult-genTime" type="hidden" asp-for="VerifyResult.GenTime" />
+
+                    <div id="captcha-box"></div>
+                    <!--极验-->
                     <div class="ex-action">
                         @if (Model.AllowRememberLogin)
                         {
@@ -58,6 +56,7 @@
                         }
                         <a asp-controller="Account" asp-action="ResetPassword" asp-route-returnUrl="@Model.ReturnUrl">忘记密码？</a>
                     </div>
+
 
                     <div class="action">
                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" name="button" value="login">登入</button>
@@ -111,3 +110,10 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    @if (Model.EnableLocalLogin)
+    {
+        <script>initGeetestCaptcha('login-form', 'Login');</script>
+    }
+}

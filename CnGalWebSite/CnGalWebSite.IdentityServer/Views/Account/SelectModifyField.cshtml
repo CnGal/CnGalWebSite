@@ -19,7 +19,7 @@
 
 
                 <div class="action">
-                    <form asp-route="SelectModifyField" onsubmit="return callGeetest('geetestCode-submit-button', 'SendCode')">
+                    <form id="select-modify-field-form" asp-route="SelectModifyField">
                         <input type="hidden" asp-for="ReturnUrl" />
 
                         <!--极验-->
@@ -29,7 +29,6 @@
                         <input id="geetestResult-genTime" type="hidden" asp-for="VerifyResult.GenTime" />
 
                         <div id="captcha-box"></div>
-                        <button class="d-none" id="geetestCode-submit-button" type="submit"></button>
                         <!--极验-->
                         <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">验证</button>
                     </form>
@@ -134,3 +133,7 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <script>initGeetestCaptcha('select-modify-field-form', 'SendCode');</script>
+}

@@ -10,43 +10,61 @@ var HttpClient = function () {
         anHttpRequest.send(null);
     }
 }
-i = 0;
-function callGeetest(buttonId, scenario) {
-    buttonId = buttonId || 'geetestCode-submit-button';
-    scenario = scenario || 'Login';
-    if (i != 0) {
-        i = 0;
-        return true;
+
+function initGeetestCaptcha(formId, scenario) {
+    var form = document.getElementById(formId);
+    if (!form) {
+        return;
     }
+
+    var captchaBox = form.querySelector('#captcha-box');
+    if (!captchaBox) {
+        return;
+    }
+
+    if (!scenario) {
+        scenario = 'Login';
+    }
+
     var client = new HttpClient();
     client.get('/api/tool/GetGeetestCode?scenario=' + encodeURIComponent(scenario), function (response) {
-        //获取页面初始化数据
-        re= JSON.parse(response);
-        gt = re.gt;
+        var re = JSON.parse(response);
+        var gt = re.gt;
 
         initGeetest4({
             captchaId: gt,
-            product: 'bind'
+            product: 'float',
+            nativeButton: {
+                width: '100%',
+                height: '48px'
+            }
         }, function (captchaObj) {
-            captchaObj.onReady(function () {
-                //验证码ready之后才能调用验证实例 captchaObj 的实例方法显示验证码
-                captchaObj.showCaptcha();
-            });
-            //成功回调
+            captchaObj.appendTo(captchaBox);
+
             captchaObj.onSuccess(function () {
-                i = 1;
                 var result = captchaObj.getValidate();
-                //设置数据
-                document.getElementById('geetestResult-lotNumber').value = result.lot_number;
-                document.getElementById('geetestResult-captchaOutput').value = result.captcha_output;
-                document.getElementById('geetestResult-passToken').value = result.pass_token;
-                document.getElementById('geetestResult-genTime').value = result.gen_time;
-                //提交表单
-                document.getElementById(buttonId).click();
+
+                var lotNumber = form.querySelector('#geetestResult-lotNumber');
+                var captchaOutput = form.querySelector('#geetestResult-captchaOutput');
+                var passToken = form.querySelector('#geetestResult-passToken');
+                var genTime = form.querySelector('#geetestResult-genTime');
+
+                if (lotNumber) {
+                    lotNumber.value = result.lot_number;
+                }
+                if (captchaOutput) {
+                    captchaOutput.value = result.captcha_output;
+                }
+                if (passToken) {
+                    passToken.value = result.pass_token;
+                }
+                if (genTime) {
+                    genTime.value = result.gen_time;
+                }
             });
+
             captchaObj.onError(function () {
             });
         });
     });
-    return false;
 }

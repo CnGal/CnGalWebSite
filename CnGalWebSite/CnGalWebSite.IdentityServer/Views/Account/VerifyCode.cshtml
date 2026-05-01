@@ -11,7 +11,7 @@
         </div>
         <partial name="_ValidationSummary" />
         <div class="mdl-card__supporting-text">
-            <form asp-route="VerifyCode">
+            <form id="verify-code-form" asp-route="VerifyCode">
                 <input type="hidden" asp-for="ReturnUrl" />
                 <input type="hidden" asp-for="UserId" />
                 <input type="hidden" asp-for="Type" />
@@ -20,6 +20,15 @@
                 <input type="hidden" asp-for="PhoneNumber" />
                 <input type="hidden" asp-for="Email" />
 
+
+                <div class="code-input">
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <input class="mdl-textfield__input" asp-for="Code" autofocus autocomplete="off">
+                        <label class="mdl-textfield__label" asp-for="Code">验证码</label>
+                    </div>
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" id="repost" name="button" value="repost" type="submit">重新发送</button>
+                </div>
+
                 <!--极验-->
                 <input id="geetestResult-lotNumber" type="hidden" asp-for="VerifyResult.LotNumber" />
                 <input id="geetestResult-captchaOutput" type="hidden" asp-for="VerifyResult.CaptchaOutput" />
@@ -27,17 +36,7 @@
                 <input id="geetestResult-genTime" type="hidden" asp-for="VerifyResult.GenTime" />
 
                 <div id="captcha-box"></div>
-                <button class="d-none" id="repost-submit-button" name="button" value="repost" type="submit"></button>
                 <!--极验-->
-
-
-                <div class="code-input">
-                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                        <input class="mdl-textfield__input" asp-for="Code" autofocus autocomplete="off">
-                        <label class="mdl-textfield__label" asp-for="Code">验证码</label>
-                    </div>
-                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" id="repost" name="button" value="repost" type="button" onclick="return callGeetest('repost-submit-button', 'SendCode')">重新发送</button>
-                </div>
 
                 <div class="action">
                     <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored" name="button" value="verify" type="submit">验证</button>
@@ -46,25 +45,27 @@
         </div>
     </div>
 </div>
-@if (Model.IsDisableRepost)
-{
-    <script>
-        window.onload = function () {
-            var GetMoblie = document.getElementById('repost');
-            GetMoblie.disabled = true;//禁用按钮
-            //GetMoblie.removeEventListener('click', funGetMoblie,false);//解除绑定事件
-            var count = 0;
-            var time = setInterval(function () {//定时器循环
-                count++;
-                GetMoblie.innerText = "重新发送（" + (61 - count) + "秒）";
-                GetMoblie.style = "width: 25rem;";
-                if (count >= 60) {
-                    window.clearInterval(time);//清除定时器
-                    GetMoblie.disabled = false;//启用按钮
-                    //GetMoblie.addEventListener('click', funGetMoblie, false);
-                    GetMoblie.innerText = "重新发送";
-                }
-            }, 1000);//一秒执行一次
-        }
-    </script>
+
+@section Scripts {
+    <script>initGeetestCaptcha('verify-code-form', 'SendCode');</script>
+    @if (Model.IsDisableRepost)
+    {
+        <script>
+            window.onload = function () {
+                var GetMoblie = document.getElementById('repost');
+                GetMoblie.disabled = true;
+                var count = 0;
+                var time = setInterval(function () {
+                    count++;
+                    GetMoblie.innerText = "重新发送（" + (61 - count) + "秒）";
+                    GetMoblie.style = "width: 25rem;";
+                    if (count >= 60) {
+                        window.clearInterval(time);
+                        GetMoblie.disabled = false;
+                        GetMoblie.innerText = "重新发送";
+                    }
+                }, 1000);
+            }
+        </script>
+    }
 }
