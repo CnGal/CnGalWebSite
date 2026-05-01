@@ -49,7 +49,8 @@
     margin: 0;
     font-size: var(--cg-font-size-sm);
     color: var(--cg-color-text-muted);
-    line-height: 1.6;
+    line-height: 1.6;    
+    white-space: pre;
 }
 
 /* ── 编辑按钮 ── */

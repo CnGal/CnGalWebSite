@@ -25,5 +25,11 @@ public static class SdkJsonSerializerOptions
         // 兼容 APIServer 返回的字符串枚举值（如 "None"）
         Default.Converters.Add(new JsonStringEnumConverter());
         Indented.Converters.Add(new JsonStringEnumConverter());
+
+        // DateTime 转换：APIServer 以 UTC 传输，MainSite 内部以本地时间处理
+        Default.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+        Default.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
+        Indented.Converters.Add(new DateTimeConverterUsingDateTimeParse());
+        Indented.Converters.Add(new DateTimeConverterUsingDateTimeNullableParse());
     }
 }

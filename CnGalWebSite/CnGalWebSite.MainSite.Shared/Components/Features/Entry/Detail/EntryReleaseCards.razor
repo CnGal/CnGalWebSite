@@ -24,7 +24,7 @@
                 </div>
             </summary>
             <div class="entry-release-body">
-                @if (release.StoreInfor.State != StoreState.None && release.Time != null && release.Time.Value.Date <= DateTime.UtcNow.AddHours(8).Date)
+                @if (release.StoreInfor.State != StoreState.None && release.Time != null && release.Time.Value.Date <= DateTime.Now.Date)
                 {
                     <div class="entry-release-price-box">
                         @if (release.StoreInfor.State == StoreState.NotPublished && release.Type != GameReleaseType.Demo)
@@ -132,7 +132,7 @@
             {
                 pro += 10;
             }
-            if (item.Time != null && item.Time.Value <= DateTime.UtcNow.AddHours(8))
+            if (item.Time != null && item.Time.Value <= DateTime.Now)
             {
                 pro += 10;
             }

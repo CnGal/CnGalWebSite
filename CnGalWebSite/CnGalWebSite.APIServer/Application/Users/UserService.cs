@@ -235,23 +235,23 @@ namespace CnGalWebSite.APIServer.Application.Users
             model.SignInDays = sign.SignInDays;
 
             //东八区转换
-            var now = DateTime.Now.ToCstTime();//.AddHours(8);
+            var now = DateTime.Now.ToCstTime().AddHours(8);
 
             if (user.SignInDays != null)
             {
-                if (user.SignInDays.Any(s => s.Time.Date == now.Date))
+                if (user.SignInDays.Any(s => s.Time.AddHours(8).Date == now.Date))
                 {
                     model.IsSignIn = true;
-                    while (user.SignInDays.Any(s => s.Time.Date == now.AddDays(-model.SignInDays).Date))
+                    while (user.SignInDays.Any(s => s.Time.AddHours(8).Date == now.AddDays(-model.SignInDays).Date))
                     {
                         model.SignInDays++;
                     }
                 }
                 else
                 {
-                    if (user.SignInDays.Any(s => s.Time.Date == now.Date.AddDays(-1)))
+                    if (user.SignInDays.Any(s => s.Time.AddHours(8).Date == now.Date.AddDays(-1)))
                     {
-                        while (user.SignInDays.Any(s => s.Time.Date == now.AddDays(-model.SignInDays - 1).Date))
+                        while (user.SignInDays.Any(s => s.Time.AddHours(8).Date == now.AddDays(-model.SignInDays - 1).Date))
                         {
                             model.SignInDays++;
                         }
@@ -269,23 +269,23 @@ namespace CnGalWebSite.APIServer.Application.Users
             var SignInDays = 0;
 
             //东八区转换
-            var now = DateTime.Now.ToCstTime();//.AddHours(8);
+            var now = DateTime.Now.ToCstTime().AddHours(8);
 
             if (user.SignInDays != null)
             {
-                if (user.SignInDays.Any(s => s.Time.Date == now.Date))
+                if (user.SignInDays.Any(s => s.Time.AddHours(8).Date == now.Date))
                 {
                     IsSignIn = true;
-                    while (user.SignInDays.Any(s => s.Time.Date == now.AddDays(-SignInDays).Date))
+                    while (user.SignInDays.Any(s => s.Time.AddHours(8).Date == now.AddDays(-SignInDays).Date))
                     {
                         SignInDays++;
                     }
                 }
                 else
                 {
-                    if (user.SignInDays.Any(s => s.Time.Date == now.Date.AddDays(-1)))
+                    if (user.SignInDays.Any(s => s.Time.AddHours(8).Date == now.Date.AddDays(-1)))
                     {
-                        while (user.SignInDays.Any(s => s.Time.Date == now.AddDays(-SignInDays - 1).Date))
+                        while (user.SignInDays.Any(s => s.Time.AddHours(8).Date == now.AddDays(-SignInDays - 1).Date))
                         {
                             SignInDays++;
                         }
