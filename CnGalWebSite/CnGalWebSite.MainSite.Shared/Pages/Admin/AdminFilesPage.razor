@@ -69,7 +69,7 @@
 </div>
 
 @code {
-    private CancellationTokenSource? _cts;
+    private CancellationTokenSource? _cts = new();
     private async Task<CgDataTableResult<UploadRecordOverviewModel>> OnQueryFiles(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel

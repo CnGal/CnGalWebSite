@@ -1,0 +1,11 @@
+.cg-rank-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-2);
+    align-items: center;
+    margin-top: var(--cg-spacing-2);
+}
+
+.cg-rank-list--center {
+    justify-content: center;
+}

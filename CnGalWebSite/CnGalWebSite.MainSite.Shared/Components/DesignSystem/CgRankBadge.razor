@@ -1,0 +1,18 @@
+@using CnGalWebSite.DataModel.ViewModel.Ranks
+
+@if (Model.Type == RankType.Badge && !string.IsNullOrWhiteSpace(Model.Image))
+{
+    <img class="cg-rank-badge-img" src="@Model.Image" alt="@Model.Text" loading="lazy" />
+}
+else
+{
+    <span class="user-rank @Model.CSS" style="@Model.Styles">@Model.Text</span>
+}
+
+@code {
+    /// <summary>
+    /// 单个头衔/徽章数据。包含文本、CSS 类名、内联样式、图片和类型
+    /// </summary>
+    [Parameter, EditorRequired]
+    public required RankViewModel Model { get; set; }
+}

@@ -74,21 +74,6 @@
     width: 100%;
 }
 
-.cg-space-hero-ranks {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--cg-spacing-2);
-    justify-content: center;
-    margin-top: var(--cg-spacing-2);
-}
-
-.cg-space-hero-rank {
-    font-size: var(--cg-font-size-xs);
-    padding: var(--cg-spacing-1) var(--cg-spacing-2);
-    border-radius: var(--cg-radius-sm);
-    color: var(--cg-color-text-primary);
-}
-
 .cg-space-hero-signature {
     font-size: var(--cg-font-size-sm);
     color: var(--cg-color-text-secondary);

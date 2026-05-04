@@ -362,7 +362,31 @@
     font-size: var(--cg-font-size-xs);
     font-weight: var(--cg-font-weight-semibold);
     line-height: 1.6;
+    color: #ffffff;
 }
+
+/* 等级头衔颜色 */
+::deep .user-rank.rank-lv10 { background-color: #F44336; }
+::deep .user-rank.rank-lv9  { background-color: #E91E63; }
+::deep .user-rank.rank-lv8  { background-color: #9C27B0; }
+::deep .user-rank.rank-lv7  { background-color: #673AB7; }
+::deep .user-rank.rank-lv6  { background-color: #3F51B5; }
+::deep .user-rank.rank-lv5  { background-color: #2196F3; }
+::deep .user-rank.rank-lv4  { background-color: #03A9F4; }
+::deep .user-rank.rank-lv3  { background-color: #00BCD4; }
+::deep .user-rank.rank-lv2  { background-color: #009688; }
+::deep .user-rank.rank-lv1  { background-color: #4CAF50; }
+::deep .user-rank.rank-lv0  { background-color: #607D8B; }
+
+/* 特殊角色头衔颜色 */
+::deep .user-rank.rank-judges  { background-color: #0091EA; }
+::deep .user-rank.rank-editor  { background-color: #4CAF50; }
+::deep .user-rank.rank-verify  { background-color: #BF360C; }
+
+/* 旧版 Masa Blazor 兼容 */
+::deep .user-rank.bg-main     { background-color: #3976ef; }
+::deep .user-rank.bg-primary  { background-color: #3976ef; }
+::deep .user-rank.bg-success  { background-color: #16a34a; }
 
 /* ─── Not Authorized ─── */
 
