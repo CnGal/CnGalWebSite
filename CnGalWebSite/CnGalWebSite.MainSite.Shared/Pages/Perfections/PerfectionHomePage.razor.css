@@ -1,4 +1,4 @@
-/* ════════════════════════════════════════════════
+﻿/* ════════════════════════════════════════════════
    PerfectionHomePage — 完善度概览页面
    3 态渲染：加载 / 错误 / 内容
    ════════════════════════════════════════════════ */
@@ -7,55 +7,69 @@
     max-width: 1440px;
     margin: 0 auto;
     padding: var(--cg-spacing-6) var(--cg-page-gutter);
+    padding-bottom: calc(var(--cg-bottom-nav-height, 0px) + var(--cg-spacing-6));    gap: 2rem;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ── Header ── */
+
 .perfection-page__header {
-    margin-bottom: var(--cg-spacing-6);
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+@media (min-width: 768px) {
+    .perfection-page__header {
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--cg-color-border);
+        gap: 0.5rem;
+    }
 }
 
 .perfection-page__title {
     display: flex;
     align-items: center;
-    gap: var(--cg-spacing-2);
-    font-size: var(--cg-font-size-2xl);
-    font-weight: var(--cg-font-weight-bold);
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
     color: var(--cg-color-text);
-    margin: 0 0 var(--cg-spacing-2);
+    margin: 0;
+}
+
+@media (min-width: 768px) {
+    .perfection-page__title {
+        font-size: 1.75rem;
+        gap: 0.75rem;
+    }
 }
 
 .perfection-page__title ::deep .cg-mdi-icon {
-    width: 1.75rem;
-    height: 1.75rem;
+    width: 24px;
+    height: 24px;
     color: var(--cg-color-primary);
 }
 
+@media (min-width: 768px) {
+    .perfection-page__title ::deep .cg-mdi-icon {
+        width: 32px;
+        height: 32px;
+    }
+}
+
 .perfection-page__desc {
-    font-size: var(--cg-font-size-md);
+    margin: 0;
+    font-size: 0.8125rem;
     color: var(--cg-color-text-muted);
-    margin: 0 0 var(--cg-spacing-2);
+    line-height: 1.5;
 }
 
-.perfection-page__desc-link {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--cg-spacing-1);
-    font-size: var(--cg-font-size-sm);
-    font-weight: var(--cg-font-weight-medium);
-    color: var(--cg-color-link);
-    text-decoration: none;
-    transition: gap var(--cg-transition-fast), color var(--cg-transition-fast);
-}
-
-.perfection-page__desc-link:hover {
-    gap: var(--cg-spacing-2);
-    color: var(--cg-color-primary-hover);
-    text-decoration: none;
-}
-
-.perfection-page__desc-link ::deep .cg-mdi-icon {
-    width: 1rem;
-    height: 1rem;
+@media (min-width: 768px) {
+    .perfection-page__desc {
+        font-size: 0.9375rem;
+    }
 }
 
 /* ── Loading ── */
@@ -120,25 +134,6 @@
 .perfection-page__error-link:hover {
     color: var(--cg-color-link);
     text-decoration: underline;
-}
-
-/* ── Placeholder Tabs ── */
-.perfection-page__placeholder-tab {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--cg-spacing-3);
-    min-height: 300px;
-    color: var(--cg-color-text-muted);
-    font-size: var(--cg-font-size-md);
-    padding: var(--cg-spacing-8) var(--cg-spacing-4);
-}
-
-.perfection-page__placeholder-tab ::deep .cg-mdi-icon {
-    width: 3rem;
-    height: 3rem;
-    opacity: 0.4;
 }
 
 /* ── Tabs wrapper ── */

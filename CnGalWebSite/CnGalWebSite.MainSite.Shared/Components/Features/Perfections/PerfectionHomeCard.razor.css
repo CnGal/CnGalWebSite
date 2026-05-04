@@ -1,6 +1,7 @@
 /* ════════════════════════════════════════════════
    PerfectionHomeCard — 完善度概览编排卡片
-   2 列网格：左 col-lg-8 + 右 col-lg-4
+   纯 CSS Grid 布局，无 Bootstrap 依赖
+   大屏（≥1024px）：chart 区 2/1 分栏，列表区 1/2 分栏
    ════════════════════════════════════════════════ */
 
 .perfection-home-card {
@@ -9,15 +10,21 @@
     gap: var(--cg-spacing-6);
 }
 
-/* ── 行 ── */
+/* ── 行级网格容器 ── */
+
 .perfection-home-card__row {
-    --cg-row-gap: var(--cg-spacing-6);
-    row-gap: var(--cg-row-gap);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--cg-spacing-5);
+    align-items: start;
 }
 
-/* ── 图表区 ── */
-.perfection-home-card__row--charts {
-    align-items: stretch;
+/* ── 图表区：大屏 left 2/3 + right 1/3 ── */
+
+@media (min-width: 1024px) {
+    .perfection-home-card__row--charts {
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    }
 }
 
 .perfection-home-card__col-charts {
@@ -32,16 +39,20 @@
     gap: var(--cg-spacing-4);
 }
 
-/* 确保折线图在 card 内无边距干扰 */
+/* 折线图卡片统一边框样式 */
 .perfection-home-card__col-charts ::deep .cg-line-chart {
     border: 1px solid var(--cg-color-border);
     border-radius: var(--cg-radius-lg);
     background: var(--cg-color-surface);
+    box-shadow: var(--cg-shadow-sm);
 }
 
-/* ── 随机列表区 ── */
-.perfection-home-card__row--random-lists {
-    align-items: flex-start;
+/* ── 随机列表区：大屏 left 1/3 + right 2/3 ── */
+
+@media (min-width: 1024px) {
+    .perfection-home-card__row--random-lists {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    }
 }
 
 .perfection-home-card__col-random-left {
@@ -58,13 +69,9 @@
 
 /* ── Responsive ── */
 
-@media (max-width: 991.98px) {
-    .perfection-home-card__col-overview {
-        margin-top: var(--cg-spacing-4);
-    }
-
-    .perfection-home-card__row--random-lists > .col-12:first-child {
-        margin-bottom: var(--cg-spacing-4);
+@media (max-width: 1023.98px) {
+    .perfection-home-card__row {
+        gap: var(--cg-spacing-4);
     }
 }
 
@@ -74,7 +81,7 @@
     }
 
     .perfection-home-card__row {
-        --cg-row-gap: var(--cg-spacing-4);
+        gap: var(--cg-spacing-3);
     }
 
     .perfection-home-card__col-charts {

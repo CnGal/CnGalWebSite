@@ -23,7 +23,14 @@
     @* ── Content 态 ── *@
     else if (_items is { Count: > 0 })
     {
-        <div class="recently-edit-list__scroll">
+        <div class="recently-edit-list__header">
+            <div class="recently-edit-list__title-group">
+                <CgMdiIcon Name="mdiHistory" aria-hidden="true" />
+                <h3 class="recently-edit-list__title">最近编辑</h3>
+            </div>
+            <span class="recently-edit-list__count">@_items.Count 条记录</span>
+        </div>
+        <div class="recently-edit-list__list">
             @foreach (var item in _items)
             {
                 <div class="recently-edit-list__item">
@@ -34,10 +41,19 @@
                              alt="@item.UserInfor.Name"
                              loading="lazy" />
                     }
+                    else
+                    {
+                        <span class="recently-edit-list__avatar recently-edit-list__avatar--placeholder" aria-hidden="true">
+                            @(item.UserInfor?.Name?.FirstOrDefault().ToString().ToUpperInvariant())
+                        </span>
+                    }
                     <div class="recently-edit-list__info">
                         <span class="recently-edit-list__username">@item.UserInfor.Name</span>
-                        <span class="recently-edit-list__operation">@item.Operation.GetDisplayName()</span>
-                        <a class="recently-edit-list__object" href="@GetLink(item)">@item.RelatedName</a>
+                        <span class="recently-edit-list__meta">
+                            <span class="recently-edit-list__operation">@item.Operation.GetDisplayName()</span>
+                            <span class="recently-edit-list__dot" aria-hidden="true">·</span>
+                            <a class="recently-edit-list__object" href="@GetLink(item)">@item.RelatedName</a>
+                        </span>
                     </div>
                     <time class="recently-edit-list__time" datetime="@item.ApplyTime.ToString("yyyy-MM-ddTHH:mm:ss")">
                         @FormatTime(item.ApplyTime)

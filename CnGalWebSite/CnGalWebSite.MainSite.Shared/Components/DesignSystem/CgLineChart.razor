@@ -1,6 +1,7 @@
 @* CgLineChart — 基于 Canvas 的折线图组件，通过 JS 模块渲染 *@
 @inject IJSRuntime JsRuntime
 @using Microsoft.JSInterop
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
 @implements IAsyncDisposable
 
 <div class="cg-line-chart @(IsExpanded ? "cg-line-chart--expanded" : "") @CssClass" style="@Style">
@@ -9,14 +10,10 @@
         <div class="cg-line-chart__actions">
             @if (ShowTimeRangeSelector)
             {
-                <select class="cg-line-chart__select" value="@_selectedDays" @onchange="OnDaysChanged">
-                    <option value="15">15天</option>
-                    <option value="30">1个月</option>
-                    <option value="90">3个月</option>
-                    <option value="180">6个月</option>
-                    <option value="365">1年</option>
-                    <option value="999999">所有</option>
-                </select>
+                <CgSelect Value="@_selectedDays.ToString()"
+                          ValueChanged="@OnDaysSelectChanged"
+                          Options="@_timeRangeOptions"
+                          ClassName="cg-line-chart__select" />
             }
             <button type="button" class="cg-line-chart__action-btn" @onclick="ToggleExpand" title="@(IsExpanded ? "还原宽度" : "横跨多列")">
                 <CgMdiIcon Name="@(IsExpanded ? "mdiFullscreenExit" : "mdiFullscreen")" aria-hidden="true" />
@@ -32,6 +29,16 @@
     private string _canvasId = $"cg-chart-{Guid.NewGuid():N}";
     private IJSObjectReference? _chartModule;
     private int _selectedDays = 30;
+
+    private static readonly IReadOnlyList<KeyValuePair<string, string>> _timeRangeOptions =
+    [
+        new("15", "15天"),
+        new("30", "1个月"),
+        new("90", "3个月"),
+        new("180", "6个月"),
+        new("365", "1年"),
+        new("999999", "所有"),
+    ];
 
     /// <summary>
     /// 图表标题。
@@ -133,9 +140,9 @@
         await _chartModule.InvokeVoidAsync("render", _canvasId, labels, datasets, Title ?? "");
     }
 
-    private async Task OnDaysChanged(ChangeEventArgs e)
+    private async Task OnDaysSelectChanged(string? value)
     {
-        if (int.TryParse(e.Value?.ToString(), out var days))
+        if (int.TryParse(value, out var days))
         {
             _selectedDays = days;
             await OnTimeRangeChanged.InvokeAsync(days);

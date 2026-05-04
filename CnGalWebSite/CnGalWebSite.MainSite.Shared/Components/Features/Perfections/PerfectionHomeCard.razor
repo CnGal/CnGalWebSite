@@ -8,16 +8,12 @@
     @* ── 行 1：最近编辑列表（全宽） ── *@
     @if (RecentlyEditItems is { Count: > 0 })
     {
-        <div class="row perfection-home-card__row">
-            <div class="col-12">
-                <RecentlyEditListCard Items="@RecentlyEditItems" />
-            </div>
-        </div>
+        <RecentlyEditListCard Items="@RecentlyEditItems" />
     }
 
-    @* ── 行 2：左 8 折线图 × 2 + 右 4 完善度总览 ── *@
-    <div class="row perfection-home-card__row perfection-home-card__row--charts">
-        <div class="col-12 col-lg-8 perfection-home-card__col-charts">
+    @* ── 行 2：大屏左 2/3 折线图 + 右 1/3 完善度总览 ── *@
+    <div class="perfection-home-card__row perfection-home-card__row--charts">
+        <div class="perfection-home-card__col-charts">
             @if (StatisticalChartLabels is not null && StatisticalChartSeries is not null)
             {
                 <CgLineChart Title="统计折线图"
@@ -38,18 +34,19 @@
             }
         </div>
 
-        <div class="col-12 col-lg-4 perfection-home-card__col-overview">
+        <div class="perfection-home-card__col-overview">
             <PerfectionOverviewCard Model="@OverviewModel" />
         </div>
     </div>
 
-    @* ── 行 3：随机列表（左 4 竖排 + 右 8 横排） ── *@
-    <div class="row perfection-home-card__row perfection-home-card__row--random-lists">
-        <div class="col-12 col-lg-4 perfection-home-card__col-random-left">
+    @* ── 行 3：随机列表（大屏左 1/3 竖排 + 右 2/3 横排） ── *@
+    <div class="perfection-home-card__row perfection-home-card__row--random-lists">
+        <div class="perfection-home-card__col-random-left">
             @if (ExcellentEntries is { Count: > 0 })
             {
                 <PerfectionRandomList Title="已完善的词条"
                                       TitleIcon="mdiTrophy"
+                                      IconColor="var(--cg-color-amber)"
                                       IsTransverse="false"
                                       OnRefresh="@OnRefreshExcellent">
                     @foreach (var entry in ExcellentEntries)
@@ -62,6 +59,7 @@
             {
                 <PerfectionRandomList Title="急需处理的项目"
                                       TitleIcon="mdiAlertOctagonOutline"
+                                      IconColor="var(--cg-color-error)"
                                       IsTransverse="false"
                                       OnRefresh="@OnRefreshHighChecks">
                     @foreach (var check in HighChecks)
@@ -72,11 +70,12 @@
             }
         </div>
 
-        <div class="col-12 col-lg-8 perfection-home-card__col-random-right">
+        <div class="perfection-home-card__col-random-right">
             @if (ToBeImprovedEntries is { Count: > 0 })
             {
                 <PerfectionRandomList Title="急需完善的词条"
                                       TitleIcon="mdiAlertCircleOutline"
+                                      IconColor="var(--cg-color-error)"
                                       IsTransverse="true"
                                       OnRefresh="@OnRefreshToBeImproved">
                     @foreach (var entry in ToBeImprovedEntries)
@@ -89,6 +88,7 @@
             {
                 <PerfectionRandomList Title="待完善的词条"
                                       TitleIcon="mdiThumbUpOutline"
+                                      IconColor="var(--cg-color-primary)"
                                       IsTransverse="true"
                                       OnRefresh="@OnRefreshGood">
                     @foreach (var entry in GoodEntries)
@@ -101,6 +101,7 @@
             {
                 <PerfectionRandomList Title="待处理的项目"
                                       TitleIcon="mdiInformationOutline"
+                                      IconColor="var(--cg-color-text-muted)"
                                       IsTransverse="true"
                                       OnRefresh="@OnRefreshMiddleChecks">
                     @foreach (var check in MiddleChecks)

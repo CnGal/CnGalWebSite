@@ -79,15 +79,18 @@
 }
 
 .perfection-overview-card__stat-box--danger {
-    border-left-color: #e53935;
+    border-left-color: var(--cg-color-error);
+    background: color-mix(in oklab, var(--cg-color-error) 5%, var(--cg-color-section-bg));
 }
 
 .perfection-overview-card__stat-box--info {
-    border-left-color: #1e88e5;
+    border-left-color: var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 5%, var(--cg-color-section-bg));
 }
 
 .perfection-overview-card__stat-box--success {
-    border-left-color: #43a047;
+    border-left-color: var(--cg-color-success);
+    background: color-mix(in oklab, var(--cg-color-success) 5%, var(--cg-color-section-bg));
 }
 
 .perfection-overview-card__stat-value {

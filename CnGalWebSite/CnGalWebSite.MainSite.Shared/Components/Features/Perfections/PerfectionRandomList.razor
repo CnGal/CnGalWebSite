@@ -3,7 +3,7 @@
         <div class="perfection-random-list__title-group">
             @if (!string.IsNullOrWhiteSpace(TitleIcon))
             {
-                <CgMdiIcon Name="@TitleIcon" class="perfection-random-list__title-icon" aria-hidden="true" />
+                <CgMdiIcon Name="@TitleIcon" class="perfection-random-list__title-icon" style="@_iconStyle" aria-hidden="true" />
             }
             <h3 class="perfection-random-list__title">@Title</h3>
         </div>
@@ -35,6 +35,12 @@
     public string? TitleIcon { get; set; }
 
     /// <summary>
+    /// 标题图标颜色（CSS 值）。为空时使用默认主色。
+    /// </summary>
+    [Parameter]
+    public string? IconColor { get; set; }
+
+    /// <summary>
     /// 桌面端是否使用横向双列网格。
     /// </summary>
     [Parameter]
@@ -55,4 +61,6 @@
     private string GridClass => IsTransverse
         ? "perfection-random-list__grid perfection-random-list__grid--transverse"
         : "perfection-random-list__grid";
+
+    private string? _iconStyle => string.IsNullOrEmpty(IconColor) ? null : $"color: {IconColor}";
 }
