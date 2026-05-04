@@ -1,5 +1,6 @@
-@using CnGalWebSite.DataModel.ViewModel.Admin
+﻿@using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Ranks
 
 @* 编辑记录列表卡片 — 通用组件，可嵌入词条/文章/视频/标签/周边详情页 *@
 
@@ -32,12 +33,16 @@
                     <div class="edit-record-list-card__content">
                         <div class="edit-record-list-card__header">
                             <span class="edit-record-list-card__user">@(item.UserInfor?.Name ?? "—")</span>
-                            <span class="edit-record-list-card__op">@item.Operation.GetDisplayName()</span>
-                        </div>
+                            @if (item.UserInfor?.Ranks?.Any() == true)
+                            {
+                                <CgRankList Model="item.UserInfor.Ranks" />
+                            }
+                              </div>
                         <div class="edit-record-list-card__time">
                             <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" />
                             @item.ApplyTime.ToString("yyyy-MM-dd HH:mm")
-                        </div>
+                        <span class="edit-record-list-card__op">@item.Operation.GetDisplayName()</span>
+                      </div>
                     </div>
                     <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
                 </a>

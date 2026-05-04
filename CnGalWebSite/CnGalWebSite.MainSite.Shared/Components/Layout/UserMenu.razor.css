@@ -1,4 +1,4 @@
-/* ── Trigger Button (avatar-only circle) ── */
+﻿/* ── Trigger Button (avatar-only circle) ── */
 
 .cg-action-btn {
     display: flex;
@@ -48,8 +48,8 @@
 }
 
 .cg-menu-header__avatar {
-    width: 2.25rem;
-    height: 2.25rem;
+    width: 3rem;
+    height: 3rem;
     flex-shrink: 0;
     border-radius: var(--cg-radius-full);
     overflow: hidden;
@@ -72,7 +72,9 @@
 }
 
 .cg-menu-header__info {
-    min-width: 0;
+    min-width: 0;display: flex;
+    flex-direction: column;
+    gap: .25rem;
 }
 
 .cg-menu-header__name {

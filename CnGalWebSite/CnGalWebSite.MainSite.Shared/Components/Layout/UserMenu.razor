@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Web
 @using CnGalWebSite.SDK.MainSite.Abstractions
+@using CnGalWebSite.DataModel.ViewModel.Ranks
 
 @rendermode InteractiveServer
 
@@ -42,6 +43,12 @@
                 </div>
                 <div class="cg-menu-header__info">
                     <div class="cg-menu-header__name">@UserName</div>
+                    @if (_ranks?.Any() == true)
+                    {
+                        <div class="cg-menu-header__ranks">
+                            <CgRankList Model="_ranks" />
+                        </div>
+                    }
                     @if (!string.IsNullOrWhiteSpace(_personalSignature))
                     {
                         <div class="cg-menu-header__hint">@_personalSignature</div>
@@ -112,6 +119,7 @@
     private string? _lastLoadedUserId;
     private string _avatarUrl = string.Empty;
     private string _personalSignature = string.Empty;
+    private IReadOnlyList<RankViewModel>? _ranks;
     private long _unreadCount;
     private bool _avatarReady => string.IsNullOrWhiteSpace(_avatarUrl) == false;
 
@@ -143,6 +151,7 @@
         {
             _avatarUrl = string.IsNullOrWhiteSpace(result.Data.PhotoPath) ? string.Empty : result.Data.PhotoPath;
             _personalSignature = result.Data.PersonalSignature ?? string.Empty;
+            _ranks = result.Data.Ranks;
         }
         else
         {
