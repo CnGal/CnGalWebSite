@@ -10,7 +10,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CnGalWebSite.SDK.MainSite.Auth;
+namespace CnGalWebSite.SDK.MainSite.AspNet.Auth;
 
 internal sealed class CookieOidcRefresher(
     IOptionsMonitor<OpenIdConnectOptions> oidcOptionsMonitor,

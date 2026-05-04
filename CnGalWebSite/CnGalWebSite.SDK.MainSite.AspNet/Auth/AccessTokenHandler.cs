@@ -2,7 +2,7 @@ using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 
-namespace CnGalWebSite.SDK.MainSite.Auth;
+namespace CnGalWebSite.SDK.MainSite.AspNet.Auth;
 
 public sealed class AccessTokenHandler(IHttpContextAccessor httpContextAccessor) : DelegatingHandler
 {

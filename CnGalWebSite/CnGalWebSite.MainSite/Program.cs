@@ -2,7 +2,7 @@
 using CnGalWebSite.MainSite.Components;
 using CnGalWebSite.MainSite.Shared;
 using CnGalWebSite.MainSite.Shared.Services;
-using CnGalWebSite.SDK.MainSite.Extensions;
+using CnGalWebSite.SDK.MainSite.AspNet.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 using CnGalWebSite.MainSite.Services;

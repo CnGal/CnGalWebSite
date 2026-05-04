@@ -2,7 +2,6 @@ using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Result = CnGalWebSite.DataModel.Model.Result;
@@ -12,7 +11,7 @@ namespace CnGalWebSite.SDK.MainSite.Commands;
 public sealed class PlayedGameCommandService(
     HttpClient httpClient,
     IMemoryCache memoryCache,
-    IHttpContextAccessor httpContextAccessor,
+    ICurrentUserAccessor currentUserAccessor,
     ILogger<PlayedGameCommandService> logger) : CommandServiceBase(httpClient), IPlayedGameCommandService
 {
     protected override ILogger Logger => logger;
@@ -113,7 +112,7 @@ public sealed class PlayedGameCommandService(
     private void InvalidatePlayedGameCaches(int gameId)
     {
         memoryCache.Remove($"main-site:played-game-overview:{gameId}");
-        var userId = httpContextAccessor.HttpContext?.User.FindFirst("sub")?.Value;
+        var userId = currentUserAccessor.GetCurrentUserId();
         if (!string.IsNullOrEmpty(userId))
         {
             memoryCache.Remove($"main-site:user-game-records:{userId}");
