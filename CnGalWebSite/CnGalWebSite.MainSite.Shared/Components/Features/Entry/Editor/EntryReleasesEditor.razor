@@ -118,6 +118,16 @@
     private bool _releaseDialogOpen;
     private EditReleaseModel? _releaseEditing;
     private EditReleaseModel? _releaseTarget;
+    private List<EditReleaseModel>? _lastReleases;
+
+    protected override void OnParametersSet()
+    {
+        if (!ReferenceEquals(_lastReleases, Releases))
+        {
+            _lastReleases = Releases;
+            StateHasChanged();
+        }
+    }
 
     private string GetPublishPlatformText(EditReleaseModel model)
         => model.PublishPlatformType == PublishPlatformType.Other && !string.IsNullOrWhiteSpace(model.PublishPlatformName)

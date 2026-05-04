@@ -1,4 +1,4 @@
-@using CnGalWebSite.SDK.MainSite.Models.Files
+﻿@using CnGalWebSite.SDK.MainSite.Models.Files
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
 @implements IAsyncDisposable
@@ -524,7 +524,7 @@
         public double Left { get; set; }
         public double Top { get; set; }
     }
-    
+
     public async ValueTask DisposeAsync()
     {
         if (_jsModule is not null)

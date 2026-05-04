@@ -45,6 +45,8 @@ else if (Model != null)
                                 IsSubmitting="IsSubmitting"
                                 HasDraftRecovered="HasDraftRecovered"
                                 EntryType="Model.Data.Main.Type"
+                                Model="Model.Data"
+                                OnModelChanged="OnSteamImportCompleted"
                                 OnDiscardDraft="DiscardDraft"
                                 OnSubmit="SubmitAsync"
                                 OnCancel="Cancel" />
@@ -275,5 +277,16 @@ else if (Model != null)
                 await _addInforEditorRef.RefreshInformationsAsync(newType);
             }
         }
+    }
+
+    private async Task OnSteamImportCompleted()
+    {
+        if (Model?.Data != null)
+        {
+            Model.Data.AddInfor.Releases = [.. Model.Data.AddInfor.Releases];
+            Model.Data.Images.Images = [.. Model.Data.Images.Images];
+        }
+
+        await InvokeAsync(StateHasChanged);
     }
 }

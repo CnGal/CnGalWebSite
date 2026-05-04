@@ -1,0 +1,193 @@
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
+@using CnGalWebSite.MainSite.Shared.Services
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@using CnGalWebSite.SDK.MainSite.Models.EntryEdit
+@inject IToolboxCommandService ToolboxCommandService
+@inject IFileCommandService FileCommandService
+@inject ICgToastService ToastService
+
+@if (Model != null && Model.AddInfor?.Type == EntryType.Game)
+{
+    <div class="entry-edit-sidebar__card entry-edit-sidebar__card--steam">
+        <CgMdiIcon Name="mdiSteam" aria-hidden="true" />
+        <div>
+            <h3>Steam 导入</h3>
+            <p>从商店页面<a class="entry-edit-sidebar__card-link" @onclick="OpenDialog">导入信息</a></p>
+        </div>
+    </div>
+
+    <CgModal IsOpen="@_dialogOpen" Title="导入 Steam 信息" OnClose="CloseDialog">
+        <ChildContent>
+            <p class="steam-import-dialog__desc">自动抓取 Steam 商店页面的信息，请注意"制作组"和"发行商"需要根据站内信息进行修改。</p>
+            <CgFormGroup Label="Steam App ID">
+                <CgInput @bind-Value="_steamId" Placeholder="在 Steam 商店页面 URL 中查找" />
+            </CgFormGroup>
+            @if (!string.IsNullOrWhiteSpace(_errorMessage))
+            {
+                <div class="steam-import-dialog__error">@_errorMessage</div>
+            }
+        </ChildContent>
+        <Footer>
+            <CgButton Variant="outline" OnClick="CloseDialog" Disabled="@_isLoading">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="ImportSteamAsync" Disabled="@_isLoading">确定导入</CgButton>
+        </Footer>
+    </CgModal>
+}
+
+@code {
+    [Parameter]
+    public EstablishEntryViewModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback OnModelChanged { get; set; }
+
+    private bool _dialogOpen;
+    private bool _isLoading;
+    private string _steamId = string.Empty;
+    private string? _errorMessage;
+
+    private void OpenDialog()
+    {
+        _dialogOpen = true;
+        _steamId = string.Empty;
+        _errorMessage = null;
+    }
+
+    private void CloseDialog()
+    {
+        _dialogOpen = false;
+        _steamId = string.Empty;
+        _errorMessage = null;
+    }
+
+    private async Task ImportSteamAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_steamId))
+        {
+            _errorMessage = "请输入 Steam App ID";
+            return;
+        }
+
+        _isLoading = true;
+        _errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var result = await ToolboxCommandService.GetSteamAppDetailsAsync(_steamId);
+
+            if (!result.Success || result.Data is null)
+            {
+                _errorMessage = result.Error?.Message ?? "导入失败";
+                _isLoading = false;
+                return;
+            }
+
+            var data = result.Data;
+
+            var main = Model.Main;
+            if (main != null)
+            {
+                if (string.IsNullOrWhiteSpace(main.MainPicture) && !string.IsNullOrWhiteSpace(data.MainImage))
+                {
+                    var uploadResult = await FileCommandService.TransformImageUrlAsync(data.MainImage);
+                    if (uploadResult.Success && !string.IsNullOrWhiteSpace(uploadResult.Data))
+                    {
+                        main.MainPicture = uploadResult.Data;
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(main.Name) && !string.IsNullOrWhiteSpace(data.Name))
+                {
+                    main.Name = data.Name;
+                }
+
+                if (string.IsNullOrWhiteSpace(main.DisplayName) && !string.IsNullOrWhiteSpace(data.Name))
+                {
+                    main.DisplayName = data.Name;
+                }
+
+                if (string.IsNullOrWhiteSpace(main.BriefIntroduction) && !string.IsNullOrWhiteSpace(data.BriefIntroduction))
+                {
+                    main.BriefIntroduction = data.BriefIntroduction;
+                }
+            }
+
+            var addInfor = Model.AddInfor;
+            if (addInfor != null)
+            {
+                if (string.IsNullOrWhiteSpace(addInfor.Publisher) && !string.IsNullOrWhiteSpace(data.Publishers))
+                {
+                    addInfor.Publisher = data.Publishers;
+                }
+
+                if (string.IsNullOrWhiteSpace(addInfor.ProductionGroup) && !string.IsNullOrWhiteSpace(data.Developers))
+                {
+                    addInfor.ProductionGroup = data.Developers;
+                }
+
+                var steamRelease = new EditReleaseModel
+                {
+                    Link = _steamId,
+                    GamePlatformTypes = [GamePlatformType.Windows],
+                    Name = data.Name ?? string.Empty,
+                    PublishPlatformType = PublishPlatformType.Steam,
+                    Type = GameReleaseType.Official,
+                    Time = data.ReleaseDate,
+                    TimeNote = data.ReleaseDate.HasValue ? null : data.ReleaseDateString,
+                };
+
+                var isDuplicate = addInfor.Releases.Any(r =>
+                    r.PublishPlatformType == steamRelease.PublishPlatformType &&
+                    r.Link == steamRelease.Link &&
+                    r.Name == steamRelease.Name);
+
+                if (!isDuplicate)
+                {
+                    addInfor.Releases.Add(steamRelease);
+                }
+            }
+
+            var images = Model.Images;
+            if (images != null && data.Screenshots.Count > 0)
+            {
+                foreach (var url in data.Screenshots)
+                {
+                    var uploadResult = await FileCommandService.TransformImageUrlAsync(url);
+                    if (uploadResult.Success && !string.IsNullOrWhiteSpace(uploadResult.Data))
+                    {
+                        images.Images.Add(new EditImageAloneModel
+                        {
+                            Image = uploadResult.Data
+                        });
+                    }
+                }
+
+                images.Images.RemoveAll(i => string.IsNullOrWhiteSpace(i.Image));
+            }
+
+            var mainPage = Model.MainPage;
+            if (mainPage != null)
+            {
+                if (string.IsNullOrWhiteSpace(mainPage.Context) && !string.IsNullOrWhiteSpace(data.MainPageMarkdown))
+                {
+                    mainPage.Context = data.MainPageMarkdown;
+                }
+            }
+
+            _dialogOpen = false;
+            ToastService.Show("导入成功", "已从 Steam 导入游戏信息", "success");
+            await OnModelChanged.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = "导入失败：" + ex.Message;
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+}

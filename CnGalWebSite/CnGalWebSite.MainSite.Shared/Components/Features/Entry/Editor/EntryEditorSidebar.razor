@@ -1,9 +1,12 @@
 @using Microsoft.JSInterop
 @using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 
 <aside class="entry-edit-sidebar">
+    <EntrySteamImportCard Model="Model" OnModelChanged="OnModelChanged" />
+
     <div class="entry-edit-sidebar__card entry-edit-sidebar__card--primary">
         <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
         <div>
@@ -78,7 +81,13 @@
     public EventCallback OnDiscardDraft { get; set; }
 
     [Parameter]
+    public EventCallback OnModelChanged { get; set; }
+
+    [Parameter]
     public EntryType EntryType { get; set; }
+
+    [Parameter]
+    public EstablishEntryViewModel Model { get; set; } = default!;
 
     // ── 导航项定义 ──
     private static readonly NavItem[] _navItems =

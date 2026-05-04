@@ -1,0 +1,70 @@
+﻿.entry-edit-sidebar__card {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    border-radius: var(--cg-radius-md);
+    border: 1px solid transparent;
+    margin-bottom: var(--cg-spacing-3);
+    font-size: var(--cg-font-size-xs);
+}
+
+.entry-edit-sidebar__card h3 {
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0;
+}
+
+.entry-edit-sidebar__card p {
+    font-size: 0.625rem;
+    margin: 0;
+}
+
+.entry-edit-sidebar__card ::deep .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.entry-edit-sidebar__card--steam {
+    background: color-mix(in oklab, var(--cg-color-brand-purple) 6%, var(--cg-color-surface));
+    border-color: color-mix(in oklab, var(--cg-color-brand-purple) 20%, transparent);
+}
+
+.entry-edit-sidebar__card--steam ::deep .cg-mdi-icon {
+    color: var(--cg-color-brand-purple);
+}
+
+.entry-edit-sidebar__card--steam h3 {
+    color: var(--cg-color-brand-purple);
+}
+
+.entry-edit-sidebar__card--steam p {
+    color: var(--cg-color-text-muted);
+}
+
+.entry-edit-sidebar__card-link {
+    color: var(--cg-color-brand-purple);
+    font-weight: var(--cg-font-weight-semibold);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.entry-edit-sidebar__card-link:hover {
+    text-decoration: underline;
+}
+
+.steam-import-dialog__desc {
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+    margin-top: 0;
+    margin-bottom: var(--cg-spacing-4);
+}
+
+.steam-import-dialog__error {
+    color: var(--cg-color-error);
+    font-size: var(--cg-font-size-sm);
+    margin-top: var(--cg-spacing-3);
+}
