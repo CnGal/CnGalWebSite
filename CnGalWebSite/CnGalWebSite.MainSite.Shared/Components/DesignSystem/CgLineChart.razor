@@ -161,7 +161,14 @@
     {
         if (_chartModule is not null)
         {
-            await _chartModule.DisposeAsync();
+            try
+            {
+                await _chartModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit already disconnected — JS interop unavailable, nothing to clean up
+            }
         }
     }
 }

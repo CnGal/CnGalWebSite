@@ -1,0 +1,25 @@
+.cg-bar-chart {
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    padding: var(--cg-spacing-4);
+    border: 1px solid var(--cg-color-border);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.cg-bar-chart__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--cg-spacing-3);
+}
+
+.cg-bar-chart__title {
+    font-weight: var(--cg-font-weight-semibold);
+    font-size: var(--cg-font-size-md);
+    color: var(--cg-color-text-primary);
+}
+
+.cg-bar-chart__body {
+    display: flex;
+    justify-content: center;
+}

@@ -90,6 +90,11 @@ else
     private IReadOnlyList<PerfectionCheckViewModel>? _highChecks;
     private IReadOnlyList<PerfectionCheckViewModel>? _middleChecks;
 
+    /// <summary>
+    /// 安全的"全部"起始日期，远早于站点数据产生时间（2020 年），确保 DateTimeOffset 转换不会溢出。
+    /// </summary>
+    private static readonly DateTime AllDataSince = new(2018, 1, 1);
+
     private static IReadOnlyList<CgTabItem> GetTabs() =>
     [
         new CgTabItem("overview", "概览", "mdiChartPie"),
@@ -198,7 +203,7 @@ else
     {
         var beforeTime = DateTime.Now.Date.AddDays(1);
         var afterTime = days >= 3650
-            ? DateTime.MinValue
+            ? AllDataSince
             : beforeTime.AddDays(-days);
         var ct = _cts!.Token;
 
