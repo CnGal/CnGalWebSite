@@ -1,4 +1,4 @@
-/* ══════════════════════════════════════════════════════════
+﻿/* ══════════════════════════════════════════════════════════
    ShareGamesLeaderboard.razor.css — Mobile-first
    ══════════════════════════════════════════════════════════ */
 
@@ -151,8 +151,8 @@
 
 @media (min-width: 768px) {
     .share-games-leaderboard__avatar {
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
     }
 }
 
@@ -160,9 +160,13 @@
     display: flex;
     flex-direction: column;
     flex: 1;
-    min-width: 0;
+    min-width: 0;gap: .5rem;
 }
-
+.share-games-leaderboard__user-name-container{
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
 .share-games-leaderboard__user-name {
     font-size: 0.8125rem;
     font-weight: var(--cg-font-weight-semibold);

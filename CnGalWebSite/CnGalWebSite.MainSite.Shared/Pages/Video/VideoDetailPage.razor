@@ -41,7 +41,8 @@ else if (Model is not null)
                                  AuthorAvatar="@Model.AuthorAvatar"
                                  AuthorId="@Model.AuthorId"
                                  OriginalAuthor="@Model.OriginalAuthor"
-                                 IsOriginal="Model.IsAuthorOriginal" />
+                                 IsOriginal="Model.IsAuthorOriginal"
+                                 Ranks="@(Model.AuthorRanks)" />
 
                 <VideoBasicInfo ReaderCount="Model.ReaderCount"
                                 CommentCount="Model.CommentCount"

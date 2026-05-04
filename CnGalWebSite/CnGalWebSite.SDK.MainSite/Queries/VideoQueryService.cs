@@ -70,6 +70,7 @@ public sealed class VideoQueryService(
             AuthorName = video.UserInfor?.Name ?? string.Empty,
             AuthorAvatar = video.UserInfor?.PhotoPath ?? string.Empty,
             AuthorId = video.UserInfor?.Id ?? string.Empty,
+            AuthorRanks = video.UserInfor?.Ranks?.ToList() ?? [],
             IsAuthorOriginal = video.IsCreatedByCurrentUser,
             RelatedEntries = video.RelatedEntries?.ToList() ?? [],
             RelatedArticles = video.RelatedArticles?.ToList() ?? [],

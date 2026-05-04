@@ -6,6 +6,10 @@
             <img src="@Model.UserPhoto" alt="@Model.UserName" class="entry-user-score-card__avatar" loading="lazy" />
             <span class="entry-user-score-card__name">@Model.UserName</span>
         </a>
+        @if (Model.Ranks?.Any() == true)
+        {
+            <CgRankList Model="Model.Ranks" />
+        }
         <time class="entry-user-score-card__time" datetime="@Model.LastEditTime.ToString("yyyy-MM-ddTHH:mm:ss")">
             @Model.LastEditTime.ToString("yyyy-MM-dd")
         </time>

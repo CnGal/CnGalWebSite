@@ -1,5 +1,7 @@
 namespace CnGalWebSite.SDK.MainSite.Models;
 
+using CnGalWebSite.DataModel.ViewModel.Ranks;
+
 /// <summary>
 /// 分享游戏库页面 — Steam 游戏总览 ViewModel。
 /// </summary>
@@ -23,6 +25,7 @@ public sealed class TopUserItem
     public string UserImage { get; init; } = string.Empty;
     public string PersonalSignature { get; init; } = string.Empty;
     public int GameCount { get; init; }
+    public IReadOnlyList<RankViewModel> Ranks { get; init; } = [];
 }
 
 /// <summary>拥有率排行中的游戏条目。</summary>
@@ -52,5 +55,6 @@ public sealed class RandomReviewItem
     public bool IsDubbing { get; init; }
     public string PlayImpressions { get; init; } = string.Empty;
     public DateTime LastEditTime { get; init; }
+    public IReadOnlyList<RankViewModel> Ranks { get; init; } = [];
 }
 

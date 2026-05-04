@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,8 @@ public sealed class FavoriteFolderDetailViewModel
     public required string UserPhotoPath { get; init; }
 
     public required string UserId { get; init; }
+
+    public required IReadOnlyList<RankViewModel> CreatorRanks { get; init; }
 
     /// <summary>
     /// 按类型分组的收藏对象 — 词条

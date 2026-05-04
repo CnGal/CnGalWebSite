@@ -130,6 +130,7 @@ public sealed class LotteryQueryService(
                             Id = u.Id ?? string.Empty,
                             Name = u.Name ?? string.Empty,
                             PhotoPath = u.PhotoPath ?? string.Empty,
+                            Ranks = u.Ranks?.ToList() ?? [],
                         })
                         .ToList() ?? [],
                 })

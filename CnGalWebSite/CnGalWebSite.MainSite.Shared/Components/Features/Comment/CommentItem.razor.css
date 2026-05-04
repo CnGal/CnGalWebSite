@@ -34,8 +34,8 @@
 }
 
 .comment-item__avatar {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: var(--cg-radius-full);
     object-fit: cover;
     background: var(--cg-color-section-bg);
@@ -54,8 +54,7 @@
 }
 
 .comment-item--child .comment-item__avatar {
-    width: 28px;
-    height: 28px;
+
 }
 
 .comment-item--child .comment-item__avatar--placeholder ::deep .cg-mdi-icon {
@@ -69,7 +68,11 @@
     gap: 2px;
     min-width: 0;
 }
-
+.comment-item__author-container{
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
 .comment-item__author {
     font-size: var(--cg-font-size-sm);
     font-weight: var(--cg-font-weight-semibold);

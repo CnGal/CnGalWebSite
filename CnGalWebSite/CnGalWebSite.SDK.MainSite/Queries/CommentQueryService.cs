@@ -74,7 +74,8 @@ public sealed class CommentQueryService(HttpClient httpClient, IMemoryCache memo
             {
                 Id = comment.UserInfor?.Id ?? "",
                 Name = comment.UserInfor?.Name ?? "",
-                PhotoPath = comment.UserInfor?.PhotoPath ?? ""
+                PhotoPath = comment.UserInfor?.PhotoPath ?? "",
+                Ranks = comment.UserInfor?.Ranks?.ToList() ?? []
             },
             Children = comment.InverseParentCodeNavigation?
                 .Select(MapComment)

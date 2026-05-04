@@ -133,6 +133,7 @@ public sealed class PlayedGameQueryService(
                     UserId = s.User.Id ?? string.Empty,
                     UserName = s.User.Name ?? string.Empty,
                     UserPhoto = s.User.PhotoPath ?? string.Empty,
+                    Ranks = s.User.Ranks?.ToList() ?? [],
                     MusicScore = s.Socres.MusicSocre,
                     PaintScore = s.Socres.PaintSocre,
                     ScriptScore = s.Socres.ScriptSocre,
@@ -279,6 +280,7 @@ public sealed class PlayedGameQueryService(
                     UserImage = u.Image ?? string.Empty,
                     PersonalSignature = u.PersonalSignature ?? string.Empty,
                     GameCount = u.Count,
+                    Ranks = u.Ranks?.ToList() ?? [],
                 })
                 .ToList(),
             TopGames = model.PossessionRateHighestGames
@@ -300,6 +302,7 @@ public sealed class PlayedGameQueryService(
             UserId = model.User?.Id ?? string.Empty,
             UserName = model.User?.Name ?? string.Empty,
             UserImage = model.User?.PhotoPath ?? string.Empty,
+            Ranks = model.User?.Ranks?.ToList() ?? [],
             GameId = model.GameId,
             GameName = model.GameName ?? string.Empty,
             TotalScore = model.Socres?.TotalSocre ?? 0,

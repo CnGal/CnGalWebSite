@@ -1,10 +1,16 @@
-@* 随机评价卡片 — 纯静态 SSR *@
+﻿@* 随机评价卡片 — 纯静态 SSR *@
 
 <a href="@($"/entries/index/{Model.GameId}")" class="share-games-review-card">
     <div class="share-games-review-card__header">
         <img src="@Model.UserImage" alt="@Model.UserName" class="share-games-review-card__avatar" loading="lazy" />
         <div class="share-games-review-card__user-info">
+           <div class="share-games-review-card__user-name-container">
             <span class="share-games-review-card__user-name">@Model.UserName</span>
+            @if (Model.Ranks?.Any() == true)
+            {
+                <CgRankList Model="Model.Ranks" />
+            }
+            </div>
             <span class="share-games-review-card__game-name">《@Model.GameName》</span>
         </div>
         <div class="share-games-review-card__score">
