@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 
-namespace CnGalWebSite.SDK.MainSite.Extensions;
+namespace CnGalWebSite.SDK.MainSite.AspNet.Extensions;
 
 public static class EndpointRouteBuilderExtensions
 {

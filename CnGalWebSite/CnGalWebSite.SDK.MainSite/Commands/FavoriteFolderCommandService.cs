@@ -3,7 +3,6 @@ using CnGalWebSite.DataModel.ViewModel.Favorites;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
@@ -12,7 +11,7 @@ namespace CnGalWebSite.SDK.MainSite.Commands;
 public sealed class FavoriteFolderCommandService(
     HttpClient httpClient,
     IMemoryCache memoryCache,
-    IHttpContextAccessor httpContextAccessor,
+    ICurrentUserAccessor currentUserAccessor,
     ILogger<FavoriteFolderCommandService> logger) : CommandServiceBase(httpClient), IFavoriteFolderCommandService
 {
     protected override ILogger Logger => logger;
@@ -207,7 +206,7 @@ public sealed class FavoriteFolderCommandService(
 
     private string? GetCurrentUserId()
     {
-        return httpContextAccessor.HttpContext?.User.FindFirst("sub")?.Value;
+        return currentUserAccessor.GetCurrentUserId();
     }
 
     public async Task<SdkResult<bool>> AddFavoriteObjectAsync(long objectId, FavoriteObjectType type,

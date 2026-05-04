@@ -18,6 +18,7 @@
     <ProjectReference Include="..\CnGalWebSite.HealthCheck\CnGalWebSite.HealthCheck.csproj" />
     <ProjectReference Include="..\CnGalWebSite.MainSite.Shared\CnGalWebSite.MainSite.Shared.csproj" />
     <ProjectReference Include="..\CnGalWebSite.SDK.MainSite\CnGalWebSite.SDK.MainSite.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.SDK.MainSite.AspNet\CnGalWebSite.SDK.MainSite.AspNet.csproj" />
   </ItemGroup>
 
 </Project>
