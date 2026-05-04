@@ -1,0 +1,83 @@
+@* PerfectionOverviewCard — 完善度总览卡片（含饼图 + 柱状图）
+   显示全站完善度统计：环形图（等级分布）+ 柱状图（统计指标）*@
+@using CnGalWebSite.DataModel.ViewModel.Perfections
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+
+<div class="perfection-overview-card">
+    @if (Model is null)
+    {
+        <div class="perfection-overview-card__placeholder">
+            <CgMdiIcon Name="mdiChartBar" aria-hidden="true" />
+            <span>暂无完善度数据</span>
+        </div>
+    }
+    else
+    {
+        <div class="perfection-overview-card__header">
+            <h3 class="perfection-overview-card__title">
+                <CgMdiIcon Name="mdiTrophy" aria-hidden="true" />
+                完善度总览
+            </h3>
+        </div>
+
+        <div class="perfection-overview-card__charts">
+            @if (_pieSlices is { Count: > 0 })
+            {
+                <CgPieChart Slices="_pieSlices" Height="260" InnerRadius="0.55" />
+            }
+            @if (_barLabels is { Count: > 0 } && _barSeries is { Count: > 0 })
+            {
+                <CgBarChart Title="统计数值" Labels="_barLabels" Series="_barSeries" Height="200" />
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private IReadOnlyList<CgPieChartSlice>? _pieSlices;
+    private IReadOnlyList<string>? _barLabels;
+    private IReadOnlyList<CgBarChartSeries>? _barSeries;
+
+    private PerfectionLevelOverviewModel? _model;
+
+    [Parameter]
+    public PerfectionLevelOverviewModel? Model
+    {
+        get => _model;
+        set
+        {
+            _model = value;
+            if (value is not null)
+            {
+                BuildChartData(value);
+            }
+        }
+    }
+
+    private void BuildChartData(PerfectionLevelOverviewModel m)
+    {
+        _pieSlices =
+        [
+            new CgPieChartSlice { Name = "已完善", Value = m.ExcellentCount, Color = "var(--cg-color-success)" },
+            new CgPieChartSlice { Name = "待完善", Value = m.GoodCount, Color = "var(--cg-color-primary)" },
+            new CgPieChartSlice { Name = "急需完善", Value = m.ToBeImprovedCount, Color = "var(--cg-color-error)" },
+        ];
+
+        _barLabels = ["平均数", "中位数", "众数", "标准差"];
+
+        _barSeries =
+        [
+            new CgBarChartSeries
+            {
+                Name = "统计数值",
+                Data = [
+                    System.Math.Round(m.AverageValue, 1),
+                    System.Math.Round(m.Median, 1),
+                    m.Mode,
+                    System.Math.Round(m.StandardDeviation, 1),
+                ],
+                Color = "var(--cg-color-primary)",
+            },
+        ];
+    }
+}

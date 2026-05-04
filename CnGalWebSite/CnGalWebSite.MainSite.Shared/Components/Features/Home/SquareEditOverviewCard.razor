@@ -1,4 +1,4 @@
-@* SquareEditOverviewCard — 编辑概览折线图卡片（交互岛）
+﻿@* SquareEditOverviewCard — 编辑概览折线图卡片（交互岛）
    CgLineChart 依赖 Canvas + JS Interop，必须在交互模式下渲染。
    组件自行通过 SDK 获取数据，避免 SSR→Interactive 参数序列化问题。 *@
 @rendermode InteractiveServer
@@ -27,12 +27,6 @@
                 <span>暂无数据</span>
             </div>
         }
-    </div>
-    <div class="square-edit-overview-card__footer">
-        <a href="/perfections" class="square-edit-overview-card__link">
-            查看完善度详情
-            <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
-        </a>
     </div>
 </div>
 

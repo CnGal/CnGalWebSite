@@ -89,12 +89,23 @@
     private bool _editDialogOpen;
     private EditImageAloneModel? _editingItem;
     private EditImageAloneModel? _editTarget;
+    private EditImagesViewModel? _lastModel;
+
+    protected override void OnParametersSet()
+    {
+        if (!ReferenceEquals(_lastModel, Model))
+        {
+            _lastModel = Model;
+            StateHasChanged();
+        }
+    }
 
     // ── 上传回调：多文件上传时每张图回调一次 ──
     private void OnImageUploaded(string url)
     {
         Model.Images ??= new();
         Model.Images.Add(new EditImageAloneModel { Image = url });
+        StateHasChanged();
     }
 
     // ── 编辑 ──
@@ -115,6 +126,7 @@
     private void DeleteImage(EditImageAloneModel item)
     {
         Model.Images?.Remove(item);
+        StateHasChanged();
     }
 
     // ── 保存编辑 ──

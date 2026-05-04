@@ -32,6 +32,11 @@ public sealed class HomeQueryService(
         const string cacheKey = "main-site:home-summary";
         if (memoryCache.TryGetValue(cacheKey, out HomeSummaryViewModel? cached) && cached is not null)
         {
+            // 随机推荐数据不走缓存，每次重新请求
+            var freshRecommends = await GetListSafeAsync<HotRecommendItemModel>(
+                "api/home/ListHotRecommends", "HOME_HOT_RECOMMENDS_FAILED",
+                new List<SdkErrorModel>(), cancellationToken);
+            cached.HotRecommends = NormalizeHomeItemUrls(freshRecommends);
             return SdkResult<HomeSummaryViewModel>.Ok(cached);
         }
 

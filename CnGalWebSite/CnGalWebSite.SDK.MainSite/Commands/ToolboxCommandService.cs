@@ -4,11 +4,14 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Videos;
+using CnGalWebSite.Extensions;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
+using CnGalWebSite.SDK.MainSite.Models.EntryEdit;
 using CnGalWebSite.SDK.MainSite.Models.Toolbox;
 using Microsoft.Extensions.Logging;
+using ReverseMarkdown;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
@@ -126,6 +129,121 @@ public sealed class ToolboxCommandService(
 
     public Task<SdkResult<bool>> HideEntryAsync(int id, CancellationToken cancellationToken = default)
         => SubmitResultAsync("api/entries/HiddenEntry", new HiddenEntryModel { Ids = [id], IsHidden = true }, "TOOLBOX_ENTRY_HIDE", cancellationToken);
+
+    public async Task<SdkResult<SteamAppDetailsViewModel>> GetSteamAppDetailsAsync(string steamId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var json = await HttpClient.GetStringAsync($"api/steam/GetSteamAppDetails/{Uri.EscapeDataString(steamId)}", cancellationToken);
+            var root = JsonNode.Parse(json);
+            if (root is null)
+            {
+                return SdkResult<SteamAppDetailsViewModel>.Fail("TOOLBOX_STEAM_INVALID_JSON", "Steam API 返回数据格式无效");
+            }
+
+            if (root[steamId] is not JsonNode appNode)
+            {
+                return SdkResult<SteamAppDetailsViewModel>.Fail("TOOLBOX_STEAM_NOT_FOUND", "未找到 Steam 应用数据");
+            }
+
+            if (!ReadBoolCompatible(appNode["success"]))
+            {
+                return SdkResult<SteamAppDetailsViewModel>.Fail("TOOLBOX_STEAM_API_FAILED", "Steam API 返回失败");
+            }
+
+            var data = appNode["data"];
+            if (data is null)
+            {
+                return SdkResult<SteamAppDetailsViewModel>.Fail("TOOLBOX_STEAM_NO_DATA", "Steam API 数据格式错误");
+            }
+
+            var name = data["name"]?.GetValue<string>();
+
+            var mainImage = data["header_image"]?.GetValue<string>();
+
+            var briefDesc = data["short_description"]?.GetValue<string>();
+            var briefIntroduction = briefDesc?.Trim()?.Replace("\t", "").Replace("\n", "").Replace("\r", "").Replace(" ", "");
+
+            var releaseDateString = default(string?);
+            DateTime? releaseDate = null;
+            var releaseDateNode = data["release_date"];
+            if (releaseDateNode is not null)
+            {
+                releaseDateString = releaseDateNode["date"]?.GetValue<string>();
+                if (!string.IsNullOrWhiteSpace(releaseDateString))
+                {
+                    releaseDate = releaseDateString.ToDate();
+                    if (releaseDate.HasValue)
+                    {
+                        releaseDate = releaseDate.Value.AddDays(1);
+                    }
+                }
+            }
+
+            var developers = JoinStringArray(data["developers"]);
+            var publishers = JoinStringArray(data["publishers"]);
+
+            var screenshots = new List<string>();
+            var screenshotsNode = data["screenshots"];
+            if (screenshotsNode?.AsArray() is { } ssArr)
+            {
+                foreach (var ss in ssArr)
+                {
+                    var path = ss?["path_full"]?.GetValue<string>();
+                    if (!string.IsNullOrWhiteSpace(path))
+                    {
+                        screenshots.Add(path);
+                    }
+                }
+            }
+
+            var mainPageMarkdown = default(string?);
+            var html = data["detailed_description"]?.GetValue<string>()
+                       ?? data["about_the_game"]?.GetValue<string>();
+            if (!string.IsNullOrWhiteSpace(html))
+            {
+                var converter = new Converter();
+                var cleaned = html
+                    .Replace("<h2>关于这款游戏</h2>", "")
+                    .Replace("<h2 class=\"bb_tag\">关于这款游戏</h2>", "");
+                mainPageMarkdown = converter.Convert(cleaned);
+                mainPageMarkdown += $"\n > 以上介绍转载自Steam商店 https://store.steampowered.com/app/{steamId}";
+            }
+
+            return SdkResult<SteamAppDetailsViewModel>.Ok(new SteamAppDetailsViewModel
+            {
+                Name = name,
+                MainImage = mainImage,
+                BriefIntroduction = briefIntroduction,
+                Developers = developers,
+                Publishers = publishers,
+                Screenshots = screenshots,
+                MainPageMarkdown = mainPageMarkdown,
+                ReleaseDateString = releaseDateString,
+                ReleaseDate = releaseDate,
+            });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "获取 Steam 应用详情异常。SteamId={SteamId}; BaseAddress={BaseAddress}", steamId, HttpClient.BaseAddress);
+            return SdkResult<SteamAppDetailsViewModel>.Fail("TOOLBOX_STEAM_QUERY_EXCEPTION", "请求 Steam 应用详情时发生异常");
+        }
+    }
+
+    private static string? JoinStringArray(JsonNode? arrayNode)
+    {
+        if (arrayNode?.AsArray() is not { } arr || arr.Count == 0)
+        {
+            return null;
+        }
+
+        var items = arr
+            .Select(item => item?.GetValue<string>())
+            .Where(s => !string.IsNullOrWhiteSpace(s))
+            .ToList();
+
+        return items.Count > 0 ? string.Join(", ", items) : null;
+    }
 
     private async Task<SdkResult<bool>> SubmitResultAsync<TRequest>(string path, TRequest request, string errorCode, CancellationToken cancellationToken)
     {

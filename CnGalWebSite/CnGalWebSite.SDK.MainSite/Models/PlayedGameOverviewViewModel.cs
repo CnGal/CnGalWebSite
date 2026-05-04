@@ -1,5 +1,7 @@
 namespace CnGalWebSite.SDK.MainSite.Models;
 
+using CnGalWebSite.DataModel.ViewModel.Ranks;
+
 /// <summary>
 /// 词条评分概览 ViewModel（面向 EntryDetailPage 静态展示）。
 /// </summary>
@@ -73,6 +75,8 @@ public sealed class UserScoreItem
     public required string UserId { get; init; }
     public required string UserName { get; init; }
     public required string UserPhoto { get; init; }
+
+    public IReadOnlyList<RankViewModel> Ranks { get; init; } = [];
 
     public required double MusicScore { get; init; }
     public required double PaintScore { get; init; }

@@ -265,7 +265,7 @@
 </CgModal>
 
 @code {
-    private CancellationTokenSource? _cts;
+    private CancellationTokenSource? _cts = new();
     private CgDataTable<UserOverviewModel>? _dataTable;
     private CgDataTable<RankOverviewModel>? _rankTable;
     private bool _showRankModal;

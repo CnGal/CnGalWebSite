@@ -53,7 +53,7 @@ else if (Model is not null)
 
                 <div class="entry-cell entry-cell--pictures">
                     <EntrySection Title="图片" Icon="mdiImageOutline" Show="Model.Pictures.Count > 0">
-                        <EntryImageGrid Pictures="Model.Pictures" MaxCount="12" EntryName="@Model.Name" DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
+                        <CgImageGallery Items="Model.Pictures.Select(p => new CgImageGallery.CgImageGalleryItem(p.Url, p.Note)).ToList()" />
                     </EntrySection>
                 </div>
 
@@ -167,7 +167,7 @@ else if (Model is not null)
 
                 <div class="entry-cell entry-cell--staff">
                     <EntryCard Title="Staff" Icon="mdiAccountGroupOutline" Show="Model.Staffs.Count > 0">
-                        <EntryStaffGroupList Staffs="Model.Staffs" MaxGroupCount="8" MaxPositionCount="5" />
+                        <EntryStaffGroupList Staffs="Model.Staffs" />
                     </EntryCard>
                 </div>
 

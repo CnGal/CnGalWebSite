@@ -40,6 +40,10 @@
                 }
                 <span>@Model.UserName</span>
             </a>
+            @if (Model.CreatorRanks?.Any() == true)
+            {
+                <CgRankList Model="Model.CreatorRanks" />
+            }
         </div>
     }
 </div>

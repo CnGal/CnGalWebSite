@@ -1,0 +1,87 @@
+@* CgPieChart — 基于 Canvas 的环形图组件，通过 JS 模块渲染 *@
+@inject IJSRuntime JsRuntime
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+
+<div class="cg-pie-chart @CssClass" style="@Style">
+    @if (!string.IsNullOrWhiteSpace(Title))
+    {
+        <div class="cg-pie-chart__header">
+            <span class="cg-pie-chart__title">@Title</span>
+        </div>
+    }
+    <div class="cg-pie-chart__body">
+        <canvas id="@_canvasId" width="400" height="@Height" style="width: 100%; height: @(Height)px; max-height: @(Height)px;"></canvas>
+    </div>
+</div>
+
+@code {
+    private string _canvasId = $"cg-pie-{Guid.NewGuid():N}";
+    private IJSObjectReference? _chartModule;
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<CgPieChartSlice>? Slices { get; set; }
+
+    [Parameter]
+    public int Height { get; set; } = 300;
+
+    [Parameter]
+    public double InnerRadius { get; set; } = 0.55;
+
+    [Parameter]
+    public string? CssClass { get; set; }
+
+    [Parameter]
+    public string? Style { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _chartModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/CnGalWebSite.MainSite.Shared/scripts/cg-pie-chart.js");
+            await RenderChart();
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_chartModule is not null)
+        {
+            await RenderChart();
+        }
+    }
+
+    private async Task RenderChart()
+    {
+        if (_chartModule is null) return;
+
+        var slices = Slices ?? [];
+        var data = slices.Select(s => new { name = s.Name, value = s.Value, color = s.Color }).ToList();
+
+        await _chartModule.InvokeVoidAsync("render", _canvasId, data, Title ?? "", InnerRadius);
+    }
+
+    public async Task RefreshAsync()
+    {
+        await RenderChart();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_chartModule is not null)
+        {
+            try
+            {
+                await _chartModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // Circuit already disconnected — JS interop unavailable, nothing to clean up
+            }
+        }
+    }
+}

@@ -1,0 +1,270 @@
+﻿@page "/perfections"
+@page "/perfections/home"
+@rendermode InteractiveServer
+@inject IPerfectionQueryService PerfectionQueryService
+@inject ICgToastService CgToastService
+@implements IDisposable
+@using CnGalWebSite.DataModel.ViewModel.Admin
+@using CnGalWebSite.DataModel.ViewModel.Others
+@using CnGalWebSite.DataModel.ViewModel.Perfections
+@using CnGalWebSite.MainSite.Shared.Components.Features.Perfections
+
+<CgPageMeta Title="完善度概览" />
+
+@if (_errorMessage is not null)
+{
+    <section class="perfection-page__error">
+        <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
+        <h1 class="perfection-page__error-title">完善度数据加载失败</h1>
+        <p class="perfection-page__error-text">@_errorMessage</p>
+        <div class="perfection-page__error-actions">
+            <CgButton Variant="primary" OnClick="@LoadAllDataAsync">重试</CgButton>
+            <a href="/" class="perfection-page__error-link">返回首页</a>
+        </div>
+    </section>
+}
+else if (_isLoaded)
+{
+    <article class="perfection-page">
+        <header class="perfection-page__header">
+            <h1 class="perfection-page__title">
+                <CgMdiIcon Name="mdiShieldCheckOutline" aria-hidden="true" />
+                完善度概览
+            </h1>
+            <p class="perfection-page__desc">全站词条完善度统计、编辑趋势与检查项一览</p>
+        </header>
+
+        <CgTabs Variant="underline" Items="@GetTabs()" DefaultActiveKey="overview" Id="perfection-tabs" AriaLabel="完善度标签页">
+            <PanelTemplate Context="tabKey">
+                @switch (tabKey)
+                {
+                    case "overview":
+                        <PerfectionHomeCard RecentlyEditItems="@_recentlyEditList"
+                                            OverviewModel="@_overviewModel"
+                                            StatisticalChartLabels="@_statisticalChartLabels"
+                                            StatisticalChartSeries="@_statisticalChartSeries"
+                                            PerfectionLevelLabels="@_perfectionLevelLabels"
+                                            PerfectionLevelSeries="@_perfectionLevelSeries"
+                                            ExcellentEntries="@_excellentEntries"
+                                            ToBeImprovedEntries="@_toBeImprovedEntries"
+                                            GoodEntries="@_goodEntries"
+                                            HighChecks="@_highChecks"
+                                            MiddleChecks="@_middleChecks"
+                                            OnStatisticalTimeRangeChanged="@ReloadStatisticalChartAsync"
+                                            OnPerfectionLevelTimeRangeChanged="@ReloadPerfectionLevelChartAsync" />
+                        break;
+
+                    case "perfection-list":
+                        <PerfectionListTab />
+                        break;
+
+                    case "check-list":
+                        <PerfectionCheckListTab />
+                        break;
+                }
+            </PanelTemplate>
+        </CgTabs>
+    </article>
+}
+else
+{
+    <section class="perfection-page__loading" aria-label="加载中">
+        <CgProgressRing Size="lg" Color="var(--cg-color-primary)" />
+        <span class="perfection-page__loading-text">加载完善度数据…</span>
+    </section>
+}
+
+@code {
+    private bool _isLoaded;
+    private string? _errorMessage;
+    private CancellationTokenSource? _cts;
+
+    private PerfectionLevelOverviewModel? _overviewModel;
+    private IReadOnlyList<ExaminedNormalListModel>? _recentlyEditList;
+    private IReadOnlyList<string>? _statisticalChartLabels;
+    private IReadOnlyList<CgLineChartSeries>? _statisticalChartSeries;
+    private IReadOnlyList<string>? _perfectionLevelLabels;
+    private IReadOnlyList<CgLineChartSeries>? _perfectionLevelSeries;
+    private IReadOnlyList<PerfectionInforTipViewModel>? _excellentEntries;
+    private IReadOnlyList<PerfectionInforTipViewModel>? _toBeImprovedEntries;
+    private IReadOnlyList<PerfectionInforTipViewModel>? _goodEntries;
+    private IReadOnlyList<PerfectionCheckViewModel>? _highChecks;
+    private IReadOnlyList<PerfectionCheckViewModel>? _middleChecks;
+
+    /// <summary>
+    /// 安全的"全部"起始日期，远早于站点数据产生时间（2020 年），确保 DateTimeOffset 转换不会溢出。
+    /// </summary>
+    private static readonly DateTime AllDataSince = new(2018, 1, 1);
+
+    private static IReadOnlyList<CgTabItem> GetTabs() =>
+    [
+        new CgTabItem("overview", "概览", "mdiChartPie"),
+        new CgTabItem("perfection-list", "完善度列表", "mdiFormatListBulleted"),
+        new CgTabItem("check-list", "单项检查列表", "mdiAlertCircleOutline"),
+    ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _cts = new CancellationTokenSource();
+        await LoadAllDataAsync();
+    }
+
+    private async Task LoadAllDataAsync()
+    {
+        _errorMessage = null;
+
+        var afterTime = DateTime.Now.Date.AddDays(-30);
+        var beforeTime = DateTime.Now.Date.AddDays(1);
+        var ct = _cts!.Token;
+
+        try
+        {
+            var overviewTask = PerfectionQueryService.GetPerfectionLevelOverviewAsync(ct);
+            var editListTask = PerfectionQueryService.GetRecentlyEditListAsync(ct);
+            var statsChartTask = PerfectionQueryService.GetPerfectionLineChartAsync(LineChartType.StatisticalData, afterTime, beforeTime, ct);
+            var levelChartTask = PerfectionQueryService.GetPerfectionLineChartAsync(LineChartType.PerfectionLevel, afterTime, beforeTime, ct);
+            var excellentTask = PerfectionQueryService.GetPerfectionLevelRadomListAsync(PerfectionLevel.Excellent, ct);
+            var toBeImprovedTask = PerfectionQueryService.GetPerfectionLevelRadomListAsync(PerfectionLevel.ToBeImproved, ct);
+            var goodTask = PerfectionQueryService.GetPerfectionLevelRadomListAsync(PerfectionLevel.Good, ct);
+            var highTask = PerfectionQueryService.GetPerfectionCheckLevelRadomListAsync(PerfectionCheckLevel.High, ct);
+            var middleTask = PerfectionQueryService.GetPerfectionCheckLevelRadomListAsync(PerfectionCheckLevel.Middle, ct);
+
+            await Task.WhenAll(overviewTask, editListTask, statsChartTask, levelChartTask,
+                excellentTask, toBeImprovedTask, goodTask, highTask, middleTask);
+
+            var overviewResult = overviewTask.Result;
+            if (overviewResult.Success && overviewResult.Data is not null)
+            {
+                _overviewModel = overviewResult.Data;
+            }
+
+            var editListResult = editListTask.Result;
+            _recentlyEditList = editListResult.Success ? editListResult.Data : null;
+
+            var statsChartResult = statsChartTask.Result;
+            if (statsChartResult.Success && statsChartResult.Data is not null)
+            {
+                (_statisticalChartLabels, _statisticalChartSeries) = ConvertLineChart(statsChartResult.Data);
+            }
+
+            var levelChartResult = levelChartTask.Result;
+            if (levelChartResult.Success && levelChartResult.Data is not null)
+            {
+                (_perfectionLevelLabels, _perfectionLevelSeries) = ConvertLineChart(levelChartResult.Data);
+            }
+
+            var excellentResult = excellentTask.Result;
+            _excellentEntries = excellentResult.Success ? excellentResult.Data : null;
+
+            var toBeImprovedResult = toBeImprovedTask.Result;
+            _toBeImprovedEntries = toBeImprovedResult.Success ? toBeImprovedResult.Data : null;
+
+            var goodResult = goodTask.Result;
+            _goodEntries = goodResult.Success ? goodResult.Data : null;
+
+            var highResult = highTask.Result;
+            _highChecks = highResult.Success ? highResult.Data : null;
+
+            var middleResult = middleTask.Result;
+            _middleChecks = middleResult.Success ? middleResult.Data : null;
+
+            _isLoaded = true;
+        }
+        catch (OperationCanceledException)
+        {
+            // Component disposed or parameters changed, ignore
+            return;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = ex.Message;
+            CgToastService.Show("完善度数据加载失败", ex.Message, "error");
+        }
+    }
+
+    /// <summary>
+    /// 将 LineChartModel 转换为 CgLineChart 所需的 Labels 和 Series。
+    /// </summary>
+    private static (IReadOnlyList<string> Labels, IReadOnlyList<CgLineChartSeries> Series) ConvertLineChart(LineChartModel model)
+    {
+        var labels = model.Options.XAxis.Data ?? [];
+        var series = model.Options.Series.Select(s => new CgLineChartSeries
+        {
+            Name = s.Name ?? string.Empty,
+            Data = s.Data ?? [],
+        }).ToList();
+
+        return (labels, series);
+    }
+
+    /// <summary>
+    /// 重新加载统计折线图数据。
+    /// </summary>
+    private async Task ReloadStatisticalChartAsync(int days)
+    {
+        var (afterTime, beforeTime) = ComputeTimeRange(days);
+        var ct = _cts!.Token;
+
+        try
+        {
+            var result = await PerfectionQueryService.GetPerfectionLineChartAsync(LineChartType.StatisticalData, afterTime, beforeTime, ct);
+            if (result.Success && result.Data is not null)
+            {
+                (_statisticalChartLabels, _statisticalChartSeries) = ConvertLineChart(result.Data);
+            }
+
+            StateHasChanged();
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (Exception ex)
+        {
+            CgToastService.Show("统计折线图数据刷新失败", ex.Message, "warning");
+        }
+    }
+
+    /// <summary>
+    /// 重新加载完善度趋势折线图数据。
+    /// </summary>
+    private async Task ReloadPerfectionLevelChartAsync(int days)
+    {
+        var (afterTime, beforeTime) = ComputeTimeRange(days);
+        var ct = _cts!.Token;
+
+        try
+        {
+            var result = await PerfectionQueryService.GetPerfectionLineChartAsync(LineChartType.PerfectionLevel, afterTime, beforeTime, ct);
+            if (result.Success && result.Data is not null)
+            {
+                (_perfectionLevelLabels, _perfectionLevelSeries) = ConvertLineChart(result.Data);
+            }
+
+            StateHasChanged();
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (Exception ex)
+        {
+            CgToastService.Show("完善度趋势折线图数据刷新失败", ex.Message, "warning");
+        }
+    }
+
+    private static (DateTime afterTime, DateTime beforeTime) ComputeTimeRange(int days)
+    {
+        var beforeTime = DateTime.Now.Date.AddDays(1);
+        var afterTime = days >= 3650
+            ? AllDataSince
+            : beforeTime.AddDays(-days);
+        return (afterTime, beforeTime);
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+}

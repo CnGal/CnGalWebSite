@@ -1,4 +1,4 @@
-@* 分享游戏库排行榜 — 库存排行 + 拥有率排行（纯静态 SSR） *@
+﻿@* 分享游戏库排行榜 — 库存排行 + 拥有率排行（纯静态 SSR） *@
 
 <div class="share-games-leaderboard">
     @* 库存排行 *@
@@ -15,7 +15,14 @@
                         <span class="share-games-leaderboard__rank @(index < 3 ? "share-games-leaderboard__rank--top" : "")">@(index + 1)</span>
                         <img src="@user.UserImage" alt="@user.UserName" class="share-games-leaderboard__avatar" loading="lazy" />
                         <div class="share-games-leaderboard__user-info">
+                        <div class="share-games-leaderboard__user-name-container">
+
                             <span class="share-games-leaderboard__user-name">@user.UserName</span>
+                            @if (user.Ranks?.Any() == true)
+                            {
+                                <CgRankList Model="user.Ranks" />
+                            }
+                            </div>
                             @if (!string.IsNullOrWhiteSpace(user.PersonalSignature))
                             {
                                 <span class="share-games-leaderboard__user-sig">@user.PersonalSignature</span>

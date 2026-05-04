@@ -1,0 +1,66 @@
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Perfections
+
+@inject IPerfectionQueryService PerfectionQueryService
+
+<CgDataTable TItem="PerfectionCheckOverviewModel"
+             Title="完善度检查列表"
+             OnServerQuery="LoadPerfectionChecksAsync"
+             DefaultSortField="@nameof(PerfectionCheckOverviewModel.Id)"
+             DefaultSortDesc="true"
+             @ref="_dataTable">
+
+    <CgDataTableColumn TItem="PerfectionCheckOverviewModel" Title="Id" Field="@nameof(PerfectionCheckOverviewModel.Id)" Width="80px" />
+
+    <CgDataTableColumn TItem="PerfectionCheckOverviewModel" Title="词条名称" Sortable="false">
+        <ChildContent Context="item">
+            <a href="/entries/index/@item.Id">@item.Name</a>
+        </ChildContent>
+    </CgDataTableColumn>
+
+    <CgDataTableColumn TItem="PerfectionCheckOverviewModel" Title="检查项类型" Sortable="false">
+        <ChildContent Context="item">
+            @item.Type.GetDisplayName()
+        </ChildContent>
+    </CgDataTableColumn>
+
+    <CgDataTableColumn TItem="PerfectionCheckOverviewModel" Title="分数" Field="@nameof(PerfectionCheckOverviewModel.Grade)" Sortable="false">
+        <ChildContent Context="item">
+            @item.Grade.ToString("F1")
+        </ChildContent>
+    </CgDataTableColumn>
+
+    <CgDataTableColumn TItem="PerfectionCheckOverviewModel" Title="击败全站百分比" Field="@nameof(PerfectionCheckOverviewModel.VictoryPercentage)" Sortable="false">
+        <ChildContent Context="item">
+            @item.VictoryPercentage.ToString("F1")%
+        </ChildContent>
+    </CgDataTableColumn>
+
+</CgDataTable>
+
+@code {
+    private CgDataTable<PerfectionCheckOverviewModel>? _dataTable;
+
+    private async Task<CgDataTableResult<PerfectionCheckOverviewModel>> LoadPerfectionChecksAsync(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? "",
+            SortBy = string.IsNullOrWhiteSpace(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await PerfectionQueryService.ListPerfectionChecksAsync(parameter);
+
+        if (result.Success && result.Data != null)
+        {
+            return new CgDataTableResult<PerfectionCheckOverviewModel>(
+                result.Data.Items.ToList(),
+                result.Data.Total);
+        }
+
+        return new CgDataTableResult<PerfectionCheckOverviewModel>([], 0);
+    }
+}

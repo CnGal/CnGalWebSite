@@ -40,7 +40,8 @@ else if (_model is not null)
                                AuthorAvatar="@_model.AuthorAvatar"
                                AuthorId="@_model.AuthorId"
                                OriginalAuthor="@_model.OriginalAuthor"
-                               OriginalLink="@_model.OriginalLink" />
+                               OriginalLink="@_model.OriginalLink"
+                               Ranks="@(_model.AuthorRanks)" />
 
                 <ArticleMeta ReaderCount="_model.ReaderCount"
                              ThumbsUpCount="_model.ThumbsUpCount"

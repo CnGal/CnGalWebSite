@@ -19,12 +19,7 @@
             <h1 class="cg-space-hero-name">@Model.Name</h1>
             @if (Model.Ranks?.Any() == true)
             {
-                <div class="cg-space-hero-ranks">
-                    @foreach (var rank in Model.Ranks)
-                    {
-                        <span class="cg-space-hero-rank @rank.CSS" style="@rank.Styles">@rank.Text</span>
-                    }
-                </div>
+                <CgRankList Model="Model.Ranks" Center="true" />
             }
             @if (!string.IsNullOrWhiteSpace(Model.PersonalSignature))
             {

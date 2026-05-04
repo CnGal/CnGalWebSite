@@ -1,4 +1,4 @@
-/* ═══════════════════════════════════════════════
+﻿/* ═══════════════════════════════════════════════
    EditRecordListCard — mobile-first
    ═══════════════════════════════════════════════ */
 .edit-record-list-card {
@@ -114,7 +114,7 @@
     color: var(--cg-color-text-muted);
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis;    margin-left: 1rem;
 }
 
 .edit-record-list-card__time {

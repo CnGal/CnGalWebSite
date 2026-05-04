@@ -1,0 +1,498 @@
+﻿/* ─────────────────────────────────────────────
+    CgImageGallery — 样式
+    - 预览区 / 胶片条 / 全屏模态
+   ───────────────────────────────────────────── */
+
+/* ── 容器 ── */
+.cg-image-gallery {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+}
+
+/* ── 空状态 ── */
+.cg-image-gallery__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-10);
+    color: var(--cg-color-text-muted);
+    background: var(--cg-color-section-bg);
+    border-radius: var(--cg-radius-lg);
+    border: 1px dashed var(--cg-color-border);
+}
+
+.cg-image-gallery__empty ::deep .cg-mdi-icon {
+    width: 48px;
+    height: 48px;
+    color: var(--cg-color-text-muted);
+}
+
+.cg-image-gallery__empty p {
+    margin: 0;
+    font-size: var(--cg-font-size-sm);
+}
+
+/* ── 大图预览区 ── */
+.cg-image-gallery__preview {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: var(--cg-radius-lg);
+   
+    cursor: zoom-in;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.cg-image-gallery__preview:focus-visible {
+    outline: 2px solid var(--cg-color-focus-ring);
+    outline-offset: 2px;
+}
+
+/* ── 预览幻灯片（堆叠） ── */
+.cg-image-gallery__preview-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--cg-transition-normal),
+                visibility 0s var(--cg-transition-normal);
+}
+
+.cg-image-gallery__preview-slide--active {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--cg-transition-normal),
+                visibility 0s 0s;
+}
+
+.cg-image-gallery__preview-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+/* ── 全屏按钮覆盖层 ── */
+.cg-image-gallery__preview-fullscreen-btn {
+    position: absolute;
+    top: var(--cg-spacing-3);
+    right: var(--cg-spacing-3);
+    z-index: 2;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: var(--cg-radius-sm);
+    background: rgba(0, 0, 0, 0.45);
+    color: var(--cg-color-on-dark);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--cg-transition-fast),
+                background-color var(--cg-transition-fast);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.cg-image-gallery__preview:hover .cg-image-gallery__preview-fullscreen-btn {
+    opacity: 1;
+}
+
+.cg-image-gallery__preview-fullscreen-btn:hover {
+    background: rgba(0, 0, 0, 0.65);
+}
+
+.cg-image-gallery__preview-fullscreen-btn:focus-visible {
+    opacity: 1;
+    outline: 2px solid var(--cg-color-focus-ring);
+    outline-offset: 2px;
+}
+
+::deep .cg-image-gallery__preview-fullscreen-btn .cg-mdi-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--cg-color-on-dark);
+}
+
+/* ── 胶片条 ── */
+.cg-image-gallery__filmstrip {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+}
+
+/* ── 胶片滚动按钮 ── */
+.cg-image-gallery__filmstrip-btn,
+.cg-image-gallery__fullscreen-filmstrip-btn {
+    flex-shrink: 0;
+    width: 32px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: var(--cg-radius-sm);
+    background: var(--cg-color-section-bg);
+    color: var(--cg-color-text);
+    cursor: pointer;
+    transition: background-color var(--cg-transition-fast),
+                color var(--cg-transition-fast);
+}
+
+.cg-image-gallery__filmstrip-btn:hover:not(:disabled),
+.cg-image-gallery__fullscreen-filmstrip-btn:hover:not(:disabled) {
+    background: var(--cg-color-border);
+    color: var(--cg-color-primary);
+}
+
+.cg-image-gallery__filmstrip-btn:focus-visible,
+.cg-image-gallery__fullscreen-filmstrip-btn:focus-visible {
+    outline: 2px solid var(--cg-color-focus-ring);
+    outline-offset: 2px;
+}
+
+.cg-image-gallery__filmstrip-btn:disabled,
+.cg-image-gallery__fullscreen-filmstrip-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+::deep .cg-image-gallery__filmstrip-btn .cg-mdi-icon,
+::deep .cg-image-gallery__fullscreen-filmstrip-btn .cg-mdi-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* ── 胶片轨道 ── */
+.cg-image-gallery__filmstrip-track,
+.cg-image-gallery__fullscreen-filmstrip-track {
+    flex: 1;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    display: flex;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-1) 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.cg-image-gallery__filmstrip-track::-webkit-scrollbar,
+.cg-image-gallery__fullscreen-filmstrip-track::-webkit-scrollbar {
+    display: none;
+}
+
+/* ── 缩略图 ── */
+.cg-image-gallery__thumbnail,
+.cg-image-gallery__fullscreen-thumbnail {
+    flex-shrink: 0;
+    width: 80px;
+    height: 60px;
+    border: 2px solid transparent;
+    border-radius: var(--cg-radius-sm);
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color var(--cg-transition-fast),
+                transform var(--cg-transition-fast);
+}
+
+.cg-image-gallery__thumbnail:hover,
+.cg-image-gallery__fullscreen-thumbnail:hover {
+    transform: scale(1.05);
+    border-color: var(--cg-color-border);
+}
+
+.cg-image-gallery__thumbnail--active,
+.cg-image-gallery__fullscreen-thumbnail--active {
+    border-color: var(--cg-color-primary);
+}
+
+.cg-image-gallery__thumbnail:focus-visible,
+.cg-image-gallery__fullscreen-thumbnail:focus-visible {
+    outline: 2px solid var(--cg-color-focus-ring);
+    outline-offset: 2px;
+}
+
+.cg-image-gallery__thumbnail img,
+.cg-image-gallery__fullscreen-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ─────────────────────────────────────────────
+    全屏模态
+   ───────────────────────────────────────────── */
+.cg-image-gallery__fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: none;
+    flex-direction: column;
+}
+
+.cg-image-gallery__fullscreen--open {
+    display: flex;
+    animation: cg-img-gallery-fs-fade-in 0.25s ease-out;
+}
+
+.cg-image-gallery__fullscreen--closing {
+    animation: cg-img-gallery-fs-fade-out 0.2s ease-in forwards;
+}
+
+@keyframes cg-img-gallery-fs-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes cg-img-gallery-fs-fade-out {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+/* ── 全屏背景 ── */
+.cg-image-gallery__fullscreen-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.82);
+}
+
+/* ── 全屏顶栏 ── */
+.cg-image-gallery__fullscreen-topbar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--cg-spacing-4) var(--cg-spacing-4) 0;
+}
+
+.cg-image-gallery__fullscreen-counter {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-on-dark-muted);
+    font-weight: var(--cg-font-weight-medium);
+    user-select: none;
+}
+
+/* ── 全屏关闭按钮 ── */
+.cg-image-gallery__fullscreen-btn-close {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--cg-color-on-dark);
+    cursor: pointer;
+    transition: background-color var(--cg-transition-fast),
+                border-color var(--cg-transition-fast),
+                transform var(--cg-transition-fast);
+}
+
+.cg-image-gallery__fullscreen-btn-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+}
+
+.cg-image-gallery__fullscreen-btn-close:focus-visible {
+    outline: 2px solid var(--cg-color-focus-ring);
+    outline-offset: 4px;
+}
+
+::deep .cg-image-gallery__fullscreen-btn-close .cg-mdi-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--cg-color-on-dark);
+}
+
+/* ── 全屏主图区 ── */
+.cg-image-gallery__fullscreen-main {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    padding: var(--cg-spacing-4);
+}
+
+/* ── 全屏主图容器 ── */
+.cg-image-gallery__fullscreen-image-wrap {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cg-image-gallery__fullscreen-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+/* ── 全屏导航按钮 ── */
+.cg-image-gallery__fullscreen-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--cg-color-on-dark);
+    cursor: pointer;
+    transition: background-color var(--cg-transition-fast),
+                opacity var(--cg-transition-fast);
+    opacity: 0.85;
+}
+
+.cg-image-gallery__fullscreen-nav:hover {
+    background: rgba(255, 255, 255, 0.25);
+    opacity: 1;
+}
+
+.cg-image-gallery__fullscreen-nav:focus-visible {
+    outline: 2px solid var(--cg-color-focus-ring);
+    outline-offset: 2px;
+    opacity: 1;
+}
+
+.cg-image-gallery__fullscreen-nav--prev {
+    left: var(--cg-spacing-3);
+}
+
+.cg-image-gallery__fullscreen-nav--next {
+    right: var(--cg-spacing-3);
+}
+
+::deep .cg-image-gallery__fullscreen-nav .cg-mdi-icon {
+    width: 28px;
+    height: 28px;
+    color: var(--cg-color-on-dark);
+}
+
+/* ── 全屏底部胶片条 ── */
+.cg-image-gallery__fullscreen-filmstrip {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4) var(--cg-spacing-4);
+}
+
+.cg-image-gallery__fullscreen-filmstrip-btn {
+    width: 32px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--cg-color-on-dark-muted);
+}
+
+.cg-image-gallery__fullscreen-filmstrip-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    color: var(--cg-color-on-dark);
+}
+
+::deep .cg-image-gallery__fullscreen-filmstrip-btn .cg-mdi-icon {
+    color: inherit;
+}
+
+/* ── 全屏缩略图 ── */
+.cg-image-gallery__fullscreen-thumbnail {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.cg-image-gallery__fullscreen-thumbnail:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.cg-image-gallery__fullscreen-thumbnail--active {
+    border-color: var(--cg-color-on-dark);
+}
+
+/* ── 响应式 ── */
+@media (max-width: 640px) {
+    .cg-image-gallery__thumbnail {
+        width: 64px;
+        height: 48px;
+    }
+
+    .cg-image-gallery__filmstrip-btn {
+        width: 28px;
+        height: 48px;
+    }
+
+    .cg-image-gallery__fullscreen-nav {
+        width: 40px;
+        height: 40px;
+    }
+
+    .cg-image-gallery__fullscreen-nav--prev {
+        left: var(--cg-spacing-2);
+    }
+
+    .cg-image-gallery__fullscreen-nav--next {
+        right: var(--cg-spacing-2);
+    }
+
+    .cg-image-gallery__fullscreen-main {
+        padding: var(--cg-spacing-2);
+    }
+
+    .cg-image-gallery__fullscreen-filmstrip {
+        padding: var(--cg-spacing-2);
+    }
+
+    .cg-image-gallery__fullscreen-thumbnail {
+        width: 64px;
+        height: 48px;
+    }
+
+    .cg-image-gallery__fullscreen-filmstrip-btn {
+        width: 28px;
+        height: 48px;
+    }
+}
+
+/* ── reduced-motion ── */
+@media (prefers-reduced-motion: reduce) {
+    .cg-image-gallery__preview-slide {
+        transition: none;
+    }
+
+    .cg-image-gallery__fullscreen--open,
+    .cg-image-gallery__fullscreen--closing {
+        animation: none;
+    }
+
+    .cg-image-gallery__thumbnail:hover,
+    .cg-image-gallery__fullscreen-thumbnail:hover {
+        transform: none;
+    }
+
+    .cg-image-gallery__preview-fullscreen-btn {
+        opacity: 1;
+    }
+}

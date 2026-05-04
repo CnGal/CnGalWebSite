@@ -170,6 +170,9 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<IAdminQueryService, AdminQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IAdminCommandService, AdminCommandService>(services, apiBase, withAuth: true);
 
+        // Perfection 服务（公开，完善度概览）
+        RegisterSdkHttpClient<IPerfectionQueryService, PerfectionQueryService>(services, apiBase, withAuth: false);
+
         // Examine 服务（需认证，审核/审阅/监控）
         RegisterSdkHttpClient<IExamineQueryService, ExamineQueryService>(services, apiBase, withAuth: true);
         RegisterSdkHttpClient<IExamineCommandService, ExamineCommandService>(services, apiBase, withAuth: true);

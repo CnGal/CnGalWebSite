@@ -1,0 +1,49 @@
+@* PerfectionEntryCard — 词条完善度卡片（纯展示组件）
+   可点击跳转至词条详情页，显示圆形评分、词条名、缺陷数与编辑数 *@
+@using CnGalWebSite.DataModel.ViewModel.Perfections
+@using CnGalWebSite.SDK.MainSite.Infrastructure
+
+@if (Model is not null)
+{
+    var color = SdkToolHelper.GetEntryPerfectionLevelColor(Model.Level);
+    var gradeText = Model.Grade.ToString("0.0");
+
+    <a class="perfection-entry-card" href="@($"/entries/index/{Model.EntryId}")">
+        <div class="perfection-entry-card__grade" style="border-color: @color; color: @color;">
+            <span class="perfection-entry-card__grade-value">@gradeText</span>
+        </div>
+        <div class="perfection-entry-card__info">
+            <span class="perfection-entry-card__name">@Model.EntryName</span>
+            <div class="perfection-entry-card__meta">
+                <span class="perfection-entry-card__meta-item perfection-entry-card__meta-item--defects">
+                    <CgMdiIcon Name="mdiAlertCircle" aria-hidden="true" />
+                    <span>@Model.DefectCount 个缺陷</span>
+                </span>
+                <span class="perfection-entry-card__meta-item perfection-entry-card__meta-item--edits">
+                    <CgMdiIcon Name="mdiPencil" aria-hidden="true" />
+                    <span>@Model.EditCount 次编辑</span>
+                </span>
+            </div>
+        </div>
+        <div class="perfection-entry-card__arrow">
+            <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+        </div>
+    </a>
+}
+else
+{
+    <div class="perfection-entry-card perfection-entry-card--empty">
+        <div class="perfection-entry-card__placeholder">
+            <CgMdiIcon Name="mdiChartBar" aria-hidden="true" />
+            <span>暂无词条数据</span>
+        </div>
+    </div>
+}
+
+@code {
+    /// <summary>
+    /// 词条完善度提示视图模型，为 null 时显示占位内容
+    /// </summary>
+    [Parameter]
+    public PerfectionInforTipViewModel? Model { get; set; }
+}

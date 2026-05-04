@@ -60,7 +60,7 @@
 </div>
 
 @code {
-    private CancellationTokenSource? _cts;
+    private CancellationTokenSource? _cts = new();
     private async Task<CgDataTableResult<MessageOverviewModel>> OnServerQuery(CgDataTableRequest request)
     {
         var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };

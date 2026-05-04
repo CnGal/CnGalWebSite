@@ -33,6 +33,10 @@
                     }
                     创建者：@Model.UserName
                 </a>
+                @if (Model.CreatorRanks?.Any() == true)
+                {
+                    <CgRankList Model="Model.CreatorRanks" />
+                }
             </div>
         }
         @if (Model.Authority)

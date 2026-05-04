@@ -25,6 +25,10 @@
                                     </span>
                                 }
                                 <span class="lottery-winner-name">@winner.Name</span>
+                                @if (winner.Ranks?.Any() == true)
+                                {
+                                    <CgRankList Model="winner.Ranks" />
+                                }
                             </li>
                         }
                     </ul>

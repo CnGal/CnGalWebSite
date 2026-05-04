@@ -1,6 +1,12 @@
 /* ═══════════════════════════════════════════════
    EntryStaffGroupList — mobile-first
    ═══════════════════════════════════════════════ */
+.staff-note {
+    font-size: 0.7rem;
+    color: var(--cg-color-text-muted);
+    margin-bottom: 0.5rem;
+}
+
 .entry-staff-group-list {
     display: flex;
     flex-direction: column;

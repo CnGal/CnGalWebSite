@@ -1,0 +1,186 @@
+@* ────────────────────────────────────────────────────────────
+    CgImageGallery — SSR 首帧 + 渐进增强图片画廊
+    - 上半部：当前选中图片的大图预览（点击触发全屏）
+    - 下半部：缩略图胶片条（左右按钮横向滚动）
+    - 全屏模式：全视口图片查看 + 导航按钮 + 胶片条
+    - 纯静态 SSR 渲染首帧，JS 接管后续交互
+   ──────────────────────────────────────────────────────────── *@
+
+<div class="cg-image-gallery" data-cg-image-gallery style="@(GalleryAspectRatio != null ? $"aspect-ratio: {GalleryAspectRatio};" : null)">
+    @if (Items is { Count: > 0 })
+    {
+        var total = Items.Count;
+        var effectiveAspect = GalleryAspectRatio ?? "16 / 9";
+
+        @* ── 大图预览区 ── *@
+        <div class="cg-image-gallery__preview"
+             style="aspect-ratio: @effectiveAspect;"
+             role="button"
+             tabindex="0"
+             aria-label="点击查看全屏大图">
+            @for (var i = 0; i < total; i++)
+            {
+                var item = Items[i];
+                var activeClass = i == 0 ? " cg-image-gallery__preview-slide--active" : "";
+
+                <div class="cg-image-gallery__preview-slide@(activeClass)" data-index="@i">
+                    <img src="@item.Url"
+                         alt="@(item.Alt ?? $"图片 {i + 1}")"
+                         loading="@(i == 0 ? "eager" : "lazy")"
+                         fetchpriority="@(i == 0 ? "high" : "low")"
+                         decoding="async" />
+                </div>
+            }
+
+            @* 全屏按钮覆盖层 *@
+            <button type="button"
+                    class="cg-image-gallery__preview-fullscreen-btn"
+                    aria-label="全屏查看">
+                <CgMdiIcon Name="mdiFullscreen" aria-hidden="true" />
+            </button>
+        </div>
+
+        @* ── 胶片缩略图区 ── *@
+        <div class="cg-image-gallery__filmstrip">
+            <button type="button"
+                    class="cg-image-gallery__filmstrip-btn cg-image-gallery__filmstrip-btn--prev"
+                    aria-label="向左滚动">
+                <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
+            </button>
+
+            <div class="cg-image-gallery__filmstrip-track">
+                @for (var i = 0; i < total; i++)
+                {
+                    var item = Items[i];
+                    var activeClass = i == 0 ? " cg-image-gallery__thumbnail--active" : "";
+
+                    <div class="cg-image-gallery__thumbnail@(activeClass)"
+                         data-index="@i"
+                         role="button"
+                         tabindex="0"
+                         aria-label="@(item.Alt ?? $"查看第 {i + 1} 张图片")">
+                        <img src="@item.Url"
+                             alt="@(item.Alt ?? $"缩略图 {i + 1}")"
+                             loading="lazy"
+                             decoding="async" />
+                    </div>
+                }
+            </div>
+
+            <button type="button"
+                    class="cg-image-gallery__filmstrip-btn cg-image-gallery__filmstrip-btn--next"
+                    aria-label="向右滚动">
+                <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+            </button>
+        </div>
+
+        @* ── 全屏模态层（默认隐藏，JS 控制显示） ── *@
+        <div class="cg-image-gallery__fullscreen"
+             data-cg-image-gallery-fullscreen
+             aria-hidden="true"
+             role="dialog"
+             aria-modal="true"
+             aria-label="全屏图片查看">
+
+            <div class="cg-image-gallery__fullscreen-backdrop"></div>
+
+            @* 顶部栏：计数 + 关闭（关闭按钮 hover 有提示环） *@
+            <div class="cg-image-gallery__fullscreen-topbar">
+                <span class="cg-image-gallery__fullscreen-counter" data-cg-image-gallery-counter>
+                    1 / @total
+                </span>
+                <button type="button"
+                        class="cg-image-gallery__fullscreen-btn-close"
+                        aria-label="关闭全屏"
+                        title="关闭 (Esc)">
+                    <CgMdiIcon Name="mdiClose" aria-hidden="true" />
+                </button>
+            </div>
+
+            @* 主图区域 *@
+            <div class="cg-image-gallery__fullscreen-main">
+                <button type="button"
+                        class="cg-image-gallery__fullscreen-nav cg-image-gallery__fullscreen-nav--prev"
+                        aria-label="上一张">
+                    <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
+                </button>
+
+                <div class="cg-image-gallery__fullscreen-image-wrap">
+                    <img src="@Items[0].Url"
+                         alt="@(Items[0].Alt ?? "图片 1")"
+                         class="cg-image-gallery__fullscreen-image"
+                         data-cg-image-gallery-fs-image />
+                </div>
+
+                <button type="button"
+                        class="cg-image-gallery__fullscreen-nav cg-image-gallery__fullscreen-nav--next"
+                        aria-label="下一张">
+                    <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+                </button>
+            </div>
+
+            @* 全屏底部的缩略图胶片 *@
+            @if (total > 1)
+            {
+                <div class="cg-image-gallery__fullscreen-filmstrip">
+                    <button type="button"
+                            class="cg-image-gallery__fullscreen-filmstrip-btn cg-image-gallery__fullscreen-filmstrip-btn--prev"
+                            aria-label="向左滚动">
+                        <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
+                    </button>
+
+                    <div class="cg-image-gallery__fullscreen-filmstrip-track">
+                        @for (var i = 0; i < total; i++)
+                        {
+                            var item = Items[i];
+                            var activeClass = i == 0 ? " cg-image-gallery__fullscreen-thumbnail--active" : "";
+
+                            <div class="cg-image-gallery__fullscreen-thumbnail@(activeClass)"
+                                 data-index="@i"
+                                 role="button"
+                                 tabindex="-1"
+                                 aria-label="@(item.Alt ?? $"切换到第 {i + 1} 张图片")">
+                                <img src="@item.Url"
+                                     alt="@(item.Alt ?? $"缩略图 {i + 1}")"
+                                     loading="lazy"
+                                     decoding="async" />
+                            </div>
+                        }
+                    </div>
+
+                    <button type="button"
+                            class="cg-image-gallery__fullscreen-filmstrip-btn cg-image-gallery__fullscreen-filmstrip-btn--next"
+                            aria-label="向右滚动">
+                        <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+                    </button>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        @* ── 空状态 ── *@
+        <div class="cg-image-gallery__empty">
+            <CgMdiIcon Name="mdiImageOffOutline" aria-hidden="true" />
+            <p>暂无图片</p>
+        </div>
+    }
+</div>
+
+@if (Items is { Count: > 0 })
+{
+    <script src="_content/CnGalWebSite.MainSite.Shared/scripts/cg-image-gallery.js"></script>
+}
+
+@code {
+    /// <summary>图片项列表</summary>
+    [Parameter, EditorRequired]
+    public IReadOnlyList<CgImageGalleryItem> Items { get; set; } = [];
+
+    /// <summary>预览区宽高比（CSS aspect-ratio 值，如 "16 / 9"。为空则不设置）</summary>
+    [Parameter]
+    public string? GalleryAspectRatio { get; set; }
+
+    /// <summary>图片画廊数据项</summary>
+    public record CgImageGalleryItem(string Url, string? Alt);
+}

@@ -1,4 +1,5 @@
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
 
 namespace CnGalWebSite.SDK.MainSite.Models;
 
@@ -79,4 +80,6 @@ public sealed class LotteryWinnerModel
     public required string Name { get; init; }
 
     public required string PhotoPath { get; init; }
+
+    public IReadOnlyList<RankViewModel> Ranks { get; init; } = [];
 }

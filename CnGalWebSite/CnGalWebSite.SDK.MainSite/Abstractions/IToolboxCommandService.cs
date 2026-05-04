@@ -2,6 +2,7 @@ using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Videos;
 using CnGalWebSite.SDK.MainSite.Models;
+using CnGalWebSite.SDK.MainSite.Models.EntryEdit;
 using CnGalWebSite.SDK.MainSite.Models.Toolbox;
 
 namespace CnGalWebSite.SDK.MainSite.Abstractions;
@@ -25,4 +26,6 @@ public interface IToolboxCommandService
     Task<SdkResult<bool>> SubmitArticleRelevancesAsync(EditArticleRelevancesViewModel model, CancellationToken cancellationToken = default);
     Task<SdkResult<bool>> SubmitVideoRelevancesAsync(EditVideoRelevancesViewModel model, CancellationToken cancellationToken = default);
     Task<SdkResult<bool>> HideEntryAsync(int id, CancellationToken cancellationToken = default);
+
+    Task<SdkResult<SteamAppDetailsViewModel>> GetSteamAppDetailsAsync(string steamId, CancellationToken cancellationToken = default);
 }

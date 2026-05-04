@@ -1,3 +1,5 @@
+@using CnGalWebSite.DataModel.ViewModel.Ranks
+
 @if (!string.IsNullOrWhiteSpace(AuthorName))
 {
     <section class="article-author">
@@ -14,6 +16,11 @@
             }
             <span class="article-author-name">@AuthorName</span>
         </a>
+
+        @if (Ranks?.Any() == true)
+        {
+            <CgRankList Model="Ranks" />
+        }
 
         @if (!string.IsNullOrWhiteSpace(OriginalAuthor))
         {
@@ -37,6 +44,7 @@
     [Parameter] public string AuthorId { get; set; } = "";
     [Parameter] public string OriginalAuthor { get; set; } = "";
     [Parameter] public string OriginalLink { get; set; } = "";
+    [Parameter] public IReadOnlyList<RankViewModel>? Ranks { get; set; }
 
     private string SpaceUrl => string.IsNullOrWhiteSpace(AuthorId) ? "#" : $"/space/index/{AuthorId}";
 }

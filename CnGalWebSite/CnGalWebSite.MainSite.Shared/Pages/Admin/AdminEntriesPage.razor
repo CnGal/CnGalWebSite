@@ -246,7 +246,7 @@
 </CgModal>
 
 @code {
-    private CancellationTokenSource? _cts;
+    private CancellationTokenSource? _cts = new();
     private CgDataTable<EntryOverviewModel>? _dataTable;
     private CgDataTable<GameRecordOverviewModel>? _playedGameTable;
     private CgDataTable<EntryInformationTypeOverviewModel>? _infoTypeTable;

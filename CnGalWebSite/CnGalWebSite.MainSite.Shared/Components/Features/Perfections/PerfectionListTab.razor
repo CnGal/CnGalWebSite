@@ -1,0 +1,60 @@
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Perfections
+
+@inject IPerfectionQueryService PerfectionQueryService
+
+<CgDataTable TItem="PerfectionOverviewModel"
+             Title="完善度列表"
+             OnServerQuery="LoadPerfectionsAsync"
+             DefaultSortField="@nameof(PerfectionOverviewModel.Id)"
+             DefaultSortDesc="true"
+             @ref="_dataTable">
+
+    <CgDataTableColumn TItem="PerfectionOverviewModel" Title="Id" Field="@nameof(PerfectionOverviewModel.Id)" Width="80px" />
+
+    <CgDataTableColumn TItem="PerfectionOverviewModel" Title="词条名称" Sortable="false">
+        <ChildContent Context="item">
+            <a href="/entries/index/@item.Id">@item.Name</a>
+        </ChildContent>
+    </CgDataTableColumn>
+
+    <CgDataTableColumn TItem="PerfectionOverviewModel" Title="完善度" Field="@nameof(PerfectionOverviewModel.Grade)" Sortable="false">
+        <ChildContent Context="item">
+            @item.Grade.ToString("F1")
+        </ChildContent>
+    </CgDataTableColumn>
+
+    <CgDataTableColumn TItem="PerfectionOverviewModel" Title="击败全站百分比" Field="@nameof(PerfectionOverviewModel.VictoryPercentage)" Sortable="false">
+        <ChildContent Context="item">
+            @item.VictoryPercentage.ToString("F1")%
+        </ChildContent>
+    </CgDataTableColumn>
+
+</CgDataTable>
+
+@code {
+    private CgDataTable<PerfectionOverviewModel>? _dataTable;
+
+    private async Task<CgDataTableResult<PerfectionOverviewModel>> LoadPerfectionsAsync(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? "",
+            SortBy = string.IsNullOrWhiteSpace(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+
+        var result = await PerfectionQueryService.ListPerfectionsAsync(parameter);
+
+        if (result.Success && result.Data != null)
+        {
+            return new CgDataTableResult<PerfectionOverviewModel>(
+                result.Data.Items.ToList(),
+                result.Data.Total);
+        }
+
+        return new CgDataTableResult<PerfectionOverviewModel>([], 0);
+    }
+}

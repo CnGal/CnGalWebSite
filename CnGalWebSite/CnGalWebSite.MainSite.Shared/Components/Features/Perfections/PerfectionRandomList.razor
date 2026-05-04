@@ -1,0 +1,66 @@
+<div class="perfection-random-list">
+    <div class="perfection-random-list__header">
+        <div class="perfection-random-list__title-group">
+            @if (!string.IsNullOrWhiteSpace(TitleIcon))
+            {
+                <CgMdiIcon Name="@TitleIcon" class="perfection-random-list__title-icon" style="@_iconStyle" aria-hidden="true" />
+            }
+            <h3 class="perfection-random-list__title">@Title</h3>
+        </div>
+        @if (OnRefresh.HasDelegate)
+        {
+            <CgButton Variant="text" Size="sm" OnClick="OnRefresh">
+                <CgMdiIcon Name="mdiRefresh" aria-hidden="true" />
+                <span>换一组</span>
+            </CgButton>
+        }
+    </div>
+
+    <div class="@GridClass">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// 区块标题。
+    /// </summary>
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    /// <summary>
+    /// 标题前 MDI 图标名称。
+    /// </summary>
+    [Parameter]
+    public string? TitleIcon { get; set; }
+
+    /// <summary>
+    /// 标题图标颜色（CSS 值）。为空时使用默认主色。
+    /// </summary>
+    [Parameter]
+    public string? IconColor { get; set; }
+
+    /// <summary>
+    /// 桌面端是否使用横向双列网格。
+    /// </summary>
+    [Parameter]
+    public bool IsTransverse { get; set; }
+
+    /// <summary>
+    /// 卡片内容插槽。
+    /// </summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>
+    /// 点击「换一组」按钮时的回调。
+    /// </summary>
+    [Parameter]
+    public EventCallback OnRefresh { get; set; }
+
+    private string GridClass => IsTransverse
+        ? "perfection-random-list__grid perfection-random-list__grid--transverse"
+        : "perfection-random-list__grid";
+
+    private string? _iconStyle => string.IsNullOrEmpty(IconColor) ? null : $"color: {IconColor}";
+}

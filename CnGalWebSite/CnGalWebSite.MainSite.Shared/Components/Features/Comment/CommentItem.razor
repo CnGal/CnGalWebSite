@@ -1,4 +1,4 @@
-@* 单条评论项（纯静态展示，支持递归子评论） *@
+﻿@* 单条评论项（纯静态展示，支持递归子评论） *@
 
 @using CnGalWebSite.SDK.MainSite.Models.Comments
 
@@ -19,6 +19,7 @@
             </a>
         }
         <div class="comment-item__meta">
+        <div class="comment-item__author-container">
             <a href="@($"/space/index/{Model.User.Id}")" class="comment-item__author">
                 @if (!string.IsNullOrWhiteSpace(ReplyToName))
                 {
@@ -31,6 +32,11 @@
                     @Model.User.Name
                 }
             </a>
+            @if (Model.User.Ranks?.Any() == true)
+            {
+                <CgRankList Model="Model.User.Ranks" />
+            }
+            </div>
             <time class="comment-item__time" datetime="@Model.CommentTime.ToString("yyyy-MM-ddTHH:mm:ss")">
                 @Model.CommentTime.ToString("yyyy-MM-dd HH:mm")
             </time>

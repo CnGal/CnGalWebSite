@@ -103,7 +103,7 @@
 </div>
 
 @code {
-    private CancellationTokenSource? _cts;
+    private CancellationTokenSource? _cts = new();
     private CgDataTable<CommentOverviewModel>? _dataTable;
 
     private async Task<CgDataTableResult<CommentOverviewModel>> OnServerQuery(CgDataTableRequest request)

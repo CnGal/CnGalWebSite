@@ -1,0 +1,104 @@
+/* ═══════════════════════════════════════════════
+   PerfectionOverviewCard — 完善度总览卡片
+   包含环形图（等级分布）+ 柱状图（统计指标）
+   ═══════════════════════════════════════════════ */
+
+.perfection-overview-card {
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    overflow: hidden;
+    transition: box-shadow var(--cg-transition-normal), border-color var(--cg-transition-normal);
+}
+
+.perfection-overview-card:hover {
+    border-color: color-mix(in oklab, var(--cg-color-primary) 30%, var(--cg-color-border));
+    box-shadow: var(--cg-shadow-md);
+}
+
+/* ── Placeholder ── */
+
+.perfection-overview-card__placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-3);
+    min-height: 200px;
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+}
+
+.perfection-overview-card__placeholder ::deep .cg-mdi-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    opacity: 0.5;
+}
+
+/* ── Header ── */
+
+.perfection-overview-card__header {
+    padding: var(--cg-spacing-4) var(--cg-spacing-4) 0;
+}
+
+.perfection-overview-card__title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    margin: 0;
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+}
+
+.perfection-overview-card__title ::deep .cg-mdi-icon {
+    color: var(--cg-color-amber);
+}
+
+/* ── Charts Area ── */
+
+.perfection-overview-card__charts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-4);
+}
+
+/* Chart cards use their own border/background, remove outer border clash */
+.perfection-overview-card__charts ::deep .cg-pie-chart,
+.perfection-overview-card__charts ::deep .cg-bar-chart {
+    border: none;
+    box-shadow: none;
+    background: var(--cg-color-section-bg);
+    border-radius: var(--cg-radius-md);
+    padding: var(--cg-spacing-3);
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 640px) {
+    .perfection-overview-card__header {
+        padding: var(--cg-spacing-3) var(--cg-spacing-3) 0;
+    }
+
+    .perfection-overview-card__charts {
+        padding: var(--cg-spacing-3);
+        gap: var(--cg-spacing-2);
+    }
+}
+
+/* ── 去除 PerfectionHomeCard 侧边栏的嵌套卡片式样 ── */
+/* 当 PerfectionOverviewCard 放在 perfection-home-card__col-overview 中时 */
+::deep .perfection-home-card__col-overview .perfection-overview-card {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+}
+
+::deep .perfection-home-card__col-overview .perfection-overview-card__charts ::deep .cg-pie-chart,
+::deep .perfection-home-card__col-overview .perfection-overview-card__charts ::deep .cg-bar-chart {
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    padding: var(--cg-spacing-4);
+}

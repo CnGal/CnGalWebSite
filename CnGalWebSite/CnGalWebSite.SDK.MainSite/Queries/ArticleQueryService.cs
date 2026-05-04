@@ -68,6 +68,7 @@ public sealed class ArticleQueryService(
             AuthorName = article.UserInfor?.Name ?? string.Empty,
             AuthorAvatar = article.UserInfor?.PhotoPath ?? string.Empty,
             AuthorId = article.UserInfor?.Id ?? string.Empty,
+            AuthorRanks = article.UserInfor?.Ranks?.ToList() ?? [],
             RelatedEntries = article.RelatedEntries?.ToList() ?? [],
             RelatedArticles = article.RelatedArticles?.ToList() ?? [],
             RelatedVideos = article.RelatedVideos?.ToList() ?? [],

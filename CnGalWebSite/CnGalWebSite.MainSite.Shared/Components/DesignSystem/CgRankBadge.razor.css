@@ -1,0 +1,45 @@
+/* ── 基础头衔徽章（文本类型） ── */
+.user-rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--cg-radius-full);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    color: #ffffff;
+    white-space: nowrap;
+    line-height: 1.5;
+    background-color: var(--cg-color-primary);
+}
+
+/* ── 等级头衔颜色（Lv10 → Lv0） ── */
+.user-rank.rank-lv10 { background-color: #F44336; }  /* Red */
+.user-rank.rank-lv9  { background-color: #E91E63; }  /* Pink */
+.user-rank.rank-lv8  { background-color: #9C27B0; }  /* Purple */
+.user-rank.rank-lv7  { background-color: #673AB7; }  /* Deep Purple */
+.user-rank.rank-lv6  { background-color: #3F51B5; }  /* Indigo */
+.user-rank.rank-lv5  { background-color: #2196F3; }  /* Blue */
+.user-rank.rank-lv4  { background-color: #03A9F4; }  /* Light Blue */
+.user-rank.rank-lv3  { background-color: #00BCD4; }  /* Cyan */
+.user-rank.rank-lv2  { background-color: #009688; }  /* Teal */
+.user-rank.rank-lv1  { background-color: #4CAF50; }  /* Green */
+.user-rank.rank-lv0  { background-color: #607D8B; }  /* Blue Grey */
+
+/* ── 特殊角色头衔颜色 ── */
+.user-rank.rank-judges  { background-color: #0091EA; }  /* 评选者 */
+.user-rank.rank-editor  { background-color: #4CAF50; }  /* 编辑者 */
+.user-rank.rank-verify  { background-color: #BF360C; }  /* 已认证 */
+
+/* ── 旧版 Masa Blazor 兼容（自动生成的头衔可能使用 bg-* 类名） ── */
+.user-rank.bg-main     { background-color: #3976ef; }
+.user-rank.bg-primary  { background-color: #3976ef; }
+.user-rank.bg-success  { background-color: #16a34a; }
+
+/* ── 图片徽章 ── */
+.cg-rank-badge-img {
+    height: 1.25rem;
+    width: auto;
+    display: inline-block;
+    vertical-align: middle;
+}

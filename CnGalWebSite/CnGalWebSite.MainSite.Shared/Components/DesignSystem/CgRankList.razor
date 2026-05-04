@@ -1,0 +1,28 @@
+@using CnGalWebSite.DataModel.ViewModel.Ranks
+
+<div class="cg-rank-list @(Center ? "cg-rank-list--center" : "") @Class">
+    @foreach (var rank in Model)
+    {
+        <CgRankBadge Model="rank" />
+    }
+</div>
+
+@code {
+    /// <summary>
+    /// 头衔/徽章列表
+    /// </summary>
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<RankViewModel> Model { get; set; }
+
+    /// <summary>
+    /// 是否居中排列
+    /// </summary>
+    [Parameter]
+    public bool Center { get; set; }
+
+    /// <summary>
+    /// 额外 CSS 类名
+    /// </summary>
+    [Parameter]
+    public string? Class { get; set; }
+}

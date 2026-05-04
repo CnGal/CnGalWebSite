@@ -965,6 +965,12 @@ namespace CnGalWebSite.APIServer.Application.Perfections
             var model = new PerfectionLevelOverviewModel();
 
             var count = grades.Count;
+            if (count == 0)
+            {
+                // 没有可用的完善度数据时返回全零模型，避免 Average() 等操作在空集合上崩溃
+                return model;
+            }
+
             model.ToBeImprovedCount = grades.Count(s => s < 60);
             model.GoodCount = grades.Count(s => s >= 60 && s < 80);
             model.ExcellentCount = grades.Count(s => s >= 80);

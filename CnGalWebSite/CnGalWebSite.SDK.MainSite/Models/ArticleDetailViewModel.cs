@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Search;
 
 namespace CnGalWebSite.SDK.MainSite.Models;
@@ -58,6 +59,8 @@ public sealed class ArticleDetailViewModel
     /// 作者 Space 用户 ID（用于链接到个人空间）
     /// </summary>
     public required string AuthorId { get; init; }
+
+    public required IReadOnlyList<RankViewModel> AuthorRanks { get; init; }
 
     public required IReadOnlyList<EntryInforTipViewModel> RelatedEntries { get; init; }
 

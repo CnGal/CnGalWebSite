@@ -222,6 +222,7 @@ public sealed class FavoriteFolderQueryService(
             UserName = userInfo.Name ?? string.Empty,
             UserPhotoPath = userInfo.PhotoPath ?? string.Empty,
             UserId = userInfo.Id ?? string.Empty,
+            CreatorRanks = userInfo.Ranks?.ToList() ?? [],
             Entries = objects.Where(o => o.entry != null).Select(o => o.entry!).ToList(),
             Articles = objects.Where(o => o.article != null).Select(o => o.article!).ToList(),
             Videos = objects.Where(o => o.Video != null).Select(o => o.Video!).ToList(),

@@ -560,27 +560,32 @@ namespace CnGalWebSite.APIServer.Application.Charts
                 {
                     var temp = new List<double>();
                     var lastTime = dataList.Value.First().Time;
+                    var lastCount = dataList.Value.First().Count;
 
-                    //给没有数据的天数添加默认值0
+                    // 首段：从 minDay 到第一个数据点之前，用第一个数据点的值填充
                     for (var i = minDay; i < lastTime; i = i.AddDays(1))
                     {
-                        temp.Add(0);
+                        temp.Add(Math.Round(lastCount, 2));
                     }
                     foreach (var item in dataList.Value)
                     {
-                        //给没有数据的天数添加默认值0
-                        for (var i = lastTime.AddDays(1); i < item.Time; i = i.AddDays(1))
+                        // 中间间隙：用线性插值填充
+                        var gapDays = (item.Time - lastTime).Days;
+                        for (var d = 1; d < gapDays; d++)
                         {
-                            temp.Add(0);
+                            var ratio = (double)d / gapDays;
+                            var interpolated = lastCount + (item.Count - lastCount) * ratio;
+                            temp.Add(Math.Round(interpolated, 2));
                         }
-                        //添加数据
                         temp.Add(Math.Round(item.Count, 2));
+
                         lastTime = item.Time;
+                        lastCount = item.Count;
                     }
-                    //给没有数据的天数添加默认值0
+                    // 尾段：从最后一个数据点到 maxDay，用最后一个数据点的值填充
                     for (var i = lastTime.AddDays(1); i <= maxDay; i = i.AddDays(1))
                     {
-                        temp.Add(0);
+                        temp.Add(Math.Round(lastCount, 2));
                     }
 
                     ds.Series.Add(new EChartsOptionSery

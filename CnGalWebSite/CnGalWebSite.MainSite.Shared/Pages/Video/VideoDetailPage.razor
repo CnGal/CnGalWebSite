@@ -41,7 +41,8 @@ else if (Model is not null)
                                  AuthorAvatar="@Model.AuthorAvatar"
                                  AuthorId="@Model.AuthorId"
                                  OriginalAuthor="@Model.OriginalAuthor"
-                                 IsOriginal="Model.IsAuthorOriginal" />
+                                 IsOriginal="Model.IsAuthorOriginal"
+                                 Ranks="@(Model.AuthorRanks)" />
 
                 <VideoBasicInfo ReaderCount="Model.ReaderCount"
                                 CommentCount="Model.CommentCount"
@@ -65,7 +66,7 @@ else if (Model is not null)
             @if (Model.Pictures.Count > 0)
             {
                 <EntrySection Title="截图" Icon="mdiImageOutline">
-                    <EntryImageGrid Pictures="Model.Pictures" MaxCount="12" EntryName="@Model.Name" DisplayTextOrFallback="ExternalLinkHelper.DisplayTextOrFallback" />
+                    <CgImageGallery Items="Model.Pictures.Select(p => new CgImageGallery.CgImageGalleryItem(p.Url, p.Note)).ToList()" />
                 </EntrySection>
             }
 

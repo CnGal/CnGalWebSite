@@ -64,7 +64,7 @@
 </div>
 
 @code {
-    private CancellationTokenSource? _cts;
+    private CancellationTokenSource? _cts = new();
     private CgDataTable<VideoOverviewModel>? _dataTable;
 
     private async Task<CgDataTableResult<VideoOverviewModel>> OnServerQuery(CgDataTableRequest request)

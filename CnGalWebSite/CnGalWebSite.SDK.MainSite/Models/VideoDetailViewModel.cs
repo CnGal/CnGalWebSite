@@ -1,5 +1,6 @@
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
+using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Search;
 
 namespace CnGalWebSite.SDK.MainSite.Models;
@@ -70,6 +71,8 @@ public sealed class VideoDetailViewModel
     /// 是否为原创作者（true = "作者"标签，false = "搬运"标签）
     /// </summary>
     public required bool IsAuthorOriginal { get; init; }
+
+    public required IReadOnlyList<RankViewModel> AuthorRanks { get; init; }
 
     public required IReadOnlyList<EntryInforTipViewModel> RelatedEntries { get; init; }
 

@@ -1,0 +1,90 @@
+/* ════════════════════════════════════════════════
+   PerfectionHomeCard — 完善度概览编排卡片
+   纯 CSS Grid 布局，无 Bootstrap 依赖
+   大屏（≥1024px）：chart 区 2/1 分栏，列表区 1/2 分栏
+   ════════════════════════════════════════════════ */
+
+.perfection-home-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-6);
+}
+
+/* ── 行级网格容器 ── */
+
+.perfection-home-card__row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--cg-spacing-5);
+    align-items: start;
+}
+
+/* ── 图表区：大屏 left 2/3 + right 1/3 ── */
+
+@media (min-width: 1024px) {
+    .perfection-home-card__row--charts {
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    }
+}
+
+.perfection-home-card__col-charts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+.perfection-home-card__col-overview {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+/* 折线图卡片统一边框样式 */
+.perfection-home-card__col-charts ::deep .cg-line-chart {
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    background: var(--cg-color-surface);
+    box-shadow: var(--cg-shadow-sm);
+}
+
+/* ── 随机列表区：大屏 left 1/3 + right 2/3 ── */
+
+@media (min-width: 1024px) {
+    .perfection-home-card__row--random-lists {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    }
+}
+
+.perfection-home-card__col-random-left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+.perfection-home-card__col-random-right {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 1023.98px) {
+    .perfection-home-card__row {
+        gap: var(--cg-spacing-4);
+    }
+}
+
+@media (max-width: 640px) {
+    .perfection-home-card {
+        gap: var(--cg-spacing-4);
+    }
+
+    .perfection-home-card__row {
+        gap: var(--cg-spacing-3);
+    }
+
+    .perfection-home-card__col-charts {
+        gap: var(--cg-spacing-3);
+    }
+}

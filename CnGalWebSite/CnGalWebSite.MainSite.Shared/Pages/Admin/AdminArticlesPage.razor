@@ -110,7 +110,7 @@
 </div>
 
 @code {
-    private CancellationTokenSource? _cts;
+    private CancellationTokenSource? _cts = new();
     private CgDataTable<ArticleOverviewModel>? _dataTable;
 
     private async Task<CgDataTableResult<ArticleOverviewModel>> OnServerQuery(CgDataTableRequest request)

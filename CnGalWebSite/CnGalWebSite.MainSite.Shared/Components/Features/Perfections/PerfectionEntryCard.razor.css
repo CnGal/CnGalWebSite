@@ -1,0 +1,152 @@
+/* ═══════════════════════════════════════════════
+   PerfectionEntryCard — 词条完善度卡片
+   ═══════════════════════════════════════════════ */
+
+.perfection-entry-card {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow var(--cg-transition-normal),
+                border-color var(--cg-transition-normal),
+                transform var(--cg-transition-fast);
+    cursor: pointer;
+}
+
+.perfection-entry-card:hover {
+    box-shadow: var(--cg-shadow-card-hover);
+    border-color: color-mix(in oklab, var(--cg-color-primary) 30%, var(--cg-color-border));
+    transform: translateY(-1px);
+    text-decoration: none;
+    color: inherit;
+}
+
+.perfection-entry-card--empty {
+    justify-content: center;
+    min-height: 80px;
+}
+
+.perfection-entry-card__placeholder {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+}
+
+.perfection-entry-card__placeholder ::deep .cg-mdi-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    opacity: 0.5;
+}
+
+/* ── Circular Grade ── */
+
+.perfection-entry-card__grade {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    border: 3px solid;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.perfection-entry-card__grade-value {
+    font-size: var(--cg-font-size-md);
+    font-weight: var(--cg-font-weight-bold);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+/* ── Info ── */
+
+.perfection-entry-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-1);
+    min-width: 0;
+    flex: 1;
+}
+
+.perfection-entry-card__name {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.perfection-entry-card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    flex-wrap: wrap;
+}
+
+.perfection-entry-card__meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+}
+
+.perfection-entry-card__meta-item ::deep .cg-mdi-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+}
+
+.perfection-entry-card__meta-item--defects ::deep .cg-mdi-icon {
+    color: var(--cg-color-error);
+}
+
+.perfection-entry-card__meta-item--edits ::deep .cg-mdi-icon {
+    color: var(--cg-color-primary);
+}
+
+/* ── Arrow ── */
+
+.perfection-entry-card__arrow {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: transform var(--cg-transition-fast);
+}
+
+.perfection-entry-card__arrow ::deep .cg-mdi-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--cg-color-text-muted);
+}
+
+.perfection-entry-card:hover .perfection-entry-card__arrow {
+    transform: translateX(3px);
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 640px) {
+    .perfection-entry-card {
+        padding: var(--cg-spacing-2) var(--cg-spacing-3);
+        gap: var(--cg-spacing-2);
+    }
+
+    .perfection-entry-card__grade {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+    }
+
+    .perfection-entry-card__grade-value {
+        font-size: var(--cg-font-size-sm);
+    }
+}

@@ -1,4 +1,6 @@
+﻿@using Microsoft.Extensions.Logging
 @typeparam TItem
+@inject ILogger<CgDataTable<TItem>> Logger
 
 <div class="cg-datatable">
     @* ── 工具栏 ── *@
@@ -330,8 +332,9 @@
                 _totalCount = result.TotalCount;
             }
         }
-        catch
+        catch (Exception ex)
         {
+            Logger.LogError(ex, "CgDataTable 加载服务端数据失败");
             _displayItems = new List<TItem>();
             _totalCount = 0;
         }

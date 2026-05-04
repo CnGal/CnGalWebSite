@@ -55,16 +55,19 @@
                 </div>
             </div>
 
-            @* 图例 *@
-            <div class="cg-heatmap__legend">
-                <span class="cg-heatmap__legend-text">少</span>
-                <span class="cg-heatmap__cell cg-heatmap__cell--lv0 cg-heatmap__legend-cell"></span>
-                <span class="cg-heatmap__cell cg-heatmap__cell--lv1 cg-heatmap__legend-cell"></span>
-                <span class="cg-heatmap__cell cg-heatmap__cell--lv2 cg-heatmap__legend-cell"></span>
-                <span class="cg-heatmap__cell cg-heatmap__cell--lv3 cg-heatmap__legend-cell"></span>
-                <span class="cg-heatmap__cell cg-heatmap__cell--lv4 cg-heatmap__legend-cell"></span>
-                <span class="cg-heatmap__legend-text">多</span>
-            </div>
+            @* 图例：仅当存在多种非零色阶时才显示 *@
+            @if (_showLegend)
+            {
+                <div class="cg-heatmap__legend">
+                    <span class="cg-heatmap__legend-text">少</span>
+                    <span class="cg-heatmap__cell cg-heatmap__cell--lv0 cg-heatmap__legend-cell"></span>
+                    <span class="cg-heatmap__cell cg-heatmap__cell--lv1 cg-heatmap__legend-cell"></span>
+                    <span class="cg-heatmap__cell cg-heatmap__cell--lv2 cg-heatmap__legend-cell"></span>
+                    <span class="cg-heatmap__cell cg-heatmap__cell--lv3 cg-heatmap__legend-cell"></span>
+                    <span class="cg-heatmap__cell cg-heatmap__cell--lv4 cg-heatmap__legend-cell"></span>
+                    <span class="cg-heatmap__legend-text">多</span>
+                </div>
+            }
         }
     </div>
 </div>
@@ -109,6 +112,7 @@
     private List<CellInfo> _cells = [];
     private List<MonthLabel> _monthLabels = [];
     private int _totalWeeks;
+    private bool _showLegend;
 
     protected override void OnParametersSet()
     {
@@ -178,6 +182,14 @@
         }
 
         _totalWeeks = col + 1;
+
+        // 仅当存在多种非零色阶（lv1~lv4）时才显示图例
+        var nonZeroLevels = _cells
+            .Where(c => !c.IsPlaceholder && c.Level > 0)
+            .Select(c => c.Level)
+            .Distinct()
+            .Count();
+        _showLegend = nonZeroLevels > 1;
     }
 
     private static int GetLevel(int count, int max)
