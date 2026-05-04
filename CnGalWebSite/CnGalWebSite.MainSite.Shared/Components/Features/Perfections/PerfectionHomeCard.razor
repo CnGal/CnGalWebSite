@@ -21,7 +21,7 @@
                              Series="@StatisticalChartSeries"
                              Height="280"
                              ShowTimeRangeSelector="true"
-                             OnTimeRangeChanged="@OnTimeRangeChanged" />
+                             OnTimeRangeChanged="@OnStatisticalTimeRangeChanged" />
             }
             @if (PerfectionLevelLabels is not null && PerfectionLevelSeries is not null)
             {
@@ -30,7 +30,7 @@
                              Series="@PerfectionLevelSeries"
                              Height="280"
                              ShowTimeRangeSelector="true"
-                             OnTimeRangeChanged="@OnTimeRangeChanged" />
+                             OnTimeRangeChanged="@OnPerfectionLevelTimeRangeChanged" />
             }
         </div>
 
@@ -182,10 +182,16 @@
     public IReadOnlyList<PerfectionCheckViewModel>? MiddleChecks { get; set; }
 
     /// <summary>
-    /// 折线图时间范围变化回调（天数）。
+    /// 统计折线图时间范围变化回调（天数）。
     /// </summary>
     [Parameter]
-    public EventCallback<int> OnTimeRangeChanged { get; set; }
+    public EventCallback<int> OnStatisticalTimeRangeChanged { get; set; }
+
+    /// <summary>
+    /// 完善度趋势折线图时间范围变化回调（天数）。
+    /// </summary>
+    [Parameter]
+    public EventCallback<int> OnPerfectionLevelTimeRangeChanged { get; set; }
 
     /// <summary>
     /// 刷新"已完善的词条"随机列表。

@@ -50,7 +50,8 @@ else if (_isLoaded)
                                             GoodEntries="@_goodEntries"
                                             HighChecks="@_highChecks"
                                             MiddleChecks="@_middleChecks"
-                                            OnTimeRangeChanged="@ReloadLineChartsAsync" />
+                                            OnStatisticalTimeRangeChanged="@ReloadStatisticalChartAsync"
+                                            OnPerfectionLevelTimeRangeChanged="@ReloadPerfectionLevelChartAsync" />
                         break;
 
                     case "perfection-list":
@@ -197,33 +198,19 @@ else
     }
 
     /// <summary>
-    /// 重新加载两张折线图数据。
+    /// 重新加载统计折线图数据。
     /// </summary>
-    private async Task ReloadLineChartsAsync(int days)
+    private async Task ReloadStatisticalChartAsync(int days)
     {
-        var beforeTime = DateTime.Now.Date.AddDays(1);
-        var afterTime = days >= 3650
-            ? AllDataSince
-            : beforeTime.AddDays(-days);
+        var (afterTime, beforeTime) = ComputeTimeRange(days);
         var ct = _cts!.Token;
 
         try
         {
-            var statsTask = PerfectionQueryService.GetPerfectionLineChartAsync(LineChartType.StatisticalData, afterTime, beforeTime, ct);
-            var levelTask = PerfectionQueryService.GetPerfectionLineChartAsync(LineChartType.PerfectionLevel, afterTime, beforeTime, ct);
-
-            await Task.WhenAll(statsTask, levelTask);
-
-            var statsResult = statsTask.Result;
-            if (statsResult.Success && statsResult.Data is not null)
+            var result = await PerfectionQueryService.GetPerfectionLineChartAsync(LineChartType.StatisticalData, afterTime, beforeTime, ct);
+            if (result.Success && result.Data is not null)
             {
-                (_statisticalChartLabels, _statisticalChartSeries) = ConvertLineChart(statsResult.Data);
-            }
-
-            var levelResult = levelTask.Result;
-            if (levelResult.Success && levelResult.Data is not null)
-            {
-                (_perfectionLevelLabels, _perfectionLevelSeries) = ConvertLineChart(levelResult.Data);
+                (_statisticalChartLabels, _statisticalChartSeries) = ConvertLineChart(result.Data);
             }
 
             StateHasChanged();
@@ -234,8 +221,45 @@ else
         }
         catch (Exception ex)
         {
-            CgToastService.Show("折线图数据刷新失败", ex.Message, "warning");
+            CgToastService.Show("统计折线图数据刷新失败", ex.Message, "warning");
         }
+    }
+
+    /// <summary>
+    /// 重新加载完善度趋势折线图数据。
+    /// </summary>
+    private async Task ReloadPerfectionLevelChartAsync(int days)
+    {
+        var (afterTime, beforeTime) = ComputeTimeRange(days);
+        var ct = _cts!.Token;
+
+        try
+        {
+            var result = await PerfectionQueryService.GetPerfectionLineChartAsync(LineChartType.PerfectionLevel, afterTime, beforeTime, ct);
+            if (result.Success && result.Data is not null)
+            {
+                (_perfectionLevelLabels, _perfectionLevelSeries) = ConvertLineChart(result.Data);
+            }
+
+            StateHasChanged();
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (Exception ex)
+        {
+            CgToastService.Show("完善度趋势折线图数据刷新失败", ex.Message, "warning");
+        }
+    }
+
+    private static (DateTime afterTime, DateTime beforeTime) ComputeTimeRange(int days)
+    {
+        var beforeTime = DateTime.Now.Date.AddDays(1);
+        var afterTime = days >= 3650
+            ? AllDataSince
+            : beforeTime.AddDays(-days);
+        return (afterTime, beforeTime);
     }
 
     public void Dispose()

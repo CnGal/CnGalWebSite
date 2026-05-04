@@ -59,10 +59,13 @@ export function render(canvasId, labels, datasets, title) {
     if (allMax === 0) allMax = 1;
     const yMax = Math.ceil(allMax * 1.12);
 
-    // Layout
+    // Layout — guard against zero-size canvas (e.g. during first render before CSS applies)
+    if (W <= 0 || H <= 0) return;
+
     const padL = 44, padR = 20, padT = 8, padB = 48;
-    const chartW = W - padL - padR;
-    const chartH = H - padT - padB;
+    const chartW = Math.max(0, W - padL - padR);
+    const chartH = Math.max(0, H - padT - padB);
+    if (chartW <= 0 || chartH <= 0) return;
 
     // Background
     ctx.fillStyle = computedStyle.getPropertyValue('--cg-color-surface').trim() || '#ffffff';

@@ -57,13 +57,16 @@ export function render(canvasId, slices, title, innerRadius) {
         return;
     }
 
-    // Layout
+    // Layout — guard against zero-size canvas (e.g. during first render before CSS applies)
+    if (W <= 0 || H <= 0) return;
+
     const legendWidth = 110;
     const legendGap = 16;
     const chartPadding = 20;
     const chartAvailableW = Math.max(0, W - legendWidth - legendGap - chartPadding * 2);
-    const chartAvailableH = H - chartPadding * 2;
+    const chartAvailableH = Math.max(0, H - chartPadding * 2);
     const chartSize = Math.min(chartAvailableW, chartAvailableH);
+    if (chartSize <= 0) return;
     const chartX = chartPadding + chartSize / 2;
     const chartY = H / 2;
 
