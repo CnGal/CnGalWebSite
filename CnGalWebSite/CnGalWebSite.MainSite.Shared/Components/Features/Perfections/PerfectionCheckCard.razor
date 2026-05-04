@@ -1,0 +1,43 @@
+@* PerfectionCheckCard — 完善度检查项卡片（纯展示组件）
+   可点击跳转至词条详情页，显示圆形评分、词条名、检查项标题与上下文 *@
+@using CnGalWebSite.DataModel.ViewModel.Perfections
+@using CnGalWebSite.SDK.MainSite.Infrastructure
+
+@if (Model is not null)
+{
+    var color = SdkToolHelper.GetEntryPerfectionCheckLevelColor(Model.Level);
+    var gradeText = Model.Grade.ToString("0.0");
+    var title = SdkToolHelper.GetPerfectionCheckTitle(Model);
+    var context = SdkToolHelper.GetPerfectionCheckContext(Model);
+
+    <a class="perfection-check-card" href="@($"/entries/index/{Model.EntryId}")">
+        <div class="perfection-check-card__grade" style="border-color: @color; color: @color;">
+            <span class="perfection-check-card__grade-value">@gradeText</span>
+        </div>
+        <div class="perfection-check-card__info">
+            <span class="perfection-check-card__name">@Model.EntryName</span>
+            <span class="perfection-check-card__title">@title</span>
+            <span class="perfection-check-card__context">@context</span>
+        </div>
+        <div class="perfection-check-card__arrow">
+            <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+        </div>
+    </a>
+}
+else
+{
+    <div class="perfection-check-card perfection-check-card--empty">
+        <div class="perfection-check-card__placeholder">
+            <CgMdiIcon Name="mdiCheckCircle" aria-hidden="true" />
+            <span>暂无检查数据</span>
+        </div>
+    </div>
+}
+
+@code {
+    /// <summary>
+    /// 完善度检查项视图模型，为 null 时显示占位内容
+    /// </summary>
+    [Parameter]
+    public PerfectionCheckViewModel? Model { get; set; }
+}

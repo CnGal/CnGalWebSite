@@ -1,0 +1,218 @@
+﻿@* PerfectionHomeCard — 完善度概览选项卡内容，编排式 2 列网格布局
+   所有数据由父页面 PerfectionHomePage 加载后通过参数传入 *@
+@using CnGalWebSite.DataModel.ViewModel.Admin
+@using CnGalWebSite.DataModel.ViewModel.Perfections
+@using CnGalWebSite.MainSite.Shared.Components.Features.Perfections
+
+<div class="perfection-home-card">
+    @* ── 行 1：最近编辑列表（全宽） ── *@
+    @if (RecentlyEditItems is { Count: > 0 })
+    {
+        <div class="row perfection-home-card__row">
+            <div class="col-12">
+                <RecentlyEditListCard Items="@RecentlyEditItems" />
+            </div>
+        </div>
+    }
+
+    @* ── 行 2：左 8 折线图 × 2 + 右 4 完善度总览 ── *@
+    <div class="row perfection-home-card__row perfection-home-card__row--charts">
+        <div class="col-12 col-lg-8 perfection-home-card__col-charts">
+            @if (StatisticalChartLabels is not null && StatisticalChartSeries is not null)
+            {
+                <CgLineChart Title="统计折线图"
+                             Labels="@StatisticalChartLabels"
+                             Series="@StatisticalChartSeries"
+                             Height="280"
+                             ShowTimeRangeSelector="true"
+                             OnTimeRangeChanged="@OnTimeRangeChanged" />
+            }
+            @if (PerfectionLevelLabels is not null && PerfectionLevelSeries is not null)
+            {
+                <CgLineChart Title="全站完善度趋势"
+                             Labels="@PerfectionLevelLabels"
+                             Series="@PerfectionLevelSeries"
+                             Height="280"
+                             ShowTimeRangeSelector="true"
+                             OnTimeRangeChanged="@OnTimeRangeChanged" />
+            }
+        </div>
+
+        <div class="col-12 col-lg-4 perfection-home-card__col-overview">
+            <PerfectionOverviewCard Model="@OverviewModel" />
+        </div>
+    </div>
+
+    @* ── 行 3：随机列表（左 4 竖排 + 右 8 横排） ── *@
+    <div class="row perfection-home-card__row perfection-home-card__row--random-lists">
+        <div class="col-12 col-lg-4 perfection-home-card__col-random-left">
+            @if (ExcellentEntries is { Count: > 0 })
+            {
+                <PerfectionRandomList Title="已完善的词条"
+                                      TitleIcon="mdiTrophy"
+                                      IsTransverse="false"
+                                      OnRefresh="@OnRefreshExcellent">
+                    @foreach (var entry in ExcellentEntries)
+                    {
+                        <PerfectionEntryCard Model="entry" />
+                    }
+                </PerfectionRandomList>
+            }
+            @if (HighChecks is { Count: > 0 })
+            {
+                <PerfectionRandomList Title="急需处理的项目"
+                                      TitleIcon="mdiAlertOctagonOutline"
+                                      IsTransverse="false"
+                                      OnRefresh="@OnRefreshHighChecks">
+                    @foreach (var check in HighChecks)
+                    {
+                        <PerfectionCheckCard Model="check" />
+                    }
+                </PerfectionRandomList>
+            }
+        </div>
+
+        <div class="col-12 col-lg-8 perfection-home-card__col-random-right">
+            @if (ToBeImprovedEntries is { Count: > 0 })
+            {
+                <PerfectionRandomList Title="急需完善的词条"
+                                      TitleIcon="mdiAlertCircleOutline"
+                                      IsTransverse="true"
+                                      OnRefresh="@OnRefreshToBeImproved">
+                    @foreach (var entry in ToBeImprovedEntries)
+                    {
+                        <PerfectionEntryCard Model="entry" />
+                    }
+                </PerfectionRandomList>
+            }
+            @if (GoodEntries is { Count: > 0 })
+            {
+                <PerfectionRandomList Title="待完善的词条"
+                                      TitleIcon="mdiThumbUpOutline"
+                                      IsTransverse="true"
+                                      OnRefresh="@OnRefreshGood">
+                    @foreach (var entry in GoodEntries)
+                    {
+                        <PerfectionEntryCard Model="entry" />
+                    }
+                </PerfectionRandomList>
+            }
+            @if (MiddleChecks is { Count: > 0 })
+            {
+                <PerfectionRandomList Title="待处理的项目"
+                                      TitleIcon="mdiInformationOutline"
+                                      IsTransverse="true"
+                                      OnRefresh="@OnRefreshMiddleChecks">
+                    @foreach (var check in MiddleChecks)
+                    {
+                        <PerfectionCheckCard Model="check" />
+                    }
+                </PerfectionRandomList>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// 最近编辑列表项。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<ExaminedNormalListModel>? RecentlyEditItems { get; set; }
+
+    /// <summary>
+    /// 完善度总览数据模型。
+    /// </summary>
+    [Parameter]
+    public PerfectionLevelOverviewModel? OverviewModel { get; set; }
+
+    /// <summary>
+    /// 统计折线图 X 轴标签。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<string>? StatisticalChartLabels { get; set; }
+
+    /// <summary>
+    /// 统计折线图数据系列。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<CgLineChartSeries>? StatisticalChartSeries { get; set; }
+
+    /// <summary>
+    /// 全站完善度趋势折线图 X 轴标签。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<string>? PerfectionLevelLabels { get; set; }
+
+    /// <summary>
+    /// 全站完善度趋势折线图数据系列。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<CgLineChartSeries>? PerfectionLevelSeries { get; set; }
+
+    /// <summary>
+    /// 已完善词条随机列表。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<PerfectionInforTipViewModel>? ExcellentEntries { get; set; }
+
+    /// <summary>
+    /// 急需完善词条随机列表。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<PerfectionInforTipViewModel>? ToBeImprovedEntries { get; set; }
+
+    /// <summary>
+    /// 待完善词条随机列表。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<PerfectionInforTipViewModel>? GoodEntries { get; set; }
+
+    /// <summary>
+    /// 高优先级检查项随机列表。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<PerfectionCheckViewModel>? HighChecks { get; set; }
+
+    /// <summary>
+    /// 中优先级检查项随机列表。
+    /// </summary>
+    [Parameter]
+    public IReadOnlyList<PerfectionCheckViewModel>? MiddleChecks { get; set; }
+
+    /// <summary>
+    /// 折线图时间范围变化回调（天数）。
+    /// </summary>
+    [Parameter]
+    public EventCallback<int> OnTimeRangeChanged { get; set; }
+
+    /// <summary>
+    /// 刷新"已完善的词条"随机列表。
+    /// </summary>
+    [Parameter]
+    public EventCallback OnRefreshExcellent { get; set; }
+
+    /// <summary>
+    /// 刷新"急需完善的词条"随机列表。
+    /// </summary>
+    [Parameter]
+    public EventCallback OnRefreshToBeImproved { get; set; }
+
+    /// <summary>
+    /// 刷新"待完善的词条"随机列表。
+    /// </summary>
+    [Parameter]
+    public EventCallback OnRefreshGood { get; set; }
+
+    /// <summary>
+    /// 刷新"急需处理的项目"随机列表。
+    /// </summary>
+    [Parameter]
+    public EventCallback OnRefreshHighChecks { get; set; }
+
+    /// <summary>
+    /// 刷新"待处理的项目"随机列表。
+    /// </summary>
+    [Parameter]
+    public EventCallback OnRefreshMiddleChecks { get; set; }
+}

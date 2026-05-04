@@ -1,0 +1,122 @@
+@using CnGalWebSite.DataModel.ViewModel.Admin
+
+@inject IPerfectionQueryService PerfectionQueryService
+@inject NavigationManager NavigationManager
+
+<div class="recently-edit-list">
+    @* ── Loading 态 ── *@
+    @if (_isLoading)
+    {
+        <div class="recently-edit-list__loading">
+            <CgProgressRing />
+            <span class="recently-edit-list__loading-text">加载中…</span>
+        </div>
+    }
+    @* ── Error 态 ── *@
+    else if (_hasError)
+    {
+        <div class="recently-edit-list__error">
+            <CgMdiIcon Name="mdiAlertCircleOutline" class="recently-edit-list__error-icon" aria-hidden="true" />
+            <span>加载失败，请稍后重试</span>
+        </div>
+    }
+    @* ── Content 态 ── *@
+    else if (_items is { Count: > 0 })
+    {
+        <div class="recently-edit-list__scroll">
+            @foreach (var item in _items)
+            {
+                <div class="recently-edit-list__item">
+                    @if (!string.IsNullOrWhiteSpace(item.UserInfor?.PhotoPath))
+                    {
+                        <img class="recently-edit-list__avatar"
+                             src="@item.UserInfor.PhotoPath"
+                             alt="@item.UserInfor.Name"
+                             loading="lazy" />
+                    }
+                    <div class="recently-edit-list__info">
+                        <span class="recently-edit-list__username">@item.UserInfor.Name</span>
+                        <span class="recently-edit-list__operation">@item.Operation.GetDisplayName()</span>
+                        <a class="recently-edit-list__object" href="@GetLink(item)">@item.RelatedName</a>
+                    </div>
+                    <time class="recently-edit-list__time" datetime="@item.ApplyTime.ToString("yyyy-MM-ddTHH:mm:ss")">
+                        @FormatTime(item.ApplyTime)
+                    </time>
+                </div>
+            }
+        </div>
+    }
+    @* ── Empty 态 ── *@
+    else
+    {
+        <div class="recently-edit-list__empty">
+            <CgMdiIcon Name="mdiHistory" class="recently-edit-list__empty-icon" aria-hidden="true" />
+            <span>暂无最近编辑</span>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public IReadOnlyList<ExaminedNormalListModel>? Items { get; set; }
+
+    private IReadOnlyList<ExaminedNormalListModel>? _items;
+    private bool _isLoading = true;
+    private bool _hasError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Items is not null)
+        {
+            _items = Items;
+            _isLoading = false;
+            return;
+        }
+
+        try
+        {
+            var result = await PerfectionQueryService.GetRecentlyEditListAsync();
+            if (result.Success && result.Data != null)
+            {
+                _items = result.Data.ToList();
+            }
+            else if (result.Error != null)
+            {
+                _hasError = true;
+            }
+        }
+        catch
+        {
+            _hasError = true;
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private static string GetLink(ExaminedNormalListModel item)
+    {
+        return item.Type switch
+        {
+            ExaminedNormalListModelType.Entry => $"/entries/index/{item.RelatedId}",
+            ExaminedNormalListModelType.Article => $"/articles/index/{item.RelatedId}",
+            ExaminedNormalListModelType.Tag => $"/tags/index/{item.RelatedId}",
+            ExaminedNormalListModelType.Periphery => $"/peripheries/index/{item.RelatedId}",
+            ExaminedNormalListModelType.Video => $"/videos/index/{item.RelatedId}",
+            ExaminedNormalListModelType.FavoriteFolder => $"/favoritefolders/index/{item.RelatedId}",
+            ExaminedNormalListModelType.User => $"/space/index/{item.RelatedId}",
+            _ => ""
+        };
+    }
+
+    private static string FormatTime(DateTime time)
+    {
+        var diff = DateTime.UtcNow.AddHours(8) - time;
+        if (diff.TotalMinutes < 1) return "刚刚";
+        if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes}分钟前";
+        if (diff.TotalHours < 24) return $"{(int)diff.TotalHours}小时前";
+        if (diff.TotalDays < 30) return $"{(int)diff.TotalDays}天前";
+        return time.ToString("yyyy-MM-dd");
+    }
+}

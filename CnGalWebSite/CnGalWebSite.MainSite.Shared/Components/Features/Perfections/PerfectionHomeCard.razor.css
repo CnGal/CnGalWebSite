@@ -1,0 +1,83 @@
+/* ════════════════════════════════════════════════
+   PerfectionHomeCard — 完善度概览编排卡片
+   2 列网格：左 col-lg-8 + 右 col-lg-4
+   ════════════════════════════════════════════════ */
+
+.perfection-home-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-6);
+}
+
+/* ── 行 ── */
+.perfection-home-card__row {
+    --cg-row-gap: var(--cg-spacing-6);
+    row-gap: var(--cg-row-gap);
+}
+
+/* ── 图表区 ── */
+.perfection-home-card__row--charts {
+    align-items: stretch;
+}
+
+.perfection-home-card__col-charts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+.perfection-home-card__col-overview {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+/* 确保折线图在 card 内无边距干扰 */
+.perfection-home-card__col-charts ::deep .cg-line-chart {
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    background: var(--cg-color-surface);
+}
+
+/* ── 随机列表区 ── */
+.perfection-home-card__row--random-lists {
+    align-items: flex-start;
+}
+
+.perfection-home-card__col-random-left {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+.perfection-home-card__col-random-right {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 991.98px) {
+    .perfection-home-card__col-overview {
+        margin-top: var(--cg-spacing-4);
+    }
+
+    .perfection-home-card__row--random-lists > .col-12:first-child {
+        margin-bottom: var(--cg-spacing-4);
+    }
+}
+
+@media (max-width: 640px) {
+    .perfection-home-card {
+        gap: var(--cg-spacing-4);
+    }
+
+    .perfection-home-card__row {
+        --cg-row-gap: var(--cg-spacing-4);
+    }
+
+    .perfection-home-card__col-charts {
+        gap: var(--cg-spacing-3);
+    }
+}

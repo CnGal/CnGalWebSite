@@ -1,0 +1,144 @@
+/* ═══════════════════════════════════════════════
+   PerfectionCheckCard — 完善度检查项卡片
+   ═══════════════════════════════════════════════ */
+
+.perfection-check-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow var(--cg-transition-normal),
+                border-color var(--cg-transition-normal),
+                transform var(--cg-transition-fast);
+    cursor: pointer;
+}
+
+.perfection-check-card:hover {
+    box-shadow: var(--cg-shadow-card-hover);
+    border-color: color-mix(in oklab, var(--cg-color-primary) 30%, var(--cg-color-border));
+    transform: translateY(-1px);
+    text-decoration: none;
+    color: inherit;
+}
+
+.perfection-check-card--empty {
+    justify-content: center;
+    align-items: center;
+    min-height: 80px;
+}
+
+.perfection-check-card__placeholder {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+}
+
+.perfection-check-card__placeholder ::deep .cg-mdi-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    opacity: 0.5;
+}
+
+/* ── Circular Grade ── */
+
+.perfection-check-card__grade {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    border: 3px solid;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.perfection-check-card__grade-value {
+    font-size: var(--cg-font-size-md);
+    font-weight: var(--cg-font-weight-bold);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+/* ── Info ── */
+
+.perfection-check-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-1);
+    min-width: 0;
+    flex: 1;
+}
+
+.perfection-check-card__name {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.perfection-check-card__title {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text);
+    font-weight: var(--cg-font-weight-medium);
+    line-height: 1.4;
+}
+
+.perfection-check-card__context {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ── Arrow ── */
+
+.perfection-check-card__arrow {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: transform var(--cg-transition-fast);
+    align-self: center;
+}
+
+.perfection-check-card__arrow ::deep .cg-mdi-icon {
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--cg-color-text-muted);
+}
+
+.perfection-check-card:hover .perfection-check-card__arrow {
+    transform: translateX(3px);
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 640px) {
+    .perfection-check-card {
+        padding: var(--cg-spacing-2) var(--cg-spacing-3);
+        gap: var(--cg-spacing-2);
+    }
+
+    .perfection-check-card__grade {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+    }
+
+    .perfection-check-card__grade-value {
+        font-size: var(--cg-font-size-sm);
+    }
+}

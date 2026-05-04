@@ -1,0 +1,165 @@
+/* ═══════════════════════════════════════════════
+   PerfectionOverviewCard — 完善度总览卡片
+   ═══════════════════════════════════════════════ */
+
+.perfection-overview-card {
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    overflow: hidden;
+    transition: box-shadow var(--cg-transition-normal), border-color var(--cg-transition-normal);
+}
+
+.perfection-overview-card:hover {
+    border-color: color-mix(in oklab, var(--cg-color-primary) 30%, var(--cg-color-border));
+    box-shadow: var(--cg-shadow-md);
+}
+
+/* ── Placeholder ── */
+
+.perfection-overview-card__placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-3);
+    min-height: 200px;
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+}
+
+.perfection-overview-card__placeholder ::deep .cg-mdi-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    opacity: 0.5;
+}
+
+/* ── Header ── */
+
+.perfection-overview-card__header {
+    padding: var(--cg-spacing-4) var(--cg-spacing-4) 0;
+}
+
+.perfection-overview-card__title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    margin: 0;
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+}
+
+.perfection-overview-card__title ::deep .cg-mdi-icon {
+    color: var(--cg-color-amber);
+}
+
+/* ── Stat Boxes ── */
+
+.perfection-overview-card__stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-4);
+}
+
+.perfection-overview-card__stat-box {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-1);
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    border-radius: var(--cg-radius-md);
+    border-left: 3px solid transparent;
+    background: var(--cg-color-section-bg);
+    transition: transform var(--cg-transition-fast);
+}
+
+.perfection-overview-card__stat-box:hover {
+    transform: translateY(-1px);
+}
+
+.perfection-overview-card__stat-box--danger {
+    border-left-color: #e53935;
+}
+
+.perfection-overview-card__stat-box--info {
+    border-left-color: #1e88e5;
+}
+
+.perfection-overview-card__stat-box--success {
+    border-left-color: #43a047;
+}
+
+.perfection-overview-card__stat-value {
+    font-size: var(--cg-font-size-2xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    line-height: 1.2;
+}
+
+.perfection-overview-card__stat-label {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    font-weight: var(--cg-font-weight-medium);
+}
+
+/* ── Stat Items Grid ── */
+
+.perfection-overview-card__items {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--cg-spacing-2);
+    padding: 0 var(--cg-spacing-4) var(--cg-spacing-4);
+}
+
+.perfection-overview-card__item {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    border-radius: var(--cg-radius-md);
+    background: var(--cg-color-section-bg);
+}
+
+.perfection-overview-card__item ::deep .cg-mdi-icon {
+    width: 1rem;
+    height: 1rem;
+    color: var(--cg-color-primary);
+    flex-shrink: 0;
+}
+
+.perfection-overview-card__item-label {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+}
+
+.perfection-overview-card__item-value {
+    margin-left: auto;
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 640px) {
+    .perfection-overview-card__stats {
+        grid-template-columns: 1fr;
+        gap: var(--cg-spacing-2);
+        padding: var(--cg-spacing-3);
+    }
+
+    .perfection-overview-card__items {
+        grid-template-columns: 1fr;
+        padding: 0 var(--cg-spacing-3) var(--cg-spacing-3);
+    }
+
+    .perfection-overview-card__header {
+        padding: var(--cg-spacing-3) var(--cg-spacing-3) 0;
+    }
+
+    .perfection-overview-card__stat-value {
+        font-size: var(--cg-font-size-xl);
+    }
+}

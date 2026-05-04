@@ -1,0 +1,68 @@
+@* PerfectionOverviewCard — 完善度总览卡片（纯展示组件）
+   显示全站完善度统计：3 个状态计数盒 + 4 个统计量 *@
+@using CnGalWebSite.DataModel.ViewModel.Perfections
+
+<div class="perfection-overview-card">
+    @if (Model is null)
+    {
+        <div class="perfection-overview-card__placeholder">
+            <CgMdiIcon Name="mdiChartBar" aria-hidden="true" />
+            <span>暂无完善度数据</span>
+        </div>
+    }
+    else
+    {
+        <div class="perfection-overview-card__header">
+            <h3 class="perfection-overview-card__title">
+                <CgMdiIcon Name="mdiTrophy" aria-hidden="true" />
+                完善度总览
+            </h3>
+        </div>
+
+        <div class="perfection-overview-card__stats">
+            <div class="perfection-overview-card__stat-box perfection-overview-card__stat-box--danger">
+                <span class="perfection-overview-card__stat-value">@Model.ToBeImprovedCount</span>
+                <span class="perfection-overview-card__stat-label">急需完善</span>
+            </div>
+            <div class="perfection-overview-card__stat-box perfection-overview-card__stat-box--info">
+                <span class="perfection-overview-card__stat-value">@Model.GoodCount</span>
+                <span class="perfection-overview-card__stat-label">待完善</span>
+            </div>
+            <div class="perfection-overview-card__stat-box perfection-overview-card__stat-box--success">
+                <span class="perfection-overview-card__stat-value">@Model.ExcellentCount</span>
+                <span class="perfection-overview-card__stat-label">已完善</span>
+            </div>
+        </div>
+
+        <div class="perfection-overview-card__items">
+            <div class="perfection-overview-card__item">
+                <CgMdiIcon Name="mdiSigma" aria-hidden="true" />
+                <span class="perfection-overview-card__item-label">平均值</span>
+                <span class="perfection-overview-card__item-value">@Model.AverageValue.ToString("0.0")</span>
+            </div>
+            <div class="perfection-overview-card__item">
+                <CgMdiIcon Name="mdiChartBar" aria-hidden="true" />
+                <span class="perfection-overview-card__item-label">中位数</span>
+                <span class="perfection-overview-card__item-value">@Model.Median.ToString("0.0")</span>
+            </div>
+            <div class="perfection-overview-card__item">
+                <CgMdiIcon Name="mdiTrendingUp" aria-hidden="true" />
+                <span class="perfection-overview-card__item-label">众数</span>
+                <span class="perfection-overview-card__item-value">@Model.Mode</span>
+            </div>
+            <div class="perfection-overview-card__item">
+                <CgMdiIcon Name="mdiSigma" aria-hidden="true" />
+                <span class="perfection-overview-card__item-label">标准差</span>
+                <span class="perfection-overview-card__item-value">@Model.StandardDeviation.ToString("0.0")</span>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    /// <summary>
+    /// 完善度总览数据模型，为 null 时显示占位内容
+    /// </summary>
+    [Parameter]
+    public PerfectionLevelOverviewModel? Model { get; set; }
+}
