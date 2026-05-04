@@ -124,6 +124,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddMainSiteSdkCore(apiBaseAddress, imageApiBaseAddress, taskApiBaseAddress);
         services.AddSingleton<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();
+        services.AddScoped<CircuitTokenStore>();
         services.AddTransient<AccessTokenHandler>();
         services.AddScoped(typeof(IToolboxLocalRepository<>), typeof(ToolboxLocalRepository<>));
 
