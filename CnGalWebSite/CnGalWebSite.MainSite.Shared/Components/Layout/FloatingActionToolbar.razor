@@ -2,6 +2,9 @@
 @inject NavigationManager NavigationManager
 @inject IMainSiteAuthRequestService AuthRequestService
 @inject IKanbanVisibilityService KanbanVisibilityService
+@inject IKanbanSettingService KanbanSettingService
+@inject IKanbanLive2DService Live2DService
+@inject IJSRuntime JS
 
 <nav class="floating-action-toolbar" aria-label="浮动工具栏">
     <div class="floating-action-toolbar__group">
@@ -87,6 +90,34 @@
 
     private async Task HandleSwitchToKanban()
     {
+        try
+        {
+            // 获取浮动工具栏的屏幕坐标，计算看板娘应放置的位置（使其按钮组与工具栏重合）
+            var pos = await JS.InvokeAsync<KanbanAlignmentResult>("eval",
+                "(function(){var t=document.querySelector('.floating-action-toolbar');if(!t)return null;var r=t.getBoundingClientRect();var bw=48,g=8,ks=300,w=window.innerWidth,h=window.innerHeight;var kbh=4*bw+3*g;var l=Math.round(Math.max(0,Math.min(r.right-ks-g-bw,w-ks)));var tp=Math.round(Math.max(0,Math.min(r.bottom-kbh,h-ks)));return{left:l,top:tp};})()");
+
+            if (pos is not null)
+            {
+                KanbanSettingService.Kanban.Position.Left = pos.Left;
+                KanbanSettingService.Kanban.Position.Top = pos.Top;
+                await KanbanSettingService.SaveAsync();
+
+                // 同时设置内存位置，避免 KanbanRoot 首次渲染时闪现到 (0,0)
+                Live2DService.Kanban.Position.Left = pos.Left;
+                Live2DService.Kanban.Position.Top = pos.Top;
+            }
+        }
+        catch
+        {
+            // JS 不可用时跳过对齐
+        }
+
         await KanbanVisibilityService.SetShowKanbanAsync(true);
+    }
+
+    private class KanbanAlignmentResult
+    {
+        public int Left { get; set; }
+        public int Top { get; set; }
     }
 }
