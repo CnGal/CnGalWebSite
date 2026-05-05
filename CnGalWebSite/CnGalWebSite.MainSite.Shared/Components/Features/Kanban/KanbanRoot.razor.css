@@ -28,6 +28,10 @@
     cursor: grab;
 }
 
+.kanban-live2d--hidden {
+    visibility: hidden;
+}
+
 .kanban-live2d.d-none {
     display: none;
 }

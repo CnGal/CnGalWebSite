@@ -2,7 +2,6 @@
 @using CnGalWebSite.MainSite.Shared.Services
 @using System.Text.RegularExpressions
 @inject IKanbanLive2DService Live2DService
-@inject IKanbanSettingService SettingService
 @implements IDisposable
 
 @if (_visible && Model is not null)
@@ -297,7 +296,7 @@
 
     private string GetPositionStyle()
     {
-        var pos = SettingService.DialogBox.Position;
+        var pos = Live2DService.DialogBox.Position;
         return $"left:{pos.Left}px; bottom:{pos.Bottom}px;";
     }
 

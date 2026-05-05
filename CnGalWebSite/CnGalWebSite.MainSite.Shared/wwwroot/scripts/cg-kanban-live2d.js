@@ -41,20 +41,6 @@ function getKanbanMaxSize() {
     return Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.8);
 }
 
-/**
- * 按设备像素比设置 canvas 缓冲区尺寸（保持 CSS 显示尺寸不变）
- * @param {HTMLCanvasElement} canvas
- * @param {number} cssWidth - CSS 像素宽度
- * @param {number} cssHeight - CSS 像素高度
- */
-function setCanvasDprSize(canvas, cssWidth, cssHeight) {
-    var dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.floor(cssWidth * dpr);
-    canvas.height = Math.floor(cssHeight * dpr);
-    canvas.style.width = cssWidth + 'px';
-    canvas.style.height = cssHeight + 'px';
-}
-
 // ---------------------------------------------------------------------------
 // CDN 加载工具
 //  注：每次调用都移除旧脚本并重新加载，确保 bundle.js 的全局状态（WebGL context 等）

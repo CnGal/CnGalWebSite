@@ -16,6 +16,8 @@ public interface IKanbanLive2DService
 
     KanbanSettingModel Kanban { get; }
 
+    DialogBoxSettingModel DialogBox { get; }
+
     /// <summary>
     /// 初始化 Live2D：加载 ES 模块 JS，创建 DotNetObjectReference，调用 JS initKanbanLive2D
     /// </summary>

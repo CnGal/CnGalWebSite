@@ -10,7 +10,7 @@
 @implements IDisposable
 @rendermode InteractiveServer
 
-<div id="kanban-live2d" class="kanban-live2d" style="@GetStyleString()">
+<div id="kanban-live2d" class="kanban-live2d @(_settingsLoaded ? "" : "kanban-live2d--hidden")" style="@GetStyleString()">
     <KanbanMainCard Width="@Live2DService.Kanban.Size.Width" Height="@Live2DService.Kanban.Size.Height" />
 
     <button class="kanban-resize-handle" type="button"
@@ -53,6 +53,7 @@
 
 @code {
     private bool _isReady;
+    private bool _settingsLoaded;
     private CancellationTokenSource? _cts;
     private Task? _eventLoopTask;
 
@@ -79,13 +80,19 @@
     {
         if (firstRender)
         {
-            await Live2DService.InitAsync("cngal形象", 0);
-
+            // 先加载设置，确保 canvas 在 Live2D 初始化前已是正确尺寸
             await SettingService.LoadAsync();
             Live2DService.Kanban.Position.Left = SettingService.Kanban.Position.Left;
             Live2DService.Kanban.Position.Top = SettingService.Kanban.Position.Top;
             Live2DService.Kanban.Size.Width = SettingService.Kanban.Size.Width;
             Live2DService.Kanban.Size.Height = SettingService.Kanban.Size.Height;
+            Live2DService.DialogBox.Position.Left = SettingService.DialogBox.Position.Left;
+            Live2DService.DialogBox.Position.Bottom = SettingService.DialogBox.Position.Bottom;
+
+            _settingsLoaded = true;
+            StateHasChanged();
+
+            await Live2DService.InitAsync("cngal形象", 0);
 
             await UserDataService.LoadAsync();
 
