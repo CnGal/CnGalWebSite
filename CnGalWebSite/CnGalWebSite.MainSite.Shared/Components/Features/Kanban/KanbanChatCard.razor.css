@@ -1,17 +1,11 @@
 /* ── KanbanChatCard — AI chat dialog with message list + input ── */
 
 .kanban-chat-card {
-    position: absolute;
     display: flex;
     flex-direction: column;
     width: var(--cg-kanban-chat-max-width);
-    max-height: var(--cg-kanban-chat-max-height);
-    background-color: var(--cg-color-surface);
-    border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-lg);
-    box-shadow: var(--cg-shadow-lg);
+    max-height: 55vh;
     overflow: hidden;
-    z-index: calc(var(--cg-kanban-z-index) + 1);
 }
 
 /* ── Header ── */
@@ -21,8 +15,21 @@
     align-items: center;
     justify-content: space-between;
     padding: var(--cg-spacing-2) var(--cg-spacing-3);
-    border-bottom: 1px solid var(--cg-color-border);
-    background-color: var(--cg-color-section-bg);
+    border-bottom: 1px solid color-mix(in oklab, var(--cg-color-border) 60%, transparent);
+    background: color-mix(in oklab, var(--cg-color-section-bg) 80%, transparent);
+    flex-shrink: 0;
+}
+
+.kanban-chat-header-start {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+}
+
+.kanban-chat-header-start ::deep .cg-mdi-icon {
+    width: 1.15rem;
+    height: 1.15rem;
+    color: var(--cg-color-primary);
     flex-shrink: 0;
 }
 
@@ -46,6 +53,10 @@
 
 .kanban-chat-messages::-webkit-scrollbar {
     width: 4px;
+}
+
+.kanban-chat-messages::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .kanban-chat-messages::-webkit-scrollbar-thumb {
@@ -91,7 +102,7 @@
     line-height: 1.5;
     word-break: break-word;
     white-space: pre-wrap;
-    border-radius: var(--cg-radius-md);
+    border-radius: var(--cg-radius-lg);
 }
 
 .kanban-chat-message--user .kanban-chat-bubble {
@@ -113,8 +124,8 @@
     align-items: flex-end;
     gap: var(--cg-spacing-2);
     padding: var(--cg-spacing-3);
-    border-top: 1px solid var(--cg-color-border);
-    background-color: var(--cg-color-surface);
+    border-top: 1px solid color-mix(in oklab, var(--cg-color-border) 60%, transparent);
+    background: var(--cg-color-surface);
     flex-shrink: 0;
 }
 

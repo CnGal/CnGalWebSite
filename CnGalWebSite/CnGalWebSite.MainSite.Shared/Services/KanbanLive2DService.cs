@@ -9,6 +9,7 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
 {
     private readonly IJSRuntime _jsRuntime;
     private readonly IConfiguration _configuration;
+    private readonly IKanbanSettingService _settingService;
     private IJSObjectReference? _module;
     private DotNetObjectReference<KanbanLive2DService>? _objRef;
     private string? _kanbanImage;
@@ -25,10 +26,11 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
 
     private const string ModulePath = "/_content/CnGalWebSite.MainSite.Shared/scripts/cg-kanban-live2d.js";
 
-    public KanbanLive2DService(IJSRuntime jsRuntime, IConfiguration configuration)
+    public KanbanLive2DService(IJSRuntime jsRuntime, IConfiguration configuration, IKanbanSettingService settingService)
     {
         _jsRuntime = jsRuntime;
         _configuration = configuration;
+        _settingService = settingService;
     }
 
     public async Task InitAsync(string modelDir, int modelIndex)
@@ -212,6 +214,10 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
     {
         Kanban.Position.Left = left;
         Kanban.Position.Top = top;
+
+        _settingService.Kanban.Position.Left = left;
+        _settingService.Kanban.Position.Top = top;
+        _ = _settingService.SaveAsync();
     }
 
     [JSInvokable]

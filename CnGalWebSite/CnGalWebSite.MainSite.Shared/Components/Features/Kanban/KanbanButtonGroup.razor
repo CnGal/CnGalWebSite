@@ -1,40 +1,43 @@
 @implements IDisposable
 
 <div id="kanban-button-group" class="kanban-button-group">
-    <AuthorizeView Roles="Admin">
-        <CgButton Variant="ghost" Size="sm" OnClick="OnChatClick" title="聊天">
-            聊
-        </CgButton>
-    </AuthorizeView>
-    <CgButton Variant="ghost" Size="sm" OnClick="OnClothesClick" title="换装">
-        装
-    </CgButton>
-    <CgButton Variant="ghost" Size="sm" OnClick="OnExpressionClick" title="表情">
-        表
-    </CgButton>
-    <CgButton Variant="ghost" Size="sm" OnClick="OnMotionClick" title="动作">
-        动
-    </CgButton>
-    <CgButton Variant="ghost" Size="sm" OnClick="OnBackToTop" title="回到顶部">
-        ↑
-    </CgButton>
-    <CgButton Variant="ghost-danger" Size="sm" OnClick="HandleQuitClick" title="退出 (双击确认)">
-        ✕
-    </CgButton>
+    <CgPopupMenu>
+        <TriggerContent>
+            <button class="kanban-action-btn" type="button" title="聊天" aria-label="聊天">
+                <CgMdiIcon Name="mdiChat" aria-hidden="true" />
+            </button>
+        </TriggerContent>
+        <ChildContent>
+            @ChatContent
+        </ChildContent>
+    </CgPopupMenu>
+
+    <CgPopupMenu>
+        <TriggerContent>
+            <button class="kanban-action-btn" type="button" title="设置" aria-label="设置">
+                <CgMdiIcon Name="mdiCogOutline" aria-hidden="true" />
+            </button>
+        </TriggerContent>
+        <ChildContent>
+            @SettingsContent
+        </ChildContent>
+    </CgPopupMenu>
+
+    <button class="kanban-action-btn" type="button" title="回到顶部" aria-label="回到顶部" @onclick="() => OnBackToTop.InvokeAsync()">
+        <CgMdiIcon Name="mdiArrowUp" aria-hidden="true" />
+    </button>
+
+    <button class="kanban-action-btn kanban-action-btn--danger" type="button" title="退出 (双击确认)" aria-label="退出" @onclick="HandleQuitClick">
+        <CgMdiIcon Name="mdiClose" aria-hidden="true" />
+    </button>
 </div>
 
 @code {
     [Parameter]
-    public EventCallback OnChatClick { get; set; }
+    public RenderFragment? ChatContent { get; set; }
 
     [Parameter]
-    public EventCallback OnClothesClick { get; set; }
-
-    [Parameter]
-    public EventCallback OnExpressionClick { get; set; }
-
-    [Parameter]
-    public EventCallback OnMotionClick { get; set; }
+    public RenderFragment? SettingsContent { get; set; }
 
     [Parameter]
     public EventCallback OnBackToTop { get; set; }

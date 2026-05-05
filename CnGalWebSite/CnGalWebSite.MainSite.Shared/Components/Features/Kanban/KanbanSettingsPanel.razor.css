@@ -1,47 +1,35 @@
-/* ── KanbanSettingsPanel — 换装/设置浮动面板 ── */
-
 .cg-kanban-settings-panel {
-    position: fixed;
-    inset: 0;
-    z-index: calc(var(--cg-kanban-z-index, 10000) + 1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.cg-kanban-settings-overlay {
-    position: absolute;
-    inset: 0;
-    background: var(--cg-color-overlay);
-    backdrop-filter: blur(2px);
-    transition: opacity var(--cg-transition-fast);
-}
-
-.cg-kanban-settings-content {
-    position: relative;
     display: flex;
     flex-direction: column;
-    width: min(400px, calc(100vw - var(--cg-spacing-8)));
-    max-height: 80vh;
-    background: var(--cg-color-surface);
-    border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-lg);
-    box-shadow: var(--cg-shadow-lg);
+    max-height: 55vh;
     overflow: hidden;
 }
 
 .cg-kanban-settings-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     flex-shrink: 0;
-    padding: var(--cg-spacing-4);
-    border-bottom: 1px solid var(--cg-color-border);
+    padding: 0 0 var(--cg-spacing-2) 0;
+    border-bottom: 1px solid color-mix(in oklab, var(--cg-color-border) 50%, transparent);
+    margin-bottom: var(--cg-spacing-1);
+}
+
+.cg-kanban-settings-header-start {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+}
+
+.cg-kanban-settings-header-start ::deep .cg-mdi-icon {
+    width: 1.15rem;
+    height: 1.15rem;
+    color: var(--cg-color-primary);
+    flex-shrink: 0;
 }
 
 .cg-kanban-settings-title {
     margin: 0;
-    font-size: var(--cg-font-size-lg);
+    font-size: var(--cg-font-size-sm);
     font-weight: var(--cg-font-weight-semibold);
     color: var(--cg-color-text);
 }
@@ -49,10 +37,22 @@
 .cg-kanban-settings-body {
     display: flex;
     flex-direction: column;
-    gap: var(--cg-spacing-4);
-    padding: var(--cg-spacing-4);
+    gap: var(--cg-spacing-3);
     overflow-y: auto;
     flex: 1;
+}
+
+.cg-kanban-settings-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.cg-kanban-settings-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.cg-kanban-settings-body::-webkit-scrollbar-thumb {
+    background-color: var(--cg-color-border);
+    border-radius: var(--cg-radius-full);
 }
 
 .cg-kanban-settings-section {
@@ -63,11 +63,9 @@
 
 .cg-kanban-settings-section-title {
     margin: 0;
-    font-size: var(--cg-font-size-sm);
+    font-size: var(--cg-font-size-xs);
     font-weight: var(--cg-font-weight-semibold);
     color: var(--cg-color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
 }
 
 .cg-kanban-settings-item-grid {

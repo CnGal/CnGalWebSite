@@ -3,6 +3,8 @@
 @using CnGalWebSite.MainSite.Shared.Services.KanbanModels
 @inject IKanbanLive2DService Live2DService
 @inject IKanbanRemoteConfigService RemoteConfigService
+@inject IKanbanSettingService SettingService
+@inject IKanbanUserDataService UserDataService
 @inject IJSRuntime JS
 @implements IDisposable
 @rendermode InteractiveServer
@@ -10,29 +12,25 @@
 <div id="kanban-live2d" class="kanban-live2d @((_isReady && _isVisible) ? "" : "d-none")" style="@GetStyleString()">
     <KanbanMainCard />
 
-    <KanbanButtonGroup OnChatClick="HandleChatClick"
-                       OnClothesClick="HandleClothesClick"
-                       OnExpressionClick="HandleExpressionClick"
-                       OnMotionClick="HandleMotionClick"
-                       OnBackToTop="HandleBackToTop"
-                       OnQuit="HandleQuit" />
+    <KanbanButtonGroup OnBackToTop="HandleBackToTop"
+                       OnQuit="HandleQuit">
+        <ChatContent>
+            <KanbanChatCard />
+        </ChatContent>
+        <SettingsContent>
+            <KanbanSettingsPanel Clothes="_clothes"
+                                 Stockings="_stockings"
+                                 Shoes="_shoes"
+                                 Expressions="_expressions"
+                                 OwnedItems="_ownedItems" />
+        </SettingsContent>
+    </KanbanButtonGroup>
     <KanbanDialogBox />
-    <KanbanChatCard IsOpen="_isChatOpen" IsOpenChanged="OnChatOpenChanged" />
-    <KanbanSettingsPanel IsOpen="_isSettingsOpen"
-                         IsOpenChanged="OnSettingsOpenChanged"
-                         Clothes="_clothes"
-                         Stockings="_stockings"
-                         Shoes="_shoes"
-                         Expressions="_expressions"
-                         MotionGroups="_motionGroups"
-                         OwnedItems="_ownedItems" />
 </div>
 
 @code {
     private bool _isReady;
     private bool _isVisible = true;
-    private bool _isSettingsOpen;
-    private bool _isChatOpen;
     private CancellationTokenSource? _cts;
 
     private List<KanbanClothesModel>? _clothes;
@@ -53,6 +51,13 @@
         if (firstRender)
         {
             await Live2DService.InitAsync("cngal形象", 0);
+
+            await SettingService.LoadAsync();
+            Live2DService.Kanban.Position.Left = SettingService.Kanban.Position.Left;
+            Live2DService.Kanban.Position.Top = SettingService.Kanban.Position.Top;
+
+            await UserDataService.LoadAsync();
+
             await LoadSettingsDataAsync();
             _cts = new CancellationTokenSource();
             StateHasChanged();
@@ -71,7 +76,6 @@
         }
         catch
         {
-            // 远程配置加载失败，设置面板将不显示对应选项
         }
     }
 
@@ -79,32 +83,6 @@
     {
         var kanban = Live2DService.Kanban;
         return $"position:fixed; left:{kanban.Position.Left}px; top:{kanban.Position.Top}px; width:var(--cg-kanban-size); height:var(--cg-kanban-size); z-index:var(--cg-kanban-z-index);";
-    }
-
-    // ── Button handlers ──
-
-    private async Task HandleChatClick()
-    {
-        _isChatOpen = true;
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private async Task HandleClothesClick()
-    {
-        _isSettingsOpen = true;
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private async Task HandleExpressionClick()
-    {
-        _isSettingsOpen = true;
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private async Task HandleMotionClick()
-    {
-        _isSettingsOpen = true;
-        await InvokeAsync(StateHasChanged);
     }
 
     private async Task HandleBackToTop()
@@ -115,7 +93,6 @@
         }
         catch
         {
-            // 忽略 JS 调用失败
         }
     }
 
@@ -126,31 +103,31 @@
         _ = Live2DService.ReleaseLive2D();
     }
 
-    // ── Child component callbacks ──
-
-    private async Task OnSettingsOpenChanged(bool isOpen)
-    {
-        _isSettingsOpen = isOpen;
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private async Task OnChatOpenChanged(bool isOpen)
-    {
-        _isChatOpen = isOpen;
-        await InvokeAsync(StateHasChanged);
-    }
-
-    // ── Service event handlers ──
-
-    private void OnLive2DInitialized()
+    private async void OnLive2DInitialized()
     {
         _isReady = true;
-        InvokeAsync(StateHasChanged);
+
+        var userData = UserDataService.UserData;
+        if (!string.IsNullOrEmpty(userData.ClothesName))
+        {
+            await Live2DService.SetClothes(userData.ClothesName);
+        }
+
+        if (!string.IsNullOrEmpty(userData.StockingsName))
+        {
+            await Live2DService.SetStockings(userData.StockingsName);
+        }
+
+        if (!string.IsNullOrEmpty(userData.ShoesName))
+        {
+            await Live2DService.SetShoes(userData.ShoesName);
+        }
+
+        await InvokeAsync(StateHasChanged);
     }
 
     private void OnCustomEventTriggered(string eventName)
     {
-        // Future event handling (Tasks 14-17)
     }
 
     public void Dispose()

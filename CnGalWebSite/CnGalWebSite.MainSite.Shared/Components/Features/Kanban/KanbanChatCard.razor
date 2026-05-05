@@ -3,90 +3,64 @@
 @inject IKanbanChatService ChatService
 @inject IJSRuntime JS
 
-@if (IsOpen)
-{
-    <div id="kanban-chatcard" class="kanban-chat-card">
-        <div class="kanban-chat-header">
+<div id="kanban-chatcard" class="kanban-chat-card">
+    <div class="kanban-chat-header">
+        <div class="kanban-chat-header-start">
+            <CgMdiIcon Name="mdiChat" aria-hidden="true" />
             <span class="kanban-chat-title">聊天</span>
-            <CgButton Variant="ghost" Size="sm" OnClick="CloseAsync" aria-label="关闭聊天框">
-                ✕
-            </CgButton>
-        </div>
-
-        <div class="kanban-chat-messages" @ref="_messagesContainer">
-            @foreach (var msg in _visibleMessages)
-            {
-                <div class="kanban-chat-message @(msg.IsUser ? "kanban-chat-message--user" : "kanban-chat-message--bot")">
-                    @if (!msg.IsUser)
-                    {
-                        <img class="kanban-chat-avatar"
-                             src="@(string.IsNullOrEmpty(msg.Image) ? "_content/CnGalWebSite.MainSite.Shared/images/default-avatar.svg" : msg.Image)"
-                             alt="看板娘头像" />
-                    }
-                    <div class="kanban-chat-bubble">
-                        @msg.Text
-                    </div>
-                    @if (msg.IsUser)
-                    {
-                        <img class="kanban-chat-avatar"
-                             src="@(string.IsNullOrEmpty(msg.Image) ? "_content/CnGalWebSite.MainSite.Shared/images/default-avatar.svg" : msg.Image)"
-                             alt="用户头像" />
-                    }
-                </div>
-            }
-        </div>
-
-        <div class="kanban-chat-input-area">
-            <CgTextarea @bind-Value="@_inputText"
-                        Placeholder="来聊天吧~"
-                        Rows="2"
-                        Disabled="@_isSending" />
-            <CgButton Variant="primary"
-                      Size="sm"
-                      Async
-                      OnClick="SendAsync"
-                      Disabled="@(string.IsNullOrWhiteSpace(_inputText) || _isSending)">
-                发送
-            </CgButton>
         </div>
     </div>
-}
+
+    <div class="kanban-chat-messages" @ref="_messagesContainer">
+        @foreach (var msg in _visibleMessages)
+        {
+            <div class="kanban-chat-message @(msg.IsUser ? "kanban-chat-message--user" : "kanban-chat-message--bot")">
+                @if (!msg.IsUser)
+                {
+                    <img class="kanban-chat-avatar"
+                         src="@(string.IsNullOrEmpty(msg.Image) ? "_content/CnGalWebSite.MainSite.Shared/images/default-avatar.svg" : msg.Image)"
+                         alt="看板娘头像" />
+                }
+                <div class="kanban-chat-bubble">
+                    @msg.Text
+                </div>
+                @if (msg.IsUser)
+                {
+                    <img class="kanban-chat-avatar"
+                         src="@(string.IsNullOrEmpty(msg.Image) ? "_content/CnGalWebSite.MainSite.Shared/images/default-avatar.svg" : msg.Image)"
+                         alt="用户头像" />
+                }
+            </div>
+        }
+    </div>
+
+    <div class="kanban-chat-input-area">
+        <CgTextarea @bind-Value="@_inputText"
+                    Placeholder="来聊天吧~"
+                    Rows="2"
+                    Disabled="@_isSending" />
+        <CgButton Variant="primary"
+                  Size="sm"
+                  Async
+                  OnClick="SendAsync"
+                  Disabled="@(string.IsNullOrWhiteSpace(_inputText) || _isSending)">
+            发送
+        </CgButton>
+    </div>
+</div>
 
 @code {
-    /// <summary>
-    /// 聊天面板是否打开
-    /// </summary>
-    [Parameter]
-    public bool IsOpen { get; set; }
-
-    /// <summary>
-    /// IsOpen 双向绑定回调
-    /// </summary>
-    [Parameter]
-    public EventCallback<bool> IsOpenChanged { get; set; }
-
     private ElementReference _messagesContainer;
     private string _inputText = string.Empty;
     private bool _isSending;
     private int _lastMessageCount;
 
-    /// <summary>
-    /// 当前可见的消息（已过滤超过 24 小时的消息）
-    /// </summary>
     private IReadOnlyList<KanbanChatModel> _visibleMessages =>
         ChatService.Messages;
 
-    protected override void OnParametersSet()
+    protected override void OnInitialized()
     {
-        // 同步 IsOpen 状态到 Service
-        if (IsOpen && !ChatService.IsOpen)
-        {
-            ChatService.Show();
-        }
-        else if (!IsOpen && ChatService.IsOpen)
-        {
-            ChatService.Close();
-        }
+        ChatService.Show();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -120,13 +94,6 @@
         }
     }
 
-    private async Task CloseAsync(MouseEventArgs args)
-    {
-        IsOpen = false;
-        await IsOpenChanged.InvokeAsync(false);
-        ChatService.Close();
-    }
-
     private async Task ScrollToBottomAsync()
     {
         try
@@ -136,7 +103,12 @@
         }
         catch
         {
-            // 忽略 JS 调用失败（Prerendering 场景）
         }
+    }
+
+    public void Dispose()
+    {
+        ChatService.Close();
+        GC.SuppressFinalize(this);
     }
 }

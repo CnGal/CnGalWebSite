@@ -2,152 +2,113 @@
 @inject IKanbanLive2DService Live2DService
 @inject IKanbanUserDataService UserDataService
 
-@if (IsOpen)
-{
-    <div class="cg-kanban-settings-panel">
-        <div class="cg-kanban-settings-overlay" @onclick="CloseAsync" @onclick:stopPropagation="true"></div>
-        <div class="cg-kanban-settings-content" @onclick:stopPropagation="true">
-            <div class="cg-kanban-settings-header">
-                <h3 class="cg-kanban-settings-title">看板娘设置</h3>
-                <CgButton Variant="ghost" Size="sm" OnClick="CloseAsync" aria-label="关闭设置面板">
-                    ✕
-                </CgButton>
-            </div>
-
-            <div class="cg-kanban-settings-body">
-                @* 衣服 *@
-                @if (Clothes is { Count: > 0 })
-                {
-                    <div class="cg-kanban-settings-section">
-                        <h4 class="cg-kanban-settings-section-title">衣服</h4>
-                        <div class="cg-kanban-settings-item-grid">
-                            @foreach (var item in Clothes)
-                            {
-                                var isSelected = _selectedClothes == item.Name;
-                                var isFree = IsFreeItem(item.Name);
-                                var isDisabled = !isFree && !IsOwned(item.Name);
-
-                                <CgButton Variant="@(isSelected ? "primary" : "outline")"
-                                          Size="sm"
-                                          Disabled="isDisabled"
-                                          OnClick="() => SwitchClothesAsync(item.Name)">
-                                    @item.DisplayName
-                                </CgButton>
-                            }
-                        </div>
-                    </div>
-                }
-
-                @* 丝袜 *@
-                @if (Stockings is { Count: > 0 })
-                {
-                    <div class="cg-kanban-settings-section">
-                        <h4 class="cg-kanban-settings-section-title">丝袜</h4>
-                        <div class="cg-kanban-settings-item-grid">
-                            @foreach (var item in Stockings)
-                            {
-                                var isSelected = _selectedStockings == item.Name;
-                                var isFree = IsFreeItem(item.Name);
-                                var isDisabled = !isFree && !IsOwned(item.Name);
-
-                                <CgButton Variant="@(isSelected ? "primary" : "outline")"
-                                          Size="sm"
-                                          Disabled="isDisabled"
-                                          OnClick="() => SwitchStockingsAsync(item.Name)">
-                                    @item.DisplayName
-                                </CgButton>
-                            }
-                        </div>
-                    </div>
-                }
-
-                @* 鞋子 *@
-                @if (Shoes is { Count: > 0 })
-                {
-                    <div class="cg-kanban-settings-section">
-                        <h4 class="cg-kanban-settings-section-title">鞋子</h4>
-                        <div class="cg-kanban-settings-item-grid">
-                            @foreach (var item in Shoes)
-                            {
-                                var isSelected = _selectedShoes == item.Name;
-                                var isFree = IsFreeItem(item.Name);
-                                var isDisabled = !isFree && !IsOwned(item.Name);
-
-                                <CgButton Variant="@(isSelected ? "primary" : "outline")"
-                                          Size="sm"
-                                          Disabled="isDisabled"
-                                          OnClick="() => SwitchShoesAsync(item.Name)">
-                                    @item.DisplayName
-                                </CgButton>
-                            }
-                        </div>
-                    </div>
-                }
-
-                @* 表情 *@
-                @if (Expressions is { Count: > 0 })
-                {
-                    <div class="cg-kanban-settings-section">
-                        <h4 class="cg-kanban-settings-section-title">表情</h4>
-                        <div class="cg-kanban-settings-item-grid">
-                            <CgButton Variant="@(_selectedExpression is null ? "primary" : "outline")"
-                                      Size="sm"
-                                      OnClick="CleanExpressionAsync">
-                                默认
-                            </CgButton>
-                            @foreach (var item in Expressions)
-                            {
-                                var isSelected = _selectedExpression == item.Name;
-
-                                <CgButton Variant="@(isSelected ? "primary" : "outline")"
-                                          Size="sm"
-                                          OnClick="() => SetExpressionAsync(item.Name)">
-                                    @item.DisplayName
-                                </CgButton>
-                            }
-                        </div>
-                    </div>
-                }
-
-                @* 动作 *@
-                @if (MotionGroups is { Count: > 0 })
-                {
-                    <div class="cg-kanban-settings-section">
-                        <h4 class="cg-kanban-settings-section-title">动作</h4>
-                        <div class="cg-kanban-settings-item-grid">
-                            <CgButton Variant="outline"
-                                      Size="sm"
-                                      OnClick="CleanMotionAsync">
-                                Idle
-                            </CgButton>
-                            @foreach (var group in MotionGroups)
-                            {
-                                foreach (var motion in group.Motions)
-                                {
-                                    var isSelected = _selectedMotionGroup == group.Name && _selectedMotionIndex == motion.Id;
-
-                                    <CgButton Variant="@(isSelected ? "primary" : "outline")"
-                                              Size="sm"
-                                              OnClick="() => SetMotionAsync(group.Name, motion.Id)">
-                                        @group.DisplayName - @motion.Name
-                                    </CgButton>
-                                }
-                            }
-                        </div>
-                    </div>
-                }
-            </div>
+<div class="cg-kanban-settings-panel">
+    <div class="cg-kanban-settings-header">
+        <div class="cg-kanban-settings-header-start">
+            <CgMdiIcon Name="mdiCogOutline" aria-hidden="true" />
+            <h3 class="cg-kanban-settings-title">看板娘设置</h3>
         </div>
     </div>
-}
+
+    <div class="cg-kanban-settings-body">
+        @* 衣服 *@
+        @if (Clothes is { Count: > 0 })
+        {
+            <div class="cg-kanban-settings-section">
+                <h4 class="cg-kanban-settings-section-title">衣服</h4>
+                <div class="cg-kanban-settings-item-grid">
+                    @foreach (var item in Clothes)
+                    {
+                        var isSelected = _selectedClothes == item.Name;
+                        var isFree = IsFreeItem(item.Name);
+                        var isDisabled = !isFree && !IsOwned(item.Name);
+
+                        <CgButton Variant="@(isSelected ? "primary" : "outline")"
+                                  Size="sm"
+                                  Disabled="isDisabled"
+                                  OnClick="() => SwitchClothesAsync(item.Name)">
+                            @item.DisplayName
+                        </CgButton>
+                    }
+                </div>
+            </div>
+        }
+
+        @* 丝袜 *@
+        @if (Stockings is { Count: > 0 })
+        {
+            <div class="cg-kanban-settings-section">
+                <h4 class="cg-kanban-settings-section-title">丝袜</h4>
+                <div class="cg-kanban-settings-item-grid">
+                    @foreach (var item in Stockings)
+                    {
+                        var isSelected = _selectedStockings == item.Name;
+                        var isFree = IsFreeItem(item.Name);
+                        var isDisabled = !isFree && !IsOwned(item.Name);
+
+                        <CgButton Variant="@(isSelected ? "primary" : "outline")"
+                                  Size="sm"
+                                  Disabled="isDisabled"
+                                  OnClick="() => SwitchStockingsAsync(item.Name)">
+                            @item.DisplayName
+                        </CgButton>
+                    }
+                </div>
+            </div>
+        }
+
+        @* 鞋子 *@
+        @if (Shoes is { Count: > 0 })
+        {
+            <div class="cg-kanban-settings-section">
+                <h4 class="cg-kanban-settings-section-title">鞋子</h4>
+                <div class="cg-kanban-settings-item-grid">
+                    @foreach (var item in Shoes)
+                    {
+                        var isSelected = _selectedShoes == item.Name;
+                        var isFree = IsFreeItem(item.Name);
+                        var isDisabled = !isFree && !IsOwned(item.Name);
+
+                        <CgButton Variant="@(isSelected ? "primary" : "outline")"
+                                  Size="sm"
+                                  Disabled="isDisabled"
+                                  OnClick="() => SwitchShoesAsync(item.Name)">
+                            @item.DisplayName
+                        </CgButton>
+                    }
+                </div>
+            </div>
+        }
+
+        @* 表情 *@
+        @if (Expressions is { Count: > 0 })
+        {
+            <div class="cg-kanban-settings-section">
+                <h4 class="cg-kanban-settings-section-title">表情</h4>
+                <div class="cg-kanban-settings-item-grid">
+                    <CgButton Variant="@(_selectedExpression is null ? "primary" : "outline")"
+                              Size="sm"
+                              OnClick="CleanExpressionAsync">
+                        默认
+                    </CgButton>
+                    @foreach (var item in Expressions)
+                    {
+                        var isSelected = _selectedExpression == item.Name;
+
+                        <CgButton Variant="@(isSelected ? "primary" : "outline")"
+                                  Size="sm"
+                                  OnClick="() => SetExpressionAsync(item.Name)">
+                            @item.DisplayName
+                        </CgButton>
+                    }
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
 
 @code {
-    [Parameter]
-    public bool IsOpen { get; set; }
-
-    [Parameter]
-    public EventCallback<bool> IsOpenChanged { get; set; }
-
     [Parameter]
     public List<KanbanClothesModel>? Clothes { get; set; }
 
@@ -161,27 +122,16 @@
     public List<KanbanExpressionModel>? Expressions { get; set; }
 
     [Parameter]
-    public List<KanbanMotionGroupModel>? MotionGroups { get; set; }
-
-    /// <summary>
-    /// 已拥有的物品名称列表。为 null 时所有物品均视为可用（不校验所有权）。
-    /// </summary>
-    [Parameter]
     public List<string>? OwnedItems { get; set; }
 
     private string? _selectedClothes;
     private string? _selectedStockings;
     private string? _selectedShoes;
     private string? _selectedExpression;
-    private string? _selectedMotionGroup;
-    private int _selectedMotionIndex;
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
-        if (IsOpen && _selectedClothes is null)
-        {
-            await LoadCurrentSelectionsAsync();
-        }
+        await LoadCurrentSelectionsAsync();
     }
 
     private async Task LoadCurrentSelectionsAsync()
@@ -191,6 +141,21 @@
         _selectedClothes = userData.ClothesName;
         _selectedStockings = userData.StockingsName;
         _selectedShoes = userData.ShoesName;
+
+        if (!string.IsNullOrEmpty(userData.ClothesName))
+        {
+            await Live2DService.SetClothes(userData.ClothesName);
+        }
+
+        if (!string.IsNullOrEmpty(userData.StockingsName))
+        {
+            await Live2DService.SetStockings(userData.StockingsName);
+        }
+
+        if (!string.IsNullOrEmpty(userData.ShoesName))
+        {
+            await Live2DService.SetShoes(userData.ShoesName);
+        }
     }
 
     private static bool IsFreeItem(string name)
@@ -243,24 +208,4 @@
         _selectedExpression = null;
         await Live2DService.CleanExpression();
     }
-
-    private async Task SetMotionAsync(string group, int index)
-    {
-        _selectedMotionGroup = group;
-        _selectedMotionIndex = index;
-        await Live2DService.SetMotion(group, index);
-    }
-
-    private async Task CleanMotionAsync()
-    {
-        _selectedMotionGroup = null;
-        _selectedMotionIndex = 0;
-        await Live2DService.CleanMotion();
-    }
-
-    private async Task CloseAsync()
-    {
-        await IsOpenChanged.InvokeAsync(false);
-    }
-
 }
