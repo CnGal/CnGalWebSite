@@ -35,6 +35,28 @@
         </ChildContent>
     </CgPopupMenu>
 
+    <CgPopupMenu Placement="left-bottom">
+        <TriggerContent>
+            <button class="kanban-action-btn" type="button" title="社区交流" aria-label="社区交流">
+                <CgMdiIcon Name="mdiLink" aria-hidden="true" />
+            </button>
+        </TriggerContent>
+        <ChildContent>
+            @CommunityContent
+        </ChildContent>
+    </CgPopupMenu>
+
+    <CgPopupMenu Placement="left-bottom">
+        <TriggerContent>
+            <button class="kanban-action-btn" type="button" title="工具箱" aria-label="工具箱">
+                <CgMdiIcon Name="mdiWrenchOutline" aria-hidden="true" />
+            </button>
+        </TriggerContent>
+        <ChildContent>
+            @ToolboxContent
+        </ChildContent>
+    </CgPopupMenu>
+
     <button class="kanban-action-btn" type="button" title="回到顶部" aria-label="回到顶部" @onclick="() => OnBackToTop.InvokeAsync()">
         <CgMdiIcon Name="mdiArrowUp" aria-hidden="true" />
     </button>
@@ -53,6 +75,12 @@
 
     [Parameter]
     public RenderFragment? ExpressionsContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? CommunityContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ToolboxContent { get; set; }
 
     [Parameter]
     public EventCallback OnBackToTop { get; set; }

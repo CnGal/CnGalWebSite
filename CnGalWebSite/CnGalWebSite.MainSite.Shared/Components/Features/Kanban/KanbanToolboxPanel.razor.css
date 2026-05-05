@@ -1,0 +1,57 @@
+.kanban-toolbox-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+    width: min(17rem, calc(100vw - 6rem));
+    max-height: 55vh;
+    overflow-y: auto;
+}
+
+.kanban-toolbox-panel::-webkit-scrollbar {
+    width: 4px;
+}
+
+.kanban-toolbox-panel::-webkit-scrollbar-thumb {
+    background-color: var(--cg-color-border);
+    border-radius: var(--cg-radius-full);
+}
+
+.kanban-toolbox-panel__actions {
+    margin-top: 0;
+}
+
+.kanban-toolbox-panel__login {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    min-height: 2.75rem;
+    border-radius: var(--cg-radius-lg);
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    color: var(--cg-color-text);
+    text-decoration: none;
+    background: color-mix(in oklab, var(--cg-color-border) 24%, transparent);
+    transition:
+        background-color var(--cg-transition-fast),
+        color var(--cg-transition-fast),
+        transform var(--cg-transition-fast);
+}
+
+.kanban-toolbox-panel__login:hover,
+.kanban-toolbox-panel__login:focus-visible {
+    color: var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-primary) 12%, transparent);
+    text-decoration: none;
+    transform: translateX(-2px);
+}
+
+.kanban-toolbox-panel__login:focus-visible {
+    outline: 3px solid var(--cg-color-focus-ring);
+    outline-offset: 3px;
+}
+
+.kanban-toolbox-panel__login ::deep .cg-mdi-icon {
+    width: 1.15rem;
+    height: 1.15rem;
+    flex-shrink: 0;
+    color: var(--cg-color-primary);
+}

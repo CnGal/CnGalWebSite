@@ -5,12 +5,7 @@
 <div class="cg-kanban-settings-panel">
     @if (ShowHeader)
     {
-        <div class="cg-kanban-settings-header">
-            <div class="cg-kanban-settings-header-start">
-                <CgMdiIcon Name="@HeaderIcon" aria-hidden="true" />
-                <h3 class="cg-kanban-settings-title">@Title</h3>
-            </div>
-        </div>
+        <KanbanPanelHeader Icon="@HeaderIcon" Title="@Title" />
     }
 
     <div class="cg-kanban-settings-body">

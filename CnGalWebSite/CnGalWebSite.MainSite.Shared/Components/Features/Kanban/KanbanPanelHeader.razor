@@ -1,0 +1,12 @@
+﻿<div class="kanban-panel-header">
+    <CgMdiIcon Name="@Icon" aria-hidden="true" />
+    <span class="kanban-panel-header__title">@Title</span>
+</div>
+
+@code {
+    [Parameter]
+    public string Icon { get; set; } = "mdiCogOutline";
+
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+}

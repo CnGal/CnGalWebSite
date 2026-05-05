@@ -1,0 +1,25 @@
+﻿@using CnGalWebSite.MainSite.Shared.Services
+@inject NavigationManager NavigationManager
+@inject IMainSiteAuthRequestService AuthRequestService
+
+<div class="kanban-toolbox-panel">
+    <KanbanPanelHeader Icon="mdiHammerWrench" Title="工具箱" />
+
+    <AuthorizeView>
+        <Authorized>
+            <div class="kanban-toolbox-panel__actions">
+                <ToolboxDialogHost />
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            <a class="kanban-toolbox-panel__login" href="@AuthRequestService.BuildLoginUrl(CurrentReturnUrl)">
+                <CgMdiIcon Name="mdiLogin" aria-hidden="true" />
+                <span>登录后使用工具箱</span>
+            </a>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+@code {
+    private string CurrentReturnUrl => new Uri(NavigationManager.Uri).PathAndQuery;
+}

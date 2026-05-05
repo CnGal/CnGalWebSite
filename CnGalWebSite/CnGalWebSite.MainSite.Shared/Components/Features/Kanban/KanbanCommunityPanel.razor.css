@@ -1,0 +1,21 @@
+/* ── KanbanCommunityPanel — community links with QR code ── */
+
+.kanban-community-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+    width: min(17rem, calc(100vw - 6rem));
+    max-height: 55vh;
+    overflow-y: auto;
+}
+
+.kanban-community-panel::-webkit-scrollbar {
+    width: 4px;
+}
+
+.kanban-community-panel::-webkit-scrollbar-thumb {
+    background-color: var(--cg-color-border);
+    border-radius: var(--cg-radius-full);
+}
+
+

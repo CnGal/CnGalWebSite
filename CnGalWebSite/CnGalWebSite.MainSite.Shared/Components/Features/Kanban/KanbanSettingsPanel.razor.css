@@ -5,35 +5,6 @@
     overflow: hidden;
 }
 
-.cg-kanban-settings-header {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-    padding: 0 0 var(--cg-spacing-2) 0;
-    border-bottom: 1px solid color-mix(in oklab, var(--cg-color-border) 50%, transparent);
-    margin-bottom: var(--cg-spacing-1);
-}
-
-.cg-kanban-settings-header-start {
-    display: flex;
-    align-items: center;
-    gap: var(--cg-spacing-2);
-}
-
-.cg-kanban-settings-header-start ::deep .cg-mdi-icon {
-    width: 1.15rem;
-    height: 1.15rem;
-    color: var(--cg-color-primary);
-    flex-shrink: 0;
-}
-
-.cg-kanban-settings-title {
-    margin: 0;
-    font-size: var(--cg-font-size-sm);
-    font-weight: var(--cg-font-weight-semibold);
-    color: var(--cg-color-text);
-}
-
 .cg-kanban-settings-body {
     display: flex;
     flex-direction: column;
