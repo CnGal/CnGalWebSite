@@ -1,4 +1,4 @@
-.cg-alert {
+﻿.cg-alert {
     display: flex;
     align-items: flex-start;
     gap: var(--cg-spacing-3);
@@ -7,7 +7,6 @@
     font-size: var(--cg-font-size-sm);
     line-height: 1.6;
     border: 1px solid transparent;
-    margin-bottom: var(--cg-spacing-4);
     border-left: 4px solid transparent;
     align-items: center;
 }

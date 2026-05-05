@@ -1,11 +1,10 @@
-@using CnGalWebSite.DataModel.ViewModel.Commodities
+﻿@using CnGalWebSite.DataModel.ViewModel.Commodities
 
 @* CommodityGCoinsRecord — G币变动记录数据表格 *@
 
 <div class="commodity-gcoins-record">
-    <h2 class="commodity-gcoins-record__title">G币记录</h2>
-
-    <CgDataTable TItem="GCoinsRecordOverviewModel"
+    <CgDataTable Title="G币记录"
+                 TItem="GCoinsRecordOverviewModel"
                  OnServerQuery="OnServerQuery"
                  DefaultSortField="Time"
                  DefaultSortDesc="true"

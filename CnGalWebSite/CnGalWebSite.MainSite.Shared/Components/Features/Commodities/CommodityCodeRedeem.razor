@@ -1,4 +1,4 @@
-@using CnGalWebSite.Core.Models
+﻿@using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Commodities
 @using CnGalWebSite.DataModel.ViewModel.Others
 @using Microsoft.Extensions.Logging
@@ -13,7 +13,6 @@
     </CgAlert>
 
     <div class="commodity-code-redeem__form">
-        <h3 class="commodity-code-redeem__form-title">输入订单号兑换</h3>
         <div class="commodity-code-redeem__input-group">
             <CgInput @bind-Value="@_orderCode"
                      Placeholder="请输入B站工房订单号"
