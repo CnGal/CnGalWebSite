@@ -1,0 +1,123 @@
+.commodity-item-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--cg-radius-lg);
+    background: var(--cg-color-surface);
+    overflow: hidden;
+    box-shadow: var(--cg-shadow-sm);
+    transition: box-shadow var(--cg-transition-fast), transform var(--cg-transition-fast);
+}
+
+.commodity-item-card:hover {
+    box-shadow: var(--cg-shadow-card-hover);
+    transform: translateY(-2px);
+}
+
+/* ── 图片 ── */
+.commodity-item-card__image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    background: var(--cg-color-section-bg);
+}
+
+.commodity-item-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform var(--cg-transition-normal);
+}
+
+.commodity-item-card:hover .commodity-item-card__image {
+    transform: scale(1.05);
+}
+
+/* ── 商品信息 ── */
+.commodity-item-card__body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: var(--cg-spacing-4);
+    gap: var(--cg-spacing-3);
+}
+
+/* ── 名称 ── */
+.commodity-item-card__name {
+    font-size: var(--cg-font-size-base);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    margin: 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ── 简介 ── */
+.commodity-item-card__intro {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    margin: 0;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex-grow: 1;
+}
+
+/* ── 底部：价格 + 操作 ── */
+.commodity-item-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--cg-spacing-3);
+    border-top: 1px solid var(--cg-color-border);
+    padding-top: var(--cg-spacing-3);
+}
+
+/* ── 价格 ── */
+.commodity-item-card__price {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+}
+
+.commodity-item-card__gcoin-icon {
+    color: var(--cg-color-amber);
+    flex-shrink: 0;
+}
+
+::deep .commodity-item-card__gcoin-icon.cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.commodity-item-card__price-value {
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-amber);
+}
+
+.commodity-item-card__price-label {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+}
+
+/* ── 操作按钮 ── */
+.commodity-item-card__action {
+    flex-shrink: 0;
+}
+
+::deep .commodity-item-card__action .cg-btn {
+    border-radius: var(--cg-radius-md);
+    min-height: 36px;
+    padding: 0 var(--cg-spacing-4);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+}

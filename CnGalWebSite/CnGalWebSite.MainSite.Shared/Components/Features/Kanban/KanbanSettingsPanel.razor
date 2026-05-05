@@ -1,6 +1,8 @@
 @using CnGalWebSite.MainSite.Shared.Services.KanbanModels
 @inject IKanbanLive2DService Live2DService
 @inject IKanbanUserDataService UserDataService
+@inject NavigationManager NavigationManager
+@inject IMainSiteAuthRequestService AuthRequestService
 
 <div class="cg-kanban-settings-panel">
     @if (ShowHeader)
@@ -103,6 +105,24 @@
             </div>
         }
 
+        @* 前往小卖铺 *@
+        <div class="cg-kanban-settings-shop-link">
+            <AuthorizeView>
+                <Authorized>
+                    <CgButton Variant="outline" Size="sm" Href="/commodities" class="cg-kanban-settings-shop-link__btn">
+                        <CgMdiIcon Name="mdiStorefrontOutline" aria-hidden="true" />
+                        <span>前往小卖铺解锁更多服装</span>
+                    </CgButton>
+                </Authorized>
+                <NotAuthorized>
+                    <a class="cg-kanban-settings-shop-link__login" href="@AuthRequestService.BuildLoginUrl(CurrentReturnUrl)">
+                        <CgMdiIcon Name="mdiLogin" aria-hidden="true" />
+                        <span>登录后解锁更多服装</span>
+                    </a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+
     </div>
 </div>
 
@@ -163,6 +183,8 @@
 
     [Parameter]
     public List<string>? OwnedItems { get; set; }
+
+    private string CurrentReturnUrl => new Uri(NavigationManager.Uri).PathAndQuery;
 
     private string? _selectedClothes;
     private string? _selectedStockings;

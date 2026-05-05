@@ -1,0 +1,67 @@
+@using CnGalWebSite.DataModel.ViewModel.Commodities
+
+@* CommodityItemCard — 小卖铺商品卡片 *@
+
+<div class="commodity-item-card">
+    @* 商品图片 *@
+    <div class="commodity-item-card__image-wrapper">
+        <img src="@Model.Image"
+             alt="@Model.Name"
+             class="commodity-item-card__image"
+             loading="lazy" />
+    </div>
+
+    @* 商品信息 *@
+    <div class="commodity-item-card__body">
+        <h3 class="commodity-item-card__name">@Model.Name</h3>
+
+        @if (!string.IsNullOrWhiteSpace(Model.BriefIntroduction))
+        {
+            <p class="commodity-item-card__intro">@Model.BriefIntroduction</p>
+        }
+
+        @* 价格与操作 *@
+        <div class="commodity-item-card__footer">
+            <div class="commodity-item-card__price">
+                <CgMdiIcon Name="mdiCircleMultiple" class="commodity-item-card__gcoin-icon" aria-hidden="true" />
+                <span class="commodity-item-card__price-value">@Model.Price</span>
+                <span class="commodity-item-card__price-label">G币</span>
+            </div>
+
+            <div class="commodity-item-card__action">
+                @if (Model.IsOwned)
+                {
+                    <CgButton Variant="secondary" Disabled="true">
+                        <CgMdiIcon Name="mdiCheck" aria-hidden="true" />
+                        已解锁
+                    </CgButton>
+                }
+                else
+                {
+                    <CgButton Variant="primary"
+                              Async="true"
+                              OnClick="HandleBuyAsync">
+                        <CgMdiIcon Name="mdiCartOutline" aria-hidden="true" />
+                        解锁
+                    </CgButton>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommodityUserModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<long> OnBuy { get; set; }
+
+    private async Task HandleBuyAsync(MouseEventArgs args)
+    {
+        if (OnBuy.HasDelegate)
+        {
+            await OnBuy.InvokeAsync(Model.Id);
+        }
+    }
+}

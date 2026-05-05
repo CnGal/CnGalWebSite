@@ -143,6 +143,7 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<IPlayedGameQueryService, PlayedGameQueryService>(services, apiBase);
         RegisterSdkHttpClient<ICommentQueryService, CommentQueryService>(services, apiBase);
         RegisterSdkHttpClient<IFavoriteFolderQueryService, FavoriteFolderQueryService>(services, apiBase);
+        RegisterSdkHttpClient<ICommodityQueryService, CommodityQueryService>(services, apiBase);
 
         RegisterSdkHttpClient<IEntryCommandService, EntryCommandService>(services, apiBase);
         RegisterSdkHttpClient<IArticleCommandService, ArticleCommandService>(services, apiBase);

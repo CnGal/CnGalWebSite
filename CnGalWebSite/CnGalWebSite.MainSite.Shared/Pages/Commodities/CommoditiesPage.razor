@@ -1,0 +1,291 @@
+﻿@page "/commodities"
+@page "/commodities/{Type}"
+
+@rendermode InteractiveServer
+
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Commodities
+@using CnGalWebSite.MainSite.Shared.Components.Features.Commodities
+
+@inject ICommodityQueryService CommodityService
+@inject IKanbanQueryService KanbanService
+@implements IDisposable
+
+<CgPageMeta Title="看板娘的小卖铺" />
+
+@if (_loadingError is not null)
+{
+    <section class="commodities-page__error" aria-label="加载失败">
+        <div class="commodities-page__error-icon">
+            <CgMdiIcon Name="mdiAlertCircleOutline" />
+        </div>
+        <h1>小卖铺加载失败</h1>
+        <p>@_loadingError</p>
+        <a href="/">返回首页</a>
+    </section>
+}
+else if (_commodities is not null)
+{
+    <article class="commodities-page">
+        @* ── 两栏布局：左侧看板娘卡片 + 右侧 Tab 区域 ── *@
+        <div class="commodities-page__grid">
+            @* 左侧：看板娘卡片 *@
+            <aside class="commodities-page__sidebar">
+                <CommodityKanbanCard GCoins="_gCoins"
+                                     Permissions="_permissions" />
+            </aside>
+
+            @* 右侧：Tab 切换内容 *@
+            <section class="commodities-page__content">
+                <CgTabs Variant="pill"
+                        Items="_tabs"
+                        DefaultActiveKey="@_activeTab"
+                        Id="commodities-tabs"
+                        AriaLabel="小卖铺分类"
+                        ActiveKeyChanged="OnTabChanged">
+                    <PanelTemplate Context="tabKey">
+
+                        @switch (tabKey)
+                        {
+                            case "shop":
+                                @* ── 小卖铺：商品网格 ── *@
+                                if (_commodities.Count == 0)
+                                {
+                                    <div class="commodities-page__empty">
+                                        <CgMdiIcon Name="mdiStoreOffOutline" />
+                                        <p>暂时没有商品上架</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="commodities-page__shop-grid">
+                                        @foreach (var item in _commodities)
+                                        {
+                                            <CommodityItemCard Model="item" OnBuy="OnBuyCommodityAsync" />
+                                        }
+                                    </div>
+                                }
+                                break;
+
+                            case "code":
+                                @* ── G币兑换：兑换码输入 ── *@
+                                <CommodityCodeRedeem OnRedeem="OnRedeemCodeAsync"
+                                                      IsProcessing="_redeemIsProcessing"
+                                                      Message="@_redeemMessage"
+                                                      IsSuccess="_redeemIsSuccess" />
+                                break;
+
+                            case "record":
+                                @* ── G币记录：服务端分页数据表格 ── *@
+                                <CommodityGCoinsRecord OnServerQuery="QueryGCoinsRecordAsync" />
+                                break;
+                        }
+
+                    </PanelTemplate>
+                </CgTabs>
+            </section>
+        </div>
+    </article>
+}
+else
+{
+    <section class="commodities-page__loading" aria-label="加载中">
+        <CgProgressRing />
+        <span>正在加载看板娘的小卖铺...</span>
+    </section>
+}
+
+@code {
+
+    // ── 路由参数 ──
+    [Parameter]
+    public string? Type { get; set; }
+
+    // ── 数据 ──
+    private List<CommodityUserModel>? _commodities;
+    private bool _permissions;
+    private int _gCoins;
+    private string? _loadingError;
+
+    // ── 兑换状态 ──
+    private string? _redeemMessage;
+    private bool _redeemIsSuccess;
+    private bool _redeemIsProcessing;
+
+    // ── 当前激活 Tab ──
+    private string _activeTab = "shop";
+
+    // ── 取消令牌 ──
+    private CancellationTokenSource? _cts;
+
+    // ── Tab 定义 ──
+    private static readonly CgTabItem[] _tabs =
+    [
+        new("shop", "小卖铺", "mdiStoreOutline"),
+        new("code", "G币兑换", "mdiTicketConfirmationOutline"),
+        new("record", "G币记录", "mdiHistory"),
+    ];
+
+    // ── 生命周期 ──
+
+    protected override async Task OnInitializedAsync()
+    {
+        _cts = new CancellationTokenSource();
+
+        // 根据路由参数确定默认 Tab
+        _activeTab = ResolveTabFromRoute(Type);
+
+        try
+        {
+            // 先获取看板娘权限
+            var permResult = await KanbanService.GetPermissionsAsync(_cts.Token);
+            if (permResult.Success && permResult.Data is not null)
+            {
+                _permissions = permResult.Data.Permissions;
+            }
+
+            // 获取商品列表
+            var result = await CommodityService.GetAllCommoditiesAsync(_cts.Token);
+            if (result.Success && result.Data is not null)
+            {
+                _commodities = result.Data;
+                // 计算 G币余额：反查已拥有的商品价值总和（实际项目中可从用户信息获取）
+                _gCoins = result.Data
+                    .Where(c => c.IsOwned)
+                    .Sum(c => c.Value.Length > 0 ? int.TryParse(c.Value, out var v) ? v : 0 : 0);
+            }
+            else
+            {
+                _loadingError = result.Error?.Message ?? "加载失败，请稍后重试";
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // 组件已释放，忽略
+        }
+    }
+
+    // ── Tab 切换 ──
+
+    private void OnTabChanged(string key)
+    {
+        _activeTab = key;
+    }
+
+    // ── 路由参数映射 ──
+
+    private static string ResolveTabFromRoute(string? type)
+    {
+        return type?.ToLowerInvariant() switch
+        {
+            "code" => "code",
+            "record" => "record",
+            _ => "shop"
+        };
+    }
+
+    // ── 购买商品 ──
+
+    private async Task OnBuyCommodityAsync(long commodityId)
+    {
+        if (_cts is null) return;
+
+        try
+        {
+            var result = await CommodityService.BuyCommodityAsync(commodityId, _cts.Token);
+            if (result.Success)
+            {
+                // 更新本地商品状态
+                var item = _commodities?.FirstOrDefault(c => c.Id == commodityId);
+                if (item is not null)
+                {
+                    item.IsOwned = true;
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // 忽略
+        }
+    }
+
+    // ── 兑换 G币 ──
+
+    private async Task OnRedeemCodeAsync(string code)
+    {
+        if (_cts is null || string.IsNullOrWhiteSpace(code)) return;
+
+        _redeemIsProcessing = true;
+        _redeemMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var model = new RedeemedCommodityCodeModel
+            {
+                Code = code
+            };
+
+            var result = await CommodityService.RedeemedCommodityCodeAsync(model, _cts.Token);
+            if (result.Success)
+            {
+                _redeemIsSuccess = true;
+                _redeemMessage = "兑换成功！G币已到账。";
+            }
+            else
+            {
+                _redeemIsSuccess = false;
+                _redeemMessage = result.Error?.Message ?? "兑换失败，请检查订单号是否正确。";
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // 忽略
+        }
+        catch (Exception ex)
+        {
+            _redeemIsSuccess = false;
+            _redeemMessage = $"兑换失败：{ex.Message}";
+        }
+        finally
+        {
+            _redeemIsProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    // ── G币记录查询（服务端分页） ──
+
+    private async Task<CgDataTableResult<GCoinsRecordOverviewModel>> QueryGCoinsRecordAsync(
+        CgDataTableRequest req)
+    {
+        if (_cts is null) return new CgDataTableResult<GCoinsRecordOverviewModel>([], 0);
+
+        var model = new QueryParameterModel
+        {
+            Page = req.Page,
+            ItemsPerPage = req.PageSize,
+            SearchText = req.SearchText ?? string.Empty,
+            SortBy = string.IsNullOrWhiteSpace(req.SortField) ? ["Time"] : [req.SortField],
+            SortDesc = [req.SortDesc],
+        };
+
+        var result = await CommodityService.ListGCoinsRecordAsync(model, _cts.Token);
+        if (result.Success && result.Data is not null)
+        {
+            return new CgDataTableResult<GCoinsRecordOverviewModel>(
+                result.Data.Items.ToList().AsReadOnly(),
+                result.Data.Total);
+        }
+
+        return new CgDataTableResult<GCoinsRecordOverviewModel>([], 0);
+    }
+
+    // ── 释放 ──
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+}
