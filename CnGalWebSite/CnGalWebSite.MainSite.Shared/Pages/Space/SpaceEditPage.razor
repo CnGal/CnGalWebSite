@@ -9,10 +9,9 @@
 @using CnGalWebSite.SDK.MainSite.Models
 @using CnGalWebSite.SDK.MainSite.Models.SpaceEdit
 @using System.Text.Json
-@using Microsoft.JSInterop
 @inject ISpaceCommandService SpaceCommandService
 @inject NavigationManager NavigationManager
-@inject IJSRuntime JS
+@inject ILocalStorageService LocalStorage
 @inject ICgToastService ToastService
 @implements IDisposable
 
@@ -83,8 +82,7 @@ else if (Model != null)
             {
                 try
                 {
-                    var json = JsonSerializer.Serialize(Model);
-                    await JS.InvokeVoidAsync("localStorage.setItem", DraftKey, json);
+                    await LocalStorage.SetItemAsync(DraftKey, Model);
                 }
                 catch { /* Ignore local storage errors */ }
             }
@@ -116,15 +114,11 @@ else if (Model != null)
                 // 尝试恢复草稿
                 try
                 {
-                    var draftStr = await JS.InvokeAsync<string>("localStorage.getItem", DraftKey);
-                    if (!string.IsNullOrWhiteSpace(draftStr))
+                    var draft = await LocalStorage.GetItemAsync<SpaceEditViewModel>(DraftKey);
+                    if (draft != null)
                     {
-                        var draft = JsonSerializer.Deserialize<SpaceEditViewModel>(draftStr);
-                        if (draft != null)
-                        {
-                            Model = draft;
-                            HasDraftRecovered = true;
-                        }
+                        Model = draft;
+                        HasDraftRecovered = true;
                     }
                 }
                 catch { }
@@ -151,7 +145,7 @@ else if (Model != null)
         {
             Model = JsonSerializer.Deserialize<SpaceEditViewModel>(JsonSerializer.Serialize(OriginalData))!;
             HasDraftRecovered = false;
-            await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);
+            await LocalStorage.RemoveItemAsync(DraftKey);
             StateHasChanged();
         }
     }
@@ -183,7 +177,7 @@ else if (Model != null)
             var result = await SpaceCommandService.SubmitEditAsync(Model, _cts?.Token ?? CancellationToken.None);
             if (result.Success)
             {
-                await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);
+                await LocalStorage.RemoveItemAsync(DraftKey);
                 ToastService.Show("保存成功", "修改已提交，部分内容需要审核通过后才会对其他用户可见", "success");
                 NavigationManager.NavigateTo($"/space/index/{result.Data}");
             }

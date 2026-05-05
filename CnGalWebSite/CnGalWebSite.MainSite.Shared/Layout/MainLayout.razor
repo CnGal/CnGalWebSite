@@ -81,7 +81,7 @@
             <div class="cg-drawer__section-title">设置</div>
             <div class="cg-drawer__links">
                 <button class="cg-drawer__theme-btn"
-                        onclick="var isDark = document.documentElement.getAttribute('data-theme') === 'dark'; window.cngalTheme.set(!isDark);"
+                        onclick="var isDark = document.documentElement.getAttribute('data-theme') === 'dark'; window.cngalTheme.setCookie(!isDark);"
                         aria-label="切换颜色主题">
                     <CgMdiIcon Name="mdiThemeLightDark" aria-hidden="true" />
                     <span>夜间模式</span>
