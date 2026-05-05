@@ -29,6 +29,7 @@ let _buttongroupMousedown = false;
 let _dialogboxMousedown = false;
 let _chatcardMousedown = false;
 let _kanbanResizing = false;
+let _kanbanPinnedToRight = false;
 
 // 看板娘尺寸常量（最小固定，最大动态计算为屏幕80%）
 const KANBAN_MIN_SIZE = 150;
@@ -240,6 +241,12 @@ function clampToBounds(value, min, max) {
     return Math.max(min, Math.min(value, max));
 }
 
+function updateKanbanRightPinnedState(live2dItem) {
+    var rect = live2dItem.getBoundingClientRect();
+    var bounds = getKanbanViewportBounds(live2dItem);
+    _kanbanPinnedToRight = Math.abs(rect.left - bounds.maxLeft) <= 2;
+}
+
 function applyKanbanFrame(live2dItem, left, top) {
     live2dItem.style.left = Math.round(left) + 'px';
     live2dItem.style.top = Math.round(top) + 'px';
@@ -247,20 +254,24 @@ function applyKanbanFrame(live2dItem, left, top) {
     live2dItem.style.height = live2dItem.offsetHeight + 'px';
 }
 
-function clampKanbanInsideViewport(dotNetRef) {
+function clampKanbanInsideViewport(dotNetRef, keepRightPinned) {
     var live2dItem = document.getElementById('kanban-live2d');
     if (!live2dItem || _kanbanMousedown || _kanbanResizing) return;
 
     var rect = live2dItem.getBoundingClientRect();
     var bounds = getKanbanViewportBounds(live2dItem);
-    var nextLeft = clampToBounds(rect.left, bounds.minLeft, bounds.maxLeft);
+    var nextLeft = keepRightPinned && _kanbanPinnedToRight
+        ? bounds.maxLeft
+        : clampToBounds(rect.left, bounds.minLeft, bounds.maxLeft);
     var nextTop = clampToBounds(rect.top, bounds.minTop, bounds.maxTop);
 
     if (Math.round(nextLeft) === Math.round(rect.left) && Math.round(nextTop) === Math.round(rect.top)) {
+        updateKanbanRightPinnedState(live2dItem);
         return;
     }
 
     applyKanbanFrame(live2dItem, nextLeft, nextTop);
+    updateKanbanRightPinnedState(live2dItem);
     dotNetRef.invokeMethodAsync('SetKanbanPosition', Math.round(nextLeft), Math.round(nextTop));
 }
 
@@ -321,12 +332,12 @@ export function initKanbanLive2D(dotNetRef, modelDir, modelIndex, resourcesPath)
 
         var clampKanbanPosition = function () {
             if (_dotNetHelper) {
-                clampKanbanInsideViewport(_dotNetHelper);
+                clampKanbanInsideViewport(_dotNetHelper, true);
             }
         };
         _resizeDebouncedHandler = debounce(clampKanbanPosition, 100);
         addTrackedListener(window, 'resize', _resizeDebouncedHandler);
-        clampKanbanInsideViewport(dotNetRef);
+        clampKanbanInsideViewport(dotNetRef, false);
 
         console.log("初始化Live2D");
     });
@@ -632,6 +643,7 @@ export function initKanbanMoveAction(dotNetRef) {
             move = false;
             var finalLeft = clampToBounds(x_org + dx, MIN_LEFT, MAX_LEFT);
             var finalTop = clampToBounds(y_org + dy, MIN_TOP, MAX_TOP);
+            _kanbanPinnedToRight = Math.abs(finalLeft - MAX_LEFT) <= 2;
             dotNetRef.invokeMethodAsync('SetKanbanPosition', Math.round(finalLeft), Math.round(finalTop));
             document.body.classList.remove('user-select-none');
             switchLiv2DExpression();
