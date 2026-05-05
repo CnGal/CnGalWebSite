@@ -6,7 +6,7 @@
 
 @if (_visible && Model is not null)
 {
-    <div class="kanban-dialogbox @GetTypeClass()">
+    <div id="kanban-dialogbox" class="kanban-dialogbox @GetTypeClass()">
         <div class="kanban-dialogbox__bubble">
             @if (_displayType == KanbanDialogBoxType.Image)
             {
