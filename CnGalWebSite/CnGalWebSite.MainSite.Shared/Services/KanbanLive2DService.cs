@@ -48,6 +48,16 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
         await _module.InvokeVoidAsync("initKanbanLive2D", _objRef, modelDir, modelIndex, resourcesPath);
     }
 
+    public async Task InitResizeAsync()
+    {
+        if (_module is null || _objRef is null)
+        {
+            return;
+        }
+
+        await _module.InvokeVoidAsync("initKanbanResizeAction", _objRef);
+    }
+
     public async Task SetModelAsync(int index)
     {
         if (_module is null)
@@ -227,6 +237,17 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
 
         _settingService.Kanban.Position.Left = left;
         _settingService.Kanban.Position.Top = top;
+        _ = _settingService.SaveAsync();
+    }
+
+    [JSInvokable]
+    public void SetKanbanSize(int width, int height)
+    {
+        Kanban.Size.Width = width;
+        Kanban.Size.Height = height;
+
+        _settingService.Kanban.Size.Width = width;
+        _settingService.Kanban.Size.Height = height;
         _ = _settingService.SaveAsync();
     }
 

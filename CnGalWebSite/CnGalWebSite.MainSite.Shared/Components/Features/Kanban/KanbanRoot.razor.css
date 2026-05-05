@@ -4,8 +4,67 @@
     position: fixed;
     z-index: var(--cg-kanban-z-index);
     user-select: none;
+    cursor: grab;
 }
 
 .kanban-live2d.d-none {
     display: none;
+}
+
+/* 拖拽状态 */
+.kanban-live2d.dragging {
+    cursor: grabbing;
+}
+
+/* 按住即将拖拽 */
+.kanban-live2d.drag-ready {
+    cursor: grabbing;
+}
+
+/* 缩放状态 */
+.kanban-live2d.resizing {
+    cursor: nwse-resize;
+}
+
+/* ── Resize 把手 ── */
+.kanban-resize-handle {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: var(--cg-kanban-resize-handle-size);
+    height: var(--cg-kanban-resize-handle-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: var(--cg-radius-sm);
+    background: color-mix(in oklab, var(--cg-color-surface) 60%, transparent);
+    color: var(--cg-color-text-muted);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    cursor: nwse-resize;
+    padding: 0;
+    transition:
+        color var(--cg-transition-fast),
+        background-color var(--cg-transition-fast),
+        transform var(--cg-transition-fast);
+    z-index: calc(var(--cg-kanban-z-index) + 2);
+}
+
+.kanban-resize-handle:hover,
+.kanban-resize-handle:focus-visible {
+    color: var(--cg-color-primary);
+    background: color-mix(in oklab, var(--cg-color-surface) 85%, transparent);
+    transform: scale(1.15);
+}
+
+.kanban-resize-handle:focus-visible {
+    outline: 2px solid var(--cg-color-focus-ring);
+    outline-offset: 1px;
+}
+
+.kanban-resize-handle ::deep .cg-mdi-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
 }

@@ -90,7 +90,7 @@ public class KanbanSettingService : IKanbanSettingService
             if (size.Width < 1600)
             {
                 _kanban.Size.Width = 220;
-                _kanban.Size.Height = 400;
+                _kanban.Size.Height = 220;
                 _button.Position.Left = 140;
                 _dialogBox.Position.Left = -200;
                 _dialogBox.Position.Bottom = 410;
@@ -127,6 +127,12 @@ public class KanbanSettingService : IKanbanSettingService
 
             if (_kanban.Position.Top + _kanban.Size.Height * (1 - percentY) > size.Height)
                 _kanban.Position.Top = (int)(size.Height - _kanban.Size.Height);
+
+            // Kanban size
+            if (_kanban.Size.Width < 150) _kanban.Size.Width = 150;
+            if (_kanban.Size.Height < 150) _kanban.Size.Height = 150;
+            if (_kanban.Size.Width > 600) _kanban.Size.Width = 600;
+            if (_kanban.Size.Height > 600) _kanban.Size.Height = 600;
 
             // Button group
             ClampRelative(_button.Position.Left, -_kanban.Size.Width, _kanban.Size.Width * 2, v => _button.Position.Left = v);

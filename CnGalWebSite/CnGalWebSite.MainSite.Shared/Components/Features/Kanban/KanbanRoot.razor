@@ -10,7 +10,13 @@
 @rendermode InteractiveServer
 
 <div id="kanban-live2d" class="kanban-live2d" style="@GetStyleString()">
-    <KanbanMainCard />
+    <KanbanMainCard Width="@Live2DService.Kanban.Size.Width" Height="@Live2DService.Kanban.Size.Height" />
+
+    <button class="kanban-resize-handle" type="button"
+            aria-label="拖动调整看板娘大小"
+            title="拖动调整大小">
+        <CgMdiIcon Name="mdiDragVariant" aria-hidden="true" />
+    </button>
 
     <KanbanButtonGroup OnBackToTop="HandleBackToTop">
         <ChatContent>
@@ -53,6 +59,8 @@
             await SettingService.LoadAsync();
             Live2DService.Kanban.Position.Left = SettingService.Kanban.Position.Left;
             Live2DService.Kanban.Position.Top = SettingService.Kanban.Position.Top;
+            Live2DService.Kanban.Size.Width = SettingService.Kanban.Size.Width;
+            Live2DService.Kanban.Size.Height = SettingService.Kanban.Size.Height;
 
             await UserDataService.LoadAsync();
 
@@ -80,7 +88,7 @@
     private string GetStyleString()
     {
         var kanban = Live2DService.Kanban;
-        return $"position:fixed; left:{kanban.Position.Left}px; top:{kanban.Position.Top}px; width:var(--cg-kanban-size); height:var(--cg-kanban-size); z-index:var(--cg-kanban-z-index);";
+        return $"position:fixed; left:{kanban.Position.Left}px; top:{kanban.Position.Top}px; width:{kanban.Size.Width}px; height:{kanban.Size.Height}px; z-index:var(--cg-kanban-z-index);";
     }
 
     private async Task HandleBackToTop()

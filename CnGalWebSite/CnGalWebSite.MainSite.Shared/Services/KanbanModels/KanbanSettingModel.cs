@@ -5,7 +5,7 @@ namespace CnGalWebSite.MainSite.Shared.Services.KanbanModels
     public class KanbanSettingModel
     {
         public Position Position { get; set; } = new();
-        public Size Size { get; set; } = new() { Height = 500, Width = 300 };
+        public Size Size { get; set; } = new() { Height = 300, Width = 300 };
     }
 
     public class ButtonSettingModel

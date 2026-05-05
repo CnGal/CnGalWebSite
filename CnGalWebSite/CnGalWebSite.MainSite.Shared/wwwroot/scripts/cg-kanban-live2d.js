@@ -23,11 +23,16 @@ let _resizeDebouncedHandler = null;
 /** @type {string[]} */
 let _blobUrls = [];
 
-// 拖动冲突检测状态
+// 拖动/缩放冲突检测状态
 let _kanbanMousedown = false;
 let _buttongroupMousedown = false;
 let _dialogboxMousedown = false;
 let _chatcardMousedown = false;
+let _kanbanResizing = false;
+
+// 看板娘尺寸常量
+const KANBAN_MIN_SIZE = 150;
+const KANBAN_MAX_SIZE = 600;
 
 // ---------------------------------------------------------------------------
 // CDN 加载工具
@@ -191,6 +196,7 @@ export function initKanbanLive2D(dotNetRef, modelDir, modelIndex, resourcesPath)
         setLive2dDefine(resourcesPath, '', modelDirs, 'live2d', modelIndex);
         initLive2d();
         initKanbanMoveAction(dotNetRef);
+        initKanbanResizeAction(dotNetRef);
         initButtonGroupMoveAction(dotNetRef);
         initDialogBoxMoveAction(dotNetRef);
         initChatCardMoveAction(dotNetRef);
@@ -382,11 +388,12 @@ export function releaseLive2D() {
     _buttongroupMousedown = false;
     _dialogboxMousedown = false;
     _chatcardMousedown = false;
+    _kanbanResizing = false;
     _resizeDebouncedHandler = null;
 }
 
 /**
- * 初始化看板娘拖拽
+ * 初始化看板娘拖拽（优化版 — 含光标反馈、边界钳制、视觉指示）
  * @param {object} dotNetRef - .NET 互操作引用
  */
 export function initKanbanMoveAction(dotNetRef) {
@@ -401,6 +408,12 @@ export function initKanbanMoveAction(dotNetRef) {
     var dy = 0;
     var time;
 
+    var MAX_LEFT, MAX_TOP;
+    function updateBounds() {
+        MAX_LEFT = window.innerWidth - live2dItem.offsetWidth * 0.3;
+        MAX_TOP = window.innerHeight - live2dItem.offsetHeight * 0.15;
+    }
+
     var mousedown_fun = function (event) {
         var touch;
         if (event.touches) {
@@ -411,14 +424,18 @@ export function initKanbanMoveAction(dotNetRef) {
         var timeStart = getTimeNow();
         _kanbanMousedown = true;
 
+        // 按住 300ms 后添加视觉反馈（即将进入拖拽状态）
+        var dragReady = false;
         time = setInterval(function () {
             var timeEnd = getTimeNow();
+            if (timeEnd - timeStart > 300 && !dragReady) {
+                dragReady = true;
+                live2dItem.classList.add('drag-ready');
+            }
             if (timeEnd - timeStart > 500) {
                 clearInterval(time);
-                if (_buttongroupMousedown) {
-                    return;
-                }
-                if (_dialogboxMousedown) {
+                if (_buttongroupMousedown || _dialogboxMousedown || _kanbanResizing) {
+                    live2dItem.classList.remove('drag-ready');
                     return;
                 }
                 deltaLeft = touch.clientX - touch.target.offsetLeft;
@@ -427,8 +444,11 @@ export function initKanbanMoveAction(dotNetRef) {
                 x_org = rect.x;
                 y_org = rect.y;
                 move = true;
+                live2dItem.classList.remove('drag-ready');
+                live2dItem.classList.add('dragging');
                 document.body.classList.add('user-select-none');
                 switchLiv2DExpression('expression1');
+                updateBounds();
             }
         }, 10);
     };
@@ -451,10 +471,15 @@ export function initKanbanMoveAction(dotNetRef) {
             var cy = touch.clientY;
             dx = cx - deltaLeft;
             dy = cy - deltaTop;
-            var rect = live2dItem.getBoundingClientRect();
-            live2dItem.setAttribute('style', 'left:' + (x_org + dx) + 'px; top:' + (y_org + dy) + 'px; width: ' + rect.width + 'px; height: ' + rect.height + 'px;');
+
+            // 实时边界钳制
+            var newLeft = Math.max(-live2dItem.offsetWidth * 0.2, Math.min(x_org + dx, MAX_LEFT));
+            var newTop = Math.max(-live2dItem.offsetHeight * 0.1, Math.min(y_org + dy, MAX_TOP));
+
+            live2dItem.setAttribute('style', 'left:' + newLeft + 'px; top:' + newTop + 'px; width: ' + live2dItem.offsetWidth + 'px; height: ' + live2dItem.offsetHeight + 'px;');
         } else {
             clearInterval(time);
+            live2dItem.classList.remove('drag-ready');
         }
     };
 
@@ -462,14 +487,103 @@ export function initKanbanMoveAction(dotNetRef) {
     addTrackedListener(window, 'touchmove', mousemove_fun, { passive: false });
 
     var mouseup_fun = function () {
+        live2dItem.classList.remove('dragging');
         if (move) {
             move = false;
-            dotNetRef.invokeMethodAsync('SetKanbanPosition', x_org + dx, y_org + dy);
+            var finalLeft = Math.max(-live2dItem.offsetWidth * 0.2, Math.min(x_org + dx, MAX_LEFT));
+            var finalTop = Math.max(-live2dItem.offsetHeight * 0.1, Math.min(y_org + dy, MAX_TOP));
+            dotNetRef.invokeMethodAsync('SetKanbanPosition', Math.round(finalLeft), Math.round(finalTop));
             document.body.classList.remove('user-select-none');
             switchLiv2DExpression();
         } else {
             clearInterval(time);
+            live2dItem.classList.remove('drag-ready');
         }
+    };
+
+    addTrackedListener(window, 'mouseup', mouseup_fun);
+    addTrackedListener(window, 'touchend', mouseup_fun, { passive: false });
+}
+
+/**
+ * 初始化看板娘拖拽缩放（自由宽高比）
+ * @param {object} dotNetRef - .NET 互操作引用
+ */
+export function initKanbanResizeAction(dotNetRef) {
+    console.log('cg-kanban: initKanbanResizeAction called');
+    var live2dItem = document.getElementById('kanban-live2d');
+    var handle = live2dItem && live2dItem.querySelector('.kanban-resize-handle');
+    if (!live2dItem || !handle) return;
+
+    var resizing = false;
+    var startX, startY, startWidth, startHeight;
+
+    var mousedown_fun = function (event) {
+        if (event.target !== handle && !handle.contains(event.target)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        resizing = true;
+        _kanbanResizing = true;
+        var touch = event.touches ? event.touches[0] : event;
+        startX = touch.clientX;
+        startY = touch.clientY;
+        var rect = live2dItem.getBoundingClientRect();
+        startWidth = rect.width;
+        startHeight = rect.height;
+        live2dItem.classList.add('resizing');
+        document.body.classList.add('user-select-none');
+    };
+
+    addTrackedListener(handle, 'mousedown', mousedown_fun);
+    addTrackedListener(handle, 'touchstart', mousedown_fun, { passive: false });
+
+    function clampAspectRatio(w, h) {
+        var ratio = w / h;
+        if (ratio > 2.5) { return [h * 2.5, h]; }
+        if (ratio < 0.4) { return [w, w / 0.4]; }
+        return [w, h];
+    }
+
+    function applyNewSize(w, h) {
+        var clamped = clampAspectRatio(w, h);
+        var newW = Math.round(Math.max(KANBAN_MIN_SIZE, Math.min(KANBAN_MAX_SIZE, clamped[0])));
+        var newH = Math.round(Math.max(KANBAN_MIN_SIZE, Math.min(KANBAN_MAX_SIZE, clamped[1])));
+        live2dItem.style.width = newW + 'px';
+        live2dItem.style.height = newH + 'px';
+        var canvas = document.getElementById('live2d');
+        if (canvas) {
+            canvas.width = newW;
+            canvas.height = newH;
+        }
+        return [newW, newH];
+    }
+
+    var mousemove_fun = function (event) {
+        if (!resizing) return;
+        event.preventDefault();
+        var touch = event.touches ? event.touches[0] : event;
+        var dx = touch.clientX - startX;
+        var dy = touch.clientY - startY;
+        applyNewSize(startWidth + dx, startHeight + dy);
+    };
+
+    addTrackedListener(window, 'mousemove', mousemove_fun);
+    addTrackedListener(window, 'touchmove', mousemove_fun, { passive: false });
+
+    var mouseup_fun = function () {
+        if (!resizing) return;
+        resizing = false;
+        _kanbanResizing = false;
+        live2dItem.classList.remove('resizing');
+        document.body.classList.remove('user-select-none');
+
+        var rect = live2dItem.getBoundingClientRect();
+        var canvas = document.getElementById('live2d');
+        if (canvas) {
+            canvas.width = Math.round(rect.width);
+            canvas.height = Math.round(rect.height);
+        }
+        dotNetRef.invokeMethodAsync('SetKanbanSize', Math.round(rect.width), Math.round(rect.height));
     };
 
     addTrackedListener(window, 'mouseup', mouseup_fun);

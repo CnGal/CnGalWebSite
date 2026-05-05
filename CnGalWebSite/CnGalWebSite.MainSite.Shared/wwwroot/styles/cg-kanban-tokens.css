@@ -5,6 +5,8 @@
 :root {
     /* ── 看板娘尺寸 ── */
     --cg-kanban-size: 300px;
+    --cg-kanban-min-size: 150px;
+    --cg-kanban-max-size: 600px;
     --cg-kanban-z-index: 100;
 
     /* ── 浮动按钮 ── */
@@ -16,6 +18,9 @@
     /* ── 聊天框 ── */
     --cg-kanban-chat-max-height: 500px;
     --cg-kanban-chat-max-width: 350px;
+
+    /* ── Resize 把手 ── */
+    --cg-kanban-resize-handle-size: 20px;
 
     /* ── 过渡 ── */
     --cg-kanban-transition: var(--cg-transition-normal);
