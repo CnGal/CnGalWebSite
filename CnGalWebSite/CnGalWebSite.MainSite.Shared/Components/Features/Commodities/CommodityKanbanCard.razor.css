@@ -18,6 +18,13 @@
     }
 }
 
+@media (min-width: 1024px) {
+    .commodity-kanban-card {
+        position: sticky;
+        top: calc(var(--cg-header-height) + var(--cg-spacing-4));
+    }
+}
+
 /* ── 形象图 ── */
 .commodity-kanban-card__image-wrapper {
     position: relative;
@@ -95,6 +102,7 @@
     font-size: var(--cg-font-size-lg);
     font-weight: var(--cg-font-weight-bold);
     color: var(--cg-color-amber);
+    transition: all var(--cg-transition-fast);
 }
 
 /* ── 操作按钮 ── */
@@ -119,4 +127,51 @@
 ::deep .commodity-kanban-card__alert .cg-alert {
     border-radius: var(--cg-radius-md);
     font-size: var(--cg-font-size-sm);
+}
+
+/* ── 移动端响应式 (<1024px)：水平布局 ── */
+@media (max-width: 1023px) {
+    .commodity-kanban-card {
+        flex-direction: row;
+    }
+
+    .commodity-kanban-card__image-wrapper {
+        width: 40%;
+        min-width: 0;
+        aspect-ratio: auto;
+        min-height: 120px;
+        flex-shrink: 0;
+    }
+
+    .commodity-kanban-card__body {
+        width: 60%;
+        min-width: 0;
+        padding: var(--cg-spacing-3);
+        gap: var(--cg-spacing-2);
+    }
+
+    .commodity-kanban-card__title {
+        font-size: var(--cg-font-size-md);
+    }
+
+    .commodity-kanban-card__welcome {
+        font-size: var(--cg-font-size-xs);
+    }
+
+    .commodity-kanban-card__balance {
+        padding: var(--cg-spacing-2);
+    }
+
+    .commodity-kanban-card__balance-label {
+        font-size: var(--cg-font-size-xs);
+    }
+
+    .commodity-kanban-card__balance-value {
+        font-size: var(--cg-font-size-md);
+    }
+
+    ::deep .commodity-kanban-card__gcoin-icon.cg-mdi-icon {
+        width: 20px;
+        height: 20px;
+    }
 }

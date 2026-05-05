@@ -9,6 +9,8 @@
 
 @inject ICommodityQueryService CommodityService
 @inject IKanbanQueryService KanbanService
+@inject ISpaceQueryService SpaceQueryService
+@inject ICgToastService ToastService
 @implements IDisposable
 
 <CgPageMeta Title="看板娘的小卖铺" />
@@ -24,6 +26,17 @@
         <a href="/">返回首页</a>
     </section>
 }
+else if (!_isAuthorized)
+{
+    <section class="commodities-page__error" aria-label="暂无权限">
+        <div class="commodities-page__error-icon">
+            <CgMdiIcon Name="mdiLockOutline" />
+        </div>
+        <h1>暂无访问权限</h1>
+        <p>看板娘的小卖铺暂未对你开放，请完成相关任务后重试。</p>
+        <a href="/">返回首页</a>
+    </section>
+}
 else if (_commodities is not null)
 {
     <article class="commodities-page">
@@ -32,7 +45,7 @@ else if (_commodities is not null)
             @* 左侧：看板娘卡片 *@
             <aside class="commodities-page__sidebar">
                 <CommodityKanbanCard GCoins="_gCoins"
-                                     Permissions="_permissions" />
+                                      Permissions="_permissions" />
             </aside>
 
             @* 右侧：Tab 切换内容 *@
@@ -69,10 +82,7 @@ else if (_commodities is not null)
 
                             case "code":
                                 @* ── G币兑换：兑换码输入 ── *@
-                                <CommodityCodeRedeem OnRedeem="OnRedeemCodeAsync"
-                                                      IsProcessing="_redeemIsProcessing"
-                                                      Message="@_redeemMessage"
-                                                      IsSuccess="_redeemIsSuccess" />
+                                <CommodityCodeRedeem OnRedeem="OnRedeemCodeAsync" />
                                 break;
 
                             case "record":
@@ -104,13 +114,9 @@ else
     // ── 数据 ──
     private List<CommodityUserModel>? _commodities;
     private bool _permissions;
+    private bool _isAuthorized = true;
     private int _gCoins;
     private string? _loadingError;
-
-    // ── 兑换状态 ──
-    private string? _redeemMessage;
-    private bool _redeemIsSuccess;
-    private bool _redeemIsProcessing;
 
     // ── 当前激活 Tab ──
     private string _activeTab = "shop";
@@ -142,17 +148,23 @@ else
             if (permResult.Success && permResult.Data is not null)
             {
                 _permissions = permResult.Data.Permissions;
+                _isAuthorized = _permissions;
             }
+
+            if (!_isAuthorized)
+            {
+                // 无权限，无需继续加载商品数据
+                return;
+            }
+
+            // 获取 G币余额
+            await RefreshGCoinsAsync();
 
             // 获取商品列表
             var result = await CommodityService.GetAllCommoditiesAsync(_cts.Token);
             if (result.Success && result.Data is not null)
             {
                 _commodities = result.Data;
-                // 计算 G币余额：反查已拥有的商品价值总和（实际项目中可从用户信息获取）
-                _gCoins = result.Data
-                    .Where(c => c.IsOwned)
-                    .Sum(c => c.Value.Length > 0 ? int.TryParse(c.Value, out var v) ? v : 0 : 0);
             }
             else
             {
@@ -184,6 +196,28 @@ else
         };
     }
 
+    // ── G币刷新 ──
+
+    private async Task RefreshGCoinsAsync()
+    {
+        try
+        {
+            var result = await SpaceQueryService.GetSpaceDetailAsync(string.Empty, _cts?.Token ?? default);
+            if (result.Success && result.Data is not null)
+            {
+                _gCoins = result.Data.GCoins;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // 忽略
+        }
+        catch (Exception)
+        {
+            // 静默处理，G币余额显示不变
+        }
+    }
+
     // ── 购买商品 ──
 
     private async Task OnBuyCommodityAsync(long commodityId)
@@ -192,15 +226,22 @@ else
 
         try
         {
+            var item = _commodities?.FirstOrDefault(c => c.Id == commodityId);
             var result = await CommodityService.BuyCommodityAsync(commodityId, _cts.Token);
             if (result.Success)
             {
                 // 更新本地商品状态
-                var item = _commodities?.FirstOrDefault(c => c.Id == commodityId);
                 if (item is not null)
                 {
                     item.IsOwned = true;
                 }
+
+                ToastService.Show("购买成功", $"商品：{item?.Name ?? commodityId.ToString()}", "success");
+                await RefreshGCoinsAsync();
+            }
+            else
+            {
+                ToastService.Show("购买失败", result.Error?.Message, "error");
             }
         }
         catch (OperationCanceledException)
@@ -211,31 +252,21 @@ else
 
     // ── 兑换 G币 ──
 
-    private async Task OnRedeemCodeAsync(string code)
+    private async Task OnRedeemCodeAsync(RedeemedCommodityCodeModel model)
     {
-        if (_cts is null || string.IsNullOrWhiteSpace(code)) return;
-
-        _redeemIsProcessing = true;
-        _redeemMessage = null;
-        StateHasChanged();
+        if (_cts is null || string.IsNullOrWhiteSpace(model?.Code)) return;
 
         try
         {
-            var model = new RedeemedCommodityCodeModel
-            {
-                Code = code
-            };
-
             var result = await CommodityService.RedeemedCommodityCodeAsync(model, _cts.Token);
             if (result.Success)
             {
-                _redeemIsSuccess = true;
-                _redeemMessage = "兑换成功！G币已到账。";
+                ToastService.Show("兑换成功", "G币已到账", "success");
+                await RefreshGCoinsAsync();
             }
             else
             {
-                _redeemIsSuccess = false;
-                _redeemMessage = result.Error?.Message ?? "兑换失败，请检查订单号是否正确。";
+                ToastService.Show("兑换失败", result.Error?.Message, "error");
             }
         }
         catch (OperationCanceledException)
@@ -244,13 +275,7 @@ else
         }
         catch (Exception ex)
         {
-            _redeemIsSuccess = false;
-            _redeemMessage = $"兑换失败：{ex.Message}";
-        }
-        finally
-        {
-            _redeemIsProcessing = false;
-            StateHasChanged();
+            ToastService.Show("兑换失败", ex.Message, "error");
         }
     }
 

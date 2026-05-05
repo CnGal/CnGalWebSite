@@ -1,0 +1,84 @@
+﻿@inject IJSRuntime JS
+@inject IHttpClientFactory HttpClientFactory
+@inject IConfiguration Configuration
+@inject ILogger<CgHumanMachineVerification> Logger
+@using System.Text.Json
+@using CnGalWebSite.DataModel.ViewModel.Accounts
+@using CnGalWebSite.DataModel.ViewModel.Others
+@using Microsoft.Extensions.Configuration
+@using Microsoft.Extensions.Logging
+@implements IDisposable
+
+@* 纯代码组件，无可见 UI *@
+
+@code {
+    [Parameter]
+    public EventCallback<HumanMachineVerificationResult> OnVerficated { get; set; }
+
+    [Parameter]
+    public bool WaitChecked { get; set; }
+
+    private bool _isChecked;
+    private DotNetObjectReference<CgHumanMachineVerification>? _objRef;
+
+    public async Task StartVerification()
+    {
+        try
+        {
+            _isChecked = false;
+
+            var client = HttpClientFactory.CreateClient();
+            var baseUrl = Configuration["MainSiteApi:BaseAddress"];
+            var response = await client.GetStringAsync($"{baseUrl}api/account/GetGeetestCode");
+            var geetestCode = JsonSerializer.Deserialize<GeetestCodeModel>(response);
+
+            if (geetestCode is null || string.IsNullOrWhiteSpace(geetestCode.Gt))
+            {
+                Logger.LogError("Geetest 服务端返回数据无效");
+                await OnVerficated.InvokeAsync(new HumanMachineVerificationResult());
+                return;
+            }
+
+            _objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("initGeetestBindCAPTCHA", _objRef, geetestCode.Gt, geetestCode.Challenge, geetestCode.Success);
+
+            while (!_isChecked && WaitChecked)
+            {
+                await Task.Delay(500);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "初始化极验人机验证失败");
+            await OnVerficated.InvokeAsync(new HumanMachineVerificationResult());
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnChecked(string challenge, string validate, string seccode)
+    {
+        await OnVerficated.InvokeAsync(new HumanMachineVerificationResult
+        {
+            Success = true,
+            Challenge = challenge,
+            Validate = validate,
+            Seccode = seccode
+        });
+
+        _isChecked = true;
+    }
+
+    [JSInvokable]
+    public async Task OnCancel()
+    {
+        await OnVerficated.InvokeAsync(new HumanMachineVerificationResult());
+        _isChecked = true;
+    }
+
+    public void Dispose()
+    {
+        _objRef?.Dispose();
+        _isChecked = true;
+        GC.SuppressFinalize(this);
+    }
+}

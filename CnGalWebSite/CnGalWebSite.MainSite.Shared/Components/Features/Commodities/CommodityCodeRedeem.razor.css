@@ -25,60 +25,9 @@
     }
 }
 
-.commodity-code-redeem__input {
+/* ── CgInput 填充剩余空间 ── */
+::deep .commodity-code-redeem__input-group .cg-input {
     flex-grow: 1;
-    padding: var(--cg-spacing-3) var(--cg-spacing-4);
-    border: 1px solid var(--cg-color-border);
-    border-radius: var(--cg-radius-md);
-    background: var(--cg-color-surface);
-    color: var(--cg-color-text);
-    font-size: var(--cg-font-size-base);
-    font-family: var(--cg-font-family);
-    outline: none;
-    transition: border-color var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
-}
-
-.commodity-code-redeem__input::placeholder {
-    color: var(--cg-color-text-muted);
-}
-
-.commodity-code-redeem__input:focus {
-    border-color: var(--cg-color-primary);
-    box-shadow: 0 0 0 3px var(--cg-color-focus-ring);
-}
-
-.commodity-code-redeem__input:disabled {
-    background: var(--cg-color-section-bg);
-    color: var(--cg-color-text-muted);
-    cursor: not-allowed;
-}
-
-/* ── 消息提示 ── */
-.commodity-code-redeem__message {
-    display: flex;
-    align-items: center;
-    gap: var(--cg-spacing-2);
-    padding: var(--cg-spacing-3) var(--cg-spacing-4);
-    border-radius: var(--cg-radius-md);
-    font-size: var(--cg-font-size-sm);
-}
-
-.commodity-code-redeem__message--success {
-    background: var(--cg-color-emerald-subtle);
-    color: var(--cg-color-emerald);
-    border: 1px solid color-mix(in oklab, var(--cg-color-emerald) 25%, transparent);
-}
-
-.commodity-code-redeem__message--error {
-    background: var(--cg-color-editor-error-bg);
-    color: var(--cg-color-editor-error-text);
-    border: 1px solid var(--cg-color-editor-error-border);
-}
-
-::deep .commodity-code-redeem__message .cg-mdi-icon {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
 }
 
 /* ── 按钮 ── */

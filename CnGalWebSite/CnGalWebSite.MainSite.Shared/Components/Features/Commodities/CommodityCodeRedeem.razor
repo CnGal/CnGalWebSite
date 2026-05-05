@@ -1,40 +1,36 @@
-@* CommodityCodeRedeem — G币兑换码输入组件 *@
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Commodities
+@using CnGalWebSite.DataModel.ViewModel.Others
+@using Microsoft.Extensions.Logging
+@inject ICgDeviceIdentificationService DeviceIdentification
+@inject ILogger<CommodityCodeRedeem> Logger
+
+@* CommodityCodeRedeem — G币兑换码输入组件（含人机验证 + 设备指纹） *@
 
 <div class="commodity-code-redeem">
-    @* B站工房说明提示 *@
     <CgAlert Variant="info">
         <span>前往 <strong>B站工房</strong> 购买周边，我们会按消费金额（不包括邮费）<strong>5：1</strong> 赠送G币哦。在下面输入B站工房 <strong>订单号</strong> 即可兑换。</span>
     </CgAlert>
 
-    @* 兑换表单 *@
     <div class="commodity-code-redeem__form">
         <div class="commodity-code-redeem__input-group">
-            <input type="text"
-                   class="commodity-code-redeem__input"
-                   placeholder="请输入B站工房订单号"
-                   @bind="_orderCode"
-                   @bind:event="oninput"
-                   disabled="@IsProcessing" />
+            <CgInput @bind-Value="@_orderCode"
+                     Placeholder="请输入B站工房订单号"
+                     Disabled="@_isProcessing" />
             <CgButton Variant="primary"
                       Async="true"
-                      Disabled="@(IsProcessing || string.IsNullOrWhiteSpace(_orderCode))"
+                      Disabled="@(string.IsNullOrWhiteSpace(_orderCode))"
                       OnClick="HandleRedeemAsync">
                 <CgMdiIcon Name="mdiTicketConfirmationOutline" aria-hidden="true" />
                 兑换
             </CgButton>
         </div>
-
-        @* 消息提示 *@
-        @if (!string.IsNullOrWhiteSpace(Message))
-        {
-            <div class="commodity-code-redeem__message @(IsSuccess ? "commodity-code-redeem__message--success" : "commodity-code-redeem__message--error")">
-                <CgMdiIcon Name="@(IsSuccess ? "mdiCheckCircleOutline" : "mdiAlertCircleOutline")" aria-hidden="true" />
-                <span>@Message</span>
-            </div>
-        }
     </div>
 
-    @* B站工房推广 *@
+    <CgHumanMachineVerification @ref="_verification"
+                                 OnVerficated="OnVerficatedAsync"
+                                 WaitChecked="true" />
+
     <div class="commodity-code-redeem__promo">
         <div class="commodity-code-redeem__promo-header">
             <CgMdiIcon Name="mdiShoppingOutline" aria-hidden="true" />
@@ -54,24 +50,64 @@
 
 @code {
     [Parameter]
-    public EventCallback<string> OnRedeem { get; set; }
-
-    [Parameter]
-    public bool IsProcessing { get; set; }
-
-    [Parameter]
-    public string? Message { get; set; }
-
-    [Parameter]
-    public bool IsSuccess { get; set; }
+    public EventCallback<RedeemedCommodityCodeModel> OnRedeem { get; set; }
 
     private string _orderCode = string.Empty;
+    private bool _isProcessing;
+    private CgHumanMachineVerification? _verification;
 
-    private async Task HandleRedeemAsync(MouseEventArgs args)
+    private async Task HandleRedeemAsync()
     {
-        if (OnRedeem.HasDelegate && !string.IsNullOrWhiteSpace(_orderCode))
+        if (!OnRedeem.HasDelegate || string.IsNullOrWhiteSpace(_orderCode))
         {
-            await OnRedeem.InvokeAsync(_orderCode);
+            return;
+        }
+
+        if (_verification is null)
+        {
+            Logger.LogError("CgHumanMachineVerification 组件引用为空");
+            return;
+        }
+
+        _isProcessing = true;
+        StateHasChanged();
+
+        try
+        {
+            await _verification.StartVerification();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "极验人机验证异常");
+        }
+        finally
+        {
+            _isProcessing = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnVerficatedAsync(HumanMachineVerificationResult result)
+    {
+        if (!result.Success)
+        {
+            return;
+        }
+
+        try
+        {
+            var device = await DeviceIdentification.GetIdentificationAsync();
+            await OnRedeem.InvokeAsync(new RedeemedCommodityCodeModel
+            {
+                Code = _orderCode,
+                Verification = result,
+                Identification = device
+            });
+            _orderCode = string.Empty;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "组装或提交兑换模型异常");
         }
     }
 }

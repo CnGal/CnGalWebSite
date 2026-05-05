@@ -1,4 +1,6 @@
 @using CnGalWebSite.DataModel.ViewModel.Commodities
+@using Microsoft.Extensions.Logging
+@inject ILogger<CommodityItemCard> Logger
 
 @* CommodityItemCard — 小卖铺商品卡片 *@
 
@@ -8,7 +10,8 @@
         <img src="@Model.Image"
              alt="@Model.Name"
              class="commodity-item-card__image"
-             loading="lazy" />
+             loading="lazy"
+             onerror="this.style.display='none';this.parentElement.classList.add('commodity-item-card__image-wrapper--broken')" />
     </div>
 
     @* 商品信息 *@
@@ -39,7 +42,7 @@
                 else
                 {
                     <CgButton Variant="primary"
-                              Async="true"
+                              Async="@_isProcessing"
                               OnClick="HandleBuyAsync">
                         <CgMdiIcon Name="mdiCartOutline" aria-hidden="true" />
                         解锁
@@ -57,11 +60,27 @@
     [Parameter]
     public EventCallback<long> OnBuy { get; set; }
 
+    private bool _isProcessing;
+
     private async Task HandleBuyAsync(MouseEventArgs args)
     {
-        if (OnBuy.HasDelegate)
+        if (!OnBuy.HasDelegate)
+        {
+            return;
+        }
+
+        _isProcessing = true;
+        try
         {
             await OnBuy.InvokeAsync(Model.Id);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "购买商品失败: {CommodityId}", Model.Id);
+        }
+        finally
+        {
+            _isProcessing = false;
         }
     }
 }
