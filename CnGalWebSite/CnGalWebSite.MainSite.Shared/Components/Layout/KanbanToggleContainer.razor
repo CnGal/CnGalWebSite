@@ -1,0 +1,64 @@
+﻿@using CnGalWebSite.MainSite.Shared.Components.Features.Kanban
+@using CnGalWebSite.MainSite.Shared.Services
+@inject IKanbanVisibilityService KanbanVisibilityService
+@inject IMiniModeService MiniModeService
+@inject NavigationManager NavigationManager
+@implements IDisposable
+@rendermode InteractiveServer
+
+@if (IsAlmanacPage)
+{
+}
+else if (KanbanVisibilityService.ShowKanban && !_isMiniMode)
+{
+    <CgMiniModeContainer>
+        <KanbanRoot />
+    </CgMiniModeContainer>
+}
+else
+{
+    <FloatingActionToolbar />
+}
+
+@code {
+    private bool _isMiniMode;
+    private bool IsAlmanacPage => NavigationManager.Uri.Contains("/almanac", StringComparison.OrdinalIgnoreCase);
+
+    protected override void OnInitialized()
+    {
+        _isMiniMode = MiniModeService.IsMiniMode;
+
+        MiniModeService.MiniModeChanged -= OnMiniModeChanged;
+        MiniModeService.MiniModeChanged += OnMiniModeChanged;
+
+        KanbanVisibilityService.OnVisibilityChanged -= OnVisibilityChanged;
+        KanbanVisibilityService.OnVisibilityChanged += OnVisibilityChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await KanbanVisibilityService.LoadAsync();
+            StateHasChanged();
+        }
+    }
+
+    private void OnMiniModeChanged()
+    {
+        _isMiniMode = MiniModeService.IsMiniMode;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void OnVisibilityChanged()
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MiniModeService.MiniModeChanged -= OnMiniModeChanged;
+        KanbanVisibilityService.OnVisibilityChanged -= OnVisibilityChanged;
+        GC.SuppressFinalize(this);
+    }
+}

@@ -5,11 +5,12 @@
 @inject IKanbanRemoteConfigService RemoteConfigService
 @inject IKanbanSettingService SettingService
 @inject IKanbanUserDataService UserDataService
+@inject IKanbanVisibilityService KanbanVisibilityService
 @inject IJSRuntime JS
 @implements IDisposable
 @rendermode InteractiveServer
 
-<div id="kanban-live2d" class="kanban-live2d @((_isReady && _isVisible) ? "" : "d-none")" style="@GetStyleString()">
+<div id="kanban-live2d" class="kanban-live2d" style="@GetStyleString()">
     <KanbanMainCard />
 
     <KanbanButtonGroup OnBackToTop="HandleBackToTop"
@@ -30,7 +31,6 @@
 
 @code {
     private bool _isReady;
-    private bool _isVisible = true;
     private CancellationTokenSource? _cts;
 
     private List<KanbanClothesModel>? _clothes;
@@ -98,9 +98,7 @@
 
     private async Task HandleQuit()
     {
-        _isVisible = false;
-        await InvokeAsync(StateHasChanged);
-        _ = Live2DService.ReleaseLive2D();
+        await KanbanVisibilityService.SetShowKanbanAsync(false);
     }
 
     private async void OnLive2DInitialized()

@@ -35,6 +35,12 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
 
     public async Task InitAsync(string modelDir, int modelIndex)
     {
+        // 如果之前已初始化过，先释放旧的资源以确保干净的状态
+        if (_module is not null)
+        {
+            await ReleaseLive2D();
+        }
+
         _module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", ModulePath);
         _objRef = DotNetObjectReference.Create(this);
 
@@ -201,6 +207,10 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
         }
 
         await _module.InvokeVoidAsync("releaseLive2D");
+        _module = null;
+
+        _objRef?.Dispose();
+        _objRef = null;
     }
 
     [JSInvokable]

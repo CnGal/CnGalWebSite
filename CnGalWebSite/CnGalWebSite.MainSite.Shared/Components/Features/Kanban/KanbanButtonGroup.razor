@@ -1,4 +1,6 @@
 @implements IDisposable
+@using CnGalWebSite.MainSite.Shared.Services
+@inject IKanbanVisibilityService KanbanVisibilityService
 
 <div id="kanban-button-group" class="kanban-button-group">
     <CgPopupMenu>
@@ -25,6 +27,10 @@
 
     <button class="kanban-action-btn" type="button" title="回到顶部" aria-label="回到顶部" @onclick="() => OnBackToTop.InvokeAsync()">
         <CgMdiIcon Name="mdiArrowUp" aria-hidden="true" />
+    </button>
+
+    <button class="kanban-action-btn" type="button" title="切换为浮动按钮" aria-label="切换为浮动按钮" @onclick="HandleSwitchToToolbar">
+        <CgMdiIcon Name="mdiSwapHorizontal" aria-hidden="true" />
     </button>
 
     <button class="kanban-action-btn kanban-action-btn--danger" type="button" title="退出 (双击确认)" aria-label="退出" @onclick="HandleQuitClick">
@@ -82,6 +88,11 @@
         _quitClickCount = 0;
         _quitTimer?.Dispose();
         _quitTimer = null;
+    }
+
+    private async Task HandleSwitchToToolbar()
+    {
+        await KanbanVisibilityService.SetShowKanbanAsync(false);
     }
 
     public void Dispose()

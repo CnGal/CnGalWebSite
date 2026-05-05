@@ -8,8 +8,6 @@
 const LIVE2D_CORE_JS_URL = 'https://res.cngal.org/live2d/js/live2dcubismcore.min.js';
 const LIVE2D_BUNDLE_JS_URL = 'https://res.cngal.org/live2d/js/bundle.js';
 
-/** @type {Promise<void>|null} */
-let _moduleLoadPromise = null;
 /** @type {object|null} */
 let _dotNetHelper = null;
 /** @type {boolean} */
@@ -32,37 +30,21 @@ let _dialogboxMousedown = false;
 let _chatcardMousedown = false;
 
 // ---------------------------------------------------------------------------
-// CDN 加载工具（幂等）
+// CDN 加载工具
+//  注：每次调用都移除旧脚本并重新加载，确保 bundle.js 的全局状态（WebGL context 等）
+//  被完全重置。这是从旧站点 live2d-core.js 继承的经验——bundle.js 不提供干净的
+//  release 方法，只能通过重新执行脚本来重置状态。
 // ---------------------------------------------------------------------------
 
 /**
- * 动态加载 CSS 文件（幂等）
- * @param {string} href
- * @returns {Promise<void>}
- */
-function loadCss(href) {
-    if (document.querySelector('link[href="' + href + '"]')) {
-        return Promise.resolve();
-    }
-    return new Promise(function (resolve, reject) {
-        var link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = href;
-        link.onload = resolve;
-        link.onerror = function () { reject(new Error('Failed to load CSS: ' + href)); };
-        document.head.appendChild(link);
-    });
-}
-
-/**
- * 动态加载 JS 文件（幂等）
+ * 强制加载 JS 文件（总是创建新 script 元素以触发重新执行）
  * @param {string} src
  * @returns {Promise<void>}
  */
-function loadScript(src) {
-    if (document.querySelector('script[src="' + src + '"]')) {
-        return Promise.resolve();
-    }
+function loadScriptFresh(src) {
+    var old = document.querySelector('script[src="' + src + '"]');
+    if (old) old.remove();
+
     return new Promise(function (resolve, reject) {
         var script = document.createElement('script');
         script.src = src;
@@ -73,16 +55,12 @@ function loadScript(src) {
 }
 
 /**
- * 确保 Live2D CDN 资源已加载（幂等，多次调用只触发一次加载）
+ * 加载 Live2D CDN 资源（每次调用都强制重新加载以重置全局状态）
  * @returns {Promise<void>}
  */
 function ensureLive2dLoaded() {
-    if (_moduleLoadPromise) {
-        return _moduleLoadPromise;
-    }
-    _moduleLoadPromise = loadScript(LIVE2D_CORE_JS_URL)
-        .then(function () { return loadScript(LIVE2D_BUNDLE_JS_URL); });
-    return _moduleLoadPromise;
+    return loadScriptFresh(LIVE2D_CORE_JS_URL)
+        .then(function () { return loadScriptFresh(LIVE2D_BUNDLE_JS_URL); });
 }
 
 // ---------------------------------------------------------------------------

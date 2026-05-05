@@ -1,7 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @attribute [StreamRendering]
 @using CnGalWebSite.MainSite.Shared.Components.Layout
-@using CnGalWebSite.MainSite.Shared.Components.Features.Kanban
 @inject NavigationManager NavigationManager
 @inject IMainSiteAuthRequestService AuthRequestService
 
@@ -254,13 +253,7 @@
             </div>
         </div>
     </footer>
-    <FloatingActionToolbar />
-    @if (!NavigationManager.Uri.Contains("/almanac", StringComparison.OrdinalIgnoreCase))
-    {
-        <CgMiniModeContainer>
-            <KanbanRoot />
-        </CgMiniModeContainer>
-    }
+    <KanbanToggleContainer />
 </div>
 
 <AuthorizeView>
