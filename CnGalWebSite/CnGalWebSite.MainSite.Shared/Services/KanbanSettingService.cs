@@ -112,39 +112,43 @@ public class KanbanSettingService : IKanbanSettingService
         try
         {
             var size = await _jsRuntime.InvokeAsync<WindowSize>("getWindowSize");
-            var percentX = 0.5;
-            var percentY = 0.8;
 
-            // Kanban position
-            if (_kanban.Position.Left + _kanban.Size.Width * percentX < 0)
-                _kanban.Position.Left = 0;
+            // 确保至少 50% 看板娘在屏幕内可见
+            var kanbanLeft = _kanban.Position.Left;
+            var kanbanTop = _kanban.Position.Top;
+            var kanbanWidth = _kanban.Size.Width;
+            var kanbanHeight = _kanban.Size.Height;
 
-            if (_kanban.Position.Left + _kanban.Size.Width * (1 - percentX) > size.Width)
-                _kanban.Position.Left = (int)(size.Width - _kanban.Size.Width);
+            if (kanbanLeft + kanbanWidth * 0.5 < 0)
+                _kanban.Position.Left = (int)(-kanbanWidth * 0.5);
 
-            if (_kanban.Position.Top + _kanban.Size.Height * percentY < 0)
-                _kanban.Position.Top = 0;
+            if (kanbanLeft + kanbanWidth * 0.5 > size.Width)
+                _kanban.Position.Left = (int)(size.Width - kanbanWidth * 0.5);
 
-            if (_kanban.Position.Top + _kanban.Size.Height * (1 - percentY) > size.Height)
-                _kanban.Position.Top = (int)(size.Height - _kanban.Size.Height);
+            if (kanbanTop + kanbanHeight * 0.5 < 0)
+                _kanban.Position.Top = (int)(-kanbanHeight * 0.5);
 
-            // Kanban size
+            if (kanbanTop + kanbanHeight * 0.5 > size.Height)
+                _kanban.Position.Top = (int)(size.Height - kanbanHeight * 0.5);
+
+            // Kanban 尺寸：最小 150px，最大为屏幕宽高的 80%
+            var maxSize = (int)(Math.Min(size.Width, size.Height) * 0.8);
             if (_kanban.Size.Width < 150) _kanban.Size.Width = 150;
             if (_kanban.Size.Height < 150) _kanban.Size.Height = 150;
-            if (_kanban.Size.Width > 600) _kanban.Size.Width = 600;
-            if (_kanban.Size.Height > 600) _kanban.Size.Height = 600;
+            if (_kanban.Size.Width > maxSize) _kanban.Size.Width = maxSize;
+            if (_kanban.Size.Height > maxSize) _kanban.Size.Height = maxSize;
 
             // Button group
-            ClampRelative(_button.Position.Left, -_kanban.Size.Width, _kanban.Size.Width * 2, v => _button.Position.Left = v);
-            ClampRelative(_button.Position.Bottom, -_kanban.Size.Height, _kanban.Size.Height * 2, v => _button.Position.Bottom = v);
+            ClampRelative(_button.Position.Left, -kanbanWidth, kanbanWidth * 2, v => _button.Position.Left = v);
+            ClampRelative(_button.Position.Bottom, -kanbanHeight, kanbanHeight * 2, v => _button.Position.Bottom = v);
 
             // Dialog box
-            ClampRelative(_dialogBox.Position.Left, -_kanban.Size.Width, _kanban.Size.Width * 4, v => _dialogBox.Position.Left = v);
-            ClampRelative(_dialogBox.Position.Bottom, -_kanban.Size.Height, _kanban.Size.Height * 4, v => _dialogBox.Position.Bottom = v);
+            ClampRelative(_dialogBox.Position.Left, -kanbanWidth, kanbanWidth * 4, v => _dialogBox.Position.Left = v);
+            ClampRelative(_dialogBox.Position.Bottom, -kanbanHeight, kanbanHeight * 4, v => _dialogBox.Position.Bottom = v);
 
             // Chat card
-            ClampRelative(_chat.Position.Left, -_kanban.Size.Width, _kanban.Size.Width * 4, v => _chat.Position.Left = v);
-            ClampRelative(_chat.Position.Bottom, -_kanban.Size.Height, _kanban.Size.Height * 4, v => _chat.Position.Bottom = v);
+            ClampRelative(_chat.Position.Left, -kanbanWidth, kanbanWidth * 4, v => _chat.Position.Left = v);
+            ClampRelative(_chat.Position.Bottom, -kanbanHeight, kanbanHeight * 4, v => _chat.Position.Bottom = v);
         }
         catch
         {

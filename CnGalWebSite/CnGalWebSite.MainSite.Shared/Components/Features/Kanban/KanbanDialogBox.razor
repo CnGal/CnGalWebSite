@@ -6,7 +6,7 @@
 
 @if (_visible && Model is not null)
 {
-    <div id="kanban-dialogbox" class="kanban-dialogbox @GetTypeClass()">
+    <div id="kanban-dialogbox" class="kanban-dialogbox @GetTypeClass()" style="@GetPositionStyle()">
         <div class="kanban-dialogbox__bubble">
             @if (_displayType == KanbanDialogBoxType.Image)
             {
@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        <button class="kanban-dialogbox__close" @onclick="HandleCloseAsync" title="关闭">
+        <button class="kanban-dialogbox__close" @onclick="HandleCloseAsync" title="关闭" aria-label="关闭对话框">
             <CgMdiIcon Name="mdiClose" aria-hidden="true" />
         </button>
     </div>
@@ -292,6 +292,12 @@
             KanbanDialogBoxType.Notification => "kanban-dialogbox--notification",
             _ => "kanban-dialogbox--text"
         };
+    }
+
+    private string GetPositionStyle()
+    {
+        var pos = Live2DService.DialogBox.Position;
+        return $"left:{pos.Left}px; bottom:{pos.Bottom}px;";
     }
 
     public void Dispose()
