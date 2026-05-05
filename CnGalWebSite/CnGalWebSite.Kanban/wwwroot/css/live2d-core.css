@@ -6,6 +6,10 @@
     z-index: 4;
 }
 
+.kanban-live2d--hidden {
+    visibility: hidden;
+}
+
     .kanban-live2d .live2d {
     }
 

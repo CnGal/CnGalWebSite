@@ -6,7 +6,7 @@
 @inject IRemoteConfigService _remoteConfigService
 @implements IDisposable
 
-<div class="@($"kanban-live2d {(isReady?"":"d-none")}")" id="kanban-live2d" style="@_settingService.Setting.Kanban.GetStyles()">
+<div class="@($"kanban-live2d {(isReady ? "" : "kanban-live2d--hidden")}")" id="kanban-live2d" style="@_settingService.Setting.Kanban.GetStyles()">
     <CnGalWebSite.Kanban.Components.MainCard />
     <CnGalWebSite.Kanban.Components.Buttons.ButtonGroupCard ChildContent="@ChildContent" />
     <CnGalWebSite.Kanban.Components.Dialogs.DialogBoxCard/>
