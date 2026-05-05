@@ -34,8 +34,10 @@ public class KanbanVisibilityService : IKanbanVisibilityService
 
         try
         {
-            var stored = await _localStorage.GetItemAsync<bool>(StorageKey);
-            _showKanban = stored;
+            if (await _localStorage.ContainKeyAsync(StorageKey))
+            {
+                _showKanban = await _localStorage.GetItemAsync<bool>(StorageKey);
+            }
         }
         catch
         {

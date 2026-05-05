@@ -11,6 +11,7 @@
 @inject IKanbanQueryService KanbanService
 @inject ISpaceQueryService SpaceQueryService
 @inject ICgToastService ToastService
+@inject IKanbanCommodityOwnershipService OwnershipService
 @implements IDisposable
 
 <CgPageMeta Title="看板娘的小卖铺" />
@@ -88,7 +89,7 @@ else if (_commodities is not null)
 
                             case "record":
                                 @* ── G币记录：服务端分页数据表格 ── *@
-                                <CommodityGCoinsRecord OnServerQuery="QueryGCoinsRecordAsync" />
+                                <CommodityGCoinsRecord OnServerQuery="QueryGCoinsRecordAsync" @ref="_gCoinsRecord" />
                                 break;
                         }
 
@@ -118,6 +119,7 @@ else
     private bool _isAuthorized = true;
     private int _gCoins;
     private string? _loadingError;
+    private CommodityGCoinsRecord? _gCoinsRecord;
 
     // ── 当前激活 Tab ──
     private string _activeTab = "shop";
@@ -238,7 +240,8 @@ else
                 }
 
                 ToastService.Show("购买成功", $"商品：{item?.Name ?? commodityId.ToString()}", "success");
-                await RefreshGCoinsAsync();
+                OwnershipService.NotifyOwnershipChanged();
+                await HandleGCoinsChangedAsync();
             }
             else
             {
@@ -263,7 +266,7 @@ else
             if (result.Success)
             {
                 ToastService.Show("兑换成功", "G币已到账", "success");
-                await RefreshGCoinsAsync();
+                await HandleGCoinsChangedAsync();
             }
             else
             {
@@ -305,6 +308,17 @@ else
         }
 
         return new CgDataTableResult<GCoinsRecordOverviewModel>([], 0);
+    }
+
+    private async Task HandleGCoinsChangedAsync()
+    {
+        SpaceQueryService.ClearSpaceDetailCache(string.Empty);
+        await RefreshGCoinsAsync();
+
+        if (_gCoinsRecord is not null)
+        {
+            await _gCoinsRecord.RefreshAsync();
+        }
     }
 
     // ── 释放 ──

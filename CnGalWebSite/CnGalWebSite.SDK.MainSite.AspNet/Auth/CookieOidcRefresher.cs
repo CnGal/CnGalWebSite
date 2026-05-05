@@ -60,7 +60,7 @@ public sealed class CookieOidcRefresher(
         ]);
     }
 
-    public async Task<TokenRefreshResult?> TryRefreshAsync(HttpContext httpContext, string oidcScheme)
+    public async Task<TokenRefreshResult?> TryRefreshAsync(HttpContext httpContext, string oidcScheme, bool forceRefresh = false)
     {
         var accessTokenExpirationText = await httpContext.GetTokenAsync("expires_at");
         if (!DateTimeOffset.TryParse(accessTokenExpirationText, out var accessTokenExpiration))
@@ -71,7 +71,7 @@ public sealed class CookieOidcRefresher(
         var oidcOptions = oidcOptionsMonitor.Get(oidcScheme);
         var now = oidcOptions.TimeProvider!.GetUtcNow();
         var refreshLeadTime = TimeSpan.FromMinutes(Math.Max(1, mainSiteOidcOptions.Value.RefreshLeadTimeMinutes));
-        if (now + refreshLeadTime < accessTokenExpiration)
+        if (forceRefresh is false && now + refreshLeadTime < accessTokenExpiration)
         {
             return null;
         }

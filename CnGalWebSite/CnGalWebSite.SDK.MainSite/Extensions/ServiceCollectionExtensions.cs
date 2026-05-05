@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
         var imageApiBase = new Uri(EnsureTrailingSlash(imageApiBaseAddress));
         var taskApiBase = new Uri(EnsureTrailingSlash(taskApiBaseAddress));
 
+        RegisterSdkHttpClient<IAccountQueryService, AccountQueryService>(services, apiBase);
         RegisterSdkHttpClient<IHomeQueryService, HomeQueryService>(services, apiBase);
         RegisterSdkHttpClient<IEntryQueryService, EntryQueryService>(services, apiBase);
         RegisterSdkHttpClient<ISpaceQueryService, SpaceQueryService>(services, apiBase);

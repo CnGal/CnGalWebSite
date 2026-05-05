@@ -49,7 +49,7 @@ public sealed class AccessTokenHandler : DelegatingHandler
             return response;
         }
 
-        var refreshResult = await _cookieOidcRefresher.TryRefreshAsync(httpContext, oidcScheme);
+        var refreshResult = await _cookieOidcRefresher.TryRefreshAsync(httpContext, oidcScheme, forceRefresh: true);
         if (refreshResult is not null)
         {
             var newExpiresAt = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(refreshResult.Value.ExpiresIn);
@@ -64,10 +64,28 @@ public sealed class AccessTokenHandler : DelegatingHandler
         else
         {
             tokenStore?.Clear();
-            await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await SignOutIfHeadersWritableAsync(httpContext);
         }
 
         return response;
+    }
+
+    private static async Task SignOutIfHeadersWritableAsync(HttpContext httpContext)
+    {
+        if (httpContext.Response.HasStarted)
+        {
+            return;
+        }
+
+        try
+        {
+            await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        }
+        catch (InvalidOperationException) when (httpContext.Response.HasStarted)
+        {
+            // Blazor InteractiveServer can issue SDK requests after the HTTP response has started.
+            // In that phase cookies cannot be changed; the next normal HTTP request will validate auth again.
+        }
     }
 
     private async Task EnsureTokenAsync(

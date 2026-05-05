@@ -1,13 +1,10 @@
 ﻿@inject IJSRuntime JS
-@inject IHttpClientFactory HttpClientFactory
-@inject IConfiguration Configuration
+@inject IAccountQueryService AccountQueryService
 @inject ILogger<CgHumanMachineVerification> Logger
-@using System.Text.Json
-@using CnGalWebSite.DataModel.ViewModel.Accounts
 @using CnGalWebSite.DataModel.ViewModel.Others
-@using Microsoft.Extensions.Configuration
+@using CnGalWebSite.SDK.MainSite.Abstractions
 @using Microsoft.Extensions.Logging
-@implements IDisposable
+@implements IAsyncDisposable
 
 @* 纯代码组件，无可见 UI *@
 
@@ -20,6 +17,9 @@
 
     private bool _isChecked;
     private DotNetObjectReference<CgHumanMachineVerification>? _objRef;
+    private IJSObjectReference? _module;
+
+    private const string ModulePath = "./_content/CnGalWebSite.MainSite.Shared/scripts/cg-geetest.js";
 
     public async Task StartVerification()
     {
@@ -27,20 +27,18 @@
         {
             _isChecked = false;
 
-            var client = HttpClientFactory.CreateClient();
-            var baseUrl = Configuration["MainSiteApi:BaseAddress"];
-            var response = await client.GetStringAsync($"{baseUrl}api/account/GetGeetestCode");
-            var geetestCode = JsonSerializer.Deserialize<GeetestCodeModel>(response);
-
-            if (geetestCode is null || string.IsNullOrWhiteSpace(geetestCode.Gt))
+            var result = await AccountQueryService.GetGeetestCodeAsync();
+            if (!result.Success || result.Data is null)
             {
-                Logger.LogError("Geetest 服务端返回数据无效");
+                Logger.LogError("获取 Geetest 初始化参数失败：{Message}", result.Error?.Message);
                 await OnVerficated.InvokeAsync(new HumanMachineVerificationResult());
                 return;
             }
 
+            var geetestCode = result.Data;
             _objRef = DotNetObjectReference.Create(this);
-            await JS.InvokeVoidAsync("initGeetestBindCAPTCHA", _objRef, geetestCode.Gt, geetestCode.Challenge, geetestCode.Success);
+            _module ??= await JS.InvokeAsync<IJSObjectReference>("import", ModulePath);
+            await _module.InvokeVoidAsync("initGeetestBindCAPTCHA", _objRef, geetestCode.Gt, geetestCode.Challenge, geetestCode.Success);
 
             while (!_isChecked && WaitChecked)
             {
@@ -75,9 +73,13 @@
         _isChecked = true;
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         _objRef?.Dispose();
+        if (_module is not null)
+        {
+            await _module.DisposeAsync();
+        }
         _isChecked = true;
         GC.SuppressFinalize(this);
     }

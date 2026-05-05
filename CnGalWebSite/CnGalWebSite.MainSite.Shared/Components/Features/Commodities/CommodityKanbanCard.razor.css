@@ -27,7 +27,7 @@
     padding: var(--cg-spacing-5);
     display: flex;
     flex-direction: column;
-    gap: var(--cg-spacing-4);
+    gap: var(--cg-spacing-4);    text-align: center;
 }
 
 .commodity-kanban-card__title {
@@ -49,9 +49,6 @@
     align-items: center;
     justify-content: space-between;
     padding: var(--cg-spacing-3) var(--cg-spacing-4);
-    background: color-mix(in oklab, var(--cg-color-amber) 10%, transparent);
-    border-radius: var(--cg-radius-lg);
-    border: 1px solid color-mix(in oklab, var(--cg-color-amber) 30%, transparent);
 }
 
 .commodity-kanban-card__balance-left {
@@ -61,8 +58,8 @@
     color: var(--cg-color-text-primary);
 }
 
-.commodity-kanban-card__gcoin-icon ::deep .cg-mdi-icon {
-    color: var(--cg-color-amber);
+ ::deep .commodity-kanban-card__gcoin-icon{
+    color: var(--cg-color-primary);
     width: 1.5rem;
     height: 1.5rem;
 }
@@ -74,18 +71,16 @@
 .commodity-kanban-card__balance-value {
     font-size: var(--cg-font-size-xl);
     font-weight: var(--cg-font-weight-bold);
-    color: var(--cg-color-amber);
+    color: var(--cg-color-primary);
     font-variant-numeric: tabular-nums;
 }
 
 .commodity-kanban-card__actions {
-    display: flex;
-    flex-direction: column;
+
 }
 
 .commodity-kanban-card__actions ::deep .cg-btn {
-    width: 100%;
-    justify-content: center;
+
 }
 
 .commodity-kanban-card__alert {

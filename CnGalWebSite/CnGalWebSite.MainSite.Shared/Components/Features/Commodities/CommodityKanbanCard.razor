@@ -1,4 +1,4 @@
-@* CommodityKanbanCard — 看板娘小卖铺侧边栏卡片 *@
+﻿@* CommodityKanbanCard — 看板娘小卖铺侧边栏卡片 *@
 
 <div class="commodity-kanban-card">
     @* 看板娘形象图 *@
@@ -28,10 +28,13 @@
         @* 获取G币按钮 *@
         <div class="commodity-kanban-card__actions">
             <CgButton Href="/tasks" Variant="primary">
-                <CgMdiIcon Name="mdiPlusCircleOutline" aria-hidden="true" />
+                <CgMdiIcon Name="mdiClipboardCheckOutline" aria-hidden="true" />
                 获取G币
             </CgButton>
         </div>
+
+    </div>
+</div>
 
         @* 抽奖活动提醒 *@
         @if (Permissions)
@@ -42,9 +45,6 @@
                 </CgAlert>
             </div>
         }
-    </div>
-</div>
-
 @code {
     /// <summary>
     /// 当前用户 G币余额。

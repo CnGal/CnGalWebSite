@@ -8,7 +8,8 @@
                  OnServerQuery="OnServerQuery"
                  DefaultSortField="Time"
                  DefaultSortDesc="true"
-                 DefaultPageSize="10">
+                 DefaultPageSize="10"
+                 @ref="_dataTable">
         <CgDataTableColumn TItem="GCoinsRecordOverviewModel"
                            Title="时间"
                            Field="Time"
@@ -41,6 +42,16 @@
 </div>
 
 @code {
+    private CgDataTable<GCoinsRecordOverviewModel>? _dataTable;
+
     [Parameter, EditorRequired]
     public Func<CgDataTableRequest, Task<CgDataTableResult<GCoinsRecordOverviewModel>>> OnServerQuery { get; set; } = default!;
+
+    public async Task RefreshAsync()
+    {
+        if (_dataTable is not null)
+        {
+            await _dataTable.RefreshAsync();
+        }
+    }
 }

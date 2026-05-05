@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IKanbanLive2DService, KanbanLive2DService>();
         services.AddScoped<IKanbanChatService, KanbanChatService>();
         services.AddScoped<IKanbanVisibilityService, KanbanVisibilityService>();
+        services.AddScoped<IKanbanCommodityOwnershipService, KanbanCommodityOwnershipService>();
         services.AddBlazoredLocalStorage();
         return services;
     }

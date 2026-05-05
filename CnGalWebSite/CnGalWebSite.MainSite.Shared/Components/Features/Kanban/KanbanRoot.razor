@@ -6,6 +6,8 @@
 @inject IKanbanSettingService SettingService
 @inject IKanbanUserDataService UserDataService
 @inject IKanbanEventService EventService
+@inject ICommodityQueryService CommodityService
+@inject IKanbanCommodityOwnershipService OwnershipService
 @inject IJSRuntime JS
 @implements IDisposable
 @rendermode InteractiveServer
@@ -74,6 +76,7 @@
         Live2DService.Live2DInitialized += OnLive2DInitialized;
         Live2DService.CustomEventTriggered += OnCustomEventTriggered;
         EventService.OnDialogTriggered += OnDialogTriggered;
+        OwnershipService.OwnershipChanged += OnOwnershipChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -96,8 +99,8 @@
 
             await UserDataService.LoadAsync();
 
-            await LoadSettingsDataAsync();
             _cts = new CancellationTokenSource();
+            await LoadSettingsDataAsync();
 
             // 启动看板娘事件循环（定时问候、空闲事件、鼠标悬停、导航事件等）
             _eventLoopTask = EventService.StartAsync(_cts.Token);
@@ -115,10 +118,23 @@
             _shoes = await RemoteConfigService.GetShoesAsync();
             _expressions = await RemoteConfigService.GetExpressionsAsync();
             _motionGroups = await RemoteConfigService.GetMotionGroupsAsync();
+            await RefreshOwnedItemsAsync();
         }
         catch
         {
+            _ownedItems = [];
         }
+    }
+
+    private async Task RefreshOwnedItemsAsync()
+    {
+        var commodities = await CommodityService.GetAllCommoditiesAsync(_cts?.Token ?? default);
+        _ownedItems = commodities.Success && commodities.Data is not null
+            ? commodities.Data
+                .Where(item => item.IsOwned && !string.IsNullOrWhiteSpace(item.Value))
+                .Select(item => item.Value)
+                .ToList()
+            : [];
     }
 
     private string GetStyleString()
@@ -185,6 +201,15 @@
         _ = InvokeAsync(StateHasChanged);
     }
 
+    private void OnOwnershipChanged()
+    {
+        _ = InvokeAsync(async () =>
+        {
+            await RefreshOwnedItemsAsync();
+            StateHasChanged();
+        });
+    }
+
     /// <summary>
     /// 用户关闭对话框时清除当前对话框。
     /// </summary>
@@ -202,6 +227,7 @@
         Live2DService.Live2DInitialized -= OnLive2DInitialized;
         Live2DService.CustomEventTriggered -= OnCustomEventTriggered;
         EventService.OnDialogTriggered -= OnDialogTriggered;
+        OwnershipService.OwnershipChanged -= OnOwnershipChanged;
 
         _ = Live2DService.ReleaseLive2D();
         GC.SuppressFinalize(this);

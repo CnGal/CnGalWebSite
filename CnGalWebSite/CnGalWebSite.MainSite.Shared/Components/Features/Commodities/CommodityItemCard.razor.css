@@ -11,10 +11,7 @@
 }
 
 .commodity-item-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--cg-shadow-card-hover);
-    border-color: color-mix(in oklab, var(--cg-color-primary) 30%, var(--cg-color-border));
-}
+   }
 
 
 .commodity-item-card__image-wrapper {
@@ -86,8 +83,8 @@
 .commodity-item-card__price {
     display: flex;
     align-items: center;
-    gap: var(--cg-spacing-1);
-    color: var(--cg-color-amber);
+    gap: var(--cg-spacing-2);
+    color: var(--cg-color-primary);
     font-weight: var(--cg-font-weight-bold);
 }
 
@@ -103,4 +100,11 @@
 .commodity-item-card__price-label {
     font-size: var(--cg-font-size-xs);
     font-weight: var(--cg-font-weight-medium);
+}
+
+.commodity-item-card__action{
+    display: flex;
+    color: var(--cg-color-primary);
+    gap: .5rem;
+    align-items: center;
 }

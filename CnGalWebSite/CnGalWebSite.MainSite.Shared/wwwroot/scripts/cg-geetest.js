@@ -1,10 +1,10 @@
 /**
  * CnGal Geetest — 人机验证脚本
  * 
- * 内嵌 Geetest SDK v0.4.8 并提供 initGeetestBindCAPTCHA 全局函数，
+ * 内嵌 Geetest SDK v0.4.8 并导出 initGeetestBindCAPTCHA，
  * 用于 Blazor 组件从 .NET 端调用 Geetest 极验验证。
  * 
- * 用法：从 Blazor 调用 JS.InvokeVoidAsync("initGeetestBindCAPTCHA", objRef, gt, challenge, success)
+ * 用法：从 Blazor import 本模块后调用 module.InvokeVoidAsync("initGeetestBindCAPTCHA", objRef, gt, challenge, success)
  * 成功时回调 dotNetObject.invokeMethodAsync('OnChecked', challenge, validate, seccode)
  * 取消/失败时回调 dotNetObject.invokeMethodAsync('OnCancel')
  */
@@ -371,8 +371,8 @@ window.initGeetest = function (userConfig, callback) {
  * @param {string} challenge    - Geetest Challenge 参数
  * @param {number|boolean} success - 服务端验证成功标志
  */
-function initGeetestBindCAPTCHA(objRef, gt, challenge, success) {
-    initGeetest({
+export function initGeetestBindCAPTCHA(objRef, gt, challenge, success) {
+    window.initGeetest({
         gt: gt,
         challenge: challenge,
         offline: !success,

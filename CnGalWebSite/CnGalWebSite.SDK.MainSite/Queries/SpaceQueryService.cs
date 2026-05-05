@@ -26,7 +26,7 @@ public sealed class SpaceQueryService(
 
     public async Task<SdkResult<SpaceDetailViewModel>> GetSpaceDetailAsync(string id, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"main-site:space-detail:{id}";
+        var cacheKey = GetSpaceDetailCacheKey(id);
         if (memoryCache.TryGetValue(cacheKey, out SpaceDetailViewModel? cached) && cached is not null)
         {
             return SdkResult<SpaceDetailViewModel>.Ok(cached);
@@ -47,6 +47,11 @@ public sealed class SpaceQueryService(
         }
 
         return result;
+    }
+
+    public void ClearSpaceDetailCache(string id)
+    {
+        memoryCache.Remove(GetSpaceDetailCacheKey(id));
     }
 
     public async Task<SdkResult<MessageListViewModel>> GetUserMessagesAsync(CancellationToken cancellationToken = default)
@@ -138,6 +143,11 @@ public sealed class SpaceQueryService(
             IsShowFavorites = space.IsShowFavorites,
             IsShowGameRecord = space.IsShowGameRecord
         };
+    }
+
+    private static string GetSpaceDetailCacheKey(string id)
+    {
+        return $"main-site:space-detail:{id}";
     }
 
     private static MessageItemViewModel MapToMessageViewModel(Message m) => new()
