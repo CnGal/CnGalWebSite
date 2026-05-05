@@ -62,17 +62,23 @@
         <span class="floating-action-toolbar__label">顶部</span>
     </button>
 
-    <button class="floating-action-toolbar__button"
-            type="button"
-            aria-label="切换为看板娘"
-            title="切换为看板娘"
-            @onclick="HandleSwitchToKanban">
-        <CgMdiIcon Name="mdiSwapHorizontal" aria-hidden="true" />
-        <span class="floating-action-toolbar__label">看板</span>
-    </button>
+    @if (ShowKanbanSwitch)
+    {
+        <button class="floating-action-toolbar__button"
+                type="button"
+                aria-label="切换为看板娘"
+                title="切换为看板娘"
+                @onclick="HandleSwitchToKanban">
+            <CgMdiIcon Name="mdiSwapHorizontal" aria-hidden="true" />
+            <span class="floating-action-toolbar__label">看板</span>
+        </button>
+    }
 </nav>
 
 @code {
+    [Parameter]
+    public bool ShowKanbanSwitch { get; set; } = true;
+
     private string CurrentReturnUrl => new Uri(NavigationManager.Uri).PathAndQuery;
 
     private async Task HandleSwitchToKanban()

@@ -255,13 +255,15 @@
     </footer>
 </div>
 
-<KanbanToggleContainer />
-
 <AuthorizeView>
     <Authorized>
+        <KanbanToggleContainer />
         <CgToast @rendermode="InteractiveServer" />
         <CnGalWebSite.MainSite.Shared.Components.Layout.UserSessionTracker @rendermode="InteractiveServer" />
     </Authorized>
+    <NotAuthorized>
+        <FloatingActionToolbar ShowKanbanSwitch="false" />
+    </NotAuthorized>
 </AuthorizeView>
 
 @* 以下错误/重连 UI 豁免 CgMdiIcon 规范：circuit 断开时 Blazor 组件无法渲染，必须使用原生 SVG *@
