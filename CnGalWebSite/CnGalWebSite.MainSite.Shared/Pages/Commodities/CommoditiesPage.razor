@@ -40,6 +40,12 @@ else if (!_isAuthorized)
 else if (_commodities is not null)
 {
     <article class="commodities-page">
+        @* ── 页面英雄标题区 ── *@
+        <header class="commodities-page__hero">
+            <h1 class="commodities-page__hero-title">看板娘的小卖铺</h1>
+            <p class="commodities-page__hero-subtitle">欢迎光临！使用 G币 解锁看板娘的新衣服、新表情和更多有趣内容</p>
+        </header>
+
         @* ── 两栏布局：左侧看板娘卡片 + 右侧 Tab 区域 ── *@
         <div class="commodities-page__grid">
             @* 左侧：看板娘卡片 *@

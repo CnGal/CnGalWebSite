@@ -6,12 +6,25 @@
     overflow: hidden;
     box-shadow: var(--cg-shadow-sm);
     border: 1px solid var(--cg-color-border);
-    transition: box-shadow var(--cg-transition-fast), transform var(--cg-transition-fast);
+    transition: box-shadow var(--cg-transition-fast), transform var(--cg-transition-fast), border-color var(--cg-transition-fast);
+    position: relative;
 }
 
 .commodity-item-card:hover {
     box-shadow: var(--cg-shadow-card-hover);
     transform: translateY(-4px);
+    border-color: color-mix(in oklab, var(--cg-color-primary) 25%, transparent);
+}
+
+/* ── 已解锁状态 ── */
+.commodity-item-card--owned {
+    border-color: color-mix(in oklab, var(--cg-color-success) 30%, transparent);
+    background: color-mix(in oklab, var(--cg-color-success) 3%, var(--cg-color-surface));
+}
+
+.commodity-item-card--owned:hover {
+    border-color: color-mix(in oklab, var(--cg-color-success) 45%, transparent);
+    box-shadow: 0 4px 20px -8px color-mix(in oklab, var(--cg-color-success) 30%, transparent);
 }
 
 /* ── 图片 ── */
@@ -58,7 +71,7 @@
 
 /* ── 名称 ── */
 .commodity-item-card__name {
-    font-size: var(--cg-font-size-base);
+    font-size: var(--cg-font-size-md);
     font-weight: var(--cg-font-weight-semibold);
     color: var(--cg-color-text);
     margin: 0;
@@ -92,6 +105,7 @@
     gap: var(--cg-spacing-3);
     border-top: 1px solid var(--cg-color-border);
     padding-top: var(--cg-spacing-3);
+    margin-top: auto;
 }
 
 /* ── 价格 ── */
@@ -99,6 +113,9 @@
     display: flex;
     align-items: center;
     gap: var(--cg-spacing-1);
+    padding: var(--cg-spacing-1) var(--cg-spacing-3) var(--cg-spacing-1) var(--cg-spacing-2);
+    background: color-mix(in oklab, var(--cg-color-amber) 8%, transparent);
+    border-radius: var(--cg-radius-full);
 }
 
 .commodity-item-card__gcoin-icon {
@@ -107,19 +124,21 @@
 }
 
 ::deep .commodity-item-card__gcoin-icon.cg-mdi-icon {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
 }
 
 .commodity-item-card__price-value {
     font-size: var(--cg-font-size-lg);
     font-weight: var(--cg-font-weight-bold);
     color: var(--cg-color-amber);
+    line-height: 1;
 }
 
 .commodity-item-card__price-label {
     font-size: var(--cg-font-size-xs);
     color: var(--cg-color-text-muted);
+    font-weight: var(--cg-font-weight-medium);
 }
 
 /* ── 操作按钮 ── */
@@ -128,9 +147,14 @@
 }
 
 ::deep .commodity-item-card__action .cg-btn {
-    border-radius: var(--cg-radius-md);
+    border-radius: var(--cg-radius-full);
     min-height: 36px;
-    padding: 0 var(--cg-spacing-4);
+    padding: 0 var(--cg-spacing-5);
     font-size: var(--cg-font-size-sm);
     font-weight: var(--cg-font-weight-semibold);
+    transition: transform var(--cg-transition-fast);
+}
+
+::deep .commodity-item-card__action .cg-btn:hover:not(:disabled) {
+    transform: scale(1.04);
 }

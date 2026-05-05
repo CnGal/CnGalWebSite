@@ -1,14 +1,19 @@
 .commodity-code-redeem {
     display: flex;
     flex-direction: column;
-    gap: var(--cg-spacing-5);
+    gap: var(--cg-spacing-6);
 }
 
-/* ── 兑换表单 ── */
+/* ── 兑换表单卡片 ── */
 .commodity-code-redeem__form {
     display: flex;
     flex-direction: column;
     gap: var(--cg-spacing-4);
+    padding: var(--cg-spacing-5);
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    border: 1px solid var(--cg-color-border);
+    box-shadow: var(--cg-shadow-sm);
 }
 
 /* ── 输入组：文本框 + 按钮 ── */
@@ -32,10 +37,15 @@
 
 /* ── 按钮 ── */
 ::deep .commodity-code-redeem__input-group .cg-btn {
-    border-radius: var(--cg-radius-md);
+    border-radius: var(--cg-radius-lg);
     min-height: 44px;
     font-weight: var(--cg-font-weight-semibold);
     white-space: nowrap;
+    transition: transform var(--cg-transition-fast);
+}
+
+::deep .commodity-code-redeem__input-group .cg-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
 }
 
 @media (min-width: 640px) {
@@ -44,11 +54,16 @@
     }
 }
 
-/* ── B站工房推广 ── */
+/* ── B站工房推广卡片 ── */
 .commodity-code-redeem__promo {
     display: flex;
     flex-direction: column;
     gap: var(--cg-spacing-3);
+    padding: var(--cg-spacing-4);
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    border: 1px solid var(--cg-color-border);
+    box-shadow: var(--cg-shadow-sm);
 }
 
 .commodity-code-redeem__promo-header {
@@ -56,24 +71,27 @@
     align-items: center;
     gap: var(--cg-spacing-2);
     font-size: var(--cg-font-size-sm);
-    color: var(--cg-color-text-muted);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
 }
 
 ::deep .commodity-code-redeem__promo-header .cg-mdi-icon {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     color: var(--cg-color-brand-bilibili);
 }
 
 .commodity-code-redeem__promo-link {
     display: block;
-    border-radius: var(--cg-radius-lg);
+    border-radius: var(--cg-radius-md);
     overflow: hidden;
-    transition: box-shadow var(--cg-transition-fast);
+    transition: box-shadow var(--cg-transition-fast), transform var(--cg-transition-fast);
+    border: 1px solid var(--cg-color-border);
 }
 
 .commodity-code-redeem__promo-link:hover {
     box-shadow: var(--cg-shadow-md);
+    transform: translateY(-2px);
 }
 
 .commodity-code-redeem__promo-image {

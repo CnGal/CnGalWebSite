@@ -4,7 +4,7 @@
 
 @* CommodityItemCard — 小卖铺商品卡片 *@
 
-<div class="commodity-item-card">
+<div class="commodity-item-card @(Model.IsOwned ? "commodity-item-card--owned" : "")">
     @* 商品图片 *@
     <div class="commodity-item-card__image-wrapper">
         <img src="@Model.Image"
