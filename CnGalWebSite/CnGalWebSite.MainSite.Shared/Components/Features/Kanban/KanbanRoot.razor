@@ -5,6 +5,7 @@
 @inject IKanbanRemoteConfigService RemoteConfigService
 @inject IKanbanSettingService SettingService
 @inject IKanbanUserDataService UserDataService
+@inject IKanbanEventService EventService
 @inject IJSRuntime JS
 @implements IDisposable
 @rendermode InteractiveServer
@@ -47,12 +48,13 @@
             <KanbanToolboxPanel />
         </ToolboxContent>
     </KanbanButtonGroup>
-    <KanbanDialogBox />
+    <KanbanDialogBox Model="_currentDialog" OnClose="HandleDialogClose" />
 </div>
 
 @code {
     private bool _isReady;
     private CancellationTokenSource? _cts;
+    private Task? _eventLoopTask;
 
     private List<KanbanClothesModel>? _clothes;
     private List<KanbanStockingsModel>? _stockings;
@@ -61,10 +63,16 @@
     private List<KanbanMotionGroupModel>? _motionGroups;
     private List<string>? _ownedItems;
 
+    /// <summary>
+    /// 事件服务触发的当前对话框模型，传入 KanbanDialogBox 显示。
+    /// </summary>
+    private KanbanDialogBoxModel? _currentDialog;
+
     protected override void OnInitialized()
     {
         Live2DService.Live2DInitialized += OnLive2DInitialized;
         Live2DService.CustomEventTriggered += OnCustomEventTriggered;
+        EventService.OnDialogTriggered += OnDialogTriggered;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -83,6 +91,10 @@
 
             await LoadSettingsDataAsync();
             _cts = new CancellationTokenSource();
+
+            // 启动看板娘事件循环（定时问候、空闲事件、鼠标悬停、导航事件等）
+            _eventLoopTask = EventService.StartAsync(_cts.Token);
+
             StateHasChanged();
         }
     }
@@ -142,8 +154,37 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    private void OnCustomEventTriggered(string eventName)
+    /// <summary>
+    /// 将 Live2D JS 层的自定义事件（摸头、触碰身体等）转发给事件服务处理。
+    /// </summary>
+    private async void OnCustomEventTriggered(string eventName)
     {
+        try
+        {
+            await EventService.TriggerCustomEventAsync(eventName);
+        }
+        catch
+        {
+            // 静默处理，避免阻塞 Live2D 交互
+        }
+    }
+
+    /// <summary>
+    /// 事件服务弹出对话框时触发，将 Model 传给 KanbanDialogBox 显示。
+    /// </summary>
+    private void OnDialogTriggered(KanbanDialogBoxModel model)
+    {
+        _currentDialog = model;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
+    /// 用户关闭对话框时清除当前对话框。
+    /// </summary>
+    private async Task HandleDialogClose()
+    {
+        _currentDialog = null;
+        await InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
@@ -153,6 +194,7 @@
 
         Live2DService.Live2DInitialized -= OnLive2DInitialized;
         Live2DService.CustomEventTriggered -= OnCustomEventTriggered;
+        EventService.OnDialogTriggered -= OnDialogTriggered;
 
         _ = Live2DService.ReleaseLive2D();
         GC.SuppressFinalize(this);

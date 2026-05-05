@@ -107,7 +107,14 @@ public sealed class KanbanEventService : IKanbanEventService, IAsyncDisposable
         _objRef?.Dispose();
         if (_module is not null)
         {
-            await _module.DisposeAsync();
+            try
+            {
+                await _module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // JS 运行时已随 circuit 断开，无需远程清理
+            }
         }
 
         GC.SuppressFinalize(this);

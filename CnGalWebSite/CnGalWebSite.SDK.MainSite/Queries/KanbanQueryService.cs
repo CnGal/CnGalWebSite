@@ -12,6 +12,7 @@ public sealed class KanbanQueryService(
     ILogger<KanbanQueryService> logger) : QueryServiceBase(httpClient), IKanbanQueryService
 {
     private const string ChatPath = "api/robot/GetKanbanReply/";
+    private const string PermissionsPath = "api/space/GetKanbanPermissions/";
 
     protected override ILogger Logger => logger;
 
@@ -48,5 +49,14 @@ public sealed class KanbanQueryService(
             Logger.LogError(ex, "获取看板娘聊天回复异常。Path={Path}; BaseAddress={BaseAddress}", ChatPath, HttpClient.BaseAddress);
             return SdkResult<KanbanChatReply>.Fail("KANBAN_CHAT_EXCEPTION", "请求聊天回复时发生异常");
         }
+    }
+
+    public async Task<SdkResult<KanbanPermissionsReply>> GetPermissionsAsync(CancellationToken cancellationToken = default)
+    {
+        return await GetAsync<KanbanPermissionsReply>(
+            PermissionsPath,
+            "KANBAN_PERMISSIONS",
+            "看板娘权限",
+            cancellationToken);
     }
 }
