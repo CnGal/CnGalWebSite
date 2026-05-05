@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using Microsoft.JSInterop;
 using System;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ public class KanbanVisibilityService : IKanbanVisibilityService
     private const string StorageKey = "kanban_live2d_show_kanban";
 
     private readonly ILocalStorageService _localStorage;
+    private readonly IJSRuntime _jsRuntime;
     private bool _showKanban = true; // 默认显示看板娘
     private bool _loaded;
 
@@ -20,9 +22,10 @@ public class KanbanVisibilityService : IKanbanVisibilityService
 
     public bool ShowKanban => _showKanban;
 
-    public KanbanVisibilityService(ILocalStorageService localStorage)
+    public KanbanVisibilityService(ILocalStorageService localStorage, IJSRuntime jsRuntime)
     {
         _localStorage = localStorage;
+        _jsRuntime = jsRuntime;
     }
 
     public async Task LoadAsync()
@@ -37,6 +40,10 @@ public class KanbanVisibilityService : IKanbanVisibilityService
             if (await _localStorage.ContainKeyAsync(StorageKey))
             {
                 _showKanban = await _localStorage.GetItemAsync<bool>(StorageKey);
+            }
+            else if (await IsMobileViewportAsync())
+            {
+                _showKanban = false;
             }
         }
         catch
@@ -72,5 +79,11 @@ public class KanbanVisibilityService : IKanbanVisibilityService
         }
 
         OnVisibilityChanged?.Invoke();
+    }
+
+    private async Task<bool> IsMobileViewportAsync()
+    {
+        var width = await _jsRuntime.InvokeAsync<int>("eval", "document.documentElement.clientWidth || window.innerWidth");
+        return width < 768;
     }
 }

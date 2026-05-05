@@ -4,8 +4,19 @@ namespace CnGalWebSite.MainSite.Shared.Services.KanbanModels
 {
     public class KanbanSettingModel
     {
+        public const int DefaultWidth = 341;
+        public const int DefaultHeight = 617;
+        public const double MobileDefaultScale = 0.5;
+        public const int MinSize = 150;
+
         public Position Position { get; set; } = new() { Left = 1444, Top = 648 };
-        public Size Size { get; set; } = new() { Height = 617, Width = 341 };
+        public Size Size { get; set; } = new() { Height = DefaultHeight, Width = DefaultWidth };
+
+        public void ApplyMobileDefaults()
+        {
+            Size.Width = System.Math.Max(MinSize, (int)System.Math.Round(DefaultWidth * MobileDefaultScale));
+            Size.Height = System.Math.Max(MinSize, (int)System.Math.Round(DefaultHeight * MobileDefaultScale));
+        }
     }
 
     public class ButtonSettingModel

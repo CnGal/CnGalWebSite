@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using CnGalWebSite.MainSite.Shared.Services.KanbanModels;
@@ -76,28 +76,40 @@ public class KanbanSettingService : IKanbanSettingService
         return $"position:fixed;left:{_kanban.Position.Left}px;top:{_kanban.Position.Top}px;";
     }
 
-    private Task ResetToDefaultsAsync()
+    private async Task ResetToDefaultsAsync()
     {
         _kanban = new KanbanSettingModel();
         _button = new ButtonSettingModel();
         _dialogBox = new DialogBoxSettingModel();
         _chat = new ChatCardSettingModel();
 
-        return Task.CompletedTask;
+        try
+        {
+            var size = await GetWindowSizeAsync();
+            if (size.Width < 768)
+            {
+                _kanban.ApplyMobileDefaults();
+            }
+        }
+        catch
+        {
+            // SSR or JS not available — use desktop defaults
+        }
     }
 
     private async Task ClampPositionsAsync()
     {
         try
         {
-            var size = await _jsRuntime.InvokeAsync<WindowSize>("getWindowSize");
+            var size = await GetWindowSizeAsync();
 
-            // Kanban 尺寸：最小 150px，最大为屏幕宽高的 80%
-            var maxSize = (int)(Math.Min(size.Width, size.Height) * 0.8);
+            // Kanban 尺寸：最小 150px，宽高分别最大为对应屏幕方向的 90%
+            var maxWidth = (int)(size.Width * 0.9);
+            var maxHeight = (int)(size.Height * 0.9);
             if (_kanban.Size.Width < 150) _kanban.Size.Width = 150;
             if (_kanban.Size.Height < 150) _kanban.Size.Height = 150;
-            if (_kanban.Size.Width > maxSize) _kanban.Size.Width = maxSize;
-            if (_kanban.Size.Height > maxSize) _kanban.Size.Height = maxSize;
+            if (_kanban.Size.Width > maxWidth) _kanban.Size.Width = maxWidth;
+            if (_kanban.Size.Height > maxHeight) _kanban.Size.Height = maxHeight;
 
             // 看板娘主体必须完整位于屏幕内，任意边被遮挡都推回可视区域。
             var kanbanWidth = _kanban.Size.Width;
@@ -129,6 +141,11 @@ public class KanbanSettingService : IKanbanSettingService
             setter(min);
         else if (value > max)
             setter(max);
+    }
+
+    private async Task<WindowSize> GetWindowSizeAsync()
+    {
+        return await _jsRuntime.InvokeAsync<WindowSize>("eval", "({ height: window.innerHeight, width: document.documentElement.clientWidth || window.innerWidth })");
     }
 
     private sealed class SettingStorageModel

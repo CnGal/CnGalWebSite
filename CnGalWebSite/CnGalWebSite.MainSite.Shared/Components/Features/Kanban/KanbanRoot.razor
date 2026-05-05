@@ -56,6 +56,8 @@
 @code {
     private bool _isReady;
     private bool _settingsLoaded;
+    private bool _live2DInitializationPending;
+    private bool _live2DInitializationStarted;
     private CancellationTokenSource? _cts;
     private Task? _eventLoopTask;
 
@@ -92,14 +94,22 @@
             Live2DService.DialogBox.Position.Left = SettingService.DialogBox.Position.Left;
             Live2DService.DialogBox.Position.Bottom = SettingService.DialogBox.Position.Bottom;
 
-            _settingsLoaded = true;
-            StateHasChanged();
+            await UserDataService.LoadAsync();
+            _cts = new CancellationTokenSource();
 
+            _settingsLoaded = true;
+            _live2DInitializationPending = true;
+            StateHasChanged();
+            return;
+        }
+
+        if (_live2DInitializationPending && !_live2DInitializationStarted)
+        {
+            // 等设置渲染到 DOM 后再初始化 Live2D，避免引擎读取到尚未创建或尺寸未更新的 canvas。
+            _live2DInitializationPending = false;
+            _live2DInitializationStarted = true;
             await Live2DService.InitAsync("cngal形象", 0);
 
-            await UserDataService.LoadAsync();
-
-            _cts = new CancellationTokenSource();
             await LoadSettingsDataAsync();
 
             // 启动看板娘事件循环（定时问候、空闲事件、鼠标悬停、导航事件等）
