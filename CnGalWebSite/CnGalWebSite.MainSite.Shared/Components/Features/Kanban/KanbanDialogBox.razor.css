@@ -10,12 +10,11 @@
     z-index: calc(var(--cg-kanban-z-index, 100) + 1);
     user-select: none;
     pointer-events: auto;
-    /* 拖动提示：整个对话框可拖拽 */
     cursor: grab;
     animation: cg-dialogbox-fade-in var(--cg-transition-normal) ease-out;
 }
 
-.kanban-dialogbox:active {
+.kanban-dialogbox--dragging {
     cursor: grabbing;
 }
 

@@ -1,6 +1,27 @@
 /* ── KanbanRoot — fixed-position Live2D root container ── */
 
 .kanban-live2d {
+    /* ── 看板娘尺寸 ── */
+    --cg-kanban-size: 300px;
+    --cg-kanban-min-size: 150px;
+    --cg-kanban-z-index: 100;
+
+    /* ── 浮动按钮 ── */
+    --cg-kanban-button-size: 3rem;
+
+    /* ── 对话框 ── */
+    --cg-kanban-dialog-max-width: 400px;
+
+    /* ── 聊天框 ── */
+    --cg-kanban-chat-max-height: 500px;
+    --cg-kanban-chat-max-width: 350px;
+
+    /* ── Resize 把手 ── */
+    --cg-kanban-resize-handle-size: 20px;
+
+    /* ── 过渡 ── */
+    --cg-kanban-transition: var(--cg-transition-normal);
+
     position: fixed;
     z-index: var(--cg-kanban-z-index);
     user-select: none;

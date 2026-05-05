@@ -523,7 +523,7 @@
     border-top: 1px solid var(--cg-color-border);
     margin-top: 2rem;
     padding-top: 2.5rem;
-    padding-bottom: 2rem;    
+    padding-bottom: 2rem;   z-index: 1;
 }
 
 @media (min-width: 768px) {

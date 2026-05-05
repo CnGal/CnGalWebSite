@@ -41,6 +41,20 @@ function getKanbanMaxSize() {
     return Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.8);
 }
 
+/**
+ * 按设备像素比设置 canvas 缓冲区尺寸（保持 CSS 显示尺寸不变）
+ * @param {HTMLCanvasElement} canvas
+ * @param {number} cssWidth - CSS 像素宽度
+ * @param {number} cssHeight - CSS 像素高度
+ */
+function setCanvasDprSize(canvas, cssWidth, cssHeight) {
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(cssWidth * dpr);
+    canvas.height = Math.floor(cssHeight * dpr);
+    canvas.style.width = cssWidth + 'px';
+    canvas.style.height = cssHeight + 'px';
+}
+
 // ---------------------------------------------------------------------------
 // CDN 加载工具
 //  注：每次调用都移除旧脚本并重新加载，确保 bundle.js 的全局状态（WebGL context 等）
@@ -691,14 +705,13 @@ export function initButtonGroupMoveAction(dotNetRef) {
 }
 
 /**
- * 初始化对话框拖拽
+ * 初始化对话框拖拽（事件委托模式，绑定在 #kanban-live2d 上，动态检测 #kanban-dialogbox）
  * @param {object} dotNetRef - .NET 互操作引用
  */
 export function initDialogBoxMoveAction(dotNetRef) {
     console.log('cg-kanban: initDialogBoxMoveAction called');
     var live2dItem = document.getElementById('kanban-live2d');
-    var groupItem = document.getElementById('kanban-dialogbox');
-    if (!live2dItem || !groupItem) return;
+    if (!live2dItem) return;
 
     var move = false;
     var deltaLeft = 0, deltaTop = 0;
@@ -708,6 +721,11 @@ export function initDialogBoxMoveAction(dotNetRef) {
     var time;
 
     var mousedown_fun = function (event) {
+        // 动态查找对话框元素（可能因 Blazor 重渲染而变化）
+        var dialogItem = document.getElementById('kanban-dialogbox');
+        // 排除关闭按钮上的点击
+        if (!dialogItem || !dialogItem.contains(event.target) || event.target.closest('.kanban-dialogbox__close')) return;
+
         var touch;
         if (event.touches) {
             touch = event.touches[0];
@@ -723,18 +741,21 @@ export function initDialogBoxMoveAction(dotNetRef) {
                 clearInterval(time);
                 deltaLeft = touch.clientX - touch.target.offsetLeft;
                 deltaTop = touch.clientY - touch.target.offsetTop;
+                var currentDialog = document.getElementById('kanban-dialogbox');
+                if (!currentDialog) return;
                 var rect_w = live2dItem.getBoundingClientRect();
-                var rect_n = groupItem.getBoundingClientRect();
+                var rect_n = currentDialog.getBoundingClientRect();
                 x_org = rect_w.x - rect_n.x;
                 y_org = rect_w.y - rect_n.y;
                 move = true;
+                currentDialog.classList.add('kanban-dialogbox--dragging');
                 document.body.classList.add('user-select-none');
             }
         }, 10);
     };
 
-    addTrackedListener(groupItem, 'mousedown', mousedown_fun);
-    addTrackedListener(groupItem, 'touchstart', mousedown_fun, { passive: false });
+    addTrackedListener(live2dItem, 'mousedown', mousedown_fun);
+    addTrackedListener(live2dItem, 'touchstart', mousedown_fun, { passive: false });
 
     var mousemove_fun = function (event) {
         if (move) {
@@ -749,7 +770,10 @@ export function initDialogBoxMoveAction(dotNetRef) {
             var cy = touch.clientY;
             dx = cx - deltaLeft - x_org;
             dy = cy - deltaTop - y_org;
-            groupItem.setAttribute('style', 'left:' + dx + 'px; top:' + dy + 'px;');
+            var currentDialog = document.getElementById('kanban-dialogbox');
+            if (currentDialog) {
+                currentDialog.setAttribute('style', 'left:' + dx + 'px; top:' + dy + 'px;');
+            }
         } else {
             clearInterval(time);
         }
@@ -762,9 +786,13 @@ export function initDialogBoxMoveAction(dotNetRef) {
         _dialogboxMousedown = false;
         if (move) {
             move = false;
-            var rect_w = live2dItem.getBoundingClientRect();
-            var rect_n = groupItem.getBoundingClientRect();
-            dotNetRef.invokeMethodAsync('SetDialogBoxPosition', dx, rect_w.height - dy - rect_n.height);
+            var currentDialog = document.getElementById('kanban-dialogbox');
+            if (currentDialog) {
+                currentDialog.classList.remove('kanban-dialogbox--dragging');
+                var rect_w = live2dItem.getBoundingClientRect();
+                var rect_n = currentDialog.getBoundingClientRect();
+                dotNetRef.invokeMethodAsync('SetDialogBoxPosition', dx, rect_w.height - dy - rect_n.height);
+            }
             document.body.classList.remove('user-select-none');
         } else {
             clearInterval(time);

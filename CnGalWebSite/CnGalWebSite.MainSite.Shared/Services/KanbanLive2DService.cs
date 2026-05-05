@@ -263,6 +263,10 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
     {
         DialogBox.Position.Left = left;
         DialogBox.Position.Bottom = bottom;
+
+        _settingService.DialogBox.Position.Left = left;
+        _settingService.DialogBox.Position.Bottom = bottom;
+        _ = _settingService.SaveAsync();
     }
 
     [JSInvokable]
