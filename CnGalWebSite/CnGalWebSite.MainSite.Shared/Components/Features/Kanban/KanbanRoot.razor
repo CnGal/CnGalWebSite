@@ -5,7 +5,6 @@
 @inject IKanbanRemoteConfigService RemoteConfigService
 @inject IKanbanSettingService SettingService
 @inject IKanbanUserDataService UserDataService
-@inject IKanbanVisibilityService KanbanVisibilityService
 @inject IJSRuntime JS
 @implements IDisposable
 @rendermode InteractiveServer
@@ -13,8 +12,7 @@
 <div id="kanban-live2d" class="kanban-live2d" style="@GetStyleString()">
     <KanbanMainCard />
 
-    <KanbanButtonGroup OnBackToTop="HandleBackToTop"
-                       OnQuit="HandleQuit">
+    <KanbanButtonGroup OnBackToTop="HandleBackToTop">
         <ChatContent>
             <KanbanChatCard />
         </ChatContent>
@@ -94,11 +92,6 @@
         catch
         {
         }
-    }
-
-    private async Task HandleQuit()
-    {
-        await KanbanVisibilityService.SetShowKanbanAsync(false);
     }
 
     private async void OnLive2DInitialized()

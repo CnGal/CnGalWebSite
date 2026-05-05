@@ -1,4 +1,3 @@
-@implements IDisposable
 @using CnGalWebSite.MainSite.Shared.Services
 @inject IKanbanVisibilityService KanbanVisibilityService
 
@@ -32,10 +31,6 @@
     <button class="kanban-action-btn" type="button" title="切换为浮动按钮" aria-label="切换为浮动按钮" @onclick="HandleSwitchToToolbar">
         <CgMdiIcon Name="mdiSwapHorizontal" aria-hidden="true" />
     </button>
-
-    <button class="kanban-action-btn kanban-action-btn--danger" type="button" title="退出 (双击确认)" aria-label="退出" @onclick="HandleQuitClick">
-        <CgMdiIcon Name="mdiClose" aria-hidden="true" />
-    </button>
 </div>
 
 @code {
@@ -48,56 +43,8 @@
     [Parameter]
     public EventCallback OnBackToTop { get; set; }
 
-    [Parameter]
-    public EventCallback OnQuit { get; set; }
-
-    private int _quitClickCount;
-    private System.Timers.Timer? _quitTimer;
-
-    private void HandleQuitClick()
-    {
-        _quitClickCount++;
-
-        if (_quitClickCount == 1)
-        {
-            StartQuitTimer();
-        }
-        else
-        {
-            ResetQuitState();
-            OnQuit.InvokeAsync();
-        }
-    }
-
-    private void StartQuitTimer()
-    {
-        _quitTimer?.Dispose();
-        _quitTimer = new System.Timers.Timer(5000);
-        _quitTimer.Elapsed += OnQuitTimerElapsed;
-        _quitTimer.AutoReset = false;
-        _quitTimer.Start();
-    }
-
-    private void OnQuitTimerElapsed(object? sender, System.Timers.ElapsedEventArgs e)
-    {
-        _ = InvokeAsync(ResetQuitState);
-    }
-
-    private void ResetQuitState()
-    {
-        _quitClickCount = 0;
-        _quitTimer?.Dispose();
-        _quitTimer = null;
-    }
-
     private async Task HandleSwitchToToolbar()
     {
         await KanbanVisibilityService.SetShowKanbanAsync(false);
-    }
-
-    public void Dispose()
-    {
-        _quitTimer?.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

@@ -2,6 +2,8 @@
 
 .kanban-button-group {
     position: absolute;
+    left: calc(100% + var(--cg-spacing-2));
+    top: 0;
     display: flex;
     flex-direction: column;
     gap: var(--cg-spacing-2);
@@ -63,35 +65,17 @@
     transform: scale(1.06);
 }
 
-/* ── Danger variant (quit button) ── */
-
-.kanban-action-btn--danger ::deep .cg-mdi-icon {
-    color: var(--cg-color-text-muted);
-}
-
-.kanban-action-btn--danger:hover,
-.kanban-action-btn--danger:focus-visible {
-    border-color: color-mix(in oklab, var(--cg-color-error) 55%, var(--cg-color-border));
-    background: color-mix(in oklab, var(--cg-color-error) 10%, var(--cg-color-surface));
-}
-
-.kanban-action-btn--danger:hover ::deep .cg-mdi-icon,
-.kanban-action-btn--danger:focus-visible ::deep .cg-mdi-icon {
-    color: var(--cg-color-error);
-    transform: scale(1.06);
-}
-
 /* ── CgPopupMenu panel positioning override ── */
 
 .kanban-button-group ::deep .cg-popup-menu-panel {
     top: 0;
-    right: calc(100% + var(--cg-spacing-2));
-    left: auto;
+    left: calc(100% + var(--cg-spacing-2));
+    right: auto;
     min-width: 280px;
     max-width: min(320px, calc(100vw - 5rem));
     max-height: 60vh;
     overflow-y: auto;
-    transform-origin: right top;
+    transform-origin: left top;
 }
 
 .kanban-button-group ::deep .cg-popup-menu-panel::-webkit-scrollbar {
