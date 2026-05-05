@@ -92,9 +92,9 @@
     {
         try
         {
-            // 获取浮动工具栏的屏幕坐标，计算看板娘应放置的位置（使其按钮组与工具栏重合）
+            // 计算看板娘位置，使按钮组底部与工具栏底部对齐（切换前后按钮位置不变）
             var pos = await JS.InvokeAsync<KanbanAlignmentResult>("eval",
-                "(function(){var t=document.querySelector('.floating-action-toolbar');if(!t)return null;var r=t.getBoundingClientRect();var bw=48,g=8,ks=" + KanbanSettingService.Kanban.Size.Width + ",w=window.innerWidth,h=window.innerHeight;var kbh=4*bw+3*g;var l=Math.round(Math.max(0,Math.min(r.right-ks-g-bw,w-ks)));var tp=Math.round(Math.max(0,Math.min(r.bottom-kbh,h-ks)));return{left:l,top:tp};})()");
+                "(function(){var t=document.querySelector('.floating-action-toolbar');if(!t)return null;var r=t.getBoundingClientRect();var bw=48,g=12,ksW=" + KanbanSettingService.Kanban.Size.Width + ",ksH=" + KanbanSettingService.Kanban.Size.Height + ",w=window.innerWidth,h=window.innerHeight;var l=Math.round(Math.max(0,Math.min(r.right-ksW-g-bw,w-ksW)));var tp=Math.round(Math.max(0,Math.min(r.bottom-ksH,h-ksH)));return{left:l,top:tp};})()");
 
             if (pos is not null)
             {

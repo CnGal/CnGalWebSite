@@ -2,11 +2,11 @@
 
 .kanban-button-group {
     position: absolute;
-    left: calc(100% + var(--cg-spacing-2));
-    top: 0;
+    left: calc(100% + var(--cg-spacing-3));
+    bottom: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--cg-spacing-2);
+    gap: var(--cg-spacing-3);
     z-index: calc(var(--cg-kanban-z-index) + 1);
     pointer-events: auto;
 }
@@ -68,14 +68,15 @@
 /* ── CgPopupMenu panel positioning override ── */
 
 .kanban-button-group ::deep .cg-popup-menu-panel {
-    top: 0;
+    top: auto;
+    bottom: 0;
     left: calc(100% + var(--cg-spacing-2));
     right: auto;
     min-width: 280px;
     max-width: min(320px, calc(100vw - 5rem));
     max-height: 60vh;
     overflow-y: auto;
-    transform-origin: left top;
+    transform-origin: left bottom;
 }
 
 .kanban-button-group ::deep .cg-popup-menu-panel::-webkit-scrollbar {
