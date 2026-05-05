@@ -22,13 +22,24 @@
         <ChatContent>
             <KanbanChatCard />
         </ChatContent>
-        <SettingsContent>
-            <KanbanSettingsPanel Clothes="_clothes"
+        <ClothesContent>
+            <KanbanSettingsPanel Title="服装"
+                                 HeaderIcon="mdiHanger"
+                                 Clothes="_clothes"
                                  Stockings="_stockings"
                                  Shoes="_shoes"
-                                 Expressions="_expressions"
+                                 ShowExpressionsSection="false"
                                  OwnedItems="_ownedItems" />
-        </SettingsContent>
+        </ClothesContent>
+        <ExpressionsContent>
+            <KanbanSettingsPanel Title="表情"
+                                 HeaderIcon="mdiEmoticonOutline"
+                                 Expressions="_expressions"
+                                 ShowClothesSection="false"
+                                 ShowStockingsSection="false"
+                                 ShowShoesSection="false"
+                                 OwnedItems="_ownedItems" />
+        </ExpressionsContent>
     </KanbanButtonGroup>
     <KanbanDialogBox />
 </div>

@@ -15,12 +15,23 @@
 
     <CgPopupMenu Placement="left-bottom">
         <TriggerContent>
-            <button class="kanban-action-btn" type="button" title="设置" aria-label="设置">
-                <CgMdiIcon Name="mdiCogOutline" aria-hidden="true" />
+            <button class="kanban-action-btn" type="button" title="服装" aria-label="服装">
+                <CgMdiIcon Name="mdiHanger" aria-hidden="true" />
             </button>
         </TriggerContent>
         <ChildContent>
-            @SettingsContent
+            @ClothesContent
+        </ChildContent>
+    </CgPopupMenu>
+
+    <CgPopupMenu Placement="left-bottom">
+        <TriggerContent>
+            <button class="kanban-action-btn" type="button" title="表情" aria-label="表情">
+                <CgMdiIcon Name="mdiEmoticonOutline" aria-hidden="true" />
+            </button>
+        </TriggerContent>
+        <ChildContent>
+            @ExpressionsContent
         </ChildContent>
     </CgPopupMenu>
 
@@ -38,7 +49,10 @@
     public RenderFragment? ChatContent { get; set; }
 
     [Parameter]
-    public RenderFragment? SettingsContent { get; set; }
+    public RenderFragment? ClothesContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ExpressionsContent { get; set; }
 
     [Parameter]
     public EventCallback OnBackToTop { get; set; }

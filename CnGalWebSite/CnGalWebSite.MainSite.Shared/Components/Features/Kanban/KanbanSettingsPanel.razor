@@ -3,16 +3,19 @@
 @inject IKanbanUserDataService UserDataService
 
 <div class="cg-kanban-settings-panel">
-    <div class="cg-kanban-settings-header">
-        <div class="cg-kanban-settings-header-start">
-            <CgMdiIcon Name="mdiCogOutline" aria-hidden="true" />
-            <h3 class="cg-kanban-settings-title">看板娘设置</h3>
+    @if (ShowHeader)
+    {
+        <div class="cg-kanban-settings-header">
+            <div class="cg-kanban-settings-header-start">
+                <CgMdiIcon Name="@HeaderIcon" aria-hidden="true" />
+                <h3 class="cg-kanban-settings-title">@Title</h3>
+            </div>
         </div>
-    </div>
+    }
 
     <div class="cg-kanban-settings-body">
         @* 衣服 *@
-        @if (Clothes is { Count: > 0 })
+        @if (ShowClothesSection && Clothes is { Count: > 0 })
         {
             <div class="cg-kanban-settings-section">
                 <h4 class="cg-kanban-settings-section-title">衣服</h4>
@@ -35,7 +38,7 @@
         }
 
         @* 丝袜 *@
-        @if (Stockings is { Count: > 0 })
+        @if (ShowStockingsSection && Stockings is { Count: > 0 })
         {
             <div class="cg-kanban-settings-section">
                 <h4 class="cg-kanban-settings-section-title">丝袜</h4>
@@ -58,7 +61,7 @@
         }
 
         @* 鞋子 *@
-        @if (Shoes is { Count: > 0 })
+        @if (ShowShoesSection && Shoes is { Count: > 0 })
         {
             <div class="cg-kanban-settings-section">
                 <h4 class="cg-kanban-settings-section-title">鞋子</h4>
@@ -81,7 +84,7 @@
         }
 
         @* 表情 *@
-        @if (Expressions is { Count: > 0 })
+        @if (ShowExpressionsSection && Expressions is { Count: > 0 })
         {
             <div class="cg-kanban-settings-section">
                 <h4 class="cg-kanban-settings-section-title">表情</h4>
@@ -109,6 +112,48 @@
 </div>
 
 @code {
+    /// <summary>
+    /// 面板标题，默认"看板娘设置"
+    /// </summary>
+    [Parameter]
+    public string Title { get; set; } = "看板娘设置";
+
+    /// <summary>
+    /// 是否显示面板头部（标题栏），默认 true
+    /// </summary>
+    [Parameter]
+    public bool ShowHeader { get; set; } = true;
+
+    /// <summary>
+    /// 头部图标名称，默认 mdiCogOutline
+    /// </summary>
+    [Parameter]
+    public string HeaderIcon { get; set; } = "mdiCogOutline";
+
+    /// <summary>
+    /// 是否显示衣服分区，默认 true
+    /// </summary>
+    [Parameter]
+    public bool ShowClothesSection { get; set; } = true;
+
+    /// <summary>
+    /// 是否显示丝袜分区，默认 true
+    /// </summary>
+    [Parameter]
+    public bool ShowStockingsSection { get; set; } = true;
+
+    /// <summary>
+    /// 是否显示鞋子分区，默认 true
+    /// </summary>
+    [Parameter]
+    public bool ShowShoesSection { get; set; } = true;
+
+    /// <summary>
+    /// 是否显示表情分区，默认 true
+    /// </summary>
+    [Parameter]
+    public bool ShowExpressionsSection { get; set; } = true;
+
     [Parameter]
     public List<KanbanClothesModel>? Clothes { get; set; }
 
