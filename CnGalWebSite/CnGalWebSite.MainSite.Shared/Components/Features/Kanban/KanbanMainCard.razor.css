@@ -1,0 +1,9 @@
+/* ── KanbanMainCard — Live2D canvas container ── */
+
+.kanban-main-card {
+    position: relative;
+}
+
+.kanban-main-card canvas {
+    display: block;
+}

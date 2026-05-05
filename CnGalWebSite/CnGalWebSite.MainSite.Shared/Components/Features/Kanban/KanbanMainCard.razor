@@ -1,0 +1,9 @@
+<div class="kanban-main-card">
+    <canvas id="live2d" style="width: @Width; height: @Height;"></canvas>
+    <canvas id="live2d-cache" style="display:none"></canvas>
+</div>
+
+@code {
+    [Parameter] public string Width { get; set; } = "var(--cg-kanban-size)";
+    [Parameter] public string Height { get; set; } = "var(--cg-kanban-size)";
+}

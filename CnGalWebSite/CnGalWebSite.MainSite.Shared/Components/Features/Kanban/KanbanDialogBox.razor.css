@@ -1,0 +1,150 @@
+/* ── KanbanDialogBox — 看板娘对话框气泡 ── */
+
+.kanban-dialogbox {
+    position: absolute;
+    max-width: var(--cg-kanban-dialog-max-width, 400px);
+    min-width: 200px;
+    font-family: var(--cg-font-family);
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text);
+    z-index: calc(var(--cg-kanban-z-index, 100) + 1);
+    user-select: none;
+    pointer-events: auto;
+    animation: cg-dialogbox-fade-in var(--cg-transition-normal) ease-out;
+}
+
+/* ── 气泡主体 ── */
+
+.kanban-dialogbox__bubble {
+    position: relative;
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    box-shadow: var(--cg-shadow-lg);
+    padding: var(--cg-spacing-4);
+    overflow: hidden;
+}
+
+/* ── 气泡尾巴（使用伪元素） ── */
+
+.kanban-dialogbox__bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 24px;
+    width: 16px;
+    height: 16px;
+    background: var(--cg-color-surface);
+    border-right: 1px solid var(--cg-color-border);
+    border-bottom: 1px solid var(--cg-color-border);
+    transform: rotate(45deg);
+    z-index: -1;
+}
+
+/* ── 关闭按钮 ── */
+
+.kanban-dialogbox__close {
+    position: absolute;
+    top: var(--cg-spacing-2);
+    right: var(--cg-spacing-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: var(--cg-radius-full);
+    background: transparent;
+    color: var(--cg-color-text-muted);
+    cursor: pointer;
+    transition:
+        background var(--cg-transition-fast),
+        color var(--cg-transition-fast);
+}
+
+.kanban-dialogbox__close:hover {
+    background: var(--cg-color-hover-overlay);
+    color: var(--cg-color-text);
+}
+
+.kanban-dialogbox__close:focus-visible {
+    outline: 2px solid var(--cg-color-focus-ring);
+    outline-offset: 2px;
+}
+
+/* ── 内容区域 ── */
+
+.kanban-dialogbox__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+}
+
+.kanban-dialogbox__text {
+    line-height: 1.6;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+/* ── 图片类型 ── */
+
+.kanban-dialogbox__image {
+    width: 100%;
+    min-height: 120px;
+    border-radius: var(--cg-radius-md);
+    background: var(--cg-color-section-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--cg-spacing-2);
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.kanban-dialogbox__image-placeholder {
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-xs);
+}
+
+/* ── 通知类型 ── */
+
+.kanban-dialogbox--notification .kanban-dialogbox__bubble {
+    border-color: var(--cg-color-primary);
+    border-left: 3px solid var(--cg-color-primary);
+}
+
+.kanban-dialogbox__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px var(--cg-spacing-2);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-on-primary);
+    background: var(--cg-color-primary);
+    border-radius: var(--cg-radius-sm);
+    width: fit-content;
+    margin-bottom: var(--cg-spacing-1);
+}
+
+/* ── 通知类型的尾巴 ── */
+
+.kanban-dialogbox--notification .kanban-dialogbox__bubble::after {
+    border-right-color: var(--cg-color-primary);
+    border-bottom-color: var(--cg-color-primary);
+}
+
+/* ── 动画 ── */
+
+@keyframes cg-dialogbox-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

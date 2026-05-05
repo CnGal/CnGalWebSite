@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<ITableQueryService, TableQueryService>(services, apiBase);
         RegisterSdkHttpClient<IVoteQueryService, VoteQueryService>(services, apiBase);
         RegisterSdkHttpClient<IFavoriteFolderQueryService, FavoriteFolderQueryService>(services, apiBase);
+        RegisterSdkHttpClient<IKanbanQueryService, KanbanQueryService>(services, apiBase);
 
         RegisterSdkHttpClient<IEntryCommandService, EntryCommandService>(services, apiBase);
         RegisterSdkHttpClient<IArticleCommandService, ArticleCommandService>(services, apiBase);

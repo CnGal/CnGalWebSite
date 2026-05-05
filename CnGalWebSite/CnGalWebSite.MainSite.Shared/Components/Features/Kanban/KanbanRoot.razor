@@ -1,0 +1,63 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@inject IKanbanLive2DService Live2DService
+@implements IDisposable
+@rendermode InteractiveServer
+
+<div class="kanban-live2d @(_isReady ? "" : "d-none")" style="@GetStyleString()">
+    <KanbanMainCard />
+
+    <KanbanButtonGroup />
+    <KanbanDialogBox />
+   <KanbanChatCard />
+ <KanbanSettingsPanel />
+</div>
+
+@code {
+    private bool _isReady;
+    private CancellationTokenSource? _cts;
+
+    protected override void OnInitialized()
+    {
+        Live2DService.Live2DInitialized += OnLive2DInitialized;
+        Live2DService.CustomEventTriggered += OnCustomEventTriggered;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Live2DService.InitAsync("cngal形象", 0);
+            _cts = new CancellationTokenSource();
+            StateHasChanged();
+        }
+    }
+
+    private string GetStyleString()
+    {
+        var kanban = Live2DService.Kanban;
+        return $"position:fixed; left:{kanban.Position.Left}px; top:{kanban.Position.Top}px; width:var(--cg-kanban-size); height:var(--cg-kanban-size); z-index:var(--cg-kanban-z-index);";
+    }
+
+    private void OnLive2DInitialized()
+    {
+        _isReady = true;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnCustomEventTriggered(string eventName)
+    {
+        // Future event handling (Tasks 14-17)
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+
+        Live2DService.Live2DInitialized -= OnLive2DInitialized;
+        Live2DService.CustomEventTriggered -= OnCustomEventTriggered;
+
+        _ = Live2DService.ReleaseLive2D();
+        GC.SuppressFinalize(this);
+    }
+}

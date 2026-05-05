@@ -1,0 +1,10 @@
+/* ── KanbanButtonGroup — floating action button group ── */
+
+.kanban-button-group {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-1);
+    z-index: calc(var(--cg-kanban-z-index) + 1);
+    pointer-events: auto;
+}

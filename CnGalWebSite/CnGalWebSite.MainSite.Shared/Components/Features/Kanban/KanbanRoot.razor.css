@@ -1,0 +1,11 @@
+/* ── KanbanRoot — fixed-position Live2D root container ── */
+
+.kanban-live2d {
+    position: fixed;
+    z-index: var(--cg-kanban-z-index);
+    user-select: none;
+}
+
+.kanban-live2d.d-none {
+    display: none;
+}

@@ -1,0 +1,77 @@
+/* ── KanbanSettingsPanel — 换装/设置浮动面板 ── */
+
+.cg-kanban-settings-panel {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--cg-kanban-z-index, 10000) + 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cg-kanban-settings-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--cg-color-overlay);
+    backdrop-filter: blur(2px);
+    transition: opacity var(--cg-transition-fast);
+}
+
+.cg-kanban-settings-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: min(400px, calc(100vw - var(--cg-spacing-8)));
+    max-height: 80vh;
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    box-shadow: var(--cg-shadow-lg);
+    overflow: hidden;
+}
+
+.cg-kanban-settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    padding: var(--cg-spacing-4);
+    border-bottom: 1px solid var(--cg-color-border);
+}
+
+.cg-kanban-settings-title {
+    margin: 0;
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+}
+
+.cg-kanban-settings-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+    padding: var(--cg-spacing-4);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.cg-kanban-settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+}
+
+.cg-kanban-settings-section-title {
+    margin: 0;
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cg-kanban-settings-item-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cg-spacing-2);
+}

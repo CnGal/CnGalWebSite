@@ -369,3 +369,6 @@ FodyWeavers.xsd
 /CnGalWebSite/CnGalWebSite.RobotClientX/wwwroot/Data
 /CnGalWebSite/CnGalWebSite.RobotClientX/wwwroot/SensitiveWords
 /CnGalWebSite/CnGalWebSite.Shared/wwwroot/font
+
+.sisyphus/
+.opencode/

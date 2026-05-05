@@ -1,0 +1,22 @@
+/* ── CnGal Kanban Design Tokens ── */
+/* Layout & sizing variables for the kanban (live2d) component.
+   References design-tokens.css for colors, spacing, radius, etc. */
+
+:root {
+    /* ── 看板娘尺寸 ── */
+    --cg-kanban-size: 300px;
+    --cg-kanban-z-index: 100;
+
+    /* ── 浮动按钮 ── */
+    --cg-kanban-button-size: 3rem;
+
+    /* ── 对话框 ── */
+    --cg-kanban-dialog-max-width: 400px;
+
+    /* ── 聊天框 ── */
+    --cg-kanban-chat-max-height: 500px;
+    --cg-kanban-chat-max-width: 350px;
+
+    /* ── 过渡 ── */
+    --cg-kanban-transition: var(--cg-transition-normal);
+}
