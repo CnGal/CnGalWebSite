@@ -263,6 +263,7 @@
     private async Task HandleCloseAsync()
     {
         CancelDismissTimer();
+        await Live2DService.CommitDialogBoxPositionAsync();
         await CleanLive2DStateAsync();
         _visible = false;
         await OnClose.InvokeAsync();

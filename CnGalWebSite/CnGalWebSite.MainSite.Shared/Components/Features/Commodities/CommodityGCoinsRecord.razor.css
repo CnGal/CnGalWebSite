@@ -1,33 +1,46 @@
+/* ═══════════════════════════════════════════
+   CommodityGCoinsRecord — G币变动记录
+   ═══════════════════════════════════════════ */
+
 .commodity-gcoins-record {
     display: flex;
     flex-direction: column;
-    gap: var(--cg-spacing-5);
+    gap: var(--cg-spacing-4);
 }
 
 .commodity-gcoins-record__title {
-    font-size: var(--cg-font-size-lg);
+    font-size: var(--cg-font-size-xl);
     font-weight: var(--cg-font-weight-bold);
     color: var(--cg-color-text);
-    margin: 0;
+    margin: 0 0 var(--cg-spacing-2);
     letter-spacing: -0.01em;
 }
 
 .commodity-gcoins-record ::deep .cg-datatable {
     box-shadow: var(--cg-shadow-sm);
     border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-xl);
+    overflow: hidden;
 }
 
 /* ── G币变动色彩 ── */
 .commodity-gcoins-record__count--increase {
     color: var(--cg-color-success);
-    font-weight: var(--cg-font-weight-semibold);
+    font-weight: var(--cg-font-weight-bold);
+    background: color-mix(in oklab, var(--cg-color-success) 10%, transparent);
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--cg-radius-full);
 }
 
 .commodity-gcoins-record__count--decrease {
     color: var(--cg-color-error);
-    font-weight: var(--cg-font-weight-semibold);
+    font-weight: var(--cg-font-weight-bold);
+    background: color-mix(in oklab, var(--cg-color-error) 10%, transparent);
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--cg-radius-full);
 }
 
 .commodity-gcoins-record__count--zero {
     color: var(--cg-color-text-muted);
+    font-weight: var(--cg-font-weight-medium);
 }

@@ -4,44 +4,37 @@
 
 .commodity-kanban-card {
     background: var(--cg-color-surface);
-    border-radius: var(--cg-radius-xl);
-    border: 1px solid var(--cg-color-border);
-    box-shadow: var(--cg-shadow-sm);
+    border-radius: var(--cg-radius-2xl); /* More rounded like modern apps */
+    border: 1px solid color-mix(in oklab, var(--cg-color-border) 60%, transparent);
+    box-shadow: 0 8px 24px color-mix(in oklab, var(--cg-color-text) 3%, transparent);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    transition: box-shadow var(--cg-transition-normal);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    text-decoration: none;
 }
 
 .commodity-kanban-card:hover {
-    box-shadow: var(--cg-shadow-md);
-}
-
-@media (min-width: 1024px) {
-    .commodity-kanban-card {
-        position: sticky;
-        top: calc(var(--cg-header-height) + var(--cg-spacing-4));
-    }
+    box-shadow: 0 16px 40px color-mix(in oklab, var(--cg-color-primary) 8%, transparent);
+    transform: translateY(-2px);
+    border-color: color-mix(in oklab, var(--cg-color-primary) 20%, transparent);
 }
 
 /* ── 形象图区域 ── */
 .commodity-kanban-card__image-wrapper {
     position: relative;
     width: 100%;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1 / 1; /* Square for a nicer profile feel */
     overflow: hidden;
-    background: linear-gradient(135deg, color-mix(in oklab, var(--cg-color-secondary) 30%, transparent), color-mix(in oklab, var(--cg-color-primary) 25%, transparent));
+    background: radial-gradient(circle at bottom, color-mix(in oklab, var(--cg-color-primary) 12%, transparent), color-mix(in oklab, var(--cg-color-secondary) 4%, transparent));
 }
 
-/* 装饰丝带 */
+/* 装饰掩图 */
 .commodity-kanban-card__image-wrapper::after {
     content: '';
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 40px;
-    background: linear-gradient(to top, var(--cg-color-surface), transparent);
+    inset: 0;
+    background: linear-gradient(to top, var(--cg-color-surface) 0%, transparent 35%);
     pointer-events: none;
     z-index: 1;
 }
@@ -50,9 +43,15 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: top center;
     display: block;
     position: relative;
     z-index: 0;
+    transition: transform 0.4s ease-out;
+}
+
+.commodity-kanban-card:hover .commodity-kanban-card__image {
+    transform: scale(1.05);
 }
 
 /* ── 卡片正文 ── */
@@ -60,23 +59,20 @@
     display: flex;
     flex-direction: column;
     gap: var(--cg-spacing-4);
-    padding: var(--cg-spacing-4) var(--cg-spacing-5);
-}
-
-@media (min-width: 768px) {
-    .commodity-kanban-card__body {
-        padding: var(--cg-spacing-5);
-    }
+    padding: var(--cg-spacing-6);
+    position: relative;
+    z-index: 2;
+    margin-top: -2rem; /* Bring content up into the fade */
 }
 
 /* ── 标题 ── */
 .commodity-kanban-card__title {
-    font-size: var(--cg-font-size-lg);
-    font-weight: var(--cg-font-weight-bold);
+    font-size: var(--cg-font-size-xl);
+    font-weight: 800;
     color: var(--cg-color-text);
     margin: 0;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
 }
 
 /* ── 欢迎语 ── */
@@ -91,16 +87,24 @@
 .commodity-kanban-card__balance {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    padding: var(--cg-spacing-4) var(--cg-spacing-5);
+    background: linear-gradient(135deg, color-mix(in oklab, var(--cg-color-amber) 15%, transparent), color-mix(in oklab, var(--cg-color-amber) 4%, transparent));
+    border-radius: var(--cg-radius-xl);
+    border: 1px solid color-mix(in oklab, var(--cg-color-amber) 25%, transparent);
+    box-shadow: 0 4px 12px color-mix(in oklab, var(--cg-color-amber) 8%, transparent);
+}
+
+.commodity-kanban-card__balance-left {
+    display: flex;
+    align-items: center;
     gap: var(--cg-spacing-2);
-    padding: var(--cg-spacing-3) var(--cg-spacing-4);
-    background: linear-gradient(135deg, color-mix(in oklab, var(--cg-color-amber) 12%, transparent), color-mix(in oklab, var(--cg-color-amber) 6%, transparent));
-    border-radius: var(--cg-radius-lg);
-    border: 1px solid color-mix(in oklab, var(--cg-color-amber) 18%, transparent);
 }
 
 .commodity-kanban-card__gcoin-icon {
     color: var(--cg-color-amber);
     flex-shrink: 0;
+    filter: drop-shadow(0 2px 4px color-mix(in oklab, var(--cg-color-amber) 40%, transparent));
 }
 
 ::deep .commodity-kanban-card__gcoin-icon.cg-mdi-icon {
@@ -110,96 +114,135 @@
 
 .commodity-kanban-card__balance-label {
     font-size: var(--cg-font-size-sm);
-    color: var(--cg-color-text-muted);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
 }
 
 .commodity-kanban-card__balance-value {
-    font-size: var(--cg-font-size-xl);
-    font-weight: var(--cg-font-weight-bold);
-    color: var(--cg-color-amber);
+    font-size: 2rem;
+    font-weight: 900;
     line-height: 1;
-    transition: all var(--cg-transition-fast);
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block;
+    filter: drop-shadow(0 2px 4px color-mix(in oklab, var(--cg-color-amber) 20%, transparent));
 }
 
 /* ── 操作按钮 ── */
 .commodity-kanban-card__actions {
     display: flex;
+    margin-top: var(--cg-spacing-2);
 }
 
 ::deep .commodity-kanban-card__actions .cg-btn {
     width: 100%;
     justify-content: center;
-    border-radius: var(--cg-radius-lg);
-    min-height: 44px;
+    border-radius: var(--cg-radius-xl);
+    min-height: 52px;
     font-size: var(--cg-font-size-md);
-    font-weight: var(--cg-font-weight-semibold);
-    transition: transform var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
+    font-weight: var(--cg-font-weight-bold);
+    background: linear-gradient(135deg, var(--cg-color-primary), var(--cg-color-secondary));
+    border: none;
+    box-shadow: 0 4px 12px color-mix(in oklab, var(--cg-color-primary) 30%, transparent);
+    transition: all 0.3s ease;
+    color: white;
 }
 
 ::deep .commodity-kanban-card__actions .cg-btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px color-mix(in oklab, var(--cg-color-primary) 30%, transparent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px color-mix(in oklab, var(--cg-color-primary) 40%, transparent);
+    filter: brightness(1.05);
 }
 
 /* ── 提醒区域 ── */
 .commodity-kanban-card__alert {
-    margin: 0;
+    margin-top: var(--cg-spacing-2);
 }
 
 ::deep .commodity-kanban-card__alert .cg-alert {
-    border-radius: var(--cg-radius-md);
-    font-size: var(--cg-font-size-sm);
+    border-radius: var(--cg-radius-lg);
+    font-size: var(--cg-font-size-xs);
+    padding: var(--cg-spacing-3);
+    line-height: 1.5;
+    background: color-mix(in oklab, var(--cg-color-info) 8%, transparent);
+    border: 1px solid color-mix(in oklab, var(--cg-color-info) 20%, transparent);
 }
 
-/* ── 移动端响应式 (<1024px)：水平布局 ── */
+/* ── 移动端响应式 (<1024px) ── */
 @media (max-width: 1023px) {
     .commodity-kanban-card {
         flex-direction: row;
-        border-radius: var(--cg-radius-lg);
+        align-items: center;
     }
 
     .commodity-kanban-card__image-wrapper {
-        width: 40%;
-        min-width: 0;
-        aspect-ratio: auto;
-        min-height: 140px;
+        width: 30%;
+        aspect-ratio: 1 / 1;
+        border-radius: 50%;
+        margin: var(--cg-spacing-4);
         flex-shrink: 0;
     }
 
     .commodity-kanban-card__image-wrapper::after {
-        content: none;
+        display: none;
     }
 
     .commodity-kanban-card__body {
-        width: 60%;
-        min-width: 0;
-        padding: var(--cg-spacing-3) var(--cg-spacing-4);
-        gap: var(--cg-spacing-2);
+        width: 70%;
+        padding: var(--cg-spacing-4) var(--cg-spacing-4) var(--cg-spacing-4) 0;
+        margin-top: 0;
+        gap: var(--cg-spacing-3);
     }
 
     .commodity-kanban-card__title {
-        font-size: var(--cg-font-size-md);
+        font-size: var(--cg-font-size-lg);
     }
 
     .commodity-kanban-card__welcome {
-        font-size: var(--cg-font-size-xs);
+        display: none;
     }
 
     .commodity-kanban-card__balance {
-        padding: var(--cg-spacing-2) var(--cg-spacing-3);
-        border-radius: var(--cg-radius-md);
-    }
-
-    .commodity-kanban-card__balance-label {
-        font-size: var(--cg-font-size-xs);
+        padding: var(--cg-spacing-3) var(--cg-spacing-4);
     }
 
     .commodity-kanban-card__balance-value {
-        font-size: var(--cg-font-size-md);
+        font-size: 1.5rem;
     }
 
-    ::deep .commodity-kanban-card__gcoin-icon.cg-mdi-icon {
-        width: 22px;
-        height: 22px;
+    ::deep .commodity-kanban-card__actions .cg-btn {
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 639px) {
+    .commodity-kanban-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .commodity-kanban-card__image-wrapper {
+        width: 100%;
+        aspect-ratio: 2 / 1;
+        border-radius: 0;
+        margin: 0;
+    }
+
+    .commodity-kanban-card__image-wrapper::after {
+        display: block;
+        background: linear-gradient(to top, var(--cg-color-surface) 0%, transparent 60%);
+    }
+
+    .commodity-kanban-card__body {
+        width: 100%;
+        padding: var(--cg-spacing-5);
+        margin-top: -2rem;
+    }
+
+    .commodity-kanban-card__welcome {
+        display: block;
     }
 }

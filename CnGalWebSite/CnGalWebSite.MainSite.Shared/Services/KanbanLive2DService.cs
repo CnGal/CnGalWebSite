@@ -209,6 +209,22 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
         return null;
     }
 
+    public async Task CommitDialogBoxPositionAsync()
+    {
+        if (_module is null)
+        {
+            return;
+        }
+
+        var position = await _module.InvokeAsync<DialogBoxPositionResult?>("getCurrentDialogBoxPosition");
+        if (position is null)
+        {
+            return;
+        }
+
+        await SetDialogBoxPosition(position.Left, position.Bottom, position.Top);
+    }
+
     public async Task ReleaseLive2D()
     {
         if (_module is null)
@@ -230,25 +246,25 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
     }
 
     [JSInvokable]
-    public void SetKanbanPosition(int left, int top)
+    public async Task SetKanbanPosition(int left, int top)
     {
         Kanban.Position.Left = left;
         Kanban.Position.Top = top;
 
         _settingService.Kanban.Position.Left = left;
         _settingService.Kanban.Position.Top = top;
-        _ = _settingService.SaveAsync();
+        await _settingService.SaveAsync();
     }
 
     [JSInvokable]
-    public void SetKanbanSize(int width, int height)
+    public async Task SetKanbanSize(int width, int height)
     {
         Kanban.Size.Width = width;
         Kanban.Size.Height = height;
 
         _settingService.Kanban.Size.Width = width;
         _settingService.Kanban.Size.Height = height;
-        _ = _settingService.SaveAsync();
+        await _settingService.SaveAsync();
     }
 
     [JSInvokable]
@@ -259,14 +275,16 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
     }
 
     [JSInvokable]
-    public void SetDialogBoxPosition(int left, int bottom)
+    public async Task SetDialogBoxPosition(int left, int bottom, int top)
     {
         DialogBox.Position.Left = left;
         DialogBox.Position.Bottom = bottom;
+        DialogBox.Position.Top = top;
 
         _settingService.DialogBox.Position.Left = left;
         _settingService.DialogBox.Position.Bottom = bottom;
-        _ = _settingService.SaveAsync();
+        _settingService.DialogBox.Position.Top = top;
+        await _settingService.SaveAsync();
     }
 
     [JSInvokable]
@@ -303,5 +321,14 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
     {
         _objRef?.Dispose();
         GC.SuppressFinalize(this);
+    }
+
+    private sealed class DialogBoxPositionResult
+    {
+        public int Left { get; set; }
+
+        public int Bottom { get; set; }
+
+        public int Top { get; set; }
     }
 }

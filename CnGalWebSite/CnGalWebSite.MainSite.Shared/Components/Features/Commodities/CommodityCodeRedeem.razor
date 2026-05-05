@@ -13,6 +13,7 @@
     </CgAlert>
 
     <div class="commodity-code-redeem__form">
+        <h3 class="commodity-code-redeem__form-title">输入订单号兑换</h3>
         <div class="commodity-code-redeem__input-group">
             <CgInput @bind-Value="@_orderCode"
                      Placeholder="请输入B站工房订单号"
@@ -33,13 +34,21 @@
 
     <div class="commodity-code-redeem__promo">
         <div class="commodity-code-redeem__promo-header">
-            <CgMdiIcon Name="mdiShoppingOutline" aria-hidden="true" />
-            <span>前往B站工房购买周边</span>
+            <div class="commodity-code-redeem__promo-title">
+                <CgMdiIcon Name="mdiShoppingOutline" aria-hidden="true" />
+                <span>前往B站工房购买周边</span>
+            </div>
+            <a href="https://gf.bilibili.com/item/detail/1110069065"
+               target="_blank"
+               rel="noopener"
+               class="commodity-code-redeem__promo-link-text">
+                去看看 <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
+            </a>
         </div>
         <a href="https://gf.bilibili.com/item/detail/1110069065"
            target="_blank"
            rel="noopener"
-           class="commodity-code-redeem__promo-link">
+           class="commodity-code-redeem__promo-image-link">
             <img src="https://tucang.cngal.top/api/image/show/e144487a1a224a3bb54dfc7eb55483ab?https://image.cngal.org/images/upload/20240818/793eac7917a9fe37ea4934760ea39bb387fce0c2.jpeg"
                  alt="B站工房周边"
                  class="commodity-code-redeem__promo-image"

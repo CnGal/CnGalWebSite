@@ -4,8 +4,8 @@ namespace CnGalWebSite.MainSite.Shared.Services.KanbanModels
 {
     public class KanbanSettingModel
     {
-        public Position Position { get; set; } = new();
-        public Size Size { get; set; } = new() { Height = 300, Width = 300 };
+        public Position Position { get; set; } = new() { Left = 1444, Top = 648 };
+        public Size Size { get; set; } = new() { Height = 617, Width = 341 };
     }
 
     public class ButtonSettingModel
@@ -16,7 +16,7 @@ namespace CnGalWebSite.MainSite.Shared.Services.KanbanModels
 
     public class DialogBoxSettingModel
     {
-        public Position Position { get; set; } = new() { Left = -110, Bottom = 525 };
+        public Position Position { get; set; } = new() { Left = 112, Top = -89, Bottom = 626 };
         public int Width { get; set; } = 400;
         public bool Hide { get; set; }
     }

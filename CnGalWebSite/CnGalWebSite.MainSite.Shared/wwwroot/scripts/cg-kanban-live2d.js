@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CgKanbanLive2D JS Interop 模块
  * 封装 Live2D 看板娘初始化、模型切换、交互事件与资源释放。
  * Live2D CDN 资源按需懒加载，仅在首次初始化时引入。
@@ -400,6 +400,24 @@ export function releaseLive2D() {
 }
 
 /**
+ * 读取当前对话框相对于看板娘根容器的位置。
+ * @returns {{Left: number, Bottom: number, Top: number}|null}
+ */
+export function getCurrentDialogBoxPosition() {
+    var live2dItem = document.getElementById('kanban-live2d');
+    var dialogItem = document.getElementById('kanban-dialogbox');
+    if (!live2dItem || !dialogItem) return null;
+
+    var rootRect = live2dItem.getBoundingClientRect();
+    var dialogRect = dialogItem.getBoundingClientRect();
+    var left = Math.round(dialogRect.left - rootRect.left);
+    var top = Math.round(dialogRect.top - rootRect.top);
+    var bottom = Math.round(rootRect.height - top - dialogRect.height);
+
+    return { Left: left, Bottom: bottom, Top: top };
+}
+
+/**
  * 初始化看板娘拖拽（优化版 — 含光标反馈、边界钳制、视觉指示）
  * @param {object} dotNetRef - .NET 互操作引用
  */
@@ -555,6 +573,13 @@ export function initKanbanResizeAction(dotNetRef) {
         return [w, h];
     }
 
+    function applyCanvasSize(canvas, width, height) {
+        canvas.width = width;
+        canvas.height = height;
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+    }
+
     function applyNewSize(w, h) {
         var clamped = clampAspectRatio(w, h);
         var maxSize = getKanbanMaxSize();
@@ -564,8 +589,7 @@ export function initKanbanResizeAction(dotNetRef) {
         live2dItem.style.height = newH + 'px';
         var canvas = document.getElementById('live2d');
         if (canvas) {
-            canvas.width = newW;
-            canvas.height = newH;
+            applyCanvasSize(canvas, newW, newH);
         }
         return [newW, newH];
     }
@@ -592,8 +616,7 @@ export function initKanbanResizeAction(dotNetRef) {
         var rect = live2dItem.getBoundingClientRect();
         var canvas = document.getElementById('live2d');
         if (canvas) {
-            canvas.width = Math.round(rect.width);
-            canvas.height = Math.round(rect.height);
+            applyCanvasSize(canvas, Math.round(rect.width), Math.round(rect.height));
         }
         dotNetRef.invokeMethodAsync('SetKanbanSize', Math.round(rect.width), Math.round(rect.height));
     };
@@ -700,10 +723,11 @@ export function initDialogBoxMoveAction(dotNetRef) {
     if (!live2dItem) return;
 
     var move = false;
-    var deltaLeft = 0, deltaTop = 0;
-    var x_org, y_org;
-    var dx = 0;
-    var dy = 0;
+    var pointerOffsetX = 0;
+    var pointerOffsetY = 0;
+    var currentLeft = 0;
+    var currentTop = 0;
+    var currentBottom = 0;
     var time;
 
     var mousedown_fun = function (event) {
@@ -725,14 +749,11 @@ export function initDialogBoxMoveAction(dotNetRef) {
             var timeEnd = getTimeNow();
             if (timeEnd - timeStart > 500) {
                 clearInterval(time);
-                deltaLeft = touch.clientX - touch.target.offsetLeft;
-                deltaTop = touch.clientY - touch.target.offsetTop;
                 var currentDialog = document.getElementById('kanban-dialogbox');
                 if (!currentDialog) return;
-                var rect_w = live2dItem.getBoundingClientRect();
                 var rect_n = currentDialog.getBoundingClientRect();
-                x_org = rect_w.x - rect_n.x;
-                y_org = rect_w.y - rect_n.y;
+                pointerOffsetX = touch.clientX - rect_n.left;
+                pointerOffsetY = touch.clientY - rect_n.top;
                 move = true;
                 currentDialog.classList.add('kanban-dialogbox--dragging');
                 document.body.classList.add('user-select-none');
@@ -754,11 +775,16 @@ export function initDialogBoxMoveAction(dotNetRef) {
             event.preventDefault();
             var cx = touch.clientX;
             var cy = touch.clientY;
-            dx = cx - deltaLeft - x_org;
-            dy = cy - deltaTop - y_org;
             var currentDialog = document.getElementById('kanban-dialogbox');
             if (currentDialog) {
-                currentDialog.setAttribute('style', 'left:' + dx + 'px; top:' + dy + 'px;');
+                var rect_w = live2dItem.getBoundingClientRect();
+                var rect_n = currentDialog.getBoundingClientRect();
+                currentLeft = Math.round(cx - rect_w.left - pointerOffsetX);
+                currentTop = Math.round(cy - rect_w.top - pointerOffsetY);
+                currentBottom = Math.round(rect_w.height - currentTop - rect_n.height);
+
+                // Razor 渲染也使用 left + bottom；拖动时保持同一坐标系，避免关闭后重渲染回到旧位置。
+                currentDialog.setAttribute('style', 'left:' + currentLeft + 'px; bottom:' + currentBottom + 'px;');
             }
         } else {
             clearInterval(time);
@@ -775,9 +801,13 @@ export function initDialogBoxMoveAction(dotNetRef) {
             var currentDialog = document.getElementById('kanban-dialogbox');
             if (currentDialog) {
                 currentDialog.classList.remove('kanban-dialogbox--dragging');
-                var rect_w = live2dItem.getBoundingClientRect();
-                var rect_n = currentDialog.getBoundingClientRect();
-                dotNetRef.invokeMethodAsync('SetDialogBoxPosition', dx, rect_w.height - dy - rect_n.height);
+                var position = getCurrentDialogBoxPosition();
+                if (position) {
+                    currentLeft = position.Left;
+                    currentTop = position.Top;
+                    currentBottom = position.Bottom;
+                    dotNetRef.invokeMethodAsync('SetDialogBoxPosition', currentLeft, currentBottom, currentTop);
+                }
             }
             document.body.classList.remove('user-select-none');
         } else {

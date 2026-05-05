@@ -2,11 +2,10 @@
    CommoditiesPage — 看板娘的小卖铺
    ═══════════════════════════════════════════ */
 
-/* ── 页面容器 ── */
 .commodities-page {
     display: flex;
     flex-direction: column;
-    gap: var(--cg-spacing-8);
+    gap: var(--cg-spacing-6);
     width: 100%;
     max-width: 1440px;
     margin: 0 auto;
@@ -16,8 +15,8 @@
 
 @media (min-width: 768px) {
     .commodities-page {
-        gap: var(--cg-spacing-10);
-        padding-bottom: var(--cg-spacing-10);
+        gap: var(--cg-spacing-8);
+        padding: var(--cg-spacing-4) var(--cg-page-gutter) var(--cg-spacing-10);
     }
 }
 
@@ -31,7 +30,7 @@
 
 @media (min-width: 768px) {
     .commodities-page__hero {
-        padding-top: var(--cg-spacing-8);
+        padding-top: var(--cg-spacing-6);
     }
 }
 
@@ -46,7 +45,7 @@
 
 @media (min-width: 768px) {
     .commodities-page__hero-title {
-        font-size: 2rem;
+        font-size: 2.25rem;
     }
 }
 
@@ -55,6 +54,12 @@
     color: var(--cg-color-text-muted);
     margin: 0;
     line-height: 1.5;
+}
+
+@media (min-width: 768px) {
+    .commodities-page__hero-subtitle {
+        font-size: var(--cg-font-size-base);
+    }
 }
 
 /* ── 两栏布局网格 ── */
@@ -68,7 +73,7 @@
 @media (min-width: 1024px) {
     .commodities-page__grid {
         display: grid;
-        grid-template-columns: 1fr 3fr;
+        grid-template-columns: 280px 1fr;
         align-items: start;
         gap: var(--cg-spacing-8);
     }
@@ -76,112 +81,90 @@
 
 @media (min-width: 1440px) {
     .commodities-page__grid {
-        grid-template-columns: 1fr 4fr;
+        grid-template-columns: 320px 1fr;
+        gap: var(--cg-spacing-10);
     }
 }
 
 /* ── 左侧边栏 ── */
 .commodities-page__sidebar {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
 }
 
 @media (min-width: 1024px) {
     .commodities-page__sidebar {
         position: sticky;
-        top: calc(var(--cg-header-height, 64.67px) + var(--cg-spacing-4));
+        top: calc(var(--cg-header-height, 64px) + var(--cg-spacing-6));
     }
 }
 
 /* ── 右侧内容区 ── */
 .commodities-page__content {
     min-width: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .commodities-page__content ::deep .cg-tabs__panel {
-    margin-top: var(--cg-spacing-4);
+    margin-top: var(--cg-spacing-5);
 }
 
 /* ── 商品网格 ── */
 .commodities-page__shop-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--cg-spacing-4);
     width: 100%;
 }
 
 @media (min-width: 640px) {
     .commodities-page__shop-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 1024px) {
-    .commodities-page__shop-grid {
+        gap: var(--cg-spacing-5);
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
-@media (min-width: 1440px) {
+@media (min-width: 1280px) {
     .commodities-page__shop-grid {
+        gap: var(--cg-spacing-6);
         grid-template-columns: repeat(4, 1fr);
     }
 }
 
-/* ── 空状态 ── */
-.commodities-page__empty {
-    text-align: center;
-    padding: var(--cg-spacing-10) var(--cg-spacing-4);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--cg-spacing-3);
-    min-height: 30vh;
-    justify-content: center;
-    background: var(--cg-color-surface);
-    border-radius: var(--cg-radius-lg);
-    border: 1px dashed var(--cg-color-border);
-}
-
-::deep .commodities-page__empty .cg-mdi-icon {
-    width: 56px;
-    height: 56px;
-    color: var(--cg-color-text-muted);
-    opacity: 0.5;
-}
-
-.commodities-page__empty p {
-    color: var(--cg-color-text-muted);
-    margin: 0;
-    font-size: var(--cg-font-size-lg);
-}
-
-/* ── 加载状态 ── */
+/* ── 空状态 & 错误状态 & 加载状态 ── */
+.commodities-page__empty,
+.commodities-page__error,
 .commodities-page__loading {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
+    background: var(--cg-color-surface);
+    border: 1px dashed var(--cg-color-border);
+    border-radius: var(--cg-radius-xl);
+    padding: var(--cg-spacing-10) var(--cg-spacing-6);
+    margin: var(--cg-spacing-6) 0;
+    min-height: 40vh;
     gap: var(--cg-spacing-4);
-    min-height: 60vh;
-    color: var(--cg-color-text-muted);
-    font-size: var(--cg-font-size-lg);
-    padding: 0 var(--cg-page-gutter);
+    transition: all var(--cg-transition-fast);
 }
 
-/* ── 错误状态 ── */
-.commodities-page__error {
-    max-width: 520px;
-    margin: var(--cg-spacing-10) auto;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--cg-spacing-4);
-    padding: var(--cg-spacing-10) var(--cg-spacing-6);
-    background: var(--cg-color-surface);
-    border-radius: var(--cg-radius-xl);
-    border: 1px solid var(--cg-color-border);
-    box-shadow: var(--cg-shadow-sm);
+.commodities-page__empty:hover,
+.commodities-page__error:hover {
+    border-color: color-mix(in oklab, var(--cg-color-primary) 30%, transparent);
+    background: color-mix(in oklab, var(--cg-color-primary) 2%, var(--cg-color-surface));
+}
+
+.commodities-page__empty .cg-mdi-icon,
+.commodities-page__error-icon .cg-mdi-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    color: var(--cg-color-text-muted);
+    opacity: 0.5;
 }
 
 .commodities-page__error-icon {
@@ -189,44 +172,55 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 64px;
-    height: 64px;
+    width: 5rem;
+    height: 5rem;
     border-radius: var(--cg-radius-full);
     background: color-mix(in oklab, var(--cg-color-error) 10%, transparent);
+    margin-bottom: var(--cg-spacing-2);
 }
 
-::deep .commodities-page__error-icon .cg-mdi-icon {
-    width: 32px;
-    height: 32px;
+.commodities-page__error-icon .cg-mdi-icon {
+    color: var(--cg-color-error);
+    opacity: 1;
+    width: 2.5rem;
+    height: 2.5rem;
+}
+
+.commodities-page__empty p,
+.commodities-page__error p {
+    color: var(--cg-color-text-muted);
+    margin: 0;
+    font-size: var(--cg-font-size-md);
+    line-height: 1.6;
+    max-width: 400px;
 }
 
 .commodities-page__error h1 {
     font-size: var(--cg-font-size-xl);
     color: var(--cg-color-text);
     margin: 0;
-}
-
-.commodities-page__error p {
-    color: var(--cg-color-text-muted);
-    margin: 0;
-    font-size: var(--cg-font-size-sm);
-    line-height: 1.6;
+    font-weight: var(--cg-font-weight-bold);
 }
 
 .commodities-page__error a {
-    color: var(--cg-color-link);
-    text-decoration: none;
-    font-weight: var(--cg-font-weight-semibold);
-    padding: var(--cg-spacing-2) var(--cg-spacing-5);
-    min-height: 44px;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    gap: var(--cg-spacing-2);
+    margin-top: var(--cg-spacing-2);
+    padding: var(--cg-spacing-2) var(--cg-spacing-6);
     border-radius: var(--cg-radius-md);
-    transition: background var(--cg-transition-fast), transform var(--cg-transition-fast);
+    background: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-bold);
+    text-decoration: none;
+    min-height: 40px;
+    transition: all var(--cg-transition-fast);
 }
 
 .commodities-page__error a:hover {
-    text-decoration: none;
-    background: color-mix(in oklab, var(--cg-color-primary) 10%, transparent);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px color-mix(in oklab, var(--cg-color-primary) 30%, transparent);
+    background: var(--cg-color-primary-hover);
 }

@@ -76,35 +76,14 @@ public class KanbanSettingService : IKanbanSettingService
         return $"position:fixed;left:{_kanban.Position.Left}px;top:{_kanban.Position.Top}px;";
     }
 
-    private async Task ResetToDefaultsAsync()
+    private Task ResetToDefaultsAsync()
     {
         _kanban = new KanbanSettingModel();
         _button = new ButtonSettingModel();
         _dialogBox = new DialogBoxSettingModel();
         _chat = new ChatCardSettingModel();
 
-        try
-        {
-            var size = await _jsRuntime.InvokeAsync<WindowSize>("getWindowSize");
-
-            if (size.Width < 1600)
-            {
-                _kanban.Size.Width = 220;
-                _kanban.Size.Height = 220;
-                _button.Position.Left = 140;
-                _dialogBox.Position.Left = -200;
-                _dialogBox.Position.Bottom = 410;
-                _chat.Position.Left = -200;
-                _chat.Position.Bottom = 410;
-            }
-
-            _kanban.Position.Left = size.Width - _kanban.Size.Width;
-            _kanban.Position.Top = size.Height - _kanban.Size.Height;
-        }
-        catch
-        {
-            // SSR or JS not available — use defaults
-        }
+        return Task.CompletedTask;
     }
 
     private async Task ClampPositionsAsync()

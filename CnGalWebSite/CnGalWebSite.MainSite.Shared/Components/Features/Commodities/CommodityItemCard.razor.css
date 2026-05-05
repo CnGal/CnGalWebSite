@@ -1,63 +1,82 @@
+﻿/* ═══════════════════════════════════════════
+   CommodityItemCard — 小卖铺商品卡片
+   ═══════════════════════════════════════════ */
+
 .commodity-item-card {
     display: flex;
     flex-direction: column;
-    border-radius: var(--cg-radius-lg);
+    border-radius: var(--cg-radius-xl);
     background: var(--cg-color-surface);
     overflow: hidden;
-    box-shadow: var(--cg-shadow-sm);
-    border: 1px solid var(--cg-color-border);
-    transition: box-shadow var(--cg-transition-fast), transform var(--cg-transition-fast), border-color var(--cg-transition-fast);
+    box-shadow: 0 4px 16px color-mix(in oklab, var(--cg-color-text) 4%, transparent);
+    border: 1px solid color-mix(in oklab, var(--cg-color-border) 50%, transparent);
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     position: relative;
+    height: 100%;
 }
 
 .commodity-item-card:hover {
-    box-shadow: var(--cg-shadow-card-hover);
+    box-shadow: 0 12px 32px color-mix(in oklab, var(--cg-color-primary) 12%, transparent);
     transform: translateY(-4px);
-    border-color: color-mix(in oklab, var(--cg-color-primary) 25%, transparent);
+    border-color: color-mix(in oklab, var(--cg-color-primary) 30%, transparent);
 }
 
 /* ── 已解锁状态 ── */
 .commodity-item-card--owned {
     border-color: color-mix(in oklab, var(--cg-color-success) 30%, transparent);
-    background: color-mix(in oklab, var(--cg-color-success) 3%, var(--cg-color-surface));
+    background: color-mix(in oklab, var(--cg-color-success) 2%, var(--cg-color-surface));
 }
 
 .commodity-item-card--owned:hover {
-    border-color: color-mix(in oklab, var(--cg-color-success) 45%, transparent);
-    box-shadow: 0 4px 20px -8px color-mix(in oklab, var(--cg-color-success) 30%, transparent);
+    box-shadow: 0 12px 32px color-mix(in oklab, var(--cg-color-success) 12%, transparent);
+    border-color: color-mix(in oklab, var(--cg-color-success) 40%, transparent);
 }
 
 /* ── 图片 ── */
 .commodity-item-card__image-wrapper {
     position: relative;
     width: 100%;
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 1 / 1;
     overflow: hidden;
-    background: var(--cg-color-section-bg);
+    background: radial-gradient(circle, color-mix(in oklab, var(--cg-color-text) 2%, transparent) 0%, transparent 80%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--cg-spacing-4);
+}
+
+.commodity-item-card__image-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 -1px 4px color-mix(in oklab, var(--cg-color-text) 2%, transparent);
+    pointer-events: none;
 }
 
 .commodity-item-card__image-wrapper--broken {
     display: flex;
     align-items: center;
     justify-content: center;
+    background: var(--cg-color-section-bg);
 }
 
 .commodity-item-card__image-wrapper--broken::after {
     content: "📷";
-    font-size: 2rem;
-    opacity: 0.4;
+    font-size: 2.5rem;
+    opacity: 0.15;
 }
 
 .commodity-item-card__image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain; /* Prevents cropping of clothes/shoes */
     display: block;
-    transition: transform var(--cg-transition-normal);
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    filter: drop-shadow(0 4px 8px color-mix(in oklab, var(--cg-color-text) 8%, transparent));
 }
 
 .commodity-item-card:hover .commodity-item-card__image {
-    transform: scale(1.05);
+    transform: scale(1.08) translateY(-2px);
 }
 
 /* ── 商品信息 ── */
@@ -66,13 +85,13 @@
     display: flex;
     flex-direction: column;
     padding: var(--cg-spacing-4);
-    gap: var(--cg-spacing-3);
+    gap: var(--cg-spacing-2);
 }
 
 /* ── 名称 ── */
 .commodity-item-card__name {
     font-size: var(--cg-font-size-md);
-    font-weight: var(--cg-font-weight-semibold);
+    font-weight: var(--cg-font-weight-bold);
     color: var(--cg-color-text);
     margin: 0;
     line-height: 1.4;
@@ -103,42 +122,45 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--cg-spacing-3);
-    border-top: 1px solid var(--cg-color-border);
+    margin-top: var(--cg-spacing-2);
     padding-top: var(--cg-spacing-3);
-    margin-top: auto;
+    border-top: 1px dashed color-mix(in oklab, var(--cg-color-border) 60%, transparent);
 }
 
 /* ── 价格 ── */
 .commodity-item-card__price {
     display: flex;
     align-items: center;
-    gap: var(--cg-spacing-1);
-    padding: var(--cg-spacing-1) var(--cg-spacing-3) var(--cg-spacing-1) var(--cg-spacing-2);
-    background: color-mix(in oklab, var(--cg-color-amber) 8%, transparent);
+    gap: 0.25rem;
+    padding: 0.25rem 0.6rem 0.25rem 0.3rem;
+    background: color-mix(in oklab, var(--cg-color-amber) 10%, transparent);
     border-radius: var(--cg-radius-full);
+    color: var(--cg-color-amber);
+    border: 1px solid color-mix(in oklab, var(--cg-color-amber) 15%, transparent);
 }
 
 .commodity-item-card__gcoin-icon {
-    color: var(--cg-color-amber);
     flex-shrink: 0;
 }
 
 ::deep .commodity-item-card__gcoin-icon.cg-mdi-icon {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 }
 
 .commodity-item-card__price-value {
     font-size: var(--cg-font-size-lg);
     font-weight: var(--cg-font-weight-bold);
-    color: var(--cg-color-amber);
     line-height: 1;
+    letter-spacing: -0.02em;
 }
 
 .commodity-item-card__price-label {
-    font-size: var(--cg-font-size-xs);
-    color: var(--cg-color-text-muted);
-    font-weight: var(--cg-font-weight-medium);
+    font-size: 0.65rem;
+    font-weight: var(--cg-font-weight-bold);
+    text-transform: uppercase;
+    opacity: 0.9;
+    margin-left: 2px;
 }
 
 /* ── 操作按钮 ── */
@@ -149,12 +171,21 @@
 ::deep .commodity-item-card__action .cg-btn {
     border-radius: var(--cg-radius-full);
     min-height: 36px;
-    padding: 0 var(--cg-spacing-5);
+    padding: 0 var(--cg-spacing-4);
     font-size: var(--cg-font-size-sm);
-    font-weight: var(--cg-font-weight-semibold);
-    transition: transform var(--cg-transition-fast);
+    font-weight: var(--cg-font-weight-bold);
+    transition: all var(--cg-transition-fast);
 }
 
 ::deep .commodity-item-card__action .cg-btn:hover:not(:disabled) {
-    transform: scale(1.04);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 4px 12px color-mix(in oklab, var(--cg-color-primary) 35%, transparent);
+}
+
+/* 已拥有按钮的特殊样式 */
+.commodity-item-card--owned ::deep .commodity-item-card__action .cg-btn {
+    background: color-mix(in oklab, var(--cg-color-success) 12%, transparent);
+    color: var(--cg-color-success);
+    border-color: transparent;
+    box-shadow: none;
 }

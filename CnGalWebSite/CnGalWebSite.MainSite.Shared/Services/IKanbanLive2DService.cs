@@ -77,6 +77,11 @@ public interface IKanbanLive2DService
     Task<string?> GetKanbanImageGeneration();
 
     /// <summary>
+    /// 从当前 DOM 同步对话框位置并持久化。
+    /// </summary>
+    Task CommitDialogBoxPositionAsync();
+
+    /// <summary>
     /// 释放 Live2D 资源
     /// </summary>
     Task ReleaseLive2D();

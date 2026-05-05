@@ -1,7 +1,18 @@
+/* ═══════════════════════════════════════════
+   CommodityCodeRedeem — G币兑换码
+   ═══════════════════════════════════════════ */
+
 .commodity-code-redeem {
     display: flex;
     flex-direction: column;
     gap: var(--cg-spacing-6);
+}
+
+/* ── 提示 ── */
+::deep .commodity-code-redeem .cg-alert {
+    border-radius: var(--cg-radius-lg);
+    font-size: var(--cg-font-size-sm);
+    line-height: 1.6;
 }
 
 /* ── 兑换表单卡片 ── */
@@ -9,14 +20,21 @@
     display: flex;
     flex-direction: column;
     gap: var(--cg-spacing-4);
-    padding: var(--cg-spacing-5);
+    padding: var(--cg-spacing-6);
     background: var(--cg-color-surface);
-    border-radius: var(--cg-radius-lg);
+    border-radius: var(--cg-radius-xl);
     border: 1px solid var(--cg-color-border);
     box-shadow: var(--cg-shadow-sm);
 }
 
-/* ── 输入组：文本框 + 按钮 ── */
+.commodity-code-redeem__form-title {
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+/* ── 输入组 ── */
 .commodity-code-redeem__input-group {
     display: flex;
     flex-direction: column;
@@ -30,22 +48,30 @@
     }
 }
 
-/* ── CgInput 填充剩余空间 ── */
 ::deep .commodity-code-redeem__input-group .cg-input {
     flex-grow: 1;
 }
 
-/* ── 按钮 ── */
+::deep .commodity-code-redeem__input-group .cg-input .cg-input__control {
+    border-radius: var(--cg-radius-lg);
+    min-height: 48px;
+    font-size: var(--cg-font-size-md);
+}
+
 ::deep .commodity-code-redeem__input-group .cg-btn {
     border-radius: var(--cg-radius-lg);
-    min-height: 44px;
-    font-weight: var(--cg-font-weight-semibold);
+    min-height: 48px;
+    padding: 0 var(--cg-spacing-8);
+    font-weight: var(--cg-font-weight-bold);
+    font-size: var(--cg-font-size-md);
     white-space: nowrap;
-    transition: transform var(--cg-transition-fast);
+    box-shadow: 0 4px 12px color-mix(in oklab, var(--cg-color-primary) 25%, transparent);
+    transition: transform var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
 }
 
 ::deep .commodity-code-redeem__input-group .cg-btn:hover:not(:disabled) {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px color-mix(in oklab, var(--cg-color-primary) 40%, transparent);
 }
 
 @media (min-width: 640px) {
@@ -58,40 +84,67 @@
 .commodity-code-redeem__promo {
     display: flex;
     flex-direction: column;
-    gap: var(--cg-spacing-3);
-    padding: var(--cg-spacing-4);
+    gap: var(--cg-spacing-4);
+    padding: var(--cg-spacing-6);
     background: var(--cg-color-surface);
-    border-radius: var(--cg-radius-lg);
+    border-radius: var(--cg-radius-xl);
     border: 1px solid var(--cg-color-border);
     box-shadow: var(--cg-shadow-sm);
+    transition: all var(--cg-transition-normal);
+}
+
+.commodity-code-redeem__promo:hover {
+    box-shadow: var(--cg-shadow-lg);
+    border-color: color-mix(in oklab, var(--cg-color-brand-bilibili) 30%, transparent);
 }
 
 .commodity-code-redeem__promo-header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+}
+
+.commodity-code-redeem__promo-title {
+    display: flex;
+    align-items: center;
     gap: var(--cg-spacing-2);
-    font-size: var(--cg-font-size-sm);
-    font-weight: var(--cg-font-weight-semibold);
+    font-size: var(--cg-font-size-md);
+    font-weight: var(--cg-font-weight-bold);
     color: var(--cg-color-text);
 }
 
-::deep .commodity-code-redeem__promo-header .cg-mdi-icon {
-    width: 20px;
-    height: 20px;
+::deep .commodity-code-redeem__promo-title .cg-mdi-icon {
+    width: 24px;
+    height: 24px;
     color: var(--cg-color-brand-bilibili);
 }
 
-.commodity-code-redeem__promo-link {
+.commodity-code-redeem__promo-link-text {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-brand-bilibili);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    transition: transform var(--cg-transition-fast);
+}
+
+.commodity-code-redeem__promo-link-text:hover {
+    transform: translateX(4px);
+    text-decoration: none;
+}
+
+.commodity-code-redeem__promo-image-link {
     display: block;
-    border-radius: var(--cg-radius-md);
+    border-radius: var(--cg-radius-lg);
     overflow: hidden;
-    transition: box-shadow var(--cg-transition-fast), transform var(--cg-transition-fast);
+    transition: transform var(--cg-transition-normal);
     border: 1px solid var(--cg-color-border);
 }
 
-.commodity-code-redeem__promo-link:hover {
-    box-shadow: var(--cg-shadow-md);
-    transform: translateY(-2px);
+.commodity-code-redeem__promo-image-link:hover {
+    transform: scale(1.02);
 }
 
 .commodity-code-redeem__promo-image {
@@ -99,4 +152,5 @@
     height: auto;
     display: block;
     object-fit: cover;
+    aspect-ratio: 21 / 9;
 }
