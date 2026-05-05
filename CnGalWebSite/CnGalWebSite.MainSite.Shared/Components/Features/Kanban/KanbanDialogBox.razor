@@ -1,0 +1,309 @@
+@using CnGalWebSite.MainSite.Shared.Services.KanbanModels
+@using CnGalWebSite.MainSite.Shared.Services
+@using System.Text.RegularExpressions
+@inject IKanbanLive2DService Live2DService
+@implements IDisposable
+
+@if (_visible && Model is not null)
+{
+    <div id="kanban-dialogbox" class="kanban-dialogbox @GetTypeClass()" style="@GetPositionStyle()">
+        <div class="kanban-dialogbox__bubble">
+            @if (_displayType == KanbanDialogBoxType.Image)
+            {
+                <div class="kanban-dialogbox__image" style="@_imageStyle">
+                    <span class="kanban-dialogbox__image-placeholder">图片加载中…</span>
+                </div>
+            }
+
+            <div class="kanban-dialogbox__content">
+                @if (_displayType == KanbanDialogBoxType.Notification)
+                {
+                    <div class="kanban-dialogbox__badge">通知</div>
+                }
+                <div class="kanban-dialogbox__text">@_parsedContent</div>
+            </div>
+        </div>
+
+        <button class="kanban-dialogbox__close" @onclick="HandleCloseAsync" title="关闭" aria-label="关闭对话框">
+            <CgMdiIcon Name="mdiClose" aria-hidden="true" />
+        </button>
+    </div>
+}
+
+
+@code {
+    /// <summary>
+    /// 当前的对话框模型。
+    /// </summary>
+    [Parameter]
+    public KanbanDialogBoxModel? Model { get; set; }
+
+    /// <summary>
+    /// 关闭时触发（手动关闭或自动消失）。
+    /// </summary>
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    private bool _visible;
+    private string _parsedContent = string.Empty;
+    private KanbanDialogBoxType _displayType;
+    private string? _expression;
+    private string? _motionGroup;
+    private int _motion = -1;
+    private System.Threading.Timer? _dismissTimer;
+
+    private string? _imageStyle;
+
+    /// <summary>
+    /// 已解析标记的标记，避免重复解析。
+    /// </summary>
+    private KanbanDialogBoxModel? _lastModel;
+
+    protected override void OnParametersSet()
+    {
+        if (Model == _lastModel)
+        {
+            return;
+        }
+
+        _lastModel = Model;
+
+        if (Model is null)
+        {
+            _visible = false;
+            CancelDismissTimer();
+            return;
+        }
+
+        // 解析内容中的标记语法 [0表情][1动作:索引][2类型]文本
+        ParseMarkup(Model.Content);
+
+        // 如果 Model 已有 Expression/Motion，优先使用 Model 的值（覆盖标记中的值）
+        if (!string.IsNullOrWhiteSpace(Model.Expression))
+        {
+            _expression = Model.Expression;
+        }
+        if (!string.IsNullOrWhiteSpace(Model.MotionGroup))
+        {
+            _motionGroup = Model.MotionGroup;
+        }
+        if (Model.Motion >= 0)
+        {
+            _motion = Model.Motion;
+        }
+        if (Model.Type != KanbanDialogBoxType.Text)
+        {
+            // 仅当 Type 不是默认 Text 时才覆盖（标记已知类型 > 默认值）
+            if (_displayType == KanbanDialogBoxType.Text)
+            {
+                _displayType = Model.Type;
+            }
+        }
+
+        // 显示对话框
+        _visible = true;
+
+        // 异步触发 Live2D 动作和表情
+        _ = ApplyLive2DActionsAsync();
+
+        // 启动自动消失计时器
+        ScheduleDismiss();
+    }
+
+    /// <summary>
+    /// 解析内容中的标记语法并剥离。
+    /// 支持三种标记：
+    ///   [0表情名]  — 设置表情
+    ///   [1动作组:索引]  — 设置动作
+    ///   [2类型名]  — 设置对话框类型 (text/image/notification)
+    /// </summary>
+    private void ParseMarkup(string rawContent)
+    {
+        _parsedContent = rawContent;
+        _displayType = KanbanDialogBoxType.Text;
+        _expression = null;
+        _motionGroup = null;
+        _motion = -1;
+
+        var regex = new Regex(@"\[(\d)([^\[\]]*)\]", RegexOptions.Compiled);
+        var matches = regex.Matches(rawContent);
+
+        foreach (Match match in matches)
+        {
+            var directive = match.Groups[1].Value;
+            var payload = match.Groups[2].Value.Trim();
+
+            switch (directive)
+            {
+                case "0":
+                    // [0表情名] — 设置表情
+                    if (!string.IsNullOrWhiteSpace(payload))
+                    {
+                        _expression = payload;
+                    }
+                    break;
+
+                case "1":
+                    // [1动作组:索引] — 如 [1greet:2] → 动作组 greet，索引 2
+                    {
+                        var colonIndex = payload.LastIndexOf(':');
+                        if (colonIndex > 0 && colonIndex < payload.Length - 1)
+                        {
+                            _motionGroup = payload[..colonIndex].Trim();
+                            if (int.TryParse(payload[(colonIndex + 1)..].Trim(), out var idx))
+                            {
+                                _motion = idx;
+                            }
+                        }
+                    }
+                    break;
+
+                case "2":
+                    // [2类型] — 如 [2Image]、[2Notification]、[2Text]
+                    {
+                        var typeName = payload.ToLowerInvariant();
+                        _displayType = typeName switch
+                        {
+                            "image" => KanbanDialogBoxType.Image,
+                            "notification" => KanbanDialogBoxType.Notification,
+                            _ => KanbanDialogBoxType.Text
+                        };
+                    }
+                    break;
+            }
+        }
+
+        // 剥离所有 [n...] 标记，留下纯文本
+        _parsedContent = regex.Replace(rawContent, string.Empty).Trim();
+
+        // 如果剥离后为空，使用原内容
+        if (string.IsNullOrWhiteSpace(_parsedContent) && !string.IsNullOrWhiteSpace(rawContent))
+        {
+            _parsedContent = rawContent.Trim();
+        }
+    }
+
+    /// <summary>
+    /// 根据解析结果调用 Live2DService 设置表情和动作。
+    /// </summary>
+    private async Task ApplyLive2DActionsAsync()
+    {
+        try
+        {
+            // 表情
+            if (!string.IsNullOrWhiteSpace(_expression))
+            {
+                await Live2DService.SetExpression(_expression);
+            }
+            else
+            {
+                await Live2DService.CleanExpression();
+            }
+
+            // 动作
+            if (!string.IsNullOrWhiteSpace(_motionGroup) && _motion >= 0)
+            {
+                await Live2DService.SetMotion(_motionGroup, _motion);
+            }
+            else
+            {
+                await Live2DService.CleanMotion();
+            }
+        }
+        catch
+        {
+            // 静默处理 Live2D 调用异常，避免阻塞对话框渲染
+        }
+    }
+
+    /// <summary>
+    /// 根据优先级启动自动消失计时器。
+    /// Priority > 0：自动消失（时长基于内容长度）
+    /// Priority == 0：永久显示，直到手动关闭
+    /// Priority < 0：最低优先级，可以被新对话框覆盖（由父组件控制）
+    /// </summary>
+    private void ScheduleDismiss()
+    {
+        CancelDismissTimer();
+
+        if (Model is null || Model.Priority <= 0)
+        {
+            return;
+        }
+
+        // 基础显示时间 2 秒 + 每个字符 200ms
+        var delayMs = 2000 + (_parsedContent.Length * 200);
+
+        _dismissTimer = new System.Threading.Timer(
+            callback: _ =>
+            {
+                _ = InvokeAsync(async () =>
+                {
+                    await CleanLive2DStateAsync();
+                    _visible = false;
+                    await InvokeAsync(StateHasChanged);
+                    await OnClose.InvokeAsync();
+                });
+            },
+            state: null,
+            dueTime: delayMs,
+            period: Timeout.Infinite
+        );
+    }
+
+    private void CancelDismissTimer()
+    {
+        _dismissTimer?.Dispose();
+        _dismissTimer = null;
+    }
+
+    /// <summary>
+    /// 关闭按钮点击处理。
+    /// </summary>
+    private async Task HandleCloseAsync()
+    {
+        CancelDismissTimer();
+        await Live2DService.CommitDialogBoxPositionAsync();
+        await CleanLive2DStateAsync();
+        _visible = false;
+        await OnClose.InvokeAsync();
+    }
+
+    /// <summary>
+    /// 清理对话框触发的 Live2D 状态（表情、动作）。
+    /// </summary>
+    private async Task CleanLive2DStateAsync()
+    {
+        try
+        {
+            await Live2DService.CleanExpression();
+            await Live2DService.CleanMotion();
+        }
+        catch
+        {
+            // 静默处理
+        }
+    }
+
+    private string GetTypeClass()
+    {
+        return _displayType switch
+        {
+            KanbanDialogBoxType.Image => "kanban-dialogbox--image",
+            KanbanDialogBoxType.Notification => "kanban-dialogbox--notification",
+            _ => "kanban-dialogbox--text"
+        };
+    }
+
+    private string GetPositionStyle()
+    {
+        var pos = Live2DService.DialogBox.Position;
+        return $"left:{pos.Left}px; bottom:{pos.Bottom}px;";
+    }
+
+    public void Dispose()
+    {
+        CancelDismissTimer();
+        GC.SuppressFinalize(this);
+    }
+}

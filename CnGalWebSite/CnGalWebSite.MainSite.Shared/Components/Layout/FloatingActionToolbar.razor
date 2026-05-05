@@ -1,5 +1,10 @@
-﻿@inject NavigationManager NavigationManager
+﻿@using CnGalWebSite.MainSite.Shared.Services
+@inject NavigationManager NavigationManager
 @inject IMainSiteAuthRequestService AuthRequestService
+@inject IKanbanVisibilityService KanbanVisibilityService
+@inject IKanbanSettingService KanbanSettingService
+@inject IKanbanLive2DService Live2DService
+@inject IJSRuntime JS
 
 <nav class="floating-action-toolbar" aria-label="浮动工具栏">
     <div class="floating-action-toolbar__group">
@@ -15,20 +20,7 @@
                 <CgMdiIcon Name="mdiWechat" aria-hidden="true" />
                 <span>社区交流</span>
             </div>
-            <div class="floating-action-toolbar__qr-card">
-                <img src="https://image.cngal.org/images/2022/06/02/76142d8159b0.jpg" alt="CnGal 微信公众号二维码" />
-                <span>扫码加入微信公众号</span>
-            </div>
-            <div class="floating-action-toolbar__link-list">
-                <a class="floating-action-toolbar__link" href="https://weibo.com/cngalorg?sudaref=www.cngal.org" target="_blank" rel="noopener noreferrer">
-                    <CgMdiIcon Name="mdiSinaWeibo" aria-hidden="true" />
-                    <span>微博</span>
-                </a>
-                <a class="floating-action-toolbar__link" href="https://qm.qq.com/q/bgKC6yy5ri" target="_blank" rel="noopener noreferrer">
-                    <CgMdiIcon Name="mdiQqchat" aria-hidden="true" />
-                    <span>QQ 群</span>
-                </a>
-            </div>
+            <CommunityLinksContent />
         </div>
     </div>
 
@@ -42,7 +34,7 @@
         </button>
         <div class="floating-action-toolbar__panel floating-action-toolbar__panel--tools" role="group" aria-label="工具箱">
             <div class="floating-action-toolbar__panel-header">
-                <CgMdiIcon Name="mdiHammerWrench" aria-hidden="true" />
+                <CgMdiIcon Name="mdiToolbox" aria-hidden="true" />
                 <span>工具箱</span>
             </div>
 
@@ -69,8 +61,56 @@
         <CgMdiIcon Name="mdiArrowUp" aria-hidden="true" />
         <span class="floating-action-toolbar__label">顶部</span>
     </button>
+
+    @if (ShowKanbanSwitch)
+    {
+        <button class="floating-action-toolbar__button"
+                type="button"
+                aria-label="切换为看板娘"
+                title="切换为看板娘"
+                @onclick="HandleSwitchToKanban">
+            <CgMdiIcon Name="mdiSwapHorizontal" aria-hidden="true" />
+            <span class="floating-action-toolbar__label">看板</span>
+        </button>
+    }
 </nav>
 
 @code {
+    [Parameter]
+    public bool ShowKanbanSwitch { get; set; } = true;
+
     private string CurrentReturnUrl => new Uri(NavigationManager.Uri).PathAndQuery;
+
+    private async Task HandleSwitchToKanban()
+    {
+        try
+        {
+            // 计算看板娘位置，使按钮组底部与工具栏底部对齐（切换前后按钮位置不变）
+            var pos = await JS.InvokeAsync<KanbanAlignmentResult>("eval",
+                "(function(){var t=document.querySelector('.floating-action-toolbar');if(!t)return null;var r=t.getBoundingClientRect();var bw=48,g=12,ksW=" + KanbanSettingService.Kanban.Size.Width + ",ksH=" + KanbanSettingService.Kanban.Size.Height + ",w=window.innerWidth,h=window.innerHeight;var l=Math.round(Math.max(0,Math.min(r.right-ksW-g-bw,w-ksW)));var tp=Math.round(Math.max(0,Math.min(r.bottom-ksH,h-ksH)));return{left:l,top:tp};})()");
+
+            if (pos is not null)
+            {
+                KanbanSettingService.Kanban.Position.Left = pos.Left;
+                KanbanSettingService.Kanban.Position.Top = pos.Top;
+                await KanbanSettingService.SaveAsync();
+
+                // 同时设置内存位置，避免 KanbanRoot 首次渲染时闪现到 (0,0)
+                Live2DService.Kanban.Position.Left = pos.Left;
+                Live2DService.Kanban.Position.Top = pos.Top;
+            }
+        }
+        catch
+        {
+            // JS 不可用时跳过对齐
+        }
+
+        await KanbanVisibilityService.SetShowKanbanAsync(true);
+    }
+
+    private class KanbanAlignmentResult
+    {
+        public int Left { get; set; }
+        public int Top { get; set; }
+    }
 }

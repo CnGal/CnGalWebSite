@@ -1,0 +1,85 @@
+﻿@using CnGalWebSite.DataModel.ViewModel.Commodities
+@using Microsoft.Extensions.Logging
+@inject ILogger<CommodityItemCard> Logger
+
+@* CommodityItemCard — 小卖铺商品卡片 *@
+
+<div class="commodity-item-card @(Model.IsOwned ? "commodity-item-card--owned" : "")">
+    @* 商品图片 *@
+    <div class="commodity-item-card__image-wrapper">
+        <img src="@Model.Image"
+             alt="@Model.Name"
+             class="commodity-item-card__image"
+             loading="lazy"
+             onerror="this.style.display='none';this.parentElement.classList.add('commodity-item-card__image-wrapper--broken')" />
+    </div>
+
+    @* 商品信息 *@
+    <div class="commodity-item-card__body">
+        <h3 class="commodity-item-card__name">@Model.Name</h3>
+
+        @if (!string.IsNullOrWhiteSpace(Model.BriefIntroduction))
+        {
+            <p class="commodity-item-card__intro">@Model.BriefIntroduction</p>
+        }
+
+        @* 价格与操作 *@
+        <div class="commodity-item-card__footer">
+            <div class="commodity-item-card__price">
+                <CgMdiIcon Name="mdiCircleMultiple" class="commodity-item-card__gcoin-icon" aria-hidden="true" />
+                <span class="commodity-item-card__price-value">@Model.Price</span>
+
+            </div>
+
+            <div class="commodity-item-card__action">
+                @if (Model.IsOwned)
+                {
+                        <CgMdiIcon Name="mdiCheckBold" aria-hidden="true" />
+                        <div>已解锁</div>
+                 
+                }
+                else
+                {
+                    <CgButton Variant="primary"
+                              Async="@_isProcessing"
+                              OnClick="HandleBuyAsync">
+                        <CgMdiIcon Name="mdiCartOutline" aria-hidden="true" />
+                        解锁
+                    </CgButton>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public CommodityUserModel Model { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<long> OnBuy { get; set; }
+
+    private bool _isProcessing;
+
+    private async Task HandleBuyAsync(MouseEventArgs args)
+    {
+        if (!OnBuy.HasDelegate)
+        {
+            return;
+        }
+
+        _isProcessing = true;
+        try
+        {
+            await OnBuy.InvokeAsync(Model.Id);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "购买商品失败: {CommodityId}", Model.Id);
+        }
+        finally
+        {
+            _isProcessing = false;
+        }
+    }
+}

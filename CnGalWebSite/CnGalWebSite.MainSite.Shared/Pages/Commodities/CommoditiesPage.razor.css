@@ -1,0 +1,112 @@
+/* ── CommoditiesPage ── */
+.commodities-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-section-gap);
+    padding: var(--cg-page-gutter);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.commodities-page__hero {
+    text-align: center;
+    padding: var(--cg-spacing-8) var(--cg-spacing-4);
+    background: color-mix(in oklab, var(--cg-color-primary) 5%, transparent);
+    border-radius: var(--cg-radius-xl);
+}
+
+.commodities-page__hero-title {
+    font-size: var(--cg-font-size-2xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text-primary);
+    margin: 0 0 var(--cg-spacing-3);
+}
+
+.commodities-page__hero-subtitle {
+    font-size: var(--cg-font-size-lg);
+    color: var(--cg-color-text-secondary);
+    margin: 0;
+}
+
+.commodities-page__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--cg-spacing-6);
+    align-items: start;
+}
+
+@media (min-width: 768px) {
+    .commodities-page__grid {
+        grid-template-columns: 320px 1fr;
+        gap: var(--cg-spacing-8);
+    }
+}
+
+.commodities-page__sidebar {
+    position: sticky;
+    top: calc(var(--cg-header-height) + var(--cg-spacing-4));
+}
+
+.commodities-page__content {
+    min-width: 0;
+}
+
+.commodities-page__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--cg-spacing-10);
+    color: var(--cg-color-text-muted);
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    border: 1px solid var(--cg-color-border);
+    gap: var(--cg-spacing-4);
+    margin-top: var(--cg-spacing-4);
+}
+
+.commodities-page__empty ::deep .cg-mdi-icon {
+    width: 3rem;
+    height: 3rem;
+    opacity: 0.5;
+}
+
+.commodities-page__shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--cg-spacing-4);
+    margin-top: var(--cg-spacing-4);
+}
+
+.commodities-page__error,
+.commodities-page__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    gap: var(--cg-spacing-4);
+    text-align: center;
+    padding: var(--cg-spacing-4);
+}
+
+.commodities-page__error-icon ::deep .cg-mdi-icon {
+    width: 4rem;
+    height: 4rem;
+    color: var(--cg-color-error);
+}
+
+.commodities-page__error h1 {
+    font-size: var(--cg-font-size-xl);
+    margin: 0;
+    color: var(--cg-color-text-primary);
+}
+
+.commodities-page__error p {
+    color: var(--cg-color-text-secondary);
+    margin: 0;
+}
+
+.commodities-page__loading {
+    color: var(--cg-color-text-muted);
+}

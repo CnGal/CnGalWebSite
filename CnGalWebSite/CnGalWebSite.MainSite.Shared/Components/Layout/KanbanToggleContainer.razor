@@ -1,0 +1,85 @@
+﻿@using CnGalWebSite.MainSite.Shared.Components.Features.Kanban
+@using CnGalWebSite.MainSite.Shared.Services
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@inject IKanbanVisibilityService KanbanVisibilityService
+@inject IMiniModeService MiniModeService
+@inject IKanbanQueryService KanbanQueryService
+@inject NavigationManager NavigationManager
+@implements IDisposable
+@rendermode InteractiveServer
+
+@if (IsAlmanacPage)
+{
+}
+else if (!_isPermissionsDenied && KanbanVisibilityService.ShowKanban && !_isMiniMode)
+{
+    <CgMiniModeContainer>
+        <KanbanRoot />
+    </CgMiniModeContainer>
+}
+else
+{
+    <FloatingActionToolbar />
+}
+
+@code {
+    private bool _isMiniMode;
+    private bool _isPermissionsDenied;
+    private bool IsAlmanacPage => NavigationManager.Uri.Contains("/almanac", StringComparison.OrdinalIgnoreCase);
+
+    protected override void OnInitialized()
+    {
+        _isMiniMode = MiniModeService.IsMiniMode;
+
+        MiniModeService.MiniModeChanged -= OnMiniModeChanged;
+        MiniModeService.MiniModeChanged += OnMiniModeChanged;
+
+        KanbanVisibilityService.OnVisibilityChanged -= OnVisibilityChanged;
+        KanbanVisibilityService.OnVisibilityChanged += OnVisibilityChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await KanbanVisibilityService.LoadAsync();
+            await CheckPermissionsAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task CheckPermissionsAsync()
+    {
+        try
+        {
+            var result = await KanbanQueryService.GetPermissionsAsync();
+            if (result.Success && result.Data is not null)
+            {
+                _isPermissionsDenied = !result.Data.Permissions;
+            }
+        }
+        catch
+        {
+            // 权限检查失败时不强制隐藏，允许看板娘显示
+            _isPermissionsDenied = false;
+        }
+    }
+
+    private void OnMiniModeChanged()
+    {
+        _isMiniMode = MiniModeService.IsMiniMode;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void OnVisibilityChanged()
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        MiniModeService.MiniModeChanged -= OnMiniModeChanged;
+        KanbanVisibilityService.OnVisibilityChanged -= OnVisibilityChanged;
+        GC.SuppressFinalize(this);
+    }
+}

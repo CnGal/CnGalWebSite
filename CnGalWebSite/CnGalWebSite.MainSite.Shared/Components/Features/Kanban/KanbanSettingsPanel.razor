@@ -1,0 +1,273 @@
+@using CnGalWebSite.MainSite.Shared.Services.KanbanModels
+@inject IKanbanLive2DService Live2DService
+@inject IKanbanUserDataService UserDataService
+@inject NavigationManager NavigationManager
+@inject IMainSiteAuthRequestService AuthRequestService
+
+<div class="cg-kanban-settings-panel">
+    @if (ShowHeader)
+    {
+        <KanbanPanelHeader Icon="@HeaderIcon" Title="@Title" />
+    }
+
+    <div class="cg-kanban-settings-body">
+        @* 衣服 *@
+        @if (ShowClothesSection && Clothes is { Count: > 0 })
+        {
+            <div class="cg-kanban-settings-section">
+                <h4 class="cg-kanban-settings-section-title">衣服</h4>
+                <div class="cg-kanban-settings-item-grid">
+                    @foreach (var item in Clothes)
+                    {
+                        var isSelected = _selectedClothes == item.Name;
+                        var isFree = IsFreeItem(item.Name);
+                        var isDisabled = !isFree && !IsOwned(item.Name);
+
+                        <CgButton Variant="@(isSelected ? "primary" : "outline")"
+                                  Size="sm"
+                                  Disabled="isDisabled"
+                                  OnClick="() => SwitchClothesAsync(item.Name)">
+                            @item.DisplayName
+                        </CgButton>
+                    }
+                </div>
+            </div>
+        }
+
+        @* 丝袜 *@
+        @if (ShowStockingsSection && Stockings is { Count: > 0 })
+        {
+            <div class="cg-kanban-settings-section">
+                <h4 class="cg-kanban-settings-section-title">丝袜</h4>
+                <div class="cg-kanban-settings-item-grid">
+                    @foreach (var item in Stockings)
+                    {
+                        var isSelected = _selectedStockings == item.Name;
+                        var isFree = IsFreeItem(item.Name);
+                        var isDisabled = !isFree && !IsOwned(item.Name);
+
+                        <CgButton Variant="@(isSelected ? "primary" : "outline")"
+                                  Size="sm"
+                                  Disabled="isDisabled"
+                                  OnClick="() => SwitchStockingsAsync(item.Name)">
+                            @item.DisplayName
+                        </CgButton>
+                    }
+                </div>
+            </div>
+        }
+
+        @* 鞋子 *@
+        @if (ShowShoesSection && Shoes is { Count: > 0 })
+        {
+            <div class="cg-kanban-settings-section">
+                <h4 class="cg-kanban-settings-section-title">鞋子</h4>
+                <div class="cg-kanban-settings-item-grid">
+                    @foreach (var item in Shoes)
+                    {
+                        var isSelected = _selectedShoes == item.Name;
+                        var isFree = IsFreeItem(item.Name);
+                        var isDisabled = !isFree && !IsOwned(item.Name);
+
+                        <CgButton Variant="@(isSelected ? "primary" : "outline")"
+                                  Size="sm"
+                                  Disabled="isDisabled"
+                                  OnClick="() => SwitchShoesAsync(item.Name)">
+                            @item.DisplayName
+                        </CgButton>
+                    }
+                </div>
+            </div>
+        }
+
+        @* 表情 *@
+        @if (ShowExpressionsSection && Expressions is { Count: > 0 })
+        {
+            <div class="cg-kanban-settings-section">
+                <h4 class="cg-kanban-settings-section-title">表情</h4>
+                <div class="cg-kanban-settings-item-grid">
+                    <CgButton Variant="@(_selectedExpression is null ? "primary" : "outline")"
+                              Size="sm"
+                              OnClick="CleanExpressionAsync">
+                        默认
+                    </CgButton>
+                    @foreach (var item in Expressions)
+                    {
+                        var isSelected = _selectedExpression == item.Name;
+
+                        <CgButton Variant="@(isSelected ? "primary" : "outline")"
+                                  Size="sm"
+                                  OnClick="() => SetExpressionAsync(item.Name)">
+                            @item.DisplayName
+                        </CgButton>
+                    }
+                </div>
+            </div>
+        }
+
+        @* 前往小卖铺 *@
+        <div class="cg-kanban-settings-shop-link">
+            <AuthorizeView>
+                <Authorized>
+                    <CgButton Variant="outline" Size="sm" Href="/commodities" class="cg-kanban-settings-shop-link__btn">
+                        <CgMdiIcon Name="mdiStorefrontOutline" aria-hidden="true" />
+                        <span>前往小卖铺解锁更多服装</span>
+                    </CgButton>
+                </Authorized>
+                <NotAuthorized>
+                    <a class="cg-kanban-settings-shop-link__login" href="@AuthRequestService.BuildLoginUrl(CurrentReturnUrl)">
+                        <CgMdiIcon Name="mdiLogin" aria-hidden="true" />
+                        <span>登录后解锁更多服装</span>
+                    </a>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    /// <summary>
+    /// 面板标题，默认"看板娘设置"
+    /// </summary>
+    [Parameter]
+    public string Title { get; set; } = "看板娘设置";
+
+    /// <summary>
+    /// 是否显示面板头部（标题栏），默认 true
+    /// </summary>
+    [Parameter]
+    public bool ShowHeader { get; set; } = true;
+
+    /// <summary>
+    /// 头部图标名称，默认 mdiCogOutline
+    /// </summary>
+    [Parameter]
+    public string HeaderIcon { get; set; } = "mdiCogOutline";
+
+    /// <summary>
+    /// 是否显示衣服分区，默认 true
+    /// </summary>
+    [Parameter]
+    public bool ShowClothesSection { get; set; } = true;
+
+    /// <summary>
+    /// 是否显示丝袜分区，默认 true
+    /// </summary>
+    [Parameter]
+    public bool ShowStockingsSection { get; set; } = true;
+
+    /// <summary>
+    /// 是否显示鞋子分区，默认 true
+    /// </summary>
+    [Parameter]
+    public bool ShowShoesSection { get; set; } = true;
+
+    /// <summary>
+    /// 是否显示表情分区，默认 true
+    /// </summary>
+    [Parameter]
+    public bool ShowExpressionsSection { get; set; } = true;
+
+    [Parameter]
+    public List<KanbanClothesModel>? Clothes { get; set; }
+
+    [Parameter]
+    public List<KanbanStockingsModel>? Stockings { get; set; }
+
+    [Parameter]
+    public List<KanbanShoesModel>? Shoes { get; set; }
+
+    [Parameter]
+    public List<KanbanExpressionModel>? Expressions { get; set; }
+
+    [Parameter]
+    public List<string>? OwnedItems { get; set; }
+
+    private string CurrentReturnUrl => new Uri(NavigationManager.Uri).PathAndQuery;
+
+    private string? _selectedClothes;
+    private string? _selectedStockings;
+    private string? _selectedShoes;
+    private string? _selectedExpression;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCurrentSelectionsAsync();
+    }
+
+    private async Task LoadCurrentSelectionsAsync()
+    {
+        await UserDataService.LoadAsync();
+        var userData = UserDataService.UserData;
+        _selectedClothes = userData.ClothesName;
+        _selectedStockings = userData.StockingsName;
+        _selectedShoes = userData.ShoesName;
+
+        if (!string.IsNullOrEmpty(userData.ClothesName))
+        {
+            await Live2DService.SetClothes(userData.ClothesName);
+        }
+
+        if (!string.IsNullOrEmpty(userData.StockingsName))
+        {
+            await Live2DService.SetStockings(userData.StockingsName);
+        }
+
+        if (!string.IsNullOrEmpty(userData.ShoesName))
+        {
+            await Live2DService.SetShoes(userData.ShoesName);
+        }
+    }
+
+    private static bool IsFreeItem(string name)
+    {
+        return name.EndsWith('0');
+    }
+
+    private bool IsOwned(string name)
+    {
+        if (OwnedItems is null)
+        {
+            return false;
+        }
+
+        return OwnedItems.Contains(name, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private async Task SwitchClothesAsync(string name)
+    {
+        _selectedClothes = name;
+        await Live2DService.SetClothes(name);
+        UserDataService.UserData.ClothesName = name;
+        await UserDataService.SaveAsync();
+    }
+
+    private async Task SwitchStockingsAsync(string name)
+    {
+        _selectedStockings = name;
+        await Live2DService.SetStockings(name);
+        UserDataService.UserData.StockingsName = name;
+        await UserDataService.SaveAsync();
+    }
+
+    private async Task SwitchShoesAsync(string name)
+    {
+        _selectedShoes = name;
+        await Live2DService.SetShoes(name);
+        UserDataService.UserData.ShoesName = name;
+        await UserDataService.SaveAsync();
+    }
+
+    private async Task SetExpressionAsync(string name)
+    {
+        _selectedExpression = name;
+        await Live2DService.SetExpression(name);
+    }
+
+    private async Task CleanExpressionAsync()
+    {
+        _selectedExpression = null;
+        await Live2DService.CleanExpression();
+    }
+}

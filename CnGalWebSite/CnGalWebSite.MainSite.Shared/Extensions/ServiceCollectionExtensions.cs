@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using CnGalWebSite.MainSite.Shared.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,7 +18,16 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICgDeviceIdentificationService, CgDeviceIdentificationService>();
         services.AddScoped<IMiniModeService, MiniModeService>();
         services.AddScoped<ICgThemeService, CgThemeService>();
+        services.AddScoped<IKanbanSettingService, KanbanSettingService>();
+        services.AddScoped<IKanbanUserDataService, KanbanUserDataService>();
+        services.AddScoped<IKanbanEventService, KanbanEventService>();
         services.AddSingleton<ICircuitHandlerService, CircuitHandlerService>();
+        services.AddSingleton<IKanbanRemoteConfigService, KanbanRemoteConfigService>();
+        services.AddScoped<IKanbanLive2DService, KanbanLive2DService>();
+        services.AddScoped<IKanbanChatService, KanbanChatService>();
+        services.AddScoped<IKanbanVisibilityService, KanbanVisibilityService>();
+        services.AddScoped<IKanbanCommodityOwnershipService, KanbanCommodityOwnershipService>();
+        services.AddBlazoredLocalStorage();
         return services;
     }
 }

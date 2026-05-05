@@ -1,0 +1,25 @@
+﻿/* ── CommodityGCoinsRecord ── */
+.commodity-gcoins-record {
+
+}
+
+.commodity-gcoins-record__title {
+    margin: 0;
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text-primary);
+}
+
+.commodity-gcoins-record__count--increase {
+    color: var(--cg-color-success);
+    font-weight: var(--cg-font-weight-bold);
+}
+
+.commodity-gcoins-record__count--decrease {
+    color: var(--cg-color-error);
+    font-weight: var(--cg-font-weight-bold);
+}
+
+.commodity-gcoins-record__count--zero {
+    color: var(--cg-color-text-muted);
+}

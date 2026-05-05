@@ -48,7 +48,6 @@
 }
 
 .floating-action-toolbar__button:focus-visible,
-.floating-action-toolbar__link:focus-visible,
 .floating-action-toolbar__login:focus-visible {
     outline: 3px solid var(--cg-color-focus-ring);
     outline-offset: 3px;
@@ -120,30 +119,6 @@
     color: var(--cg-color-primary);
 }
 
-.floating-action-toolbar__qr-card {
-    display: grid;
-    gap: var(--cg-spacing-2);
-    margin-bottom: var(--cg-spacing-3);
-    text-align: center;
-    color: var(--cg-color-text-muted);
-    font-size: var(--cg-font-size-xs);
-}
-
-.floating-action-toolbar__qr-card img {
-    width: 100%;
-    max-width: 11rem;
-    justify-self: center;
-    border-radius: var(--cg-radius-lg);
-    border: 1px solid var(--cg-color-border);
-    background: var(--cg-color-bg);
-}
-
-.floating-action-toolbar__link-list {
-    display: grid;
-    gap: var(--cg-spacing-2);
-}
-
-.floating-action-toolbar__link,
 .floating-action-toolbar__login {
     display: flex;
     align-items: center;
@@ -157,7 +132,6 @@
     transition: background-color var(--cg-transition-fast), color var(--cg-transition-fast), transform var(--cg-transition-fast);
 }
 
-.floating-action-toolbar__link:hover,
 .floating-action-toolbar__login:hover {
     color: var(--cg-color-primary);
     background: color-mix(in oklab, var(--cg-color-primary) 12%, transparent);
@@ -165,7 +139,6 @@
     transform: translateX(-2px);
 }
 
-.floating-action-toolbar__link ::deep .cg-mdi-icon,
 .floating-action-toolbar__login ::deep .cg-mdi-icon {
     width: 1.15rem;
     height: 1.15rem;

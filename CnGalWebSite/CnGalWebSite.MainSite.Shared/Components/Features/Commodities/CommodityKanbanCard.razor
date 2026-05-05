@@ -1,0 +1,60 @@
+﻿@* CommodityKanbanCard — 看板娘小卖铺侧边栏卡片 *@
+
+<div class="commodity-kanban-card">
+    @* 看板娘形象图 *@
+    <div class="commodity-kanban-card__image-wrapper">
+        <img src="https://image.cngal.org/images/upload/20230928/a8206180d6d4c5f08dc0fc560f25557f366e8513.png"
+             alt="看板娘"
+             class="commodity-kanban-card__image"
+             loading="lazy" />
+    </div>
+
+    @* 卡片正文 *@
+    <div class="commodity-kanban-card__body">
+        <h2 class="commodity-kanban-card__title">看板娘的小卖铺</h2>
+        <p class="commodity-kanban-card__welcome">
+            欢迎光临看板娘的小卖铺！看板娘不需要新衣服，看板娘就是最可爱的！
+        </p>
+
+        @* G币余额 *@
+        <div class="commodity-kanban-card__balance">
+            <div class="commodity-kanban-card__balance-left">
+                <CgMdiIcon Name="mdiCircleMultiple" class="commodity-kanban-card__gcoin-icon" aria-hidden="true" />
+                <span class="commodity-kanban-card__balance-label">G币余额</span>
+            </div>
+            <span class="commodity-kanban-card__balance-value">@GCoins</span>
+        </div>
+
+        @* 获取G币按钮 *@
+        <div class="commodity-kanban-card__actions">
+            <CgButton Href="/tasks" Variant="primary">
+                <CgMdiIcon Name="mdiClipboardCheckOutline" aria-hidden="true" />
+                获取G币
+            </CgButton>
+        </div>
+
+    </div>
+</div>
+
+        @* 抽奖活动提醒 *@
+        @if (Permissions)
+        {
+            <div class="commodity-kanban-card__alert">
+                <CgAlert Variant="info">
+                    <span>看板娘：9月抽奖活动即将开始，记得攒G币哦~</span>
+                </CgAlert>
+            </div>
+        }
+@code {
+    /// <summary>
+    /// 当前用户 G币余额。
+    /// </summary>
+    [Parameter]
+    public int GCoins { get; set; }
+
+    /// <summary>
+    /// 看板娘显示权限（控制是否显示额外信息）。
+    /// </summary>
+    [Parameter]
+    public bool Permissions { get; set; }
+}

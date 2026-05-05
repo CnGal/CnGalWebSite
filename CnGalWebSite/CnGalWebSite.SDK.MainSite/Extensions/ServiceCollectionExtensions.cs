@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
         var imageApiBase = new Uri(EnsureTrailingSlash(imageApiBaseAddress));
         var taskApiBase = new Uri(EnsureTrailingSlash(taskApiBaseAddress));
 
+        RegisterSdkHttpClient<IAccountQueryService, AccountQueryService>(services, apiBase);
         RegisterSdkHttpClient<IHomeQueryService, HomeQueryService>(services, apiBase);
         RegisterSdkHttpClient<IEntryQueryService, EntryQueryService>(services, apiBase);
         RegisterSdkHttpClient<ISpaceQueryService, SpaceQueryService>(services, apiBase);
@@ -32,6 +33,8 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<ITableQueryService, TableQueryService>(services, apiBase);
         RegisterSdkHttpClient<IVoteQueryService, VoteQueryService>(services, apiBase);
         RegisterSdkHttpClient<IFavoriteFolderQueryService, FavoriteFolderQueryService>(services, apiBase);
+        RegisterSdkHttpClient<IKanbanQueryService, KanbanQueryService>(services, apiBase);
+        RegisterSdkHttpClient<ICommodityQueryService, CommodityQueryService>(services, apiBase);
 
         RegisterSdkHttpClient<IEntryCommandService, EntryCommandService>(services, apiBase);
         RegisterSdkHttpClient<IArticleCommandService, ArticleCommandService>(services, apiBase);

@@ -1,0 +1,158 @@
+/* ── KanbanChatCard — AI chat dialog with message list + input ── */
+
+.kanban-chat-card {
+    display: flex;
+    flex-direction: column;
+    width: var(--cg-kanban-chat-max-width);
+    max-height: 55vh;
+    overflow: hidden;
+}
+
+/* ── Header ── */
+
+.kanban-chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    border-bottom: 1px solid color-mix(in oklab, var(--cg-color-border) 60%, transparent);
+    background: color-mix(in oklab, var(--cg-color-section-bg) 80%, transparent);
+    flex-shrink: 0;
+}
+
+.kanban-chat-header-start {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+}
+
+.kanban-chat-header-start ::deep .cg-mdi-icon {
+    width: 1.15rem;
+    height: 1.15rem;
+    color: var(--cg-color-primary);
+    flex-shrink: 0;
+}
+
+.kanban-chat-title {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+}
+
+/* ── Message list ── */
+
+.kanban-chat-messages {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: var(--cg-spacing-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+    scroll-behavior: smooth;
+}
+
+.kanban-chat-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.kanban-chat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.kanban-chat-messages::-webkit-scrollbar-thumb {
+    background-color: var(--cg-color-border);
+    border-radius: var(--cg-radius-full);
+}
+
+/* ── Single message ── */
+
+.kanban-chat-message {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--cg-spacing-2);
+}
+
+.kanban-chat-message--user {
+    flex-direction: row-reverse;
+    align-self: flex-end;
+}
+
+.kanban-chat-message--bot {
+    flex-direction: row;
+    align-self: flex-start;
+}
+
+/* ── Avatar ── */
+
+.kanban-chat-avatar {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: var(--cg-radius-full);
+    border: 1px solid var(--cg-color-border);
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+/* ── Bubble ── */
+
+.kanban-chat-bubble {
+    max-width: 75%;
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    font-size: var(--cg-font-size-sm);
+    line-height: 1.5;
+    word-break: break-word;
+    white-space: pre-wrap;
+    border-radius: var(--cg-radius-lg);
+}
+
+.kanban-chat-message--user .kanban-chat-bubble {
+    background-color: var(--cg-color-primary);
+    color: var(--cg-color-on-primary);
+    border-bottom-right-radius: var(--cg-radius-sm);
+}
+
+.kanban-chat-message--bot .kanban-chat-bubble {
+    background-color: var(--cg-color-section-bg);
+    color: var(--cg-color-text);
+    border-bottom-left-radius: var(--cg-radius-sm);
+}
+
+/* ── Input area ── */
+
+.kanban-chat-input-area {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-3);
+    border-top: 1px solid color-mix(in oklab, var(--cg-color-border) 60%, transparent);
+    background: var(--cg-color-surface);
+    flex-shrink: 0;
+}
+
+.kanban-chat-input-area ::deep .cg-textarea {
+    min-height: 36px;
+    max-height: 72px;
+    resize: none;
+    flex: 1 1 auto;
+}
+
+.kanban-chat-input-area ::deep .cg-btn {
+    flex-shrink: 0;
+}
+
+/* ── Fade-in animation for new messages ── */
+
+.kanban-chat-message {
+    animation: kanban-chat-fade-in var(--cg-transition-normal) ease-out;
+}
+
+@keyframes kanban-chat-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -8,10 +8,9 @@
 @using CnGalWebSite.MainSite.Shared.Components.Features.Periphery.Editor
 @using CnGalWebSite.SDK.MainSite.Models.PeripheryEdit
 @using System.Text.Json
-@using Microsoft.JSInterop
 @inject IPeripheryCommandService PeripheryCommandService
 @inject NavigationManager NavigationManager
-@inject IJSRuntime JS
+@inject ILocalStorageService LocalStorage
 @inject ICgToastService ToastService
 @implements IDisposable
 
@@ -89,8 +88,7 @@ else if (Model != null)
             {
                 try
                 {
-                    var json = JsonSerializer.Serialize(Model.Data);
-                    await JS.InvokeVoidAsync("localStorage.setItem", DraftKey, json);
+                    await LocalStorage.SetItemAsync(DraftKey, Model.Data);
                 }
                 catch { /* Ignore local storage errors */ }
             }
@@ -130,15 +128,11 @@ else if (Model != null)
                 // 尝试恢复草稿
                 try
                 {
-                    var draftStr = await JS.InvokeAsync<string>("localStorage.getItem", DraftKey);
-                    if (!string.IsNullOrWhiteSpace(draftStr))
+                    var draft = await LocalStorage.GetItemAsync<CreatePeripheryViewModel>(DraftKey);
+                    if (draft != null)
                     {
-                        var draft = JsonSerializer.Deserialize<CreatePeripheryViewModel>(draftStr);
-                        if (draft != null)
-                        {
-                            Model.Data = draft;
-                            HasDraftRecovered = true;
-                        }
+                        Model.Data = draft;
+                        HasDraftRecovered = true;
                     }
                 }
                 catch { }
@@ -176,7 +170,7 @@ else if (Model != null)
         {
             Model.Data = JsonSerializer.Deserialize<CreatePeripheryViewModel>(JsonSerializer.Serialize(OriginalData))!;
             HasDraftRecovered = false;
-            await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);
+            await LocalStorage.RemoveItemAsync(DraftKey);
             StateHasChanged();
         }
     }
@@ -206,7 +200,7 @@ else if (Model != null)
             var result = await PeripheryCommandService.SubmitEditAsync(request, _cts!.Token);
             if (result.Success)
             {
-                await JS.InvokeVoidAsync("localStorage.removeItem", DraftKey);
+                await LocalStorage.RemoveItemAsync(DraftKey);
                 NavigationManager.NavigateTo($"/peripheries/index/{result.Data}");
             }
             else

@@ -98,30 +98,24 @@
     };
 
     window.cngalMiniMode = {
-        set: function (isMiniMode) {
+        setCookie: function (isMiniMode) {
             if (isMiniMode) {
                 document.cookie = 'cg-mini-mode=true; path=/; max-age=31536000; samesite=lax';
-                localStorage.setItem('IsMiniMode', 'true');
                 return;
             }
-
             document.cookie = 'cg-mini-mode=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; samesite=lax';
-            localStorage.removeItem('IsMiniMode');
         },
         getCookie: function () {
             return document.cookie
                 .split(';')
                 .map(function (item) { return item.trim(); })
                 .some(function (item) { return item === 'cg-mini-mode=true'; });
-        },
-        getLegacy: function () {
-            return localStorage.getItem('IsMiniMode') === 'true';
         }
     };
 
     window.cngalTheme = {
         apply: function () {
-            var value = this.getCookie() || this.getLegacy();
+            var value = this.getCookie();
             if (value !== 'dark' && value !== 'light') {
                 value = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
                     ? 'dark'
@@ -131,26 +125,14 @@
             document.documentElement.setAttribute('data-theme', value);
             return value;
         },
-        set: function (isDark) {
+        setCookie: function (isDark) {
             var value = isDark ? 'dark' : 'light';
             document.cookie = 'cg-theme=' + value + '; path=/; max-age=31536000; samesite=lax';
-            try {
-                localStorage.setItem('cg-theme', value);
-            } catch {
-                // Ignore storage failures; the cookie still keeps SSR navigation stable.
-            }
             document.documentElement.setAttribute('data-theme', value);
         },
         getCookie: function () {
             var match = document.cookie.match(/(?:^|;\s*)cg-theme=([^;]*)/);
             return match ? match[1] : null;
-        },
-        getLegacy: function () {
-            try {
-                return localStorage.getItem('cg-theme');
-            } catch {
-                return null;
-            }
         }
     };
 </script>

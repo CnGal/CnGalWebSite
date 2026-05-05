@@ -1,0 +1,23 @@
+.kanban-panel-header {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    padding-bottom: var(--cg-spacing-2);
+    border-bottom: 1px solid color-mix(in oklab, var(--cg-color-border) 50%, transparent);
+    color: var(--cg-color-text);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+}
+
+.kanban-panel-header ::deep .cg-mdi-icon {
+    width: 1.15rem;
+    height: 1.15rem;
+    flex-shrink: 0;
+    color: var(--cg-color-primary);
+}
+
+.kanban-panel-header__title {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+}

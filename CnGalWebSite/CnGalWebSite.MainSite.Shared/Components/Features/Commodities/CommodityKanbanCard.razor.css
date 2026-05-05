@@ -1,0 +1,88 @@
+﻿/* ── CommodityKanbanCard ── */
+.commodity-kanban-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-xl);
+    border: 1px solid var(--cg-color-border);
+    overflow: hidden;
+    box-shadow: var(--cg-shadow-sm);
+}
+
+.commodity-kanban-card__image-wrapper {
+    position: relative;
+    width: 100%;
+
+    overflow: hidden;
+}
+
+.commodity-kanban-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+}
+
+.commodity-kanban-card__body {
+    padding: var(--cg-spacing-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);    text-align: center;
+}
+
+.commodity-kanban-card__title {
+    margin: 0;
+    font-size: var(--cg-font-size-xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text-primary);
+}
+
+.commodity-kanban-card__welcome {
+    margin: 0;
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-secondary);
+    line-height: 1.6;
+}
+
+.commodity-kanban-card__balance {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+}
+
+.commodity-kanban-card__balance-left {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    color: var(--cg-color-text-primary);
+}
+
+ ::deep .commodity-kanban-card__gcoin-icon{
+    color: var(--cg-color-primary);
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.commodity-kanban-card__balance-label {
+    font-weight: var(--cg-font-weight-medium);
+}
+
+.commodity-kanban-card__balance-value {
+    font-size: var(--cg-font-size-xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.commodity-kanban-card__actions {
+
+}
+
+.commodity-kanban-card__actions ::deep .cg-btn {
+
+}
+
+.commodity-kanban-card__alert {
+    margin-top: var(--cg-spacing-2);
+}

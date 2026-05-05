@@ -1,0 +1,15 @@
+/* ── KanbanMainCard — Live2D canvas container ── */
+
+.kanban-main-card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.kanban-main-card canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: auto;
+}

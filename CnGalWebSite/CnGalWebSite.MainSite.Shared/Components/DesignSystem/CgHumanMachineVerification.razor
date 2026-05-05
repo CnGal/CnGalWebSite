@@ -1,0 +1,86 @@
+﻿@inject IJSRuntime JS
+@inject IAccountQueryService AccountQueryService
+@inject ILogger<CgHumanMachineVerification> Logger
+@using CnGalWebSite.DataModel.ViewModel.Others
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@using Microsoft.Extensions.Logging
+@implements IAsyncDisposable
+
+@* 纯代码组件，无可见 UI *@
+
+@code {
+    [Parameter]
+    public EventCallback<HumanMachineVerificationResult> OnVerficated { get; set; }
+
+    [Parameter]
+    public bool WaitChecked { get; set; }
+
+    private bool _isChecked;
+    private DotNetObjectReference<CgHumanMachineVerification>? _objRef;
+    private IJSObjectReference? _module;
+
+    private const string ModulePath = "./_content/CnGalWebSite.MainSite.Shared/scripts/cg-geetest.js";
+
+    public async Task StartVerification()
+    {
+        try
+        {
+            _isChecked = false;
+
+            var result = await AccountQueryService.GetGeetestCodeAsync();
+            if (!result.Success || result.Data is null)
+            {
+                Logger.LogError("获取 Geetest 初始化参数失败：{Message}", result.Error?.Message);
+                await OnVerficated.InvokeAsync(new HumanMachineVerificationResult());
+                return;
+            }
+
+            var geetestCode = result.Data;
+            _objRef = DotNetObjectReference.Create(this);
+            _module ??= await JS.InvokeAsync<IJSObjectReference>("import", ModulePath);
+            await _module.InvokeVoidAsync("initGeetestBindCAPTCHA", _objRef, geetestCode.Gt, geetestCode.Challenge, geetestCode.Success);
+
+            while (!_isChecked && WaitChecked)
+            {
+                await Task.Delay(500);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "初始化极验人机验证失败");
+            await OnVerficated.InvokeAsync(new HumanMachineVerificationResult());
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnChecked(string challenge, string validate, string seccode)
+    {
+        await OnVerficated.InvokeAsync(new HumanMachineVerificationResult
+        {
+            Success = true,
+            Challenge = challenge,
+            Validate = validate,
+            Seccode = seccode
+        });
+
+        _isChecked = true;
+    }
+
+    [JSInvokable]
+    public async Task OnCancel()
+    {
+        await OnVerficated.InvokeAsync(new HumanMachineVerificationResult());
+        _isChecked = true;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _objRef?.Dispose();
+        if (_module is not null)
+        {
+            await _module.DisposeAsync();
+        }
+        _isChecked = true;
+        GC.SuppressFinalize(this);
+    }
+}

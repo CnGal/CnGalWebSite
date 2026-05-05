@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Http;
 using Microsoft.JSInterop;
 
@@ -9,6 +10,7 @@ public class CgThemeService : ICgThemeService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IJSRuntime _jsRuntime;
+    private readonly ILocalStorageService _localStorage;
     private bool _isDarkMode;
 
     public event Action? ThemeChanged;
@@ -20,10 +22,12 @@ public class CgThemeService : ICgThemeService
 
     public CgThemeService(
         IHttpContextAccessor httpContextAccessor,
-        IJSRuntime jsRuntime)
+        IJSRuntime jsRuntime,
+        ILocalStorageService localStorageService)
     {
         _httpContextAccessor = httpContextAccessor;
         _jsRuntime = jsRuntime;
+        _localStorage = localStorageService;
         _isDarkMode = ResolveInitialTheme();
         PersistThemeCookieOnServer(_isDarkMode);
     }
@@ -59,7 +63,7 @@ public class CgThemeService : ICgThemeService
             }
             else
             {
-                var legacyValue = await _jsRuntime.InvokeAsync<string>("cngalTheme.getLegacy");
+                var legacyValue = await _localStorage.GetItemAsync<string>("cg-theme");
                 if (!string.IsNullOrEmpty(legacyValue))
                 {
                     var isDarkFromLegacy = string.Equals(legacyValue, ThemeConstants.DarkValue, StringComparison.OrdinalIgnoreCase);
@@ -130,6 +134,7 @@ public class CgThemeService : ICgThemeService
 
     private async Task PersistThemeOnClientAsync(bool isDark)
     {
-        await _jsRuntime.InvokeVoidAsync("cngalTheme.set", isDark);
+        await _localStorage.SetItemAsync("cg-theme", isDark ? "dark" : "light");
+        await _jsRuntime.InvokeVoidAsync("cngalTheme.setCookie", isDark);
     }
 }

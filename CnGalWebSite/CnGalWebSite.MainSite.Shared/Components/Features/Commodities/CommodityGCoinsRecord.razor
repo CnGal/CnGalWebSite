@@ -1,0 +1,57 @@
+﻿@using CnGalWebSite.DataModel.ViewModel.Commodities
+
+@* CommodityGCoinsRecord — G币变动记录数据表格 *@
+
+<div class="commodity-gcoins-record">
+    <CgDataTable Title="G币记录"
+                 TItem="GCoinsRecordOverviewModel"
+                 OnServerQuery="OnServerQuery"
+                 DefaultSortField="Time"
+                 DefaultSortDesc="true"
+                 DefaultPageSize="10"
+                 @ref="_dataTable">
+        <CgDataTableColumn TItem="GCoinsRecordOverviewModel"
+                           Title="时间"
+                           Field="Time"
+                           Width="160px">
+            @context.Time.ToString("yyyy-MM-dd HH:mm")
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="GCoinsRecordOverviewModel"
+                           Title="G币变动"
+                           Field="Count"
+                           Width="100px">
+            @if (context.Count > 0)
+            {
+                <span class="commodity-gcoins-record__count--increase">+@context.Count</span>
+            }
+            else if (context.Count < 0)
+            {
+                <span class="commodity-gcoins-record__count--decrease">@context.Count</span>
+            }
+            else
+            {
+                <span class="commodity-gcoins-record__count--zero">0</span>
+            }
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="GCoinsRecordOverviewModel"
+                           Title="备注"
+                           Field="Note">
+            @(string.IsNullOrWhiteSpace(context.Note) ? "—" : context.Note)
+        </CgDataTableColumn>
+    </CgDataTable>
+</div>
+
+@code {
+    private CgDataTable<GCoinsRecordOverviewModel>? _dataTable;
+
+    [Parameter, EditorRequired]
+    public Func<CgDataTableRequest, Task<CgDataTableResult<GCoinsRecordOverviewModel>>> OnServerQuery { get; set; } = default!;
+
+    public async Task RefreshAsync()
+    {
+        if (_dataTable is not null)
+        {
+            await _dataTable.RefreshAsync();
+        }
+    }
+}

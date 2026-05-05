@@ -1,0 +1,92 @@
+﻿@using CnGalWebSite.MainSite.Shared.Services
+@inject IKanbanVisibilityService KanbanVisibilityService
+
+<div id="kanban-button-group" class="kanban-button-group">
+    <CgPopupMenu Placement="left-bottom">
+        <TriggerContent>
+            <button class="kanban-action-btn" type="button" title="聊天" aria-label="聊天">
+                <CgMdiIcon Name="mdiChat" aria-hidden="true" />
+            </button>
+        </TriggerContent>
+        <ChildContent>
+            @ChatContent
+        </ChildContent>
+    </CgPopupMenu>
+
+    <CgPopupMenu Placement="left-bottom">
+        <TriggerContent>
+            <button class="kanban-action-btn" type="button" title="服装" aria-label="服装">
+                <CgMdiIcon Name="mdiHanger" aria-hidden="true" />
+            </button>
+        </TriggerContent>
+        <ChildContent>
+            @ClothesContent
+        </ChildContent>
+    </CgPopupMenu>
+
+    <CgPopupMenu Placement="left-bottom">
+        <TriggerContent>
+            <button class="kanban-action-btn" type="button" title="表情" aria-label="表情">
+                <CgMdiIcon Name="mdiEmoticonOutline" aria-hidden="true" />
+            </button>
+        </TriggerContent>
+        <ChildContent>
+            @ExpressionsContent
+        </ChildContent>
+    </CgPopupMenu>
+
+    <CgPopupMenu Placement="left-bottom">
+        <TriggerContent>
+            <button class="kanban-action-btn" type="button" title="社区交流" aria-label="社区交流">
+                <CgMdiIcon Name="mdiLink" aria-hidden="true" />
+            </button>
+        </TriggerContent>
+        <ChildContent>
+            @CommunityContent
+        </ChildContent>
+    </CgPopupMenu>
+
+    <CgPopupMenu Placement="left-bottom">
+        <TriggerContent>
+            <button class="kanban-action-btn" type="button" title="工具箱" aria-label="工具箱">
+                <CgMdiIcon Name="mdiToolbox" aria-hidden="true" />
+            </button>
+        </TriggerContent>
+        <ChildContent>
+            @ToolboxContent
+        </ChildContent>
+    </CgPopupMenu>
+
+    <button class="kanban-action-btn" type="button" title="回到顶部" aria-label="回到顶部" @onclick="() => OnBackToTop.InvokeAsync()">
+        <CgMdiIcon Name="mdiArrowUp" aria-hidden="true" />
+    </button>
+
+    <button class="kanban-action-btn" type="button" title="切换为浮动按钮" aria-label="切换为浮动按钮" @onclick="HandleSwitchToToolbar">
+        <CgMdiIcon Name="mdiSwapHorizontal" aria-hidden="true" />
+    </button>
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChatContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ClothesContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ExpressionsContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? CommunityContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ToolboxContent { get; set; }
+
+    [Parameter]
+    public EventCallback OnBackToTop { get; set; }
+
+    private async Task HandleSwitchToToolbar()
+    {
+        await KanbanVisibilityService.SetShowKanbanAsync(false);
+    }
+}

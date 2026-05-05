@@ -34,6 +34,7 @@ function initGeetestCaptcha(formId, scenario) {
         initGeetest4({
             captchaId: gt,
             product: 'float',
+            displayMode: 1,
             nativeButton: {
                 width: '100%',
                 height: '48px'

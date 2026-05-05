@@ -1,7 +1,7 @@
-@* 纯静态实现：通过 JS onclick 直接调用 window.cngalTheme.set()，无需交互模式 *@
+@* 纯静态实现：通过 JS onclick 直接调用 window.cngalTheme.setCookie()，无需交互模式 *@
 
 <button class="cg-theme-toggle"
-        onclick="var isDark = document.documentElement.getAttribute('data-theme') === 'dark'; window.cngalTheme.set(!isDark);"
+        onclick="var isDark = document.documentElement.getAttribute('data-theme') === 'dark'; window.cngalTheme.setCookie(!isDark);"
         aria-label="切换颜色主题">
     <CgMdiIcon Name="mdiThemeLightDark" aria-hidden="true" />
 </button>

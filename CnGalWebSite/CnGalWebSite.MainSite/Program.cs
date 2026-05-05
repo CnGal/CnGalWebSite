@@ -33,6 +33,7 @@ builder.Services.AddHttpContextAccessor();
 //添加状态检查
 builder.Services.AddHealthChecks();
 builder.Services.AddScoped<CircuitHandler, IdleCircuitHandler>();
+builder.Services.AddScoped<CircuitHandler, KanbanEventCircuitHandler>();
 
 var app = builder.Build();
 //设置请求来源

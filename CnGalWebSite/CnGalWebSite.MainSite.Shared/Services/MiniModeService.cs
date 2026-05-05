@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
@@ -15,6 +16,7 @@ public class MiniModeService : IMiniModeService
     private readonly NavigationManager _navigationManager;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IJSRuntime _jsRuntime;
+    private readonly ILocalStorageService _localStorage;
     private bool _isMiniMode;
 
     public event Action? MiniModeChanged;
@@ -27,11 +29,13 @@ public class MiniModeService : IMiniModeService
     public MiniModeService(
         NavigationManager navigationManager,
         IHttpContextAccessor httpContextAccessor,
-        IJSRuntime jsRuntime)
+        IJSRuntime jsRuntime,
+        ILocalStorageService localStorageService)
     {
         _navigationManager = navigationManager;
         _httpContextAccessor = httpContextAccessor;
         _jsRuntime = jsRuntime;
+        _localStorage = localStorageService;
         _isMiniMode = ResolveInitialMiniMode(_navigationManager.Uri);
         PersistMiniModeCookieOnServer(_isMiniMode);
     }
@@ -77,7 +81,7 @@ public class MiniModeService : IMiniModeService
                 }
                 else
                 {
-                    var isMiniModeInLegacyStorage = await _jsRuntime.InvokeAsync<bool>("cngalMiniMode.getLegacy");
+                    var isMiniModeInLegacyStorage = await _localStorage.GetItemAsync<bool>("IsMiniMode");
                     if (isMiniModeInLegacyStorage && !_isMiniMode)
                     {
                         _isMiniMode = true;
@@ -172,7 +176,8 @@ public class MiniModeService : IMiniModeService
 
     private async Task PersistMiniModeOnClientAsync(bool isMiniMode)
     {
-        await _jsRuntime.InvokeVoidAsync("cngalMiniMode.set", isMiniMode);
+        await _localStorage.SetItemAsync("IsMiniMode", isMiniMode);
+        await _jsRuntime.InvokeVoidAsync("cngalMiniMode.setCookie", isMiniMode);
     }
 
     private static CookieOptions CreateCookieOptions(HttpContext httpContext)

@@ -10,7 +10,7 @@
     @if (_isOpen)
     {
         <div class="cg-popup-menu-backdrop" @onclick="Close"></div>
-        <div class="cg-popup-menu-panel" role="menu" @onclick:stopPropagation>
+        <div class="cg-popup-menu-panel cg-popup-menu-panel--@Placement" role="menu" @onclick:stopPropagation>
             @if (ChildContent != null)
             {
                 @ChildContent
@@ -42,6 +42,7 @@
     [Parameter] public EventCallback<string> ItemSelected { get; set; }
     [Parameter] public RenderFragment? TriggerContent { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string Placement { get; set; } = "bottom-end";
 
     private bool _isOpen;
 

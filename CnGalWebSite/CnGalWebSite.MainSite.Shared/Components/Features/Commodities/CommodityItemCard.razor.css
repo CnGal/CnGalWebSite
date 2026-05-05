@@ -1,0 +1,110 @@
+﻿/* ── CommodityItemCard ── */
+.commodity-item-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--cg-color-surface);
+    border-radius: var(--cg-radius-lg);
+    border: 1px solid var(--cg-color-border);
+    overflow: hidden;
+    transition: transform var(--cg-transition-fast), box-shadow var(--cg-transition-fast), border-color var(--cg-transition-fast);
+    height: 100%;
+}
+
+.commodity-item-card:hover {
+   }
+
+
+.commodity-item-card__image-wrapper {
+    position: relative;
+    width: 100%;
+
+    overflow: hidden;
+}
+
+.commodity-item-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--cg-transition-normal);
+}
+
+.commodity-item-card:hover .commodity-item-card__image {
+    transform: scale(1.05);
+}
+
+.commodity-item-card__image-wrapper--broken {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.commodity-item-card__image-wrapper--broken::after {
+    content: '图片缺失';
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+}
+
+.commodity-item-card__body {
+    display: flex;
+    flex-direction: column;
+    padding: var(--cg-spacing-4);
+    flex: 1;
+}
+
+.commodity-item-card__name {
+    margin: 0 0 var(--cg-spacing-2);
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-primary);
+    line-height: 1.4;
+}
+
+.commodity-item-card__intro {
+    margin: 0 0 var(--cg-spacing-4);
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-secondary);
+    line-height: 1.5;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.commodity-item-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: var(--cg-spacing-3);
+    border-top: 1px solid var(--cg-color-border);
+}
+
+.commodity-item-card__price {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    color: var(--cg-color-primary);
+    font-weight: var(--cg-font-weight-bold);
+}
+
+.commodity-item-card__gcoin-icon ::deep .cg-mdi-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.commodity-item-card__price-value {
+    font-size: var(--cg-font-size-lg);
+}
+
+.commodity-item-card__price-label {
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-medium);
+}
+
+.commodity-item-card__action{
+    display: flex;
+    color: var(--cg-color-primary);
+    gap: .5rem;
+    align-items: center;
+}

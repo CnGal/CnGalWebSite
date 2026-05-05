@@ -1,0 +1,105 @@
+﻿/* ── CommodityCodeRedeem ── */
+.commodity-code-redeem {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-6);
+    background: var(--cg-color-surface);
+    padding: var(--cg-spacing-5);
+    border-radius: var(--cg-radius-xl);
+    border: 1px solid var(--cg-color-border);
+    box-shadow: var(--cg-shadow-sm);
+    margin-top: var(--cg-spacing-4);
+}
+
+.commodity-code-redeem__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+}
+
+.commodity-code-redeem__form-title {
+    margin: 0;
+    font-size: var(--cg-font-size-lg);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-primary);
+}
+
+.commodity-code-redeem__input-group {
+    display: flex;
+    gap: var(--cg-spacing-3);
+    align-items: stretch;
+}
+
+.commodity-code-redeem__input-group ::deep .cg-input {
+    flex: 1;
+}
+
+@media (max-width: 640px) {
+    .commodity-code-redeem__input-group {
+        flex-direction: column;
+    }
+    .commodity-code-redeem__input-group ::deep .cg-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+.commodity-code-redeem__promo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-3);
+    padding-top: var(--cg-spacing-4);
+    border-top: 1px dashed var(--cg-color-border);
+}
+
+.commodity-code-redeem__promo-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.commodity-code-redeem__promo-title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-text-primary);
+}
+
+.commodity-code-redeem__promo-title ::deep .cg-mdi-icon {
+    color: var(--cg-color-primary);
+}
+
+.commodity-code-redeem__promo-link-text {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-primary);
+}
+
+.commodity-code-redeem__promo-link-text:hover {
+    color: var(--cg-color-primary-hover);
+    text-decoration: none;
+}
+
+.commodity-code-redeem__promo-image-link {
+    display: block;
+    border-radius: var(--cg-radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--cg-color-border);
+    transition: transform var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
+}
+
+.commodity-code-redeem__promo-image-link:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--cg-shadow-md);
+}
+
+.commodity-code-redeem__promo-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
