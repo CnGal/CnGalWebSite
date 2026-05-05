@@ -18,22 +18,20 @@
     z-index: 19;
 }
 
-@keyframes cg-popup-slide-in {
+@keyframes cg-popup-fade-in {
     from {
         opacity: 0;
-        transform: translateY(-6px) scale(0.97);
+        transform: scale(0.95);
     }
     to {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: scale(1);
     }
 }
 
 .cg-popup-menu-panel {
     position: absolute;
     z-index: 20;
-    top: calc(100% + var(--cg-spacing-2));
-    right: 0;
     min-width: 220px;
     margin: 0;
     padding: var(--cg-spacing-2);
@@ -44,8 +42,59 @@
     -webkit-backdrop-filter: blur(20px);
     box-shadow: var(--cg-shadow-lg), 0 0 0 1px rgba(0, 0, 0, 0.02);
     overflow: hidden;
-    animation: cg-popup-slide-in 0.2s ease-out;
+    animation: cg-popup-fade-in 0.2s ease-out;
+}
+
+/* ── Placement: bottom (below trigger) ── */
+.cg-popup-menu-panel--bottom-end {
+    top: calc(100% + var(--cg-spacing-2));
+    right: 0;
     transform-origin: top right;
+}
+
+.cg-popup-menu-panel--bottom-start {
+    top: calc(100% + var(--cg-spacing-2));
+    left: 0;
+    transform-origin: top left;
+}
+
+/* ── Placement: top (above trigger) ── */
+.cg-popup-menu-panel--top-end {
+    bottom: calc(100% + var(--cg-spacing-2));
+    right: 0;
+    transform-origin: bottom right;
+}
+
+.cg-popup-menu-panel--top-start {
+    bottom: calc(100% + var(--cg-spacing-2));
+    left: 0;
+    transform-origin: bottom left;
+}
+
+/* ── Placement: right (right of trigger) ── */
+.cg-popup-menu-panel--right-top {
+    left: calc(100% + var(--cg-spacing-2));
+    top: 0;
+    transform-origin: left top;
+}
+
+.cg-popup-menu-panel--right-bottom {
+    left: calc(100% + var(--cg-spacing-2));
+    bottom: 0;
+    transform-origin: left bottom;
+}
+
+/* ── Placement: left (left of trigger) ── */
+.cg-popup-menu-panel--left-top {
+    right: calc(100% + var(--cg-spacing-2));
+    top: 0;
+    transform-origin: right top;
+}
+
+.cg-popup-menu-panel--left-bottom {
+    right: calc(100% + var(--cg-spacing-2));
+    bottom: 0;
+    transform-origin: right bottom;
 }
 
 .cg-popup-menu-list {

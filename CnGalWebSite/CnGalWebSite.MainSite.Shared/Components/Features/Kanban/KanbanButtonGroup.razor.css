@@ -65,18 +65,13 @@
     transform: scale(1.06);
 }
 
-/* ── CgPopupMenu panel positioning override ── */
+/* ── 弹出菜单尺寸限制 ── */
 
 .kanban-button-group ::deep .cg-popup-menu-panel {
-    top: auto;
-    bottom: 0;
-    left: calc(100% + var(--cg-spacing-2));
-    right: auto;
     min-width: 280px;
     max-width: min(320px, calc(100vw - 5rem));
     max-height: 60vh;
     overflow-y: auto;
-    transform-origin: left bottom;
 }
 
 .kanban-button-group ::deep .cg-popup-menu-panel::-webkit-scrollbar {

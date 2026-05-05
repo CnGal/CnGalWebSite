@@ -1,8 +1,8 @@
-@using CnGalWebSite.MainSite.Shared.Services
+﻿@using CnGalWebSite.MainSite.Shared.Services
 @inject IKanbanVisibilityService KanbanVisibilityService
 
 <div id="kanban-button-group" class="kanban-button-group">
-    <CgPopupMenu>
+    <CgPopupMenu Placement="left-bottom">
         <TriggerContent>
             <button class="kanban-action-btn" type="button" title="聊天" aria-label="聊天">
                 <CgMdiIcon Name="mdiChat" aria-hidden="true" />
@@ -13,7 +13,7 @@
         </ChildContent>
     </CgPopupMenu>
 
-    <CgPopupMenu>
+    <CgPopupMenu Placement="left-bottom">
         <TriggerContent>
             <button class="kanban-action-btn" type="button" title="设置" aria-label="设置">
                 <CgMdiIcon Name="mdiCogOutline" aria-hidden="true" />
