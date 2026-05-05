@@ -1209,6 +1209,11 @@ function initKanbanLive2D(dotNetHelper, modelDir, modelIndex, resourcesPath) {
             live2d_dotNetHelper = dotNetHelper;
 
             setLive2dDefine(resourcesPath, backImageName, modelDirs, canvasId, modelIndex);
+            const canvas = document.getElementById(canvasId);
+            if (canvas) {
+                const rect = canvas.getBoundingClientRect();
+                applyLive2dCanvasSize(rect.width || canvas.width, rect.height || canvas.height);
+            }
             initLive2d();
             initKanbanMoveAction(dotNetHelper);
             initButtonGroupMoveAction(dotNetHelper);
@@ -1231,6 +1236,20 @@ function getWindowSize() {
         Height: window.innerHeight,
         Width: window.innerWidth,
     }
+}
+
+function applyLive2dCanvasSize(width, height) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) {
+        return;
+    }
+
+    const nextWidth = Math.round(width);
+    const nextHeight = Math.round(height);
+    canvas.width = nextWidth;
+    canvas.height = nextHeight;
+    canvas.style.width = `${nextWidth}px`;
+    canvas.style.height = `${nextHeight}px`;
 }
 
 // 监听窗口变化
@@ -1751,7 +1770,10 @@ function listenLive2dCanvasChange() {
             var rect = live2dItem.getBoundingClientRect();
             if (_w > 0 && _h > 0) {
                 if (_w != rect.width || _h != rect.height) {
+                    applyLive2dCanvasSize(rect.width, rect.height);
                     resizeLive2d();
+                    _w = rect.width;
+                    _h = rect.height;
                 }
             }
             else {

@@ -1,7 +1,11 @@
 ﻿@inject ISettingService _settingService
 @implements IDisposable
 
-<canvas id="live2d" width="@_settingService.Setting.Kanban.Size.Width" height="@_settingService.Setting.Kanban.Size.Height"  class="live2d"></canvas>
+<canvas id="live2d"
+        width="@_settingService.Setting.Kanban.Size.Width"
+        height="@_settingService.Setting.Kanban.Size.Height"
+        style="@($"width:{_settingService.Setting.Kanban.Size.Width}px;height:{_settingService.Setting.Kanban.Size.Height}px;")"
+        class="live2d"></canvas>
 <canvas id="live2d-cache" style="display:none"></canvas>
 
 

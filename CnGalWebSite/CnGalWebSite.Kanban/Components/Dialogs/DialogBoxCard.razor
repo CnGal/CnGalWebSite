@@ -12,7 +12,6 @@
 <div class="@($"kanban-dialogbox {(_sleep?"d-none":"")}")" id="kanban-dialogbox" style="@_settingService.Setting.DialogBox.GetStyles()">
     <MDCard Style="@($"width: fit-content;{((_show && !_settingService.Setting.DialogBox.Hide)?"":"opacity: 0;")}")">
         <MDCard Style="@_settingService.Setting.DialogBox.GetContentStyles()">
-            <ImageCard />
             <div class="content-card  pa-3">
                 <div class="title-medium name">
                     @if (_type != IconType.None)
