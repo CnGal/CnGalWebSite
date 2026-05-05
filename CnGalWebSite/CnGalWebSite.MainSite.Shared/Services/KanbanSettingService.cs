@@ -92,30 +92,18 @@ public class KanbanSettingService : IKanbanSettingService
         {
             var size = await _jsRuntime.InvokeAsync<WindowSize>("getWindowSize");
 
-            // 确保至少 50% 看板娘在屏幕内可见
-            var kanbanLeft = _kanban.Position.Left;
-            var kanbanTop = _kanban.Position.Top;
-            var kanbanWidth = _kanban.Size.Width;
-            var kanbanHeight = _kanban.Size.Height;
-
-            if (kanbanLeft + kanbanWidth * 0.5 < 0)
-                _kanban.Position.Left = (int)(-kanbanWidth * 0.5);
-
-            if (kanbanLeft + kanbanWidth * 0.5 > size.Width)
-                _kanban.Position.Left = (int)(size.Width - kanbanWidth * 0.5);
-
-            if (kanbanTop + kanbanHeight * 0.5 < 0)
-                _kanban.Position.Top = (int)(-kanbanHeight * 0.5);
-
-            if (kanbanTop + kanbanHeight * 0.5 > size.Height)
-                _kanban.Position.Top = (int)(size.Height - kanbanHeight * 0.5);
-
             // Kanban 尺寸：最小 150px，最大为屏幕宽高的 80%
             var maxSize = (int)(Math.Min(size.Width, size.Height) * 0.8);
             if (_kanban.Size.Width < 150) _kanban.Size.Width = 150;
             if (_kanban.Size.Height < 150) _kanban.Size.Height = 150;
             if (_kanban.Size.Width > maxSize) _kanban.Size.Width = maxSize;
             if (_kanban.Size.Height > maxSize) _kanban.Size.Height = maxSize;
+
+            // 看板娘主体必须完整位于屏幕内，任意边被遮挡都推回可视区域。
+            var kanbanWidth = _kanban.Size.Width;
+            var kanbanHeight = _kanban.Size.Height;
+            ClampRelative(_kanban.Position.Left, 0, Math.Max(0, size.Width - kanbanWidth), v => _kanban.Position.Left = v);
+            ClampRelative(_kanban.Position.Top, 0, Math.Max(0, size.Height - kanbanHeight), v => _kanban.Position.Top = v);
 
             // Button group
             ClampRelative(_button.Position.Left, -kanbanWidth, kanbanWidth * 2, v => _button.Position.Left = v);

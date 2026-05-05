@@ -154,6 +154,116 @@ function debounce(fn, delay) {
     };
 }
 
+function getCssPixelVariable(name, fallback) {
+    var raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    if (!raw) return fallback;
+
+    if (raw.endsWith('px')) {
+        var px = Number.parseFloat(raw);
+        return Number.isFinite(px) ? px : fallback;
+    }
+
+    var probe = document.createElement('div');
+    probe.style.position = 'absolute';
+    probe.style.visibility = 'hidden';
+    probe.style.pointerEvents = 'none';
+    probe.style.width = raw;
+    document.body.appendChild(probe);
+    var width = probe.getBoundingClientRect().width;
+    probe.remove();
+
+    return width > 0 ? width : fallback;
+}
+
+function getFloatingToolbarRightGap() {
+    if (window.matchMedia('(min-width: 768px)').matches) {
+        return getCssPixelVariable('--cg-spacing-8', 32);
+    }
+
+    return getCssPixelVariable('--cg-spacing-4', 16);
+}
+
+function getViewportWidthWithoutScrollbar() {
+    return document.documentElement.clientWidth || window.innerWidth;
+}
+
+function getKanbanVisualMetrics(live2dItem) {
+    var rootRect = live2dItem.getBoundingClientRect();
+    var groupItem = document.getElementById('kanban-button-group');
+    var groupRect = groupItem ? groupItem.getBoundingClientRect() : null;
+    var firstButton = groupItem ? groupItem.querySelector('.kanban-action-btn') : null;
+    var firstButtonRect = firstButton ? firstButton.getBoundingClientRect() : null;
+
+    var leftOffset = 0;
+    var topOffset = 0;
+    var rightOffset = live2dItem.offsetWidth;
+    var bottomOffset = live2dItem.offsetHeight;
+
+    if (groupRect) {
+        var groupLeftOffset = groupRect.left - rootRect.left;
+        var groupTopOffset = groupRect.top - rootRect.top;
+        var groupWidth = Math.max(groupRect.width, firstButtonRect ? firstButtonRect.width : 0);
+        var groupHeight = Math.max(groupRect.height, firstButtonRect ? firstButtonRect.height : 0);
+
+        leftOffset = Math.min(leftOffset, groupLeftOffset);
+        topOffset = Math.min(topOffset, groupTopOffset);
+        rightOffset = Math.max(rightOffset, groupLeftOffset + groupWidth);
+        bottomOffset = Math.max(bottomOffset, groupTopOffset + groupHeight);
+    }
+
+    return {
+        leftOffset: leftOffset,
+        topOffset: topOffset,
+        rightOffset: rightOffset,
+        bottomOffset: bottomOffset
+    };
+}
+
+function getKanbanViewportBounds(live2dItem) {
+    var metrics = getKanbanVisualMetrics(live2dItem);
+    var rightGap = getFloatingToolbarRightGap();
+    var viewportWidth = getViewportWidthWithoutScrollbar();
+
+    return {
+        minLeft: -metrics.leftOffset,
+        minTop: -metrics.topOffset,
+        maxLeft: viewportWidth - rightGap - metrics.rightOffset,
+        maxTop: window.innerHeight - metrics.bottomOffset
+    };
+}
+
+function clampToBounds(value, min, max) {
+    if (max < min) {
+        return min;
+    }
+
+    return Math.max(min, Math.min(value, max));
+}
+
+function applyKanbanFrame(live2dItem, left, top) {
+    live2dItem.style.left = Math.round(left) + 'px';
+    live2dItem.style.top = Math.round(top) + 'px';
+    live2dItem.style.width = live2dItem.offsetWidth + 'px';
+    live2dItem.style.height = live2dItem.offsetHeight + 'px';
+}
+
+function clampKanbanInsideViewport(dotNetRef) {
+    var live2dItem = document.getElementById('kanban-live2d');
+    if (!live2dItem || _kanbanMousedown || _kanbanResizing) return;
+
+    var rect = live2dItem.getBoundingClientRect();
+    var bounds = getKanbanViewportBounds(live2dItem);
+    var nextLeft = clampToBounds(rect.left, bounds.minLeft, bounds.maxLeft);
+    var nextTop = clampToBounds(rect.top, bounds.minTop, bounds.maxTop);
+
+    if (Math.round(nextLeft) === Math.round(rect.left) && Math.round(nextTop) === Math.round(rect.top)) {
+        return;
+    }
+
+    applyKanbanFrame(live2dItem, nextLeft, nextTop);
+    dotNetRef.invokeMethodAsync('SetKanbanPosition', Math.round(nextLeft), Math.round(nextTop));
+}
+
 // ---------------------------------------------------------------------------
 // 全局回调（Live2D 引擎调用）
 // ---------------------------------------------------------------------------
@@ -209,13 +319,14 @@ export function initKanbanLive2D(dotNetRef, modelDir, modelIndex, resourcesPath)
         initChatCardMoveAction(dotNetRef);
         listenLive2dCanvasChange();
 
-        var getWindowInfo = function () {
+        var clampKanbanPosition = function () {
             if (_dotNetHelper) {
-                _dotNetHelper.invokeMethodAsync('CheckKanbanPositionAsync');
+                clampKanbanInsideViewport(_dotNetHelper);
             }
         };
-        _resizeDebouncedHandler = debounce(getWindowInfo, 100);
+        _resizeDebouncedHandler = debounce(clampKanbanPosition, 100);
         addTrackedListener(window, 'resize', _resizeDebouncedHandler);
+        clampKanbanInsideViewport(dotNetRef);
 
         console.log("初始化Live2D");
     });
@@ -436,11 +547,11 @@ export function initKanbanMoveAction(dotNetRef) {
     var MAX_LEFT, MAX_TOP;
     var MIN_LEFT, MIN_TOP;
     function updateBounds() {
-        // 确保至少 50% 看板娘在屏幕内可见
-        MIN_LEFT = -(live2dItem.offsetWidth * 0.5);
-        MIN_TOP = -(live2dItem.offsetHeight * 0.5);
-        MAX_LEFT = window.innerWidth - live2dItem.offsetWidth * 0.5;
-        MAX_TOP = window.innerHeight - live2dItem.offsetHeight * 0.5;
+        var bounds = getKanbanViewportBounds(live2dItem);
+        MIN_LEFT = bounds.minLeft;
+        MIN_TOP = bounds.minTop;
+        MAX_LEFT = bounds.maxLeft;
+        MAX_TOP = bounds.maxTop;
     }
 
     var mousedown_fun = function (event) {
@@ -501,11 +612,11 @@ export function initKanbanMoveAction(dotNetRef) {
             dx = cx - deltaLeft;
             dy = cy - deltaTop;
 
-            // 实时边界钳制：至少 50% 在屏幕内可见
-            var newLeft = Math.max(MIN_LEFT, Math.min(x_org + dx, MAX_LEFT));
-            var newTop = Math.max(MIN_TOP, Math.min(y_org + dy, MAX_TOP));
+            // 实时边界钳制：看板娘主体和右侧按钮组任意边超出屏幕后立即推回屏幕内
+            var newLeft = clampToBounds(x_org + dx, MIN_LEFT, MAX_LEFT);
+            var newTop = clampToBounds(y_org + dy, MIN_TOP, MAX_TOP);
 
-            live2dItem.setAttribute('style', 'left:' + newLeft + 'px; top:' + newTop + 'px; width: ' + live2dItem.offsetWidth + 'px; height: ' + live2dItem.offsetHeight + 'px;');
+            applyKanbanFrame(live2dItem, newLeft, newTop);
         } else {
             clearInterval(time);
             live2dItem.classList.remove('drag-ready');
@@ -519,8 +630,8 @@ export function initKanbanMoveAction(dotNetRef) {
         live2dItem.classList.remove('dragging');
         if (move) {
             move = false;
-            var finalLeft = Math.max(MIN_LEFT, Math.min(x_org + dx, MAX_LEFT));
-            var finalTop = Math.max(MIN_TOP, Math.min(y_org + dy, MAX_TOP));
+            var finalLeft = clampToBounds(x_org + dx, MIN_LEFT, MAX_LEFT);
+            var finalTop = clampToBounds(y_org + dy, MIN_TOP, MAX_TOP);
             dotNetRef.invokeMethodAsync('SetKanbanPosition', Math.round(finalLeft), Math.round(finalTop));
             document.body.classList.remove('user-select-none');
             switchLiv2DExpression();
