@@ -1,8 +1,10 @@
-﻿@using CnGalWebSite.SDK.MainSite.Models.Files
+﻿@using CnGalWebSite.MainSite.Shared
+@using CnGalWebSite.SDK.MainSite.Models.Files
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
 @implements IAsyncDisposable
 @inject IJSRuntime JSRuntime
+@inject IFileCommandService FileCommandService
 
 <div class="cg-image-upload @Class">
     @if (ShowPreview)
@@ -184,10 +186,6 @@
     [Parameter]
     public bool Disabled { get; set; }
 
-    [Parameter]
-    public Func<IBrowserFile, CancellationToken, Task<ImageUploadResult?>>? OnUploadImageAsync { get; set; }
-
-
     private string? CurrentImagePath => Value ?? ImagePath ?? _localImagePath;
     private string CropRectStyle =>
         $"left:{_cropRect.X * 100:0.###}%;top:{_cropRect.Y * 100:0.###}%;width:{_cropRect.Width * 100:0.###}%;height:{_cropRect.Height * 100:0.###}%;";
@@ -248,17 +246,18 @@
 
     private async Task UploadSingleFileAsync(IBrowserFile file, bool cropped, ImageCropRect? cropRect = null)
     {
-        if (OnUploadImageAsync is null)
-        {
-            _errorMessage = "上传功能未配置";
-            return;
-        }
-
         _isUploading = true;
         try
         {
             using var cts = new CancellationTokenSource();
-            var result = await OnUploadImageAsync.Invoke(file, cts.Token);
+
+            var result = await FileCommandService.UploadImageAsync(
+                file,
+                Type,
+                Gallery,
+                cropped ? cropRect : null,
+                cts.Token);
+
             if (result is null)
             {
                 _errorMessage = "上传失败";

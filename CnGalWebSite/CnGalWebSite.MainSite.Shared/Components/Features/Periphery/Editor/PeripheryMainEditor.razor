@@ -1,4 +1,4 @@
-@using CnGalWebSite.DataModel.Model
+﻿@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Peripheries
 @using CnGalWebSite.SDK.MainSite.Models.Files
 
@@ -26,7 +26,8 @@
         <CgFormGroup Label="主图">
             <CgImageUpload @bind-Value="Model.MainPicture"
                            Text="上传主图"
-                           Type="ImageAspectType.None"/>
+                           Type="ImageAspectType._16_9"
+                           ShowCropper />
         </CgFormGroup>
 
         <CgFormGroup Label="名称同步">

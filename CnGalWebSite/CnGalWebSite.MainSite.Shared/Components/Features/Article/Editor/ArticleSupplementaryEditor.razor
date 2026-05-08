@@ -2,6 +2,8 @@
 @using CnGalWebSite.DataModel.ViewModel.Articles
 @using CnGalWebSite.Extensions
 @using CnGalWebSite.SDK.MainSite.Models.Files
+@using CnGalWebSite.SDK.MainSite.Abstractions
+@inject IFileCommandService FileCommandService
 
 <section class="article-editor-section" id="section-article-supplementary">
     <h2><CgMdiIcon Name="mdiInformationOutline" Class="article-section-icon" aria-hidden="true"/>补充信息</h2>
@@ -32,12 +34,14 @@
             <CgFormGroup Label="背景图">
                 <CgImageUpload @bind-Value="Model.BackgroundPicture"
                                Text="上传背景图"
-                               Type="ImageAspectType.None"/>
+                               Type="ImageAspectType.None"
+                              />
             </CgFormGroup>
             <CgFormGroup Label="小背景图">
                 <CgImageUpload @bind-Value="Model.SmallBackgroundPicture"
                                Text="上传小背景图"
-                               Type="ImageAspectType.None"/>
+                               Type="ImageAspectType.None"
+                              />
             </CgFormGroup>
         </CgGrid>
 

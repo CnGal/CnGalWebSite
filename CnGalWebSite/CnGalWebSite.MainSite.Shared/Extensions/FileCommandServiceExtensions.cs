@@ -12,10 +12,14 @@ public static class FileCommandServiceExtensions
     public static async Task<ImageUploadResult?> UploadImageAsync(
         this IFileCommandService service,
         IBrowserFile file,
+        ImageAspectType aspectType,
+        bool gallery,
+        ImageCropRect? cropRect,
         CancellationToken ct = default)
     {
         await using var stream = file.OpenReadStream(MaxImageUploadBytes);
-        var result = await service.UploadImageAsync(stream, file.Name, cancellationToken: ct);
+        var result = await service.UploadImageAsync(
+            stream, file.Name, aspectType, gallery, cropRect, ct);
         if (!result.Success || string.IsNullOrWhiteSpace(result.Data))
         {
             return null;

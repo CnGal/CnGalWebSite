@@ -21,7 +21,7 @@
                 <CgImageUpload @bind-Value="Model.Logo"
                                Type="ImageAspectType.None"
                                Text="上传Logo"
-                               OnUploadImageAsync="FileCommandService.UploadImageAsync" />
+                               />
             </CgFormGroup>
             <CgFormGroup Label="副标题">
                 <CgInput @bind-Value="Model.SubTitle" Placeholder="专题副标题" />
@@ -41,7 +41,7 @@
                                ShowPreview="false"
                                Text="上传图片到图床"
                                OnImageUploaded="OnImageUploaded"
-                               OnUploadImageAsync="FileCommandService.UploadImageAsync" />
+                               />
             </HeaderActions>
             <ChildContent>
                 <CgTable HasData="@Model.Images.Any()" MaxHeight="400px">
@@ -137,7 +137,7 @@
                 <CgImageUpload @bind-Value="_editingItem.Image"
                                Type="ImageAspectType.None"
                                Text="上传图片"
-                               OnUploadImageAsync="FileCommandService.UploadImageAsync" />
+                               />
             </CgFormGroup>
 
             <CgGrid>
