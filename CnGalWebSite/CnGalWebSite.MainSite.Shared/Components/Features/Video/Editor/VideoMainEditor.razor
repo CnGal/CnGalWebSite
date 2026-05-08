@@ -15,19 +15,19 @@
                                Text="上传主图"
                                ShowCropper
                                Type="ImageAspectType._16_9"
-                               OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
+                              />
             </CgFormGroup>
             <CgFormGroup Label="背景图">
                 <CgImageUpload @bind-Value="Model.BackgroundPicture"
                                Text="上传大背景图"
                                Type="ImageAspectType.None"
-                               OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
+                              />
             </CgFormGroup>
             <CgFormGroup Label="小背景图">
                 <CgImageUpload @bind-Value="Model.SmallBackgroundPicture"
                                Text="上传小背景图"
                                Type="ImageAspectType.None"
-                               OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
+                              />
             </CgFormGroup>
         </CgGrid>
 

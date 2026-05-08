@@ -18,7 +18,7 @@
                                ShowPreview="false"
                                Text="上传图片到图床"
                                OnImageUploaded="OnImageUploaded"
-                               OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
+                              />
             </HeaderActions>
             <ChildContent>
                 @if (Model.Images.Any())
@@ -65,7 +65,7 @@
             <CgFormGroup Label="图片">
                 <CgImageUpload @bind-Value="_editingItem.Image"
                                Text="上传替换图片"
-                               OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
+                              />
             </CgFormGroup>
             <CgGrid>
                 <CgFormGroup Label="备注">
