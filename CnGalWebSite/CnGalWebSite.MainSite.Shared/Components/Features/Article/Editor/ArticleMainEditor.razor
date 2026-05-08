@@ -1,8 +1,10 @@
-@using CnGalWebSite.DataModel.Model
+﻿@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Articles
 @using CnGalWebSite.Extensions
 @using CnGalWebSite.SDK.MainSite.Models.Files
+@using CnGalWebSite.SDK.MainSite.Abstractions
 @using System.Linq
+@inject IFileCommandService FileCommandService
 
 <section class="article-editor-section" id="section-article-main">
     <h2><CgMdiIcon Name="mdiFileDocumentOutline" Class="article-section-icon" aria-hidden="true"/>核心内容</h2>
@@ -27,7 +29,9 @@
         <CgFormGroup Label="主图">
             <CgImageUpload @bind-Value="Model.MainPicture"
                            Text="上传主图"
-                           Type="ImageAspectType.None"/>
+                           Type="ImageAspectType._16_9"
+                           ShowCropper
+                           OnUploadImageAsync="FileCommandService.UploadImageAsync"/>
         </CgFormGroup>
 
         <CgFormGroup Label="标题">
