@@ -1,0 +1,43 @@
+/* ═══════════════════════════════════════════════════
+   EditRecordContrastPanel — 对比版本选择器
+   ═══════════════════════════════════════════════════ */
+
+.ecp-contrast-bar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: flex-end;
+    gap: var(--cg-spacing-3);
+    padding: 1.25rem 1.5rem;
+    background: var(--cg-color-surface);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid color-mix(in oklab, var(--cg-color-primary) 10%, var(--cg-color-border));
+    border-radius: var(--cg-radius-xl);
+    box-shadow: var(--cg-shadow-sm);
+    flex-wrap: wrap;
+}
+
+.ecp-contrast-selector {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-1);
+    flex: 1;
+    min-width: 180px;
+}
+
+.ecp-contrast-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+::deep .ecp-contrast-label .cg-mdi-icon {
+    width: 14px;
+    height: 14px;
+}

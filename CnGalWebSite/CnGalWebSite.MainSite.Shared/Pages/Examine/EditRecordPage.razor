@@ -1,13 +1,11 @@
 @page "/home/editrecord"
-@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 @using CnGalWebSite.DataModel.ViewModel.Home
 @using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 
 @inject IExamineQueryService ExamineQueryService
-@inject NavigationManager NavigationManager
-@implements IDisposable
+@inject IMainSiteAuthRequestService AuthRequestService
 
 <CgPageMeta Title="编辑记录" />
 
@@ -32,7 +30,7 @@
         <div class="edit-record-page__error">
             <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true"/>
             <p>@_errorMessage</p>
-            <CgButton Variant="primary" OnClick="LoadDataAsync">重试</CgButton>
+            <a class="cg-btn cg-btn--primary" href="/home/editrecord?ContrastId=@ContrastId&CurrentId=@CurrentId&SelectedId=@SelectedId">重试</a>
             <a href="/" class="cg-btn cg-btn--secondary">返回首页</a>
         </div>
     }
@@ -66,32 +64,27 @@
                 </div>
                 <EditRecordTimeline Items="@_overview.Examines"
                                     SelectedId="@_selectedId"
-                                    OnSelected="OnTimelineItemSelected"/>
+                                    ContrastId="@ContrastId"
+                                    CurrentId="@_currentId" />
             </aside>
             <main class="edit-record-page__main">
-                @* ── 对比视图选择器 ── *@
-                <div class="edit-record-page__contrast-bar">
-                    <div class="edit-record-page__contrast-selector">
-                        <label class="edit-record-page__contrast-label">
-                            <CgMdiIcon Name="mdiFileRestoreOutline" aria-hidden="true"/>
-                            对比版本
-                        </label>
-                        <CgSelect Value="@_contrastIdStr" ValueChanged="OnContrastChanged" Options="@_examineOptions" />
-                    </div>
-                    <div class="edit-record-page__contrast-selector">
-                        <label class="edit-record-page__contrast-label">
-                            <CgMdiIcon Name="mdiFileDocumentCheckOutline" aria-hidden="true"/>
-                            当前版本
-                        </label>
-                        <CgSelect Value="@_currentIdStr" ValueChanged="OnCurrentChanged" Options="@_examineOptions" />
-                    </div>
-                    <CgButton Variant="primary" OnClick="LoadContrastAsync" Disabled="_isContrastLoading">
-                        <CgMdiIcon Name="mdiMagnify" aria-hidden="true"/>
-                        对比
-                    </CgButton>
-                </div>
+                @* ── 对比版本选择器 (交互岛, 登录门控) ── *@
+                <AuthorizeView>
+                    <Authorized>
+                        <EditRecordContrastPanel ExamineOptions="@_examineOptions"
+                                                  ContrastId="@ContrastId"
+                                                  CurrentId="@_currentId" />
+                    </Authorized>
+                    <NotAuthorized>
+                        <div class="edit-record-page__login-prompt">
+                            <CgMdiIcon Name="mdiLoginVariant" aria-hidden="true" />
+                            <span>登录后可选择自定义对比版本</span>
+                            <a class="cg-btn cg-btn--primary" href="@AuthRequestService.BuildLoginUrl(GetCurrentUrl())">去登录</a>
+                        </div>
+                    </NotAuthorized>
+                </AuthorizeView>
 
-                @* ── 对比视图内容 ── *@
+                @* ── 对比视图 (始终可见) ── *@
                 @if (_isContrastLoading)
                 {
                     <div class="edit-record-page__loading">
@@ -124,7 +117,7 @@
                 {
                     <EditRecordDetail Model="@_selectedRecord"/>
                 }
-                else if (_contrastModel is null)
+                else if (_contrastModel is null && !_isContrastLoading)
                 {
                     <div class="edit-record-page__no-selection">
                         <CgMdiIcon Name="mdiCursorDefaultClickOutline" aria-hidden="true"/>
@@ -141,52 +134,22 @@
 
     [SupplyParameterFromQuery] [Parameter] public long CurrentId { get; set; }
 
+    [SupplyParameterFromQuery] [Parameter] public long SelectedId { get; set; }
+
     private ExaminesOverviewViewModel? _overview;
     private EditRecordAloneViewModel? _selectedRecord;
     private ExamineViewModel? _contrastModel;
     private long _selectedId;
-    private string _contrastIdStr = "";
-    private string _currentIdStr = "";
-
-    private IEnumerable<KeyValuePair<string, string>> _examineOptions = [];
     private long _contrastId;
     private long _currentId;
+
+    private IEnumerable<KeyValuePair<string, string>> _examineOptions = [];
     private bool _isLoading = true;
     private bool _isContrastLoading;
     private bool _isError;
     private string _errorMessage = string.Empty;
-    private bool _initialized;
-    private bool _selfNavigating;
-    private CancellationTokenSource? _cts;
 
-    protected override async Task OnParametersSetAsync()
-    {
-        // Only reload on first render or self-initiated navigation.
-        // When navigating away, Blazor resets query params and fires this method;
-        // _selfNavigating is false in that case, so we skip the reload.
-        if (_initialized && !_selfNavigating)
-        {
-            return;
-        }
-        _selfNavigating = false;
-        _initialized = true;
-
-        // Cancel any in-flight operation and create new CTS for this parameter set
-        _cts?.Cancel();
-        _cts?.Dispose();
-        _cts = new CancellationTokenSource();
-
-        try
-        {
-            await LoadDataAsync();
-        }
-        catch (OperationCanceledException)
-        {
-            // Component disposed or parameters changed, ignore.
-        }
-    }
-
-    private async Task LoadDataAsync()
+    protected override async Task OnInitializedAsync()
     {
         if (ContrastId <= 0)
         {
@@ -196,37 +159,32 @@
             return;
         }
 
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
         _isLoading = true;
         _isError = false;
-        _overview = null;
-        _selectedRecord = null;
-        _contrastModel = null;
-        StateHasChanged();
 
-        var result = await ExamineQueryService.GetExaminesOverviewAsync(ContrastId, _cts!.Token);
+        var result = await ExamineQueryService.GetExaminesOverviewAsync(ContrastId);
 
         if (result.Success && result.Data is not null)
         {
             _overview = result.Data;
-
-            // 初始化对比 ID 与选择器选项
             _contrastId = ContrastId;
             _currentId = CurrentId > 0 ? CurrentId : _overview.Examines.LastOrDefault()?.Id ?? ContrastId;
-            _contrastIdStr = _contrastId.ToString();
-            _currentIdStr = _currentId.ToString();
             _examineOptions = _overview.Examines
                 .Select(e => new KeyValuePair<string, string>(e.Id.ToString(), $"#{e.Id:00000} — {e.ApplyTime:yyyy-MM-dd HH:mm}"))
                 .ToList();
 
-            // 定位选中项：优先选 ContrastId 对应的记录，其次选 IsSelected=true 的
-            _selectedRecord = _overview.Examines.FirstOrDefault(e => e.Id == ContrastId)
-                              ?? _overview.Examines.FirstOrDefault(e => e.IsSelected)
-                              ?? _overview.Examines.FirstOrDefault();
-
+            _selectedRecord = _overview.Examines.FirstOrDefault(e => e.Id == SelectedId)
+                             ?? _overview.Examines.FirstOrDefault(e => e.Id == ContrastId)
+                             ?? _overview.Examines.FirstOrDefault(e => e.IsSelected)
+                             ?? _overview.Examines.FirstOrDefault();
             _selectedId = _selectedRecord?.Id ?? 0;
 
-            // 如果有 CurrentId，自动加载对比视图
-            if (CurrentId > 0)
+            if (_currentId > 0 && _contrastId > 0 && _contrastId <= _currentId)
             {
                 await LoadContrastAsync();
             }
@@ -242,15 +200,9 @@
 
     private async Task LoadContrastAsync()
     {
-        if (_contrastId <= 0 || _currentId <= 0 || _contrastId > _currentId)
-        {
-            return;
-        }
-
         _isContrastLoading = true;
-        StateHasChanged();
 
-        var result = await ExamineQueryService.GetContrastExamineAsync(_contrastId, _currentId, _cts!.Token);
+        var result = await ExamineQueryService.GetContrastExamineAsync(_contrastId, _currentId);
         if (result.Success && result.Data is not null)
         {
             _contrastModel = result.Data;
@@ -259,38 +211,13 @@
         _isContrastLoading = false;
     }
 
-    private Task OnTimelineItemSelected(EditRecordAloneViewModel item)
+    private string GetCurrentUrl()
     {
-        _selectedRecord = item;
-        _selectedId = item.Id;
-        StateHasChanged();
-        return Task.CompletedTask;
-    }
-
-    private Task OnContrastChanged(string? value)
-    {
-        if (long.TryParse(value, out var id))
-        {
-            _contrastId = id;
-            _contrastIdStr = value!;
-        }
-        return Task.CompletedTask;
-    }
-
-    private Task OnCurrentChanged(string? value)
-    {
-        if (long.TryParse(value, out var id))
-        {
-            _currentId = id;
-            _currentIdStr = value!;
-        }
-        return Task.CompletedTask;
-    }
-
-    public void Dispose()
-    {
-        _cts?.Cancel();
-        _cts?.Dispose();
+        var parameters = new List<string>();
+        if (ContrastId > 0) parameters.Add($"ContrastId={ContrastId}");
+        if (CurrentId > 0) parameters.Add($"CurrentId={CurrentId}");
+        if (SelectedId > 0) parameters.Add($"SelectedId={SelectedId}");
+        return $"/home/editrecord?{string.Join("&", parameters)}";
     }
 
     private string? GetObjectUrl()
@@ -306,5 +233,4 @@
             _ => null
         };
     }
-
 }

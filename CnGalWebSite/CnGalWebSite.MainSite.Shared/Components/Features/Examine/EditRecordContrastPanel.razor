@@ -1,0 +1,76 @@
+@rendermode InteractiveServer
+
+@inject NavigationManager NavigationManager
+
+@* 编辑记录对比选择器 — 交互岛，仅在登录后可用 *@
+
+<div class="ecp-contrast-bar">
+    <div class="ecp-contrast-selector">
+        <label class="ecp-contrast-label">
+            <CgMdiIcon Name="mdiFileRestoreOutline" aria-hidden="true"/>
+            对比版本
+        </label>
+        <CgSelect Value="@_contrastIdStr" ValueChanged="OnContrastChanged" Options="@ExamineOptions" />
+    </div>
+    <div class="ecp-contrast-selector">
+        <label class="ecp-contrast-label">
+            <CgMdiIcon Name="mdiFileDocumentCheckOutline" aria-hidden="true"/>
+            当前版本
+        </label>
+        <CgSelect Value="@_currentIdStr" ValueChanged="OnCurrentChanged" Options="@ExamineOptions" />
+    </div>
+    <CgButton Variant="primary" OnClick="NavigateToContrast">
+        <CgMdiIcon Name="mdiMagnify" aria-hidden="true"/>
+        对比
+    </CgButton>
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<KeyValuePair<string, string>> ExamineOptions { get; set; } = [];
+
+    [Parameter]
+    public long ContrastId { get; set; }
+
+    [Parameter]
+    public long CurrentId { get; set; }
+
+    private string _contrastIdStr = "";
+    private string _currentIdStr = "";
+    private long _contrastId;
+    private long _currentId;
+
+    protected override void OnInitialized()
+    {
+        _contrastId = ContrastId;
+        _currentId = CurrentId;
+        _contrastIdStr = _contrastId.ToString();
+        _currentIdStr = _currentId.ToString();
+    }
+
+    private Task OnContrastChanged(string? value)
+    {
+        if (long.TryParse(value, out var id))
+        {
+            _contrastId = id;
+            _contrastIdStr = value!;
+        }
+        return Task.CompletedTask;
+    }
+
+    private Task OnCurrentChanged(string? value)
+    {
+        if (long.TryParse(value, out var id))
+        {
+            _currentId = id;
+            _currentIdStr = value!;
+        }
+        return Task.CompletedTask;
+    }
+
+    private void NavigateToContrast()
+    {
+        NavigationManager.NavigateTo(
+            $"/home/editrecord?ContrastId={_contrastId}&CurrentId={_currentId}");
+    }
+}
