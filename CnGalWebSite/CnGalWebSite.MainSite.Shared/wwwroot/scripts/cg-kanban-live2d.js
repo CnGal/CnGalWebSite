@@ -72,12 +72,57 @@ function loadScriptFresh(src) {
 }
 
 /**
+ * 移除指定 src 的 script 元素，用于释放 Live2D CDN 脚本持有的全局状态。
+ * @param {string} src
+ */
+function removeScriptBySrc(src) {
+    var el = document.querySelector('script[src="' + src + '"]');
+    if (el) el.remove();
+}
+
+/**
  * 加载 Live2D CDN 资源（每次调用都强制重新加载以重置全局状态）
  * @returns {Promise<void>}
  */
 function ensureLive2dLoaded() {
     return loadScriptFresh(LIVE2D_CORE_JS_URL)
         .then(function () { return loadScriptFresh(LIVE2D_BUNDLE_JS_URL); });
+}
+
+// ---------------------------------------------------------------------------
+// 全局错误处理（防止 Live2D SDK 内部未捕获异常导致 Blazor 电路断开）
+// ---------------------------------------------------------------------------
+
+/** @type {boolean} */
+var _live2dActive = false;
+/** @type {Function|null} */
+var _live2dErrorHandler = null;
+
+function installLive2dErrorGuard() {
+    if (_live2dErrorHandler) return;
+    _live2dErrorHandler = function (event) {
+        if (!_live2dActive) return;
+        var msg = event.message || '';
+        var src = event.filename || '';
+        // Live2D SDK 的错误（lappdelegate / bundle.js / live2dcubismcore）只记日志，不传播
+        if (msg.indexOf('getBoundingClientRect') !== -1 ||
+            src.indexOf('bundle.js') !== -1 ||
+            src.indexOf('live2dcubismcore') !== -1 ||
+            src.indexOf('lappdelegate') !== -1) {
+            console.warn('cg-kanban: Live2D SDK error suppressed', msg);
+            event.preventDefault();
+            return false;
+        }
+    };
+    window.addEventListener('error', _live2dErrorHandler);
+}
+
+function uninstallLive2dErrorGuard() {
+    if (_live2dErrorHandler) {
+        window.removeEventListener('error', _live2dErrorHandler);
+        _live2dErrorHandler = null;
+    }
+    _live2dActive = false;
 }
 
 // ---------------------------------------------------------------------------
@@ -346,28 +391,36 @@ window.Live2dHitBodyEvent = function () {
 export function initKanbanLive2D(dotNetRef, modelDir, modelIndex, resourcesPath) {
     console.log('cg-kanban: initKanbanLive2D called', { modelDir: modelDir, modelIndex: modelIndex, resourcesPath: resourcesPath });
     _dotNetHelper = dotNetRef;
+    _live2dActive = true;
+    installLive2dErrorGuard();
     ensureLive2dLoaded().then(function () {
         console.log('cg-kanban: CDN loaded, ready to init Live2D');
-        var modelDirs = modelDir.split(',');
-        setLive2dDefine(resourcesPath, '', modelDirs, 'live2d', modelIndex);
-        initLive2d();
-        initKanbanMoveAction(dotNetRef);
-        initKanbanResizeAction(dotNetRef);
-        initButtonGroupMoveAction(dotNetRef);
-        initDialogBoxMoveAction(dotNetRef);
-        initChatCardMoveAction(dotNetRef);
-        listenLive2dCanvasChange();
+        try {
+            var modelDirs = modelDir.split(',');
+            setLive2dDefine(resourcesPath, '', modelDirs, 'live2d', modelIndex);
+            initLive2d();
+            initKanbanMoveAction(dotNetRef);
+            initKanbanResizeAction(dotNetRef);
+            initButtonGroupMoveAction(dotNetRef);
+            initDialogBoxMoveAction(dotNetRef);
+            initChatCardMoveAction(dotNetRef);
+            listenLive2dCanvasChange();
 
-        var clampKanbanPosition = function () {
-            if (_dotNetHelper) {
-                clampKanbanInsideViewport(_dotNetHelper, true);
-            }
-        };
-        _resizeDebouncedHandler = debounce(clampKanbanPosition, 100);
-        addTrackedListener(window, 'resize', _resizeDebouncedHandler);
-        clampKanbanInsideViewport(dotNetRef, false);
+            var clampKanbanPosition = function () {
+                if (_dotNetHelper) {
+                    clampKanbanInsideViewport(_dotNetHelper, true);
+                }
+            };
+            _resizeDebouncedHandler = debounce(clampKanbanPosition, 100);
+            addTrackedListener(window, 'resize', _resizeDebouncedHandler);
+            clampKanbanInsideViewport(dotNetRef, false);
 
-        console.log("初始化Live2D");
+            console.log("初始化Live2D");
+        } catch (e) {
+            console.error('cg-kanban: Live2D initialization failed', e);
+        }
+    }).catch(function (e) {
+        console.error('cg-kanban: Live2D CDN load failed', e);
     });
 }
 
@@ -377,8 +430,12 @@ export function initKanbanLive2D(dotNetRef, modelDir, modelIndex, resourcesPath)
  */
 export function switchLiv2DModel(id) {
     console.log('cg-kanban: switchLiv2DModel called', id);
-    var manger = getLive2dManager();
-    manger.changeScene(id);
+    try {
+        var manger = getLive2dManager();
+        if (manger) manger.changeScene(id);
+    } catch (e) {
+        console.warn('cg-kanban: switchLiv2DModel failed', e);
+    }
 }
 
 /**
@@ -387,12 +444,18 @@ export function switchLiv2DModel(id) {
  */
 export function switchLiv2DExpression(id) {
     console.log('cg-kanban: switchLiv2DExpression called', id);
-    var manger = getLive2dManager();
-    var model = manger.getCurrentModel();
-    if (id) {
-        model.setExpression(id);
-    } else {
-        model.cleanExpressions();
+    try {
+        var manger = getLive2dManager();
+        if (!manger) return;
+        var model = manger.getCurrentModel();
+        if (!model) return;
+        if (id) {
+            model.setExpression(id);
+        } else {
+            model.cleanExpressions();
+        }
+    } catch (e) {
+        console.warn('cg-kanban: switchLiv2DExpression failed', e);
     }
 }
 
@@ -402,12 +465,18 @@ export function switchLiv2DExpression(id) {
  */
 export function switchLiv2DClothes(id) {
     console.log('cg-kanban: switchLiv2DClothes called', id);
-    var manger = getLive2dManager();
-    var model = manger.getCurrentModel();
-    if (id) {
-        model.setClothes(id);
-    } else {
-        model.cleanClothes();
+    try {
+        var manger = getLive2dManager();
+        if (!manger) return;
+        var model = manger.getCurrentModel();
+        if (!model) return;
+        if (id) {
+            model.setClothes(id);
+        } else {
+            model.cleanClothes();
+        }
+    } catch (e) {
+        console.warn('cg-kanban: switchLiv2DClothes failed', e);
     }
 }
 
@@ -417,12 +486,18 @@ export function switchLiv2DClothes(id) {
  */
 export function switchLiv2DStockings(id) {
     console.log('cg-kanban: switchLiv2DStockings called', id);
-    var manger = getLive2dManager();
-    var model = manger.getCurrentModel();
-    if (id) {
-        model.setStockings(id);
-    } else {
-        model.cleanStockings();
+    try {
+        var manger = getLive2dManager();
+        if (!manger) return;
+        var model = manger.getCurrentModel();
+        if (!model) return;
+        if (id) {
+            model.setStockings(id);
+        } else {
+            model.cleanStockings();
+        }
+    } catch (e) {
+        console.warn('cg-kanban: switchLiv2DStockings failed', e);
     }
 }
 
@@ -432,12 +507,18 @@ export function switchLiv2DStockings(id) {
  */
 export function switchLiv2DShoes(id) {
     console.log('cg-kanban: switchLiv2DShoes called', id);
-    var manger = getLive2dManager();
-    var model = manger.getCurrentModel();
-    if (id) {
-        model.setShoes(id);
-    } else {
-        model.cleanShoes();
+    try {
+        var manger = getLive2dManager();
+        if (!manger) return;
+        var model = manger.getCurrentModel();
+        if (!model) return;
+        if (id) {
+            model.setShoes(id);
+        } else {
+            model.cleanShoes();
+        }
+    } catch (e) {
+        console.warn('cg-kanban: switchLiv2DShoes failed', e);
     }
 }
 
@@ -448,12 +529,18 @@ export function switchLiv2DShoes(id) {
  */
 export function switchLiv2DMotion(group, index) {
     console.log('cg-kanban: switchLiv2DMotion called', { group: group, index: index });
-    var manger = getLive2dManager();
-    var model = manger.getCurrentModel();
-    if (index) {
-        model.startMotion(group, index, 3);
-    } else {
-        model.startRandomMotion(group, 3);
+    try {
+        var manger = getLive2dManager();
+        if (!manger) return;
+        var model = manger.getCurrentModel();
+        if (!model) return;
+        if (index) {
+            model.startMotion(group, index, 3);
+        } else {
+            model.startRandomMotion(group, 3);
+        }
+    } catch (e) {
+        console.warn('cg-kanban: switchLiv2DMotion failed', e);
     }
 }
 
@@ -506,15 +593,9 @@ export function startKanbanImageGeneration(dotNetRef, x, y, height, width) {
 export function releaseLive2D() {
     console.log('cg-kanban: releaseLive2D called');
 
-    // Release Live2D manager
-    try {
-        var manager = getLive2dManager();
-        if (manager) {
-            manager.release();
-        }
-    } catch (e) {
-        console.warn('cg-kanban: error releasing Live2D manager', e);
-    }
+    // bundle.js 不提供干净的 release 方法，通过移除 CDN script 标签来重置全局状态
+    removeScriptBySrc(LIVE2D_BUNDLE_JS_URL);
+    removeScriptBySrc(LIVE2D_CORE_JS_URL);
 
     // Disconnect ResizeObserver
     if (_resizeObserver) {
@@ -537,6 +618,9 @@ export function releaseLive2D() {
         URL.revokeObjectURL(_blobUrls[j]);
     }
     _blobUrls = [];
+
+    // Remove Live2D error guard
+    uninstallLive2dErrorGuard();
 
     // Reset state
     _dotNetHelper = null;
