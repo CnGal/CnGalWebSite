@@ -11,7 +11,28 @@
 
     private IReadOnlyList<CgCarouselItem> MapToCarouselItems()
     {
-        return (Carousels ?? [])
+        var carousels = (Carousels ?? []).ToList();
+
+        // 按优先级排序并取前3个
+        var selected = carousels.OrderByDescending(s => s.Priority).Take(3).ToList();
+
+        if (carousels.Count >= 6)
+        {
+            // 从剩余项中随机选取3个（排除重复图片）
+            selected.AddRange(carousels
+                .Where(s => selected.Any(x => x.Image == s.Image) == false)
+                .ToList()
+                .Random()
+                .Take(3));
+        }
+        else
+        {
+            // 少于6个则添加所有剩余项（排除重复图片）
+            selected.AddRange(carousels
+                .Where(s => selected.Any(x => x.Image == s.Image) == false));
+        }
+
+        return selected
             .Select(c => new CgCarouselItem(c.Image, c.Link, c.Note))
             .ToList();
     }
