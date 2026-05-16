@@ -6,10 +6,10 @@
     @foreach (var item in Items.OrderByDescending(s => s.Id))
     {
         var isActive = item.Id == SelectedId;
-        <button class="edit-record-timeline__item @(isActive ? "edit-record-timeline__item--active" : "")"
-                role="listitem"
-                aria-current="@(isActive ? "true" : "false")"
-                @onclick="() => OnItemClick(item)">
+        <a class="edit-record-timeline__item @(isActive ? "edit-record-timeline__item--active" : "")"
+           role="listitem"
+           aria-current="@(isActive ? "true" : "false")"
+           href="/home/editrecord?ContrastId=@ContrastId&CurrentId=@CurrentId&SelectedId=@item.Id">
             <div class="edit-record-timeline__marker"></div>
             <div class="edit-record-timeline__content">
                 <div class="edit-record-timeline__header">
@@ -24,7 +24,7 @@
                     <span class="edit-record-timeline__time">@item.ApplyTime.ToString("yyyy-MM-dd HH:mm")</span>
                 </div>
             </div>
-        </button>
+        </a>
     }
 </div>
 
@@ -36,10 +36,8 @@
     public long SelectedId { get; set; }
 
     [Parameter]
-    public EventCallback<EditRecordAloneViewModel> OnSelected { get; set; }
+    public long ContrastId { get; set; }
 
-    private async Task OnItemClick(EditRecordAloneViewModel item)
-    {
-        await OnSelected.InvokeAsync(item);
-    }
+    [Parameter]
+    public long CurrentId { get; set; }
 }

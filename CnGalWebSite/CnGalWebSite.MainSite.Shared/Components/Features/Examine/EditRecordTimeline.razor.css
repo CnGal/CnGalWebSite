@@ -27,6 +27,8 @@
     font-family: inherit;
     font-size: inherit;
     position: relative;
+    text-decoration: none;
+    color: inherit;
 }
 
 .edit-record-timeline__item:hover {

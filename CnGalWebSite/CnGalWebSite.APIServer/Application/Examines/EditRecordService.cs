@@ -77,6 +77,11 @@ namespace CnGalWebSite.APIServer.Application.Examines
         /// <returns></returns>
         public async Task<bool> CheckUserExaminePermission( Examine examine, ApplicationUser user, bool allowEditor = true)
         {
+            if (user == null)
+            {
+                return false;
+            }
+
             var adminRole = allowEditor ? "Editor" : "Admin";
             var isAdmin = _userService.CheckCurrentUserRole(adminRole);
 

@@ -1,4 +1,4 @@
-@using CnGalWebSite.DataModel.ViewModel.Home
+﻿@using CnGalWebSite.DataModel.ViewModel.Home
 
 @* 编辑记录详情 — 展示选中编辑记录的概览、批注、备注 *@
 
@@ -11,10 +11,10 @@
                     <CgMdiIcon Name="mdiFileDocumentOutline" aria-hidden="true" />
                     <span>@($"#{Model.Id:00000}") — @Model.Operation.GetDisplayName()</span>
                 </h3>
-                <a class="edit-record-detail__action-link" href="/examine?Id=@Model.Id">
-                    <CgMdiIcon Name="mdiMagnify" aria-hidden="true" />
-                    查看审核详情
-                </a>
+                        <a class="edit-record-detail__action-link" href="/examine?Id=@Model.Id">
+                            <CgMdiIcon Name="mdiMagnify" aria-hidden="true" />
+                            查看审核详情
+                        </a>
             </div>
             <div class="edit-record-detail__meta">
                 @if (!string.IsNullOrWhiteSpace(Model.UserId))
