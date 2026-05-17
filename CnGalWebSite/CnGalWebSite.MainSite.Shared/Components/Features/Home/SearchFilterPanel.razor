@@ -11,10 +11,10 @@
             <div class="search-filter-panel__tags">
                 @foreach (var type in EntryTypes)
                 {
-                    <button class="search-filter-panel__tag @(SelectedTypes.Contains(type.Key) ? "search-filter-panel__tag--active" : "")"
-                            @onclick="() => ToggleType(type.Key)">
+                    <a href="@GetTypeToggleUrl(type.Key)"
+                       class="search-filter-panel__tag @(SelectedTypes.Contains(type.Key) ? "search-filter-panel__tag--active" : "")">
                         @type.Value
-                    </button>
+                    </a>
                 }
             </div>
         </div>
@@ -24,10 +24,10 @@
             <div class="search-filter-panel__tags">
                 @foreach (var type in ArticleTypes)
                 {
-                    <button class="search-filter-panel__tag @(SelectedTypes.Contains(type.Key) ? "search-filter-panel__tag--active" : "")"
-                            @onclick="() => ToggleType(type.Key)">
+                    <a href="@GetTypeToggleUrl(type.Key)"
+                       class="search-filter-panel__tag @(SelectedTypes.Contains(type.Key) ? "search-filter-panel__tag--active" : "")">
                         @type.Value
-                    </button>
+                    </a>
                 }
             </div>
         </div>
@@ -37,10 +37,10 @@
             <div class="search-filter-panel__tags">
                 @foreach (var type in OtherTypes)
                 {
-                    <button class="search-filter-panel__tag @(SelectedTypes.Contains(type.Key) ? "search-filter-panel__tag--active" : "")"
-                            @onclick="() => ToggleType(type.Key)">
+                    <a href="@GetTypeToggleUrl(type.Key)"
+                       class="search-filter-panel__tag @(SelectedTypes.Contains(type.Key) ? "search-filter-panel__tag--active" : "")">
                         @type.Value
-                    </button>
+                    </a>
                 }
             </div>
         </div>
@@ -55,10 +55,10 @@
         <div class="search-filter-panel__tags">
             @foreach (var time in AvailableTimes)
             {
-                <button class="search-filter-panel__tag @(SelectedTimes.Contains(time.Key) ? "search-filter-panel__tag--active" : "")"
-                        @onclick="() => ToggleTime(time.Key)">
+                <a href="@GetTimeToggleUrl(time.Key)"
+                   class="search-filter-panel__tag @(SelectedTimes.Contains(time.Key) ? "search-filter-panel__tag--active" : "")">
                     @time.Value
-                </button>
+                </a>
             }
         </div>
     </div>
@@ -72,34 +72,29 @@
         <div class="search-filter-panel__tags">
             @foreach (var sort in SortOptions)
             {
-                <button class="search-filter-panel__tag @(CurrentSortField == sort.Key ? "search-filter-panel__tag--active" : "")"
-                        @onclick="() => SetSort(sort.Key)">
+                <a href="@GetSortUrl(sort.Key)"
+                   class="search-filter-panel__tag @(CurrentSortField == sort.Key ? "search-filter-panel__tag--active" : "")">
                     @sort.Value
-                </button>
+                </a>
             }
             @if (!string.IsNullOrEmpty(CurrentSortField))
             {
-                <button class="search-filter-panel__tag search-filter-panel__tag--active search-filter-panel__tag--order"
-                        @onclick="ToggleSortOrder">
+                <a href="@GetSortOrderToggleUrl()"
+                   class="search-filter-panel__tag search-filter-panel__tag--active search-filter-panel__tag--order">
                     <CgMdiIcon Name="@(IsAscending ? "mdiSortAscending" : "mdiSortDescending")" aria-hidden="true" />
                     @(IsAscending ? "顺序" : "逆序")
-                </button>
+                </a>
             }
         </div>
     </div>
 </div>
 
 @code {
+    [Parameter] public string SearchText { get; set; } = "";
     [Parameter] public List<string> SelectedTypes { get; set; } = [];
-    [Parameter] public EventCallback<List<string>> SelectedTypesChanged { get; set; }
-
     [Parameter] public List<string> SelectedTimes { get; set; } = [];
-    [Parameter] public EventCallback<List<string>> SelectedTimesChanged { get; set; }
-
     [Parameter] public string CurrentSort { get; set; } = "";
-    [Parameter] public EventCallback<string> CurrentSortChanged { get; set; }
 
-    // Type definitions as Key-Value pairs (Key = enum name sent to API, Value = display label)
     private static readonly KeyValuePair<string, string>[] EntryTypes =
     [
         new("Entry", "词条"), new("Game", "游戏"), new("Role", "角色"),
@@ -137,27 +132,6 @@
         return result;
     }
 
-    private async Task ToggleType(string type)
-    {
-        var list = new List<string>(SelectedTypes);
-        if (!list.Remove(type))
-        {
-            list.Add(type);
-        }
-        await SelectedTypesChanged.InvokeAsync(list);
-    }
-
-    private async Task ToggleTime(string time)
-    {
-        var list = new List<string>(SelectedTimes);
-        if (!list.Remove(time))
-        {
-            list.Add(time);
-        }
-        await SelectedTimesChanged.InvokeAsync(list);
-    }
-
-    // Sort options matching old site (key = API field name, value = display label)
     private static readonly KeyValuePair<string, string>[] SortOptions =
     [
         new("", "默认排序"),
@@ -167,22 +141,51 @@
         new("ReaderCount", "热度"),
     ];
 
-    // Parse "LastEditTime desc" into field + direction
     private string CurrentSortField => CurrentSort.Replace(" desc", "");
     private bool IsAscending => !string.IsNullOrEmpty(CurrentSortField) && !CurrentSort.Contains(" desc");
 
-    private async Task SetSort(string field)
+    private string GetTypeToggleUrl(string type)
     {
-        // When selecting a sort field, default to descending (same as old site)
-        var sort = string.IsNullOrEmpty(field) ? "" : field + " desc";
-        await CurrentSortChanged.InvokeAsync(sort);
+        var types = new List<string>(SelectedTypes);
+        if (!types.Remove(type)) types.Add(type);
+        return BuildUrl(types: types);
     }
 
-    private async Task ToggleSortOrder()
+    private string GetTimeToggleUrl(string time)
     {
-        var sort = IsAscending
-            ? CurrentSortField + " desc"
-            : CurrentSortField;
-        await CurrentSortChanged.InvokeAsync(sort);
+        var times = new List<string>(SelectedTimes);
+        if (!times.Remove(time)) times.Add(time);
+        return BuildUrl(times: times);
+    }
+
+    private string GetSortUrl(string field)
+    {
+        var sort = string.IsNullOrEmpty(field) ? "" : field + " desc";
+        return BuildUrl(sort: sort);
+    }
+
+    private string GetSortOrderToggleUrl()
+    {
+        var sort = IsAscending ? CurrentSortField + " desc" : CurrentSortField;
+        return BuildUrl(sort: sort);
+    }
+
+    private string BuildUrl(List<string>? types = null, List<string>? times = null, string? sort = null)
+    {
+        var tTypes = types ?? SelectedTypes;
+        var tTimes = times ?? SelectedTimes;
+        var tSort = sort ?? CurrentSort;
+
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(SearchText))
+            parts.Add("Text=" + Uri.EscapeDataString(SearchText));
+        if (!string.IsNullOrWhiteSpace(tSort))
+            parts.Add("Sort=" + Uri.EscapeDataString(tSort));
+        foreach (var tt in tTypes)
+            parts.Add("Types=" + Uri.EscapeDataString(tt));
+        foreach (var tt in tTimes)
+            parts.Add("Times=" + Uri.EscapeDataString(tt));
+        var qs = parts.Count == 0 ? "" : "?" + string.Join("&", parts);
+        return "/search" + qs;
     }
 }

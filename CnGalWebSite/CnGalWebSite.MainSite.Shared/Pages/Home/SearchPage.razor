@@ -1,9 +1,6 @@
 @page "/search"
-@rendermode InteractiveServer
 
 @inject IHomeQueryService HomeQueryService
-@inject NavigationManager NavigationManager
-@implements IDisposable
 @using CnGalWebSite.DataModel.ViewModel.Home
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
 
@@ -15,35 +12,45 @@
         <p class="search-page__desc">在 CnGal 资料站中搜索游戏、角色、文章、标签等内容</p>
     </div>
 
-    @* ── Search bar ── *@
-    <div class="search-page__search-bar">
+    @* ── Search bar (SSR form) ── *@
+    <form method="get" action="/search" class="search-page__search-bar">
+        @foreach (var type in FilterTypes)
+        {
+            <input type="hidden" name="Types" value="@type" />
+        }
+        @foreach (var time in FilterTimes)
+        {
+            <input type="hidden" name="Times" value="@time" />
+        }
+        @if (!string.IsNullOrEmpty(SortValue))
+        {
+            <input type="hidden" name="Sort" value="@SortValue" />
+        }
+
         <div class="search-page__input-wrapper">
             <CgMdiIcon Name="mdiMagnify" aria-hidden="true" />
             <input type="text"
+                   name="Text"
                    class="search-page__input"
                    placeholder="输入关键词搜索..."
-                   @bind="SearchText"
-                   @bind:event="oninput"
-                   @onkeydown="OnKeyDown" />
+                   value="@SearchText" />
             @if (!string.IsNullOrWhiteSpace(SearchText))
             {
-                <button class="search-page__clear-btn" @onclick="ClearSearch" aria-label="清除搜索">
+                <a href="@ClearTextUrl" class="search-page__clear-btn" aria-label="清除搜索">
                     <CgMdiIcon Name="mdiCloseCircle" aria-hidden="true" />
-                </button>
+                </a>
             }
         </div>
-        <button class="search-page__search-btn" @onclick="OnSearch">
+        <button type="submit" class="search-page__search-btn">
             搜索
         </button>
-    </div>
+    </form>
 
     @* ── Filters ── *@
-    <SearchFilterPanel SelectedTypes="FilterTypes"
-                       SelectedTypesChanged="OnTypesChanged"
+    <SearchFilterPanel SearchText="@SearchText"
+                       SelectedTypes="FilterTypes"
                        SelectedTimes="FilterTimes"
-                       SelectedTimesChanged="OnTimesChanged"
-                       CurrentSort="@SortValue"
-                       CurrentSortChanged="OnSortChanged" />
+                       CurrentSort="@SortValue" />
 
     @* ── Results ── *@
     @if (IsLoading)
@@ -91,7 +98,7 @@
             {
                 <CgPagination CurrentPage="CurrentPage"
                               TotalPages="SearchResult.pagedResultDto.TotalPages"
-                              CurrentPageChanged="OnPageChanged" />
+                              HrefTemplate="@_paginationHrefTemplate" />
             }
         }
     }
@@ -117,7 +124,7 @@
     [SupplyParameterFromQuery(Name = "Page")]
     public int QueryPage { get; set; }
 
-    // ── State ──
+    // ── State (parsed from query params on each render) ──
     private string SearchText = "";
     private List<string> FilterTypes = [];
     private List<string> FilterTimes = [];
@@ -128,49 +135,44 @@
     private bool IsLoading;
     private string? ErrorMessage;
 
-    private bool _initialized;
-    private bool _selfNavigating;
-    private CancellationTokenSource? _cts;
+    private string _paginationHrefTemplate = "";
+
+    private string ClearTextUrl
+    {
+        get
+        {
+            var parts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(SortValue))
+                parts.Add("Sort=" + Uri.EscapeDataString(SortValue));
+            foreach (var type in FilterTypes)
+                parts.Add("Types=" + Uri.EscapeDataString(type));
+            foreach (var time in FilterTimes)
+                parts.Add("Times=" + Uri.EscapeDataString(time));
+            return parts.Count == 0 ? "/search" : "/search?" + string.Join("&", parts);
+        }
+    }
 
     protected override async Task OnParametersSetAsync()
     {
-        // Skip if self-navigating: state is already set by event handlers
-        if (_selfNavigating)
-        {
-            _selfNavigating = false;
-            return;
-        }
-
-        if (_initialized)
-        {
-            return;
-        }
-        _initialized = true;
-
-        // Parse URL query parameters into state (only on initial load or external navigation)
         SearchText = QueryText ?? "";
         SortValue = QuerySort ?? "";
         CurrentPage = QueryPage < 1 ? 1 : QueryPage;
         FilterTypes = QueryTypes?.Where(t => !string.IsNullOrWhiteSpace(t)).ToList() ?? [];
         FilterTimes = QueryTimes?.Where(t => !string.IsNullOrWhiteSpace(t)).ToList() ?? [];
 
+        _paginationHrefTemplate = BuildPaginationHrefTemplate();
+
         await ExecuteSearchAsync();
     }
 
     private async Task ExecuteSearchAsync()
     {
-        _cts?.Cancel();
-        _cts = new CancellationTokenSource();
-
         IsLoading = true;
         ErrorMessage = null;
-        StateHasChanged();
 
-        var queryString = BuildQueryString();
         try
         {
-            var result = await HomeQueryService.SearchAsync(queryString, _cts!.Token);
-
+            var result = await HomeQueryService.SearchAsync(BuildQueryString());
             if (result.Success && result.Data is not null)
             {
                 SearchResult = result.Data;
@@ -181,114 +183,44 @@
                 SearchResult = null;
             }
         }
-        catch (OperationCanceledException)
+        finally
         {
-            return;
-        }
-
-        IsLoading = false;
-    }
-
-    // ── Event handlers ──
-    private async Task OnSearch()
-    {
-        CurrentPage = 1;
-        NavigateWithParams();
-        await ExecuteSearchAsync();
-    }
-
-    private async Task OnKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Code is "Enter" or "NumpadEnter")
-        {
-            await OnSearch();
+            IsLoading = false;
         }
     }
 
-    private async Task ClearSearch()
-    {
-        SearchText = "";
-        CurrentPage = 1;
-        NavigateWithParams();
-        await ExecuteSearchAsync();
-    }
-
-    private async Task OnTypesChanged(List<string> types)
-    {
-        FilterTypes = types;
-        CurrentPage = 1;
-        NavigateWithParams();
-        await ExecuteSearchAsync();
-    }
-
-    private async Task OnTimesChanged(List<string> times)
-    {
-        FilterTimes = times;
-        CurrentPage = 1;
-        NavigateWithParams();
-        await ExecuteSearchAsync();
-    }
-
-    private async Task OnSortChanged(string sort)
-    {
-        SortValue = sort;
-        CurrentPage = 1;
-        NavigateWithParams();
-        await ExecuteSearchAsync();
-    }
-
-    private async Task OnPageChanged(int page)
-    {
-        CurrentPage = page;
-        NavigateWithParams();
-        await ExecuteSearchAsync();
-    }
-
-    private void NavigateWithParams()
-    {
-        _selfNavigating = true;
-        NavigationManager.NavigateTo("/search" + BuildQueryString());
-    }
-
-    /// <summary>
-    /// Build query string compatible with the backend API format.
-    /// </summary>
     private string BuildQueryString()
     {
         var parts = new List<string>();
-
         if (!string.IsNullOrWhiteSpace(SearchText))
-        {
             parts.Add("Text=" + Uri.EscapeDataString(SearchText));
-        }
-
         if (!string.IsNullOrWhiteSpace(SortValue))
-        {
             parts.Add("Sort=" + Uri.EscapeDataString(SortValue));
-        }
-
         if (CurrentPage > 1)
-        {
             parts.Add("Page=" + CurrentPage);
-        }
-
         foreach (var type in FilterTypes)
-        {
             parts.Add("Types=" + Uri.EscapeDataString(type));
-        }
-
         foreach (var time in FilterTimes)
-        {
             parts.Add("Times=" + Uri.EscapeDataString(time));
-        }
-
         return parts.Count == 0 ? "" : "?" + string.Join("&", parts);
     }
 
-    public void Dispose()
+    /// <summary>
+    /// Build href template for CgPagination link mode.
+    /// Produces "/search?Text=xxx&Types=A&Page={0}" with {0} as page placeholder.
+    /// </summary>
+    private string BuildPaginationHrefTemplate()
     {
-        _cts?.Cancel();
-        _cts?.Dispose();
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(SearchText))
+            parts.Add("Text=" + Uri.EscapeDataString(SearchText));
+        if (!string.IsNullOrWhiteSpace(SortValue))
+            parts.Add("Sort=" + Uri.EscapeDataString(SortValue));
+        foreach (var type in FilterTypes)
+            parts.Add("Types=" + Uri.EscapeDataString(type));
+        foreach (var time in FilterTimes)
+            parts.Add("Times=" + Uri.EscapeDataString(time));
+        var qs = parts.Count == 0 ? "" : "?" + string.Join("&", parts);
+        return "/search" + qs + (parts.Count == 0 ? "?" : "&") + "Page={0}";
     }
 }
-
