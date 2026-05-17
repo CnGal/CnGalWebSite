@@ -1,0 +1,12 @@
+@* 注入 JSON-LD 结构化数据，用于 Google 富媒体搜索结果 *@
+
+<HeadContent>
+    <script type="application/ld+json">
+        @Data
+    </script>
+</HeadContent>
+
+@code {
+    [Parameter]
+    public string? Data { get; set; }
+}

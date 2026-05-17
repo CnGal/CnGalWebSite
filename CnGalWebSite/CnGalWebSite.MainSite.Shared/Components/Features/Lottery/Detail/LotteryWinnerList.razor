@@ -14,21 +14,23 @@
                         @foreach (var winner in award.Winners)
                         {
                             <li class="lottery-winner-user">
-                                @if (!string.IsNullOrWhiteSpace(winner.PhotoPath))
-                                {
-                                    <img src="@winner.PhotoPath" alt="@winner.Name" class="lottery-winner-avatar" loading="lazy" />
-                                }
-                                else
-                                {
-                                    <span class="lottery-winner-avatar lottery-winner-avatar--placeholder">
-                                        <CgMdiIcon Name="mdiAccountOutline" />
-                                    </span>
-                                }
-                                <span class="lottery-winner-name">@winner.Name</span>
-                                @if (winner.Ranks?.Any() == true)
-                                {
-                                    <CgRankList Model="winner.Ranks" />
-                                }
+                                <a href="/space/index/@winner.Id" class="lottery-winner-link">
+                                    @if (!string.IsNullOrWhiteSpace(winner.PhotoPath))
+                                    {
+                                        <img src="@winner.PhotoPath" alt="@winner.Name" class="lottery-winner-avatar" loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        <span class="lottery-winner-avatar lottery-winner-avatar--placeholder">
+                                            <CgMdiIcon Name="mdiAccountOutline" />
+                                        </span>
+                                    }
+                                    <span class="lottery-winner-name">@winner.Name</span>
+                                    @if (winner.Ranks?.Any() == true)
+                                    {
+                                        <CgRankList Model="winner.Ranks" />
+                                    }
+                                </a>
                             </li>
                         }
                     </ul>

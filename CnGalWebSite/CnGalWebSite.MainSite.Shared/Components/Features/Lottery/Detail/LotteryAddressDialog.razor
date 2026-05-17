@@ -1,0 +1,101 @@
+@using CnGalWebSite.DataModel.ViewModel.Space
+@inject ISpaceCommandService SpaceCommandService
+@inject ICgToastService ToastService
+
+<CgModal IsOpen="_isOpen" OnClose="Close" Title="编辑收货地址">
+    <ChildContent>
+        @if (_isLoading)
+        {
+            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; padding: 32px;">
+                <CgProgressRing />
+                <span>加载中…</span>
+            </div>
+        }
+        else if (_errorMessage is not null)
+        {
+            <CgAlert Variant="warning">@_errorMessage</CgAlert>
+        }
+        else if (_model is not null)
+        {
+            <div style="display: flex; flex-direction: column; gap: 16px; min-width: 360px;">
+                <CgFormGroup Label="真实姓名">
+                    <CgInput @bind-Value="_model.RealName" Placeholder="请输入真实姓名" />
+                </CgFormGroup>
+                <CgFormGroup Label="手机号码">
+                    <CgInput @bind-Value="_model.PhoneNumber" Placeholder="请输入手机号码" />
+                </CgFormGroup>
+                <CgFormGroup Label="详细地址">
+                    <CgTextarea Rows="3" @bind-Value="_model.Address" Placeholder="请输入详细地址" />
+                </CgFormGroup>
+            </div>
+        }
+    </ChildContent>
+    <Footer>
+        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <CgButton OnClick="Close" Variant="text">取消</CgButton>
+            <CgButton OnClick="SaveAsync" Variant="primary" Disabled="_isSaving">
+                @if (_isSaving)
+                {
+                    <CgProgressRing />
+                }
+                <span>保存</span>
+            </CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
+@code {
+    private bool _isOpen;
+    private bool _isLoading;
+    private bool _isSaving;
+    private EditUserAddressModel? _model;
+    private string? _errorMessage;
+
+    public async Task OpenAsync()
+    {
+        _isOpen = true;
+        _isLoading = true;
+        _isSaving = false;
+        _errorMessage = null;
+
+        var result = await SpaceCommandService.GetUserAddressAsync();
+        if (result.Success && result.Data is not null)
+        {
+            _model = result.Data;
+        }
+        else
+        {
+            _errorMessage = result.Error?.Message ?? "获取地址信息失败";
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_model is null)
+        {
+            return;
+        }
+
+        _isSaving = true;
+
+        var result = await SpaceCommandService.EditUserAddressAsync(_model);
+        if (result.Success)
+        {
+            ToastService.Show("编辑收货地址成功", variant: "success");
+            _isOpen = false;
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "编辑收货地址失败", variant: "error");
+        }
+
+        _isSaving = false;
+    }
+
+    private void Close()
+    {
+        _isOpen = false;
+    }
+}

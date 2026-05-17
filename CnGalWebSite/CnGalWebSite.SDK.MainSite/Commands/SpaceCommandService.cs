@@ -170,4 +170,37 @@ public sealed class SpaceCommandService(
             return SdkResult<string>.Fail("MAKE_ONLINE_EXCEPTION", "更新在线状态时发生异常");
         }
     }
+
+    public async Task<SdkResult<EditUserAddressModel>> GetUserAddressAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var model = await GetFromJsonAsync<EditUserAddressModel>("api/space/EditUserAddress", cancellationToken);
+            return SdkResult<EditUserAddressModel>.Ok(model ?? new EditUserAddressModel());
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "获取用户地址异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
+            return SdkResult<EditUserAddressModel>.Fail("ADDRESS_QUERY_EXCEPTION", "获取用户地址时发生异常");
+        }
+    }
+
+    public async Task<SdkResult<bool>> EditUserAddressAsync(EditUserAddressModel model, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await PostAsJsonAsync<EditUserAddressModel, Result>("api/space/EditUserAddress", model, cancellationToken);
+            if (result is { Successful: true })
+            {
+                return SdkResult<bool>.Ok(true);
+            }
+
+            return SdkResult<bool>.Fail("ADDRESS_EDIT_FAILED", result?.Error ?? "保存地址失败");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "保存用户地址异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
+            return SdkResult<bool>.Fail("ADDRESS_EDIT_EXCEPTION", "保存用户地址时发生异常");
+        }
+    }
 }

@@ -181,6 +181,16 @@ public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminComm
             new EditLotteryCanCommentModel { Ids = ids, CanComment = canComment },
             "EDIT_LOTTERY_CAN_COMMENT", "设置抽奖留言板", cancellationToken);
 
+    public Task<SdkResult<bool>> HideLotteryUserAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/lotteries/HiddenLotteryUser",
+            new HiddenLotteryModel { Ids = ids, IsHidden = isHidden },
+            "HIDE_LOTTERY_USER", "操作抽奖用户显隐", cancellationToken);
+
+    public Task<SdkResult<bool>> EditLotteryUserPrizeAsync(EditUserPrizeModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/lotteries/EditUserPrize",
+            model,
+            "EDIT_LOTTERY_USER_PRIZE", "编辑用户奖品", cancellationToken);
+
     // ─── 周边 ───
 
     public Task<SdkResult<bool>> EditPeripheryPriorityAsync(long[] ids, int plusPriority, CancellationToken cancellationToken = default)

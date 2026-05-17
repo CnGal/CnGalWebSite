@@ -5,6 +5,7 @@
 @inject ICgDeviceIdentificationService DeviceIdentificationService
 @using CnGalWebSite.DataModel.ViewModel.Lotteries
 @using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Space
 
 <div class="lottery-op-card">
     @if (_isLoading)
@@ -66,6 +67,12 @@
                     <CgAlert Variant="success">
                         恭喜中奖！你的奖品是：<strong>@_state.Award.Name</strong>
                     </CgAlert>
+                    <div class="lottery-op-card__action">
+                        <CgButton Variant="primary" OnClick="() => _prizeDialog?.OpenAsync()">
+                            <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+                            <span>查看激活码</span>
+                        </CgButton>
+                    </div>
                 }
                 else if (_state.Award.Type == LotteryAwardType.Integral)
                 {
@@ -77,20 +84,38 @@
 
             case UserLotteryState.WaitAddress when _state.Award is not null:
                 <CgAlert Variant="success">
-                    中奖啦！请填写收货地址。你的奖品是：<strong>@_state.Award.Name</strong>
+                    中奖啦！你的奖品是：<strong>@_state.Award.Name</strong>
                 </CgAlert>
+                <div class="lottery-op-card__action">
+                    <CgButton Variant="primary" OnClick="() => _addressDialog?.OpenAsync()">
+                        <CgMdiIcon Name="mdiMapMarkerOutline" aria-hidden="true" />
+                        <span>填写收货地址</span>
+                    </CgButton>
+                </div>
                 break;
 
             case UserLotteryState.WaitShipments when _state.Award is not null:
                 <CgAlert Variant="success">
                     看板娘正在努力发货中。你的奖品是：<strong>@_state.Award.Name</strong>
                 </CgAlert>
+                <div class="lottery-op-card__action">
+                    <CgButton Variant="outline" OnClick="() => _addressDialog?.OpenAsync()">
+                        <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                        <span>修改地址</span>
+                    </CgButton>
+                </div>
                 break;
 
             case UserLotteryState.Shipped when _state.Award is not null:
                 <CgAlert Variant="success">
                     发货啦，记得给五星好评哦~。你的奖品是：<strong>@_state.Award.Name</strong>
                 </CgAlert>
+                <div class="lottery-op-card__action">
+                    <CgButton Variant="primary" OnClick="() => _prizeDialog?.OpenAsync()">
+                        <CgMdiIcon Name="mdiTruckFastOutline" aria-hidden="true" />
+                        <span>查看快递单号</span>
+                    </CgButton>
+                </div>
                 break;
         }
     }
@@ -99,6 +124,9 @@
         <CgAlert Variant="warning">@_errorMessage</CgAlert>
     }
 </div>
+
+<LotteryPrizeDialog @ref="_prizeDialog" LotteryId="@LotteryId" />
+<LotteryAddressDialog @ref="_addressDialog" />
 
 @code {
     [Parameter]
@@ -117,6 +145,8 @@
     private bool _isLoading = true;
     private bool _isParticipating;
     private string? _errorMessage;
+    private LotteryPrizeDialog? _prizeDialog;
+    private LotteryAddressDialog? _addressDialog;
 
     protected override async Task OnInitializedAsync()
     {

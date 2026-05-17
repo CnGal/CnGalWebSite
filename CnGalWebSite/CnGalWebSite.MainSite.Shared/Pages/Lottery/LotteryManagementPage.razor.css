@@ -1,0 +1,204 @@
+﻿/* ── Page layout ── */
+
+.lottery-manage-page {
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Header ── */
+
+.lottery-manage-page__header {
+    margin-bottom: var(--cg-spacing-5);
+    padding-bottom: var(--cg-spacing-4);
+    border-bottom: 1px solid var(--cg-color-border);
+}
+
+.lottery-manage-page__title {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+    font-size: var(--cg-font-size-xl);
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
+.lottery-manage-page__title ::deep .cg-mdi-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--cg-color-primary);
+}
+
+/* ── Tab panels ── */
+
+.lottery-manage-page__panel {
+    padding-top: var(--cg-spacing-1);
+}
+
+/* ── Cell content ── */
+
+.lottery-manage-user {
+    font-weight: var(--cg-font-weight-medium);
+}
+
+.lottery-manage-award-type {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-text-secondary);
+}
+
+.lottery-manage-code {
+    font-family: var(--cg-font-mono, monospace);
+    font-size: var(--cg-font-size-sm);
+    word-break: break-all;
+}
+
+.lottery-manage-na {
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+}
+
+/* ── Status badges ── */
+
+.lottery-manage-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.625rem;
+    border-radius: var(--cg-radius-full);
+    font-size: var(--cg-font-size-xs);
+    font-weight: var(--cg-font-weight-semibold);
+}
+
+.lottery-manage-badge--hidden {
+    background: color-mix(in oklab, var(--cg-color-text-muted) 12%, transparent);
+    color: var(--cg-color-text-muted);
+}
+
+.lottery-manage-badge--visible {
+    background: color-mix(in oklab, var(--cg-color-success) 12%, transparent);
+    color: var(--cg-color-success);
+}
+
+/* ── Action buttons ── */
+
+.lottery-manage-actions {
+    display: flex;
+    gap: var(--cg-spacing-1);
+    align-items: center;
+}
+
+.lottery-manage-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--cg-radius-md);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background var(--cg-transition-fast), color var(--cg-transition-fast);
+    padding: 0;
+}
+
+.lottery-manage-action-btn ::deep .cg-mdi-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.lottery-manage-action-btn--show {
+    color: var(--cg-color-success);
+}
+
+.lottery-manage-action-btn--show:hover {
+    background: color-mix(in oklab, var(--cg-color-success) 12%, transparent);
+}
+
+.lottery-manage-action-btn--hide {
+    color: var(--cg-color-text-muted);
+}
+
+.lottery-manage-action-btn--hide:hover {
+    background: var(--cg-color-hover-overlay);
+    color: var(--cg-color-text);
+}
+
+.lottery-manage-action-btn--edit {
+    color: var(--cg-color-primary);
+}
+
+.lottery-manage-action-btn--edit:hover {
+    background: color-mix(in oklab, var(--cg-color-primary) 12%, transparent);
+}
+
+.lottery-manage-action-btn--execute {
+    color: var(--cg-color-warning);
+}
+
+.lottery-manage-action-btn--execute:hover {
+    background: color-mix(in oklab, var(--cg-color-warning) 12%, transparent);
+}
+
+/* ── Toolbar export button ── */
+
+.lottery-manage-export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cg-spacing-1);
+    padding: 0 var(--cg-spacing-3);
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-medium);
+    color: var(--cg-color-text-secondary);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: var(--cg-radius-md);
+    height: 32px;
+    transition: background var(--cg-transition-fast), color var(--cg-transition-fast);
+}
+
+.lottery-manage-export-btn:hover {
+    background: var(--cg-color-hover-overlay);
+    color: var(--cg-color-text);
+}
+
+.lottery-manage-export-btn ::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+}
+
+/* ── Modal content ── */
+
+.lottery-manage-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+    min-width: 360px;
+}
+
+.lottery-manage-modal-hint {
+    margin: 0;
+    color: var(--cg-color-text-secondary);
+    font-size: var(--cg-font-size-sm);
+}
+
+.lottery-manage-modal-footer {
+    display: flex;
+    gap: var(--cg-spacing-2);
+    justify-content: flex-end;
+}
+
+/* ── Export data display ── */
+
+.lottery-manage-export-pre {
+    white-space: break-spaces;
+    max-height: 60vh;
+    overflow-y: auto;
+    font-size: var(--cg-font-size-sm);
+    padding: var(--cg-spacing-3);
+    background: var(--cg-color-section-bg);
+    border-radius: var(--cg-radius-md);
+    margin: 0;
+}
+

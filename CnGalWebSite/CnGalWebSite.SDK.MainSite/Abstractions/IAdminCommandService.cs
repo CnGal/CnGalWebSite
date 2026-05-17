@@ -2,6 +2,7 @@
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Expo;
 using CnGalWebSite.DataModel.ViewModel.Home;
+using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.News;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Recommends;
@@ -98,6 +99,10 @@ public interface IAdminCommandService
     Task<SdkResult<bool>> EditLotteryPriorityAsync(long[] ids, int plusPriority, CancellationToken cancellationToken = default);
     Task<SdkResult<bool>> HideLotteryAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default);
     Task<SdkResult<bool>> EditLotteryCanCommentAsync(long[] ids, bool canComment, CancellationToken cancellationToken = default);
+
+    Task<SdkResult<bool>> HideLotteryUserAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default);
+
+    Task<SdkResult<bool>> EditLotteryUserPrizeAsync(EditUserPrizeModel model, CancellationToken cancellationToken = default);
 
     // ─── 周边操作 ───
 

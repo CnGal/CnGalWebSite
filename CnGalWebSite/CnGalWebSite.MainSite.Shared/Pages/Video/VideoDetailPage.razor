@@ -1,6 +1,7 @@
 @page "/videos/index/{Id:long}"
 @inject IVideoQueryService VideoQueryService
 @inject IExamineQueryService ExamineQueryService
+@inject NavigationManager NavigationManager
 @implements IDisposable
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Admin
@@ -8,8 +9,14 @@
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 @using CnGalWebSite.MainSite.Shared.Services
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
 
 <CgPageMeta Title="@(Model is null ? null : GetDisplayTitle())" Description="@(Model?.BriefIntroduction)" Image="@(Model?.MainPicture)" />
+
+@if (Model is not null)
+{
+    <CgStructuredData Data="@GenerateStructuredDataJson()" />
+}
 
 @if (ErrorMessage is not null)
 {
@@ -217,6 +224,20 @@ var editRecordsTask = ExamineQueryService.GetVideoEditRecordsAsync(Id, cancellat
 
         return string.IsNullOrWhiteSpace(Model.BackgroundPicture) is false
             || string.IsNullOrWhiteSpace(Model.SmallBackgroundPicture) is false;
+    }
+
+    private string GenerateStructuredDataJson()
+    {
+        if (Model is null) return string.Empty;
+
+        var url = StructuredDataHelper.EscapeJson($"{NavigationManager.BaseUri}videos/index/{Model.Id}");
+        var name = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(Model.DisplayName) ? Model.Name : Model.DisplayName);
+        var description = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(Model.BriefIntroduction) ? Model.Name : Model.BriefIntroduction);
+        var image = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(Model.MainPicture) ? StructuredDataHelper.LogoUrl : Model.MainPicture);
+        var authorName = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(Model.AuthorName) ? "CnGal" : Model.AuthorName);
+        var uploadDate = Model.PubishTime.ToString("yyyy-MM-dd");
+
+        return "{\"@context\":\"https://schema.org\",\"@type\":\"VideoObject\",\"name\":\"" + name + "\",\"description\":\"" + description + "\",\"thumbnailUrl\":\"" + image + "\",\"author\":{\"@type\":\"Person\",\"name\":\"" + authorName + "\"},\"uploadDate\":\"" + uploadDate + "\",\"mainEntityOfPage\":{\"@type\":\"WebPage\",\"@id\":\"" + url + "\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"CnGal\",\"logo\":{\"@type\":\"ImageObject\",\"url\":\"" + StructuredDataHelper.LogoUrl + "\"}}}";
     }
 
     public void Dispose()

@@ -11,5 +11,6 @@ public interface ILotteryCommandService
     Task<SdkResult<long>> CreateLotteryAsync(EditLotteryModel model, CancellationToken cancellationToken = default);
     Task<SdkResult<long>> EditLotteryAsync(EditLotteryModel model, CancellationToken cancellationToken = default);
     Task<SdkResult<UserLotteryStateModel>> GetUserLotteryStateAsync(long lotteryId, CancellationToken cancellationToken = default);
+    Task<SdkResult<PrizeViewModel>> GetUserPrizeAsync(long lotteryId, CancellationToken cancellationToken = default);
     Task<SdkResult<bool>> ParticipateInLotteryAsync(long lotteryId, DeviceIdentificationModel identification, CancellationToken cancellationToken = default);
 }

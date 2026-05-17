@@ -165,6 +165,55 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
         QueryParameterModel parameter, CancellationToken cancellationToken = default)
         => QueryListAsync<LotteryOverviewModel>("api/lotteries/List", "ADMIN_LOTTERIES", "抽奖", parameter, cancellationToken);
 
+    public async Task<SdkResult<QueryResultModel<LotteryUserOverviewModel>>> GetLotteryUsersAsync(
+        long lotteryId, QueryParameterModel parameter, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await HttpClient.PostAsJsonAsync(
+                $"api/lotteries/ListLotteryUsers?lotteryId={lotteryId}",
+                parameter, SdkJsonSerializerOptions.Default, cancellationToken);
+
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Logger.LogError(
+                    "抽奖参与用户列表请求失败。LotteryId={LotteryId}; StatusCode={StatusCode}; ResponseBody={ResponseBody}",
+                    lotteryId, (int)response.StatusCode, TrimForLog(body));
+                return SdkResult<QueryResultModel<LotteryUserOverviewModel>>.Fail(
+                    "ADMIN_LOTTERY_USERS_HTTP_FAILED",
+                    $"获取参与用户列表失败（HTTP {(int)response.StatusCode}）");
+            }
+
+            try
+            {
+                var result = Deserialize<QueryResultModel<LotteryUserOverviewModel>>(body);
+                return SdkResult<QueryResultModel<LotteryUserOverviewModel>>.Ok(result!);
+            }
+            catch (System.Text.Json.JsonException ex)
+            {
+                Logger.LogError(ex,
+                    "抽奖参与用户列表反序列化失败。LotteryId={LotteryId}; ResponseBody={ResponseBody}",
+                    lotteryId, TrimForLog(body));
+                return SdkResult<QueryResultModel<LotteryUserOverviewModel>>.Fail(
+                    "ADMIN_LOTTERY_USERS_DESERIALIZE_FAILED", "参与用户列表数据格式不兼容");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "获取抽奖参与用户列表异常。LotteryId={LotteryId}", lotteryId);
+            return SdkResult<QueryResultModel<LotteryUserOverviewModel>>.Fail(
+                "ADMIN_LOTTERY_USERS_EXCEPTION", "请求参与用户列表时发生异常");
+        }
+    }
+
+    public Task<SdkResult<List<WinnerOverviewModel>>> GetLotteryWinnersAsync(
+        long lotteryId, CancellationToken cancellationToken = default)
+        => GetAsync<List<WinnerOverviewModel>>(
+            $"api/lotteries/GetWinnerDatas/{lotteryId}",
+            "ADMIN_LOTTERY_WINNERS", "中奖用户列表", cancellationToken);
+
     public Task<SdkResult<QueryResultModel<PeripheryOverviewModel>>> GetPeripheriesAsync(
         QueryParameterModel parameter, CancellationToken cancellationToken = default)
         => QueryListAsync<PeripheryOverviewModel>("api/peripheries/List", "ADMIN_PERIPHERIES", "周边", parameter, cancellationToken);

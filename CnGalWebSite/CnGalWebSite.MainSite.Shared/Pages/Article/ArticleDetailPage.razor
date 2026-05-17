@@ -9,8 +9,14 @@
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 @using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 @using CnGalWebSite.MainSite.Shared.Services
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
 
 <CgPageMeta Title="@(_model is null ? null : GetDisplayTitle())" Description="@(_model?.BriefIntroduction)" Image="@(_model?.MainPicture)" />
+
+@if (_model is not null)
+{
+    <CgStructuredData Data="@GenerateStructuredDataJson()" />
+}
 
 @if (_errorMessage is not null)
 {
@@ -139,6 +145,9 @@ else
     [Parameter]
     public long Id { get; set; }
 
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
     private ArticleDetailViewModel? _model;
     private IReadOnlyList<ExaminedNormalListModel>? _editRecords;
     private string? _errorMessage;
@@ -186,6 +195,20 @@ else
     {
         _cts?.Cancel();
         _cts?.Dispose();
+    }
+
+    private string GenerateStructuredDataJson()
+    {
+        if (_model is null) return string.Empty;
+
+        var url = StructuredDataHelper.EscapeJson($"{NavigationManager.BaseUri}articles/index/{_model.Id}");
+        var authorName = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(_model.AuthorName) ? "CnGal" : _model.AuthorName);
+        var title = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(_model.DisplayName) ? _model.Name : _model.DisplayName);
+        var description = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(_model.BriefIntroduction) ? _model.Name : _model.BriefIntroduction);
+        var image = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(_model.MainPicture) ? StructuredDataHelper.LogoUrl : _model.MainPicture);
+        var datePublished = _model.PubishTime?.ToString("yyyy-MM-dd") ?? _model.CreateTime.ToString("yyyy-MM-dd");
+
+        return "{\"@context\":\"https://schema.org\",\"@type\":\"Article\",\"headline\":\"" + title + "\",\"description\":\"" + description + "\",\"image\":\"" + image + "\",\"author\":{\"@type\":\"Person\",\"name\":\"" + authorName + "\"},\"datePublished\":\"" + datePublished + "\",\"mainEntityOfPage\":{\"@type\":\"WebPage\",\"@id\":\"" + url + "\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"CnGal\",\"logo\":{\"@type\":\"ImageObject\",\"url\":\"" + StructuredDataHelper.LogoUrl + "\"}}}";
     }
 
     private string GetDisplayTitle()
