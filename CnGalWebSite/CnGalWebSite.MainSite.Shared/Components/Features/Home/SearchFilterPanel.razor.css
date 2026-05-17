@@ -1,4 +1,4 @@
-/* ══════════════════════════════════════════════════════════
+﻿/* ══════════════════════════════════════════════════════════
    SearchFilterPanel.razor.css — Mobile-first filter chips
    ══════════════════════════════════════════════════════════ */
 
@@ -135,6 +135,7 @@
     white-space: nowrap;
     line-height: 1.4;
     min-height: 32px;
+    text-decoration: none!important;
 }
 
 @media (min-width: 768px) {

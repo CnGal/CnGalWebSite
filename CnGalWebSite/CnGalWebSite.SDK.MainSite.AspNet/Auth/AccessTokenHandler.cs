@@ -42,7 +42,15 @@ public sealed class AccessTokenHandler : DelegatingHandler
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         }
 
-        var response = await base.SendAsync(request, cancellationToken);
+        HttpResponseMessage response;
+        try
+        {
+            response = await base.SendAsync(request, cancellationToken);
+        }
+        catch (TaskCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return CreateEmptyResponse(request);
+        }
 
         if (response.StatusCode != HttpStatusCode.Unauthorized || httpContext is null)
         {
@@ -59,7 +67,14 @@ public sealed class AccessTokenHandler : DelegatingHandler
             retryRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshResult.Value.AccessToken);
 
             response.Dispose();
-            response = await base.SendAsync(retryRequest, cancellationToken);
+            try
+            {
+                response = await base.SendAsync(retryRequest, cancellationToken);
+            }
+            catch (TaskCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                return CreateEmptyResponse(retryRequest);
+            }
         }
         else
         {
@@ -68,6 +83,15 @@ public sealed class AccessTokenHandler : DelegatingHandler
         }
 
         return response;
+    }
+
+    private static HttpResponseMessage CreateEmptyResponse(HttpRequestMessage request)
+    {
+        return new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent("{}"),
+            RequestMessage = request
+        };
     }
 
     private static async Task SignOutIfHeadersWritableAsync(HttpContext httpContext)
