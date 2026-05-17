@@ -63,11 +63,14 @@
         </div>
 
         @* SEO schema.org 结构化数据 *@
-        <div itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating" style="display:none">
-            <meta itemprop="ratingValue" content="@Model.TotalScores.TotalScore" />
-            <meta itemprop="worstRating" content="1">
-            <meta itemprop="bestRating" content="10" />
-            <meta itemprop="ratingCount" content="@Model.ScoredCount" />
+        <div itemscope itemtype="https://schema.org/VideoGame" style="display:none">
+            <meta itemprop="name" content="@Model.GameName" />
+            <div itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+                <meta itemprop="ratingValue" content="@Model.TotalScores.TotalScore" />
+                <meta itemprop="worstRating" content="1">
+                <meta itemprop="bestRating" content="10" />
+                <meta itemprop="ratingCount" content="@Model.ScoredCount" />
+            </div>
         </div>
     }
     else
@@ -91,7 +94,7 @@
                 @foreach (var user in ScoredUsers.Take(MaxUserScores))
                 {
                     <li>
-                        <EntryUserScoreCard Model="user" IsDubbing="Model.IsDubbing" />
+                        <EntryUserScoreCard Model="user" IsDubbing="Model.IsDubbing" GameName="@Model.GameName" />
                     </li>
                 }
             </ul>

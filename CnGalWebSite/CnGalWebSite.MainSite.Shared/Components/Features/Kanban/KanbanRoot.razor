@@ -112,8 +112,18 @@
 
             await LoadSettingsDataAsync();
 
-            // 启动看板娘事件循环（定时问候、空闲事件、鼠标悬停、导航事件等）
-            _eventLoopTask = EventService.StartAsync(_cts.Token);
+            if (_cts is not null)
+            {
+                // 启动看板娘事件循环（定时问候、空闲事件、鼠标悬停、导航事件等）
+                try
+                {
+                    _eventLoopTask = EventService.StartAsync(_cts.Token);
+                }
+                catch (ObjectDisposedException)
+                {
+                    // _cts 在上面的 await 期间被 Dispose 了，忽略
+                }
+            }
 
             StateHasChanged();
         }

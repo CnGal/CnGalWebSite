@@ -148,6 +148,21 @@ public interface IAdminQueryService
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// 分页查询抽奖参与用户列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<LotteryUserOverviewModel>>> GetLotteryUsersAsync(
+        long lotteryId,
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取抽奖中奖用户列表（含地址信息）。
+    /// </summary>
+    Task<SdkResult<List<WinnerOverviewModel>>> GetLotteryWinnersAsync(
+        long lotteryId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// 分页查询周边列表。
     /// </summary>
     Task<SdkResult<QueryResultModel<PeripheryOverviewModel>>> GetPeripheriesAsync(

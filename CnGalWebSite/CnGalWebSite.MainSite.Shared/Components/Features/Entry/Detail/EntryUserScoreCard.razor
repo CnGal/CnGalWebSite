@@ -61,7 +61,8 @@
     }
 
     @* schema.org Review 结构化数据 *@
-    <div itemprop="review" itemscope itemtype="https://schema.org/Review" style="display:none">
+    <div itemscope itemtype="https://schema.org/Review" style="display:none">
+        <meta itemprop="itemReviewed" content="@GameName">
         <meta itemprop="datePublished" content="@Model.LastEditTime.ToString("yyyy-MM-dd")">
         @if (Model.IsScored)
         {
@@ -80,4 +81,7 @@
 
     [Parameter]
     public bool IsDubbing { get; set; }
+
+    [Parameter]
+    public string? GameName { get; set; }
 }

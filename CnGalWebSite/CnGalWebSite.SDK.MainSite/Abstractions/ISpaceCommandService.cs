@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.SpaceEdit;
 
@@ -34,4 +35,14 @@ public interface ISpaceCommandService
     /// 上报用户在线状态（心跳），建议每 10 分钟调用一次。
     /// </summary>
     Task<SdkResult<string>> MakeUserOnlineAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取当前用户的收货地址。
+    /// </summary>
+    Task<SdkResult<EditUserAddressModel>> GetUserAddressAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 保存当前用户的收货地址。
+    /// </summary>
+    Task<SdkResult<bool>> EditUserAddressAsync(EditUserAddressModel model, CancellationToken cancellationToken = default);
 }

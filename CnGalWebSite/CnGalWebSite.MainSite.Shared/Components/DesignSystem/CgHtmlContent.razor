@@ -1,8 +1,10 @@
 @* CgHtmlContent — 通用 HTML 内容显示组件，用于渲染 markdown 解析生成的 HTML *@
+@using System.Text.RegularExpressions
+
 @if (!string.IsNullOrWhiteSpace(Content))
 {
     <div class="cg-html-content">
-        @(new MarkupString(Content))
+        @(new MarkupString(Sanitize(Content)))
     </div>
 }
 
@@ -12,4 +14,48 @@
     /// </summary>
     [Parameter]
     public string? Content { get; set; }
+
+    private static readonly Regex _scriptRegex = new(
+        @"<script[\s>].*?</script\s*>",
+        RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
+
+    private static readonly Regex _iframeRegex = new(
+        @"<iframe[\s>].*?</iframe\s*>",
+        RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
+
+    private static readonly Regex _containerCloseRegex = new(
+        @"</(div|section|main|article|header|footer|nav|aside|html|body|head)\s*>",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static readonly Regex _aOpenRegex = new(
+        @"<\s*a\b[^>]*>",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static readonly Regex _aCloseRegex = new(
+        @"<\s*/\s*a\s*>",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static string Sanitize(string html)
+    {
+        if (string.IsNullOrWhiteSpace(html))
+        {
+            return html;
+        }
+
+        html = _scriptRegex.Replace(html, string.Empty);
+        html = _iframeRegex.Replace(html, string.Empty);
+
+        // 转义会破坏外层容器结构的关闭标签，防止 HTML 内容突破 DOM 容器
+        html = _containerCloseRegex.Replace(html, "&lt;/$1&gt;");
+
+        // 补全未闭合的 <a> 标签，防止后续内容被错误包裹
+        var openCount = _aOpenRegex.Count(html);
+        var closeCount = _aCloseRegex.Count(html);
+        if (openCount > closeCount)
+        {
+            html += string.Concat(Enumerable.Repeat("</a>", openCount - closeCount));
+        }
+
+        return html;
+    }
 }

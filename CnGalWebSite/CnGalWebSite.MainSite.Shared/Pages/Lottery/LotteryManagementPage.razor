@@ -1,0 +1,363 @@
+@page "/lotteries/manage/{Id:long}"
+@attribute [Authorize(Roles = "Admin")]
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@inject IAdminQueryService AdminQueryService
+@inject IAdminCommandService AdminCommandService
+@inject ICgToastService ToastService
+@implements IDisposable
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Lotteries
+@using CnGalWebSite.Core.Models
+
+<CgPageMeta Title="@($"抽奖参与管理")" />
+
+<div class="lottery-manage-page">
+    <header class="lottery-manage-page__header">
+        <h1 class="lottery-manage-page__title">
+            <CgMdiIcon Name="mdiGiftOutline" aria-hidden="true" />
+            抽奖参与管理
+        </h1>
+    </header>
+
+    <CgTabs Items="@_tabs"
+            Variant="underline"
+            DefaultActiveKey="participants"
+            AriaLabel="抽奖管理标签页"
+            Id="lottery-manage-tabs">
+        <PanelTemplate Context="key">
+            @switch (key)
+            {
+                case "participants":
+                    <div class="lottery-manage-page__panel">
+                        <CgDataTable TItem="LotteryUserOverviewModel" Title="参与抽奖的用户" OnServerQuery="OnParticipantQuery" DefaultSortField="Id" DefaultSortDesc="true" @ref="_participantTable">
+                            <ToolbarContent>
+                                <button class="lottery-manage-export-btn" title="导出数据" @onclick="OnExport">
+                                    <CgMdiIcon Name="mdiExport" aria-hidden="true" />
+                                    <span>导出数据</span>
+                                </button>
+                            </ToolbarContent>
+                            <ChildContent>
+                                <CgDataTableColumn TItem="LotteryUserOverviewModel" Title="Id" Field="LotteryUserId" Width="80px" />
+                                <CgDataTableColumn TItem="LotteryUserOverviewModel" Title="号码" Field="Number" Width="80px" />
+                                <CgDataTableColumn TItem="LotteryUserOverviewModel" Title="用户" Field="Name">
+                                    <ChildContent Context="item">
+                                        <span class="lottery-manage-user">@item.Name</span>
+                                    </ChildContent>
+                                </CgDataTableColumn>
+                                <CgDataTableColumn TItem="LotteryUserOverviewModel" Title="Cookie" Field="Cookie" />
+                                <CgDataTableColumn TItem="LotteryUserOverviewModel" Title="Ip" Field="Ip" />
+                                <CgDataTableColumn TItem="LotteryUserOverviewModel" Title="状态" Field="IsHidden">
+                                    <ChildContent Context="item">
+                                        @if (item.IsHidden)
+                                        {
+                                            <span class="lottery-manage-badge lottery-manage-badge--hidden">已隐藏</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="lottery-manage-badge lottery-manage-badge--visible">可见</span>
+                                        }
+                                    </ChildContent>
+                                </CgDataTableColumn>
+                                <CgDataTableColumn TItem="LotteryUserOverviewModel" Title="操作" Sortable="false" Width="80px">
+                                    <ChildContent Context="item">
+                                        <div class="lottery-manage-actions">
+                                            @if (item.IsHidden)
+                                            {
+                                                <button class="lottery-manage-action-btn lottery-manage-action-btn--show" title="显示" @onclick="() => HideParticipant(item, false)">
+                                                    <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button class="lottery-manage-action-btn lottery-manage-action-btn--hide" title="隐藏" @onclick="() => HideParticipant(item, true)">
+                                                    <CgMdiIcon Name="mdiEyeOffOutline" aria-hidden="true" />
+                                                </button>
+                                            }
+                                        </div>
+                                    </ChildContent>
+                                </CgDataTableColumn>
+                            </ChildContent>
+                        </CgDataTable>
+                    </div>
+                    break;
+                case "winners":
+                    <div class="lottery-manage-page__panel">
+                        <CgDataTable TItem="WinnerOverviewModel" Items="_winners" Title="中奖用户" DefaultSortField="Number">
+                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="号码" Field="Number" Width="80px" />
+                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="用户名" Field="UserName" />
+                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="电子邮箱" Field="Email" />
+                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="类型" Field="AwardType">
+                                <ChildContent Context="item">
+                                    <span class="lottery-manage-award-type">@GetAwardTypeText(item.AwardType)</span>
+                                </ChildContent>
+                            </CgDataTableColumn>
+                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="激活码" Field="ActivationCode">
+                                <ChildContent Context="item">
+                                    @if (item.AwardType == LotteryAwardType.ActivationCode)
+                                    {
+                                        <span class="lottery-manage-code">@item.ActivationCode</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="lottery-manage-na">-</span>
+                                    }
+                                </ChildContent>
+                            </CgDataTableColumn>
+                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="快递单号" Field="TrackingNumber">
+                                <ChildContent Context="item">
+                                    @if (item.AwardType == LotteryAwardType.RealThing)
+                                    {
+                                        @if (string.IsNullOrWhiteSpace(item.TrackingNumber))
+                                        {
+                                            <span class="lottery-manage-badge lottery-manage-badge--hidden">未填写</span>
+                                        }
+                                        else
+                                        {
+                                            <span>@item.TrackingNumber</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="lottery-manage-na">-</span>
+                                    }
+                                </ChildContent>
+                            </CgDataTableColumn>
+                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="真实姓名" Field="RealName" />
+                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="地址" Field="Address" />
+                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="电话号码" Field="Phone" />
+                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="操作" Sortable="false" Width="80px">
+                                <ChildContent Context="item">
+                                    <div class="lottery-manage-actions">
+                                        @if (item.AwardType != LotteryAwardType.Integral)
+                                        {
+                                            if (item.AwardType == LotteryAwardType.RealThing && string.IsNullOrWhiteSpace(item.TrackingNumber))
+                                            {
+                                                <button class="lottery-manage-action-btn lottery-manage-action-btn--execute" title="填写快递单号" @onclick="() => OpenPrizeEditor(item)">
+                                                    <CgMdiIcon Name="mdiTruckFastOutline" aria-hidden="true" />
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button class="lottery-manage-action-btn lottery-manage-action-btn--edit" title="编辑" @onclick="() => OpenPrizeEditor(item)">
+                                                    <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
+                                                </button>
+                                            }
+                                        }
+                                    </div>
+                                </ChildContent>
+                            </CgDataTableColumn>
+                        </CgDataTable>
+                    </div>
+                    break;
+            }
+        </PanelTemplate>
+    </CgTabs>
+</div>
+
+@* ── 编辑奖品对话框 ── *@
+<CgModal IsOpen="_prizeEditorOpen" Title="编辑奖品" OnClose="ClosePrizeEditor">
+    <ChildContent>
+        <div class="lottery-manage-modal-body">
+            <p class="lottery-manage-modal-hint">输入完毕后点击保存即可生效</p>
+
+            @if (_editingPrize?.AwardType == LotteryAwardType.ActivationCode)
+            {
+                <CgInput @bind-Value="_prizeEditValue" Placeholder="激活码" />
+            }
+            else
+            {
+                <CgInput @bind-Value="_prizeEditValue" Placeholder="快递单号" />
+            }
+        </div>
+    </ChildContent>
+    <Footer>
+        <div class="lottery-manage-modal-footer">
+            <CgButton OnClick="ClosePrizeEditor" Variant="text">取消</CgButton>
+            <CgButton OnClick="SavePrize" Variant="primary">保存</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
+@* ── 导出数据对话框 ── *@
+<CgModal IsOpen="_exportOpen" Title="导出抽奖数据" OnClose="() => _exportOpen = false">
+    <ChildContent>
+        <pre class="lottery-manage-export-pre">@_exportData</pre>
+    </ChildContent>
+    <Footer>
+        <div class="lottery-manage-modal-footer">
+            <CgButton OnClick="() => _exportOpen = false" Variant="text">关闭</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    private CancellationTokenSource? _cts = new();
+    private CgDataTable<LotteryUserOverviewModel>? _participantTable;
+
+    private List<WinnerOverviewModel> _winners = [];
+
+    private bool _prizeEditorOpen;
+    private WinnerOverviewModel? _editingPrize;
+    private string _prizeEditValue = string.Empty;
+
+    private bool _exportOpen;
+    private string _exportData = string.Empty;
+
+    private static readonly IReadOnlyList<CgTabItem> _tabs = new CgTabItem[]
+    {
+        new("participants", "参与用户", "mdiAccountGroupOutline"),
+        new("winners", "中奖用户", "mdiTrophyOutline"),
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadWinnersAsync();
+    }
+
+    private async Task LoadWinnersAsync()
+    {
+        var result = await AdminQueryService.GetLotteryWinnersAsync(Id, _cts.Token);
+        if (result.Success && result.Data is not null)
+        {
+            _winners = result.Data;
+        }
+    }
+
+    private async Task<CgDataTableResult<LotteryUserOverviewModel>> OnParticipantQuery(CgDataTableRequest request)
+    {
+        // ViewModel 属性名映射到 LotteryUser 实体属性名（API 对实体做动态 LINQ 排序）
+        var sortField = request.SortField switch
+        {
+            "LotteryUserId" => "Id",
+            _ => request.SortField
+        };
+
+        var parameter = new QueryParameterModel
+        {
+            Page = request.Page,
+            ItemsPerPage = request.PageSize,
+            SearchText = request.SearchText ?? string.Empty,
+            SortBy = string.IsNullOrEmpty(sortField) ? new[] { "Id" } : new[] { sortField },
+            SortDesc = new[] { request.SortDesc }
+        };
+        var result = await AdminQueryService.GetLotteryUsersAsync(Id, parameter, _cts.Token);
+        return result.Success && result.Data is not null
+            ? new CgDataTableResult<LotteryUserOverviewModel>(result.Data.Items.ToList(), result.Data.Total)
+            : new CgDataTableResult<LotteryUserOverviewModel>([], 0);
+    }
+
+    private async Task HideParticipant(LotteryUserOverviewModel item, bool isHidden)
+    {
+        var message = isHidden ? "隐藏" : "显示";
+        var r = await AdminCommandService.HideLotteryUserAsync(new[] { item.LotteryUserId }, isHidden, _cts.Token);
+        if (r.Success)
+        {
+            ToastService.Show($"{message}成功", variant: "success");
+            if (_participantTable is not null)
+            {
+                await _participantTable.RefreshAsync();
+            }
+        }
+        else
+        {
+            ToastService.Show(r.Error?.Message ?? $"{message}失败", variant: "error");
+        }
+    }
+
+    private void OpenPrizeEditor(WinnerOverviewModel item)
+    {
+        _editingPrize = item;
+        _prizeEditValue = item.AwardType == LotteryAwardType.ActivationCode ? item.ActivationCode ?? string.Empty : item.TrackingNumber ?? string.Empty;
+        _prizeEditorOpen = true;
+    }
+
+    private void ClosePrizeEditor()
+    {
+        _prizeEditorOpen = false;
+        _editingPrize = null;
+        _prizeEditValue = string.Empty;
+    }
+
+    private async Task SavePrize()
+    {
+        if (_editingPrize is null)
+        {
+            return;
+        }
+
+        var r = await AdminCommandService.EditLotteryUserPrizeAsync(new EditUserPrizeModel
+        {
+            UserId = _editingPrize.Id,
+            LotteryAwardId = _editingPrize.AwardId,
+            Context = _prizeEditValue
+        }, _cts.Token);
+
+        if (r.Success)
+        {
+            if (_editingPrize.AwardType == LotteryAwardType.ActivationCode)
+            {
+                _editingPrize.ActivationCode = _prizeEditValue;
+            }
+            else
+            {
+                _editingPrize.TrackingNumber = _prizeEditValue;
+            }
+            ToastService.Show("编辑奖品成功", variant: "success");
+            ClosePrizeEditor();
+        }
+        else
+        {
+            ToastService.Show(r.Error?.Message ?? "编辑奖品失败", variant: "error");
+        }
+    }
+
+    private async Task OnExport()
+    {
+        try
+        {
+            var dataResult = await AdminQueryService.GetLotteryWinnersAsync(Id, _cts.Token);
+            var participantsResult = await AdminQueryService.GetLotteryUsersAsync(Id, new QueryParameterModel
+            {
+                Page = 1,
+                ItemsPerPage = int.MaxValue,
+                SearchText = string.Empty,
+                SortBy = new[] { "LotteryUserId" },
+                SortDesc = new[] { false }
+            }, _cts.Token);
+
+            var json = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                winners = dataResult.Success && dataResult.Data is not null
+                    ? dataResult.Data.Select(w => new { number = w.Number, userName = w.UserName, awardName = w.AwardName, awardType = w.AwardType.ToString(), realName = w.RealName, address = w.Address, phone = w.Phone, activationCode = w.ActivationCode, trackingNumber = w.TrackingNumber })
+                    : [],
+                participants = participantsResult.Success && participantsResult.Data is not null
+                    ? participantsResult.Data.Items.Select(p => new { number = p.Number, name = p.Name, isHidden = p.IsHidden })
+                    : []
+            }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+
+            _exportData = json;
+            _exportOpen = true;
+        }
+        catch (Exception)
+        {
+            ToastService.Show("导出数据失败", variant: "error");
+        }
+    }
+
+    private static string GetAwardTypeText(LotteryAwardType type) => type switch
+    {
+        LotteryAwardType.ActivationCode => "激活码",
+        LotteryAwardType.RealThing => "实物",
+        LotteryAwardType.Integral => "积分",
+        _ => type.ToString()
+    };
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+}

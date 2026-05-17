@@ -47,15 +47,21 @@
 
 .lottery-winner-user {
     display: inline-flex;
+}
+
+.lottery-winner-link {
+    display: inline-flex;
     align-items: center;
     gap: var(--cg-spacing-1);
     padding: var(--cg-spacing-1) var(--cg-spacing-2);
     border-radius: var(--cg-radius-full);
     background: var(--cg-color-bg);
     transition: var(--cg-transition-fast);
+    text-decoration: none;
+    color: inherit;
 }
 
-.lottery-winner-user:hover {
+.lottery-winner-link:hover {
     background: color-mix(in oklab, var(--cg-color-primary) 8%, var(--cg-color-bg));
 }
 

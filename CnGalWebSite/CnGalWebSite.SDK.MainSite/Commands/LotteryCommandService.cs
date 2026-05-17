@@ -112,6 +112,24 @@ public sealed class LotteryCommandService(
         }
     }
 
+    public async Task<SdkResult<PrizeViewModel>> GetUserPrizeAsync(long lotteryId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var model = await GetFromJsonAsync<PrizeViewModel>($"api/lotteries/GetUserPrize/{lotteryId}", cancellationToken);
+            if (model is null)
+            {
+                return SdkResult<PrizeViewModel>.Fail("LOTTERY_PRIZE_NOT_FOUND", "未找到奖品信息");
+            }
+            return SdkResult<PrizeViewModel>.Ok(model);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "获取用户奖品异常。LotteryId={LotteryId}; BaseAddress={BaseAddress}", lotteryId, HttpClient.BaseAddress);
+            return SdkResult<PrizeViewModel>.Fail("LOTTERY_PRIZE_EXCEPTION", "获取用户奖品时发生异常");
+        }
+    }
+
     public async Task<SdkResult<bool>> ParticipateInLotteryAsync(long lotteryId, CnGalWebSite.Core.Models.DeviceIdentificationModel identification, CancellationToken cancellationToken = default)
     {
         try

@@ -1,0 +1,70 @@
+@using CnGalWebSite.DataModel.ViewModel.Lotteries
+@inject ILotteryCommandService LotteryCommandService
+
+<CgModal IsOpen="_isOpen" OnClose="Close" Title="@(_prize?.Type == LotteryAwardType.ActivationCode ? "查看激活码" : "查看快递单号")">
+    <ChildContent>
+        @if (_isLoading)
+        {
+            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; padding: 32px;">
+                <CgProgressRing />
+                <span>加载中…</span>
+            </div>
+        }
+        else if (_errorMessage is not null)
+        {
+            <CgAlert Variant="warning">@_errorMessage</CgAlert>
+        }
+        else if (_prize is not null)
+        {
+            @if (_prize.Type == LotteryAwardType.ActivationCode)
+            {
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <span style="font-weight: var(--cg-font-weight-medium);">激活码</span>
+                    <span style="font-size: var(--cg-font-size-lg); word-break: break-all; padding: 12px; background: var(--cg-color-surface-container); border-radius: var(--cg-radius-md);">@_prize.Context</span>
+                </div>
+            }
+            else if (_prize.Type == LotteryAwardType.RealThing)
+            {
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <span style="font-weight: var(--cg-font-weight-medium);">快递单号</span>
+                    <span style="font-size: var(--cg-font-size-lg); word-break: break-all; padding: 12px; background: var(--cg-color-surface-container); border-radius: var(--cg-radius-md);">@_prize.Context</span>
+                </div>
+            }
+        }
+    </ChildContent>
+</CgModal>
+
+@code {
+    [Parameter]
+    public long LotteryId { get; set; }
+
+    private bool _isOpen;
+    private bool _isLoading;
+    private PrizeViewModel? _prize;
+    private string? _errorMessage;
+
+    public async Task OpenAsync()
+    {
+        _isOpen = true;
+        _isLoading = true;
+        _errorMessage = null;
+        _prize = null;
+
+        var result = await LotteryCommandService.GetUserPrizeAsync(LotteryId);
+        if (result.Success && result.Data is not null)
+        {
+            _prize = result.Data;
+        }
+        else
+        {
+            _errorMessage = result.Error?.Message ?? "获取奖品信息失败";
+        }
+
+        _isLoading = false;
+    }
+
+    private void Close()
+    {
+        _isOpen = false;
+    }
+}

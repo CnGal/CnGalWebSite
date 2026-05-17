@@ -4,6 +4,7 @@
 @inject IPeripheryQueryService PeripheryQueryService
 @inject IFavoriteFolderQueryService FavoriteFolderQueryService
 @inject IExamineQueryService ExamineQueryService
+@inject NavigationManager NavigationManager
 @using CnGalWebSite.DataModel.Model
 @implements IDisposable
 @using CnGalWebSite.DataModel.ViewModel
@@ -13,9 +14,15 @@
 @using CnGalWebSite.DataModel.ViewModel.Favorites
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 @using CnGalWebSite.MainSite.Shared.Services
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
 @using CnGalWebSite.Extensions
 
 <CgPageMeta Title="@(Model?.Name)" Description="@(Model?.BriefIntroduction)" Image="@(Model?.MainPicture)" />
+
+@if (Model is not null)
+{
+    <CgStructuredData Data="@GenerateStructuredDataJson()" />
+}
 
 @if (ErrorMessage is not null)
 {
@@ -288,6 +295,30 @@ else
             ErrorMessage = result.Error?.Message ?? "请稍后重试";
         }
         catch (OperationCanceledException) { }
+    }
+
+    private string GenerateStructuredDataJson()
+    {
+        if (Model is null) return string.Empty;
+
+        var url = StructuredDataHelper.EscapeJson($"{NavigationManager.BaseUri}entries/index/{Model.Id}");
+        var name = StructuredDataHelper.EscapeJson(Model.Name);
+        var description = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(Model.BriefIntroduction) ? Model.Name : Model.BriefIntroduction);
+        var image = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(Model.MainPicture) ? StructuredDataHelper.LogoUrl : Model.MainPicture);
+
+        var schemaType = Model.Type switch
+        {
+            EntryType.Game => "VideoGame",
+            EntryType.ProductionGroup => "Organization",
+            EntryType.Role or EntryType.Staff => "Person",
+            _ => "CreativeWork"
+        };
+
+        var aggregateRating = ScoreOverview is { TotalScores.IsScored: true }
+            ? ",\"aggregateRating\":{\"@type\":\"AggregateRating\",\"ratingValue\":\"" + ScoreOverview.TotalScores.TotalScore.ToString("0.0") + "\",\"bestRating\":\"10\",\"worstRating\":\"1\",\"ratingCount\":\"" + ScoreOverview.ScoredCount + "\"}"
+            : string.Empty;
+
+        return "{\"@context\":\"https://schema.org\",\"@type\":\"" + schemaType + "\",\"name\":\"" + name + "\",\"description\":\"" + description + "\",\"image\":\"" + image + "\"" + aggregateRating + ",\"mainEntityOfPage\":{\"@type\":\"WebPage\",\"@id\":\"" + url + "\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"CnGal\",\"logo\":{\"@type\":\"ImageObject\",\"url\":\"" + StructuredDataHelper.LogoUrl + "\"}}}";
     }
 
     public void Dispose()
