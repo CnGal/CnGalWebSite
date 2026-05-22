@@ -39,6 +39,13 @@
                                 <CgMdiIcon Name="mdiAccountCogOutline" aria-hidden="true"/>
                                 <span>管理参与</span>
                             </a>
+                            @if (Type != LotteryType.Automatic && !IsEnd)
+                            {
+                                <a class="lottery-hero-edit-btn" href="/lotteries/drawlottery/@LotteryId">
+                                    <CgMdiIcon Name="mdiGiftOutline" aria-hidden="true"/>
+                                    <span>抽奖</span>
+                                </a>
+                            }
                         </Authorized>
                     </AuthorizeView>
                 </div>
@@ -84,6 +91,13 @@ else
                                 <CgMdiIcon Name="mdiAccountCogOutline" aria-hidden="true"/>
                                 <span>管理参与</span>
                             </a>
+                            @if (Type != LotteryType.Automatic && !IsEnd)
+                            {
+                                <a class="lottery-hero-edit-btn" href="/lotteries/drawlottery/@LotteryId">
+                                    <CgMdiIcon Name="mdiGiftOutline" aria-hidden="true"/>
+                                    <span>抽奖</span>
+                                </a>
+                            }
                         </Authorized>
                     </AuthorizeView>
                 </div>
@@ -91,6 +105,8 @@ else
         </div>
     </section>
 }
+
+@using CnGalWebSite.DataModel.Model
 
 @code {
     [Parameter] public string DisplayName { get; set; } = "";
@@ -102,6 +118,7 @@ else
     [Parameter] public long Count { get; set; }
     [Parameter] public int ReaderCount { get; set; }
     [Parameter] public long LotteryId { get; set; }
+    [Parameter] public LotteryType Type { get; set; }
 
     private string StatusText => IsEnd ? "已结束" : (DateTime.Now < BeginTime ? "未开始" : (DateTime.Now > EndTime ? "已截止" : "进行中"));
     private string StatusCssClass => IsEnd ? "ended" : (DateTime.Now < BeginTime ? "upcoming" : (DateTime.Now > EndTime ? "ended" : "active"));

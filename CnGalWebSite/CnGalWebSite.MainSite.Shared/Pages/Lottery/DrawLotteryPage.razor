@@ -1,0 +1,275 @@
+@page "/lotteries/drawlottery/{Id:long}"
+@attribute [Authorize(Roles = "Admin")]
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@implements IDisposable
+@inject ILotteryCommandService LotteryCommandService
+@inject ICgToastService ToastService
+@inject ILogger<DrawLotteryPage> Logger
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Lotteries
+@using CnGalWebSite.MainSite.Shared.Components.Features.Lottery.Draw
+@using Microsoft.Extensions.Logging
+
+<CgPageMeta Title="抽奖" />
+
+<div>
+    @if (isReady)
+    {
+        <LotteryAnimationCard @ref="lotteryAnimationCard" OnClickRoll="OnDrawLottery" />
+
+        <div class="draw-lottery-info">
+            @if (CurrentAward == null)
+            {
+                <span class="draw-lottery-end">抽奖结束</span>
+            }
+            else
+            {
+                @if (string.IsNullOrWhiteSpace(CurrentAward.Sponsor) == false)
+                {
+                    <span>
+                        即将抽选由
+                        <strong class="draw-lottery-highlight">@CurrentAward.Sponsor</strong>
+                        提供的
+                        <strong class="draw-lottery-highlight">@CurrentAward.Name</strong>
+                    </span>
+                }
+                else
+                {
+                    <span>
+                        即将抽选
+                        <strong class="draw-lottery-highlight">@CurrentAward.Name</strong>
+                    </span>
+                }
+            }
+
+            @if (LastWinningUser != null)
+            {
+                if (LastAward != null)
+                {
+                    @if (string.IsNullOrWhiteSpace(LastAward.Sponsor) == false)
+                    {
+                        <span>
+                            恭喜用户
+                            <strong class="draw-lottery-highlight">@LastWinningUser.Name</strong>
+                            获得由
+                            <strong class="draw-lottery-highlight">@LastAward.Sponsor</strong>
+                            提供的
+                            <strong class="draw-lottery-highlight">@LastAward.Name</strong>
+                        </span>
+                    }
+                    else
+                    {
+                        <span>
+                            恭喜用户
+                            <strong class="draw-lottery-highlight">@LastWinningUser.Name</strong>
+                            获得
+                            <strong class="draw-lottery-highlight">@LastAward.Name</strong>
+                        </span>
+                    }
+                }
+            }
+
+            @if (string.IsNullOrWhiteSpace(CurrentAward?.Image) == false)
+            {
+                <img src="@CurrentAward.Image" alt="@CurrentAward.Name" class="draw-lottery-award-image" />
+            }
+        </div>
+    }
+    else
+    {
+        <div class="draw-lottery-loading">
+            <div class="draw-lottery-loading-block" style="height:400px"></div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    LotteryAnimationCard? lotteryAnimationCard;
+
+    DrawLotteryDataModel Model = new();
+    LotteryAwardDataModel? CurrentAward;
+    LotteryUserDataModel? LastWinningUser;
+    LotteryAwardDataModel? LastAward;
+    LotteryAwardDataModel? NextAward;
+    List<ManualLotteryModel> LotteryResults = new();
+
+    bool isReady;
+    bool isDrawing;
+    CancellationTokenSource? _cts = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var result = await LotteryCommandService.GetLotteryDataAsync(Id, _cts?.Token ?? default);
+            if (result.Success && result.Data is not null)
+            {
+                Model = result.Data;
+                await GetAward();
+                isReady = true;
+            }
+            else
+            {
+                ToastService.Show("获取抽奖数据失败", result.Error?.Message ?? "未知错误", "error");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "获取抽奖数据失败");
+            ToastService.Show("获取抽奖数据失败", ex.Message, "error");
+        }
+    }
+
+    async Task OnDrawLottery()
+    {
+        if (isDrawing)
+        {
+            return;
+        }
+        isDrawing = true;
+
+        if (CurrentAward == null)
+        {
+            ToastService.Show("抽奖失败", "全部奖品已经抽完", "error");
+            isDrawing = false;
+            return;
+        }
+        if (Model.NotWinningUsers.Count == 0)
+        {
+            ToastService.Show("抽奖失败", "所有参与的用户都已抽中，但是还有奖品剩余", "error");
+            isDrawing = false;
+            return;
+        }
+
+        int index;
+        if (Model.Type == LotteryType.UserWeights)
+        {
+            var random = new Random().Next(0, Model.NotWinningUsers.Sum(s => s.Priority));
+            index = 0;
+            foreach (var item in Model.NotWinningUsers)
+            {
+                if (random < item.Priority)
+                {
+                    break;
+                }
+                random -= item.Priority;
+                index++;
+            }
+        }
+        else
+        {
+            index = new Random().Next(0, Model.NotWinningUsers.Count);
+        }
+
+        // Show animation
+        if (lotteryAnimationCard != null)
+        {
+            await lotteryAnimationCard.Roll(Model.NotWinningUsers[index].Number);
+        }
+        await Task.Delay(1000);
+
+        LastWinningUser = Model.NotWinningUsers[index];
+        Model.NotWinningUsers.Remove(LastWinningUser);
+
+        CurrentAward.WinningUsers.Add(LastWinningUser);
+
+        var model = new ManualLotteryModel
+        {
+            LotteryAwardId = CurrentAward.Id,
+            LotteryId = Model.Id,
+            UserId = LastWinningUser.Id
+        };
+
+        // Export data
+        LotteryResults.Add(model);
+        var exportString = System.Text.Json.JsonSerializer.Serialize(LotteryResults, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+        Logger.LogInformation(exportString);
+
+        // Get next award
+        await GetAward();
+
+        // Submit draw result to server in background
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                var drawResult = await LotteryCommandService.DrawLotteryAsync(model);
+                if (!drawResult.Success)
+                {
+                    ToastService.Show("抽奖失败", drawResult.Error?.Message, "error");
+                    Logger.LogError("抽奖失败，{error}", drawResult.Error?.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "抽奖失败");
+            }
+        });
+
+        isDrawing = false;
+    }
+
+    async Task GetAward()
+    {
+        LastAward = CurrentAward;
+
+        var awards = Model.Awards
+            .Where(s => s.TotalCount > s.WinningUsers.Count)
+            .OrderByDescending(s => s.Priority)
+            .ToList();
+
+        if (awards.Count == 0)
+        {
+            CurrentAward = NextAward = null;
+            // Lottery ended
+            await EndLottery();
+            return;
+        }
+        CurrentAward = awards[0];
+        if (CurrentAward.TotalCount - CurrentAward.WinningUsers.Count > 1)
+        {
+            NextAward = CurrentAward;
+        }
+        else
+        {
+            if (awards.Count > 1)
+            {
+                NextAward = awards[1];
+            }
+            else
+            {
+                NextAward = null;
+            }
+        }
+    }
+
+    async Task EndLottery()
+    {
+        try
+        {
+            var result = await LotteryCommandService.EndLotteryAsync(new EndLotteryModel
+            {
+                Ids = new long[] { Model.Id },
+                IsEnd = true
+            });
+            if (!result.Success)
+            {
+                ToastService.Show("结束抽奖失败", result.Error?.Message, "error");
+                Logger.LogError("结束抽奖失败，{error}", result.Error?.Message);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "结束抽奖失败");
+        }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+}
