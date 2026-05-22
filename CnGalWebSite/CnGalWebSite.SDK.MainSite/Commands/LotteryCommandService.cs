@@ -154,4 +154,64 @@ public sealed class LotteryCommandService(
             return SdkResult<bool>.Fail("LOTTERY_PARTICIPATE_EXCEPTION", "参与抽奖时发生异常");
         }
     }
+
+    public async Task<SdkResult<DrawLotteryDataModel>> GetLotteryDataAsync(long id, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var model = await GetFromJsonAsync<DrawLotteryDataModel>($"api/lotteries/GetLotteryData/{id}", cancellationToken);
+            if (model is null)
+            {
+                return SdkResult<DrawLotteryDataModel>.Fail("LOTTERY_DATA_NOT_FOUND", "未找到抽奖数据");
+            }
+            return SdkResult<DrawLotteryDataModel>.Ok(model);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "获取抽奖数据异常。LotteryId={LotteryId}; BaseAddress={BaseAddress}", id, HttpClient.BaseAddress);
+            return SdkResult<DrawLotteryDataModel>.Fail("LOTTERY_DATA_EXCEPTION", "获取抽奖数据时发生异常");
+        }
+    }
+
+    public async Task<SdkResult<bool>> DrawLotteryAsync(ManualLotteryModel model, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await PostAsJsonRawAsync("api/lotteries/DrawLottery", model, cancellationToken);
+            var result = await ReadResponseAsync<Result>(response, cancellationToken);
+
+            if (result?.Successful == true)
+            {
+                return SdkResult<bool>.Ok(true);
+            }
+
+            return SdkResult<bool>.Fail("LOTTERY_DRAW_FAILED", result?.Error ?? "抽奖失败");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "抽奖异常。LotteryId={LotteryId}; BaseAddress={BaseAddress}", model.LotteryId, HttpClient.BaseAddress);
+            return SdkResult<bool>.Fail("LOTTERY_DRAW_EXCEPTION", "抽奖时发生异常");
+        }
+    }
+
+    public async Task<SdkResult<bool>> EndLotteryAsync(EndLotteryModel model, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var response = await PostAsJsonRawAsync("api/lotteries/EndLottery", model, cancellationToken);
+            var result = await ReadResponseAsync<Result>(response, cancellationToken);
+
+            if (result?.Successful == true)
+            {
+                return SdkResult<bool>.Ok(true);
+            }
+
+            return SdkResult<bool>.Fail("LOTTERY_END_FAILED", result?.Error ?? "结束抽奖失败");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "结束抽奖异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
+            return SdkResult<bool>.Fail("LOTTERY_END_EXCEPTION", "结束抽奖时发生异常");
+        }
+    }
 }

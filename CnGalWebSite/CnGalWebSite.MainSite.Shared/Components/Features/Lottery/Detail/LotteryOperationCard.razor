@@ -65,7 +65,7 @@
                 @if (_state.Award.Type == LotteryAwardType.ActivationCode)
                 {
                     <CgAlert Variant="success">
-                        恭喜中奖！你的奖品是：<strong>@_state.Award.Name</strong>
+                        欸欸欸，中奖了欸！你的奖品是：<strong>@_state.Award.Name</strong>
                     </CgAlert>
                     <div class="lottery-op-card__action">
                         <CgButton Variant="primary" OnClick="() => _prizeDialog?.OpenAsync()">
@@ -84,7 +84,7 @@
 
             case UserLotteryState.WaitAddress when _state.Award is not null:
                 <CgAlert Variant="success">
-                    中奖啦！你的奖品是：<strong>@_state.Award.Name</strong>
+                    中奖啦，快点填写收货地址吧！你的奖品是：<strong>@_state.Award.Name</strong>
                 </CgAlert>
                 <div class="lottery-op-card__action">
                     <CgButton Variant="primary" OnClick="() => _addressDialog?.OpenAsync()">
@@ -96,7 +96,7 @@
 
             case UserLotteryState.WaitShipments when _state.Award is not null:
                 <CgAlert Variant="success">
-                    看板娘正在努力发货中。你的奖品是：<strong>@_state.Award.Name</strong>
+                    看板娘正在努力发货中，还可以修改地址哦。你的奖品是：<strong>@_state.Award.Name</strong>
                 </CgAlert>
                 <div class="lottery-op-card__action">
                     <CgButton Variant="outline" OnClick="() => _addressDialog?.OpenAsync()">
@@ -108,7 +108,7 @@
 
             case UserLotteryState.Shipped when _state.Award is not null:
                 <CgAlert Variant="success">
-                    发货啦，记得给五星好评哦~。你的奖品是：<strong>@_state.Award.Name</strong>
+                    发货啦，记得给五星好评哦~ 快递单号在这里呢！你的奖品是：<strong>@_state.Award.Name</strong>
                 </CgAlert>
                 <div class="lottery-op-card__action">
                     <CgButton Variant="primary" OnClick="() => _prizeDialog?.OpenAsync()">
@@ -126,7 +126,7 @@
 </div>
 
 <LotteryPrizeDialog @ref="_prizeDialog" LotteryId="@LotteryId" />
-<LotteryAddressDialog @ref="_addressDialog" />
+<LotteryAddressDialog @ref="_addressDialog" OnSaved="LoadStateAsync" />
 
 @code {
     [Parameter]

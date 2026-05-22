@@ -49,6 +49,7 @@
         _isLoading = true;
         _errorMessage = null;
         _prize = null;
+        StateHasChanged();
 
         var result = await LotteryCommandService.GetUserPrizeAsync(LotteryId);
         if (result.Success && result.Data is not null)
@@ -61,10 +62,12 @@
         }
 
         _isLoading = false;
+        StateHasChanged();
     }
 
     private void Close()
     {
         _isOpen = false;
+        StateHasChanged();
     }
 }

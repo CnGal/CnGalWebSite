@@ -10,6 +10,7 @@
 @using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 @using CnGalWebSite.MainSite.Shared.Services
 @using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+@using System.Text.Json.Nodes
 
 <CgPageMeta Title="@(_model is null ? null : GetDisplayTitle())" Description="@(_model?.BriefIntroduction)" Image="@(_model?.MainPicture)" />
 
@@ -201,14 +202,44 @@ else
     {
         if (_model is null) return string.Empty;
 
-        var url = StructuredDataHelper.EscapeJson($"{NavigationManager.BaseUri}articles/index/{_model.Id}");
-        var authorName = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(_model.AuthorName) ? "CnGal" : _model.AuthorName);
-        var title = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(_model.DisplayName) ? _model.Name : _model.DisplayName);
-        var description = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(_model.BriefIntroduction) ? _model.Name : _model.BriefIntroduction);
-        var image = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(_model.MainPicture) ? StructuredDataHelper.LogoUrl : _model.MainPicture);
+        var url = $"{NavigationManager.BaseUri}articles/index/{_model.Id}";
+        var authorName = string.IsNullOrWhiteSpace(_model.AuthorName) ? "CnGal" : _model.AuthorName;
+        var title = (string.IsNullOrWhiteSpace(_model.DisplayName) ? _model.Name : _model.DisplayName) ?? string.Empty;
+        var description = (string.IsNullOrWhiteSpace(_model.BriefIntroduction) ? _model.Name : _model.BriefIntroduction) ?? string.Empty;
+        var image = string.IsNullOrWhiteSpace(_model.MainPicture) ? StructuredDataHelper.LogoUrl : _model.MainPicture;
         var datePublished = _model.PubishTime?.ToString("yyyy-MM-dd") ?? _model.CreateTime.ToString("yyyy-MM-dd");
 
-        return "{\"@context\":\"https://schema.org\",\"@type\":\"Article\",\"headline\":\"" + title + "\",\"description\":\"" + description + "\",\"image\":\"" + image + "\",\"author\":{\"@type\":\"Person\",\"name\":\"" + authorName + "\"},\"datePublished\":\"" + datePublished + "\",\"mainEntityOfPage\":{\"@type\":\"WebPage\",\"@id\":\"" + url + "\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"CnGal\",\"logo\":{\"@type\":\"ImageObject\",\"url\":\"" + StructuredDataHelper.LogoUrl + "\"}}}";
+        var data = new JsonObject
+        {
+            ["@context"] = "https://schema.org",
+            ["@type"] = "Article",
+            ["headline"] = title,
+            ["description"] = description,
+            ["image"] = image,
+            ["author"] = new JsonObject
+            {
+                ["@type"] = "Person",
+                ["name"] = authorName
+            },
+            ["datePublished"] = datePublished,
+            ["mainEntityOfPage"] = new JsonObject
+            {
+                ["@type"] = "WebPage",
+                ["@id"] = url
+            },
+            ["publisher"] = new JsonObject
+            {
+                ["@type"] = "Organization",
+                ["name"] = "CnGal",
+                ["logo"] = new JsonObject
+                {
+                    ["@type"] = "ImageObject",
+                    ["url"] = StructuredDataHelper.LogoUrl
+                }
+            }
+        };
+
+        return StructuredDataHelper.SerializeJsonLd(data);
     }
 
     private string GetDisplayTitle()

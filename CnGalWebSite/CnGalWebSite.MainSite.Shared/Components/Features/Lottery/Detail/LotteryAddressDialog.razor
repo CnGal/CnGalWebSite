@@ -57,6 +57,7 @@
         _isLoading = true;
         _isSaving = false;
         _errorMessage = null;
+        StateHasChanged();
 
         var result = await SpaceCommandService.GetUserAddressAsync();
         if (result.Success && result.Data is not null)
@@ -69,7 +70,11 @@
         }
 
         _isLoading = false;
+        StateHasChanged();
     }
+
+    [Parameter]
+    public EventCallback OnSaved { get; set; }
 
     private async Task SaveAsync()
     {
@@ -79,12 +84,15 @@
         }
 
         _isSaving = true;
+        StateHasChanged();
 
         var result = await SpaceCommandService.EditUserAddressAsync(_model);
         if (result.Success)
         {
             ToastService.Show("编辑收货地址成功", variant: "success");
             _isOpen = false;
+            StateHasChanged();
+            await OnSaved.InvokeAsync();
         }
         else
         {
@@ -92,10 +100,12 @@
         }
 
         _isSaving = false;
+        StateHasChanged();
     }
 
     private void Close()
     {
         _isOpen = false;
+        StateHasChanged();
     }
 }

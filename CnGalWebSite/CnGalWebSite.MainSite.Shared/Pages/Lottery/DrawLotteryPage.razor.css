@@ -1,0 +1,48 @@
+.draw-lottery-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: var(--cg-font-size-xl);
+    padding: var(--cg-spacing-4);
+    gap: var(--cg-spacing-2);
+}
+
+.draw-lottery-end {
+    font-weight: var(--cg-font-weight-bold);
+    color: var(--cg-color-primary);
+}
+
+.draw-lottery-highlight {
+    color: var(--cg-color-primary);
+}
+
+.draw-lottery-award-image {
+    max-width: 200px;
+    width: 100%;
+    margin-top: 30px;
+}
+
+.draw-lottery-loading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+    max-width: 920px;
+    margin: var(--cg-spacing-8) auto;
+}
+
+.draw-lottery-loading-block {
+    border-radius: var(--cg-radius-lg);
+    background: linear-gradient(
+        120deg,
+        color-mix(in oklab, var(--cg-color-bg) 90%, white),
+        color-mix(in oklab, var(--cg-color-bg) 76%, white),
+        color-mix(in oklab, var(--cg-color-bg) 90%, white)
+    );
+    background-size: 200% 100%;
+    animation: lottery-loading 1.2s infinite;
+}
+
+@keyframes lottery-loading {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
