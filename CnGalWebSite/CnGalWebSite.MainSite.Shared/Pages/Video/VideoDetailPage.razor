@@ -10,6 +10,7 @@
 @using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 @using CnGalWebSite.MainSite.Shared.Services
 @using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+@using System.Text.Json.Nodes
 
 <CgPageMeta Title="@(Model is null ? null : GetDisplayTitle())" Description="@(Model?.BriefIntroduction)" Image="@(Model?.MainPicture)" />
 
@@ -230,14 +231,44 @@ var editRecordsTask = ExamineQueryService.GetVideoEditRecordsAsync(Id, cancellat
     {
         if (Model is null) return string.Empty;
 
-        var url = StructuredDataHelper.EscapeJson($"{NavigationManager.BaseUri}videos/index/{Model.Id}");
-        var name = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(Model.DisplayName) ? Model.Name : Model.DisplayName);
-        var description = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(Model.BriefIntroduction) ? Model.Name : Model.BriefIntroduction);
-        var image = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(Model.MainPicture) ? StructuredDataHelper.LogoUrl : Model.MainPicture);
-        var authorName = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(Model.AuthorName) ? "CnGal" : Model.AuthorName);
+        var url = $"{NavigationManager.BaseUri}videos/index/{Model.Id}";
+        var name = (string.IsNullOrWhiteSpace(Model.DisplayName) ? Model.Name : Model.DisplayName) ?? string.Empty;
+        var description = (string.IsNullOrWhiteSpace(Model.BriefIntroduction) ? Model.Name : Model.BriefIntroduction) ?? string.Empty;
+        var image = string.IsNullOrWhiteSpace(Model.MainPicture) ? StructuredDataHelper.LogoUrl : Model.MainPicture;
+        var authorName = string.IsNullOrWhiteSpace(Model.AuthorName) ? "CnGal" : Model.AuthorName;
         var uploadDate = Model.PubishTime.ToString("yyyy-MM-dd");
 
-        return "{\"@context\":\"https://schema.org\",\"@type\":\"VideoObject\",\"name\":\"" + name + "\",\"description\":\"" + description + "\",\"thumbnailUrl\":\"" + image + "\",\"author\":{\"@type\":\"Person\",\"name\":\"" + authorName + "\"},\"uploadDate\":\"" + uploadDate + "\",\"mainEntityOfPage\":{\"@type\":\"WebPage\",\"@id\":\"" + url + "\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"CnGal\",\"logo\":{\"@type\":\"ImageObject\",\"url\":\"" + StructuredDataHelper.LogoUrl + "\"}}}";
+        var data = new JsonObject
+        {
+            ["@context"] = "https://schema.org",
+            ["@type"] = "VideoObject",
+            ["name"] = name,
+            ["description"] = description,
+            ["thumbnailUrl"] = image,
+            ["author"] = new JsonObject
+            {
+                ["@type"] = "Person",
+                ["name"] = authorName
+            },
+            ["uploadDate"] = uploadDate,
+            ["mainEntityOfPage"] = new JsonObject
+            {
+                ["@type"] = "WebPage",
+                ["@id"] = url
+            },
+            ["publisher"] = new JsonObject
+            {
+                ["@type"] = "Organization",
+                ["name"] = "CnGal",
+                ["logo"] = new JsonObject
+                {
+                    ["@type"] = "ImageObject",
+                    ["url"] = StructuredDataHelper.LogoUrl
+                }
+            }
+        };
+
+        return StructuredDataHelper.SerializeJsonLd(data);
     }
 
     public void Dispose()

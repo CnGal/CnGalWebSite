@@ -16,6 +16,7 @@
 @using CnGalWebSite.MainSite.Shared.Services
 @using CnGalWebSite.MainSite.Shared.Components.DesignSystem
 @using CnGalWebSite.Extensions
+@using System.Text.Json.Nodes
 
 <CgPageMeta Title="@(Model?.Name)" Description="@(Model?.BriefIntroduction)" Image="@(Model?.MainPicture)" />
 
@@ -301,10 +302,10 @@ else
     {
         if (Model is null) return string.Empty;
 
-        var url = StructuredDataHelper.EscapeJson($"{NavigationManager.BaseUri}entries/index/{Model.Id}");
-        var name = StructuredDataHelper.EscapeJson(Model.Name);
-        var description = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(Model.BriefIntroduction) ? Model.Name : Model.BriefIntroduction);
-        var image = StructuredDataHelper.EscapeJson(string.IsNullOrWhiteSpace(Model.MainPicture) ? StructuredDataHelper.LogoUrl : Model.MainPicture);
+        var url = $"{NavigationManager.BaseUri}entries/index/{Model.Id}";
+        var name = Model.Name ?? string.Empty;
+        var description = (string.IsNullOrWhiteSpace(Model.BriefIntroduction) ? Model.Name : Model.BriefIntroduction) ?? string.Empty;
+        var image = string.IsNullOrWhiteSpace(Model.MainPicture) ? StructuredDataHelper.LogoUrl : Model.MainPicture;
 
         var schemaType = Model.Type switch
         {
@@ -314,11 +315,43 @@ else
             _ => "CreativeWork"
         };
 
-        var aggregateRating = ScoreOverview is { TotalScores.IsScored: true }
-            ? ",\"aggregateRating\":{\"@type\":\"AggregateRating\",\"ratingValue\":\"" + ScoreOverview.TotalScores.TotalScore.ToString("0.0") + "\",\"bestRating\":\"10\",\"worstRating\":\"1\",\"ratingCount\":\"" + ScoreOverview.ScoredCount + "\"}"
-            : string.Empty;
+        var data = new JsonObject
+        {
+            ["@context"] = "https://schema.org",
+            ["@type"] = schemaType,
+            ["name"] = name,
+            ["description"] = description,
+            ["image"] = image,
+            ["mainEntityOfPage"] = new JsonObject
+            {
+                ["@type"] = "WebPage",
+                ["@id"] = url
+            },
+            ["publisher"] = new JsonObject
+            {
+                ["@type"] = "Organization",
+                ["name"] = "CnGal",
+                ["logo"] = new JsonObject
+                {
+                    ["@type"] = "ImageObject",
+                    ["url"] = StructuredDataHelper.LogoUrl
+                }
+            }
+        };
 
-        return "{\"@context\":\"https://schema.org\",\"@type\":\"" + schemaType + "\",\"name\":\"" + name + "\",\"description\":\"" + description + "\",\"image\":\"" + image + "\"" + aggregateRating + ",\"mainEntityOfPage\":{\"@type\":\"WebPage\",\"@id\":\"" + url + "\"},\"publisher\":{\"@type\":\"Organization\",\"name\":\"CnGal\",\"logo\":{\"@type\":\"ImageObject\",\"url\":\"" + StructuredDataHelper.LogoUrl + "\"}}}";
+        if (ScoreOverview is { TotalScores.IsScored: true })
+        {
+            data["aggregateRating"] = new JsonObject
+            {
+                ["@type"] = "AggregateRating",
+                ["ratingValue"] = ScoreOverview.TotalScores.TotalScore.ToString("0.0"),
+                ["bestRating"] = 10,
+                ["worstRating"] = 1,
+                ["ratingCount"] = ScoreOverview.ScoredCount
+            };
+        }
+
+        return StructuredDataHelper.SerializeJsonLd(data);
     }
 
     public void Dispose()

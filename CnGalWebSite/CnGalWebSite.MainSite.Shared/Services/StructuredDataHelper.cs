@@ -1,45 +1,22 @@
-using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace CnGalWebSite.MainSite.Shared.Services;
 
 /// <summary>
-/// 提供生成 JSON-LD 结构化数据时的常用转义方法。
+/// 提供生成 JSON-LD 结构化数据时的通用方法。
 /// </summary>
 public static class StructuredDataHelper
 {
     /// <summary>
-    /// 对 JSON 字符串值中的特殊字符进行转义，返回安全的值（不含外层双引号）。
+    /// 将 <see cref="JsonObject"/> 序列化为单行 JSON 字符串，自动处理所有转义。
     /// </summary>
-    public static string EscapeJson(string? value)
+    public static string SerializeJsonLd(JsonObject data)
     {
-        if (string.IsNullOrEmpty(value)) return string.Empty;
-
-        var sb = new StringBuilder(value.Length);
-        foreach (var ch in value)
+        return JsonSerializer.Serialize(data, new JsonSerializerOptions
         {
-            switch (ch)
-            {
-                case '"':
-                    sb.Append("\\\"");
-                    break;
-                case '\\':
-                    sb.Append("\\\\");
-                    break;
-                case '\n':
-                    sb.Append("\\n");
-                    break;
-                case '\r':
-                    sb.Append("\\r");
-                    break;
-                case '\t':
-                    sb.Append("\\t");
-                    break;
-                default:
-                    sb.Append(ch);
-                    break;
-            }
-        }
-        return sb.ToString();
+            WriteIndented = false
+        });
     }
 
     public static string LogoUrl => "https://app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png";
