@@ -1,8 +1,9 @@
-@* 注入 JSON-LD 结构化数据，用于 Google 富媒体搜索结果 *@
+@* 注入 JSON-LD 结构化数据，用于 Google 富媒体搜索结果
+   @Data 是动态表达式，仍会走 AddContent 被 HTML 编码，需用 MarkupString 绕过 *@
 
 <HeadContent>
     <script type="application/ld+json">
-        @Data
+        @(new MarkupString(Data ?? string.Empty))
     </script>
 </HeadContent>
 
