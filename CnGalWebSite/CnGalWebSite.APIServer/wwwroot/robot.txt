@@ -1,9 +1,11 @@
-﻿User-agent: *
+User-agent: *
 Disallow: /home/examines/
 Disallow: /examines
 Disallow: /home/editrecord/
 Disallow: /home/editrecord
 Disallow: /account/
 Disallow: /admin/
+Disallow: /search/
+Disallow: /search
 
 Sitemap: https://www.cngal.org/sitemap.xml
