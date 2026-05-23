@@ -90,6 +90,13 @@ public class KanbanSettingService : IKanbanSettingService
             {
                 _kanban.ApplyMobileDefaults();
             }
+
+            // 动态计算右下角初始位置
+            // 右侧与底部留出与浮动工具栏一致的间距：桌面端 32px，移动端 16px + 底部导航栏高度
+            var rightGap = size.Width < 768 ? 16 : 32;
+            var bottomGap = size.Width < 768 ? 72 : 32;
+            _kanban.Position.Left = Math.Max(0, size.Width - _kanban.Size.Width - rightGap);
+            _kanban.Position.Top = Math.Max(0, size.Height - _kanban.Size.Height - bottomGap);
         }
         catch
         {

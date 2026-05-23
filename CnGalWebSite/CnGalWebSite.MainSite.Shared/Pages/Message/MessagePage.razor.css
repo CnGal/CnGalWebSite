@@ -1,4 +1,4 @@
-/* ── MessagePage ── */
+﻿/* ── MessagePage ── */
 
 .message-page {
     max-width: 1200px;
@@ -33,7 +33,7 @@
 /* ── Tab panel ── */
 
 .message-page__tab-panel {
-    padding-top: var(--cg-spacing-4);
+
 }
 
 /* ── Loading ── */
