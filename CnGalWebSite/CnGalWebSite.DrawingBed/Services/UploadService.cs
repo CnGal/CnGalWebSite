@@ -7,6 +7,7 @@ using COSXML.Transfer;
 using System.Security.AccessControl;
 using System.Security.Policy;
 using Aliyun.OSS;
+using Microsoft.AspNetCore.StaticFiles;
 using Newtonsoft.Json.Linq;
 
 namespace CnGalWebSite.DrawingBed.Services
@@ -128,6 +129,13 @@ namespace CnGalWebSite.DrawingBed.Services
             {
                 using var content = new MultipartFormDataContent();
                 using var fileContent = new StreamContent(File.OpenRead(filePath));
+
+                // 根据文件扩展名设置正确的 Content-Type
+                var contentTypeProvider = new FileExtensionContentTypeProvider();
+                if (contentTypeProvider.TryGetContentType(filePath, out var mimeType))
+                {
+                    fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(mimeType);
+                }
 
                 content.Add(
                     content: fileContent,
