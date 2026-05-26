@@ -6,58 +6,63 @@
 
 @if (Records is not null && Records.Count > 0)
 {
-    <section class="edit-record-list-card" aria-label="编辑记录">
-        <h2><CgMdiIcon Name="mdiHistory" aria-hidden="true" />编辑记录</h2>
+    var filteredRecords = Records.Where(r => r.UserInfor?.Name != "看板娘").ToList();
 
-        <div class="edit-record-list-card__list @(Columns >= 2 ? "edit-record-list-card__list--two-col" : "")" role="list">
-            @{
-                var displayRecords = ShowAll ? Records : Records.Take(MaxCount).ToList();
-            }
-            @foreach (var item in displayRecords)
-            {
-                <a class="edit-record-list-card__item"
-                   href="@($"/home/editrecord?ContrastId={item.Id}")"
-                   role="listitem">
-                    <div class="edit-record-list-card__avatar">
-                        @if (!string.IsNullOrWhiteSpace(item.UserInfor?.PhotoPath))
-                        {
-                            <img src="@item.UserInfor.PhotoPath"
-                                 alt="@(item.UserInfor.Name ?? "用户")"
-                                 loading="lazy" />
-                        }
-                        else
-                        {
-                            <CgMdiIcon Name="mdiAccountCircleOutline" aria-hidden="true" />
-                        }
-                    </div>
-                    <div class="edit-record-list-card__content">
-                        <div class="edit-record-list-card__header">
-                            <span class="edit-record-list-card__user">@(item.UserInfor?.Name ?? "—")</span>
-                            @if (item.UserInfor?.Ranks?.Any() == true)
+    if (filteredRecords.Count > 0)
+    {
+        <section class="edit-record-list-card" aria-label="编辑记录">
+            <h2><CgMdiIcon Name="mdiHistory" aria-hidden="true" />编辑记录</h2>
+
+            <div class="edit-record-list-card__list @(Columns >= 2 ? "edit-record-list-card__list--two-col" : "")" role="list">
+                @{
+                    var displayRecords = ShowAll ? filteredRecords : filteredRecords.Take(MaxCount).ToList();
+                }
+                @foreach (var item in displayRecords)
+                {
+                    <a class="edit-record-list-card__item"
+                       href="@($"/home/editrecord?ContrastId={item.Id}")"
+                       role="listitem">
+                        <div class="edit-record-list-card__avatar">
+                            @if (!string.IsNullOrWhiteSpace(item.UserInfor?.PhotoPath))
                             {
-                                <CgRankList Model="item.UserInfor.Ranks" />
+                                <img src="@item.UserInfor.PhotoPath"
+                                     alt="@(item.UserInfor.Name ?? "用户")"
+                                     loading="lazy" />
                             }
-                              </div>
-                        <div class="edit-record-list-card__time">
-                            <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" />
-                            @item.ApplyTime.ToString("yyyy-MM-dd HH:mm")
-                        <span class="edit-record-list-card__op">@item.Operation.GetDisplayName()</span>
-                      </div>
-                    </div>
-                    <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+                            else
+                            {
+                                <CgMdiIcon Name="mdiAccountCircleOutline" aria-hidden="true" />
+                            }
+                        </div>
+                        <div class="edit-record-list-card__content">
+                            <div class="edit-record-list-card__header">
+                                <span class="edit-record-list-card__user">@(item.UserInfor?.Name ?? "—")</span>
+                                @if (item.UserInfor?.Ranks?.Any() == true)
+                                {
+                                    <CgRankList Model="item.UserInfor.Ranks" />
+                                }
+                                  </div>
+                            <div class="edit-record-list-card__time">
+                                <CgMdiIcon Name="mdiClockOutline" aria-hidden="true" />
+                                @item.ApplyTime.ToString("yyyy-MM-dd HH:mm")
+                            <span class="edit-record-list-card__op">@item.Operation.GetDisplayName()</span>
+                          </div>
+                        </div>
+                        <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+                    </a>
+                }
+            </div>
+
+            @if (!ShowAll && filteredRecords.Count > MaxCount)
+            {
+                <a class="edit-record-list-card__more"
+                   href="@($"/home/editrecord?ContrastId={filteredRecords.First().Id}")">
+                    查看全部 @filteredRecords.Count 条编辑记录
+                    <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
                 </a>
             }
-        </div>
-
-        @if (!ShowAll && Records.Count > MaxCount)
-        {
-            <a class="edit-record-list-card__more"
-               href="@($"/home/editrecord?ContrastId={Records.First().Id}")">
-                查看全部 @Records.Count 条编辑记录
-                <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
-            </a>
-        }
-    </section>
+        </section>
+    }
 }
 
 @code {
