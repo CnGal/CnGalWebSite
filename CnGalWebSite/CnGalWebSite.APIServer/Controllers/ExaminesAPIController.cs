@@ -173,7 +173,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<Result>> ProcAsync(Models.ExaminedViewModel model)
+        public async Task<ActionResult<ExamineProcResultModel>> ProcAsync(Models.ExaminedViewModel model)
         {
             var examine = await _examineRepository.GetAll().Include(s => s.ApplicationUser).FirstOrDefaultAsync(x => x.Id == model.Id);
             if (examine == null)
@@ -184,7 +184,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //判断是否已审核
             if (examine.IsPassed != null)
             {
-                return new Result { Successful = false, Error = "该记录已经被被审核，不能修改审核状态" };
+                return new ExamineProcResultModel { Successful = false, Error = "该记录已经被被审核，不能修改审核状态" };
             }
 
             //判断是否有前置审核
@@ -193,7 +193,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 var temp = await _examineRepository.FirstOrDefaultAsync(s => s.Id == examine.PrepositionExamineId && s.IsPassed == null);
                 if (temp != null)
                 {
-                    return new Result { Successful = false, Error = $"该审核有一个前置审核,请先对前置审核进行审核，ID{examine.PrepositionExamineId}" };
+                    return new ExamineProcResultModel { Successful = false, Error = $"该审核有一个前置审核,请先对前置审核进行审核，ID{examine.PrepositionExamineId}" };
                 }
             }
 
@@ -338,18 +338,18 @@ namespace CnGalWebSite.APIServer.Controllers
                        .FirstOrDefaultAsync(s => s.Id == examine.VideoId);
                     break;
                 default:
-                    return new Result { Successful = false, Error = "未知的操作" };
+                    return new ExamineProcResultModel { Successful = false, Error = "未知的操作" };
             }
 
             if (entry == null)
             {
-                return new Result { Successful = false, Error = "获取目标对象失败" };
+                return new ExamineProcResultModel { Successful = false, Error = "获取目标对象失败" };
             }
 
             //判断是否有权限审核目标对象
             if (await _editRecordService.CheckUserExaminePermission(entry, currentUser, examine.Operation == Operation.RequestUserCertification ? false : true) == false)
             {
-                return new Result { Successful = false, Error = "权限不足" };
+                return new ExamineProcResultModel { Successful = false, Error = "权限不足" };
             }
 
 
@@ -369,7 +369,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     if (string.IsNullOrWhiteSpace(examine.Context))
                     {
-                        return new Result { Successful = false, Error = "审核内容为空" };
+                        return new ExamineProcResultModel { Successful = false, Error = "审核内容为空" };
                     }
                     using TextReader str = new StringReader(examine.Context);
                     var serializer = new JsonSerializer();
@@ -405,7 +405,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     });
                     if (examineData == null)
                     {
-                        return new Result { Successful = false, Error = "获取审核数据失败" };
+                        return new ExamineProcResultModel { Successful = false, Error = "获取审核数据失败" };
                     }
                 }
 
@@ -417,7 +417,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
                 catch(Exception ex)
                 {
-                    return new Result { Successful = false, Error = "应用审核记录失败，错误信息：" + ex.Message };
+                    return new ExamineProcResultModel { Successful = false, Error = "应用审核记录失败，错误信息：" + ex.Message };
                 }
                
 
@@ -487,7 +487,21 @@ namespace CnGalWebSite.APIServer.Controllers
 
             }
 
-            return new Result { Successful = true };
+            return new ExamineProcResultModel
+            {
+                Successful = true,
+                Operation = examine.Operation,
+                EntryId = examine.EntryId,
+                ArticleId = examine.ArticleId,
+                TagId = examine.TagId,
+                VideoId = examine.VideoId,
+                PeripheryId = examine.PeripheryId,
+                CommentId = examine.CommentId,
+                DisambigId = examine.DisambigId,
+                PlayedGameId = examine.PlayedGameId,
+                FavoriteFolderId = examine.FavoriteFolderId,
+                ApplicationUserId = examine.ApplicationUserId,
+            };
         }
 
         /// <summary>

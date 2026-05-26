@@ -49,6 +49,9 @@
                                 </a>
                             </NotAuthorized>
                         </AuthorizeView>
+                        <AuthorizeView Roles="Admin">
+                            <CgHideToggleButton IsHidden="IsHidden" Id="VideoId" Type="Video" />
+                        </AuthorizeView>
                     }
                 </div>
             </CgMiniModeContainer>
@@ -62,6 +65,8 @@
     [Parameter] public string MainPicture { get; set; } = "";
     [Parameter] public string TypeText { get; set; } = "";
     [Parameter] public TimeSpan Duration { get; set; }
+    [Parameter] public bool IsHidden { get; set; }
+
     [Parameter] public long VideoId { get; set; }
     [Parameter] public string WatchUrl { get; set; } = "";
 

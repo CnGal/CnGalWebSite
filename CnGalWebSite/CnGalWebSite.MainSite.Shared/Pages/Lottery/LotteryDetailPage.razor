@@ -1,5 +1,7 @@
 @page "/lotteries/index/{Id:long}"
 @inject ILotteryQueryService LotteryQueryService
+
+
 @implements IDisposable
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.MainSite.Shared.Components.Features.Lottery.Detail
@@ -32,14 +34,10 @@ else if (_model is not null)
                      Count="@_model.Count"
                      ReaderCount="@_model.ReaderCount"
                      LotteryId="@_model.Id"
-                     Type="@_model.Type" />
+                     Type="@_model.Type"
+                     IsHidden="_model.IsHidden" />
 
-        @if (_model.IsHidden)
-        {
-            <CgAlert Variant="warning" Class="lottery-hidden-alert">
-                当前抽奖处于隐藏状态，如果你看到了这个提示，请立即联系管理员
-            </CgAlert>
-        }
+        <CgHiddenTip IsHidden="_model.IsHidden" ContentTypeName="抽奖" />
 
         <section class="lottery-layout lottery-layout--desktop" aria-label="桌面详情布局">
             <main class="lottery-main-col">
@@ -190,5 +188,8 @@ else
         _cts?.Cancel();
         _cts?.Dispose();
     }
+
+
+
 
 }

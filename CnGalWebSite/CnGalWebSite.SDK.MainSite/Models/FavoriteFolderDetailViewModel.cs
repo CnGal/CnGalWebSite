@@ -24,7 +24,7 @@ public sealed class FavoriteFolderDetailViewModel
 
     public required int ReaderCount { get; init; }
 
-    public required bool IsHidden { get; init; }
+    public required bool IsHidden { get; set; }
 
     public required bool Authority { get; init; }
 

@@ -1,6 +1,8 @@
 @page "/articles/index/{Id:long}"
 @inject IArticleQueryService ArticleQueryService
 @inject IExamineQueryService ExamineQueryService
+
+
 @using CnGalWebSite.DataModel.Model
 @implements IDisposable
 @using CnGalWebSite.DataModel.ViewModel.Admin
@@ -40,7 +42,8 @@ else if (_model is not null)
                          BriefIntroduction="@_model.BriefIntroduction"
                          MainPicture="@_model.MainPicture"
                          TypeText="@GetTypeText(_model.Type)"
-                         ArticleId="@_model.Id" />
+                         ArticleId="@_model.Id"
+                         IsHidden="_model.IsHidden" />
 
             <div class="article-info-bar">
                 <ArticleAuthor AuthorName="@_model.AuthorName"
@@ -59,12 +62,7 @@ else if (_model is not null)
             </div>
         </header>
 
-        @if (_model.IsHidden)
-        {
-            <CgAlert Variant="warning" Class="article-hidden-alert">
-                当前文章处于隐藏状态，如果你看到了这个提示，请立即联系管理员
-            </CgAlert>
-        }
+        <CgHiddenTip IsHidden="_model.IsHidden" ContentTypeName="文章" />
 
         <main class="article-main-content">
             @if (!string.IsNullOrWhiteSpace(_model.MainPage))
@@ -267,4 +265,7 @@ else
         return string.IsNullOrWhiteSpace(_model.BackgroundPicture) is false
             || string.IsNullOrWhiteSpace(_model.SmallBackgroundPicture) is false;
     }
+
+
+
 }

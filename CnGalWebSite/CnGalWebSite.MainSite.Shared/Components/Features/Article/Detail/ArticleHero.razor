@@ -36,6 +36,9 @@
                                 </a>
                             </NotAuthorized>
                         </AuthorizeView>
+                        <AuthorizeView Roles="Admin">
+                            <CgHideToggleButton IsHidden="IsHidden" Id="ArticleId" Type="Article" />
+                        </AuthorizeView>
                     </div>
                 </CgMiniModeContainer>
             }
@@ -48,5 +51,7 @@
     [Parameter] public string BriefIntroduction { get; set; } = "";
     [Parameter] public string MainPicture { get; set; } = "";
     [Parameter] public string TypeText { get; set; } = "";
+    [Parameter] public bool IsHidden { get; set; }
+
     [Parameter] public long ArticleId { get; set; }
 }

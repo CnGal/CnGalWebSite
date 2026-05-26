@@ -1,6 +1,8 @@
 @page "/videos/index/{Id:long}"
 @inject IVideoQueryService VideoQueryService
 @inject IExamineQueryService ExamineQueryService
+
+
 @inject NavigationManager NavigationManager
 @implements IDisposable
 @using CnGalWebSite.DataModel.Model
@@ -42,7 +44,8 @@ else if (Model is not null)
                        TypeText="@GetTypeText()"
                        Duration="@Model.Duration"
                        VideoId="@Id"
-                       WatchUrl="@(Model.RelatedOutlinks.FirstOrDefault()?.Link ?? Model.RelatedOutlinks.FirstOrDefault()?.DisplayValue)" />
+                       WatchUrl="@(Model.RelatedOutlinks.FirstOrDefault()?.Link ?? Model.RelatedOutlinks.FirstOrDefault()?.DisplayValue)"
+                       IsHidden="Model.IsHidden" />
 
             <div class="video-info-bar">
                 <VideoAuthorCard AuthorName="@Model.AuthorName"
@@ -63,12 +66,7 @@ else if (Model is not null)
             </div>
         </header>
 
-        @if (Model.IsHidden)
-        {
-            <CgAlert Variant="warning" Class="video-hidden-alert">
-                当前视频处于隐藏状态，如果你看到了这个提示，请立即联系管理员
-            </CgAlert>
-        }
+        <CgHiddenTip IsHidden="Model.IsHidden" ContentTypeName="视频" />
 
         <main class="video-main-content">
             @if (Model.Pictures.Count > 0)
@@ -276,5 +274,7 @@ var editRecordsTask = ExamineQueryService.GetVideoEditRecordsAsync(Id, cancellat
         _cts?.Cancel();
         _cts?.Dispose();
     }
+
+
 
 }

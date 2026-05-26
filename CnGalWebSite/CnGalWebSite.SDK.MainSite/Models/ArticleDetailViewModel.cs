@@ -41,7 +41,7 @@ public sealed class ArticleDetailViewModel
 
     public required long CommentCount { get; init; }
 
-    public required bool IsHidden { get; init; }
+    public required bool IsHidden { get; set; }
 
     public required bool CanComment { get; init; }
 

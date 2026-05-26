@@ -37,7 +37,7 @@ public sealed class LotteryDetailViewModel
 
     public required bool IsEnd { get; init; }
 
-    public required bool IsHidden { get; init; }
+    public required bool IsHidden { get; set; }
 
     public required bool CanComment { get; init; }
 

@@ -24,12 +24,7 @@ else if (_model != null)
     <article class="cg-ff-page">
         <FavoriteFolderHero Model="_model" />
 
-        @if (_model.IsHidden)
-        {
-            <CgAlert Variant="warning">
-                当前目录处于隐藏状态，如果你看到了这个提示，请立即联系管理员
-            </CgAlert>
-        }
+        <CgHiddenTip IsHidden="_model.IsHidden" ContentTypeName="目录" />
 
         <section class="cg-ff-layout cg-ff-layout--desktop" aria-label="桌面详情布局">
             <main class="cg-ff-main-col">

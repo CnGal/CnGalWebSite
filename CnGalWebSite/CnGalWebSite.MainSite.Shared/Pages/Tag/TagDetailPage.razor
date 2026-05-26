@@ -1,6 +1,8 @@
 @page "/tags/index/{Id:int}"
 @inject ITagQueryService TagQueryService
 @inject IExamineQueryService ExamineQueryService
+
+
 @implements IDisposable
 @using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.ViewModel.Tags
@@ -33,15 +35,11 @@ else if (_model is not null)
                      MainPicture="@_model.MainPicture"
                      BackgroundPicture="@_model.BackgroundPicture"
                      ReaderCount="_model.ReaderCount"
-                     TagId="_model.Id" />
+                     TagId="_model.Id"
+                     IsHidden="_model.IsHidden" />
         </header>
 
-        @if (_model.IsHidden)
-        {
-            <CgAlert Variant="warning" Class="tag-hidden-alert">
-                当前标签处于隐藏状态，如果你看到了这个提示，请立即联系管理员
-            </CgAlert>
-        }
+        <CgHiddenTip IsHidden="_model.IsHidden" ContentTypeName="标签" />
 
         <section class="tag-footer-related" aria-label="相关内容">
             <TagChildTags Tags="_model.ChildrenTags" />
@@ -126,5 +124,7 @@ var editRecordsTask = ExamineQueryService.GetTagEditRecordsAsync(Id, cancellatio
         _cts?.Cancel();
         _cts?.Dispose();
     }
+
+
 
 }

@@ -1,6 +1,8 @@
 ﻿@page "/peripheries/index/{Id:long}"
 @inject IPeripheryQueryService PeripheryQueryService
 @inject IExamineQueryService ExamineQueryService
+
+
 @implements IDisposable
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Admin
@@ -33,12 +35,10 @@ else if (_model is not null)
                        BackgroundPicture="@_model.BackgroundPicture"
                        ReaderCount="_model.ReaderCount"
                        CollectedCount="_model.CollectedCount"
-                       PeripheryId="_model.Id" />
+                       PeripheryId="_model.Id"
+                       IsHidden="_model.IsHidden" />
 
-        @if (_model.IsHidden)
-        {
-            <CgAlert Variant="warning">当前周边处于隐藏状态，如果你看到了这个提示，请立即联系管理员</CgAlert>
-        }
+        <CgHiddenTip IsHidden="_model.IsHidden" ContentTypeName="周边" />
 
         @* ── 桌面端双栏布局 ── *@
         <section class="periphery-layout periphery-layout--desktop" aria-label="桌面详情布局">
@@ -195,5 +195,7 @@ else
         _cts?.Cancel();
         _cts?.Dispose();
     }
+
+
 
 }

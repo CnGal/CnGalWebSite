@@ -18,7 +18,7 @@ public sealed class ExamineCommandService(HttpClient httpClient, IMemoryCache me
     {
         try
         {
-            var result = await PostAsJsonAsync<ExamineProcModel, Result>(
+            var result = await PostAsJsonAsync<ExamineProcModel, ExamineProcResultModel>(
                 "api/examines/proc",
                 new ExamineProcModel { Id = id, IsPassed = isPassed, Comments = comments },
                 cancellationToken);
@@ -31,6 +31,7 @@ public sealed class ExamineCommandService(HttpClient httpClient, IMemoryCache me
             memoryCache.Remove("main-site:user-content-center");
             memoryCache.Remove($"main-site:examine-detail:{id}");
             memoryCache.Remove($"main-site:examine-overview:{id}");
+            InvalidateEntityCaches(result);
             return SdkResult<bool>.Ok(true);
         }
         catch (Exception ex)
@@ -81,6 +82,88 @@ public sealed class ExamineCommandService(HttpClient httpClient, IMemoryCache me
         {
             Logger.LogError(ex, "监控设置修改异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
             return SdkResult<bool>.Fail("EXAMINE_MONITOR_EXCEPTION", "监控设置修改时发生异常");
+        }
+    }
+
+    private void InvalidateEntityCaches(ExamineProcResultModel result)
+    {
+        switch (result.Operation)
+        {
+            case Operation.EstablishMain:
+            case Operation.EstablishAddInfor:
+            case Operation.EstablishMainPage:
+            case Operation.EstablishImages:
+            case Operation.EstablishRelevances:
+            case Operation.EstablishTags:
+            case Operation.EstablishAudio:
+            case Operation.EstablishWebsite:
+                if (result.EntryId.HasValue)
+                {
+                    memoryCache.Remove($"main-site:entry-detail:{result.EntryId.Value}");
+                    memoryCache.Remove($"main-site:entry-edit-records:{result.EntryId.Value}");
+                }
+                memoryCache.Remove("main-site:home-summary");
+                break;
+
+            case Operation.EditArticleMain:
+            case Operation.EditArticleRelevanes:
+            case Operation.EditArticleMainPage:
+                if (result.ArticleId.HasValue)
+                {
+                    memoryCache.Remove($"main-site:article-detail:{result.ArticleId.Value}");
+                    memoryCache.Remove($"main-site:article-edit-records:{result.ArticleId.Value}");
+                }
+                memoryCache.Remove("main-site:home-summary");
+                break;
+
+            case Operation.EditTagMain:
+            case Operation.EditTagChildTags:
+            case Operation.EditTagChildEntries:
+                if (result.TagId.HasValue)
+                {
+                    memoryCache.Remove($"main-site:tag-detail:{result.TagId.Value}");
+                    memoryCache.Remove($"main-site:tag-edit-records:{result.TagId.Value}");
+                    memoryCache.Remove("main-site:tag-tree");
+                }
+                break;
+
+            case Operation.EditVideoMain:
+            case Operation.EditVideoImages:
+            case Operation.EditVideoMainPage:
+            case Operation.EditVideoRelevanes:
+                if (result.VideoId.HasValue)
+                {
+                    memoryCache.Remove($"main-site:video-detail:{result.VideoId.Value}");
+                    memoryCache.Remove($"main-site:video-edit-records:{result.VideoId.Value}");
+                }
+                memoryCache.Remove("main-site:home-summary");
+                break;
+
+            case Operation.EditPeripheryMain:
+            case Operation.EditPeripheryImages:
+            case Operation.EditPeripheryRelatedEntries:
+            case Operation.EditPeripheryRelatedPeripheries:
+                if (result.PeripheryId.HasValue)
+                {
+                    memoryCache.Remove($"main-site:periphery-detail:{result.PeripheryId.Value}");
+                    memoryCache.Remove($"main-site:periphery-edit-records:{result.PeripheryId.Value}");
+                }
+                break;
+
+            case Operation.UserMainPage:
+            case Operation.EditUserMain:
+                if (!string.IsNullOrEmpty(result.ApplicationUserId))
+                {
+                    memoryCache.Remove($"main-site:space-detail:{result.ApplicationUserId}");
+                }
+                break;
+
+            case Operation.EditPlayedGameMain:
+                if (result.PlayedGameId.HasValue)
+                {
+                    memoryCache.Remove($"main-site:played-game-overview:{result.PlayedGameId.Value}");
+                }
+                break;
         }
     }
 }

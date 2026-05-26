@@ -45,6 +45,9 @@
                                 </a>
                             </NotAuthorized>
                         </AuthorizeView>
+                        <AuthorizeView Roles="Admin">
+                            <CgHideToggleButton IsHidden="IsHidden" Id="TagId" Type="Tag" />
+                        </AuthorizeView>
                     </div>
                 </CgMiniModeContainer>
             }
@@ -58,6 +61,8 @@
     [Parameter] public string? MainPicture { get; set; }
     [Parameter] public string? BackgroundPicture { get; set; }
     [Parameter] public int ReaderCount { get; set; }
+    [Parameter] public bool IsHidden { get; set; }
+
     [Parameter] public int TagId { get; set; }
 
     private bool HasMainPicture => !string.IsNullOrWhiteSpace(MainPicture);

@@ -21,7 +21,7 @@ public sealed class PeripheryDetailViewModel
 
     public required string SmallBackgroundPicture { get; init; }
 
-    public required bool IsHidden { get; init; }
+    public required bool IsHidden { get; set; }
 
     // ── 类型与属性 ──
 
