@@ -1,0 +1,29 @@
+.cg-hide-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    border-radius: var(--cg-radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--cg-transition-fast);
+    border: 1px solid var(--cg-color-warning);
+    background: transparent;
+    color: var(--cg-color-warning);
+    white-space: nowrap;
+}
+
+.cg-hide-toggle-btn:hover {
+    background: color-mix(in oklab, var(--cg-color-warning) 12%, transparent);
+}
+
+.cg-hide-toggle-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.cg-hide-toggle-btn ::deep .cg-mdi-icon {
+    width: 16px;
+    height: 16px;
+}

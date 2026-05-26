@@ -27,7 +27,7 @@ public sealed class EntryDetailViewModel
 
     public required bool IsEdit { get; init; }
 
-    public required bool IsHidden { get; init; }
+    public required bool IsHidden { get; set; }
 
     public required bool IsHideOutlink { get; init; }
 

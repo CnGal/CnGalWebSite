@@ -31,11 +31,6 @@
     gap: var(--cg-spacing-3);
 }
 
-.tag-hidden-alert {
-    margin-top: var(--cg-spacing-2);
-    margin-bottom: 0;
-}
-
 .tag-not-found {
     text-align: center;
     padding: var(--cg-spacing-10) var(--cg-spacing-4);

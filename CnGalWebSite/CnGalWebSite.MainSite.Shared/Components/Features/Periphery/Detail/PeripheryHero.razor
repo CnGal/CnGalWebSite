@@ -56,6 +56,9 @@
                                 </a>
                             </NotAuthorized>
                         </AuthorizeView>
+                        <AuthorizeView Roles="Admin">
+                            <CgHideToggleButton IsHidden="IsHidden" Id="PeripheryId" Type="Periphery" />
+                        </AuthorizeView>
                     </div>
                 </CgMiniModeContainer>
             }
@@ -71,6 +74,8 @@
     [Parameter] public string? BackgroundPicture { get; set; }
     [Parameter] public int ReaderCount { get; set; }
     [Parameter] public int CollectedCount { get; set; }
+    [Parameter] public bool IsHidden { get; set; }
+
     [Parameter] public long PeripheryId { get; set; }
 
     private string DisplayTitle => string.IsNullOrWhiteSpace(DisplayName) ? Name : DisplayName;

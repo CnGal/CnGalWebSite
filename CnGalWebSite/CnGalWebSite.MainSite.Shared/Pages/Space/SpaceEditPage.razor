@@ -154,6 +154,12 @@ else if (Model != null)
     {
         if (Model == null || IsSubmitting) return;
 
+        // 若原始值与当前值都是 null 或空字符串，保持原始值不变，避免产生空的审核记录
+        if (string.IsNullOrEmpty(Model.MainPage.MainPage) && string.IsNullOrEmpty(OriginalData?.MainPage.MainPage))
+        {
+            Model.MainPage.MainPage = OriginalData.MainPage.MainPage;
+        }
+
         // 客户端校验
         var userDataValidation = Model.UserData.Validate();
         if (!userDataValidation.Successful)

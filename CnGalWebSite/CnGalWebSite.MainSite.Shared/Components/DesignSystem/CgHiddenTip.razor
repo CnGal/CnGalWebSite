@@ -1,0 +1,12 @@
+@* CgHiddenTip — 隐藏内容提示组件，统一全站隐藏状态提示样式 *@
+@if (IsHidden)
+{
+    <CgAlert Variant="warning">
+        当前@(ContentTypeName)处于隐藏状态，仅管理员可见
+    </CgAlert>
+}
+
+@code {
+    [Parameter] public bool IsHidden { get; set; }
+    [Parameter] public string ContentTypeName { get; set; } = "内容";
+}

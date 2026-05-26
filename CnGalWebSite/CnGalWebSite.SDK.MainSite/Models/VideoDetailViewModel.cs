@@ -48,7 +48,7 @@ public sealed class VideoDetailViewModel
 
     public required string OriginalAuthor { get; init; }
 
-    public required bool IsHidden { get; init; }
+    public required bool IsHidden { get; set; }
 
     public required bool CanComment { get; init; }
 

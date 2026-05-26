@@ -18,11 +18,12 @@ using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
-public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminCommandService> logger)
+public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memoryCache, ILogger<AdminCommandService> logger)
     : CommandServiceBase(httpClient), IAdminCommandService
 {
     protected override ILogger Logger => logger;
@@ -96,10 +97,21 @@ public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminComm
             new EditEntryPriorityViewModel { Ids = ids, PlusPriority = plusPriority },
             "EDIT_ENTRY_PRIORITY", "调整词条优先级", cancellationToken);
 
-    public Task<SdkResult<bool>> HideEntryAsync(int[] ids, bool isHidden, CancellationToken cancellationToken = default)
-        => PostCommandAsync("api/entries/HiddenEntry",
+    public async Task<SdkResult<bool>> HideEntryAsync(int[] ids, bool isHidden, CancellationToken cancellationToken = default)
+    {
+        var result = await PostCommandAsync("api/entries/HiddenEntry",
             new HiddenEntryModel { Ids = ids, IsHidden = isHidden },
             "HIDE_ENTRY", "操作词条显隐", cancellationToken);
+        if (result.Success)
+        {
+            foreach (var id in ids)
+            {
+                memoryCache.Remove($"main-site:entry-detail:{id}");
+                memoryCache.Remove($"main-site:entry-edit-records:{id}");
+            }
+        }
+        return result;
+    }
 
     public Task<SdkResult<bool>> HideEntryOutlinkAsync(int[] ids, bool isHidden, CancellationToken cancellationToken = default)
         => PostCommandAsync("api/entries/HideEntryOutlink",
@@ -130,10 +142,22 @@ public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminComm
             new EditArticlePriorityViewModel { Ids = ids, PlusPriority = plusPriority },
             "EDIT_ARTICLE_PRIORITY", "调整文章优先级", cancellationToken);
 
-    public Task<SdkResult<bool>> HideArticleAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
-        => PostCommandAsync("api/articles/Hide",
+    public async Task<SdkResult<bool>> HideArticleAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
+    {
+        var result = await PostCommandAsync("api/articles/Hide",
             new HiddenArticleModel { Ids = ids, IsHidden = isHidden },
             "HIDE_ARTICLE", "操作文章显隐", cancellationToken);
+        if (result.Success)
+        {
+            foreach (var id in ids)
+            {
+                memoryCache.Remove($"main-site:article-detail:{id}");
+                memoryCache.Remove($"main-site:article-edit-records:{id}");
+            }
+            memoryCache.Remove("main-site:home-summary");
+        }
+        return result;
+    }
 
     public Task<SdkResult<bool>> EditArticleCanCommentAsync(long[] ids, bool canComment, CancellationToken cancellationToken = default)
         => PostCommandAsync("api/comments/EditArticleCanComment",
@@ -147,10 +171,22 @@ public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminComm
             new EditArticlePriorityViewModel { Ids = ids, PlusPriority = plusPriority },
             "EDIT_VIDEO_PRIORITY", "调整视频优先级", cancellationToken);
 
-    public Task<SdkResult<bool>> HideVideoAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
-        => PostCommandAsync("api/videos/Hide",
+    public async Task<SdkResult<bool>> HideVideoAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
+    {
+        var result = await PostCommandAsync("api/videos/Hide",
             new HiddenArticleModel { Ids = ids, IsHidden = isHidden },
             "HIDE_VIDEO", "操作视频显隐", cancellationToken);
+        if (result.Success)
+        {
+            foreach (var id in ids)
+            {
+                memoryCache.Remove($"main-site:video-detail:{id}");
+                memoryCache.Remove($"main-site:video-edit-records:{id}");
+            }
+            memoryCache.Remove("main-site:home-summary");
+        }
+        return result;
+    }
 
     public Task<SdkResult<bool>> EditVideoCanCommentAsync(long[] ids, bool canComment, CancellationToken cancellationToken = default)
         => PostCommandAsync("api/comments/EditVideoCanComment",
@@ -159,10 +195,22 @@ public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminComm
 
     // ─── 标签 ───
 
-    public Task<SdkResult<bool>> HideTagAsync(int[] ids, bool isHidden, CancellationToken cancellationToken = default)
-        => PostCommandAsync("api/Tags/HiddenTag",
+    public async Task<SdkResult<bool>> HideTagAsync(int[] ids, bool isHidden, CancellationToken cancellationToken = default)
+    {
+        var result = await PostCommandAsync("api/Tags/HiddenTag",
             new HiddenTagModel { Ids = ids, IsHidden = isHidden },
             "HIDE_TAG", "操作标签显隐", cancellationToken);
+        if (result.Success)
+        {
+            foreach (var id in ids)
+            {
+                memoryCache.Remove($"main-site:tag-detail:{id}");
+                memoryCache.Remove($"main-site:tag-edit-records:{id}");
+            }
+            memoryCache.Remove("main-site:tag-tree");
+        }
+        return result;
+    }
 
     // ─── 抽奖 ───
 
@@ -171,10 +219,20 @@ public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminComm
             new EditLotteryPriorityViewModel { Ids = ids, PlusPriority = plusPriority },
             "EDIT_LOTTERY_PRIORITY", "调整抽奖优先级", cancellationToken);
 
-    public Task<SdkResult<bool>> HideLotteryAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
-        => PostCommandAsync("api/Lotteries/HiddenLottery",
+    public async Task<SdkResult<bool>> HideLotteryAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
+    {
+        var result = await PostCommandAsync("api/Lotteries/HiddenLottery",
             new HiddenLotteryModel { Ids = ids, IsHidden = isHidden },
             "HIDE_LOTTERY", "操作抽奖显隐", cancellationToken);
+        if (result.Success)
+        {
+            foreach (var id in ids)
+            {
+                memoryCache.Remove($"main-site:lottery-detail:{id}");
+            }
+        }
+        return result;
+    }
 
     public Task<SdkResult<bool>> EditLotteryCanCommentAsync(long[] ids, bool canComment, CancellationToken cancellationToken = default)
         => PostCommandAsync("api/comments/EditLotteryCanComment",
@@ -198,10 +256,21 @@ public sealed class AdminCommandService(HttpClient httpClient, ILogger<AdminComm
             new EditPeripheryPriorityViewModel { Ids = ids, PlusPriority = plusPriority },
             "EDIT_PERIPHERY_PRIORITY", "调整周边优先级", cancellationToken);
 
-    public Task<SdkResult<bool>> HidePeripheryAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
-        => PostCommandAsync("api/peripheries/HiddenPeriphery",
+    public async Task<SdkResult<bool>> HidePeripheryAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
+    {
+        var result = await PostCommandAsync("api/peripheries/HiddenPeriphery",
             new HiddenPeripheryModel { Ids = ids, IsHidden = isHidden },
             "HIDE_PERIPHERY", "操作周边显隐", cancellationToken);
+        if (result.Success)
+        {
+            foreach (var id in ids)
+            {
+                memoryCache.Remove($"main-site:periphery-detail:{id}");
+                memoryCache.Remove($"main-site:periphery-edit-records:{id}");
+            }
+        }
+        return result;
+    }
 
     public Task<SdkResult<bool>> EditPeripheryCanCommentAsync(long[] ids, bool canComment, CancellationToken cancellationToken = default)
         => PostCommandAsync("api/comments/EditPeripheryCanComment",

@@ -1,0 +1,89 @@
+@rendermode InteractiveServer
+@implements IDisposable
+@inject IAdminCommandService AdminCommandService
+@inject ICgToastService ToastService
+
+<button class="cg-hide-toggle-btn" @onclick="HandleToggle" disabled="@_isToggling"
+        title="@(_isHidden ? "公开显示" : "隐藏")" type="button">
+    <CgMdiIcon Name="@(_isToggling ? "mdiLoading" : (_isHidden ? "mdiEyeOutline" : "mdiEyeOffOutline"))"
+               Class="@(_isToggling ? "cg-spin" : "")" aria-hidden="true" />
+    <span>@(_isToggling ? "处理中..." : (_isHidden ? "显示" : "隐藏"))</span>
+</button>
+
+@code {
+    [Parameter] public bool IsHidden { get; set; }
+    [Parameter] public long Id { get; set; }
+    [Parameter] public string Type { get; set; } = "Entry";
+
+    private bool _isHidden;
+    private bool _isToggling;
+    private CancellationTokenSource? _cts;
+
+    protected override void OnInitialized()
+    {
+        _isHidden = IsHidden;
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!_isToggling && IsHidden != _isHidden)
+        {
+            _isHidden = IsHidden;
+        }
+    }
+
+    private async Task HandleToggle()
+    {
+        if (_isToggling) return;
+        _isToggling = true;
+        _cts = new CancellationTokenSource();
+        try
+        {
+            var hide = !_isHidden;
+            var typeName = Type switch
+            {
+                "Entry" => "词条",
+                "Article" => "文章",
+                "Tag" => "标签",
+                "Video" => "视频",
+                "Periphery" => "周边",
+                "Lottery" => "抽奖",
+                _ => "内容"
+            };
+
+            var r = Type switch
+            {
+                "Entry" => await AdminCommandService.HideEntryAsync(new[] { (int)Id }, hide, _cts.Token),
+                "Article" => await AdminCommandService.HideArticleAsync(new[] { Id }, hide, _cts.Token),
+                "Tag" => await AdminCommandService.HideTagAsync(new[] { (int)Id }, hide, _cts.Token),
+                "Video" => await AdminCommandService.HideVideoAsync(new[] { Id }, hide, _cts.Token),
+                "Periphery" => await AdminCommandService.HidePeripheryAsync(new[] { Id }, hide, _cts.Token),
+                "Lottery" => await AdminCommandService.HideLotteryAsync(new[] { Id }, hide, _cts.Token),
+                _ => throw new InvalidOperationException($"Unknown entity type: {Type}")
+            };
+
+            if (r.Success)
+            {
+                _isHidden = hide;
+                ToastService.Show(hide ? $"已隐藏{typeName}" : $"已公开显示{typeName}", "success");
+            }
+            else
+            {
+                ToastService.Show(r.Error?.Message ?? "操作失败", "error");
+            }
+        }
+        catch (OperationCanceledException) { }
+        finally
+        {
+            _isToggling = false;
+            _cts?.Dispose();
+            _cts = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+}

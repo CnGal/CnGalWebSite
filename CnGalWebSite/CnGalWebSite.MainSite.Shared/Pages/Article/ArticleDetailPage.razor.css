@@ -46,10 +46,6 @@
     padding-top: var(--cg-section-gap);
 }
 
-.article-hidden-alert {
-    margin-bottom: var(--cg-spacing-8);
-}
-
 .article-not-found {
     text-align: center;
     padding: var(--cg-spacing-10) var(--cg-page-gutter);
