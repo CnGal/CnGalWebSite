@@ -78,7 +78,7 @@ namespace CnGalWebSite.APIServer.Application.GPT
             //添加记录
             _record.Add(datetime);
 
-            var response=await _httpClient.PostAsJsonAsync<ChatCompletionModel>(url + "v1/chat/completions", new ChatCompletionModel
+            var model = new ChatCompletionModel
             {
                 Messages = new List<ChatCompletionMessage>
                 {
@@ -93,7 +93,15 @@ namespace CnGalWebSite.APIServer.Application.GPT
                         Content=user
                     }
                 }
-            });
+            };
+            var json = JsonSerializer.Serialize(model);
+            var request = new HttpRequestMessage(HttpMethod.Post, url + "v1/chat/completions")
+            {
+                Content = new StringContent(json, Encoding.UTF8, "application/json")
+            };
+            request.Headers.TryAddWithoutValidation("x-bf-passthrough-extra-params", "true");
+
+            var response = await _httpClient.SendAsync(request);
 
             if(!response.IsSuccessStatusCode)
             {
