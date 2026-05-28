@@ -272,7 +272,14 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                     }
                 }
 
-                var response = await _httpClient.PostAsJsonAsync(url + "v1/chat/completions", model);
+                var json = JsonSerializer.Serialize(model);
+                var request = new HttpRequestMessage(HttpMethod.Post, url + "v1/chat/completions")
+                {
+                    Content = new StringContent(json, Encoding.UTF8, "application/json")
+                };
+                request.Headers.TryAddWithoutValidation("x-bf-passthrough-extra-params", "true");
+
+                var response = await _httpClient.SendAsync(request);
 
                 if (!response.IsSuccessStatusCode)
                 {
