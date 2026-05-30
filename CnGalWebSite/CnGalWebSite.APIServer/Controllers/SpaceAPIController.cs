@@ -363,8 +363,12 @@ namespace CnGalWebSite.APIServer.Controllers
                 return new Result { Successful = false, Error = "当前已超过最大待审核编辑数目，请等待审核通过后继续编辑，长时间未更新请联系管理员" };
             }
 
-            //保存并尝试应用审核记录
-            await _editRecordService.SaveAndApplyEditRecord(user, user, model.MainPage, Operation.UserMainPage, model.Note);
+            //判断内容是否修改
+            if (model.MainPage != user.MainPageContext)
+            {
+                //保存并尝试应用审核记录
+                await _editRecordService.SaveAndApplyEditRecord(user, user, model.MainPage, Operation.UserMainPage, model.Note);
+            }
 
 
             return new Result { Successful = true };
