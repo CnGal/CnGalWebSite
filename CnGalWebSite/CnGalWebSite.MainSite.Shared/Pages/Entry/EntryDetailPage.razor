@@ -526,7 +526,7 @@ else
         {
             var displayTitle = items.Count > 4 ? $"{title} ({items.Count})" : title;
             <EntrySection Title="@displayTitle" Icon="@icon" Show="true">
-                <EntryCardList LimitCount="@limitCount" ShowExpandButton="items.Count > @limitCount">
+                <EntryCardList LimitCount="@limitCount" ShowExpandButton="@(items.Count > limitCount)">
                     @foreach (var item in items)
                     {
                         <li>
