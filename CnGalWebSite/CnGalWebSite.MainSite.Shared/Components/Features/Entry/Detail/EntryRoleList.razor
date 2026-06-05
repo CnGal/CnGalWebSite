@@ -1,7 +1,7 @@
 @using CnGalWebSite.DataModel.ViewModel
 
 <ul class="entry-role-list">
-    @foreach (var role in Roles.Take(MaxCount))
+    @foreach (var role in (MaxCount > 0 ? Roles.Take(MaxCount) : Roles))
     {
         <li>
             <a href="@BuildEntryUrl(role.Id)" class="entry-role-item">

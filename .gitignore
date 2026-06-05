@@ -372,3 +372,4 @@ FodyWeavers.xsd
 
 .sisyphus/
 .opencode/
+.claude/settings.local.json

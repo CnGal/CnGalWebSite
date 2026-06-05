@@ -184,7 +184,7 @@ else if (Model is not null)
 
                 <div class="entry-cell entry-cell--roles">
                     <EntrySection Title="登场角色" Icon="mdiAccountStarOutline" Show="Model.Roles.Count > 0">
-                        <EntryRoleList Roles="Model.Roles" MaxCount="8" BuildEntryUrl="BuildEntryUrl" />
+                        <EntryRoleList Roles="Model.Roles" MaxCount="0" BuildEntryUrl="BuildEntryUrl" />
                     </EntrySection>
                 </div>
 
@@ -519,14 +519,14 @@ else
         };
     }
 
-    private RenderFragment RenderRelevanceGroup(string title, string icon, IEnumerable<EntryInforTipViewModel> sourceItems) => __builder =>
+    private RenderFragment RenderRelevanceGroup(string title, string icon, IEnumerable<EntryInforTipViewModel> sourceItems, int limitCount = 9) => __builder =>
     {
         var items = sourceItems.ToList();
         if (items.Count > 0)
         {
             var displayTitle = items.Count > 4 ? $"{title} ({items.Count})" : title;
             <EntrySection Title="@displayTitle" Icon="@icon" Show="true">
-                <EntryCardList LimitCount="9" ShowExpandButton="items.Count > 9">
+                <EntryCardList LimitCount="@limitCount" ShowExpandButton="items.Count > @limitCount">
                     @foreach (var item in items)
                     {
                         <li>
