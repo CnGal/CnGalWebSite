@@ -191,7 +191,7 @@ namespace CnGalWebSite.APIServer.Application.Home
 
             //获取友情置顶词条 根据优先级排序
             var entry_result4 = await _friendLinkRepository.GetAll().AsNoTracking().OrderByDescending(s => s.Priority)
-                .Where(s => s.Name != null && s.Name != "").Take(12).ToListAsync();
+                .Where(s => s.Name != null && s.Name != "").ToListAsync();
             if (entry_result4 != null)
             {
                 foreach (var item in entry_result4)

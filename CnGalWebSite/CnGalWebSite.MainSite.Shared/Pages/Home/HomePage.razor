@@ -384,7 +384,7 @@ else
     <CgMiniModeContainer>
         <HomeSection Title="友情链接" Icon="mdiLink" IconColor="var(--cg-color-text-muted)">
             <ul class="home-friend-link-grid">
-                @foreach (var item in Model.FriendLinks.Take(20))
+                @foreach (var item in Model.FriendLinks)
                 {
                     <li style="display: flex;">
                         <a href="@item.Url" target="_blank" rel="noopener noreferrer" class="home-friend-link-card" style="width: 100%;">
