@@ -848,7 +848,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return _peripheryService.GetGameOverviewPeripheryListModel(user, entry, ownedPeripheries, true);
         }
 
-        [HttpGet("{id}")]
+        [HttpPost("{id}")]
         public async Task<ActionResult<Result>> CollectPeriphery(long id)
         {
             //获取当前用户ID
@@ -881,7 +881,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
 
-        [HttpGet("{id}")]
+        [HttpPost("{id}")]
         public async Task<ActionResult<Result>> UnCollectPeriphery(long id)
         {
             //获取当前用户ID

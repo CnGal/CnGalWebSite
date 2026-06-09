@@ -367,7 +367,7 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
         => PostCommandAsync("api/news/AddCustomNews", model, "ADD_CUSTOM_NEWS", "添加自定义动态", cancellationToken);
 
     public Task<SdkResult<bool>> PublishGameNewsAsync(long id, CancellationToken cancellationToken = default)
-        => GetCommandAsync($"api/news/PublishGameNews/{id}", "PUBLISH_GAME_NEWS", "发布动态", cancellationToken);
+        => PostCommandAsync<object>($"api/news/PublishGameNews/{id}", null!, "PUBLISH_GAME_NEWS", "发布动态", cancellationToken);
 
     public Task<SdkResult<bool>> IgnoreGameNewsAsync(long[] ids, bool isIgnore, CancellationToken cancellationToken = default)
         => PostCommandAsync("api/news/IgnoreGameNews",
@@ -385,10 +385,10 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
         => PostCommandAsync("api/news/EditWeeklyNews", model, "EDIT_WEEKLY_NEWS", "编辑周报", cancellationToken);
 
     public Task<SdkResult<bool>> PublishWeeklyNewsAsync(long id, CancellationToken cancellationToken = default)
-        => GetCommandAsync($"api/news/PublishWeelyNews/{id}", "PUBLISH_WEEKLY_NEWS", "发布周报", cancellationToken);
+        => PostCommandAsync<object>($"api/news/PublishWeelyNews/{id}", null!, "PUBLISH_WEEKLY_NEWS", "发布周报", cancellationToken);
 
     public Task<SdkResult<bool>> ResetWeeklyNewsAsync(long id, CancellationToken cancellationToken = default)
-        => GetCommandAsync($"api/news/ResetWeelyNews/{id}", "RESET_WEEKLY_NEWS", "重置周报", cancellationToken);
+        => PostCommandAsync<object>($"api/news/ResetWeelyNews/{id}", null!, "RESET_WEEKLY_NEWS", "重置周报", cancellationToken);
 
     // ─── 展会 ───
 

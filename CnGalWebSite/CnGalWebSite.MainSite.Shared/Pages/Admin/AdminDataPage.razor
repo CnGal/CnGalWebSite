@@ -30,6 +30,7 @@
 
 @code {
     private CancellationTokenSource? _cts;
+    private bool _isDisposed;
     private readonly LineChartType[] _chartTypes =
     [
         LineChartType.User,
@@ -55,9 +56,10 @@
             {
                 foreach (var ct in _chartTypes)
                 {
+                    if (_isDisposed) break;
                     await LoadChart(ct, 30);
                 }
-                StateHasChanged();
+                if (!_isDisposed) StateHasChanged();
             }
             catch (OperationCanceledException)
             {
@@ -86,10 +88,16 @@
 
     private async Task LoadChart(LineChartType chartType, int days)
     {
+        if (_isDisposed) return;
+
         var beforeTime = DateTime.Now.Date.AddDays(1);
         var afterTime = days > 9999 ? new DateTime(100, 10, 10) : beforeTime.AddDays(-days);
 
-        var result = await AdminQueryService.GetLineChartAsync(chartType, afterTime, beforeTime, _cts?.Token ?? CancellationToken.None);
+        CancellationToken token;
+        try { token = _cts?.Token ?? CancellationToken.None; }
+        catch (ObjectDisposedException) { return; }
+
+        var result = await AdminQueryService.GetLineChartAsync(chartType, afterTime, beforeTime, token);
         if (result.Success && result.Data is not null)
         {
             _chartData[chartType] = result.Data;
@@ -98,6 +106,7 @@
 
     public void Dispose()
     {
+        _isDisposed = true;
         _cts?.Cancel();
         _cts?.Dispose();
     }

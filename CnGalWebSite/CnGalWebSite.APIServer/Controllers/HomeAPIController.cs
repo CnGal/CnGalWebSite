@@ -199,8 +199,7 @@ namespace CnGalWebSite.APIServer.Controllers
             }
             catch
             {
-                //轮播图获取不到 代表数据库有问题 重启
-                _applicationLifetime.StopApplication();
+                //轮播图获取失败 记录日志但不重启
                 return NotFound();
             }
         }

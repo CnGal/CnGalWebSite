@@ -304,7 +304,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return dtos;
         }
 
-        [HttpGet]
+        [HttpPost]
         public async Task<ActionResult<Result>> SignInAsync()
         {
             //获取当前用户ID
@@ -525,7 +525,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [HttpGet]
+        [HttpPost]
         public async Task<ActionResult<Result>> ReadedAllMessagesAsync()
         {
             //获取当前用户ID
@@ -561,7 +561,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //判断是否为管理员
             var isAdmin = _userService.CheckCurrentUserRole("Admin");
-            await _messageRepository.GetAll().Where(s => (true || s.ApplicationUserId == user.Id) && model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.IsReaded, b => model.IsReaded));
+            await _messageRepository.GetAll().Where(s => (isAdmin || s.ApplicationUserId == user.Id) && model.Ids.Contains(s.Id)).ExecuteUpdateAsync(s => s.SetProperty(s => s.IsReaded, b => model.IsReaded));
 
             return new Result { Successful = true };
         }
@@ -616,7 +616,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <summary>
         /// 获取每日任务
         /// </summary>
-        [HttpGet]
+        [HttpPost]
         public async Task<ActionResult<UserTaskModel>> GetUserTasks()
         {
             //获取当前用户ID

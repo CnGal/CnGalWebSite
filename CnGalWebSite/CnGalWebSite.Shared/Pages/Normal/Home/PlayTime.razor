@@ -261,7 +261,7 @@
             var user = await authenticationStateTask;
             if (user.User.Identity.IsAuthenticated)
             {
-                var result = await _httpService.GetAsync<Result>("api/playedgame/RefreshPlayedGameSteamInfor");
+                var result = await _httpService.PostAsync<object, Result>("api/playedgame/RefreshPlayedGameSteamInfor", null!);
                 if (result.Successful)
                 {
                     string userId = user.User.Claims.GetUserId();

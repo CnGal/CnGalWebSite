@@ -67,7 +67,7 @@ else
     {
         try
         {
-            Model = await _httpService.GetAsync<UserTaskModel>("api/space/GetUserTasks");
+            Model = await _httpService.PostAsync<object, UserTaskModel>("api/space/GetUserTasks", null!);
             isReady = true;
         }
         catch (Exception ex)

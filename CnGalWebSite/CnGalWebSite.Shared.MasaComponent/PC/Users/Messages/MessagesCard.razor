@@ -177,7 +177,7 @@
     {
         try
         {
-            var obj = await _httpService.GetAsync<Result>("api/space/ReadedAllMessages/");
+            var obj = await _httpService.PostAsync<object, Result>("api/space/ReadedAllMessages/", null!);
             //判断结果
             if (obj.Successful == false)
             {
