@@ -185,8 +185,8 @@ public sealed class PeripheryCommandService(
     {
         try
         {
-            var result = await GetFromJsonAsync<Result>(
-                $"api/peripheries/CollectPeriphery/{peripheryId}", cancellationToken);
+            var result = await PostAsJsonAsync<object, Result>(
+                $"api/peripheries/CollectPeriphery/{peripheryId}", null!, cancellationToken);
 
             if (result is { Successful: true })
             {
@@ -206,8 +206,8 @@ public sealed class PeripheryCommandService(
     {
         try
         {
-            var result = await GetFromJsonAsync<Result>(
-                $"api/peripheries/UnCollectPeriphery/{peripheryId}", cancellationToken);
+            var result = await PostAsJsonAsync<object, Result>(
+                $"api/peripheries/UnCollectPeriphery/{peripheryId}", null!, cancellationToken);
 
             if (result is { Successful: true })
             {

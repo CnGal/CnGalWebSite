@@ -134,7 +134,7 @@
         await OnSave();
         try
         {
-            var result = await _httpService.GetAsync<Result>("api/news/PublishGameNews/" + Id);
+            var result = await _httpService.PostAsync<object, Result>("api/news/PublishGameNews/" + Id, null!);
             if (result.Successful)
             {
                 await OnRefreshTable.InvokeAsync();

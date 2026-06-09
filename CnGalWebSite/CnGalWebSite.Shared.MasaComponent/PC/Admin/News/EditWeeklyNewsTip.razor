@@ -171,7 +171,7 @@
         await OnSave();
         try
         {
-            var result = await _httpService.GetAsync<Result>("api/news/PublishWeelyNews/" + Id);
+            var result = await _httpService.PostAsync<object, Result>("api/news/PublishWeelyNews/" + Id, null!);
             if (result.Successful)
             {
                 await PopupService.ToastSuccessAsync("发布周报成功", "发布周报成功");
@@ -222,7 +222,7 @@
     {
         try
         {
-            var result = await _httpService.GetAsync<Result>("api/news/ResetWeelyNews/" + Id);
+            var result = await _httpService.PostAsync<object, Result>("api/news/ResetWeelyNews/" + Id, null!);
             if (result.Successful)
             {
                 await DataChanged();

@@ -308,7 +308,7 @@ public sealed class SpaceQueryService(
 
     public async Task<SdkResult<UserTaskModel>> GetUserTasksAsync(CancellationToken cancellationToken = default)
     {
-        return await GetAsync<UserTaskModel>(
+        return await PostAsync<UserTaskModel>(
             "api/space/GetUserTasks",
             "SPACE",
             "用户任务状态",

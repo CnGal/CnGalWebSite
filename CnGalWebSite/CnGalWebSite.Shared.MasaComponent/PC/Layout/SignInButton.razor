@@ -33,7 +33,7 @@ else
 
         try
         {
-            var result = await _httpService.GetAsync<Result>("api/space/signIn");
+            var result = await _httpService.PostAsync<object, Result>("api/space/signIn", null!);
             if (result.Successful == true)
             {
                 Model.IsSignIn = true;

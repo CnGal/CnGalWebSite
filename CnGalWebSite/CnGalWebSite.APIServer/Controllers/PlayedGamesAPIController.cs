@@ -405,7 +405,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return gameIds;
         }
 
-        [HttpGet]
+        [HttpPost]
         public async Task<ActionResult<Result>> RefreshPlayedGameSteamInfor()
         {
             //获取当前用户ID

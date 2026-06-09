@@ -163,6 +163,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<Result> EditGameAsync(ExpoGameEditModel model)
         {
@@ -317,6 +318,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<Result> EditTagAsync(ExpoTagEditModel model)
         {
@@ -765,6 +767,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return hasJoinedLottery;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<QueryResultModel<ExpoTaskOverviewModel>> ListTask(QueryParameterModel model)
         {
@@ -885,6 +888,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<Result> EditAwardAsync(ExpoAwardEditModel model)
         {
@@ -1261,6 +1265,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         #region 奖品
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<QueryResultModel<ExpoPrizeOverviewModel>> ListPrize(QueryParameterModel model)
         {
@@ -1581,6 +1586,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<Result> EditActivityAsync(ExpoActivityEditModel model)
         {
@@ -1894,6 +1900,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return model;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<Result> EditTicketAsync(ExpoTicketEditModel model)
         {

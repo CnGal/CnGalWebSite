@@ -83,7 +83,7 @@ public sealed class SpaceCommandService(
     {
         try
         {
-            var result = await GetFromJsonAsync<Result>("api/playedgame/RefreshPlayedGameSteamInfor", cancellationToken);
+            var result = await PostAsJsonAsync<object, Result>("api/playedgame/RefreshPlayedGameSteamInfor", null!, cancellationToken);
             if (result is { Successful: true })
             {
                 // 清空相关缓存，确保后续查询获取最新数据
@@ -115,7 +115,7 @@ public sealed class SpaceCommandService(
     {
         try
         {
-            var result = await GetFromJsonAsync<Result>("api/space/ReadedAllMessages/", cancellationToken);
+            var result = await PostAsJsonAsync<object, Result>("api/space/ReadedAllMessages/", null!, cancellationToken);
 
             if (result is { Successful: true })
             {
@@ -135,7 +135,7 @@ public sealed class SpaceCommandService(
     {
         try
         {
-            var result = await GetFromJsonAsync<Result>("api/space/signIn", cancellationToken);
+            var result = await PostAsJsonAsync<object, Result>("api/space/signIn", null!, cancellationToken);
 
             if (result is { Successful: true })
             {

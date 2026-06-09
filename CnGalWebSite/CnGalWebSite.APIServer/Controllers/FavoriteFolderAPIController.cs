@@ -618,7 +618,7 @@ namespace CnGalWebSite.APIServer.Controllers
             //判断是否为管理员
             var isAdmin = _userService.CheckCurrentUserRole( "Admin");
             //判断是否为当前用户
-            if (isAdmin == false && await _favoriteFolderRepository.GetAll().CountAsync(s => model.Ids.Contains(s.Id) && s.ApplicationUserId == user.Id) == model.Ids.Length)
+            if (isAdmin == false && await _favoriteFolderRepository.GetAll().CountAsync(s => model.Ids.Contains(s.Id) && s.ApplicationUserId == user.Id) != model.Ids.Length)
             {
                 return new Result { Successful = false, Error = "访问被拒绝" };
             }

@@ -126,7 +126,7 @@
     {
         try
         {
-            var model = await _httpService.GetAsync<Result>("api/playedgame/RefreshPlayedGameSteamInfor");
+            var model = await _httpService.PostAsync<object, Result>("api/playedgame/RefreshPlayedGameSteamInfor", null!);
             if (model.Successful)
             {
                 _dataCacheService.UserGameRecordDataCatche.Clean(UserId);

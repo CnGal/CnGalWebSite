@@ -271,7 +271,7 @@ namespace CnGalWebSite.APIServer.Controllers
             return new Result { Successful = true };
         }
 
-        [HttpGet("{id}")]
+        [HttpPost("{id}")]
         public async Task<ActionResult<Result>> PublishGameNewsAsync(long id)
         {
             try
@@ -445,7 +445,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
 
-        [HttpGet("{id}")]
+        [HttpPost("{id}")]
         public async Task<ActionResult<Result>> PublishWeelyNewsAsync(long id)
         {
             try
@@ -469,7 +469,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
 
-        [HttpGet("{id}")]
+        [HttpPost("{id}")]
         public async Task<ActionResult<Result>> ResetWeelyNewsAsync(long id)
         {
             try

@@ -88,7 +88,7 @@
     {
         try
         {
-            Result obj = await _httpService.GetAsync<Result>("api/peripheries/UnCollectPeriphery/" + Id);
+            Result obj = await _httpService.PostAsync<object, Result>("api/peripheries/UnCollectPeriphery/" + Id, null!);
             //判断结果
             if (obj.Successful == false)
             {
@@ -110,7 +110,7 @@
     {
         try
         {
-            Result obj = await _httpService.GetAsync<Result>("api/peripheries/CollectPeriphery/" + Id);
+            Result obj = await _httpService.PostAsync<object, Result>("api/peripheries/CollectPeriphery/" + Id, null!);
 
             //判断结果
             if (obj.Successful == false)

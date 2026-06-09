@@ -171,7 +171,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        [Authorize]
+        [Authorize(Roles = "Admin,Editor")]
         [HttpPost]
         public async Task<ActionResult<ExamineProcResultModel>> ProcAsync(Models.ExaminedViewModel model)
         {

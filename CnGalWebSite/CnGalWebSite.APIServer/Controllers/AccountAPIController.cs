@@ -185,6 +185,7 @@ namespace CnGalWebSite.APIServer.Controllers
             };
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<QueryResultModel<UserOverviewModel>> ListUsers(QueryParameterModel model)
         {
@@ -234,6 +235,7 @@ namespace CnGalWebSite.APIServer.Controllers
             };
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<QueryResultModel<OperationRecordOverviewModel>> ListOperationRecords(QueryParameterModel model)
         {

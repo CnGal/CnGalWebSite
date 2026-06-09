@@ -1,3 +1,4 @@
+using System.Net.Http.Json;
 using System.Text.Json;
 using CnGalWebSite.SDK.MainSite.Models;
 using Microsoft.Extensions.Logging;
@@ -293,6 +294,64 @@ public abstract class QueryServiceBase(HttpClient httpClient)
         try
         {
             var (response, responseBody) = await GetAsyncWithBody(HttpClient, path, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Logger.LogError(
+                    "获取{EntityDescription}失败。Path={Path}; StatusCode={StatusCode}; BaseAddress={BaseAddress}; ResponseBody={ResponseBody}",
+                    entityDescription,
+                    path,
+                    (int)response.StatusCode,
+                    HttpClient.BaseAddress,
+                    TrimForLog(responseBody));
+
+                return SdkResult<T>.Fail($"{errorCodePrefix}_HTTP_FAILED", $"获取{entityDescription}失败（HTTP {(int)response.StatusCode}）");
+            }
+
+            try
+            {
+                var data = Deserialize<T>(responseBody);
+                return SdkResult<T>.Ok(data!);
+            }
+            catch (JsonException ex)
+            {
+                Logger.LogError(
+                    ex,
+                    "{EntityDescription}反序列化失败。Path={Path}; BaseAddress={BaseAddress}; ResponseBody={ResponseBody}",
+                    entityDescription,
+                    path,
+                    HttpClient.BaseAddress,
+                    TrimForLog(responseBody));
+
+                return SdkResult<T>.Fail($"{errorCodePrefix}_DESERIALIZE_FAILED", $"{entityDescription}数据格式不兼容");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(
+                ex,
+                "获取{EntityDescription}异常。Path={Path}; BaseAddress={BaseAddress}",
+                entityDescription,
+                path,
+                HttpClient.BaseAddress);
+
+            return SdkResult<T>.Fail($"{errorCodePrefix}_EXCEPTION", $"请求{entityDescription}数据时发生异常");
+        }
+    }
+
+    /// <summary>
+    /// 通用 POST（空 body）→ 反序列化 → SdkResult 流程（用于需要 POST 动词的查询场景）。
+    /// </summary>
+    protected async Task<SdkResult<T>> PostAsync<T>(
+        string path,
+        string errorCodePrefix,
+        string entityDescription,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var response = await HttpClient.PostAsJsonAsync(path, new { }, SdkJsonSerializerOptions.Default, cancellationToken);
+            var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {

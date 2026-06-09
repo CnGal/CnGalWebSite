@@ -78,7 +78,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var objectUser = await _userRepository.FirstOrDefaultAsync(s => s.Id == id);
 
-            if (objectUser.IsShowGameRecord == false && id != user.Id)
+            if (objectUser.IsShowGameRecord == false && (user == null || id != user.Id))
             {
                 return NotFound("该用户的游玩记录未公开");
             }
