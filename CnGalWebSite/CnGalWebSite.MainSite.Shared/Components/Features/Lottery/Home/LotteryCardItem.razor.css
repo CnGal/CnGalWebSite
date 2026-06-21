@@ -23,7 +23,7 @@
 .lottery-card-image-wrapper {
     position: relative;
     width: 100%;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 460 / 215;
     overflow: hidden;
     background: color-mix(in oklab, var(--cg-color-bg) 90%, white);
     flex-shrink: 0;

@@ -3,10 +3,16 @@
 
 <li>
     <div class="lottery-card">
-        @if (!string.IsNullOrWhiteSpace(Model.Thumbnail))
+        @if (!string.IsNullOrWhiteSpace(Model.MainPicture) || !string.IsNullOrWhiteSpace(Model.Thumbnail))
         {
             <a class="lottery-card-image-wrapper" href="@($"/lotteries/index/{Model.Id}")">
-                <img src="@Model.Thumbnail" alt="@Model.Name" class="lottery-card-image" loading="lazy" />
+                <picture>
+                    @if (!string.IsNullOrWhiteSpace(Model.Thumbnail))
+                    {
+                        <source media="(min-width: 768px)" srcset="@Model.Thumbnail">
+                    }
+                    <img src="@(Model.MainPicture ?? Model.Thumbnail)" alt="@Model.Name" class="lottery-card-image" loading="lazy" />
+                </picture>
             </a>
         }
         <div class="lottery-card-body">
