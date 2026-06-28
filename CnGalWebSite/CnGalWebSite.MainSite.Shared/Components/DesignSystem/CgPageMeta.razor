@@ -1,4 +1,8 @@
-@* 统一页面标题与 SEO meta 标签，对齐旧站 TitleTip 组件行为 *@
+@* 统一页面标题与 SEO meta 标签，对齐旧站 TitleTip 组件行为
+   实现方式：通过 IPageMetaService 将 meta 值写入 scoped 服务，
+   App.razor 在渲染 <head> 时直接读取，绕过 HeadContent/HeadOutlet 时序问题 *@
+@using CnGalWebSite.MainSite.Shared.Services
+@inject IPageMetaService PageMetaService
 
 <PageTitle>@ComputedTitle</PageTitle>
 <HeadContent>
@@ -38,4 +42,11 @@
 
     private string ComputedImage =>
         string.IsNullOrWhiteSpace(Image) ? DefaultImage : Image;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        // 将 meta 值写入 scoped 服务（值变更时自动通知 App.razor 刷新 <head>）
+        PageMetaService.SetMeta(Title, Description, Image);
+    }
 }
