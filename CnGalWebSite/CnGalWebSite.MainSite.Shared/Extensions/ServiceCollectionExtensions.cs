@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICgDeviceIdentificationService, CgDeviceIdentificationService>();
         services.AddScoped<IMiniModeService, MiniModeService>();
         services.AddScoped<ICgThemeService, CgThemeService>();
+        services.AddScoped<IPageMetaService, PageMetaService>();
         services.AddScoped<IKanbanSettingService, KanbanSettingService>();
         services.AddScoped<IKanbanUserDataService, KanbanUserDataService>();
         services.AddScoped<IKanbanEventService, KanbanEventService>();

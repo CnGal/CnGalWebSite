@@ -1,6 +1,8 @@
 ﻿@using CnGalWebSite.MainSite.Shared.Services
 @using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
+@inject IPageMetaService PageMetaService
+@implements IDisposable
 
 <!DOCTYPE html>
 <html lang="zh-CN" data-theme="@InitialTheme">
@@ -51,6 +53,9 @@
     <link rel="stylesheet" href="@Assets["_content/CnGalWebSite.MainSite.Shared/styles/design-tokens.css"]"/>
     <link rel="stylesheet" href="@Assets["CnGalWebSite.MainSite.styles.css"]"/>
     <ImportMap/>
+    <meta name="description" content="@PageMetaService.Description">
+    <meta itemprop="name" content="@PageMetaService.Title" />
+    <meta itemprop="image" content="@PageMetaService.Image" />
     <HeadOutlet/>
     <script async src="https://umami.cngal.top/script.js" data-website-id="c190d5e2-f859-430c-8463-be388f6875b0"></script>
     <script type="text/javascript">
@@ -156,5 +161,22 @@
             var theme = HttpContextAccessor.HttpContext?.Request.Cookies[ThemeConstants.CookieName];
             return theme is ThemeConstants.DarkValue or ThemeConstants.LightValue ? theme : null;
         }
+    }
+
+    protected override void OnInitialized()
+    {
+        // 订阅 meta 变更事件，当子组件异步加载数据后更新 meta 值时触发重新渲染
+        PageMetaService.OnChanged += HandleMetaChanged;
+    }
+
+    private void HandleMetaChanged()
+    {
+        // 在 SSR 中，子组件数据加载完成后触发 App.razor 重渲染 <head> 内的 meta 标签
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        PageMetaService.OnChanged -= HandleMetaChanged;
     }
 }
