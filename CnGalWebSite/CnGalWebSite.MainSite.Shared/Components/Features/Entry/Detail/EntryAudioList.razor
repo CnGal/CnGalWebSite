@@ -16,7 +16,7 @@
         </div>
         
         <div class="cg-audio-tracks">
-            @for (var i = 0; i < Audio.Take(MaxCount).Count(); i++)
+            @for (var i = 0; i < Audio.Count; i++)
             {
                 var item = Audio[i];
                 var index = i + 1;
@@ -64,5 +64,4 @@
 
 @code {
     [Parameter] public IReadOnlyList<EditAudioAloneModel> Audio { get; set; } = [];
-    [Parameter] public int MaxCount { get; set; } = 6;
 }
