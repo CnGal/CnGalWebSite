@@ -2,23 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.Kanban.ChatGPT.Models.GPT
 {
     public class ChatCompletionModel
     {
-        public string Model { get; set; } = "gpt-3.5-turbo";
+        public string Model { get; set; } = "deepseek-v4-flash";
         public List<ChatCompletionMessage> Messages { get; set; } = [];
         public List<ChatCompletionTool>? Tools { get; set; }
         public double temperature { get; set; } = 1.3;
         public Dictionary<string, string> thinking { get; set; } = new() { ["type"] = "disabled" };
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? reasoning_effort { get; set; }
     }
 
     public class ChatCompletionMessage
     {
         public string? Role { get; set; }
         public string? Content { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? reasoning_content { get; set; }
         public List<ToolCall>? tool_calls { get; set; }
         public string? tool_call_id { get; set; }
     }

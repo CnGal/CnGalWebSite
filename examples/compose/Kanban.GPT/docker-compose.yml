@@ -19,7 +19,11 @@ services:
       # 1天所有用户调用次数限制
       - ChatGPTLimit_1_Day=${ChatGPTLimit_1_Day:-1000}
       # GPT 模型
-      - ChatGPTModel=${ChatGPTModel:-gpt-3.5-turbo-0125}
+      - ChatGPTModel=${ChatGPTModel:-deepseek-v4-flash}
+      # 是否启用思考模式
+      - EnableThinking=${EnableThinking:-true}
+      # 思考强度，可选 high 或 max
+      - ChatGPTReasoningEffort=${ChatGPTReasoningEffort:-high}
       # GPT API url
       - ChatGPTApiUrl=${ChatGPTApiUrl}
       # GPT 提示词
@@ -34,7 +38,7 @@ services:
       - MaxRecursionDepth=${MaxRecursionDepth:-10}
       # CnGal API 路径
       - WebApiPath=${WebApiPath:-https://api.cngal.org/}
-      # 是否启用函数调用 启用后不能使用r1模型
+      # 是否启用函数调用，思考模式下必须续传 reasoning_content
       - EnableFunctionCalling=${EnableFunctionCalling:-true}
       # 是否禁用个性化系统提示词 
       - DisablePersonalizedSystem=${DisablePersonalizedSystem:-true}
