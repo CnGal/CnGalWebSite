@@ -326,7 +326,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.UserAnalysisService
 
                 var fusionRequest = new ChatCompletionModel
                 {
-                    Model = string.IsNullOrWhiteSpace(_configuration["ChatGPTModel"]) ? "gpt-3.5-turbo" : _configuration["ChatGPTModel"]!,
+                    Model = string.IsNullOrWhiteSpace(_configuration["ChatGPTModel"]) ? "deepseek-v4-flash" : _configuration["ChatGPTModel"]!,
                     Messages = fusionMessages,
                     temperature = 0.1
                 };

@@ -35,6 +35,8 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
         private string? _lastToolCallHash;
         private int _recursionCount;
         private readonly int MaxRecursionDepth;
+        private readonly bool _enableThinking;
+        private readonly string _reasoningEffort;
 
         private readonly JsonSerializerOptions _jsonOptions = new()
         {
@@ -57,6 +59,36 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
             if (!int.TryParse(_configuration["MaxRecursionDepth"], out MaxRecursionDepth))
             {
                 MaxRecursionDepth = 10;
+            }
+
+            var enableThinkingConfig = _configuration["EnableThinking"];
+            if (string.IsNullOrWhiteSpace(enableThinkingConfig))
+            {
+                _enableThinking = true;
+            }
+            else if (bool.TryParse(enableThinkingConfig, out var enableThinking))
+            {
+                _enableThinking = enableThinking;
+            }
+            else
+            {
+                _enableThinking = true;
+                _logger.LogWarning("EnableThinking 配置无效，使用默认值 true");
+            }
+
+            var reasoningEffortConfig = _configuration["ChatGPTReasoningEffort"];
+            if (string.IsNullOrWhiteSpace(reasoningEffortConfig))
+            {
+                _reasoningEffort = "high";
+            }
+            else if (reasoningEffortConfig.Equals("high", StringComparison.OrdinalIgnoreCase) || reasoningEffortConfig.Equals("max", StringComparison.OrdinalIgnoreCase))
+            {
+                _reasoningEffort = reasoningEffortConfig.ToLowerInvariant();
+            }
+            else
+            {
+                _reasoningEffort = "high";
+                _logger.LogWarning("ChatGPTReasoningEffort 配置无效，使用默认值 high");
             }
         }
 
@@ -257,9 +289,11 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
 
                 var model = new ChatCompletionModel
                 {
-                    Model = string.IsNullOrWhiteSpace(_configuration["ChatGPTModel"]) ? "gpt-3.5-turbo" : _configuration["ChatGPTModel"]!,
-                    Messages = messages
+                    Model = string.IsNullOrWhiteSpace(_configuration["ChatGPTModel"]) ? "deepseek-v4-flash" : _configuration["ChatGPTModel"]!,
+                    Messages = messages,
+                    reasoning_effort = _enableThinking ? _reasoningEffort : null
                 };
+                model.thinking["type"] = _enableThinking ? "enabled" : "disabled";
 
 
                 if (_configuration["EnableFunctionCalling"]?.ToLower() == "true")
@@ -303,14 +337,15 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                     };
                 }
 
-                reply = result.Choices?.FirstOrDefault()?.Message?.Content;
+                var responseMessage = result.Choices?.FirstOrDefault()?.Message;
+                reply = responseMessage?.Content;
 
                 // 调用完直接输出用量统计
                 _logger.LogInformation("收到ChatGPT的回复：{reply}\n      消耗 {} Token，回复占比 {}%（{}），命中缓存 {}%（{}）\n", reply, result.Usage.Total_tokens, (result.Usage.Completion_tokens * 100.0 / result.Usage.Total_tokens).ToString("0.0"), result.Usage.Completion_tokens, (result.Usage.prompt_cache_hit_tokens * 100.0 / result.Usage.Prompt_tokens).ToString("0.0"), result.Usage.prompt_cache_hit_tokens);
 
 
                 // 处理函数调用
-                var toolCalls = result.Choices?.FirstOrDefault()?.Message?.tool_calls;
+                var toolCalls = responseMessage?.tool_calls;
 
                 bool toolFail = false;
 
@@ -332,6 +367,8 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                     }
                     _lastToolCallHash = currentHash;
 
+                    var toolMessages = new List<ChatCompletionMessage>();
+
                     foreach (var toolCall in toolCalls)
                     {
                         try
@@ -341,15 +378,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
                                 toolCall.Function.Arguments
                             );
 
-                            // 将函数调用结果添加到消息列表
-                            messages.Add(new ChatCompletionMessage
-                            {
-                                Role = "assistant",
-                                Content = null,
-                                tool_calls = new List<ToolCall> { toolCall }
-                            });
-
-                            messages.Add(new ChatCompletionMessage
+                            toolMessages.Add(new ChatCompletionMessage
                             {
                                 Role = "tool",
                                 Content = functionResult,
@@ -366,6 +395,9 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.ChatGPTService
 
                     if (toolFail == false)
                     {
+                        messages.Add(responseMessage!);
+                        messages.AddRange(toolMessages);
+
                         // 继续对话
                         return await SendMessages(messages);
                     }
