@@ -65,7 +65,7 @@
                             var index = _editModel.Tags.IndexOf(tag);
                             <div class="admin-tag-row">
                                 <CgInput @bind-Value="_editModel.Tags[index].Name" Placeholder="标签名称" />
-                                <CgButton Variant="text" OnClick="() => _editModel.Tags.RemoveAt(index)" Class="admin-tag-remove">
+                                <CgButton Variant="ghost-danger" OnClick="() => _editModel.Tags.RemoveAt(index)" style="flex-shrink: 0;">
                                     <CgMdiIcon Name="mdiClose" />
                                 </CgButton>
                             </div>

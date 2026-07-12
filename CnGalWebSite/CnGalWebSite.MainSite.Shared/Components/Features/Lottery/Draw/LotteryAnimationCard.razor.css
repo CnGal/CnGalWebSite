@@ -33,7 +33,7 @@
     position: absolute;
     background-color: rgba(250,249,250,1);
     top: 103px;
-    border: 1px solid rgba(253,138,197,1);
+    border: 1px solid var(--cg-color-primary);
 }
 
     .slot li {
@@ -83,7 +83,7 @@ div.prizeTips {
 
     div.prizeTips > span {
         font-weight: bold;
-        color: rgba(253,138,197,1);
+        color: var(--cg-color-primary);
         padding: 0 0.5em;
     }
 

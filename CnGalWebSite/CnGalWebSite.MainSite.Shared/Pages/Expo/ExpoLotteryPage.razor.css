@@ -24,7 +24,7 @@
 }
 
 .title-card span {
-    background: linear-gradient(45deg, #3976ef 0%, #ffa5d2 100%) no-repeat right bottom;
+    background: linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%) no-repeat right bottom;
     background-size: 100% 3px;
     transition: background-size 1000ms;
     padding-bottom: .5rem;

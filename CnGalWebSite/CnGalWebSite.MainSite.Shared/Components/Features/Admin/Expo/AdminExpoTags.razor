@@ -65,7 +65,7 @@
                             var index = _editModel.Games.IndexOf(game);
                             <div class="admin-tag-row">
                                 <CgInput @bind-Value="_editModel.Games[index].Name" Placeholder="游戏词条名称" />
-                                <CgButton Variant="text" OnClick="() => _editModel.Games.RemoveAt(index)" Class="admin-tag-remove">
+                                <CgButton Variant="ghost-danger" OnClick="() => _editModel.Games.RemoveAt(index)" style="flex-shrink: 0;">
                                     <CgMdiIcon Name="mdiClose" />
                                 </CgButton>
                             </div>

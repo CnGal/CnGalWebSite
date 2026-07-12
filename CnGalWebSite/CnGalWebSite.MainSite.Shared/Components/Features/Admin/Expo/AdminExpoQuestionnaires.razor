@@ -84,10 +84,10 @@
                     <CgTextarea @bind-Value="_editModel.Description" Placeholder="问卷描述" />
                 </CgFormGroup>
                 <CgFormGroup Label="主图">
-                    <CgInput @bind-Value="_editModel.MainPicture" Placeholder="主图URL" />
+                    <CgImageUpload @bind-Value="_editModel.MainPicture" />
                 </CgFormGroup>
                 <CgFormGroup Label="缩略图">
-                    <CgInput @bind-Value="_editModel.Thumbnail" Placeholder="缩略图URL" />
+                    <CgImageUpload @bind-Value="_editModel.Thumbnail" />
                 </CgFormGroup>
                 <CgFormGroup Label="开始时间">
                     <CgInput @bind-Value="_editModel.BeginTime" Type="datetime-local" />

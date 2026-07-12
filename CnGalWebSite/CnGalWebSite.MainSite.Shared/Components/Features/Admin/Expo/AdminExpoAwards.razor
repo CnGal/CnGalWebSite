@@ -23,6 +23,12 @@
     <ChildContent>
         <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="Id" Field="Id" Width="80px" />
         <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="名称" Field="Name" Sortable="false" />
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="图片" Sortable="false" Width="60px">
+            <ChildContent Context="item">
+                @if (!string.IsNullOrWhiteSpace(item.Image))
+                { <img src="@item.Image" alt="奖项图片" style="width: 32px; height: 32px; border-radius: 4px; object-fit: cover;" /> }
+            </ChildContent>
+        </CgDataTableColumn>
         <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="类型" Field="Type" Width="100px">
             <ChildContent Context="item">
                 @(item.Type == ExpoAwardType.Key ? "激活码" : "无实体")
@@ -46,7 +52,7 @@
     </ChildContent>
 </CgDataTable>
 
-<div class="mb-4"></div>
+<div style="margin-bottom: 1rem;"></div>
 
 @* ─── 奖品列表 ─── *@
 
@@ -79,8 +85,8 @@
                 <CgFormGroup Label="奖项名称" Required="true">
                     <CgInput @bind-Value="_editModel.Name" Placeholder="奖项名称" />
                 </CgFormGroup>
-                <CgFormGroup Label="图片链接">
-                    <CgInput @bind-Value="_editModel.Image" Placeholder="图片URL" />
+                <CgFormGroup Label="图片">
+                    <CgImageUpload @bind-Value="_editModel.Image" />
                 </CgFormGroup>
                 <CgFormGroup Label="类型">
                     <CgEnumSelect TEnum="ExpoAwardType" @bind-Value="_editModel.Type" />
@@ -112,7 +118,7 @@
                                     }
                                     else
                                     {
-                                        <CgButton Variant="text" OnClick="() => _editModel.Prizes.RemoveAt(index)" Class="admin-tag-remove">
+                                        <CgButton Variant="ghost-danger" OnClick="() => _editModel.Prizes.RemoveAt(index)" style="flex-shrink: 0;">
                                             <CgMdiIcon Name="mdiClose" />
                                         </CgButton>
                                     }

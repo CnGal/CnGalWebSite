@@ -9,7 +9,7 @@
     border: 2px solid transparent;
     background-clip: padding-box, border-box;
     background-origin: padding-box, border-box;
-    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
+    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
     border-top-right-radius: 24px;
 }
 
@@ -17,7 +17,7 @@
     display: flex;
     justify-content: space-between;
     padding: .5rem 1rem;
-    background: linear-gradient(45deg, #ff9aec33 0%) no-repeat;
+    background: linear-gradient(45deg, color-mix(in oklab, var(--cg-color-primary) 20%, transparent) 0%) no-repeat;
     background-size: calc(100% - 200px) 100%;
     margin: 5px;
     align-items: center;
@@ -40,18 +40,18 @@
     border: 2px solid transparent;
     background-clip: padding-box, border-box;
     background-origin: padding-box, border-box;
-    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
+    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
     padding: .5rem 3rem;
     display: flex;
     align-items: center;
-    color: #e135b9 !important;
+    color: var(--cg-color-primary) !important;
     font-size: larger;
     cursor: pointer;
 }
 
 .lottery-tasks-card .task-card .action-card:hover,
 .lottery-tasks-card .task-card .action-card.active {
-    background-image: linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
+    background-image: linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
     color: white !important;
 }
 
@@ -70,8 +70,8 @@
     border-radius: 50%;
     background-clip: padding-box, border-box;
     background-origin: padding-box, border-box;
-    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
-    color: #e135b9 !important;
+    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
+    color: var(--cg-color-primary) !important;
     width: 36px;
     height: 36px;
     padding: 1rem;
@@ -83,7 +83,7 @@
     width: 67px;
     text-align: center;
     bottom: -2px;
-    background-image: linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
+    background-image: linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
     left: 4px;
     color: white;
     line-height: 1;
@@ -96,7 +96,7 @@
     border-radius: 50%;
     background-clip: padding-box, border-box;
     background-origin: padding-box, border-box;
-    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
+    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
     padding: 2px;
     position: relative;
 }
