@@ -137,4 +137,8 @@
     .lottery-grid-card .action-card > div .go-card {
         font-size: x-large;
     }
+
+    .lottery-grid-card .grid-col-card ::deep .prize-card {
+        min-height: 100%;
+    }
 }

@@ -37,3 +37,14 @@
     justify-content: flex-end;
     gap: 0.5rem;
 }
+
+@media (max-width: 960px) {
+    .cg-prizes-dialog__table {
+        font-size: 0.8rem;
+    }
+
+    .cg-prizes-dialog__table th,
+    .cg-prizes-dialog__table td {
+        padding: 0.4rem 0.3rem;
+    }
+}

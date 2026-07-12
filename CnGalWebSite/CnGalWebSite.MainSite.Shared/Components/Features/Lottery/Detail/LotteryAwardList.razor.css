@@ -1,4 +1,4 @@
-.lottery-award-list {
+﻿.lottery-award-list {
     border-radius: var(--cg-radius-xl);
     background: var(--cg-color-surface);
     padding: var(--cg-spacing-5);
@@ -69,6 +69,7 @@
 .lottery-award-header {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: var(--cg-spacing-2);
     flex-wrap: wrap;
 }

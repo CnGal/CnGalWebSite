@@ -1,4 +1,4 @@
-@rendermode InteractiveServer
+﻿@rendermode InteractiveServer
 @inject IExpoQueryService ExpoQueryService
 @inject IExpoCommandService ExpoCommandService
 @inject ICgToastService ToastService
@@ -125,13 +125,6 @@
                 IsCompleted = Model.SignInDays >= 5,
                 IsSignedIn = Model.IsSignIn && Model.SignInDays < 5,
                 OnClick = OnClickSignInAsync
-            },
-            new()
-            {
-                Name = "填写问卷",
-                Points = 100,
-                IsCompleted = Model.IsSurvey,
-                OnClick = OnClickSurveyAsync
             },
             new()
             {

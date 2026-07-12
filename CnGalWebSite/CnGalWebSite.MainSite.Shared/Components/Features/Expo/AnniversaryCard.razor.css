@@ -1,6 +1,5 @@
 ﻿.cg-anniversary-card {
     text-align: center;
-    padding: 1.5rem 0;
 }
 
 .cg-anniversary-card__title {
@@ -83,4 +82,37 @@
 ::deep .slotMachine-box {
     padding: 0 !important;
     margin-top: 4rem!important;
+}
+
+@media (max-width: 960px) {
+    .cg-anniversary-card {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .cg-anniversary-card__brief {
+        text-align: center;
+        font-size: inherit;
+    }
+
+    .cg-anniversary-card__machine {
+        height: 200px;
+        overflow: hidden;
+        margin-bottom: 0;
+    }
+
+    ::deep .slotMachine-box {
+        transform: scale(0.35) translate(-700px, -200px);
+        margin-top: 0 !important;
+    }
+
+    .title-card {
+        font-size: large;
+        padding-bottom: 1rem;
+        padding-top: 1rem;
+    }
+
+    ::deep .lottery-award-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
 }
