@@ -1,0 +1,75 @@
+.cg-tasks-card {
+    border-radius: 12px;
+    background: var(--cg-color-surface, #fff);
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.cg-tasks-card__title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--cg-color-border, #eee);
+    margin: 0;
+}
+
+.cg-tasks-card__item {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--cg-color-border, #eee);
+}
+
+.cg-tasks-card__item:last-child {
+    border-bottom: none;
+}
+
+.cg-tasks-card__item-header {
+    margin-bottom: 0.4rem;
+}
+
+.cg-tasks-card__item-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--cg-color-text);
+}
+
+.cg-tasks-card__item-name--link {
+    color: var(--cg-color-primary);
+    text-decoration: none;
+}
+
+.cg-tasks-card__item-name--link:hover {
+    text-decoration: underline;
+}
+
+.cg-tasks-card__item-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cg-tasks-card__item-points {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    color: var(--cg-color-primary);
+}
+
+.cg-tasks-card__item-status {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+}
+
+.cg-tasks-card__item-status--done {
+    background: var(--cg-color-success-bg, rgba(76, 175, 80, 0.12));
+    color: var(--cg-color-success, #4caf50);
+}
+
+.cg-tasks-card__item-status--signed {
+    background: var(--cg-color-info-bg, rgba(33, 150, 243, 0.12));
+    color: var(--cg-color-info, #2196f3);
+}

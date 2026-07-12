@@ -1,4 +1,4 @@
-.slotMachine-box {
+﻿.slotMachine-box {
     min-height: calc(100% - 341px);
     width: 848px;
     margin: 0 auto;
@@ -23,6 +23,7 @@
     position: absolute;
     right: -156px;
     top: calc(50% - 66px);
+    cursor:pointer;
 }
 
 .slot {
@@ -61,7 +62,7 @@
 }
 
 .slotAnimation {
-    animation: slotSlice 1s linear 0s 1;
+    animation: slotSlice 1s linear 0s 1 forwards;
 }
 
 @keyframes slotSlice {
@@ -88,4 +89,6 @@ div.prizeTips {
 
 .slotMachine-box ul {
     padding: 0;
+    margin: 0;
+    list-style: none;
 }

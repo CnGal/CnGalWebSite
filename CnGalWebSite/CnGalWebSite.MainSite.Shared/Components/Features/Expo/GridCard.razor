@@ -1,0 +1,327 @@
+@rendermode InteractiveServer
+@implements IDisposable
+@inject IExpoQueryService ExpoQueryService
+@inject IExpoCommandService ExpoCommandService
+@inject ICgToastService ToastService
+@inject NavigationManager Navigation
+@inject IMainSiteAuthRequestService AuthRequestService
+
+<div class="cg-grid-card">
+    <div class="cg-grid-card__header">
+        <div class="cg-grid-card__points">
+            <CgMdiIcon Name="mdiGift" />
+            <span>×@Model.TotalPoints</span>
+        </div>
+    </div>
+    <div class="cg-grid-card__divider"></div>
+    <div class="cg-grid-card__content">
+        <div class="cg-grid-card__row">
+            <GridPrizeCard Items="_items" Take="3" ActiveIndex="_activeIndex" />
+        </div>
+        <div class="cg-grid-card__row">
+            <div class="cg-grid-card__col">
+                <GridPrizeCard Items="_items" Skip="3" Take="1" ActiveIndex="_activeIndex" />
+            </div>
+            <div class="cg-grid-card__action @(HasAvailablePrizes ? "" : "cg-grid-card__action--disabled")" @onclick="OnClickStartAsync">
+                @if (HasAvailablePrizes)
+                {
+                    <div class="cg-grid-card__go">GO</div>
+                    <div class="cg-grid-card__go-text">参加抽奖</div>
+                    <div class="cg-grid-card__go-points">（消耗100点）</div>
+                }
+                else
+                {
+                    <div class="cg-grid-card__go">×</div>
+                    <div class="cg-grid-card__go-text">暂无奖品</div>
+                    <div class="cg-grid-card__go-points">（即将补充）</div>
+                }
+            </div>
+            <div class="cg-grid-card__col">
+                <GridPrizeCard Items="_items" Skip="4" Take="1" ActiveIndex="_activeIndex" />
+            </div>
+        </div>
+        <div class="cg-grid-card__row">
+            <GridPrizeCard Items="_items" Skip="5" Take="3" ActiveIndex="_activeIndex" />
+        </div>
+    </div>
+</div>
+<div class="cg-grid-card__buttons">
+    <CgButton Variant="outline" OnClick="OpenRules">
+        <CgMdiIcon Name="mdiInformationOutline" />
+        <span>抽奖规则</span>
+    </CgButton>
+    <CgButton Variant="outline" OnClick="OpenPrizesAsync">
+        <CgMdiIcon Name="mdiGiftOpenOutline" />
+        <span>我的奖品</span>
+    </CgButton>
+</div>
+
+<RulesDialog @ref="_rulesDialog" />
+<PrizesDialog @ref="_prizesDialog" />
+
+@code {
+    [Parameter]
+    public ExpoUserTaskModel Model { get; set; } = new();
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthState { get; set; }
+
+    private List<ExpoAwardOverviewModel> _items = [];
+    private int _activeIndex = -1;
+    private int _targetIndex = -1;
+    private int _currentSpeed = 200;
+    private readonly int _maxSpeed = 50;
+    private readonly int _minSpeed = 200;
+    private Timer? _animationTimer;
+    private bool _isAnimating;
+    private int _animationCount;
+    private readonly int _totalAnimationCount = 50;
+    private readonly int[] _animationSequence = [0, 1, 2, 4, 7, 6, 5, 3];
+    private int _sequenceIndex;
+
+    private RulesDialog? _rulesDialog;
+    private PrizesDialog? _prizesDialog;
+
+    private bool HasAvailablePrizes => _items.Any(a => a.Type == ExpoAwardType.Key && a.Count > a.PrizeCount);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshAsync();
+    }
+
+    public async Task RefreshAsync()
+    {
+        try
+        {
+            var result = await ExpoQueryService.GetAllAwardsAsync();
+            if (result.Success && result.Data is not null)
+            {
+                var awards = result.Data;
+                _items.Clear();
+
+                if (awards.Count < 8)
+                {
+                    var sortedAwards = awards.OrderBy(a => a.Id).ToList();
+                    _items.AddRange(sortedAwards);
+
+                    var needToAdd = 8 - awards.Count;
+                    var availableAwards = awards
+                        .Where(a => a.Count > a.PrizeCount)
+                        .OrderBy(a => a.Id)
+                        .ToList();
+
+                    if (availableAwards.Count == 0 && awards.Count > 0)
+                    {
+                        availableAwards = awards.OrderBy(a => a.Id).ToList();
+                    }
+
+                    for (var i = 0; i < needToAdd; i++)
+                    {
+                        if (availableAwards.Count > 0)
+                        {
+                            var award = availableAwards[i % availableAwards.Count];
+                            _items.Add(new ExpoAwardOverviewModel
+                            {
+                                Count = award.Count,
+                                Id = _items.Max(s => s.Id) + 1,
+                                Image = award.Image,
+                                Type = award.Type,
+                                Url = award.Url,
+                                Name = award.Name,
+                                PrizeCount = award.PrizeCount,
+                                IsEnabled = award.IsEnabled
+                            });
+                        }
+                    }
+                }
+                else if (awards.Count == 8)
+                {
+                    _items.AddRange(awards.OrderBy(a => a.Id).Take(8));
+                }
+                else
+                {
+                    ToastService.Show("获取奖项失败", "奖项超过8个", "error");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.Show("获取奖项失败", ex.Message, "error");
+        }
+    }
+
+    private async Task<bool> CheckLoginAsync()
+    {
+        if (AuthState is null)
+        {
+            var returnUrl = new Uri(Navigation.Uri).PathAndQuery;
+            Navigation.NavigateTo(AuthRequestService.BuildLoginUrl(returnUrl), true);
+            return false;
+        }
+
+        var authState = await AuthState;
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            return true;
+        }
+
+        var returnUrl2 = new Uri(Navigation.Uri).PathAndQuery;
+        Navigation.NavigateTo(AuthRequestService.BuildLoginUrl(returnUrl2), true);
+        return false;
+    }
+
+    private async Task OnClickStartAsync()
+    {
+        if (_isAnimating) return;
+
+        if (!await CheckLoginAsync()) return;
+
+        if (!HasAvailablePrizes)
+        {
+            ToastService.Show("抽奖失败", "暂无可用奖品，我们会尽快补充奖品", "error");
+            return;
+        }
+
+        if (Model.TotalPoints < 100)
+        {
+            ToastService.Show("抽奖失败", $"点数不足，需要100点才能抽奖（当前{Model.TotalPoints}点）", "error");
+            return;
+        }
+
+        await RefreshAsync();
+
+        long awardId;
+        try
+        {
+            var result = await ExpoCommandService.LotteryAsync();
+            await OnChanged.InvokeAsync();
+
+            if (!result.Success)
+            {
+                ToastService.Show("抽奖失败", result.Error?.Message ?? "请稍后重试", "error");
+                return;
+            }
+
+            if (!result.Data.HasValue)
+            {
+                ToastService.Show("抽奖失败", "获取奖项Id失败", "error");
+                return;
+            }
+
+            awardId = result.Data.Value;
+        }
+        catch (Exception ex)
+        {
+            ToastService.Show("抽奖失败", ex.Message, "error");
+            return;
+        }
+
+        await OnChanged.InvokeAsync();
+
+        // Find the award index in the grid
+        var itemIndex = -1;
+        for (var i = 0; i < _items.Count; i++)
+        {
+            if (_items[i].Id == awardId)
+            {
+                itemIndex = i;
+                break;
+            }
+        }
+
+        if (itemIndex == -1)
+        {
+            ToastService.Show("抽奖失败", "找不到对应的奖项", "error");
+            return;
+        }
+
+        if (!_animationSequence.Contains(itemIndex))
+        {
+            ToastService.Show("抽奖失败", "找不到对应的奖项", "error");
+            return;
+        }
+
+        _targetIndex = itemIndex;
+        _currentSpeed = _minSpeed;
+        _animationCount = 0;
+        _activeIndex = -1;
+        _sequenceIndex = -1;
+        _isAnimating = true;
+
+        _animationTimer = new Timer(UpdateAnimation, null, 0, Timeout.Infinite);
+    }
+
+    private async void UpdateAnimation(object? state)
+    {
+        if (!_isAnimating) return;
+
+        _animationCount++;
+        _sequenceIndex = (_sequenceIndex + 1) % _animationSequence.Length;
+        _activeIndex = _animationSequence[_sequenceIndex];
+
+        if (_animationCount < _totalAnimationCount / 3)
+        {
+            _currentSpeed = Math.Max(_maxSpeed, _currentSpeed - 5);
+        }
+        else if (_animationCount < _totalAnimationCount * 2 / 3)
+        {
+            _currentSpeed = _maxSpeed;
+        }
+        else
+        {
+            _currentSpeed = Math.Min(_minSpeed, _currentSpeed + 5);
+        }
+
+        if (_animationCount >= _totalAnimationCount)
+        {
+            var targetSequenceIndex = Array.IndexOf(_animationSequence, _targetIndex);
+            var currentSequenceIndex = _sequenceIndex;
+
+            if (currentSequenceIndex >= targetSequenceIndex)
+            {
+                targetSequenceIndex += _animationSequence.Length;
+            }
+
+            var stepsToTarget = targetSequenceIndex - currentSequenceIndex;
+
+            if (stepsToTarget == 0 || _activeIndex == _targetIndex)
+            {
+                _isAnimating = false;
+                _animationTimer?.Dispose();
+                await InvokeAsync(StateHasChanged);
+
+                if (_items[_targetIndex].Type == ExpoAwardType.Key)
+                {
+                    await InvokeAsync(OpenPrizesAsync);
+                }
+                return;
+            }
+
+            _currentSpeed = _minSpeed;
+        }
+
+        await InvokeAsync(StateHasChanged);
+        _animationTimer?.Change(_currentSpeed, Timeout.Infinite);
+    }
+
+    private void OpenRules()
+    {
+        _rulesDialog?.Open();
+    }
+
+    private async Task OpenPrizesAsync()
+    {
+        if (_prizesDialog is not null)
+        {
+            await _prizesDialog.OpenAsync();
+        }
+    }
+
+    public void Dispose()
+    {
+        _animationTimer?.Dispose();
+    }
+}

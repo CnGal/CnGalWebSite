@@ -1,0 +1,34 @@
+.cg-grid-prize {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+}
+
+.cg-grid-prize--active {
+    background-color: var(--cg-color-primary, rgba(64, 128, 255, 0.15));
+    box-shadow: 0 0 8px rgba(64, 128, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.cg-grid-prize__link {
+    display: block;
+    width: 100%;
+}
+
+.cg-grid-prize__image {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.cg-grid-prize__name {
+    margin-top: 4px;
+    font-size: 0.8rem;
+    text-align: center;
+    word-break: break-all;
+}

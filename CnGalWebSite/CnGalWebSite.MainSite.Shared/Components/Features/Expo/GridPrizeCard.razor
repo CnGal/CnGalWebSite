@@ -1,0 +1,30 @@
+@using CnGalWebSite.DataModel.Model
+
+@foreach (var item in Items.Skip(Skip).Take(Take))
+{
+    var index = Items.IndexOf(item);
+    var isActive = ActiveIndex == index;
+    <div class="cg-grid-prize @(isActive ? "cg-grid-prize--active" : "")">
+        @if (!string.IsNullOrWhiteSpace(item.Image))
+        {
+            <a href="@item.Url" target="_blank" rel="noopener" class="cg-grid-prize__link">
+                <img src="@item.Image" alt="@item.Name" loading="lazy" class="cg-grid-prize__image" />
+            </a>
+        }
+        <div class="cg-grid-prize__name">@($"{item.Name}{(item.Type != ExpoAwardType.NoEntry ? " ×1" : "")}")</div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<ExpoAwardOverviewModel> Items { get; set; } = [];
+
+    [Parameter]
+    public int ActiveIndex { get; set; } = -1;
+
+    [Parameter]
+    public int Take { get; set; }
+
+    [Parameter]
+    public int Skip { get; set; }
+}

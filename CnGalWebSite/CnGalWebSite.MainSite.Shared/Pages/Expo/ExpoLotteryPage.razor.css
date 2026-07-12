@@ -1,0 +1,14 @@
+﻿.expo-lottery-page {
+    padding: 1rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.expo-lottery-page__cards {
+    display: flex;
+    gap: 1rem;
+    align-items: start;
+    flex-direction: column;
+    align-items: stretch;
+}
+

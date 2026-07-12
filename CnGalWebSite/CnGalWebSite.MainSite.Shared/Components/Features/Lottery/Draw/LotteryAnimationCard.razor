@@ -8,7 +8,7 @@
         <div class="slot slot3"><ul id="slot3"><li>0</li></ul></div>
         <div class="slot slot4"><ul id="slot4"><li>0</li></ul></div>
         <a class="slotMachine-btn" @onclick="() => OnClickRoll.InvokeAsync()">
-            <img src="https://res.cngal.org/_content/CnGalWebSite.Shared/images/raffle-btn.png" alt="button">
+            <img src="@(IsDrawNumberMode ? "https://res.cngal.org/images/expo/raffle-btn.png" : "https://res.cngal.org/_content/CnGalWebSite.Shared/images/raffle-btn.png")" alt="button">
         </a>
     </div>
     <div id="prize" class="prizeTips"></div>
@@ -18,6 +18,12 @@
 @code {
     [Parameter]
     public EventCallback OnClickRoll { get; set; }
+
+    /// <summary>
+    /// 抽号模式：切换按钮图标为 Expo 专用样式
+    /// </summary>
+    [Parameter]
+    public bool IsDrawNumberMode { get; set; }
 
     private bool _scriptLoaded;
 
@@ -43,6 +49,8 @@ function slotMachineTrigger(luckyNum) {
     let slot2 = document.querySelector("div.slot2 > ul");
     let slot3 = document.querySelector("div.slot3 > ul");
     let slot4 = document.querySelector("div.slot4 > ul");
+    // Blazor CSS Isolation 无法作用于 JS 动态创建的 li，需内联样式
+    var liCss = 'display:block;width:106px;height:163px;font-size:72px;text-align:center;line-height:163px';
     if (slot1.querySelectorAll('li').length > 1) {
         let lis1 = Array.prototype.slice.call(slot1.querySelectorAll('li')).slice(0, 30);
         let lis2 = Array.prototype.slice.call(slot2.querySelectorAll('li')).slice(0, 30);
@@ -82,6 +90,10 @@ function slotMachineTrigger(luckyNum) {
         let li2 = document.createElement('li');
         let li3 = document.createElement('li');
         let li4 = document.createElement('li');
+        li1.style.cssText = liCss;
+        li2.style.cssText = liCss;
+        li3.style.cssText = liCss;
+        li4.style.cssText = liCss;
         li1.textContent = n1;
         li2.textContent = n2;
         li3.textContent = n3;
@@ -99,6 +111,10 @@ function slotMachineTrigger(luckyNum) {
     let li6 = document.createElement('li');
     let li7 = document.createElement('li');
     let li8 = document.createElement('li');
+    li5.style.cssText = liCss;
+    li6.style.cssText = liCss;
+    li7.style.cssText = liCss;
+    li8.style.cssText = liCss;
     li5.textContent = luckyNum[0];
     li6.textContent = luckyNum[1];
     li7.textContent = luckyNum[2];
@@ -111,13 +127,6 @@ function slotMachineTrigger(luckyNum) {
     slot2.classList.add("slotAnimation");
     slot3.classList.add("slotAnimation");
     slot4.classList.add("slotAnimation");
-    let fin = function () {
-        slot1.style.transform = "translateY(-4890px)";
-        slot2.style.transform = "translateY(-4890px)";
-        slot3.style.transform = "translateY(-4890px)";
-        slot4.style.transform = "translateY(-4890px)";
-    };
-    setTimeout(fin, 1000);
 };
 """;
 }
