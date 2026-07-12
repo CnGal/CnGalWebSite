@@ -1,4 +1,4 @@
-﻿@page "/expo/lottery"
+@page "/expo/lottery"
 @rendermode InteractiveServer
 @inject IExpoQueryService ExpoQueryService
 @inject ICgToastService ToastService
@@ -6,17 +6,27 @@
 <CgPageMeta Title="CNGAL周年庆展示会 - 预约抽奖" />
 
 <div class="expo-lottery-page">
-    <div class="expo-lottery-page__cards">
-        <CgAlert Variant="info">
-            <span>别忘了每日签到哦</span>
-        </CgAlert>
-
+    <CgTabs Variant="underline"
+            Items="_tabs"
+            DefaultActiveKey="lottery"
+            HrefTemplate="/expo/{0}" />
+    <div class="title-card">
+        <span>
+            别忘了每日签到哦
+        </span>
+    </div>
+    <div class="booking-card">
         <GridCard Model="_model" OnChanged="OnChangedAsync" />
         <TasksCard Model="_model" OnChanged="OnChangedAsync" />
     </div>
 </div>
 
 @code {
+    private static readonly IReadOnlyList<CgTabItem> _tabs = [
+        new("lottery", "预约抽奖"),
+        new("anniversary", "直播抽号")
+    ];
+
     private ExpoUserTaskModel _model = new();
 
     protected override async Task OnInitializedAsync()

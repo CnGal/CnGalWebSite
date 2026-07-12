@@ -2,16 +2,19 @@
 
 @foreach (var item in Items.Skip(Skip).Take(Take))
 {
-    var index = Items.IndexOf(item);
-    var isActive = ActiveIndex == index;
-    <div class="cg-grid-prize @(isActive ? "cg-grid-prize--active" : "")">
-        @if (!string.IsNullOrWhiteSpace(item.Image))
-        {
-            <a href="@item.Url" target="_blank" rel="noopener" class="cg-grid-prize__link">
-                <img src="@item.Image" alt="@item.Name" loading="lazy" class="cg-grid-prize__image" />
-            </a>
-        }
-        <div class="cg-grid-prize__name">@($"{item.Name}{(item.Type != ExpoAwardType.NoEntry ? " ×1" : "")}")</div>
+    var active = ActiveIndex == Items.IndexOf(item);
+    <div class="prize-card @(active ? "active" : "")">
+        <div>
+            @if (string.IsNullOrWhiteSpace(item.Image) == false)
+            {
+                <div class="image-button-card">
+                    <a href="@item.Url" target="_blank" rel="noopener">
+                        <img src="@item.Image" alt="@item.Name" loading="lazy" />
+                    </a>
+                </div>
+            }
+            <div class="name-card">@($"{item.Name}{(item.Type != ExpoAwardType.NoEntry ? " ×1" : "")}")</div>
+        </div>
     </div>
 }
 

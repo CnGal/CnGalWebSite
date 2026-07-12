@@ -1,14 +1,96 @@
 ﻿.expo-lottery-page {
-    padding: 1rem;
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.expo-lottery-page__cards {
     display: flex;
-    gap: 1rem;
-    align-items: start;
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
+
 }
 
+    .expo-lottery-page .cngal-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 2rem;
+    }
+
+.expo-lottery-page .cngal-card span:nth-child(1) {
+    background-image: linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    -ms-background-clip: text;
+    color: transparent;
+    font-size: xxx-large;
+    font-weight: bold;
+    padding-right: 30rem;
+}
+
+.expo-lottery-page .cngal-card span:nth-child(2) {
+    text-align: center;
+    font-size: xx-large;
+    font-weight: bold;
+    background-image: linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    -ms-background-clip: text;
+    color: transparent;
+}
+
+.expo-lottery-page .cngal-card span:nth-child(3) {
+    background-image: linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    -ms-background-clip: text;
+    color: transparent;
+    font-size: xxx-large;
+    font-weight: bold;
+    padding-left: 30rem;
+}
+
+.expo-lottery-page .booking-card {
+    display: flex;
+    width: 100%;
+    max-width: 800px;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-direction: column;
+    align-items: center;
+}
+
+@media (max-width: 960px) {
+    .expo-lottery-page .cngal-card {
+        padding-bottom: 1rem;
+    }
+
+    .expo-lottery-page .cngal-card span:nth-child(1) {
+        font-size: x-large;
+        padding-right: 14rem;
+    }
+
+    .expo-lottery-page .cngal-card span:nth-child(2) {
+        font-size: larger;
+    }
+
+    .expo-lottery-page .cngal-card span:nth-child(3) {
+        font-size: x-large;
+        padding-left: 14rem;
+    }
+
+    .expo-lottery-page {
+        padding-bottom: 2rem;
+    }
+}
+.title-card {
+    display: flex;
+    justify-content: center;
+    font-size: xx-large;
+    font-weight: bold;
+    padding-bottom: 3rem;
+    padding-top: 1.5rem;
+}
+
+
+    .title-card span {
+        background: linear-gradient(45deg, #3976ef 0%, #ffa5d2 100%) no-repeat right bottom;
+        background-size: 100% 3px;
+        transition: background-size 1000ms;
+        padding-bottom: .5rem;
+    }

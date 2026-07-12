@@ -1,95 +1,140 @@
-﻿.cg-grid-card {
+﻿/* 九宫格抽奖卡片 */
+.lottery-grid-card {
+    width: 100%;
+    border: 2px solid transparent;
+    background-clip: padding-box, border-box;
+    background-origin: padding-box, border-box;
+    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
     border-radius: 12px;
-    background: var(--cg-color-surface, #fff);
-    overflow: hidden;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
-.cg-grid-card__header {
+.lottery-grid-card .head-card {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.8rem 1rem;
+    justify-content: flex-end;
 }
 
-.cg-grid-card__points {
+.lottery-grid-card .count-card {
+    border: 2px solid transparent;
+    background-clip: padding-box, border-box;
+    background-origin: padding-box, border-box;
+    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
+    border-radius: 12px;
+    margin-right: 1rem;
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+    position: relative;
+    padding: .1rem 1rem .1rem 1rem;
+}
+
+.lottery-grid-card .count-card ::deep svg {
+    position: absolute;
+    left: -22px;
+    top: -7px;
+    width: 30px;
+    height: 30px;
+    color: #e135b9 !important;
+    background-color: white;
+}
+
+.lottery-grid-card .count-card div {
+    line-height: 1;
+}
+
+.lottery-grid-card .grid-row-card {
     display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--cg-color-primary);
+    gap: .5rem;
 }
 
-.cg-grid-card__divider {
-    height: 1px;
-    background: var(--cg-color-border, #eee);
-    margin: 0 1rem;
+/* Use ::deep to style child GridPrizeCard elements within the grid layout */
+.lottery-grid-card .grid-row-card ::deep .prize-card {
+    width: 33%;
 }
 
-.cg-grid-card__content {
+.lottery-grid-card .lottery-content-card {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
     padding: 1rem;
 }
 
-.cg-grid-card__row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-}
-
-.cg-grid-card__col {
+.lottery-grid-card .grid-col-card {
+    width: 33%;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+
 }
 
-.cg-grid-card__action {
+.lottery-grid-card .grid-col-card ::deep .prize-card {
+    width: 100%;    height:100%;
+}
+
+.lottery-grid-card .action-card {
+    width: 33%;
+}
+
+.lottery-grid-card .action-card > div {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    aspect-ratio: 1;
-    border: 2px dashed var(--cg-color-primary, #4080ff);
-    border-radius: 8px;
+    background-image: linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
+    border-radius: 50%;
+    color: white;
     cursor: pointer;
-    transition: all 0.2s ease;
-    user-select: none;
+    aspect-ratio: 1;
 }
 
-.cg-grid-card__action:hover {
-    background: rgba(64, 128, 255, 0.08);
+.lottery-grid-card .action-card > div .go-card {
+    font-size: xxx-large;
 }
 
-.cg-grid-card__action--disabled {
-    border-color: var(--cg-color-text-secondary, #999);
+.lottery-grid-card .action-card .points-text-card {
+    font-size: small;
+}
+
+/* 禁用状态的抽奖按钮 */
+.lottery-grid-card .action-card.disabled > div {
+    background-image: linear-gradient(135deg, #999999, #666666);
     cursor: not-allowed;
 }
 
-.cg-grid-card__go {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--cg-color-primary);
+.lottery-grid-card .action-card.disabled > div:hover {
+    background-image: linear-gradient(135deg, #999999, #666666);
 }
 
-.cg-grid-card__action--disabled .cg-grid-card__go {
-    color: var(--cg-color-text-secondary, #999);
+.lottery-grid-card .divid-card {
+    background-image: linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
+    height: 2px;
 }
 
-.cg-grid-card__go-text {
-    font-size: 0.85rem;
-    color: var(--cg-color-text);
-}
-
-.cg-grid-card__go-points {
-    font-size: 0.7rem;
-    color: var(--cg-color-text-secondary, #999);
-    margin-top: 2px;
-}
-
-.cg-grid-card__buttons {
+/* 抽奖按钮 */
+.lottery-action-card {
     display: flex;
-    justify-content: center;
-    gap: 0.8rem;
-    padding: 0.8rem 1rem;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.lottery-action-card .button-card {
+    background-image: linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
+    color: white !important;
+    padding: .5rem 2rem;
+    font-size: larger;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+@media (max-width: 960px) {
+    .lottery-grid-card .lottery-content-card {
+        padding: 2px;
+    }
+
+    .lottery-grid-card .action-card .points-text-card {
+        font-size: x-small;
+        text-align: center;
+        width: calc(100% - 5px);
+    }
+
+    .lottery-grid-card .action-card > div .go-card {
+        font-size: x-large;
+    }
 }

@@ -1,0 +1,321 @@
+@inject IAdminQueryService AdminQueryService
+@inject IAdminCommandService AdminCommandService
+@inject ICgToastService ToastService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Questionnaires
+@using CnGalWebSite.SDK.MainSite.Models
+
+@* ─── 问卷列表 ─── *@
+
+<CgDataTable TItem="QuestionnaireOverviewModel"
+             Title="问卷列表"
+             OnServerQuery="OnQueryAsync"
+             DefaultSortField="Id"
+             DefaultSortDesc="true"
+             @ref="_table">
+    <ToolbarContent>
+        <CgButton Variant="outline" OnClick="OnCreateAsync">
+            <CgMdiIcon Name="mdiPlus" />
+            添加问卷
+        </CgButton>
+    </ToolbarContent>
+    <ChildContent>
+        <CgDataTableColumn TItem="QuestionnaireOverviewModel" Title="Id" Field="Id" Width="80px" />
+        <CgDataTableColumn TItem="QuestionnaireOverviewModel" Title="名称" Field="DisplayName" Sortable="false" />
+        <CgDataTableColumn TItem="QuestionnaireOverviewModel" Title="状态" Sortable="false" Width="80px">
+            <ChildContent Context="item">
+                @switch (item.Status)
+                {
+                    case QuestionnaireStatus.Active:
+                        <span class="admin-badge admin-badge--visible">进行中</span>
+                        break;
+                    case QuestionnaireStatus.Inactive:
+                        <span class="admin-badge admin-badge--hidden">未激活</span>
+                        break;
+                    case QuestionnaireStatus.NotStarted:
+                        <span class="admin-badge admin-badge--hidden">未开始</span>
+                        break;
+                    case QuestionnaireStatus.Ended:
+                        <span class="admin-badge admin-badge--hidden">已结束</span>
+                        break;
+                    default:
+                        <span class="admin-badge admin-badge--hidden">未知</span>
+                        break;
+                }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="QuestionnaireOverviewModel" Title="回答数" Field="ResponseCount" Width="80px" />
+        <CgDataTableColumn TItem="QuestionnaireOverviewModel" Title="优先级" Field="Priority" Width="80px" />
+        <CgDataTableColumn TItem="QuestionnaireOverviewModel" Title="隐藏" Field="IsHidden">
+            <ChildContent Context="item">
+                @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
+                else { <span class="admin-badge admin-badge--visible">可见</span> }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="QuestionnaireOverviewModel" Title="操作" Sortable="false" Width="160px">
+            <ChildContent Context="item">
+                <div class="admin-actions">
+                    <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                    <button class="admin-action-btn admin-action-btn--info" title="统计" @onclick="() => OnStatisticsAsync(item)"><CgMdiIcon Name="mdiChartBar" aria-hidden="true" /></button>
+                    <button class="admin-action-btn admin-action-btn--info" title="回答列表" @onclick="() => OnResponsesAsync(item)"><CgMdiIcon Name="mdiFormatListBulleted" aria-hidden="true" /></button>
+                    <button class="admin-action-btn @(item.IsHidden ? "admin-action-btn--restore" : "admin-action-btn--delete")" title="@(item.IsHidden ? "显示" : "隐藏")" @onclick="() => OnToggleHideAsync(item)">
+                        <CgMdiIcon Name="@(item.IsHidden ? "mdiEyeOutline" : "mdiEyeOffOutline")" aria-hidden="true" />
+                    </button>
+                </div>
+            </ChildContent>
+        </CgDataTableColumn>
+    </ChildContent>
+</CgDataTable>
+
+@* ─── 编辑弹窗 ─── *@
+
+<CgModal IsOpen="_showModal" OnClose="() => _showModal = false" Title="@(_isNew ? "添加问卷" : "编辑问卷")">
+    <ChildContent>
+        <CgFormSection Flat>
+            @if (_editModel != null)
+            {
+                <CgFormGroup Label="唯一名称" Required="true">
+                    <CgInput @bind-Value="_editModel.Name" Placeholder="内部唯一标识名称" />
+                </CgFormGroup>
+                <CgFormGroup Label="显示名称" Required="true">
+                    <CgInput @bind-Value="_editModel.DisplayName" Placeholder="问卷显示名称" />
+                </CgFormGroup>
+                <CgFormGroup Label="描述">
+                    <CgTextarea @bind-Value="_editModel.Description" Placeholder="问卷描述" />
+                </CgFormGroup>
+                <CgFormGroup Label="主图">
+                    <CgInput @bind-Value="_editModel.MainPicture" Placeholder="主图URL" />
+                </CgFormGroup>
+                <CgFormGroup Label="缩略图">
+                    <CgInput @bind-Value="_editModel.Thumbnail" Placeholder="缩略图URL" />
+                </CgFormGroup>
+                <CgFormGroup Label="开始时间">
+                    <CgInput @bind-Value="_editModel.BeginTime" Type="datetime-local" />
+                </CgFormGroup>
+                <CgFormGroup Label="结束时间">
+                    <CgInput @bind-Value="_editModel.EndTime" Type="datetime-local" />
+                </CgFormGroup>
+                <CgFormGroup Label="感谢信息">
+                    <CgInput @bind-Value="_editModel.ThankYouMessage" Placeholder="提交后的感谢信息" />
+                </CgFormGroup>
+                <CgFormGroup Label="优先级">
+                    <CgInput @bind-Value="_editModel.Priority" />
+                </CgFormGroup>
+                <CgFormGroup Label="是否激活">
+                    <CgCheckbox @bind-Value="_editModel.IsActive" Label="激活此问卷" />
+                </CgFormGroup>
+                <CgFormGroup Label="允许修改">
+                    <CgCheckbox @bind-Value="_editModel.AllowMultipleSubmissions" Label="允许用户多次提交" />
+                </CgFormGroup>
+                <CgFormGroup Label="需要登录">
+                    <CgCheckbox @bind-Value="_editModel.RequireLogin" Label="需要登录才能参与" />
+                </CgFormGroup>
+            }
+            else
+            {
+                <div class="admin-loading-state">
+                    <CgProgressRing />
+                    <span class="admin-loading-state__text">正在加载...</span>
+                </div>
+            }
+        </CgFormSection>
+    </ChildContent>
+    <Footer>
+        <div class="admin-modal-footer">
+            <CgButton Variant="secondary" OnClick="() => _showModal = false">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="SaveAsync">保存</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
+@* ─── 统计对话框 ─── *@
+
+<CgModal IsOpen="_showStats" OnClose="() => _showStats = false" Title="问卷统计">
+    <ChildContent>
+        @if (_statsModel != null)
+        {
+            <CgFormSection Flat>
+                <dl class="admin-stats-grid">
+                    <div><dt>问卷名称</dt><dd>@_statsModel.QuestionnaireName</dd></div>
+                    <div><dt>总回答数</dt><dd>@_statsModel.TotalResponses</dd></div>
+                    <div><dt>已完成</dt><dd>@_statsModel.CompletedResponses</dd></div>
+                    <div><dt>草稿</dt><dd>@_statsModel.DraftResponses</dd></div>
+                    <div><dt>完成率</dt><dd>@(_statsModel.CompletionRate.ToString("F1"))%</dd></div>
+                    <div><dt>平均用时</dt><dd>@(_statsModel.AverageCompletionTimeSeconds.ToString("F0"))秒</dd></div>
+                </dl>
+            </CgFormSection>
+        }
+        else
+        {
+            <div class="admin-loading-state">
+                <CgProgressRing />
+                <span class="admin-loading-state__text">正在加载统计...</span>
+            </div>
+        }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="secondary" OnClick="() => _showStats = false">关闭</CgButton>
+    </Footer>
+</CgModal>
+
+@* ─── 回答列表对话框 ─── *@
+
+<CgModal IsOpen="_showResponses" OnClose="() => _showResponses = false" Title="用户回答列表">
+    <ChildContent>
+        @if (_responsesModel != null)
+        {
+            <CgFormSection Flat>
+                <div style="max-height: 60vh; overflow-y: auto;">
+                    <table class="admin-mini-table">
+                        <thead><tr><th>用户</th><th>状态</th><th>提交时间</th><th>进度</th></tr></thead>
+                        <tbody>
+                            @foreach (var r in _responsesModel.Responses)
+                            {
+                                <tr>
+                                    <td>@(r.UserDisplayName ?? r.UserName ?? "-")</td>
+                                    <td>@(r.IsCompleted ? "已完成" : "草稿")</td>
+                                    <td>@r.SubmitTime.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@(r.CompletionPercentage.ToString("F0"))%</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </CgFormSection>
+        }
+        else
+        {
+            <div class="admin-loading-state">
+                <CgProgressRing />
+                <span class="admin-loading-state__text">正在加载回答列表...</span>
+            </div>
+        }
+    </ChildContent>
+    <Footer>
+        <CgButton Variant="secondary" OnClick="() => _showResponses = false">关闭</CgButton>
+    </Footer>
+</CgModal>
+
+@code {
+    private CgDataTable<QuestionnaireOverviewModel>? _table;
+    private bool _showModal;
+    private bool _isNew;
+    private EditQuestionnaireModel? _editModel;
+    private bool _showStats;
+    private QuestionnaireStatisticsModel? _statsModel;
+    private bool _showResponses;
+    private UserResponseListModel? _responsesModel;
+
+    private async Task<CgDataTableResult<QuestionnaireOverviewModel>> OnQueryAsync(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var result = await AdminQueryService.GetQuestionnairesAsync(parameter, CancellationToken.None);
+        return result.Success && result.Data is not null ? new CgDataTableResult<QuestionnaireOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<QuestionnaireOverviewModel>([], 0);
+    }
+
+    private async Task OnCreateAsync()
+    {
+        _isNew = true;
+        _editModel = new EditQuestionnaireModel { IsActive = true, RequireLogin = true };
+        _showModal = true;
+        await Task.CompletedTask;
+    }
+
+    private async Task OnEditAsync(QuestionnaireOverviewModel model)
+    {
+        _isNew = false;
+        _editModel = null;
+        _showModal = true;
+        StateHasChanged();
+
+        var result = await AdminQueryService.GetQuestionnaireEditAsync(model.Id, CancellationToken.None);
+        if (result.Success && result.Data != null)
+        {
+            _editModel = result.Data;
+            StateHasChanged();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取详情失败", variant: "error");
+            _showModal = false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_editModel == null) return;
+
+        SdkResult<bool> result;
+        if (_isNew)
+        {
+            result = await AdminCommandService.CreateQuestionnaireAsync(_editModel, CancellationToken.None);
+        }
+        else
+        {
+            result = await AdminCommandService.EditQuestionnaireAsync(_editModel, CancellationToken.None);
+        }
+
+        if (result.Success)
+        {
+            ToastService.Show("问卷已保存", variant: "success");
+            _showModal = false;
+            if (_table != null) await _table.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
+        }
+    }
+
+    private async Task OnToggleHideAsync(QuestionnaireOverviewModel model)
+    {
+        var result = await AdminCommandService.HiddenQuestionnaireAsync(new HiddenQuestionnaireModel { Id = model.Id, IsHidden = !model.IsHidden }, CancellationToken.None);
+        if (result.Success)
+        {
+            ToastService.Show(model.IsHidden ? "已显示" : "已隐藏", variant: "success");
+            if (_table != null) await _table.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "操作失败", variant: "error");
+        }
+    }
+
+    private async Task OnStatisticsAsync(QuestionnaireOverviewModel model)
+    {
+        _statsModel = null;
+        _showStats = true;
+        StateHasChanged();
+
+        var result = await AdminQueryService.GetQuestionnaireStatisticsAsync(model.Id, CancellationToken.None);
+        if (result.Success && result.Data != null)
+        {
+            _statsModel = result.Data;
+            StateHasChanged();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取统计失败", variant: "error");
+            _showStats = false;
+        }
+    }
+
+    private async Task OnResponsesAsync(QuestionnaireOverviewModel model)
+    {
+        _responsesModel = null;
+        _showResponses = true;
+        StateHasChanged();
+
+        var result = await AdminQueryService.GetUserResponseListAsync(model.Id, CancellationToken.None);
+        if (result.Success && result.Data != null)
+        {
+            _responsesModel = result.Data;
+            StateHasChanged();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取回答列表失败", variant: "error");
+            _showResponses = false;
+        }
+    }
+}

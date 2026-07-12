@@ -6,54 +6,58 @@
 @inject NavigationManager Navigation
 @inject IMainSiteAuthRequestService AuthRequestService
 
-<div class="cg-grid-card">
-    <div class="cg-grid-card__header">
-        <div class="cg-grid-card__points">
+<div class="lottery-grid-card">
+    <div class="head-card">
+        <div class="count-card">
             <CgMdiIcon Name="mdiGift" />
-            <span>×@Model.TotalPoints</span>
+            <div>
+                ×@Model.TotalPoints
+            </div>
         </div>
     </div>
-    <div class="cg-grid-card__divider"></div>
-    <div class="cg-grid-card__content">
-        <div class="cg-grid-card__row">
+    <div class="divid-card">
+    </div>
+    <div class="lottery-content-card">
+        <div class="grid-row-card">
             <GridPrizeCard Items="_items" Take="3" ActiveIndex="_activeIndex" />
         </div>
-        <div class="cg-grid-card__row">
-            <div class="cg-grid-card__col">
+        <div class="grid-row-card">
+            <div class="grid-col-card">
                 <GridPrizeCard Items="_items" Skip="3" Take="1" ActiveIndex="_activeIndex" />
             </div>
-            <div class="cg-grid-card__action @(HasAvailablePrizes ? "" : "cg-grid-card__action--disabled")" @onclick="OnClickStartAsync">
-                @if (HasAvailablePrizes)
-                {
-                    <div class="cg-grid-card__go">GO</div>
-                    <div class="cg-grid-card__go-text">参加抽奖</div>
-                    <div class="cg-grid-card__go-points">（消耗100点）</div>
-                }
-                else
-                {
-                    <div class="cg-grid-card__go">×</div>
-                    <div class="cg-grid-card__go-text">暂无奖品</div>
-                    <div class="cg-grid-card__go-points">（即将补充）</div>
-                }
+
+            <div class="action-card @(HasAvailablePrizes ? "" : "disabled")" @onclick="OnClickStartAsync">
+                <div>
+                    @if (HasAvailablePrizes)
+                    {
+                        <div class="go-card">GO</div>
+                        <div class="text-card">参加抽奖</div>
+                        <div class="points-text-card">（消耗100点）</div>
+                    }
+                    else
+                    {
+                        <div class="go-card">×</div>
+                        <div class="text-card">暂无奖品</div>
+                        <div class="points-text-card">（即将补充）</div>
+                    }
+                </div>
             </div>
-            <div class="cg-grid-card__col">
+            <div class="grid-col-card">
                 <GridPrizeCard Items="_items" Skip="4" Take="1" ActiveIndex="_activeIndex" />
             </div>
         </div>
-        <div class="cg-grid-card__row">
+        <div class="grid-row-card">
             <GridPrizeCard Items="_items" Skip="5" Take="3" ActiveIndex="_activeIndex" />
         </div>
     </div>
 </div>
-<div class="cg-grid-card__buttons">
-    <CgButton Variant="outline" OnClick="OpenRules">
-        <CgMdiIcon Name="mdiInformationOutline" />
-        <span>抽奖规则</span>
-    </CgButton>
-    <CgButton Variant="outline" OnClick="OpenPrizesAsync">
-        <CgMdiIcon Name="mdiGiftOpenOutline" />
-        <span>我的奖品</span>
-    </CgButton>
+<div class="lottery-action-card">
+    <div class="button-card" @onclick="OpenRules">
+        抽奖规则
+    </div>
+    <div class="button-card" @onclick="OpenPrizesAsync">
+        我的奖品
+    </div>
 </div>
 
 <RulesDialog @ref="_rulesDialog" />

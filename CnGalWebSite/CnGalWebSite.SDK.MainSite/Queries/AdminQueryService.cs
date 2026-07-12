@@ -15,6 +15,7 @@ using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.PlayedGames;
+using CnGalWebSite.DataModel.ViewModel.Questionnaires;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Recommends;
 using CnGalWebSite.DataModel.ViewModel.Space;
@@ -311,6 +312,82 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
         => GetSingleAsync<ExpoTicketEditModel, ExpoTicketEditModel>(
             $"api/expo/EditTicket?id={id}", dto => dto,
             "ADMIN_EXPO_TICKET", "展会票根", id, cancellationToken);
+
+    // ─── 展会扩展管理 ───
+
+    public Task<SdkResult<QueryResultModel<ExpoGameOverviewModel>>> GetExpoGamesAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<ExpoGameOverviewModel>("api/expo/ListGame", "ADMIN_EXPO_GAMES", "展会游戏", parameter, cancellationToken);
+
+    public Task<SdkResult<ExpoGameEditModel>> GetExpoGameEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<ExpoGameEditModel, ExpoGameEditModel>(
+            $"api/expo/EditGame?id={id}", dto => dto,
+            "ADMIN_EXPO_GAME", "展会游戏", id, cancellationToken);
+
+    public Task<SdkResult<QueryResultModel<ExpoTagOverviewModel>>> GetExpoTagsExpoAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<ExpoTagOverviewModel>("api/expo/ListTag", "ADMIN_EXPO_TAGS", "展会标签", parameter, cancellationToken);
+
+    public Task<SdkResult<ExpoTagEditModel>> GetExpoTagEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<ExpoTagEditModel, ExpoTagEditModel>(
+            $"api/expo/EditTag?id={id}", dto => dto,
+            "ADMIN_EXPO_TAG", "展会标签", id, cancellationToken);
+
+    public Task<SdkResult<QueryResultModel<ExpoTaskOverviewModel>>> GetExpoTasksAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<ExpoTaskOverviewModel>("api/expo/ListTask", "ADMIN_EXPO_TASKS", "展会任务", parameter, cancellationToken);
+
+    public Task<SdkResult<QueryResultModel<ExpoAwardOverviewModel>>> GetExpoAwardsAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<ExpoAwardOverviewModel>("api/expo/ListAward", "ADMIN_EXPO_AWARDS", "展会奖项", parameter, cancellationToken);
+
+    public Task<SdkResult<ExpoAwardEditModel>> GetExpoAwardEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<ExpoAwardEditModel, ExpoAwardEditModel>(
+            $"api/expo/EditAward?id={id}", dto => dto,
+            "ADMIN_EXPO_AWARD", "展会奖项", id, cancellationToken);
+
+    public Task<SdkResult<QueryResultModel<ExpoPrizeOverviewModel>>> GetExpoPrizesAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<ExpoPrizeOverviewModel>("api/expo/ListPrize", "ADMIN_EXPO_PRIZES", "展会奖品", parameter, cancellationToken);
+
+    // ─── 问卷管理 ───
+
+    public Task<SdkResult<QueryResultModel<QuestionnaireOverviewModel>>> GetQuestionnairesAsync(
+        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<QuestionnaireOverviewModel>("api/questionnaires/List", "ADMIN_QUESTIONNAIRES", "问卷", parameter, cancellationToken);
+
+    public Task<SdkResult<EditQuestionnaireModel>> GetQuestionnaireEditAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<EditQuestionnaireModel, EditQuestionnaireModel>(
+            $"api/questionnaires/EditQuestionnaire/{id}", dto => dto,
+            "ADMIN_QUESTIONNAIRE", "问卷", id, cancellationToken);
+
+    public Task<SdkResult<QuestionnaireStatisticsModel>> GetQuestionnaireStatisticsAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<QuestionnaireStatisticsModel, QuestionnaireStatisticsModel>(
+            $"api/questionnaires/GetQuestionnaireStatistics/{id}", dto => dto,
+            "ADMIN_QUESTIONNAIRE_STATS", "问卷统计", id, cancellationToken);
+
+    public Task<SdkResult<UserResponseListModel>> GetUserResponseListAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<UserResponseListModel, UserResponseListModel>(
+            $"api/questionnaires/GetUserResponseList?id={id}", dto => dto,
+            "ADMIN_QUESTIONNAIRE_RESPONSES", "问卷回答列表", id, cancellationToken);
+
+    public Task<SdkResult<UserResponseDetailModel>> GetUserResponseDetailAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<UserResponseDetailModel, UserResponseDetailModel>(
+            $"api/questionnaires/GetUserResponseDetail?id={id}", dto => dto,
+            "ADMIN_QUESTIONNAIRE_RESPONSE_DETAIL", "回答详情", id, cancellationToken);
+
+    public Task<SdkResult<QuestionAnalysisModel>> GetQuestionAnalysisAsync(
+        long id, CancellationToken cancellationToken = default)
+        => GetSingleAsync<QuestionAnalysisModel, QuestionAnalysisModel>(
+            $"api/questionnaires/GetQuestionAnalysis?id={id}", dto => dto,
+            "ADMIN_QUESTIONNAIRE_ANALYSIS", "题目分析", id, cancellationToken);
 
     // ─── 小卖铺编辑模型查询（P2 CRUD） ───
 

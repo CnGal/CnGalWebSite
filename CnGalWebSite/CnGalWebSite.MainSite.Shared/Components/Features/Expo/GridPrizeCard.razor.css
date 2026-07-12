@@ -1,34 +1,70 @@
-.cg-grid-prize {
+.prize-card {
+    background-color: rgb(255 154 228 / 20%);
+    border-radius: 4px;
+    padding: .5rem;
+    aspect-ratio: 1;
+}
+
+.prize-card > div {
+    width: 100%;
+    height: 100%;
+    border: 2px dashed #fe7fd982;
+    border-radius: 4px;
+    padding: .5rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: .5rem;
     justify-content: center;
-    padding: 4px;
-    border-radius: 8px;
-    transition: all 0.15s ease;
 }
 
-.cg-grid-prize--active {
-    background-color: var(--cg-color-primary, rgba(64, 128, 255, 0.15));
-    box-shadow: 0 0 8px rgba(64, 128, 255, 0.3);
-    transform: scale(1.05);
+.prize-card.active {
+    background-image: linear-gradient(45deg, #FF38B5 0%, #EC7AFE 100%);
 }
 
-.cg-grid-prize__link {
-    display: block;
+.prize-card.active > div {
+    border: 2px dashed #e135b9;
+}
+
+.prize-card img {
     width: 100%;
 }
 
-.cg-grid-prize__image {
-    width: 100%;
-    aspect-ratio: 1;
-    object-fit: cover;
-    border-radius: 6px;
-}
-
-.cg-grid-prize__name {
-    margin-top: 4px;
-    font-size: 0.8rem;
+.prize-card .name-card {
     text-align: center;
-    word-break: break-all;
+}
+
+/* 图片按钮样式 - 带 hover 缩放效果 */
+.image-button-card {
+    display: flex;
+    overflow: hidden;
+    border-radius: 12px;
+    position: relative;
+}
+
+.image-button-card img {
+    width: 100%;
+    transition: .5s;
+}
+
+.image-button-card:hover img {
+    transform: scale(1.1);
+}
+
+@media (max-width: 960px) {
+    .prize-card .name-card {
+        font-size: x-small;
+    }
+
+    .prize-card {
+        aspect-ratio: inherit;
+        padding: 2px;
+    }
+
+    .prize-card > div {
+        padding: 2px;
+    }
+
+    .image-button-card {
+        border-radius: 4px;
+    }
 }

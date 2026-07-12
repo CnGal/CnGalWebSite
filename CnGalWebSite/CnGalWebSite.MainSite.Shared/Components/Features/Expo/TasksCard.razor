@@ -8,52 +8,54 @@
 @inject NavigationManager Navigation
 @inject IMainSiteAuthRequestService AuthRequestService
 
-<div class="cg-tasks-card">
-    <h3 class="cg-tasks-card__title">
-        <CgMdiIcon Name="mdiClipboardListOutline" />
-        <span>任务列表</span>
-    </h3>
+<div class="lottery-tasks-card">
     @foreach (var task in GetSortedTasks())
     {
-        <div class="cg-tasks-card__item">
-            <div class="cg-tasks-card__item-header">
-                @if (!string.IsNullOrWhiteSpace(task.Link))
-                {
-                    <a href="@task.Link" target="_blank" rel="noopener" class="cg-tasks-card__item-name cg-tasks-card__item-name--link">
+        <div class="task-card">
+            <div>
+                <div class="name-card">
+                    @if (!string.IsNullOrWhiteSpace(task.Link))
+                    {
+                        <a href="@task.Link" target="_blank" rel="noopener">
+                            @task.Name
+                        </a>
+                    }
+                    else
+                    {
                         @task.Name
-                    </a>
-                }
-                else
-                {
-                    <span class="cg-tasks-card__item-name">@task.Name</span>
-                }
-            </div>
-            <div class="cg-tasks-card__item-body">
-                <div class="cg-tasks-card__item-points">
-                    <CgMdiIcon Name="mdiGift" />
-                    <span>@task.Points 点</span>
+                    }
                 </div>
-                @if (task.IsCompleted)
-                {
-                    <span class="cg-tasks-card__item-status cg-tasks-card__item-status--done">已完成</span>
-                }
-                else if (task.IsSignedIn)
-                {
-                    <span class="cg-tasks-card__item-status cg-tasks-card__item-status--signed">已签到</span>
-                }
-                else
-                {
-                    <CgButton Variant="primary" Size="sm" OnClick="task.OnClick" Disabled="task.IsLoading">
-                        @if (task.IsLoading)
-                        {
-                            <span>@task.LoadingText</span>
-                        }
-                        else
-                        {
-                            <span>去完成</span>
-                        }
-                    </CgButton>
-                }
+                <div class="content-card">
+                    <div class="gift-card">
+                        <CgMdiIcon Name="mdiGift" />
+                        <div class="count-card">@task.Points 点</div>
+                    </div>
+                    @if (task.IsCompleted)
+                    {
+                        <div class="action-card active">
+                            已完成
+                        </div>
+                    }
+                    else if (task.IsSignedIn)
+                    {
+                        <div class="action-card active">
+                            已签到
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="action-card" @onclick="task.OnClick">
+                            @if (task.IsLoading)
+                            {
+                                <span>@task.LoadingText</span>
+                            }
+                            else
+                            {
+                                <span>去完成</span>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     }
