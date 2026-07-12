@@ -303,10 +303,10 @@
 }
 
 /* Primary/Info Actions */
-::deep .admin-action-btn--down, ::deep .admin-action-btn--edit, ::deep .admin-action-btn--link, ::deep .admin-action-btn--run {
+::deep .admin-action-btn--down, ::deep .admin-action-btn--edit, ::deep .admin-action-btn--link, ::deep .admin-action-btn--run, ::deep .admin-action-btn--info {
     color: var(--cg-color-primary);
 }
-::deep .admin-action-btn--down:hover, ::deep .admin-action-btn--edit:hover, ::deep .admin-action-btn--link:hover, ::deep .admin-action-btn--run:hover {
+::deep .admin-action-btn--down:hover, ::deep .admin-action-btn--edit:hover, ::deep .admin-action-btn--link:hover, ::deep .admin-action-btn--run:hover, ::deep .admin-action-btn--info:hover {
     background: color-mix(in srgb, var(--cg-color-primary) 12%, transparent);
 }
 
@@ -342,7 +342,116 @@
     background: var(--cg-color-surface-hover);
 }
 
+/* Restore/Undo Actions */
+::deep .admin-action-btn--restore {
+    color: var(--cg-color-success);
+}
+::deep .admin-action-btn--restore:hover {
+    background: color-mix(in srgb, var(--cg-color-success) 12%, transparent);
+}
+
+/* ─── Loading State (Global Admin) ─── */
+
+::deep .admin-loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--cg-spacing-8) 0;
+    gap: var(--cg-spacing-3);
+    color: var(--cg-color-text-muted);
+}
+
+::deep .admin-loading-state__text {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+}
+
+/* ─── Modal Footer (Global Admin) ─── */
+
+::deep .admin-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--cg-spacing-3);
+}
+
+/* ─── Tag List Editor (Global Admin) ─── */
+
+::deep .admin-tag-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+}
+
+::deep .admin-tag-row {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-2);
+}
+
+::deep .admin-tag-row .cg-input {
+    flex: 1;
+}
+
+::deep .admin-tag-remove {
+    flex-shrink: 0;
+}
+
+/* ─── Mini Table (Global Admin) ─── */
+
+::deep .admin-mini-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--cg-font-size-sm);
+}
+
+::deep .admin-mini-table th,
+::deep .admin-mini-table td {
+    padding: var(--cg-spacing-2) var(--cg-spacing-3);
+    text-align: left;
+    border-bottom: 1px solid var(--cg-color-border);
+}
+
+::deep .admin-mini-table th {
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text-muted);
+    background: var(--cg-color-bg);
+}
+
+::deep .admin-mini-table tbody tr:hover {
+    background: var(--cg-color-hover-overlay);
+}
+
+/* ─── Stats Grid (Global Admin) ─── */
+
+::deep .admin-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--cg-spacing-4);
+}
+
+::deep .admin-stats-grid > div {
+    padding: var(--cg-spacing-3);
+    background: var(--cg-color-bg);
+    border-radius: var(--cg-radius-md);
+    border: 1px solid var(--cg-color-border);
+}
+
+::deep .admin-stats-grid dt {
+    font-size: var(--cg-font-size-xs);
+    color: var(--cg-color-text-muted);
+    margin-bottom: var(--cg-spacing-1);
+}
+
+::deep .admin-stats-grid dd {
+    font-size: var(--cg-font-size-md);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+    margin: 0;
+}
+
 /* ─── Rank Preview ─── */
+
 
 ::deep .rank-preview-area {
     display: flex;

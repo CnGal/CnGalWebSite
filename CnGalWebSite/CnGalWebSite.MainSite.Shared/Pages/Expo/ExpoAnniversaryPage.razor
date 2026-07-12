@@ -1,0 +1,19 @@
+@page "/expo/anniversary"
+@rendermode InteractiveServer
+
+<CgPageMeta Title="CNGAL周年庆展示会 - 直播抽号" />
+
+<div class="expo-anniversary-page">
+    <CgTabs Variant="underline"
+            Items="_tabs"
+            DefaultActiveKey="anniversary"
+            HrefTemplate="/expo/{0}" />
+    <AnniversaryCard />
+</div>
+
+@code {
+    private static readonly IReadOnlyList<CgTabItem> _tabs = [
+        new("lottery", "预约抽奖"),
+        new("anniversary", "直播抽号")
+    ];
+}

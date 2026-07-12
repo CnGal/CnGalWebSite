@@ -1,0 +1,165 @@
+﻿@rendermode InteractiveServer
+@inject ILotteryQueryService LotteryQueryService
+@inject ILotteryCommandService LotteryCommandService
+@inject ICgToastService ToastService
+@inject ICgDeviceIdentificationService DeviceIdentificationService
+@inject NavigationManager Navigation
+@inject IMainSiteAuthRequestService AuthRequestService
+
+<div class="cg-anniversary-card">
+    <div class="title-card">
+        <span>CnGal十周年庆直播抽奖</span>
+    </div>
+    <div class="cg-anniversary-card__brief">
+        点击下方按钮抽取幸运号码，8月2日18时(周六晚)在B站直播间 ·
+        <a href="https://live.bilibili.com/4622426" target="_blank" rel="noopener">4622426</a> 进行抽奖。更多精彩奖品，敬请期待！
+    </div>
+    <div class="cg-anniversary-card__machine">
+        <LotteryAnimationCard @ref="_lotteryAnimationCard" OnClickRoll="OnClickStartAsync" IsDrawNumberMode="true" />
+    </div>
+
+
+    @if (_model is not null)
+    {
+        <div class="title-card">
+            <span>奖品一览</span>
+        </div>
+        <div class="cg-anniversary-card__awards">
+            <LotteryAwardList Awards="_model.Awards" />
+        </div>
+    }
+</div>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthState { get; set; }
+
+    private LotteryDetailViewModel? _model;
+    private LotteryAnimationCard? _lotteryAnimationCard;
+    private bool _isDrawing;
+    private bool _hasParticipated;
+    private int? _userNumber;
+
+    private const long LotteryId = 3;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshAsync();
+    }
+
+    private async Task RefreshAsync()
+    {
+        try
+        {
+            var result = await LotteryQueryService.GetLotteryDetailAsync(LotteryId);
+            if (result.Success && result.Data is not null)
+            {
+                _model = result.Data;
+            }
+            else
+            {
+                ToastService.Show("获取抽奖信息失败", result.Error?.Message ?? "请稍后重试", "error");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.Show("获取抽奖信息失败", ex.Message, "error");
+        }
+
+        if (AuthState is not null)
+        {
+            var authState = await AuthState;
+            if (authState.User.Identity?.IsAuthenticated == true)
+            {
+                try
+                {
+                    var stateResult = await LotteryCommandService.GetUserLotteryStateAsync(LotteryId);
+                    if (stateResult.Success && stateResult.Data is not null)
+                    {
+                        _hasParticipated = stateResult.Data.State != UserLotteryState.NotInvolved
+                                        && stateResult.Data.State != UserLotteryState.NoCondition;
+                        _userNumber = stateResult.Data.Number;
+
+                        // If participated, roll to show the number
+                        if (_hasParticipated && _userNumber.HasValue && _lotteryAnimationCard is not null)
+                        {
+                            await _lotteryAnimationCard.Roll(_userNumber.Value);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ToastService.Show("获取用户抽奖状态失败", ex.Message, "error");
+                }
+            }
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task<bool> CheckLoginAsync()
+    {
+        if (AuthState is null)
+        {
+            var returnUrl = new Uri(Navigation.Uri).PathAndQuery;
+            Navigation.NavigateTo(AuthRequestService.BuildLoginUrl(returnUrl), true);
+            return false;
+        }
+
+        var authState = await AuthState;
+        if (authState.User.Identity?.IsAuthenticated == true)
+        {
+            return true;
+        }
+
+        var returnUrl2 = new Uri(Navigation.Uri).PathAndQuery;
+        Navigation.NavigateTo(AuthRequestService.BuildLoginUrl(returnUrl2), true);
+        return false;
+    }
+
+    private async Task OnClickStartAsync()
+    {
+        if (_isDrawing) return;
+
+        if (!await CheckLoginAsync()) return;
+
+        _isDrawing = true;
+
+        try
+        {
+            var identification = await DeviceIdentificationService.GetIdentificationAsync();
+            var result = await LotteryCommandService.ParticipateInLotteryAsync(LotteryId, identification);
+
+            if (!result.Success)
+            {
+                ToastService.Show("参与抽奖失败", result.Error?.Message ?? "请稍后重试", "error");
+                _isDrawing = false;
+                return;
+            }
+
+            // Get the assigned number
+            var stateResult = await LotteryCommandService.GetUserLotteryStateAsync(LotteryId);
+            if (stateResult.Success && stateResult.Data is not null)
+            {
+                _hasParticipated = true;
+                _userNumber = stateResult.Data.Number;
+
+                if (_lotteryAnimationCard is not null && _userNumber.HasValue)
+                {
+                    await _lotteryAnimationCard.Roll(_userNumber.Value);
+                }
+
+                ToastService.Show("参与抽奖成功", variant: "success");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.Show("参与抽奖失败", ex.Message, "error");
+        }
+        finally
+        {
+            _isDrawing = false;
+            StateHasChanged();
+        }
+    }
+}

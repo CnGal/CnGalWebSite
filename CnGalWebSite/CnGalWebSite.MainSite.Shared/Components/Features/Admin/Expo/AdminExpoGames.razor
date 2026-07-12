@@ -1,0 +1,153 @@
+@inject IAdminQueryService AdminQueryService
+@inject IAdminCommandService AdminCommandService
+@inject ICgToastService ToastService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Expo
+@using CnGalWebSite.SDK.MainSite.Models
+
+<CgDataTable TItem="ExpoGameOverviewModel"
+             Title="展会游戏列表"
+             OnServerQuery="OnQueryAsync"
+             DefaultSortField="Id"
+             DefaultSortDesc="true"
+             @ref="_table">
+    <ToolbarContent>
+        <CgButton Variant="outline" OnClick="OnCreateAsync">
+            <CgMdiIcon Name="mdiPlus" />
+            添加游戏
+        </CgButton>
+    </ToolbarContent>
+    <ChildContent>
+        <CgDataTableColumn TItem="ExpoGameOverviewModel" Title="Id" Field="Id" Width="80px" />
+        <CgDataTableColumn TItem="ExpoGameOverviewModel" Title="游戏名称" Field="GameName" Sortable="false" />
+        <CgDataTableColumn TItem="ExpoGameOverviewModel" Title="标签" Sortable="false" Width="100px">
+            <ChildContent Context="item">
+                @(item.Tags?.Count ?? 0)
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="ExpoGameOverviewModel" Title="优先级" Field="Priority" Width="80px" />
+        <CgDataTableColumn TItem="ExpoGameOverviewModel" Title="状态" Field="Hidden">
+            <ChildContent Context="item">
+                @if (item.Hidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
+                else { <span class="admin-badge admin-badge--visible">可见</span> }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="ExpoGameOverviewModel" Title="操作" Sortable="false" Width="60px">
+            <ChildContent Context="item">
+                <div class="admin-actions">
+                    <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                </div>
+            </ChildContent>
+        </CgDataTableColumn>
+    </ChildContent>
+</CgDataTable>
+
+@* ─── 编辑弹窗 ─── *@
+
+<CgModal IsOpen="_showModal" OnClose="() => _showModal = false" Title="@(_isNew ? "添加展会游戏" : "编辑展会游戏")">
+    <ChildContent>
+        <CgFormSection Flat>
+            @if (_editModel != null)
+            {
+                <CgFormGroup Label="游戏名称" Required="true">
+                    <CgInput @bind-Value="_editModel.GameName" Placeholder="请输入 CnGal 词条名称" />
+                </CgFormGroup>
+                <CgFormGroup Label="优先级">
+                    <CgInput @bind-Value="_editModel.Priority" />
+                </CgFormGroup>
+                <CgFormGroup Label="是否隐藏">
+                    <CgCheckbox @bind-Value="_editModel.Hidden" Label="隐藏此游戏" />
+                </CgFormGroup>
+                <CgFormGroup Label="标签">
+                    <div class="admin-tag-list">
+                        @foreach (var tag in _editModel.Tags)
+                        {
+                            var index = _editModel.Tags.IndexOf(tag);
+                            <div class="admin-tag-row">
+                                <CgInput @bind-Value="_editModel.Tags[index].Name" Placeholder="标签名称" />
+                                <CgButton Variant="ghost-danger" OnClick="() => _editModel.Tags.RemoveAt(index)" style="flex-shrink: 0;">
+                                    <CgMdiIcon Name="mdiClose" />
+                                </CgButton>
+                            </div>
+                        }
+                        <CgButton Variant="outline" Size="small" OnClick="() => _editModel.Tags.Add(new ExpoGameTagOverviewModel())">
+                            <CgMdiIcon Name="mdiPlus" /> 添加标签
+                        </CgButton>
+                    </div>
+                </CgFormGroup>
+            }
+            else
+            {
+                <div class="admin-loading-state">
+                    <CgProgressRing />
+                    <span class="admin-loading-state__text">正在加载...</span>
+                </div>
+            }
+        </CgFormSection>
+    </ChildContent>
+    <Footer>
+        <div class="admin-modal-footer">
+            <CgButton Variant="secondary" OnClick="() => _showModal = false">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="SaveAsync">保存</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
+@code {
+    private CgDataTable<ExpoGameOverviewModel>? _table;
+    private bool _showModal;
+    private bool _isNew;
+    private ExpoGameEditModel? _editModel;
+
+    private async Task<CgDataTableResult<ExpoGameOverviewModel>> OnQueryAsync(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var result = await AdminQueryService.GetExpoGamesAsync(parameter, CancellationToken.None);
+        return result.Success && result.Data is not null ? new CgDataTableResult<ExpoGameOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<ExpoGameOverviewModel>([], 0);
+    }
+
+    private async Task OnCreateAsync()
+    {
+        _isNew = true;
+        _editModel = new ExpoGameEditModel();
+        _showModal = true;
+        await Task.CompletedTask;
+    }
+
+    private async Task OnEditAsync(ExpoGameOverviewModel model)
+    {
+        _isNew = false;
+        _editModel = null;
+        _showModal = true;
+        StateHasChanged();
+
+        var result = await AdminQueryService.GetExpoGameEditAsync(model.Id, CancellationToken.None);
+        if (result.Success && result.Data != null)
+        {
+            _editModel = result.Data;
+            StateHasChanged();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取详情失败", variant: "error");
+            _showModal = false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_editModel == null) return;
+
+        var result = await AdminCommandService.EditExpoGameAsync(_editModel, CancellationToken.None);
+        if (result.Success)
+        {
+            ToastService.Show("游戏已保存", variant: "success");
+            _showModal = false;
+            if (_table != null) await _table.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
+        }
+    }
+}

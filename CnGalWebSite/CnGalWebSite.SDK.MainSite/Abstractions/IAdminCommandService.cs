@@ -4,6 +4,7 @@ using CnGalWebSite.DataModel.ViewModel.Expo;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.News;
+using CnGalWebSite.DataModel.ViewModel.Questionnaires;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Recommends;
 using CnGalWebSite.DataModel.ViewModel.Steam;
@@ -211,6 +212,43 @@ public interface IAdminCommandService
     /// 编辑/新增展会票根。
     /// </summary>
     Task<SdkResult<bool>> EditExpoTicketAsync(ExpoTicketEditModel model, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 编辑/新增展会游戏。
+    /// </summary>
+    Task<SdkResult<bool>> EditExpoGameAsync(ExpoGameEditModel model, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 编辑/新增展会标签。
+    /// </summary>
+    Task<SdkResult<bool>> EditExpoTagExpoAsync(ExpoTagEditModel model, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 编辑/新增展会奖项。
+    /// </summary>
+    Task<SdkResult<bool>> EditExpoAwardAsync(ExpoAwardEditModel model, CancellationToken cancellationToken = default);
+
+    // ─── 问卷操作 ───
+
+    /// <summary>
+    /// 创建问卷。
+    /// </summary>
+    Task<SdkResult<bool>> CreateQuestionnaireAsync(EditQuestionnaireModel model, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 编辑问卷。
+    /// </summary>
+    Task<SdkResult<bool>> EditQuestionnaireAsync(EditQuestionnaireModel model, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 隐藏/显示问卷。
+    /// </summary>
+    Task<SdkResult<bool>> HiddenQuestionnaireAsync(HiddenQuestionnaireModel model, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 编辑问卷优先级。
+    /// </summary>
+    Task<SdkResult<bool>> EditQuestionnairePriorityAsync(EditQuestionnairePriorityViewModel model, CancellationToken cancellationToken = default);
 
     // ─── 商品操作 ───
 

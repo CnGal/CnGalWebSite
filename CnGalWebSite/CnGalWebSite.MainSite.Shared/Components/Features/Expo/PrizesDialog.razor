@@ -1,0 +1,104 @@
+﻿@rendermode InteractiveServer
+@inject IExpoQueryService ExpoQueryService
+@inject ICgToastService ToastService
+
+<CgModal IsOpen="_isOpen" OnClose="Close" Title="我的奖品" Width="850px">
+    <ChildContent>
+        <div class="cg-prizes-dialog">
+            @if (_isLoading)
+            {
+                <div class="cg-prizes-dialog__loading">
+                    <CgProgressRing />
+                    <span>加载中...</span>
+                </div>
+            }
+            else if (_prizes is null || _prizes.Count == 0)
+            {
+                <div class="cg-prizes-dialog__empty">
+                    <CgMdiIcon Name="mdiGiftOffOutline" />
+                    <p>暂无奖品</p>
+                    <span>继续参与抽奖，获取更多奖品吧！</span>
+                </div>
+            }
+            else
+            {
+                <table class="cg-prizes-dialog__table">
+                    <thead>
+                        <tr>
+                            <th>奖品名称</th>
+                            <th>奖品内容</th>
+                            <th>获得时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var prize in _prizes)
+                        {
+                            <tr>
+                                <td>@prize.AwardName</td>
+                                <td>@prize.Content</td>
+                                <td>@prize.DrawTime.ToString("yyyy-MM-dd HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </ChildContent>
+    <Footer>
+        <div class="cg-prizes-dialog__footer">
+            <CgButton Variant="primary" OnClick="LoadPrizesAsync" Disabled="_isLoading">
+                <CgMdiIcon Name="mdiRefresh" />
+                <span>刷新</span>
+            </CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
+@code {
+    private bool _isOpen;
+    private bool _isLoading;
+    private List<ExpoPrizeOverviewModel>? _prizes;
+
+    public async Task OpenAsync()
+    {
+        _isOpen = true;
+        StateHasChanged();
+        await LoadPrizesAsync();
+    }
+
+    private async Task LoadPrizesAsync()
+    {
+        try
+        {
+            _isLoading = true;
+            StateHasChanged();
+
+            var result = await ExpoQueryService.GetUserPrizesAsync();
+            if (result.Success && result.Data is not null)
+            {
+                _prizes = result.Data
+                    .Where(s => s.AwardType != ExpoAwardType.NoEntry)
+                    .ToList();
+            }
+            else
+            {
+                ToastService.Show("获取奖品失败", result.Error?.Message ?? "请稍后重试", "error");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.Show("获取奖品失败", ex.Message, "error");
+        }
+        finally
+        {
+            _isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private Task Close()
+    {
+        _isOpen = false;
+        return Task.CompletedTask;
+    }
+}

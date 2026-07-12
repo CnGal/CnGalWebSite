@@ -1,0 +1,50 @@
+.cg-prizes-dialog {
+    min-height: 120px;
+}
+
+.cg-prizes-dialog__loading,
+.cg-prizes-dialog__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    gap: 0.5rem;
+    color: var(--cg-color-text-secondary);
+}
+
+.cg-prizes-dialog__table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cg-prizes-dialog__table th,
+.cg-prizes-dialog__table td {
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+    border-bottom: 1px solid var(--cg-color-border);
+}
+
+.cg-prizes-dialog__table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--cg-color-text-secondary);
+    background: var(--cg-color-surface-variant, rgba(128, 128, 128, 0.08));
+}
+
+.cg-prizes-dialog__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+@media (max-width: 960px) {
+    .cg-prizes-dialog__table {
+        font-size: 0.8rem;
+    }
+
+    .cg-prizes-dialog__table th,
+    .cg-prizes-dialog__table td {
+        padding: 0.4rem 0.3rem;
+    }
+}

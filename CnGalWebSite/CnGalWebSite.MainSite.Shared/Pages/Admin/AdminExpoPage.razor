@@ -124,6 +124,26 @@
                     </ChildContent>
                 </CgDataTable>
             }
+            else if (context == "games")
+            {
+                <CnGalWebSite.MainSite.Shared.Components.Features.Admin.Expo.AdminExpoGames />
+            }
+            else if (context == "tags")
+            {
+                <CnGalWebSite.MainSite.Shared.Components.Features.Admin.Expo.AdminExpoTags />
+            }
+            else if (context == "tasks")
+            {
+                <CnGalWebSite.MainSite.Shared.Components.Features.Admin.Expo.AdminExpoTasks />
+            }
+            else if (context == "awards")
+            {
+                <CnGalWebSite.MainSite.Shared.Components.Features.Admin.Expo.AdminExpoAwards />
+            }
+            else if (context == "questionnaires")
+            {
+                <CnGalWebSite.MainSite.Shared.Components.Features.Admin.Expo.AdminExpoQuestionnaires />
+            }
         </PanelTemplate>
     </CgTabs>
 </div>
@@ -229,6 +249,11 @@
     [
         new CgTabItem("activities", "活动管理", "mdiCalendarStar"),
         new CgTabItem("tickets", "票根管理", "mdiTicket"),
+        new CgTabItem("games", "游戏管理", "mdiGamepadVariant"),
+        new CgTabItem("tags", "标签管理", "mdiTagMultiple"),
+        new CgTabItem("tasks", "任务记录", "mdiCalendarCheck"),
+        new CgTabItem("awards", "奖项管理", "mdiGift"),
+        new CgTabItem("questionnaires", "问卷管理", "mdiClipboardList"),
     ];
 
     // ─── 活动查询 ───

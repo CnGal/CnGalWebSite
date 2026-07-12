@@ -1,0 +1,217 @@
+@inject IAdminQueryService AdminQueryService
+@inject IAdminCommandService AdminCommandService
+@inject ICgToastService ToastService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Expo
+@using CnGalWebSite.SDK.MainSite.Models
+
+@* ─── 奖项列表 ─── *@
+
+<CgDataTable TItem="ExpoAwardOverviewModel"
+             Title="奖项列表"
+             OnServerQuery="OnQueryAwardsAsync"
+             DefaultSortField="Id"
+             DefaultSortDesc="true"
+             @ref="_awardTable">
+    <ToolbarContent>
+        <CgButton Variant="outline" OnClick="OnCreateAwardAsync">
+            <CgMdiIcon Name="mdiPlus" />
+            添加奖项
+        </CgButton>
+    </ToolbarContent>
+    <ChildContent>
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="Id" Field="Id" Width="80px" />
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="名称" Field="Name" Sortable="false" />
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="图片" Sortable="false" Width="60px">
+            <ChildContent Context="item">
+                @if (!string.IsNullOrWhiteSpace(item.Image))
+                { <img src="@item.Image" alt="奖项图片" style="width: 32px; height: 32px; border-radius: 4px; object-fit: cover;" /> }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="类型" Field="Type" Width="100px">
+            <ChildContent Context="item">
+                @(item.Type == ExpoAwardType.Key ? "激活码" : "无实体")
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="总数" Field="Count" Width="80px" />
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="已分配" Field="PrizeCount" Width="80px" />
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="状态" Field="IsEnabled">
+            <ChildContent Context="item">
+                @if (item.IsEnabled) { <span class="admin-badge admin-badge--visible">启用</span> }
+                else { <span class="admin-badge admin-badge--hidden">禁用</span> }
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="操作" Sortable="false" Width="60px">
+            <ChildContent Context="item">
+                <div class="admin-actions">
+                    <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditAwardAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                </div>
+            </ChildContent>
+        </CgDataTableColumn>
+    </ChildContent>
+</CgDataTable>
+
+<div style="margin-bottom: 1rem;"></div>
+
+@* ─── 奖品列表 ─── *@
+
+<CgDataTable TItem="ExpoPrizeOverviewModel"
+             Title="奖品记录"
+             OnServerQuery="OnQueryPrizesAsync"
+             DefaultSortField="Id"
+             DefaultSortDesc="true"
+             @ref="_prizeTable">
+    <ChildContent>
+        <CgDataTableColumn TItem="ExpoPrizeOverviewModel" Title="Id" Field="Id" Width="80px" />
+        <CgDataTableColumn TItem="ExpoPrizeOverviewModel" Title="内容" Field="Content" Sortable="false" />
+        <CgDataTableColumn TItem="ExpoPrizeOverviewModel" Title="奖项" Field="AwardName" Sortable="false" />
+        <CgDataTableColumn TItem="ExpoPrizeOverviewModel" Title="用户" Field="UserName" Sortable="false" />
+        <CgDataTableColumn TItem="ExpoPrizeOverviewModel" Title="抽取时间" Field="DrawTime" Width="160px">
+            <ChildContent Context="item">
+                @(item.DrawTime > DateTime.MinValue ? item.DrawTime.ToString("yyyy-MM-dd HH:mm") : "-")
+            </ChildContent>
+        </CgDataTableColumn>
+    </ChildContent>
+</CgDataTable>
+
+@* ─── 奖项编辑弹窗 ─── *@
+
+<CgModal IsOpen="_showModal" OnClose="() => _showModal = false" Title="@(_isNew ? "添加奖项" : "编辑奖项")">
+    <ChildContent>
+        <CgFormSection Flat>
+            @if (_editModel != null)
+            {
+                <CgFormGroup Label="奖项名称" Required="true">
+                    <CgInput @bind-Value="_editModel.Name" Placeholder="奖项名称" />
+                </CgFormGroup>
+                <CgFormGroup Label="图片">
+                    <CgImageUpload @bind-Value="_editModel.Image" />
+                </CgFormGroup>
+                <CgFormGroup Label="类型">
+                    <CgEnumSelect TEnum="ExpoAwardType" @bind-Value="_editModel.Type" />
+                </CgFormGroup>
+                @if (_editModel.Type == ExpoAwardType.NoEntry)
+                {
+                    <CgFormGroup Label="数量">
+                        <CgInput @bind-Value="_editModel.Count" />
+                    </CgFormGroup>
+                }
+                <CgFormGroup Label="链接">
+                    <CgInput @bind-Value="_editModel.Url" Placeholder="相关链接" />
+                </CgFormGroup>
+                <CgFormGroup Label="是否启用">
+                    <CgCheckbox @bind-Value="_editModel.IsEnabled" Label="启用此奖项" />
+                </CgFormGroup>
+                @if (_editModel.Type == ExpoAwardType.Key)
+                {
+                    <CgFormGroup Label="奖品列表（激活码）">
+                        <div class="admin-tag-list">
+                            @foreach (var prize in _editModel.Prizes)
+                            {
+                                var index = _editModel.Prizes.IndexOf(prize);
+                                <div class="admin-tag-row">
+                                    <CgInput @bind-Value="_editModel.Prizes[index].Content" Placeholder="激活码内容" />
+                                    @if (prize.Allocated)
+                                    {
+                                        <span class="admin-badge admin-badge--hidden" style="margin-left:8px;">已分配</span>
+                                    }
+                                    else
+                                    {
+                                        <CgButton Variant="ghost-danger" OnClick="() => _editModel.Prizes.RemoveAt(index)" style="flex-shrink: 0;">
+                                            <CgMdiIcon Name="mdiClose" />
+                                        </CgButton>
+                                    }
+                                </div>
+                            }
+                            <CgButton Variant="outline" Size="small" OnClick="() => _editModel.Prizes.Add(new ExpoPrizeEditModel())">
+                                <CgMdiIcon Name="mdiPlus" /> 添加奖品
+                            </CgButton>
+                        </div>
+                    </CgFormGroup>
+                }
+            }
+            else
+            {
+                <div class="admin-loading-state">
+                    <CgProgressRing />
+                    <span class="admin-loading-state__text">正在加载...</span>
+                </div>
+            }
+        </CgFormSection>
+    </ChildContent>
+    <Footer>
+        <div class="admin-modal-footer">
+            <CgButton Variant="secondary" OnClick="() => _showModal = false">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="SaveAsync">保存</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
+@code {
+    private CgDataTable<ExpoAwardOverviewModel>? _awardTable;
+    private CgDataTable<ExpoPrizeOverviewModel>? _prizeTable;
+    private bool _showModal;
+    private bool _isNew;
+    private ExpoAwardEditModel? _editModel;
+
+    private async Task<CgDataTableResult<ExpoAwardOverviewModel>> OnQueryAwardsAsync(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var result = await AdminQueryService.GetExpoAwardsAsync(parameter, CancellationToken.None);
+        return result.Success && result.Data is not null ? new CgDataTableResult<ExpoAwardOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<ExpoAwardOverviewModel>([], 0);
+    }
+
+    private async Task<CgDataTableResult<ExpoPrizeOverviewModel>> OnQueryPrizesAsync(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var result = await AdminQueryService.GetExpoPrizesAsync(parameter, CancellationToken.None);
+        return result.Success && result.Data is not null ? new CgDataTableResult<ExpoPrizeOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<ExpoPrizeOverviewModel>([], 0);
+    }
+
+    private async Task OnCreateAwardAsync()
+    {
+        _isNew = true;
+        _editModel = new ExpoAwardEditModel();
+        _showModal = true;
+        await Task.CompletedTask;
+    }
+
+    private async Task OnEditAwardAsync(ExpoAwardOverviewModel model)
+    {
+        _isNew = false;
+        _editModel = null;
+        _showModal = true;
+        StateHasChanged();
+
+        var result = await AdminQueryService.GetExpoAwardEditAsync(model.Id, CancellationToken.None);
+        if (result.Success && result.Data != null)
+        {
+            _editModel = result.Data;
+            StateHasChanged();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "获取详情失败", variant: "error");
+            _showModal = false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_editModel == null) return;
+
+        var result = await AdminCommandService.EditExpoAwardAsync(_editModel, CancellationToken.None);
+        if (result.Success)
+        {
+            ToastService.Show("奖项已保存", variant: "success");
+            _showModal = false;
+            if (_awardTable != null) await _awardTable.RefreshAsync();
+            if (_prizeTable != null) await _prizeTable.RefreshAsync();
+        }
+        else
+        {
+            ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
+        }
+    }
+}

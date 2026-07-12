@@ -14,6 +14,7 @@ using CnGalWebSite.DataModel.ViewModel.OperationRecords;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.PlayedGames;
+using CnGalWebSite.DataModel.ViewModel.Questionnaires;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Recommends;
 using CnGalWebSite.DataModel.ViewModel.Space;
@@ -267,6 +268,106 @@ public interface IAdminQueryService
     /// 获取展会票根编辑模型。
     /// </summary>
     Task<SdkResult<ExpoTicketEditModel>> GetExpoTicketEditAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 分页查询展会游戏列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<ExpoGameOverviewModel>>> GetExpoGamesAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取展会游戏编辑模型。
+    /// </summary>
+    Task<SdkResult<ExpoGameEditModel>> GetExpoGameEditAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 分页查询展会标签列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<ExpoTagOverviewModel>>> GetExpoTagsExpoAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取展会标签编辑模型。
+    /// </summary>
+    Task<SdkResult<ExpoTagEditModel>> GetExpoTagEditAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 分页查询展会任务列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<ExpoTaskOverviewModel>>> GetExpoTasksAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 分页查询展会奖项列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<ExpoAwardOverviewModel>>> GetExpoAwardsAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取展会奖项编辑模型。
+    /// </summary>
+    Task<SdkResult<ExpoAwardEditModel>> GetExpoAwardEditAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 分页查询展会奖品列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<ExpoPrizeOverviewModel>>> GetExpoPrizesAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    // ─── 问卷管理 ───
+
+    /// <summary>
+    /// 分页查询问卷列表。
+    /// </summary>
+    Task<SdkResult<QueryResultModel<QuestionnaireOverviewModel>>> GetQuestionnairesAsync(
+        QueryParameterModel parameter,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取问卷编辑模型。
+    /// </summary>
+    Task<SdkResult<EditQuestionnaireModel>> GetQuestionnaireEditAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取问卷统计信息。
+    /// </summary>
+    Task<SdkResult<QuestionnaireStatisticsModel>> GetQuestionnaireStatisticsAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取问卷用户回答列表。
+    /// </summary>
+    Task<SdkResult<UserResponseListModel>> GetUserResponseListAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取用户回答详情。
+    /// </summary>
+    Task<SdkResult<UserResponseDetailModel>> GetUserResponseDetailAsync(
+        long id,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取问卷题目分析数据。
+    /// </summary>
+    Task<SdkResult<QuestionAnalysisModel>> GetQuestionAnalysisAsync(
         long id,
         CancellationToken cancellationToken = default);
 

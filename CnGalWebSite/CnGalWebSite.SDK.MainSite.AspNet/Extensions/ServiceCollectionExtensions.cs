@@ -166,6 +166,9 @@ public static class ServiceCollectionExtensions
         RegisterSdkHttpClient<IFileQueryService, FileQueryService>(services, imageApiBase);
         RegisterSdkHttpClient<ITimedTaskService, TimedTaskService>(services, taskApiBase);
 
+        RegisterSdkHttpClient<IExpoQueryService, ExpoQueryService>(services, apiBase);
+        RegisterSdkHttpClient<IExpoCommandService, ExpoCommandService>(services, apiBase);
+
         return services;
     }
 

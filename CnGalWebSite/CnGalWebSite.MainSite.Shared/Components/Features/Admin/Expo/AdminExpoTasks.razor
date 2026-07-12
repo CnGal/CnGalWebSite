@@ -1,0 +1,54 @@
+@inject IAdminQueryService AdminQueryService
+@using CnGalWebSite.Core.Models
+@using CnGalWebSite.DataModel.ViewModel.Expo
+@using CnGalWebSite.SDK.MainSite.Models
+
+<CgDataTable TItem="ExpoTaskOverviewModel"
+             Title="展会任务记录"
+             OnServerQuery="OnQueryAsync"
+             DefaultSortField="Id"
+             DefaultSortDesc="true"
+             @ref="_table">
+    <ChildContent>
+        <CgDataTableColumn TItem="ExpoTaskOverviewModel" Title="Id" Field="Id" Width="80px" />
+        <CgDataTableColumn TItem="ExpoTaskOverviewModel" Title="任务类型" Field="Type" Sortable="false">
+            <ChildContent Context="item">
+                @GetTaskTypeName(item.Type)
+            </ChildContent>
+        </CgDataTableColumn>
+        <CgDataTableColumn TItem="ExpoTaskOverviewModel" Title="用户" Field="UserName" Sortable="false" />
+        <CgDataTableColumn TItem="ExpoTaskOverviewModel" Title="点数" Field="LotteryCount" Width="80px" />
+        <CgDataTableColumn TItem="ExpoTaskOverviewModel" Title="时间" Field="Time" Width="160px">
+            <ChildContent Context="item">
+                @item.Time.ToString("yyyy-MM-dd HH:mm")
+            </ChildContent>
+        </CgDataTableColumn>
+    </ChildContent>
+</CgDataTable>
+
+@code {
+    private CgDataTable<ExpoTaskOverviewModel>? _table;
+
+    private async Task<CgDataTableResult<ExpoTaskOverviewModel>> OnQueryAsync(CgDataTableRequest request)
+    {
+        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var result = await AdminQueryService.GetExpoTasksAsync(parameter, CancellationToken.None);
+        return result.Success && result.Data is not null ? new CgDataTableResult<ExpoTaskOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<ExpoTaskOverviewModel>([], 0);
+    }
+
+    private static string GetTaskTypeName(ExpoTaskType type) => type switch
+    {
+        ExpoTaskType.SignIn => "签到",
+        ExpoTaskType.Booking => "预约直播",
+        ExpoTaskType.ShareGames => "分享游戏库",
+        ExpoTaskType.Lottery => "抽奖(消耗)",
+        ExpoTaskType.Survey => "填写问卷",
+        ExpoTaskType.RateGame => "给游戏评分",
+        ExpoTaskType.BindQQ => "绑定群聊QQ",
+        ExpoTaskType.ChangeAvatar => "更换默认头像",
+        ExpoTaskType.ChangeSignature => "更换默认签名",
+        ExpoTaskType.SaveGGeneration => "填写国G世代",
+        ExpoTaskType.LotteryNumber => "领取抽奖号码",
+        _ => type.ToString()
+    };
+}

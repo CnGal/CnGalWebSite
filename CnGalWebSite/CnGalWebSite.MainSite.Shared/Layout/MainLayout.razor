@@ -26,6 +26,11 @@
                     <a href="/lotteries/home">抽奖</a>
                     <a href="/square">广场</a>
                     <a href="/sharegames">分享游玩记录</a>
+                    <AuthorizeView Roles="Admin">
+                        <Authorized> 
+                            <a href="/11th">周年庆</a>
+                        </Authorized>
+                    </AuthorizeView>
                 </nav>
             </div>
 
@@ -72,6 +77,19 @@
                 <a href="/" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
                     <CgMdiIcon Name="mdiHomeOutline" aria-hidden="true" />
                     <span>主页</span>
+                </a>
+            </div>
+
+            <div class="cg-drawer__divider"></div>
+            <div class="cg-drawer__section-title">周年庆活动</div>
+            <div class="cg-drawer__links">
+                <a href="/expo/lottery" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                    <CgMdiIcon Name="mdiGift" aria-hidden="true" />
+                    <span>预约抽奖</span>
+                </a>
+                <a href="/expo/anniversary" onclick="document.getElementById('cg-drawer').classList.remove('cg-drawer--open');document.getElementById('cg-drawer-backdrop').classList.remove('cg-drawer-backdrop--visible')">
+                    <CgMdiIcon Name="mdiWalletGiftcard" aria-hidden="true" />
+                    <span>直播抽号</span>
                 </a>
             </div>
 

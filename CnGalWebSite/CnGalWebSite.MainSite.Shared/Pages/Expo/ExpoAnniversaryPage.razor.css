@@ -1,0 +1,18 @@
+﻿.expo-anniversary-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+::deep .cg-tabs {
+    width: fit-content;
+    place-self: center;
+}
+
+
+::deep .lottery-award-list{
+    padding:0!important;
+}
+::deep .cg-anniversary-card__awards {
+    padding: 0 !important;
+}

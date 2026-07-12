@@ -1,4 +1,4 @@
-.slotMachine-box {
+﻿.slotMachine-box {
     min-height: calc(100% - 341px);
     width: 848px;
     margin: 0 auto;
@@ -23,6 +23,7 @@
     position: absolute;
     right: -156px;
     top: calc(50% - 66px);
+    cursor:pointer;
 }
 
 .slot {
@@ -32,7 +33,7 @@
     position: absolute;
     background-color: rgba(250,249,250,1);
     top: 103px;
-    border: 1px solid rgba(253,138,197,1);
+    border: 1px solid var(--cg-color-primary);
 }
 
     .slot li {
@@ -61,7 +62,7 @@
 }
 
 .slotAnimation {
-    animation: slotSlice 1s linear 0s 1;
+    animation: slotSlice 1s linear 0s 1 forwards;
 }
 
 @keyframes slotSlice {
@@ -82,10 +83,12 @@ div.prizeTips {
 
     div.prizeTips > span {
         font-weight: bold;
-        color: rgba(253,138,197,1);
+        color: var(--cg-color-primary);
         padding: 0 0.5em;
     }
 
 .slotMachine-box ul {
     padding: 0;
+    margin: 0;
+    list-style: none;
 }

@@ -1,0 +1,70 @@
+.prize-card {
+    background-color: color-mix(in oklab, var(--cg-color-primary) 20%, transparent);
+    border-radius: 4px;
+    padding: .5rem;
+    aspect-ratio: 1;
+}
+
+.prize-card > div {
+    width: 100%;
+    height: 100%;
+    border: 2px dashed color-mix(in oklab, var(--cg-color-primary) 51%, transparent);
+    border-radius: 4px;
+    padding: .5rem;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    justify-content: center;
+}
+
+.prize-card.active {
+    background-image: linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
+}
+
+.prize-card.active > div {
+    border: 2px dashed var(--cg-color-primary);
+}
+
+.prize-card img {
+    width: 100%;
+}
+
+.prize-card .name-card {
+    text-align: center;
+}
+
+/* 图片按钮样式 - 带 hover 缩放效果 */
+.image-button-card {
+    display: flex;
+    overflow: hidden;
+    border-radius: 12px;
+    position: relative;
+}
+
+.image-button-card img {
+    width: 100%;
+    transition: .5s;
+}
+
+.image-button-card:hover img {
+    transform: scale(1.1);
+}
+
+@media (max-width: 960px) {
+    .prize-card .name-card {
+        font-size: x-small;
+    }
+
+    .prize-card {
+        aspect-ratio: inherit;
+        padding: 2px;
+    }
+
+    .prize-card > div {
+        padding: 2px;
+    }
+
+    .image-button-card {
+        border-radius: 4px;
+    }
+}

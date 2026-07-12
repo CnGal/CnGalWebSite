@@ -10,6 +10,7 @@ using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.DataModel.ViewModel.News;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.PlayedGames;
+using CnGalWebSite.DataModel.ViewModel.Questionnaires;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Recommends;
 using CnGalWebSite.DataModel.ViewModel.Steam;
@@ -397,6 +398,29 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
 
     public Task<SdkResult<bool>> EditExpoTicketAsync(ExpoTicketEditModel model, CancellationToken cancellationToken = default)
         => PostCommandAsync("api/expo/EditTicket", model, "EDIT_EXPO_TICKET", "编辑展会票根", cancellationToken);
+
+    public Task<SdkResult<bool>> EditExpoGameAsync(ExpoGameEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/expo/EditGame", model, "EDIT_EXPO_GAME", "编辑展会游戏", cancellationToken);
+
+    public Task<SdkResult<bool>> EditExpoTagExpoAsync(ExpoTagEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/expo/EditTag", model, "EDIT_EXPO_TAG", "编辑展会标签", cancellationToken);
+
+    public Task<SdkResult<bool>> EditExpoAwardAsync(ExpoAwardEditModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/expo/EditAward", model, "EDIT_EXPO_AWARD", "编辑展会奖项", cancellationToken);
+
+    // ─── 问卷 ───
+
+    public Task<SdkResult<bool>> CreateQuestionnaireAsync(EditQuestionnaireModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/questionnaires/CreateQuestionnaire", model, "CREATE_QUESTIONNAIRE", "创建问卷", cancellationToken);
+
+    public Task<SdkResult<bool>> EditQuestionnaireAsync(EditQuestionnaireModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/questionnaires/EditQuestionnaire", model, "EDIT_QUESTIONNAIRE", "编辑问卷", cancellationToken);
+
+    public Task<SdkResult<bool>> HiddenQuestionnaireAsync(HiddenQuestionnaireModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/questionnaires/HiddenQuestionnaire", model, "HIDE_QUESTIONNAIRE", "操作问卷显隐", cancellationToken);
+
+    public Task<SdkResult<bool>> EditQuestionnairePriorityAsync(EditQuestionnairePriorityViewModel model, CancellationToken cancellationToken = default)
+        => PostCommandAsync("api/questionnaires/EditQuestionnairePriority", model, "EDIT_QUESTIONNAIRE_PRIORITY", "调整问卷优先级", cancellationToken);
 
     // ─── 商品 ───
 

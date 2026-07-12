@@ -1,0 +1,53 @@
+﻿@page "/expo/lottery"
+@page "/11th"
+@rendermode InteractiveServer
+@inject IExpoQueryService ExpoQueryService
+@inject ICgToastService ToastService
+
+<CgPageMeta Title="CNGAL周年庆展示会 - 预约抽奖" />
+
+<div class="expo-lottery-page">
+    <CgTabs Variant="underline"
+            Items="_tabs"
+            DefaultActiveKey="lottery"
+            HrefTemplate="/expo/{0}" />
+    <div class="title-card">
+        <span>
+            别忘了每日签到哦
+        </span>
+    </div>
+    <div class="booking-card">
+        <GridCard Model="_model" OnChanged="OnChangedAsync" />
+        <TasksCard Model="_model" OnChanged="OnChangedAsync" />
+    </div>
+</div>
+
+@code {
+    private static readonly IReadOnlyList<CgTabItem> _tabs = [
+        new("lottery", "预约抽奖"),
+        new("anniversary", "直播抽号")
+    ];
+
+    private ExpoUserTaskModel _model = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await OnChangedAsync();
+    }
+
+    private async Task OnChangedAsync()
+    {
+        try
+        {
+            var result = await ExpoQueryService.GetUserTaskAsync();
+            if (result.Success && result.Data is not null)
+            {
+                _model = result.Data;
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.Show("获取用户任务失败", ex.Message, "error");
+        }
+    }
+}
