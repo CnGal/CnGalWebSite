@@ -500,18 +500,18 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var model = new ExpoUserTaskModel
             {
-                IsPickUpSharedGames = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ShareGames),
+                IsPickUpSharedGames = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ShareGames && s.Time >= TaskStartDate),
                 IsSharedGames = string.IsNullOrWhiteSpace(user.SteamId) == false,
-                IsSignIn = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SignIn && s.Time.Date == now.Date),
-                IsBooking = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.Booking),
+                IsSignIn = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SignIn && s.Time >= TaskStartDate && s.Time.Date == now.Date),
+                IsBooking = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.Booking && s.Time >= TaskStartDate),
                 SignInDays = signInDays,
-                IsSurvey = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.Survey),
-                IsRateGame = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.RateGame),
-                IsBindQQ = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.BindQQ),
-                IsChangeAvatar = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ChangeAvatar),
-                IsChangeSignature = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ChangeSignature),
-                IsSaveGGeneration = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SaveGGeneration),
-                IsLotteryNumber = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.LotteryNumber),
+                IsSurvey = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.Survey && s.Time >= TaskStartDate),
+                IsRateGame = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.RateGame && s.Time >= TaskStartDate),
+                IsBindQQ = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.BindQQ && s.Time >= TaskStartDate),
+                IsChangeAvatar = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ChangeAvatar && s.Time >= TaskStartDate),
+                IsChangeSignature = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ChangeSignature && s.Time >= TaskStartDate),
+                IsSaveGGeneration = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SaveGGeneration && s.Time >= TaskStartDate),
+                IsLotteryNumber = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.LotteryNumber && s.Time >= TaskStartDate),
                 IsHasJoinedLottery = await CheckUserHasJoinedLottery(user.Id, 56),
                 TotalPoints = Math.Max(0, totalPoints) // 确保点数不为负
             };

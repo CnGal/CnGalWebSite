@@ -1,4 +1,4 @@
-.expo-lottery-page {
+﻿.expo-lottery-page {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -20,7 +20,6 @@
     font-size: xx-large;
     font-weight: bold;
     padding-bottom: 3rem;
-    padding-top: 1.5rem;
 }
 
 .title-card span {
