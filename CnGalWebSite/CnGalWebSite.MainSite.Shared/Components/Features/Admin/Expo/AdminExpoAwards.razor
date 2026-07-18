@@ -124,9 +124,14 @@
                                     }
                                 </div>
                             }
-                            <CgButton Variant="outline" Size="small" OnClick="() => _editModel.Prizes.Add(new ExpoPrizeEditModel())">
-                                <CgMdiIcon Name="mdiPlus" /> 添加奖品
-                            </CgButton>
+                            <div style="display:flex; gap:8px;">
+                                <CgButton Variant="outline" Size="small" OnClick="() => _editModel.Prizes.Add(new ExpoPrizeEditModel())">
+                                    <CgMdiIcon Name="mdiPlus" /> 添加奖品
+                                </CgButton>
+                                <CgButton Variant="outline" Size="small" OnClick="OpenPrizeBatchImport">
+                                    <CgMdiIcon Name="mdiDatabaseImportOutline" /> 批量导入
+                                </CgButton>
+                            </div>
                         </div>
                     </CgFormGroup>
                 }
@@ -148,12 +153,27 @@
     </Footer>
 </CgModal>
 
+@* ─── 奖品批量导入弹窗（渲染在奖项弹窗之后，确保叠层在上） ─── *@
+
+<CgModal IsOpen="_isPrizeBatchModalOpen" OnClose="ClosePrizeBatchModal" Title="批量导入奖品">
+    <div class="admin-batch-form">
+        <CgAlert Variant="info">每行一个激活码，将自动添加到奖品列表中。</CgAlert>
+        <CgTextarea @bind-Value="_prizeBatchText" Rows="8" Placeholder="请输入激活码，每行一个" style="margin-top:12px;" />
+        <div class="admin-modal-footer" style="margin-top:16px;">
+            <CgButton Variant="secondary" OnClick="ClosePrizeBatchModal">取消</CgButton>
+            <CgButton Variant="primary" OnClick="ConfirmPrizeBatchImport">导入</CgButton>
+        </div>
+    </div>
+</CgModal>
+
 @code {
     private CgDataTable<ExpoAwardOverviewModel>? _awardTable;
     private CgDataTable<ExpoPrizeOverviewModel>? _prizeTable;
     private bool _showModal;
     private bool _isNew;
     private ExpoAwardEditModel? _editModel;
+    private bool _isPrizeBatchModalOpen;
+    private string _prizeBatchText = string.Empty;
 
     private async Task<CgDataTableResult<ExpoAwardOverviewModel>> OnQueryAwardsAsync(CgDataTableRequest request)
     {
@@ -213,5 +233,35 @@
         {
             ToastService.Show(result.Error?.Message ?? "保存失败", variant: "error");
         }
+    }
+
+    // ── 批量导入奖品 ──
+
+    private void OpenPrizeBatchImport()
+    {
+        _prizeBatchText = string.Empty;
+        _isPrizeBatchModalOpen = true;
+    }
+
+    private void ClosePrizeBatchModal()
+    {
+        _isPrizeBatchModalOpen = false;
+    }
+
+    private void ConfirmPrizeBatchImport()
+    {
+        if (_editModel == null || string.IsNullOrWhiteSpace(_prizeBatchText))
+        {
+            _isPrizeBatchModalOpen = false;
+            return;
+        }
+
+        var lines = _prizeBatchText.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        foreach (var line in lines)
+        {
+            _editModel.Prizes.Add(new ExpoPrizeEditModel { Content = line });
+        }
+
+        _isPrizeBatchModalOpen = false;
     }
 }

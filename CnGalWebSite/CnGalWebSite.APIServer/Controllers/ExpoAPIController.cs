@@ -415,6 +415,11 @@ namespace CnGalWebSite.APIServer.Controllers
         #region 任务
 
         /// <summary>
+        /// 任务统计起始日期（2026年1月1日），此日期之前的任务不计入今年的统计
+        /// </summary>
+        private static readonly DateTime TaskStartDate = new(2026, 1, 1);
+
+        /// <summary>
         /// 获取任务对应的点数
         /// </summary>
         /// <param name="taskType">任务类型</param>
@@ -450,9 +455,9 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
 
-            // 获取用户的所有任务
+            // 获取用户在2026年1月1日之后的所有任务
             var userTasks = await _expoTaskRepository.GetAll()
-                .Where(s => s.ApplicationUserId == user.Id)
+                .Where(s => s.ApplicationUserId == user.Id && s.Time >= TaskStartDate)
                 .ToListAsync();
 
             // 计算签到天数（限制最多5天，按不同日期计算）
@@ -507,7 +512,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 IsChangeSignature = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ChangeSignature),
                 IsSaveGGeneration = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SaveGGeneration),
                 IsLotteryNumber = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.LotteryNumber),
-                IsHasJoinedLottery = await CheckUserHasJoinedLottery(user.Id, 38),
+                IsHasJoinedLottery = await CheckUserHasJoinedLottery(user.Id, 56),
                 TotalPoints = Math.Max(0, totalPoints) // 确保点数不为负
             };
 
@@ -535,12 +540,12 @@ namespace CnGalWebSite.APIServer.Controllers
             switch (model.Type)
             {
                 case ExpoTaskType.Booking:
-                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.Booking);
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.Booking && s.Time >= TaskStartDate);
                     errorMessage = "预约直播奖励已经领取过了";
                     break;
 
                 case ExpoTaskType.ShareGames:
-                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ShareGames);
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ShareGames && s.Time >= TaskStartDate);
                     if (string.IsNullOrWhiteSpace(user.SteamId))
                     {
                         return new Result { Successful = false, Error = "需要先绑定Steam" };
@@ -549,9 +554,9 @@ namespace CnGalWebSite.APIServer.Controllers
                     break;
 
                 case ExpoTaskType.SignIn:
-                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SignIn && s.Time.Date == now.AddHours(8).Date);
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SignIn && s.Time >= TaskStartDate && s.Time.Date == now.AddHours(8).Date);
                     // 检查签到天数是否已达上限
-                    var signInCount = await _expoTaskRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SignIn);
+                    var signInCount = await _expoTaskRepository.CountAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SignIn && s.Time >= TaskStartDate);
                     if (signInCount >= 5)
                     {
                         return new Result { Successful = false, Error = "签到奖励已达上限（5天）" };
@@ -564,7 +569,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     break;
 
                 case ExpoTaskType.Survey:
-                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.Survey);
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.Survey && s.Time >= TaskStartDate);
                     if (!taskExists)
                     {
                         // 验证用户是否真的完成了问卷(ID=1)
@@ -578,7 +583,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     break;
 
                 case ExpoTaskType.RateGame:
-                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.RateGame);
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.RateGame && s.Time >= TaskStartDate);
                     if (!taskExists)
                     {
                         // 验证用户是否真的有游戏评分记录
@@ -592,7 +597,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     break;
 
                 case ExpoTaskType.BindQQ:
-                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.BindQQ);
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.BindQQ && s.Time >= TaskStartDate);
                     if (!taskExists)
                     {
                         // 验证用户是否真的绑定了群聊QQ
@@ -606,7 +611,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     break;
 
                 case ExpoTaskType.ChangeAvatar:
-                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ChangeAvatar);
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ChangeAvatar && s.Time >= TaskStartDate);
                     if (!taskExists)
                     {
                         // 验证用户是否真的更换了默认头像
@@ -620,7 +625,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     break;
 
                 case ExpoTaskType.ChangeSignature:
-                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ChangeSignature);
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.ChangeSignature && s.Time >= TaskStartDate);
                     if (!taskExists)
                     {
                         // 验证用户是否真的更换了默认签名
@@ -634,16 +639,16 @@ namespace CnGalWebSite.APIServer.Controllers
                     break;
 
                 case ExpoTaskType.SaveGGeneration:
-                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SaveGGeneration);
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.SaveGGeneration && s.Time >= TaskStartDate);
                     errorMessage = "填写国G世代奖励已经领取过了";
                     break;
 
                 case ExpoTaskType.LotteryNumber:
-                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.LotteryNumber);
+                    taskExists = await _expoTaskRepository.AnyAsync(s => s.ApplicationUserId == user.Id && s.Type == ExpoTaskType.LotteryNumber && s.Time >= TaskStartDate);
                     if (!taskExists)
                     {
-                        // 验证用户是否真的参与了抽奖（ID=38）
-                        var hasJoinedLottery = await CheckUserHasJoinedLottery(user.Id, 38);
+                        // 验证用户是否真的参与了抽奖（ID=56）
+                        var hasJoinedLottery = await CheckUserHasJoinedLottery(user.Id, 56);
                         if (!hasJoinedLottery)
                         {
                             return new Result { Successful = false, Error = "请先参与十周年庆典抽奖后再领取奖励" };
@@ -764,7 +769,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return BadRequest("找不到该用户");
             }
 
-            var hasJoinedLottery = await CheckUserHasJoinedLottery(user.Id, 38); // 检查抽奖ID=38
+            var hasJoinedLottery = await CheckUserHasJoinedLottery(user.Id, 56); // 检查抽奖ID=56
             return hasJoinedLottery;
         }
 
@@ -1010,9 +1015,9 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var now = DateTime.Now.ToCstTime();
 
-            // 计算用户当前总点数
+            // 计算用户在2026年1月1日之后的当前总点数
             var userTasks = await _expoTaskRepository.GetAll()
-                .Where(s => s.ApplicationUserId == user.Id)
+                .Where(s => s.ApplicationUserId == user.Id && s.Time >= TaskStartDate)
                 .ToListAsync();
 
             var totalPoints = 0;
