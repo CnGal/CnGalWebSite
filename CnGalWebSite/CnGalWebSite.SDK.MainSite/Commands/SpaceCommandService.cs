@@ -203,4 +203,78 @@ public sealed class SpaceCommandService(
             return SdkResult<bool>.Fail("ADDRESS_EDIT_EXCEPTION", "保存用户地址时发生异常");
         }
     }
+
+    public async Task<SdkResult<string>> GetBindGroupQQCodeAsync(UnBindGroupQQModel model, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await PostAsJsonAsync<UnBindGroupQQModel, Result>("api/space/GetBindGroupQQCode", model, cancellationToken);
+            if (result is { Successful: true })
+            {
+                // 身份识别码通过 Result.Error 字段返回（历史原因）
+                return SdkResult<string>.Ok(result.Error ?? string.Empty);
+            }
+
+            return SdkResult<string>.Fail("QQ_BIND_CODE_FAILED", result?.Error ?? "获取身份识别码失败");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "获取绑定群聊 QQ 身份识别码异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
+            return SdkResult<string>.Fail("QQ_BIND_CODE_EXCEPTION", "获取身份识别码时发生异常");
+        }
+    }
+
+    public async Task<SdkResult<string>> UnBindGroupQQAsync(UnBindGroupQQModel model, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await PostAsJsonAsync<UnBindGroupQQModel, Result>("api/space/UnBindGroupQQ", model, cancellationToken);
+            if (result is { Successful: true })
+            {
+                return SdkResult<string>.Ok("解除绑定成功");
+            }
+
+            return SdkResult<string>.Fail("QQ_UNBIND_FAILED", result?.Error ?? "解除绑定失败");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "解除群聊 QQ 绑定异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
+            return SdkResult<string>.Fail("QQ_UNBIND_EXCEPTION", "解除绑定时发生异常");
+        }
+    }
+
+    public async Task<SdkResult<string>> EditUserCertificationAsync(EditUserCertificationModel model, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await PostAsJsonAsync<EditUserCertificationModel, Result>("api/space/EditUserCertification", model, cancellationToken);
+            if (result is { Successful: true })
+            {
+                var message = string.IsNullOrWhiteSpace(model.EntryName) ? "已取消认证" : "已提交用户认证申请，等待审核通过";
+                return SdkResult<string>.Ok(message);
+            }
+
+            var errorTitle = string.IsNullOrWhiteSpace(model.EntryName) ? "取消认证失败" : "提交用户认证申请失败";
+            return SdkResult<string>.Fail("CERTIFICATION_EDIT_FAILED", result?.Error ?? errorTitle);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "提交用户认证申请异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
+            return SdkResult<string>.Fail("CERTIFICATION_EDIT_EXCEPTION", "提交用户认证申请时发生异常");
+        }
+    }
+
+    public async Task<SdkResult<List<string>>> GetAllNotCertificatedEntriesAsync(EntryType type, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var result = await GetFromJsonAsync<List<string>>($"api/space/GetAllNotCertificatedEntries?type={type}", cancellationToken);
+            return SdkResult<List<string>>.Ok(result ?? []);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "获取未认证词条列表异常。Type={Type}; BaseAddress={BaseAddress}", type, HttpClient.BaseAddress);
+            return SdkResult<List<string>>.Fail("CERTIFICATION_ENTRIES_EXCEPTION", "获取未认证词条列表时发生异常");
+        }
+    }
 }

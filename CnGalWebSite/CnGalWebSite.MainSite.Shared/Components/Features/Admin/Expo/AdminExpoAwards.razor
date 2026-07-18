@@ -158,7 +158,9 @@
 <CgModal IsOpen="_isPrizeBatchModalOpen" OnClose="ClosePrizeBatchModal" Title="批量导入奖品">
     <div class="admin-batch-form">
         <CgAlert Variant="info">每行一个激活码，将自动添加到奖品列表中。</CgAlert>
-        <CgTextarea @bind-Value="_prizeBatchText" Rows="8" Placeholder="请输入激活码，每行一个" style="margin-top:12px;" />
+        <div style="margin-top:12px;">
+            <CgTextarea @bind-Value="_prizeBatchText" Rows="8" Placeholder="请输入激活码，每行一个" />
+        </div>
         <div class="admin-modal-footer" style="margin-top:16px;">
             <CgButton Variant="secondary" OnClick="ClosePrizeBatchModal">取消</CgButton>
             <CgButton Variant="primary" OnClick="ConfirmPrizeBatchImport">导入</CgButton>
