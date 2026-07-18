@@ -1,7 +1,11 @@
+﻿@using CnGalWebSite.DataModel.ViewModel.Others
 @using CnGalWebSite.DataModel.ViewModel.Space
 @using CnGalWebSite.MainSite.Shared.Services
+@using CnGalWebSite.SDK.MainSite.Abstractions
 
+@inject ISpaceCommandService SpaceCommandService
 @inject ICgToastService ToastService
+@inject IJSRuntime JS
 
 <section class="space-editor-section" id="section-account">
     <h2><CgMdiIcon Name="mdiShieldAccountOutline" Class="space-section-icon" aria-hidden="true"/>账户安全</h2>
@@ -11,7 +15,7 @@
     {
         <div class="space-account-grid">
             @* ── 账户安全（跳转安全中心） ── *@
-            <div class="space-account-card">
+            <div class="space-account-card space-account-card--wrap">
                 <div class="space-account-card__icon">
                     <CgMdiIcon Name="mdiLockOutline" aria-hidden="true"/>
                 </div>
@@ -65,7 +69,7 @@
             </div>
 
             @* ── QQ 群绑定 ── *@
-            <div class="space-account-card">
+            <div class="space-account-card space-account-card--wrap">
                 <div class="space-account-card__icon">
                     <CgMdiIcon Name="mdiChat" aria-hidden="true"/>
                 </div>
@@ -73,7 +77,7 @@
                     <h3>群聊 QQ 号</h3>
                     @if (string.IsNullOrWhiteSpace(Model.GroupQQ))
                     {
-                        <p>未绑定 — 在 QQ 群(490888010)中发送绑定指令即可绑定</p>
+                        <p>未绑定 — 点击【绑定】获取身份识别码，并在群聊中发送指定信息即可绑定</p>
                     }
                     else
                     {
@@ -84,10 +88,29 @@
                         <span class="space-account-card__meta">QQ昵称：@Model.QQAccountName</span>
                     }
                 </div>
+                <div class="space-account-card__action space-account-card__action--stack">
+                    <CgButton Variant="@(string.IsNullOrWhiteSpace(Model.GroupQQ) ? "primary" : "outline")"
+                              Size="sm"
+                              Async
+                              OnClick="OnClickBindAsync">
+                        <CgMdiIcon Name="@(string.IsNullOrWhiteSpace(Model.GroupQQ) ? "mdiLinkVariant" : "mdiLinkVariantPlus")" aria-hidden="true"/>
+                        <span>@(string.IsNullOrWhiteSpace(Model.GroupQQ) ? "绑定" : "更换绑定")</span>
+                    </CgButton>
+                    @if (!string.IsNullOrWhiteSpace(Model.GroupQQ))
+                    {
+                        <CgButton Variant="outline"
+                                  Size="sm"
+                                  Async
+                                  OnClick="OnClickUnBindAsync">
+                            <CgMdiIcon Name="mdiLinkVariantOff" aria-hidden="true"/>
+                            <span>解除绑定</span>
+                        </CgButton>
+                    }
+                </div>
             </div>
 
             @* ── 用户认证 ── *@
-            <div class="space-account-card">
+            <div class="space-account-card space-account-card--wrap">
                 <div class="space-account-card__icon space-account-card__icon--cert">
                     <CgMdiIcon Name="mdiCertificateOutline" aria-hidden="true"/>
                 </div>
@@ -110,12 +133,382 @@
                         }
                     }
                 </div>
+                <div class="space-account-card__action space-account-card__action--stack">
+                    <CgButton Variant="@(Model.UserCertificationModel != null && !string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "outline" : "primary")"
+                              Size="sm"
+                              Async
+                              OnClick="OnOpenCertDialogAsync">
+                        <CgMdiIcon Name="@(Model.UserCertificationModel != null && !string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "mdiLinkVariantPlus" : "mdiLinkVariant")" aria-hidden="true"/>
+                        <span>@(Model.UserCertificationModel != null && !string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName) ? "更换认证" : "认证")</span>
+                    </CgButton>
+                    @if (Model.UserCertificationModel != null && !string.IsNullOrWhiteSpace(Model.UserCertificationModel.EntryName))
+                    {
+                        <CgButton Variant="outline"
+                                  Size="sm"
+                                  Async
+                                  OnClick="OnCancelCertAsync">
+                            <CgMdiIcon Name="mdiLinkVariantOff" aria-hidden="true"/>
+                            <span>取消认证</span>
+                        </CgButton>
+                    }
+                </div>
             </div>
         </div>
     }
 </section>
 
+@* ── 人机验证 ── *@
+<CgHumanMachineVerification @ref="_humanMachineVerification" OnVerficated="OnVerficatedAsync" WaitChecked/>
+
+@* ── 用户认证弹窗 ── *@
+<CgModal IsOpen="_showCertDialog"
+         OnClose="CloseCertDialog"
+         Width="600px"
+         Title="用户认证">
+    <ChildContent>
+        <div class="space-cert-dialog">
+            <p class="space-cert-dialog__desc">
+                选择认证的词条，认证为一对一关系，请在下方上传并填写身份证明
+            </p>
+            <div class="space-cert-dialog__row">
+                <label class="space-cert-dialog__label">类别</label>
+                <CgEnumSelect @bind-Value="_certType"
+                              @bind-Value:after="OnCertTypeChangedAsync"
+                              TEnum="UserCertificationType" />
+            </div>
+            <div class="space-cert-dialog__row">
+                <label class="space-cert-dialog__label">认证的词条</label>
+                <CgAutoComplete @bind-Value="_certEntryName"
+                                Items="_certEntryList"
+                                Placeholder="输入词条名称搜索..." />
+            </div>
+            <div class="space-cert-dialog__row">
+                <label class="space-cert-dialog__label">备注</label>
+                <CgMarkdownEditor @bind-Value="_certNote"
+                                   Placeholder="可以上传并填写一些有助于我们确认身份的内容哦~" />
+            </div>
+        </div>
+    </ChildContent>
+    <Footer>
+        <div class="space-cert-dialog__footer">
+            <CgButton Variant="outline" OnClick="CloseCertDialog">取消</CgButton>
+            <CgButton Variant="primary" Async OnClick="OnSubmitCertAsync">提交</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
+@* ── 身份识别码弹窗 ── *@
+<CgModal IsOpen="_showCodeDialog"
+         OnClose="CloseCodeDialog"
+         Title="身份识别码">
+    <ChildContent>
+        <div class="space-qq-code-dialog">
+            <p class="space-qq-code-dialog__desc">
+                在 CnGal资料站 QQ 群(128446539，490888010，948774838)中发送【看板娘，绑定+身份识别码】即可绑定，90 分钟内有效，仅可使用一次（可以直接复制下面的文本）
+            </p>
+            <div class="space-qq-code-dialog__copy-row">
+                <code class="space-qq-code-dialog__code">看板娘，绑定 @_bindCode</code>
+                <CgButton Variant="outline" Size="sm" OnClick="CopyFullCodeAsync">
+                    <CgMdiIcon Name="mdiContentCopy" aria-hidden="true"/>
+                    <span>复制</span>
+                </CgButton>
+            </div>
+        </div>
+    </ChildContent>
+    <Footer>
+        <div class="space-qq-code-dialog__footer">
+            <CgButton Variant="primary" OnClick="CloseCodeDialog">确定</CgButton>
+        </div>
+    </Footer>
+</CgModal>
+
 @code {
     [Parameter]
     public EditUserDataViewModel Model { get; set; } = default!;
+
+    private CgHumanMachineVerification _humanMachineVerification = default!;
+
+    private bool _showCodeDialog;
+    private string _bindCode = string.Empty;
+    private bool _isBindOperation;
+
+    /// <summary>
+    /// 点击"绑定"或"更换绑定"按钮，启动人机验证。
+    /// </summary>
+    private async Task OnClickBindAsync()
+    {
+        _isBindOperation = true;
+        await _humanMachineVerification.StartVerification();
+    }
+
+    /// <summary>
+    /// 点击"解除绑定"按钮，启动人机验证。
+    /// </summary>
+    private async Task OnClickUnBindAsync()
+    {
+        _isBindOperation = false;
+        await _humanMachineVerification.StartVerification();
+    }
+
+    /// <summary>
+    /// 人机验证完成回调。
+    /// </summary>
+    private async Task OnVerficatedAsync(HumanMachineVerificationResult verification)
+    {
+        if (!verification.Success)
+        {
+            return;
+        }
+
+        if (_isBindOperation)
+        {
+            await ProcBindAsync(verification);
+        }
+        else
+        {
+            await ProcUnBindAsync(verification);
+        }
+    }
+
+    /// <summary>
+    /// 执行绑定：调用 API 获取身份识别码，然后弹窗展示。
+    /// </summary>
+    private async Task ProcBindAsync(HumanMachineVerificationResult verification)
+    {
+        try
+        {
+            var model = new UnBindGroupQQModel
+            {
+                Verification = verification
+            };
+
+            var result = await SpaceCommandService.GetBindGroupQQCodeAsync(model);
+            if (result.Success && !string.IsNullOrEmpty(result.Data))
+            {
+                _bindCode = result.Data;
+                _showCodeDialog = true;
+            }
+            else
+            {
+                ToastService.Show("获取身份识别码失败", result.Error?.Message ?? "未知错误", "error");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.Show("发生错误", ex.Message, "error");
+        }
+    }
+
+    /// <summary>
+    /// 执行解除绑定：调用 API 清除 QQ 号绑定。
+    /// </summary>
+    private async Task ProcUnBindAsync(HumanMachineVerificationResult verification)
+    {
+        try
+        {
+            var model = new UnBindGroupQQModel
+            {
+                Verification = verification
+            };
+
+            var result = await SpaceCommandService.UnBindGroupQQAsync(model);
+            if (result.Success)
+            {
+                ToastService.Show("解除绑定成功", "群聊 QQ 号已解除绑定", "success");
+                Model.GroupQQ = null;
+            }
+            else
+            {
+                ToastService.Show("解除绑定失败", result.Error?.Message ?? "未知错误", "error");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.Show("发生错误", ex.Message, "error");
+        }
+    }
+
+    /// <summary>
+    /// 关闭身份识别码弹窗。
+    /// </summary>
+    private async Task CloseCodeDialog()
+    {
+        _showCodeDialog = false;
+    }
+
+    /// <summary>
+    /// 复制文本到剪贴板。
+    /// </summary>
+    private async Task CopyToClipboardAsync(string text)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", text);
+            ToastService.Show("已复制", text, "success");
+        }
+        catch
+        {
+            ToastService.Show("复制失败", "请手动复制文本", "error");
+        }
+    }
+
+    /// <summary>
+    /// 复制"看板娘，绑定 + 识别码"完整文本。
+    /// </summary>
+    private async Task CopyFullCodeAsync()
+    {
+        await CopyToClipboardAsync("看板娘，绑定 " + _bindCode);
+    }
+
+    /// <summary>
+    /// 仅复制身份识别码。
+    /// </summary>
+    private async Task CopyCodeOnlyAsync()
+    {
+        await CopyToClipboardAsync(_bindCode);
+    }
+
+    // ────────── 用户认证 ──────────
+
+    private bool _showCertDialog;
+    private UserCertificationType _certType = UserCertificationType.Staff;
+    private string _certEntryName = string.Empty;
+    private string _certNote = string.Empty;
+    private List<string> _certEntryList = [];
+    private bool _certEntriesLoaded;
+
+    /// <summary>
+    /// 打开用户认证弹窗。
+    /// </summary>
+    private async Task OnOpenCertDialogAsync()
+    {
+        if (!_certEntriesLoaded)
+        {
+            await LoadCertEntriesAsync();
+        }
+
+        // 回填已有数据
+        if (Model.UserCertificationModel != null)
+        {
+            _certType = Model.UserCertificationModel.Type;
+            _certEntryName = Model.UserCertificationModel.EntryName ?? string.Empty;
+            _certNote = Model.UserCertificationModel.Note ?? string.Empty;
+        }
+
+        _showCertDialog = true;
+    }
+
+    /// <summary>
+    /// 关闭用户认证弹窗。
+    /// </summary>
+    private async Task CloseCertDialog()
+    {
+        _showCertDialog = false;
+    }
+
+    /// <summary>
+    /// 变更认证类别时重新加载对应词条列表。
+    /// </summary>
+    private async Task OnCertTypeChangedAsync()
+    {
+        _certEntryName = string.Empty;
+        await LoadCertEntriesAsync();
+    }
+
+    /// <summary>
+    /// 加载未认证词条列表。
+    /// </summary>
+    private async Task LoadCertEntriesAsync()
+    {
+        try
+        {
+            var entryType = _certType == UserCertificationType.Group ? EntryType.ProductionGroup : EntryType.Staff;
+            var result = await SpaceCommandService.GetAllNotCertificatedEntriesAsync(entryType);
+            if (result.Success && result.Data != null)
+            {
+                _certEntryList = result.Data;
+            }
+            else
+            {
+                _certEntryList = [];
+            }
+            _certEntriesLoaded = true;
+        }
+        catch
+        {
+            _certEntryList = [];
+        }
+    }
+
+    /// <summary>
+    /// 取消认证。
+    /// </summary>
+    private async Task OnCancelCertAsync()
+    {
+        if (Model.UserCertificationModel == null)
+        {
+            return;
+        }
+
+        Model.UserCertificationModel.EntryName = null;
+        Model.UserCertificationModel.Note = null;
+        await SubmitCertAsync();
+    }
+
+    /// <summary>
+    /// 提交用户认证申请。
+    /// </summary>
+    private async Task OnSubmitCertAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_certEntryName))
+        {
+            ToastService.Show("请填写需要认证的词条", null, "error");
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(_certNote))
+        {
+            ToastService.Show("请填写一些有助于身份认证的信息", null, "error");
+            return;
+        }
+
+        if (Model.UserCertificationModel == null)
+        {
+            Model.UserCertificationModel = new EditUserCertificationModel();
+        }
+
+        Model.UserCertificationModel.Type = _certType;
+        Model.UserCertificationModel.EntryName = _certEntryName;
+        Model.UserCertificationModel.Note = _certNote;
+
+        await SubmitCertAsync();
+    }
+
+    /// <summary>
+    /// 调用 API 提交认证或取消认证。
+    /// </summary>
+    private async Task SubmitCertAsync()
+    {
+        try
+        {
+            var result = await SpaceCommandService.EditUserCertificationAsync(Model.UserCertificationModel!);
+            if (result.Success)
+            {
+                ToastService.Show(result.Data ?? "操作成功", null, "success");
+                if (!string.IsNullOrWhiteSpace(Model.UserCertificationModel!.EntryName))
+                {
+                    Model.UserCertificationModel.IsPending = true;
+                }
+                _showCertDialog = false;
+            }
+            else
+            {
+                var title = string.IsNullOrWhiteSpace(Model.UserCertificationModel!.EntryName) ? "取消认证失败" : "提交用户认证申请失败";
+                ToastService.Show(title, result.Error?.Message, "error");
+            }
+        }
+        catch (Exception ex)
+        {
+            ToastService.Show("发生错误", ex.Message, "error");
+        }
+    }
 }

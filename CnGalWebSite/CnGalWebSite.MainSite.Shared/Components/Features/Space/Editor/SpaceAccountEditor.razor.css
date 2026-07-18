@@ -128,3 +128,98 @@
     width: 16px;
     height: 16px;
 }
+
+/* ── 换行卡片（操作区下移单独一行靠右） ── */
+.space-account-card--wrap {
+    flex-wrap: wrap;
+    column-gap: var(--cg-spacing-4);
+    row-gap: calc(var(--cg-spacing-4) / 2);
+}
+
+.space-account-card--wrap .space-account-card__action,
+.space-account-card--wrap .space-account-card__action--stack {
+    flex-basis: 100%;
+    min-width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: var(--cg-spacing-2);
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.space-account-card--wrap .space-account-card__action ::deep .cg-btn,
+.space-account-card--wrap .space-account-card__action--stack ::deep .cg-btn {
+    white-space: nowrap;
+}
+
+/* ── 身份识别码弹窗 ── */
+.space-qq-code-dialog {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+.space-qq-code-dialog__desc {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.space-qq-code-dialog__copy-row {
+    display: flex;
+    align-items: center;
+    gap: var(--cg-spacing-3);
+}
+
+.space-qq-code-dialog__code {
+    flex: 1;
+    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    border-radius: var(--cg-radius-md);
+    background: color-mix(in oklab, var(--cg-color-primary) 6%, var(--cg-color-surface));
+    border: 1px solid var(--cg-color-border);
+    font-family: var(--cg-font-mono, "Cascadia Code", "Fira Code", "JetBrains Mono", Consolas, monospace);
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text);
+    word-break: break-all;
+    user-select: all;
+}
+
+.space-qq-code-dialog__footer {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+/* ── 用户认证弹窗 ── */
+.space-cert-dialog {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-4);
+}
+
+.space-cert-dialog__desc {
+    font-size: var(--cg-font-size-sm);
+    color: var(--cg-color-text-muted);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.space-cert-dialog__row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-1);
+}
+
+.space-cert-dialog__label {
+    font-size: var(--cg-font-size-sm);
+    font-weight: var(--cg-font-weight-semibold);
+    color: var(--cg-color-text);
+}
+
+.space-cert-dialog__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--cg-spacing-3);
+    width: 100%;
+}
