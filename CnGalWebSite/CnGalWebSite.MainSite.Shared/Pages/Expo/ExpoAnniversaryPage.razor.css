@@ -1,4 +1,18 @@
-﻿.expo-anniversary-page {
+﻿.banner-image {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
+    margin-bottom: 2rem;
+}
+
+.banner-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.expo-anniversary-page {
     display: flex;
     flex-direction: column;
     align-items: center;
