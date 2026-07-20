@@ -139,7 +139,7 @@
                 Name = "绑定群聊QQ",
                 Points = 20,
                 IsCompleted = Model.IsBindQQ,
-                Link = "https://app.cngal.org/space/editdata",
+                Link = "/space/edit",
                 OnClick = OnClickBindQQAsync
             },
             new()
@@ -147,7 +147,7 @@
                 Name = "更换默认头像",
                 Points = 20,
                 IsCompleted = Model.IsChangeAvatar,
-                Link = "https://app.cngal.org/space/editdata",
+                Link = "/space/edit",
                 OnClick = OnClickChangeAvatarAsync
             },
             new()
@@ -155,7 +155,7 @@
                 Name = "更换默认签名",
                 Points = 20,
                 IsCompleted = Model.IsChangeSignature,
-                Link = "https://app.cngal.org/space/editdata",
+                Link = "/space/edit",
                 OnClick = OnClickChangeSignatureAsync
             },
             new()
@@ -311,7 +311,7 @@
         catch { /* fall through */ }
 
         ToastService.Show("提示", "请先绑定群聊QQ后再领取奖励", "info");
-        await JS.InvokeVoidAsync("window.open", "https://app.cngal.org/space/editdata", "_blank");
+        await JS.InvokeVoidAsync("window.open", "/space/edit", "_blank");
     }
 
     private async Task OnClickChangeAvatarAsync()
@@ -331,7 +331,7 @@
         catch { /* fall through */ }
 
         ToastService.Show("提示", "请先更换默认头像后再领取奖励", "info");
-        await JS.InvokeVoidAsync("window.open", "https://app.cngal.org/space/editdata", "_blank");
+        await JS.InvokeVoidAsync("window.open", "/space/edit", "_blank");
     }
 
     private async Task OnClickChangeSignatureAsync()
@@ -351,7 +351,7 @@
         catch { /* fall through */ }
 
         ToastService.Show("提示", "请先更换默认签名后再领取奖励", "info");
-        await JS.InvokeVoidAsync("window.open", "https://app.cngal.org/space/editdata", "_blank");
+        await JS.InvokeVoidAsync("window.open", "/space/edit", "_blank");
     }
 
     private async Task OnClickSaveGGenerationAsync()

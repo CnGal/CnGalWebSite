@@ -50,7 +50,7 @@
 
 
 ::deep .lottery-award-card {
-    background: white;
+    background: var(--cg-color-surface);
 }
 
 ::deep .lottery-award-list {

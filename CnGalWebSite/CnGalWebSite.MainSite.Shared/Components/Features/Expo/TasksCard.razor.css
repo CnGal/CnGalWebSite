@@ -9,7 +9,7 @@
     border: 2px solid transparent;
     background-clip: padding-box, border-box;
     background-origin: padding-box, border-box;
-    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
+    background-image: linear-gradient(to right, var(--cg-color-surface), var(--cg-color-surface)), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
     border-top-right-radius: 24px;
 }
 
@@ -40,7 +40,7 @@
     border: 2px solid transparent;
     background-clip: padding-box, border-box;
     background-origin: padding-box, border-box;
-    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
+    background-image: linear-gradient(to right, var(--cg-color-surface), var(--cg-color-surface)), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
     padding: .5rem 3rem;
     display: flex;
     align-items: center;
@@ -70,7 +70,7 @@
     border-radius: 50%;
     background-clip: padding-box, border-box;
     background-origin: padding-box, border-box;
-    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
+    background-image: linear-gradient(to right, var(--cg-color-surface), var(--cg-color-surface)), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
     color: var(--cg-color-primary) !important;
     width: 36px;
     height: 36px;
@@ -96,7 +96,7 @@
     border-radius: 50%;
     background-clip: padding-box, border-box;
     background-origin: padding-box, border-box;
-    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
+    background-image: linear-gradient(to right, var(--cg-color-surface), var(--cg-color-surface)), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
     padding: 2px;
     position: relative;
 }
