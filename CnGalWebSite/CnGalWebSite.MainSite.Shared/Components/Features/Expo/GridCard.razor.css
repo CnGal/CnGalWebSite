@@ -4,7 +4,7 @@
     border: 2px solid transparent;
     background-clip: padding-box, border-box;
     background-origin: padding-box, border-box;
-    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
+    background-image: linear-gradient(to right, var(--cg-color-surface), var(--cg-color-surface)), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
     border-radius: 12px;
 }
 
@@ -17,7 +17,7 @@
     border: 2px solid transparent;
     background-clip: padding-box, border-box;
     background-origin: padding-box, border-box;
-    background-image: linear-gradient(to right, #ffffff, #ffffff), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
+    background-image: linear-gradient(to right, var(--cg-color-surface), var(--cg-color-surface)), linear-gradient(45deg, var(--cg-color-primary) 0%, var(--cg-color-primary-hover) 100%);
     border-radius: 12px;
     margin-right: 1rem;
     margin-top: .5rem;
@@ -33,7 +33,7 @@
     width: 30px;
     height: 30px;
     color: var(--cg-color-primary) !important;
-    background-color: white;
+    background-color: var(--cg-color-surface);
 }
 
 .lottery-grid-card .count-card div {
@@ -94,12 +94,12 @@
 
 /* 禁用状态的抽奖按钮 */
 .lottery-grid-card .action-card.disabled > div {
-    background-image: linear-gradient(135deg, #999999, #666666);
+    background-image: linear-gradient(135deg, var(--cg-color-text-muted), color-mix(in oklab, var(--cg-color-text-muted) 60%, transparent));
     cursor: not-allowed;
 }
 
 .lottery-grid-card .action-card.disabled > div:hover {
-    background-image: linear-gradient(135deg, #999999, #666666);
+    background-image: linear-gradient(135deg, var(--cg-color-text-muted), color-mix(in oklab, var(--cg-color-text-muted) 60%, transparent));
 }
 
 .lottery-grid-card .divid-card {
