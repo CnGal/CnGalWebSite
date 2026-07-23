@@ -1,10 +1,11 @@
-
+using System.Collections.Concurrent;
 
 namespace CnGalWebSite.MainSite.Shared.Services;
 
 public sealed class CircuitHandlerService : ICircuitHandlerService
 {
-    private readonly Dictionary<string, CircuitHandlerModel> _circuits = new();
+    // 每个应用实例独立维护 Circuit 状态，使用线程安全字典处理实例内的并发读写
+    private readonly ConcurrentDictionary<string, CircuitHandlerModel> _circuits = new();
 
     public void AddCircuit(string id)
     {
@@ -19,7 +20,7 @@ public sealed class CircuitHandlerService : ICircuitHandlerService
 
     public void RemoveCircuit(string id)
     {
-        _circuits.Remove(id);
+        _circuits.TryRemove(id, out _);
     }
 
     public void ActiveCircuit(string id)
