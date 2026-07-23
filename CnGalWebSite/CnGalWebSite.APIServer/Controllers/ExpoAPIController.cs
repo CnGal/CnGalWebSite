@@ -651,7 +651,7 @@ namespace CnGalWebSite.APIServer.Controllers
                         var hasJoinedLottery = await CheckUserHasJoinedLottery(user.Id, 56);
                         if (!hasJoinedLottery)
                         {
-                            return new Result { Successful = false, Error = "请先参与十周年庆典抽奖后再领取奖励" };
+                            return new Result { Successful = false, Error = "请先参与周年庆典抽奖后再领取奖励" };
                         }
                     }
                     errorMessage = "领取抽奖号码奖励已经领取过了";
