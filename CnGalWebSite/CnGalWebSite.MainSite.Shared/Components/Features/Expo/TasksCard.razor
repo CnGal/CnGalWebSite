@@ -131,7 +131,7 @@
                 Name = "给游戏评分",
                 Points = 20,
                 IsCompleted = Model.IsRateGame,
-                Link = "https://www.cngal.org/sharegames/new",
+                Link = "https://www.cngal.org/sharegames",
                 OnClick = OnClickRateGameAsync
             },
             new()
@@ -215,7 +215,7 @@
         if (!await CheckLoginAsync()) return;
         if (Model.IsBooking) return;
 
-        await JS.InvokeVoidAsync("window.open", "https://space.bilibili.com/145239325", "_blank");
+        await JS.InvokeVoidAsync("window.open", "https://space.bilibili.com/145239325/dynamic", "_blank");
         await FinishTaskAsync(ExpoTaskType.Booking);
     }
 
@@ -291,7 +291,7 @@
         catch { /* fall through */ }
 
         ToastService.Show("提示", "请先对游戏进行评分后再领取奖励", "info");
-        await JS.InvokeVoidAsync("window.open", "https://www.cngal.org/sharegames/new", "_blank");
+        await JS.InvokeVoidAsync("window.open", "https://www.cngal.org/sharegames", "_blank");
     }
 
     private async Task OnClickBindQQAsync()
