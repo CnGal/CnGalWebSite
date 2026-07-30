@@ -18,30 +18,6 @@
         <LotteryAnimationCard @ref="lotteryAnimationCard" OnClickRoll="OnDrawLottery" />
 
         <div class="draw-lottery-info">
-            @if (CurrentAward == null)
-            {
-                <span class="draw-lottery-end">抽奖结束</span>
-            }
-            else
-            {
-                @if (string.IsNullOrWhiteSpace(CurrentAward.Sponsor) == false)
-                {
-                    <span>
-                        即将抽选由
-                        <strong class="draw-lottery-highlight">@CurrentAward.Sponsor</strong>
-                        提供的
-                        <strong class="draw-lottery-highlight">@CurrentAward.Name</strong>
-                    </span>
-                }
-                else
-                {
-                    <span>
-                        即将抽选
-                        <strong class="draw-lottery-highlight">@CurrentAward.Name</strong>
-                    </span>
-                }
-            }
-
             @if (LastWinningUser != null)
             {
                 if (LastAward != null)
@@ -66,6 +42,30 @@
                             <strong class="draw-lottery-highlight">@LastAward.Name</strong>
                         </span>
                     }
+                }
+            }
+
+            @if (CurrentAward == null)
+            {
+                <span class="draw-lottery-end">抽奖结束</span>
+            }
+            else
+            {
+                @if (string.IsNullOrWhiteSpace(CurrentAward.Sponsor) == false)
+                {
+                    <span>
+                        即将抽选由
+                        <strong class="draw-lottery-highlight">@CurrentAward.Sponsor</strong>
+                        提供的
+                        <strong class="draw-lottery-highlight">@CurrentAward.Name</strong>
+                    </span>
+                }
+                else
+                {
+                    <span>
+                        即将抽选
+                        <strong class="draw-lottery-highlight">@CurrentAward.Name</strong>
+                    </span>
                 }
             }
 
