@@ -20,30 +20,6 @@
 
         <div class=" pa-4" style=" display: flex; flex-direction: column; align-items: center; font-size: x-large;">
 
-            @if (CurrentAward == null)
-            {
-                <span class="fw-bold primary-text">抽奖结束</span>
-            }
-            else
-            {
-                @if (string.IsNullOrWhiteSpace(CurrentAward.Sponsor) == false)
-                {
-                    <span>
-                        即将抽选由
-                        <strong class="primary-text">  @CurrentAward.Sponsor</strong>
-                        提供的
-                        <strong class="primary-text">  @CurrentAward.Name</strong>
-                    </span>
-                }
-                else
-                {
-                    <span>
-                        即将抽选
-                        <strong class="primary-text">  @CurrentAward.Name</strong>
-                    </span>
-                }
-            }
-
             @if (LastWinningUser != null)
             {
                 if (LastAward != null)
@@ -70,6 +46,30 @@
                     }
                 }
 
+            }
+
+            @if (CurrentAward == null)
+            {
+                <span class="fw-bold primary-text">抽奖结束</span>
+            }
+            else
+            {
+                @if (string.IsNullOrWhiteSpace(CurrentAward.Sponsor) == false)
+                {
+                    <span>
+                        即将抽选由
+                        <strong class="primary-text">  @CurrentAward.Sponsor</strong>
+                        提供的
+                        <strong class="primary-text">  @CurrentAward.Name</strong>
+                    </span>
+                }
+                else
+                {
+                    <span>
+                        即将抽选
+                        <strong class="primary-text">  @CurrentAward.Name</strong>
+                    </span>
+                }
             }
 
             @if (string.IsNullOrWhiteSpace(CurrentAward?.Image) == false)
