@@ -143,6 +143,10 @@ namespace CnGalWebSite.APIServer.Application.Stores
         /// <returns></returns>
         public async Task UpdateSteamInfo(StoreInfo storeInfo)
         {
+            var isDemo = await _storeInfoRepository.GetAll().AsNoTracking()
+                .AnyAsync(s => s.Id == storeInfo.Id && s.Entry.Releases.Any(r => r.Type == GameReleaseType.Demo
+                    && r.PublishPlatformType == s.PlatformType && r.PublishPlatformName == s.PlatformName && r.Link == s.Link && r.Name == s.Name));
+
             var data = new StoreInfo
             {
                 Name = storeInfo.Name,
@@ -150,13 +154,18 @@ namespace CnGalWebSite.APIServer.Application.Stores
             };
 
 
-            await UpdateSteamInfoFromOfficialAPI(data);
+            if (isDemo == false)
+            {
+                await UpdateSteamInfoFromOfficialAPI(data);
+            }
             await UpdateSteamInfoFromOfficialHtml(data);
             await UpdateSteamInfoFromIsthereanydeal(data);
             await UpdateSteamInfoFromXiaoHeiHe(data);
-            await UpdateSteamInfoFromGamalytic(data);
-            await UpdateSteamInfoFromVginsights(data);
-
+            if (isDemo == false)
+            {
+                await UpdateSteamInfoFromGamalytic(data);
+                await UpdateSteamInfoFromVginsights(data);
+            }
 
             storeInfo.State = data.State;
             storeInfo.PriceLowest = data.PriceLowest;
