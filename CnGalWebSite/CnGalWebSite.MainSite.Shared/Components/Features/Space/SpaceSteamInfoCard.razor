@@ -22,9 +22,9 @@
 
         @if (GameRecords is not null)
         {
-            var steamCount = GameRecords.Records.Count(r => r.IsInSteam);
-            var totalHours = GameRecords.Records.Sum(r => r.PlayDuration) / 60.0;
-            var totalCount = GameRecords.Records.Count;
+            var steamCount = GameRecords.Count(r => r.IsInSteam);
+            var totalHours = GameRecords.Sum(r => r.PlayDuration) / 60.0;
+            var totalCount = GameRecords.Count;
             var totalPrice = SteamUsers.Sum(u => u.Price);
 
             <div class="space-steam-info-card__stats">
@@ -80,7 +80,7 @@
     public IReadOnlyList<SteamUserInfoItem> SteamUsers { get; set; } = [];
 
     [Parameter]
-    public UserGameRecordsViewModel? GameRecords { get; set; }
+    public IReadOnlyList<GameRecordItem>? GameRecords { get; set; }
 
     /// <summary>
     /// 站内已收录游戏总数（用于计算收集率），0 表示不显示收集率。

@@ -15,7 +15,6 @@ public sealed class PlayedGameQueryService(
     ILogger<PlayedGameQueryService> logger) : QueryServiceBase(httpClient), IPlayedGameQueryService
 {
     private static readonly TimeSpan OverviewCacheDuration = TimeSpan.FromMinutes(5);
-    private static readonly TimeSpan RecordsCacheDuration = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan SteamInfoCacheDuration = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan GamesOverviewCacheDuration = TimeSpan.FromMinutes(10);
     private const string OverviewPathTemplate = "api/playedgame/GetPlayedGameOverview/{0}";
@@ -53,12 +52,6 @@ public sealed class PlayedGameQueryService(
 
     public async Task<SdkResult<UserGameRecordsViewModel>> GetUserGameRecordsAsync(string userId, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"main-site:user-game-records:{userId}";
-        if (memoryCache.TryGetValue(cacheKey, out UserGameRecordsViewModel? cached) && cached is not null)
-        {
-            return SdkResult<UserGameRecordsViewModel>.Ok(cached);
-        }
-
         var path = string.Format(UserRecordsPathTemplate, userId);
         var result = await GetAsync<List<GameRecordViewModel>>(
             path,
@@ -75,7 +68,6 @@ public sealed class PlayedGameQueryService(
         }
 
         var viewModel = MapRecordsToViewModel(result.Data);
-        memoryCache.Set(cacheKey, viewModel, RecordsCacheDuration);
         return SdkResult<UserGameRecordsViewModel>.Ok(viewModel);
     }
 
