@@ -333,7 +333,14 @@ namespace CnGalWebSite.APIServer.Controllers
 
             var objectUser = await _userRepository.FirstOrDefaultAsync(s => s.Id == id);
 
-            if (objectUser.IsShowGameRecord == false && id != user.Id)
+            if (objectUser == null)
+            {
+                return NotFound("未找到该用户");
+            }
+
+            var isCurrentUser = user != null && objectUser.Id == user.Id;
+
+            if (objectUser.IsShowGameRecord == false && isCurrentUser == false)
             {
                 return NotFound("该用户的游玩记录未公开");
             }
@@ -343,17 +350,21 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s => s.Entry).ThenInclude(s => s.Tags)
                 .Where(s => string.IsNullOrWhiteSpace(s.Entry.Name) == false && s.Entry.IsHidden == false)
                 .Where(s => s.ApplicationUserId == id)
+                .Where(s => isCurrentUser || (!s.IsHidden && s.ShowPublicly))
                 .ToListAsync();
 
             var gameIds = games.Select(s => s.Id).ToList();
             //提前加载预览
             //获取审核记录
-            var examines = await _examineRepository.GetAllListAsync(s => s.PlayedGameId != null && gameIds.Contains(s.PlayedGameId.Value) && s.ApplicationUserId == user.Id
-              && (s.Operation == Operation.EditPlayedGameMain) && s.IsPassed == null);
-
-            foreach (var item in examines)
+            if (isCurrentUser)
             {
-                _playedGameService.UpdatePlayedGameData(games.FirstOrDefault(s => s.Id == item.PlayedGameId.Value), item);
+                var examines = await _examineRepository.GetAllListAsync(s => s.PlayedGameId != null && gameIds.Contains(s.PlayedGameId.Value) && s.ApplicationUserId == objectUser.Id
+                  && (s.Operation == Operation.EditPlayedGameMain) && s.IsPassed == null);
+
+                foreach (var item in examines)
+                {
+                    _playedGameService.UpdatePlayedGameData(games.FirstOrDefault(s => s.Id == item.PlayedGameId.Value), item);
+                }
             }
 
             var model = new List<GameRecordViewModel>();
@@ -369,7 +380,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     GameName = item.Entry.Name,
                     PlayDuration = item.PlayDuration,
                     Type = item.Type,
-                    PlayImpressions = objectUser.Id == user.Id ? item.PlayImpressions : "",
+                    PlayImpressions = isCurrentUser ? item.PlayImpressions : "",
                     IsHidden = item.IsHidden,
                     MusicSocre = item.MusicSocre,
                     ScriptSocre = item.ScriptSocre,

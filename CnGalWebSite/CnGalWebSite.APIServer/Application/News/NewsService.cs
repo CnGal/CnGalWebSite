@@ -76,7 +76,9 @@ namespace CnGalWebSite.APIServer.Application.News
                 await _gameNewsRepository.GetAll().Include(s => s.RSS).Where(s => s.RSS.Type == OriginalRSSType.HeyBox).MaxAsync(s => s.RSS.PublishTime) : DateTime.MinValue;
 
             // 获取rss源
-            var rss = await _rssHelper.GetOriginalWeibo(long.Parse(_configuration["RSSWeiboUserId"]), weiboTime);
+            //微博采集已关闭
+            //var rss = await _rssHelper.GetOriginalWeibo(long.Parse(_configuration["RSSWeiboUserId"]), weiboTime);
+            var rss = new List<OriginalRSS>();
             rss.AddRange(await _rssHelper.GetOriginalBilibili(long.Parse(_configuration["RSSBilibiliUserId"])));
             rss.AddRange(await _rssHelper.GetOriginalHeyBox(heyBoxTime));
 

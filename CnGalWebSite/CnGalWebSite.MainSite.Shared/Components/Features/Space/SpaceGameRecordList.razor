@@ -1,6 +1,6 @@
 @* 游玩记录列表 + Steam 信息 *@
 
-<SpaceSteamInfoCard SteamUsers="SteamUsers" GameRecords="Model" TotalGameCount="TotalGameCount" />
+<SpaceSteamInfoCard SteamUsers="SteamUsers" GameRecords="VisibleRecords" TotalGameCount="TotalGameCount" />
 
 @if (IsCurrentUser)
 {
@@ -66,7 +66,7 @@ else
     private GameRecordItem? _currentRecord;
 
     private IReadOnlyList<GameRecordItem> VisibleRecords => Model.Records
-        .Where(r => !r.IsHidden || IsCurrentUser)
+        .Where(r => IsCurrentUser || (!r.IsHidden && r.ShowPublicly))
         .ToList();
 
     /// <summary>
