@@ -15,6 +15,50 @@ let _ready = false;
 let _pendingValue = undefined;
 let _vditorLoadPromise = null;
 let _imageApiBaseUrl = '';
+let _editorContainer = null;
+let _isComposing = false;
+let _suppressedFinalValue = undefined;
+
+function notifyEditorValueChanged(value) {
+    if (_suppressChangeEvent || !_dotNetRef) {
+        return;
+    }
+
+    _dotNetRef.invokeMethodAsync('OnEditorValueChanged', value);
+}
+
+function onCompositionStart() {
+    _isComposing = true;
+    _suppressedFinalValue = undefined;
+}
+
+function onCompositionEnd() {
+    _isComposing = false;
+    if (!_vditor || !_ready) {
+        return;
+    }
+
+    const value = _vditor.getValue();
+    _suppressedFinalValue = value;
+    notifyEditorValueChanged(value);
+}
+
+function attachCompositionListeners(containerElement) {
+    _editorContainer = containerElement;
+    _editorContainer.addEventListener('compositionstart', onCompositionStart);
+    _editorContainer.addEventListener('compositionend', onCompositionEnd);
+}
+
+function detachCompositionListeners() {
+    if (_editorContainer) {
+        _editorContainer.removeEventListener('compositionstart', onCompositionStart);
+        _editorContainer.removeEventListener('compositionend', onCompositionEnd);
+        _editorContainer = null;
+    }
+
+    _isComposing = false;
+    _suppressedFinalValue = undefined;
+}
 
 /**
  * 动态加载 CSS 文件（幂等）
@@ -103,6 +147,7 @@ export function initEditor(dotNetRef, containerElement, initialValue, placeholde
     _ready = false;
     _pendingValue = undefined;
     _imageApiBaseUrl = (imageApiBaseUrl || '').replace(/\/+$/, '');
+    attachCompositionListeners(containerElement);
 
     return ensureVditorLoaded().then(function () {
         _vditor = new Vditor(containerElement, {
@@ -149,10 +194,19 @@ export function initEditor(dotNetRef, containerElement, initialValue, placeholde
                 }
             },
             input: function (value) {
-                if (_suppressChangeEvent || !_dotNetRef) {
+                if (_isComposing) {
                     return;
                 }
-                _dotNetRef.invokeMethodAsync('OnEditorValueChanged', value);
+
+                if (_suppressedFinalValue !== undefined) {
+                    const isDuplicateFinalInput = _suppressedFinalValue === value;
+                    _suppressedFinalValue = undefined;
+                    if (isDuplicateFinalInput) {
+                        return;
+                    }
+                }
+
+                notifyEditorValueChanged(value);
             },
             after: function () {
                 _ready = true;
@@ -205,6 +259,7 @@ export function setValue(value) {
  * 销毁编辑器实例
  */
 export function disposeEditor() {
+    detachCompositionListeners();
     if (_vditor) {
         try {
             _vditor.destroy();

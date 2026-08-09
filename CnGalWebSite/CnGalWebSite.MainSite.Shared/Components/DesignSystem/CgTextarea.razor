@@ -2,8 +2,9 @@
           rows="@Rows"
           disabled="@Disabled"
           placeholder="@Placeholder"
+          data-cg-ime-input="true"
           @bind="Value"
-          @bind:event="oninput"
+          @bind:event="oncginputcommit"
           @bind:after="OnInputAsync"></textarea>
 
 @code {
