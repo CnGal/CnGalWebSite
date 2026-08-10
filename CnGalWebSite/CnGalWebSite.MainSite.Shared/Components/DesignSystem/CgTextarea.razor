@@ -1,11 +1,11 @@
-<textarea class="cg-textarea @(Monospace ? "cg-textarea--mono" : string.Empty)"
+<textarea @key="_textareaKey"
+          class="cg-textarea @(Monospace ? "cg-textarea--mono" : string.Empty)"
           rows="@Rows"
           disabled="@Disabled"
           placeholder="@Placeholder"
           data-cg-ime-input="true"
-          @bind="Value"
-          @bind:event="oncginputcommit"
-          @bind:after="OnInputAsync"></textarea>
+          value="@Value"
+          @oncginputcommit="OnInputAsync"></textarea>
 
 @code {
     [Parameter]
@@ -29,8 +29,23 @@
     [Parameter]
     public bool Monospace { get; set; }
 
-    private Task OnInputAsync()
+    private int _textareaKey;
+    private string? _lastUserInput;
+
+    protected override void OnParametersSet()
     {
-        return ValueChanged.InvokeAsync(Value);
+        // 正常输入时以浏览器当前值为准；仅当父组件主动替换或规范化值时，
+        // 才重建元素并同步外部值，避免 Server 回写旧值导致光标跳动。
+        if (_lastUserInput is not null && Value != _lastUserInput)
+        {
+            _textareaKey++;
+            _lastUserInput = null;
+        }
+    }
+
+    private Task OnInputAsync(ChangeEventArgs args)
+    {
+        _lastUserInput = args.Value?.ToString() ?? string.Empty;
+        return ValueChanged.InvokeAsync(_lastUserInput);
     }
 }
