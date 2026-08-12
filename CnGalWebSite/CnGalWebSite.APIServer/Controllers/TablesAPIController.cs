@@ -56,7 +56,8 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<QueryResultModel<BasicInforTableModel>> ListGames(QueryParameterModel model)
         {
-            var (items, total) = await _queryService.QueryAsync<BasicInforTableModel, long>(_basicInforTableModelRepository.GetAll().AsSingleQuery(), model,
+            var visibleGameIds = _entryRepository.GetAll().Where(s => s.Type == EntryType.Game && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => (long)s.Id);
+            var (items, total) = await _queryService.QueryAsync<BasicInforTableModel, long>(_basicInforTableModelRepository.GetAll().AsSingleQuery().Where(s => visibleGameIds.Contains(s.RealId)), model,
                 s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
 
             return new QueryResultModel<BasicInforTableModel>
@@ -149,7 +150,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<QueryResultModel<StoreInfoViewModel>> ListStoreInfo(QueryParameterModel model)
         {
-            var (items, total) = await _queryService.QueryAsync<StoreInfo, long>(_storeInfoRepository.GetAll().AsSingleQuery().Where(s => s.State != StoreState.None), model,
+            var (items, total) = await _queryService.QueryAsync<StoreInfo, long>(_storeInfoRepository.GetAll().AsSingleQuery().Where(s => s.State != StoreState.None && s.Entry != null && s.Entry.Type == EntryType.Game && s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false), model,
               s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
 
             return new QueryResultModel<StoreInfoViewModel>
@@ -183,7 +184,8 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<QueryResultModel<GameScoreTableModel>> ListGameScores(QueryParameterModel model)
         {
-            var (items, total) = await _queryService.QueryAsync<GameScoreTableModel, long>(_gameScoreTableRepository.GetAll().AsSingleQuery(), model,
+            var visibleGameIds = _entryRepository.GetAll().Where(s => s.Type == EntryType.Game && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false).Select(s => (long)s.Id);
+            var (items, total) = await _queryService.QueryAsync<GameScoreTableModel, long>(_gameScoreTableRepository.GetAll().AsSingleQuery().Where(s => visibleGameIds.Contains(s.GameId)), model,
               s => string.IsNullOrWhiteSpace(model.SearchText) || (s.GameName.Contains(model.SearchText)));
 
 

@@ -65,7 +65,9 @@ namespace CnGalWebSite.APIServer.Application.Tables
                          s.Outlinks,
                          s.Information,
                          Tags = s.Tags.Select(s => s.Name).ToList(),
-                         Staffs=s.EntryStaffFromEntryNavigation.Where(s=>s.PositionGeneral== PositionGeneralType.Publisher|| s.PositionGeneral == PositionGeneralType.ProductionGroup)
+                         Staffs=s.EntryStaffFromEntryNavigation.Where(s =>
+                             (s.PositionGeneral == PositionGeneralType.Publisher || s.PositionGeneral == PositionGeneralType.ProductionGroup) &&
+                             (s.ToEntry == null || (s.ToEntryNavigation.IsHidden == false && string.IsNullOrWhiteSpace(s.ToEntryNavigation.Name) == false)))
                      })
                      .AsSingleQuery()
                      .ToListAsync();
@@ -185,9 +187,9 @@ namespace CnGalWebSite.APIServer.Application.Tables
                 }
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                _logger.LogError(ex, "更新游戏基本信息汇总失败");
             }
         }
 
@@ -287,7 +289,11 @@ namespace CnGalWebSite.APIServer.Application.Tables
                 .Where(s => s.Type == EntryType.Game && s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false)
                 .Select(s => new
                 {
-                    EntryStaffFromEntryNavigation= s.EntryStaffFromEntryNavigation.Where(s=>s.PositionGeneral!= PositionGeneralType.Publisher&& s.PositionGeneral != PositionGeneralType.ProductionGroup&&s.PositionGeneral!= PositionGeneralType.SpecialThanks),
+                    EntryStaffFromEntryNavigation = s.EntryStaffFromEntryNavigation.Where(s =>
+                        s.PositionGeneral != PositionGeneralType.Publisher &&
+                        s.PositionGeneral != PositionGeneralType.ProductionGroup &&
+                        s.PositionGeneral != PositionGeneralType.SpecialThanks &&
+                        (s.ToEntry == null || (s.ToEntryNavigation.IsHidden == false && string.IsNullOrWhiteSpace(s.ToEntryNavigation.Name) == false))),
                     s.Name,
                     s.DisplayName
                 })
@@ -518,15 +524,16 @@ namespace CnGalWebSite.APIServer.Application.Tables
                 foreach (var nav in infor.EntryRelationFromEntryNavigation)
                 {
                     var item = nav.ToEntryNavigation;
-                    if (item.Type == EntryType.Game && string.IsNullOrWhiteSpace(item.DisplayName) == false)
+                    if (item != null && item.Type == EntryType.Game && item.IsHidden == false && string.IsNullOrWhiteSpace(item.Name) == false)
                     {
+                        var gameName = string.IsNullOrWhiteSpace(item.DisplayName) ? item.Name : item.DisplayName;
                         if (string.IsNullOrWhiteSpace(tableModel.GameName))
                         {
-                            tableModel.GameName = item.DisplayName;
+                            tableModel.GameName = gameName;
                         }
                         else
                         {
-                            tableModel.GameName += ("、" + item.DisplayName);
+                            tableModel.GameName += ("、" + gameName);
                         }
                     }
                 }
@@ -605,6 +612,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
                 {
                     s.Id,
                     s.Type,
+                    s.Name,
                     s.DisplayName,
                     Entries = s.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation != null && s.ToEntryNavigation.IsHidden == false && string.IsNullOrWhiteSpace(s.ToEntryNavigation.Name) == false).Select(s => s.ToEntryNavigation.Id).ToList(),
                     Staffs = s.EntryStaffFromEntryNavigation.Where(s => s.ToEntryNavigation != null && s.ToEntryNavigation.IsHidden == false && string.IsNullOrWhiteSpace(s.ToEntryNavigation.Name) == false).Select(s => s.ToEntryNavigation.Id).ToList()
@@ -656,7 +664,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
 
                 data.Category = (int)item.Type;
                 data.Id = data.Value = item.Id;
-                data.Name = item.DisplayName;
+                data.Name = string.IsNullOrWhiteSpace(item.DisplayName) ? item.Name : item.DisplayName;
 
                
                 //关联信息
@@ -686,8 +694,13 @@ namespace CnGalWebSite.APIServer.Application.Tables
                 .Select(s => new
                 {
                     s.Id,
+                    s.Name,
                     s.DisplayName,
-                    Entries = s.EntryRelationFromEntryNavigation.Where(s => s.ToEntryNavigation.Type == EntryType.Game).Select(s => s.ToEntryNavigation)
+                    Entries = s.EntryRelationFromEntryNavigation.Where(s =>
+                        s.ToEntryNavigation != null &&
+                        s.ToEntryNavigation.Type == EntryType.Game &&
+                        s.ToEntryNavigation.IsHidden == false &&
+                        string.IsNullOrWhiteSpace(s.ToEntryNavigation.Name) == false).Select(s => s.ToEntryNavigation)
                 })
                 .ToListAsync();
 
@@ -697,12 +710,17 @@ namespace CnGalWebSite.APIServer.Application.Tables
 
             var games = await _entryRepository.GetAll().AsNoTracking()
                 .Include(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                .Where(s =>gameIds.Contains(s.Id))
+                .Where(s => gameIds.Contains(s.Id) && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
                 .Select(s => new
                 {
                     s.Id,
+                    s.Name,
                     s.DisplayName,
-                    Entries = s.EntryRelationFromEntryNavigation.Where(s=>s.ToEntryNavigation.Type== EntryType.Role).Select(s => s.ToEntryNavigation)
+                    Entries = s.EntryRelationFromEntryNavigation.Where(s =>
+                        s.ToEntryNavigation != null &&
+                        s.ToEntryNavigation.Type == EntryType.Role &&
+                        s.ToEntryNavigation.IsHidden == false &&
+                        string.IsNullOrWhiteSpace(s.ToEntryNavigation.Name) == false).Select(s => s.ToEntryNavigation)
                 })
                 .ToListAsync();
 
@@ -711,10 +729,11 @@ namespace CnGalWebSite.APIServer.Application.Tables
             games.ForEach(s => roleIds.AddRange(s.Entries.Select(x => x.Id)));
 
             var roles = await _entryRepository.GetAll().AsNoTracking()
-                .Where(s => roleIds.Contains(s.Id))
+                .Where(s => roleIds.Contains(s.Id) && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
                 .Select(s => new
                 {
                     s.Id,
+                    s.Name,
                     s.DisplayName,
                 })
                 .ToListAsync();
@@ -724,7 +743,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
             var roleDatas = new List<EChartsTreeMapOptionSeryDataChildren>();
             roles.ForEach(s => roleDatas.Add(new EChartsTreeMapOptionSeryDataChildren
             {
-                Name = s.DisplayName,
+                Name = string.IsNullOrWhiteSpace(s.DisplayName) ? s.Name : s.DisplayName,
                 Value = 1,
                 Id = s.Id
             }));
@@ -732,7 +751,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
             var gameDatas = new List<EChartsTreeMapOptionSeryDataChildren>();
             games.ForEach(s => gameDatas.Add(new EChartsTreeMapOptionSeryDataChildren
             {
-                Name = s.DisplayName,
+                Name = string.IsNullOrWhiteSpace(s.DisplayName) ? s.Name : s.DisplayName,
                 Value = s.Entries.Count(),
                 Id=s.Id,
                 Children = roleDatas.Where(x => s.Entries.Select(s => s.Id).Contains(x.Id)).ToList()
@@ -741,7 +760,7 @@ namespace CnGalWebSite.APIServer.Application.Tables
             var groupDatas = new List<EChartsTreeMapOptionSeryData>();
             groups.ForEach(s => groupDatas.Add(new EChartsTreeMapOptionSeryData
             {
-                Name = s.DisplayName,
+                Name = string.IsNullOrWhiteSpace(s.DisplayName) ? s.Name : s.DisplayName,
                 Children = gameDatas.Where(x => s.Entries.Select(s => s.Id).Contains(x.Id)).ToList()
             }));
             groupDatas.ForEach(s => s.Value = s.Children.Sum(s => s.Value));
