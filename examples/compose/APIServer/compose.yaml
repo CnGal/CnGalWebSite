@@ -13,8 +13,8 @@ services:
         user: root
 
     ports:
-      - "${BIND_ADDRESS:-0.0.0.0}:${PORT:-2001}:8080"
-      # - "${BIND_ADDRESS:-0.0.0.0}:${HTTPS_PORT:-3001}:8081"
+      - ${HTTP_PORT:-2001}:8080
+      # - ${HTTPS_PORT:-3001}:8081
 
     env_file:
       - path: .env

@@ -1,9 +1,9 @@
 # Requires Docker Compose 5.4.0+ for pre_start hook image resolution.
 services:
-  identityserveradmin:
-    image: ghcr.io/cngal/cngalwebsite-identityserver-admin:${IMAGE_TAG:-latest}
-    container_name: ${CONTAINER_NAME:-identityserveradmin}
-    hostname: identityserveradmin
+  expo:
+    image: ghcr.io/cngal/cngalwebsite-expo:${IMAGE_TAG:-latest}
+    container_name: ${CONTAINER_NAME:-expo}
+    hostname: expo
 
     restart: unless-stopped
 
@@ -13,19 +13,20 @@ services:
         user: root
 
     ports:
-      - "${BIND_ADDRESS:-0.0.0.0}:${PORT:-5100}:8080"
+      - ${PORT:-2202}:8080
+      # - ${HTTPS_PORT:-3302}:8081
 
     env_file:
       - path: .env
         required: false
     environment:
       TZ: ${TZ:-Asia/Shanghai}
+      WebApiPath: ${WebApiPath:-https://api.cngal.org/}
       Authority: ${Authority:-https://oauth2.cngal.org}
       ClientId: ${ClientId}
       ClientSecret: ${ClientSecret}
-      IdsApiUrl: ${IdsApiUrl:-https://oauth2.cngal.org}
-      TokenAPI: ${TokenAPI:-https://oauth2.cngal.org/api/tokens/}
-      TokenAPISecret: ${TokenAPISecret}
+      # 图床API
+      ImageApiPath: ${ImageApiPath}
 
     labels:
       com.centurylinklabs.watchtower.enable: ${WATCHTOWER_ENABLE:-true}
@@ -34,12 +35,12 @@ services:
       test: ["CMD", "curl", "--fail", "--silent", "--show-error", "http://localhost:8080/healthz"]
 
     volumes:
-      - ${DATA_PROTECTION_KEYS_DIR:-DataProtection-Keys}:/home/app/.aspnet/DataProtection-Keys
+      - ${DATA_PROTECTION_KEYS_DIR:-expo-DataProtection-Keys}:/home/app/.aspnet/DataProtection-Keys
 
     deploy:
       resources:
         limits:
-          memory: ${RESOURCES_LIMITS_MEMORY:-500m}
+          memory: ${RESOURCES_LIMITS_MEMORY:-1.5G}
 
 volumes:
-  DataProtection-Keys:
+  expo-DataProtection-Keys:

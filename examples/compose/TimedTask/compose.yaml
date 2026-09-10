@@ -1,9 +1,9 @@
 # Requires Docker Compose 5.4.0+ for pre_start hook image resolution.
 services:
-  expo:
-    image: ghcr.io/cngal/cngalwebsite-expo:${IMAGE_TAG:-latest}
-    container_name: ${CONTAINER_NAME:-expo}
-    hostname: expo
+  timedtask:
+    image: ghcr.io/cngal/cngalwebsite-timedtask:${IMAGE_TAG:-latest}
+    container_name: ${CONTAINER_NAME:-timedtask}
+    hostname: timedtask
 
     restart: unless-stopped
 
@@ -13,20 +13,23 @@ services:
         user: root
 
     ports:
-      - "${BIND_ADDRESS:-0.0.0.0}:${PORT:-2202}:8080"
-      # - "${BIND_ADDRESS:-0.0.0.0}:${HTTPS_PORT:-3302}:8081"
+      - ${PORT:-2009}:8080
+      # - ${HTTPS_PORT:-3009}:8081
 
     env_file:
       - path: .env
         required: false
     environment:
       TZ: ${TZ:-Asia/Shanghai}
-      WebApiPath: ${WebApiPath:-https://api.cngal.org/}
+      # Ids 地址
       Authority: ${Authority:-https://oauth2.cngal.org}
-      ClientId: ${ClientId}
-      ClientSecret: ${ClientSecret}
-      # 图床API
-      ImageApiPath: ${ImageApiPath}
+      # 数据库连接字符串
+      DefaultDBConnection: ${DefaultDBConnection}
+      # 事件总线
+      EventBus_HostName: ${EventBus_HostName}
+      EventBus_Port: ${EventBus_Port:-5672}
+      EventBus_UserName: ${EventBus_UserName}
+      EventBus_Password: ${EventBus_Password}
 
     labels:
       com.centurylinklabs.watchtower.enable: ${WATCHTOWER_ENABLE:-true}
@@ -35,12 +38,12 @@ services:
       test: ["CMD", "curl", "--fail", "--silent", "--show-error", "http://localhost:8080/healthz"]
 
     volumes:
-      - ${DATA_PROTECTION_KEYS_DIR:-expo-DataProtection-Keys}:/home/app/.aspnet/DataProtection-Keys
+      - ${DATA_PROTECTION_KEYS_DIR:-DataProtection-Keys}:/home/app/.aspnet/DataProtection-Keys
 
     deploy:
       resources:
         limits:
-          memory: ${RESOURCES_LIMITS_MEMORY:-1.5G}
+          memory: ${RESOURCES_LIMITS_MEMORY:-100m}
 
 volumes:
-  expo-DataProtection-Keys:
+  DataProtection-Keys:
