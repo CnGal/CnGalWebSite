@@ -29,6 +29,8 @@ jobs:
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: false
 
       - name: Generate MDI icon map
         run: uv run mdi_extract.py

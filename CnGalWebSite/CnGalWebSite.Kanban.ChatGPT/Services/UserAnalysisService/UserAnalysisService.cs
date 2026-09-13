@@ -332,7 +332,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Services.UserAnalysisService
                 };
 
                 var url = _configuration["ChatGPTApiUrl"];
-                var fusionResponse = await _httpClient.PostAsJsonAsync(url + "v1/chat/completions", fusionRequest);
+                var fusionResponse = await _httpClient.PostAsJsonAsync(url!.TrimEnd('/') + "/v1/chat/completions", fusionRequest);
 
                 if (!fusionResponse.IsSuccessStatusCode)
                 {

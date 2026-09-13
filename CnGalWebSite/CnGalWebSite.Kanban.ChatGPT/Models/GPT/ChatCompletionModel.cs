@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -9,13 +10,36 @@ namespace CnGalWebSite.Kanban.ChatGPT.Models.GPT
 {
     public class ChatCompletionModel
     {
-        public string Model { get; set; } = "deepseek-v4-flash";
+        public string Model { get; set; } = "deepseek-flash";
         public List<ChatCompletionMessage> Messages { get; set; } = [];
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<ChatCompletionTool>? Tools { get; set; }
-        public double temperature { get; set; } = 1.3;
-        public Dictionary<string, string> thinking { get; set; } = new() { ["type"] = "disabled" };
+        public double? temperature { get; set; } = 1.3;
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Dictionary<string, string>? thinking { get; set; } = new() { ["type"] = "disabled" };
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? reasoning_effort { get; set; }
+
+        public HttpRequestMessage CreateRequest(string baseUrl)
+        {
+            var deepSeek = Model.Contains("deepseek", StringComparison.OrdinalIgnoreCase);
+            var url = baseUrl.TrimEnd('/') + "/v1/chat/completions";
+
+            // 使用副本过滤扩展字段，避免修改缓存中的历史消息。
+            var body = new ChatCompletionModel
+            {
+                Model = Model,
+                Messages = deepSeek ? Messages : Messages.Select(m => new ChatCompletionMessage
+                {
+                    Role = m.Role, Content = m.Content, tool_calls = m.tool_calls, tool_call_id = m.tool_call_id
+                }).ToList(),
+                Tools = Tools,
+                thinking = null,
+                temperature = deepSeek ? temperature : null,
+                reasoning_effort = deepSeek ? reasoning_effort : null
+            };
+            return new HttpRequestMessage(HttpMethod.Post, url) { Content = JsonContent.Create(body) };
+        }
     }
 
     public class ChatCompletionMessage
@@ -24,7 +48,9 @@ namespace CnGalWebSite.Kanban.ChatGPT.Models.GPT
         public string? Content { get; set; }
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? reasoning_content { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<ToolCall>? tool_calls { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? tool_call_id { get; set; }
     }
 
@@ -74,7 +100,7 @@ namespace CnGalWebSite.Kanban.ChatGPT.Models.GPT
         public long Created { get; set; }
         public string? Model { get; set; }
         public List<Choice>? Choices { get; set; }
-        public required Usage Usage { get; set; }
+        public Usage? Usage { get; set; }
     }
 
     public class Choice
