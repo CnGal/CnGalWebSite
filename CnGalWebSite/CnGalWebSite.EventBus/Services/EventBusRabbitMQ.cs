@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -6,12 +6,15 @@ using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
+using CnGalWebSite.Core.Configuration;
+using CnGalWebSite.EventBus.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace CnGalWebSite.EventBus.Services
 {
-    public class EventBusRabbitMQ(IConfiguration configuration, ILogger<EventBusRabbitMQ> logger) : IEventBus, IDisposable
+    public class EventBusRabbitMQ(IOptions<RabbitMqOptions> options, ILogger<EventBusRabbitMQ> logger) : IEventBus, IDisposable
     {
-        private readonly IConfiguration _configuration = configuration;
+        private readonly IOptions<RabbitMqOptions> _options = options;
         private readonly ILogger<EventBusRabbitMQ> _logger = logger;
         private readonly ConcurrentDictionary<string, TaskCompletionSource<byte[]>> callbackMapper = new();
 
@@ -24,12 +27,13 @@ namespace CnGalWebSite.EventBus.Services
         {
             if (_channel == null && _connection == null)
             {
+                var settings = _options.GetOptional(RabbitMqOptions.SectionName);
                 var factory = new ConnectionFactory
                 {
-                    HostName = _configuration["EventBus_HostName"],
-                    Port = int.Parse(_configuration["EventBus_Port"]),
-                    UserName = _configuration["EventBus_UserName"],
-                    Password = _configuration["EventBus_Password"],
+                    HostName = settings.HostName,
+                    Port = settings.Port,
+                    UserName = settings.UserName,
+                    Password = settings.Password,
                 };
                 _connection = factory.CreateConnection();
                 _channel = _connection.CreateModel();

@@ -18,13 +18,13 @@ services:
     environment:
       TZ: ${TZ:-Asia/Shanghai}
       # 事件总线 主机名称
-      EventBus_HostName: ${EventBus_HostName}
+      RabbitMq__HostName: ${RabbitMq__HostName:-}
       # 事件总线 端口
-      EventBus_Port: ${EventBus_Port:-5672}
+      RabbitMq__Port: ${RabbitMq__Port:-5672}
       # 事件总线 用户名
-      EventBus_UserName: ${EventBus_UserName}
+      RabbitMq__UserName: ${RabbitMq__UserName:-}
       # 事件总线 密码
-      EventBus_Password: ${EventBus_Password}
+      RabbitMq__Password: ${RabbitMq__Password:-}
       # GPT API KEY
       ChatGPTApiKey: ${ChatGPTApiKey}
       # 1分钟所有用户调用次数限制

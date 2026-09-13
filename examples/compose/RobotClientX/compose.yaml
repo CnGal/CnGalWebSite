@@ -43,10 +43,10 @@ services:
       # 网站主题颜色
       WebSiteTheme: "${WebSiteTheme:-#f06292}"
       # 事件总线
-      EventBus_HostName: ${EventBus_HostName}
-      EventBus_Port: ${EventBus_Port:-5672}
-      EventBus_UserName: ${EventBus_UserName}
-      EventBus_Password: ${EventBus_Password}
+      RabbitMq__HostName: ${RabbitMq__HostName:-}
+      RabbitMq__Port: ${RabbitMq__Port:-5672}
+      RabbitMq__UserName: ${RabbitMq__UserName:-}
+      RabbitMq__Password: ${RabbitMq__Password:-}
       # 群聊历史记录最大条数
       GroupHistoryMax: ${GroupHistoryMax:-30}
       # 群聊历史记录达到最大条数后，保留最近N条消息

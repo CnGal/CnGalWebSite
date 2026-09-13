@@ -55,7 +55,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
 
         public void InitEventBus()
         {
-            if (string.IsNullOrWhiteSpace(_configuration["EventBus_HostName"]) == false)
+            try
             {
                 _eventBusService.RecieveQQMessage(async (e) =>
                 {
@@ -65,6 +65,10 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                 {
                     await SendMessage(RobotReplyRange.Group, e.GroupId, e.Message);
                 });
+            }
+            catch (CnGalWebSite.Core.Configuration.ConfigurationException ex)
+            {
+                _logger.LogWarning("Skipping event bus setup: {Section}", ex.Section);
             }
         }
 
