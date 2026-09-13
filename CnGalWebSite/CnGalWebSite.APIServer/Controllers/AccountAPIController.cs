@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
@@ -42,7 +42,8 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IUserService _userService;
         private readonly IOperationRecordService _operationRecordService;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<GeetestOptions> _geetestOptions;
+        private readonly IOptionsSnapshot<InternalApiAccessOptions> _internalApiAccessOptions;
         private readonly ILogger<AccountAPIController> _logger;
         private readonly IQueryService _queryService;
         private readonly IRepository<UserCertification, long> _userCertificationRepository;
@@ -50,14 +51,15 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
         public AccountAPIController(IRepository<UserOnlineInfor, long> userOnlineInforRepository,  IAppHelper appHelper, IRepository<ApplicationUser, string> userRepository, IQueryService queryService, IRepository<UserCertification, long> userCertificationRepository,
-        IRepository<HistoryUser, int> historyUserRepository, IUserService userService, IConfiguration configuration, ILogger<AccountAPIController> logger, IOperationRecordService operationRecordService, IRepository<OperationRecord, long> operationRecordRepository)
+        IRepository<HistoryUser, int> historyUserRepository, IUserService userService, IOptions<GeetestOptions> geetestOptions, IOptionsSnapshot<InternalApiAccessOptions> internalApiAccessOptions, ILogger<AccountAPIController> logger, IOperationRecordService operationRecordService, IRepository<OperationRecord, long> operationRecordRepository)
         {
             _appHelper = appHelper;
             _userOnlineInforRepository = userOnlineInforRepository;
             _historyUserRepository = historyUserRepository;
             _userRepository = userRepository;
             _userService = userService;
-            _configuration = configuration;
+            _geetestOptions = geetestOptions;
+            _internalApiAccessOptions = internalApiAccessOptions;
             _logger = logger;
             _operationRecordService = operationRecordService;
             _queryService = queryService;
@@ -86,7 +88,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 client_type 客户端类型，web：电脑上的浏览器；h5：手机上的浏览器，包括移动应用内完全内置的web_view；native：通过原生sdk植入app应用的方式；unknown：未知
                 ip_address 客户端请求sdk服务器的ip地址
             */
-            var gtLib = new GeetestLib(_configuration["GEETEST_ID"], _configuration["GEETEST_KEY"]);
+            var gtLib = new GeetestLib(_geetestOptions.GetOptional(GeetestOptions.SectionName).Id, _geetestOptions.GetOptional(GeetestOptions.SectionName).Key);
             var userId = ip;
             var digestmod = "md5";
             IDictionary<string, string> paramDict = new Dictionary<string, string> { { "digestmod", digestmod }, { "user_id", userId }, { "client_type", "web" }, { "ip_address", "127.0.0.1" } };
@@ -264,7 +266,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<GetQQResultModel> GetQQ(GetQQModel model)
         {
-            if (_configuration["JwtSecurityKey"]!=model.Token)
+            if (!InternalApiToken.Matches(_internalApiAccessOptions.GetOptional(InternalApiAccessOptions.SectionName).ProjectSiteToken, model.Token))
             {
                 return new GetQQResultModel();
             }

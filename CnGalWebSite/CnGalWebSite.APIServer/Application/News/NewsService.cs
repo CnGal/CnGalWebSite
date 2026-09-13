@@ -1,4 +1,4 @@
-﻿
+
 using CnGalWebSite.APIServer.Application.Files;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
@@ -26,7 +26,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
     public class NewsService : INewsService
     {
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<AutomationUsersOptions> _automationUsersOptions;
         private readonly IRSSHelper _rssHelper;
         private readonly IAppHelper _appHelper;
         private readonly IRepository<Entry, int> _entryRepository;
@@ -39,11 +39,11 @@ namespace CnGalWebSite.APIServer.Application.News
         private readonly IFileService _fileService;
         private readonly IFileUploadService _fileUploadService;
 
-        public NewsService(IConfiguration configuration, IRSSHelper rssHelper, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFileService fileService, IRepository<ApplicationUser, string> userRepository,
+        public NewsService(IOptions<AutomationUsersOptions> automationUsersOptions, IRSSHelper rssHelper, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFileService fileService, IRepository<ApplicationUser, string> userRepository,
         IRepository<WeiboUserInfor, long> weiboUserInforRepository, IRepository<GameNews, long> gameNewsRepository, IExamineService examineService, IFileUploadService fileUploadService,
         IRepository<Article, long> articleRepository, IRepository<WeeklyNews, long> weeklyNewsRepository)
         {
-            _configuration = configuration;
+            _automationUsersOptions = automationUsersOptions;
             _rssHelper = rssHelper;
             _appHelper = appHelper;
             _entryRepository = entryRepository;
@@ -74,12 +74,24 @@ namespace CnGalWebSite.APIServer.Application.News
 
             // 获取rss源
             //微博采集已关闭
-            //var rss = await _rssHelper.GetOriginalWeibo(long.Parse(_configuration["RSSWeiboUserId"]), weiboTime);
             var rss = new List<OriginalRSS>();
-            rss.AddRange(await _rssHelper.GetOriginalBilibili(long.Parse(_configuration["RSSBilibiliUserId"])));
-            rss.AddRange(await _rssHelper.GetOriginalHeyBox(DateTime.MinValue));
-
-            //var rss = await _rssHelper.GetOriginalBilibili(long.Parse(_configuration["RSSBilibiliUserId"]), time);
+            ConfigurationException configurationError = null;
+            try
+            {
+                rss.AddRange(await _rssHelper.GetOriginalBilibili());
+            }
+            catch (ConfigurationException ex)
+            {
+                configurationError = ex;
+            }
+            try
+            {
+                rss.AddRange(await _rssHelper.GetOriginalHeyBox(DateTime.MinValue));
+            }
+            catch (ConfigurationException ex)
+            {
+                configurationError ??= ex;
+            }
 
             //获取周报
             var weekly = await _weeklyNewsRepository.GetAll().Include(s => s.News).OrderByDescending(s => s.CreateTime).FirstOrDefaultAsync();
@@ -103,14 +115,24 @@ namespace CnGalWebSite.APIServer.Application.News
             rss.RemoveAll(r => r.Type == OriginalRSSType.HeyBox && existingHeyBoxLinks.Contains(r.Link));
             rss.Sort((a, b) => a.PublishTime.CompareTo(b.PublishTime));
 
-            //图床上传从RSSHelper移至此处，仅对去重后的新B站条目执行
-            foreach (var item in rss.Where(r => r.Type == OriginalRSSType.Bilibili))
+            // Keep upstream upload failures unchanged; isolate only configuration failures.
+            foreach (var item in rss.Where(r => r.Type == OriginalRSSType.Bilibili).ToList())
             {
-                item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
+                try
+                {
+                    item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
+                }
+                catch (ConfigurationException ex)
+                {
+                    configurationError ??= ex;
+                    rss.Remove(item);
+                }
             }
 
             if (rss.Count == 0)
             {
+                if (configurationError != null)
+                    throw configurationError;
                 return;
             }
 
@@ -121,11 +143,13 @@ namespace CnGalWebSite.APIServer.Application.News
                 {
                     var temp = await ProcessingOriginalRSS(item);
 
+                    var shouldPublish = temp.State == GameNewsState.Publish;
+                    temp.State = GameNewsState.Edit;
                     temp = await _gameNewsRepository.InsertAsync(temp);
 
 
                     //判断是否需要立即发表
-                    if (temp.State == GameNewsState.Publish)
+                    if (shouldPublish)
                     {
                         try
                         {
@@ -133,7 +157,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
                             weekly.News.Add(temp);
                         }
-                        catch
+                        catch (Exception ex) when (ex is not ConfigurationException)
                         {
                             temp.State = GameNewsState.Edit;
                             await _gameNewsRepository.UpdateAsync(temp);
@@ -141,14 +165,20 @@ namespace CnGalWebSite.APIServer.Application.News
 
                     }
                 }
-                catch(Exception ex)
+                catch (ConfigurationException ex)
                 {
-
+                    configurationError ??= ex;
+                }
+                catch (Exception ex)
+                {
+                    // 继续处理其余已导入的新闻项。
                 }
 
             }
 
             await _weeklyNewsRepository.UpdateAsync(weekly);
+            if (configurationError != null)
+                throw configurationError;
 
         }
 
@@ -168,6 +198,8 @@ namespace CnGalWebSite.APIServer.Application.News
             }
             var temp = await ProcessingOriginalRSS(item);
 
+            var shouldPublish = temp.State == GameNewsState.Publish;
+            temp.State = GameNewsState.Edit;
             temp = await _gameNewsRepository.InsertAsync(temp);
 
             //获取周报
@@ -177,7 +209,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 weekly = await GenerateNewestWeeklyNews();
             }
             //判断是否需要立即发表
-            if (temp.State == GameNewsState.Publish)
+            if (shouldPublish)
             {
                 try
                 {
@@ -185,7 +217,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
                     weekly.News.Add(temp);
                 }
-                catch
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     temp.State = GameNewsState.Edit;
                     await _gameNewsRepository.UpdateAsync(temp);
@@ -247,9 +279,9 @@ namespace CnGalWebSite.APIServer.Application.News
                 {
                     await AddWeiboUserInfor(item.Key, item.Value);
                 }
-                catch (Exception)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
-
+                    // 继续处理其余微博用户。
                 }
 
             }
@@ -351,7 +383,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 MainPicture = gameNews.MainPicture,
                 Type = gameNews.Type,
                 NewsType = gameNews.NewsType ?? "动态",
-                CreateUserId = _configuration["NewsAdminId"],
+                CreateUserId = _automationUsersOptions.GetOptional(AutomationUsersOptions.SectionName).NewsAdminId,
                 PubishTime = gameNews.PublishTime,
                 RealNewsTime = gameNews.PublishTime,
                 CreateTime = DateTime.Now.ToCstTime(),
@@ -440,7 +472,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 PubishTime = DateTime.Now.ToCstTime(),
                 CreateTime = DateTime.Now.ToCstTime(),
                 NewsType = "周报",
-                CreateUserId = _configuration["NewsAdminId"]
+                CreateUserId = _automationUsersOptions.GetOptional(AutomationUsersOptions.SectionName).NewsAdminId
             };
 
 

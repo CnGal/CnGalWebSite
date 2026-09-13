@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Controllers;
+using CnGalWebSite.APIServer.Controllers;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
@@ -25,17 +25,17 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<SteamUserInfor, long> _steamUserInforRepository;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<SteamOptions> _steamOptions;
         private readonly HttpClient _httpClient;
         private readonly ILogger<SteamInforService> _logger;
 
         public SteamInforService(IRepository<StoreInfo, long> storeInfoRepository, IRepository<ApplicationUser, string> userRepository, IRepository<Entry, int> entryRepository,
-        IConfiguration configuration, IRepository<PlayedGame, long> playedGameRepository, IRepository<SteamUserInfor, long> steamUserInforRepository, ILogger<SteamInforService> logger,
+        IOptions<SteamOptions> steamOptions, IRepository<PlayedGame, long> playedGameRepository, IRepository<SteamUserInfor, long> steamUserInforRepository, ILogger<SteamInforService> logger,
         HttpClient httpClient)
         {
             _storeInfoRepository = storeInfoRepository;
             _userRepository = userRepository;
-            _configuration = configuration;
+            _steamOptions = steamOptions;
             _playedGameRepository = playedGameRepository;
             _httpClient = httpClient;
             _steamUserInforRepository = steamUserInforRepository;
@@ -93,13 +93,14 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             {
                 try
                 {
-                    var jsonContent = await _httpClient.GetStringAsync(_configuration["SteamAPIUrl"] + "IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"] + "&steamid=" + item + "&skip_unvetted_apps=0&include_played_free_games=1");
+                    var steam = _steamOptions.GetOptional(SteamOptions.SectionName);
+                    var jsonContent = await _httpClient.GetStringAsync(steam.BaseAddress + "IPlayerService/GetOwnedGames/v1/?key=" + steam.ApiToken + "&steamid=" + item + "&skip_unvetted_apps=0&include_played_free_games=1");
                     var obj = JObject.Parse(jsonContent);
                     var temp = obj["response"].ToObject<UserSteamResponseJson>();
                     steamGames.games.AddRange(temp.games);
                     steamGames.game_count += temp.game_count;
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     _logger.LogError(ex, "获取用户Steam游戏列表失败");
                     isError = true;
@@ -212,11 +213,12 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             var steamUser = new SteamUserInforJson();
             try
             {
-                var jsonContent = await _httpClient.GetStringAsync(_configuration["SteamAPIUrl"] + "ISteamUser/GetPlayerSummaries/v2/?key=" + _configuration["SteamAPIToken"] + "&steamids=" + SteamId);
+                var steam = _steamOptions.GetOptional(SteamOptions.SectionName);
+                var jsonContent = await _httpClient.GetStringAsync(steam.BaseAddress + "ISteamUser/GetPlayerSummaries/v2/?key=" + steam.ApiToken + "&steamids=" + SteamId);
                 var obj = JObject.Parse(jsonContent);
                 steamUser = obj.ToObject<SteamUserInforJson>();
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return null;
             }
@@ -282,7 +284,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 throw new Exception("获取愿望单失败，请设置Steam个人资料公开", ex);
             }
@@ -321,7 +323,8 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         {
             try
             {
-                var url = _configuration["SteamAPIUrl"] + "IPlayerService/GetOwnedGames/v1/?key=" + _configuration["SteamAPIToken"]
+                var steam = _steamOptions.GetOptional(SteamOptions.SectionName);
+                var url = steam.BaseAddress + "IPlayerService/GetOwnedGames/v1/?key=" + steam.ApiToken
                     + "&steamid=" + userId + "&appids_filter[0]=" + gameId + "&skip_unvetted_apps=0&include_played_free_games=1";
                 var jsonContent = await _httpClient.GetStringAsync(url);
                 var obj = JObject.Parse(jsonContent);
@@ -332,7 +335,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 }
                 return games.Any(s => s["appid"]?.ToString() == gameId);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 throw new Exception("获取Steam库存失败，请设置Steam个人资料公开", ex);
             }

@@ -1,4 +1,4 @@
-﻿
+
 using CnGalWebSite.APIServer.Application.BackUpArchives;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Files;
@@ -152,6 +152,10 @@ namespace CnGalWebSite.APIServer.Application.TimedTasks
                 }
 
                 _logger.LogInformation("成功执行定时任务：{name}", Model.Note ?? ((TimedTaskType)Model.Type).GetDisplayName());
+            }
+            catch (ConfigurationException ex)
+            {
+                _logger.LogWarning("Skipping task due to configuration: {Section}", ex.Section);
             }
             catch (Exception ex)
             {

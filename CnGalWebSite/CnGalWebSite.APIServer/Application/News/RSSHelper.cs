@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Files;
+using CnGalWebSite.APIServer.Application.Files;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Files;
@@ -18,15 +18,19 @@ namespace CnGalWebSite.APIServer.Application.News
     public class RSSHelper : IRSSHelper
     {
         private readonly HttpClient _httpClient;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<BilibiliFeedOptions> _bilibiliFeedOptions;
+        private readonly IOptions<HeyBoxFeedOptions> _heyBoxFeedOptions;
+        private readonly IOptions<RssOptions> _rssOptions;
         private readonly IFileService _fileService;
         private readonly IFileUploadService _fileUploadService;
         private readonly ILogger<RSSHelper> _logger;
 
-        public RSSHelper(HttpClient httpClient, IConfiguration configuration, IFileService fileService, IFileUploadService fileUploadService, ILogger<RSSHelper> logger)
+        public RSSHelper(HttpClient httpClient, IOptions<BilibiliFeedOptions> bilibiliFeedOptions, IOptions<HeyBoxFeedOptions> heyBoxFeedOptions, IOptions<RssOptions> rssOptions, IFileService fileService, IFileUploadService fileUploadService, ILogger<RSSHelper> logger)
         {
             _httpClient = httpClient;
-            _configuration = configuration;
+            _bilibiliFeedOptions = bilibiliFeedOptions;
+            _heyBoxFeedOptions = heyBoxFeedOptions;
+            _rssOptions = rssOptions;
             _fileService = fileService;
             _fileUploadService = fileUploadService;
             _logger = logger;
@@ -39,7 +43,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 var model = new List<OriginalRSS>();
 
                 //获取最新微博数据
-                var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id);
+                var xmlStr = await _httpClient.GetStringAsync(_rssOptions.GetOptional(RssOptions.SectionName).BaseAddress + "weibo/user/" + id);
                 //反序列化数据
                 var doc = new XmlDocument();
                 doc.LoadXml(xmlStr);
@@ -82,7 +86,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
                 return model;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 _logger.LogError(ex, "获取微博动态失败");
                 return [];
@@ -100,7 +104,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
 
             //获取最新微博数据
-            var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id.ToString());
+            var xmlStr = await _httpClient.GetStringAsync(_rssOptions.GetOptional(RssOptions.SectionName).BaseAddress + "weibo/user/" + id.ToString());
             //反序列化数据
             var doc = new XmlDocument();
             doc.LoadXml(xmlStr);
@@ -123,7 +127,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 var model = new OriginalRSS();
 
                 //获取最新微博数据
-                var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id);
+                var xmlStr = await _httpClient.GetStringAsync(_rssOptions.GetOptional(RssOptions.SectionName).BaseAddress + "weibo/user/" + id);
                 //反序列化数据
                 var doc = new XmlDocument();
                 doc.LoadXml(xmlStr);
@@ -156,7 +160,7 @@ namespace CnGalWebSite.APIServer.Application.News
                     }
                 }
             }
-            catch
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return null;
             }
@@ -170,7 +174,7 @@ namespace CnGalWebSite.APIServer.Application.News
             var model = new OriginalRSS();
 
             //获取最新微博数据
-            var xmlStr = await _httpClient.GetStringAsync(_configuration["RSSUrl"] + "weibo/user/" + id);
+            var xmlStr = await _httpClient.GetStringAsync(_rssOptions.GetOptional(RssOptions.SectionName).BaseAddress + "weibo/user/" + id);
             //反序列化数据
             var doc = new XmlDocument();
             doc.LoadXml(xmlStr);
@@ -211,14 +215,14 @@ namespace CnGalWebSite.APIServer.Application.News
             return null;
         }
 
-        public async Task<List<OriginalRSS>> GetOriginalBilibili(long id)
+        public async Task<List<OriginalRSS>> GetOriginalBilibili()
         {
             try
             {
                 var model = new List<OriginalRSS>();
 
                 //获取最新B站数据
-                var xmlStr = await _httpClient.GetStringAsync(_configuration["BilibiliRSSUrl"]);
+                var xmlStr = await _httpClient.GetStringAsync(_bilibiliFeedOptions.GetOptional(BilibiliFeedOptions.SectionName).BilibiliFeedAddress);
                 //反序列化数据
                 var doc = new XmlDocument();
                 doc.LoadXml(xmlStr);
@@ -261,7 +265,7 @@ namespace CnGalWebSite.APIServer.Application.News
 
                 return model;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 _logger.LogError(ex, "获取Bilibili动态失败");
                 return [];
@@ -274,7 +278,7 @@ namespace CnGalWebSite.APIServer.Application.News
             {
                 var model = new List<OriginalRSS>();
                 //获取最新小黑盒数据
-                var jsonStr = await _httpClient.GetStringAsync(_configuration["HeyBoxRSSUrl"]);
+                var jsonStr = await _httpClient.GetStringAsync(_heyBoxFeedOptions.GetOptional(HeyBoxFeedOptions.SectionName).HeyBoxFeedAddress);
 
                 //反序列化数据
                 using var doc = JsonDocument.Parse(jsonStr);
@@ -375,7 +379,7 @@ namespace CnGalWebSite.APIServer.Application.News
                 }
                 return model;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 _logger.LogError(ex, "获取小黑盒动态失败");
                 return [];

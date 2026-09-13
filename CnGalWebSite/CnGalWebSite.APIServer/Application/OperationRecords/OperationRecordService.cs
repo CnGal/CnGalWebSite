@@ -1,4 +1,4 @@
-﻿
+
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.Helper;
@@ -21,23 +21,28 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
     public partial class OperationRecordService : IOperationRecordService
     {
         private readonly IRepository<OperationRecord, long> _operationRecordRepository;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<ClientIpOptions> _clientIpOptions;
         private readonly IDictionary<string, string> _ips = new Dictionary<string, string>();
         private DateTime _lastRefreshTime;
+        private bool _hostsLoaded;
 
-        public OperationRecordService(IRepository<OperationRecord, long> operationRecordRepository, IConfiguration configuration)
+        public OperationRecordService(IRepository<OperationRecord, long> operationRecordRepository, IOptions<ClientIpOptions> clientIpOptions)
         {
             _operationRecordRepository = operationRecordRepository;
-            _configuration = configuration;
+            _clientIpOptions = clientIpOptions;
+        }
 
-            if (string.IsNullOrWhiteSpace(_configuration["IpWhitelist"]) == false)
+        private void LoadHosts()
+        {
+            if (_hostsLoaded) return;
+            if (string.IsNullOrWhiteSpace(_clientIpOptions.GetOptional(ClientIpOptions.SectionName).TrustedProxyHosts) == false)
             {
-                foreach (var item in _configuration["IpWhitelist"].Split(',').Select(s => new KeyValuePair<string, string>(s.Trim(), null)))
+                foreach (var item in _clientIpOptions.GetOptional(ClientIpOptions.SectionName).TrustedProxyHosts.Split(',').Select(s => new KeyValuePair<string, string>(s.Trim(), null)))
                 {
                     _ips.Add(item);
                 }
             }
-
+            _hostsLoaded = true;
         }
 
         private static string GetHostAddresses(string howtogeek)
@@ -49,6 +54,7 @@ namespace CnGalWebSite.APIServer.Application.OperationRecords
 
         private void RefreshIPs()
         {
+            LoadHosts();
             if ((DateTime.Now.ToCstTime() - _lastRefreshTime).TotalMinutes < 10)
             {
                 return;

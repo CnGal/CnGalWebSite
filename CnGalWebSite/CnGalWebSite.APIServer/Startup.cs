@@ -29,8 +29,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NetCore.AutoRegisterDi;
-using NETCore.MailKit.Extensions;
-using NETCore.MailKit.Infrastructure.Internal;
 using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Filters;
 using System;
@@ -39,7 +37,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
-using Meilisearch;
 using CnGalWebSite.EventBus.Extensions;
 using CnGalWebSite.APIServer.Application.Tasks;
 using Microsoft.OpenApi;
@@ -58,16 +55,23 @@ namespace CnGalWebSite.APIServer
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddApiConfiguration();
+            services.AddProblemDetails();
+            services.AddExceptionHandler<ConfigurationExceptionHandler>();
+            services.AddConfiguredMeilisearch();
             //添加数据库连接池
-            services.AddDbContextPool<AppDbContext>(options =>
-                options.UseMySql(Configuration["CnGalDBConnection"], ServerVersion.AutoDetect(Configuration["CnGalDBConnection"]),
+            services.AddDbContextPool<AppDbContext>((provider, options) =>
+            {
+                    var connection = provider.GetRequiredService<IOptions<DatabaseOptions>>().Value.Default;
+                options.UseMySql(connection, ServerVersion.AutoDetect(connection),
                     o =>
                     {
                         //全局配置查询拆分模式
                         o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                         // 在查询中使用表达式包装集合
                         o.TranslateParameterizedCollectionsToConstants();
-                    }));
+                    });
+            });
 
             //配置Json
             services.AddControllersWithViews()
@@ -94,9 +98,6 @@ namespace CnGalWebSite.APIServer
             services.AddHttpClient();
             services.AddScoped<IHttpService, HttpService>();
             //添加搜索服务
-            services.AddSingleton(new MeilisearchClient(
-                Configuration["MeilisearchHost"],
-                Configuration["MeilisearchApiKey"]));
             services.AddScoped<ISearchHelper, MeilisearchHelper>();
             //依赖注入仓储
             services.AddTransient(typeof(IRepository<,>), typeof(RepositoryBase<,>));
@@ -140,13 +141,15 @@ namespace CnGalWebSite.APIServer
             services.AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
                 {
-                    options.Authority = Configuration["Authority"];
                     options.RequireHttpsMetadata = false;
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateAudience = false
                     };
                 });
+            services.AddOptions<JwtBearerOptions>("Bearer")
+                .Configure<IOptions<JwtAuthorityOptions>>((options, authority) =>
+                    options.Authority = authority.Value.Authority);
 
             //添加授权范围
             services.AddAuthorization(options =>
@@ -159,23 +162,7 @@ namespace CnGalWebSite.APIServer
             });
 
             //添加 MailKit 发送邮件
-            services.AddMailKit(optionBuilder =>
-            {
-                optionBuilder.UseMailKit(new MailKitOptions()
-                {
-                    //get options from sercets.json
-                    Server = Configuration["Server"],
-                    Port = Convert.ToInt32(Configuration["Port"]),
-                    SenderName = Configuration["SenderName"],
-                    SenderEmail = Configuration["SenderEmail"],
-
-                    // can be optional with no authentication
-                    Account = Configuration["Account"],
-                    Password = Configuration["Password"],
-                    // enable ssl or tls
-                    Security = true
-                });
-            });
+            services.AddConfiguredMailKit();
             //事件总线
             services.AddEventBus();
             //添加后台定时任务
@@ -197,7 +184,14 @@ namespace CnGalWebSite.APIServer
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseDeveloperExceptionPage();
+            if (env.IsDevelopment())
+                app.UseDeveloperExceptionPage();
+
+            app.UseExceptionHandler(new ExceptionHandlerOptions
+            {
+                // 保留 .NET 10 之前的行为：已处理的配置异常仍输出框架诊断信息，便于运行维护。
+                SuppressDiagnosticsCallback = _ => false
+            });
 
             //添加真实IP中间件
             app.UseForwardedHeaders();

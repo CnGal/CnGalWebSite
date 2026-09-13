@@ -16,70 +16,63 @@ services:
       - ${HTTP_PORT:-2001}:8080
       # - ${HTTPS_PORT:-3001}:8081
 
-    env_file:
-      - path: .env
-        required: false
     environment:
       # 运行环境
       TZ: ${TZ:-Asia/Shanghai}
 
       # 数据库与认证
-      CnGalDBConnection: ${CnGalDBConnection}
-      Authority: ${Authority:-https://oauth2.cngal.org}
-      JwtSecurityKey: ${JwtSecurityKey}
-      GEETEST_ID: ${GEETEST_ID}
-      GEETEST_KEY: ${GEETEST_KEY}
-      IpWhitelist: ${IpWhitelist}
-
-      # 第三方登录
-      WeiboAppKey: ${WeiboAppKey}
-      AppSecret: ${AppSecret}
-      ThirdPartyLoginQQ_client_id: ${ThirdPartyLoginQQ_client_id}
-      ThirdPartyLoginQQ_client_secret: ${ThirdPartyLoginQQ_client_secret}
-      WeiXinToken: ${WeiXinToken}
-      WeiXinEncodingAESKey: ${WeiXinEncodingAESKey}
-      WeixinAppId: ${WeixinAppId}
-      WeiXinAppSecret: ${WeiXinAppSecret}
+      ConnectionStrings__Default: ${ConnectionStrings__Default:-}
+      JwtBearer__Authority: ${JwtBearer__Authority:-https://oauth2.cngal.org}
+      InternalApiAccess__ProjectSiteToken: ${InternalApiAccess__ProjectSiteToken:-}
+      Geetest__Id: ${Geetest__Id:-}
+      Geetest__Key: ${Geetest__Key:-}
+      ClientIp__TrustedProxyHosts: ${ClientIp__TrustedProxyHosts:-}
 
       # 邮件服务
-      Password: ${Password}
+      Mail__Server: ${Mail__Server:-smtp.exmail.qq.com}
+      Mail__Port: ${Mail__Port:-465}
+      Mail__SenderName: ${Mail__SenderName:-CnGal资料站}
+      Mail__SenderEmail: ${Mail__SenderEmail:-kanban@cngal.org}
+      Mail__Account: ${Mail__Account-kanban@cngal.org}
+      Mail__Password: ${Mail__Password:-}
 
       # 搜索服务
-      TypesenseAPIKey: ${TypesenseAPIKey}
-      MeilisearchHost: ${MeilisearchHost}
-      MeilisearchApiKey: ${MeilisearchApiKey}
+      Meilisearch__BaseAddress: ${Meilisearch__BaseAddress:-}
+      Meilisearch__ApiKey: ${Meilisearch__ApiKey:-}
 
       # 图床与外部接口
-      ImageApiPath: ${ImageApiPath:-https://api.cngal.top/}
-      AccessKeyId: ${AccessKeyId}
-      AccessKeySecret: ${AccessKeySecret}
-      SliotsImageAPIToken: ${SliotsImageAPIToken}
-      TucangCCAPIToken: ${TucangCCAPIToken}
-      BackUpArchiveUrl: ${BackUpArchiveUrl}
-      SteamAPIUrl: ${SteamAPIUrl}
-      SteamAPIToken: ${SteamAPIToken}
-      IsthereanydealAPIToken: ${IsthereanydealAPIToken}
-      HeyboxGetGameDetailUrl: ${HeyboxGetGameDetailUrl}
-      GamalyticApiUrl: ${GamalyticApiUrl}
-      VginsightsApiUrl: ${VginsightsApiUrl}
+      ImageApi__BaseAddress: ${ImageApi__BaseAddress:-https://api.cngal.top/}
+      BackupArchive__BaseAddress: ${BackupArchive__BaseAddress:-http://web.archive.org/save/}
+      Steam__BaseAddress: ${Steam__BaseAddress:-https://api.steampowered.com/}
+      Steam__ApiToken: ${Steam__ApiToken:-}
+      IsThereAnyDeal__ApiToken: ${IsThereAnyDeal__ApiToken:-}
+      HeyBox__GameDetailBaseAddress: ${HeyBox__GameDetailBaseAddress:-}
+      Gamalytic__BaseAddress: ${Gamalytic__BaseAddress:-}
+      VgInsights__BaseAddress: ${VgInsights__BaseAddress:-}
 
       # 内容采集
-      RSSUrl: ${RSSUrl}
-      BilibiliRSSUrl: ${BilibiliRSSUrl}
-      HeyBoxRSSUrl: ${HeyBoxRSSUrl}
-      RSSBilibiliUserId: ${RSSBilibiliUserId}
-      BilibiliCookie: ${BilibiliCookie}
+      Rss__BaseAddress: ${Rss__BaseAddress:-https://rss.cngal.top/}
+      Rss__BilibiliFeedAddress: ${Rss__BilibiliFeedAddress:-}
+      Rss__HeyBoxFeedAddress: ${Rss__HeyBoxFeedAddress:-}
+      Bilibili__Cookie: ${Bilibili__Cookie:-}
+      AutomationUsers__NewsAdminId: ${AutomationUsers__NewsAdminId:-30e74a97-12f9-420e-8f90-03aab796fa05}
+      AutomationUsers__ExamineAdminId: ${AutomationUsers__ExamineAdminId:-a27c27d9-8c42-49f4-a315-05a167e1a6d4}
 
       # GPT 请求限制
-      ChatGPTLimit_1_Minute: ${ChatGPTLimit_1_Minute}
-      ChatGPTLimit_1_Day: ${ChatGPTLimit_1_Day}
-      ChatGPTLimit_PreConversationMax: ${ChatGPTLimit_PreConversationMax}
+      ChatGpt__BaseAddress: ${ChatGpt__BaseAddress:-}
+      ChatGpt__ApiKey: ${ChatGpt__ApiKey:-}
+      ChatGpt__GlobalRequestsPerMinute: ${ChatGpt__GlobalRequestsPerMinute:-10}
+      ChatGpt__UserRequestsPerMinute: ${ChatGpt__UserRequestsPerMinute:-10}
+      ChatGpt__UserRequestsPerDay: ${ChatGpt__UserRequestsPerDay:-1000}
+      ChatGpt__MaxMessagesPerConversation: ${ChatGpt__MaxMessagesPerConversation:-5}
+      ChatGpt__SystemMessageTemplate: ${ChatGpt__SystemMessageTemplate:-}
+      ChatGpt__UserMessageTemplate: ${ChatGpt__UserMessageTemplate:-}
 
       # 事件总线
-      EventBus_HostName: ${EventBus_HostName}
-      EventBus_Port: ${EventBus_Port:-5672}
-      EventBus_UserName: ${EventBus_UserName}
-      EventBus_Password: ${EventBus_Password}
+      RabbitMq__HostName: ${RabbitMq__HostName:-}
+      RabbitMq__Port: ${RabbitMq__Port:-5672}
+      RabbitMq__UserName: ${RabbitMq__UserName:-}
+      RabbitMq__Password: ${RabbitMq__Password:-}
 
     labels:
       com.centurylinklabs.watchtower.enable: ${WATCHTOWER_ENABLE:-true}

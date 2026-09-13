@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.Core.Services;
+using CnGalWebSite.Core.Services;
 using CnGalWebSite.DataModel.Model;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
@@ -19,7 +19,7 @@ namespace CnGalWebSite.APIServer.Application.GPT
     public class ChatGPTService:IChatGPTService
     {
         private readonly IHttpService _httpService;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<ChatGptOptions> _chatGptOptions;
        
         private readonly ILogger<ChatGPTService> _logger;
 
@@ -30,27 +30,24 @@ namespace CnGalWebSite.APIServer.Application.GPT
             PropertyNameCaseInsensitive = true,
         };
 
-        public ChatGPTService(IHttpService httpService, IConfiguration configuration, ILogger<ChatGPTService> logger)
+        public ChatGPTService(IHttpService httpService, IOptions<ChatGptOptions> chatGptOptions, ILogger<ChatGPTService> logger)
         {
             _httpService = httpService;
-            _configuration = configuration;
+            _chatGptOptions = chatGptOptions;
             _logger = logger;
         }
 
         public async Task< string > GetReply(string question)
         {
-            HttpClient _httpClient = null;
-            if (_httpClient == null)
-            {
-                _httpClient =await _httpService.GetClientAsync();
-                _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + _configuration["ChatGPTApiKey"]);
-            }
+            var _httpClient = await _httpService.GetClientAsync();
+            var chatGpt = _chatGptOptions.GetOptional(ChatGptOptions.SectionName);
+            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + chatGpt.ApiKey);
 
 
             var datetime= DateTime.Now.ToCstTime();
 
             //检查上限
-            if (_record.Count(s => s > datetime.AddMinutes(-1)) > int.Parse(_configuration["ChatGPTLimit"] ?? "10"))
+            if (_record.Count(s => s > datetime.AddMinutes(-1)) > chatGpt.GlobalRequestsPerMinute)
             {
                 return "哀家累了呢~";
             }
@@ -58,14 +55,10 @@ namespace CnGalWebSite.APIServer.Application.GPT
             _record.RemoveAll(s => s < datetime.AddMinutes(-1));
 
             //读取配置
-            var sys = _configuration["ChatGPT_SystemMessageTemplate"];
-            var user = _configuration["ChatGPT_UserMessageTemplate"];
-            var url = _configuration["ChatGPTApiUrl"];
+            var sys = chatGpt.SystemMessageTemplate;
+            var user = chatGpt.UserMessageTemplate;
+            var url = chatGpt.BaseAddress;
 
-            if (string.IsNullOrWhiteSpace(sys)|| string.IsNullOrWhiteSpace(user))
-            {
-                return null;
-            }
             //替换文字
             question = question.Replace("看板娘", "").Replace($"[@3257277748]", "");
 

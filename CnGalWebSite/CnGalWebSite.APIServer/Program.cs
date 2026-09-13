@@ -16,14 +16,6 @@ namespace CnGalWebSite.APIServer
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration(builder =>
-                {
-                    builder.AddCommandLine(args);//设置添加命令行
-                })
-                .ConfigureAppConfiguration((hostingContext, config) =>
-                {
-                    config.AddUserSecrets<Startup>();
-                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
