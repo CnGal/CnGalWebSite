@@ -158,7 +158,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     await _newsService.AddWeiboUserInfor(model.AuthorEntryName, long.Parse(model.WeiboId));
 
                 }
-                catch
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     return new Result { Successful = false, Error = "尝试获取作者信息失败" };
                 }
@@ -260,7 +260,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     await _newsService.AddWeiboUserInfor(model.AuthorEntryName, long.Parse(model.WeiboId));
 
                 }
-                catch
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     return new Result { Successful = false, Error = "尝试获取作者信息失败" };
                 }
@@ -287,7 +287,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 return new Result { Successful = true };
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }
@@ -308,7 +308,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 article = await _newsService.GameNewsToArticle(gameNews);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return BadRequest(ex.Message);
             }
@@ -461,7 +461,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 return new Result { Successful = true };
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }
@@ -487,7 +487,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 return new Result { Successful = true };
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }
@@ -510,7 +510,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 article = await _newsService.WeeklyNewsToArticle(weeklyNews);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return BadRequest(ex.Message);
             }
@@ -622,7 +622,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 await _newsService.AddGameMewsFromWeibo(id, keyword);
 
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }

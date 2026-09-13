@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Articles;
+using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -554,7 +554,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
                 videoIds = await _videoService.GetIdsFromNames(videoNames);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }
@@ -725,7 +725,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
                 videoIds = await _videoService.GetIdsFromNames(videoNames);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }
@@ -751,7 +751,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 video = await _examineService.AddNewVideoExaminesAsync(newVideo, user, model.Note);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
 

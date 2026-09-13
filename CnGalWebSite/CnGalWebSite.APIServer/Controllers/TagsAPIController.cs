@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Articles;
+using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -321,7 +321,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     tagIds = await _tagService.GetTagIdsFromNames(tagNames);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     return new Result { Successful = false, Error = ex.Message };
                 }
@@ -337,7 +337,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     return new Result { Successful = false, Error = ex.Message };
                 }
@@ -357,7 +357,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     tag = await _examineService.AddNewTagExaminesAsync(newTag, user, model.Note);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     return new Result { Successful = false, Error = ex.Message };
 
@@ -366,7 +366,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 return new Result { Successful = true, Error = tag.Id.ToString() };
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Error = "创建标签的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
             }
@@ -550,7 +550,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 tagIds = await _tagService.GetTagIdsFromNames(tagNames);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }
@@ -654,7 +654,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }

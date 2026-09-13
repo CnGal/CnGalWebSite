@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Articles;
+using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -378,7 +378,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
                     videoIds = await _videoService.GetIdsFromNames(videoNames);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     return new Result { Successful = false, Error = ex.Message };
                 }
@@ -401,14 +401,14 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     article = await _examineService.AddNewArticleExaminesAsync(newArticle, user, model.Note);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     return new Result { Successful = false, Error = ex.Message };
 
                 }
                 return new Result { Successful = true, Error = article.Id.ToString() };
             }
-            catch
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Error = "发表文章的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
             }
@@ -536,7 +536,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 return new Result { Successful = true, Error = currentArticle.Id.ToString() };
             }
-            catch
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Error = "修改文章的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
 
@@ -649,7 +649,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 return new Result { Successful = true, Error = currentArticle.Id.ToString() };
             }
-            catch
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Error = "修改文章的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
             }
@@ -832,7 +832,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
                     videoIds = await _videoService.GetIdsFromNames(videoNames);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     return new Result { Successful = false, Error = ex.Message };
                 }
@@ -877,7 +877,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 return new Result { Successful = true, Error = currentArticle.Id.ToString() };
             }
-            catch
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Error = "修改文章的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
 

@@ -733,7 +733,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
                 videoIds = await _videoService.GetIdsFromNames(videoNames);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }
@@ -1203,7 +1203,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
                     videoIds = await _videoService.GetIdsFromNames(videoNames);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     return new Result { Successful = false, Error = ex.Message };
                 }
@@ -1242,7 +1242,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     entry = await _examineService.AddNewEntryExaminesAsync(newEntry, user, model.Note);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     return new Result { Successful = false, Error = ex.Message };
 
@@ -1251,7 +1251,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 //创建词条成功
                 return new Result { Successful = true, Error = entry.Id.ToString() };
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Error = "创建词条的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
             }
