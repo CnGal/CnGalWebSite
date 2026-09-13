@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Disambigs;
+using CnGalWebSite.APIServer.Application.Disambigs;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Users;
@@ -282,7 +282,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
                 return new Result { Successful = true, Error = disambig.Id.ToString() };
             }
-            catch
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Error = "创建消歧义页的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
             }
@@ -543,7 +543,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
                 return new Result { Successful = true, Error = disambig.Id.ToString() };
             }
-            catch
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Error = "修改消歧义页的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
 

@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Articles;
+using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Comments;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Favorites;
@@ -58,12 +58,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IWeiXinService _weiXinService;
         private readonly IChatGPTService _chatGPTService;
         private readonly IAppHelper _appHelper;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<ChatGptUserLimitsOptions> _chatGptUserLimitsOptions;
         private readonly IEventBusService _eventBusService;
         private readonly IOperationRecordService _operationRecordService;
         private readonly ILogger<RobotAPIController> _logger;
 
-        public RobotAPIController(IRepository<StoreInfo, long> storeInfoRepository, IWeiXinService weiXinService, IConfiguration configuration, IEventBusService eventBusService,
+        public RobotAPIController(IRepository<StoreInfo, long> storeInfoRepository, IWeiXinService weiXinService, IOptions<ChatGptUserLimitsOptions> chatGptUserLimitsOptions, IEventBusService eventBusService,
         IUserService userService, IChatGPTService chatGPTService, IAppHelper appHelper, IOperationRecordService operationRecordService, ILogger<RobotAPIController> logger,
         IRepository<Entry, int> entryRepository)
         {
@@ -75,7 +75,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _appHelper = appHelper;
             _operationRecordService = operationRecordService;
             _logger = logger;
-            _configuration = configuration;
+            _chatGptUserLimitsOptions = chatGptUserLimitsOptions;
             _eventBusService = eventBusService;
         }
 
@@ -214,11 +214,13 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
 
             // 限流
-            if (await _operationRecordService.GetOperationRecordNumber(OperationRecordType.Chat, user.Id, user, TimeSpan.FromMinutes(1)) > int.Parse(_configuration["ChatGPTLimit_1_Minute"] ?? "10"))
+            var minuteRequests = await _operationRecordService.GetOperationRecordNumber(OperationRecordType.Chat, user.Id, user, TimeSpan.FromMinutes(1));
+            var limits = _chatGptUserLimitsOptions.GetOptional(ChatGptUserLimitsOptions.SectionName);
+            if (minuteRequests > limits.UserRequestsPerMinute)
             {
                 return new Result { Successful = false, Error = "累了喵，待会再聊喵~" };
             }
-            if (await _operationRecordService.GetOperationRecordNumber(OperationRecordType.Chat, user.Id, user, TimeSpan.FromDays(1)) > int.Parse(_configuration["ChatGPTLimit_1_Day"] ?? "1000"))
+            if (await _operationRecordService.GetOperationRecordNumber(OperationRecordType.Chat, user.Id, user, TimeSpan.FromDays(1)) > limits.UserRequestsPerDay)
             {
                 return new Result { Successful = false, Error = "累了喵，待会再聊喵~" };
             }
@@ -229,7 +231,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 await _operationRecordService.AddOperationRecord(OperationRecordType.Chat, user.Id, user, model.Identification, HttpContext);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 _logger.LogError(ex, "用户 {Name}({Id})身份识别失败", user.UserName, user.Id);
                 return new Result { Successful = false, Error = "身份识别失败" };
@@ -243,7 +245,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     IsFirst = model.IsFirst,
                     Message = model.Message,
                     UserId = user.Id,
-                    MessageMax = int.Parse(_configuration["ChatGPTLimit_PreConversationMax"] ?? "5")
+                    MessageMax = limits.MaxMessagesPerConversation
                 });
 
                 if (result == null)
@@ -257,7 +259,7 @@ namespace CnGalWebSite.APIServer.Controllers
                     Error = result.Message
                 };
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result
                 {

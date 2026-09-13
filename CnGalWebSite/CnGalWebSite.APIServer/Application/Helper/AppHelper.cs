@@ -62,9 +62,8 @@ namespace CnGalWebSite.APIServer.Application.Helper
         private readonly IRepository<PlayedGame, long> _playedGameRepository;
 
         private readonly IRepository<UserIntegral, long> _userIntegralRepository;
-        private readonly IEmailService _EmailService;
         private readonly IHttpClientFactory _clientFactory;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<GeetestOptions> _geetestOptions;
         private readonly HttpClient _httpClient;
 
         public AppHelper(IRepository<BackUpArchive, long> backUpArchiveRepository,
@@ -73,10 +72,10 @@ namespace CnGalWebSite.APIServer.Application.Helper
             IRepository<UserFile, int> userFileRepository,
             IRepository<FavoriteFolder, long> favoriteFolderRepository,
             IRepository<HistoryUser, int> historyUserRepository, IRepository<ApplicationUser, string> userRepository,
-            IRepository<Comment, long> commentRepository, IConfiguration configuration,
+            IRepository<Comment, long> commentRepository, IOptions<GeetestOptions> geetestOptions,
             IRepository<Loginkey, long> loginkeyRepository,
             IHttpClientFactory clientFactory, IRepository<FileManager, int> fileManagerRepository,
-            IEmailService EmailService, IRepository<TokenCustom, int> tokenCustomRepository,
+            IRepository<TokenCustom, int> tokenCustomRepository,
             IRepository<Article, long> aricleRepository, IRepository<Entry, int> entryRepository,
             IRepository<SendCount, long> sendCountRepository, HttpClient httpClient,
             IWebHostEnvironment webHostEnvironment, IRepository<Examine, long> examineRepository,
@@ -87,12 +86,11 @@ namespace CnGalWebSite.APIServer.Application.Helper
             _examineRepository = examineRepository;
             _tagRepository = tagRepository;
             _articleRepository = aricleRepository;
-            _EmailService = EmailService;
             _webHostEnvironment = webHostEnvironment;
             _fileManagerRepository = fileManagerRepository;
             _tokenCustomRepository = tokenCustomRepository;
             _clientFactory = clientFactory;
-            _configuration = configuration;
+            _geetestOptions = geetestOptions;
             _userRepository = userRepository;
             _commentRepository = commentRepository;
             _examineRepository = examineRepository;
@@ -338,11 +336,11 @@ namespace CnGalWebSite.APIServer.Application.Helper
             {
                 GeetestLibResult result = null;
                 IDictionary<string, string> paramDict = new Dictionary<string, string> { };
-                var gtLib = new GeetestLib(_configuration["GEETEST_ID"], _configuration["GEETEST_KEY"]);
+                var gtLib = new GeetestLib(_geetestOptions.GetOptional(GeetestOptions.SectionName).Id, _geetestOptions.GetOptional(GeetestOptions.SectionName).Key);
                 result = gtLib.SuccessValidate(challenge, validate, seccode, paramDict);
                 return result.GetStatus() == 1;
             }
-            catch
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return false;
             }
@@ -701,7 +699,7 @@ namespace CnGalWebSite.APIServer.Application.Helper
 
 
                 sb = sb.Replace(item,
-                    $"<div class=\"aspect-ratio\"><iframe src=\"https://player.bilibili.com/player.html?{(id[0] == 'B' ? $"bvid={id}" : id[0] == 'a' ? $"aid={id[2..^1]}" : "")}&high_quality=1&autoplay=0\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\" width=\"100%\" height=\"500px\"></iframe></div>\n\n{(string.IsNullOrWhiteSpace(infor) ? "" : $"**{infor.Trim()}**\n\n")}");
+                    $"<div class=\"aspect-ratio\"><iframe src=\"https://player.bilibili.com/player.html?{(id[0] == 'B' ? $"bvid={id}" : id[0] == 'a' ? $"aid={id[2..]}" : "")}&high_quality=1&autoplay=0\" scrolling=\"no\" border=\"0\" frameborder=\"no\" framespacing=\"0\" allowfullscreen=\"true\" width=\"100%\" height=\"500px\"></iframe></div>\n\n{(string.IsNullOrWhiteSpace(infor) ? "" : $"**{infor.Trim()}**\n\n")}");
             }
 
             return sb;

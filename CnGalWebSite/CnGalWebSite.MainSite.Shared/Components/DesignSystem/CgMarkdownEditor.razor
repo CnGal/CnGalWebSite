@@ -50,7 +50,7 @@
                 "import",
                 "./_content/CnGalWebSite.MainSite.Shared/scripts/cg-markdown-editor.js");
 
-            var imageApiBaseUrl = Configuration["MainSiteApi:ImageApiPath"] ?? string.Empty;
+            var imageApiBaseUrl = Configuration["ImageApi:BaseAddress"] ?? string.Empty;
 
             _lastKnownValue = Value;
             await _jsModule.InvokeVoidAsync("initEditor", _dotNetRef, _containerRef, Value ?? string.Empty, Placeholder ?? string.Empty, imageApiBaseUrl);

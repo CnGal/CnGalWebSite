@@ -78,7 +78,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IPlayedGameService _playedGameService;
         private readonly IFavoriteFolderService _favoriteFolderService;
         private readonly ICommentService _commentService;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<AutomationUsersOptions> _automationUsersOptions;
         
         private readonly ILogger<ExamineService> _logger;
         private readonly IRepository<Message, long> _messageRepository;
@@ -94,7 +94,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository, IRepository<Message, long> messageRepository,
         IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService, IPlayedGameService playedGameService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository, ILogger<ExamineService> logger, IRepository<Lottery, long> lotteryRepository,
-        IConfiguration configuration,  IRepository<PlayedGame, long> playedGameRepository, ICommentService commentService, IRepository<Vote, long> voteRepository)
+        IOptions<AutomationUsersOptions> automationUsersOptions,  IRepository<PlayedGame, long> playedGameRepository, ICommentService commentService, IRepository<Vote, long> voteRepository)
         {
             _examineRepository = examineRepository;
             _appHelper = appHelper;
@@ -113,7 +113,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _perfectionService = perfectionService;
             _peripheryRepository = peripheryRepository;
             _peripheryService = peripheryService;
-            _configuration = configuration;
+            _automationUsersOptions = automationUsersOptions;
             
             _logger = logger;
             _playedGameService = playedGameService;
@@ -3374,7 +3374,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
             //更新完善度
             //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
 
-            var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+            var examineAdminId = _automationUsersOptions.GetOptional(AutomationUsersOptions.SectionName).ExamineAdminId;
+            var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == examineAdminId);
 
             //反向关联
             foreach (var item in examine.Staffs)
@@ -3435,7 +3436,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
             //更新完善度
             //await _perfectionService.UpdateEntryPerfectionResultAsync(entry.Id);
 
-            var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+            var examineAdminId = _automationUsersOptions.GetOptional(AutomationUsersOptions.SectionName).ExamineAdminId;
+            var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == examineAdminId);
 
             //反向关联 词条
             foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Entry))
@@ -3602,7 +3604,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
             await _articleService.UpdateArticleDataRelevances(article, examine);
             _ = await _articleRepository.UpdateAsync(article);
 
-            var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+            var examineAdminId = _automationUsersOptions.GetOptional(AutomationUsersOptions.SectionName).ExamineAdminId;
+            var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == examineAdminId);
             //反向关联 文章
             foreach (var item in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Article))
             {
@@ -3968,7 +3971,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
             await _videoService.UpdateRelevances(item, examine);
             _ = await _videoRepository.UpdateAsync(item);
 
-            var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+            var examineAdminId = _automationUsersOptions.GetOptional(AutomationUsersOptions.SectionName).ExamineAdminId;
+            var admin = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == examineAdminId);
 
             //反向关联 视频
             foreach (var infor in examine.Relevances.Where(s => s.IsDelete == false && s.Type == RelevancesType.Video))
@@ -5853,7 +5857,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         public async Task ExaminesCompletionEntry(Entry newEntry, Entry currentEntry)
         {
-            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+            var examineAdminId = _automationUsersOptions.GetOptional(AutomationUsersOptions.SectionName).ExamineAdminId;
+            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == examineAdminId);
 
             //将当前模型和新模型对比 获取差异审核 并补全
             var examines = _entryService.ExaminesCompletion(currentEntry, newEntry);
@@ -5883,7 +5888,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         public async Task ExaminesCompletionArticle(Article newArticle, Article currentArticle)
         {
-            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+            var examineAdminId = _automationUsersOptions.GetOptional(AutomationUsersOptions.SectionName).ExamineAdminId;
+            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == examineAdminId);
 
             //将当前模型和新模型对比 获取差异审核 并补全
             var examines = _articleService.ExaminesCompletion(currentArticle, newArticle);
@@ -5913,7 +5919,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         private async Task ExaminesCompletionTag(Tag newTag, Tag currentTag)
         {
-            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+            var examineAdminId = _automationUsersOptions.GetOptional(AutomationUsersOptions.SectionName).ExamineAdminId;
+            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == examineAdminId);
 
             //将当前模型和新模型对比 获取差异审核 并补全
             var examines = _tagService.ExaminesCompletion(currentTag, newTag);
@@ -5939,7 +5946,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         private async Task ExaminesCompletionPeriphery(Periphery newPeriphery, Periphery currentPeriphery)
         {
-            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+            var examineAdminId = _automationUsersOptions.GetOptional(AutomationUsersOptions.SectionName).ExamineAdminId;
+            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == examineAdminId);
 
             //将当前模型和新模型对比 获取差异审核 并补全
             var examines = _peripheryService.ExaminesCompletion(currentPeriphery, newPeriphery);
@@ -5965,7 +5973,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         public async Task ExaminesCompletionVideo(Video newVideo, Video currentVideo)
         {
-            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == _configuration["ExamineAdminId"]);
+            var examineAdminId = _automationUsersOptions.GetOptional(AutomationUsersOptions.SectionName).ExamineAdminId;
+            var admin = await _userRepository.FirstOrDefaultAsync(s => s.Id == examineAdminId);
 
             //将当前模型和新模型对比 获取差异审核 并补全
             var examines = _videoService.ExaminesCompletion(currentVideo, newVideo);
@@ -6130,7 +6139,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 .Include(s=>s.Information).ThenInclude(s=>s.Additional)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
-            var admin = await _userRepository.FirstOrDefaultAsync(s=>s.Id==_configuration["ExamineAdminId"]);
+            var examineAdminId = _automationUsersOptions.GetOptional(AutomationUsersOptions.SectionName).ExamineAdminId;
+            var admin = await _userRepository.FirstOrDefaultAsync(s=>s.Id==examineAdminId);
             if (entry == null)
             {
                 return;
@@ -6158,7 +6168,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                             _logger.LogInformation("自动创建词条 - {Name}({Id}) 的Staff - {Staff}", entry.Name, entry.Id, newEntry.Name);
 
                         }
-                        catch (Exception ex)
+                        catch (Exception ex) when (ex is not ConfigurationException)
                         {
                             _logger.LogError(ex, "自动创建词条失败 - {Name}({Id}) 的Staff - {Staff}", entry.Name, entry.Id, newEntry.Name);
 
@@ -6201,7 +6211,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
                 _logger.LogInformation("成功刷新词条 - {Name}({Id}) 的Staff关联", entry.Name, entry.Id);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 _logger.LogError(ex, "刷新词条 - {Name}({Id}) 的Staff关联失败", entry.Name, entry.Id);
             }

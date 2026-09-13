@@ -13,8 +13,8 @@ services:
         user: root
 
     ports:
-      - "${BIND_ADDRESS:-0.0.0.0}:${PORT:-2009}:8080"
-      # - "${BIND_ADDRESS:-0.0.0.0}:${HTTPS_PORT:-3009}:8081"
+      - ${PORT:-2009}:8080
+      # - ${HTTPS_PORT:-3009}:8081
 
     env_file:
       - path: .env
@@ -26,10 +26,10 @@ services:
       # 数据库连接字符串
       DefaultDBConnection: ${DefaultDBConnection}
       # 事件总线
-      EventBus_HostName: ${EventBus_HostName}
-      EventBus_Port: ${EventBus_Port:-5672}
-      EventBus_UserName: ${EventBus_UserName}
-      EventBus_Password: ${EventBus_Password}
+      RabbitMq__HostName: ${RabbitMq__HostName:-}
+      RabbitMq__Port: ${RabbitMq__Port:-5672}
+      RabbitMq__UserName: ${RabbitMq__UserName:-}
+      RabbitMq__Password: ${RabbitMq__Password:-}
 
     labels:
       com.centurylinklabs.watchtower.enable: ${WATCHTOWER_ENABLE:-true}
@@ -43,7 +43,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${RESOURCES_LIMITS_MEMORY:-200m}
+          memory: ${RESOURCES_LIMITS_MEMORY:-100m}
 
 volumes:
   DataProtection-Keys:

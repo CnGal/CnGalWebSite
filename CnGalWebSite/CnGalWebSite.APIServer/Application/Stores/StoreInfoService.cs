@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Services;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
@@ -17,14 +17,20 @@ namespace CnGalWebSite.APIServer.Application.Stores
         private readonly IRepository<StoreInfo, long> _storeInfoRepository;
         private readonly ILogger<StoreInfoService> _logger;
         private readonly IHttpService _httpService;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<GamalyticOptions> _gamalyticOptions;
+        private readonly IOptions<HeyBoxOptions> _heyBoxOptions;
+        private readonly IOptions<IsThereAnyDealOptions> _isThereAnyDealOptions;
+        private readonly IOptions<VgInsightsOptions> _vgInsightsOptions;
 
-        public StoreInfoService(IRepository<StoreInfo, long> storeInfoRepository, ILogger<StoreInfoService> logger, IHttpService httpService, IConfiguration configuration)
+        public StoreInfoService(IRepository<StoreInfo, long> storeInfoRepository, ILogger<StoreInfoService> logger, IHttpService httpService, IOptions<GamalyticOptions> gamalyticOptions, IOptions<HeyBoxOptions> heyBoxOptions, IOptions<IsThereAnyDealOptions> isThereAnyDealOptions, IOptions<VgInsightsOptions> vgInsightsOptions)
         {
             _storeInfoRepository = storeInfoRepository;
             _logger = logger;
             _httpService = httpService;
-            _configuration = configuration;
+            _gamalyticOptions = gamalyticOptions;
+            _heyBoxOptions = heyBoxOptions;
+            _isThereAnyDealOptions = isThereAnyDealOptions;
+            _vgInsightsOptions = vgInsightsOptions;
         }
 
         public async Task<StoreInfoViewModel> Get(PublishPlatformType platformType, string platformName, string link, string name, int entryId)
@@ -211,7 +217,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
                     storeInfo.State = StoreState.OnSale;
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 _logger.LogError(ex, "获取 {name} - {id} Steam官方API数据失败", storeInfo.Name, storeInfo.Link);
             }
@@ -243,7 +249,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
                     storeInfo.RecommendationRate ??= (int)((double)totalPositive / totalReviews * 100);
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 _logger.LogError(ex, "获取 {name} - {id} Steam商店页面数据失败", storeInfo.Name, storeInfo.Link);
             }
@@ -258,14 +264,15 @@ namespace CnGalWebSite.APIServer.Application.Stores
         {
             try
             {
-                var id = await _httpService.GetAsync<IsthereanydealGetIdModel>($"https://api.isthereanydeal.com/games/lookup/v1?key={_configuration["IsthereanydealAPIToken"]}&appid={storeInfo.Link}");
+                var apiToken = _isThereAnyDealOptions.GetOptional(IsThereAnyDealOptions.SectionName).ApiToken;
+                var id = await _httpService.GetAsync<IsthereanydealGetIdModel>($"https://api.isthereanydeal.com/games/lookup/v1?key={apiToken}&appid={storeInfo.Link}");
 
                 if (id.found == false)
                 {
                     return;
                 }
 
-                var data = await _httpService.PostAsync<List<string>, IsthereanydealDataModel>($"https://api.isthereanydeal.com/games/overview/v2?key={_configuration["IsthereanydealAPIToken"]}&shops=61&country=CN", [id.game.id]);
+                var data = await _httpService.PostAsync<List<string>, IsthereanydealDataModel>($"https://api.isthereanydeal.com/games/overview/v2?key={apiToken}&shops=61&country=CN", [id.game.id]);
 
                 if (data.prices == null || data.prices.Count == 0)
                 {
@@ -298,6 +305,10 @@ namespace CnGalWebSite.APIServer.Application.Stores
                     }
                 }
             }
+            catch (ConfigurationException ex)
+            {
+                _logger.LogWarning("Skipping store data source due to configuration: {Section}", ex.Section);
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "获取 {name} - {id} isthereanydeal 数据失败", storeInfo.Name, storeInfo.Link);
@@ -313,7 +324,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
         {
             try
             {
-                var data = await _httpService.GetAsync<XiaoHeiHeDataModel>(_configuration["HeyboxGetGameDetailUrl"] + storeInfo.Link);
+                var data = await _httpService.GetAsync<XiaoHeiHeDataModel>(_heyBoxOptions.GetOptional(HeyBoxOptions.SectionName).GameDetailBaseAddress + storeInfo.Link);
                 if (data.Status != "ok")
                 {
                     _logger.LogError("获取 {name} - {id} 小黑盒API数据失败", storeInfo.Name, storeInfo.Link);
@@ -360,6 +371,10 @@ namespace CnGalWebSite.APIServer.Application.Stores
                     storeInfo.RecommendationRate ??= int.Parse(data.Result.Positive_desc.MidStrEx("：", "%"));
                 }
             }
+            catch (ConfigurationException ex)
+            {
+                _logger.LogWarning("Skipping store data source due to configuration: {Section}", ex.Section);
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "获取 {name} - {id} 小黑盒API数据失败", storeInfo.Name, storeInfo.Link);
@@ -375,7 +390,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
         {
             try
             {
-                var data = await _httpService.GetAsync<GamalyticDataModel>(_configuration["GamalyticApiUrl"] + storeInfo.Link);
+                var data = await _httpService.GetAsync<GamalyticDataModel>(_gamalyticOptions.GetOptional(GamalyticOptions.SectionName).BaseAddress + storeInfo.Link);
 
                 //评测数
                 storeInfo.EvaluationCount ??= data.ReviewsSteam;
@@ -407,6 +422,10 @@ namespace CnGalWebSite.APIServer.Application.Stores
                     storeInfo.State = StoreState.NotPublished;
                 }
             }
+            catch (ConfigurationException ex)
+            {
+                _logger.LogWarning("Skipping store data source due to configuration: {Section}", ex.Section);
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "获取 {name} - {id} gamalytic 数据失败", storeInfo.Name, storeInfo.Link);
@@ -423,7 +442,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
         {
             try
             {
-                var data = await _httpService.GetAsync<VginsightsDataModel>(_configuration["VginsightsApiUrl"] + storeInfo.Link);
+                var data = await _httpService.GetAsync<VginsightsDataModel>(_vgInsightsOptions.GetOptional(VgInsightsOptions.SectionName).BaseAddress + storeInfo.Link);
 
                 //评测数
                 storeInfo.EvaluationCount ??= data.reviews;
@@ -456,6 +475,10 @@ namespace CnGalWebSite.APIServer.Application.Stores
                 {
                     storeInfo.State = data.isReleased ? StoreState.OnSale : StoreState.NotPublished;
                 }
+            }
+            catch (ConfigurationException ex)
+            {
+                _logger.LogWarning("Skipping store data source due to configuration: {Section}", ex.Section);
             }
             catch (Exception ex)
             {
@@ -582,7 +605,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
 
 
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 _logger.LogError(ex, "获取 {name} - {id} TapTap官方API数据失败", storeInfo.Name, storeInfo.Link);
             }

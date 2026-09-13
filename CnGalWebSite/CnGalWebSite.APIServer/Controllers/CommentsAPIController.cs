@@ -54,11 +54,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IEditRecordService _editRecordService;
         private readonly IQueryService _queryService;
         private readonly ILotteryService _lotteryService;
+        private readonly ILogger<CommentsAPIController> _logger;
 
         public CommentsAPIController(IRepository<ApplicationUser, string> userRepository, ICommentService commentService, IRepository<Video, long> videoRepository, IQueryService queryService,
         IRepository<Comment, long> commentRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Lottery, long> lotteryRepository, IEditRecordService editRecordService, ILotteryService lotteryService,
         IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Vote, long> voteRepository, IExamineService examineService, IRepository<Examine, long> examineRepository,
-        IRepository<Entry, int> entryRepository)
+        IRepository<Entry, int> entryRepository, ILogger<CommentsAPIController> logger)
         {
             _entryRepository = entryRepository;
             _appHelper = appHelper;
@@ -76,6 +77,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _videoRepository = videoRepository;
             _queryService = queryService;
             _lotteryService = lotteryService;
+            _logger = logger;
         }
 
         [AllowAnonymous]
@@ -351,6 +353,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 try
                 {
                     await _lotteryService.AddUserToLottery(lottery, user, HttpContext, model.Identification);
+                }
+                catch (ConfigurationException ex)
+                {
+                    _logger.LogWarning("Skipping ancillary lottery due to configuration: {Section}", ex.Section);
                 }
                 catch
                 { }

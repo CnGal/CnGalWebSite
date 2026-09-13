@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
@@ -392,7 +392,11 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 await _operationRecordService.AddOperationRecord(OperationRecordType.Redeemed, code.Code, user, model.Identification, HttpContext);
             }
-            catch (Exception ex)
+            catch (ConfigurationException ex)
+            {
+                _logger.LogWarning("Skipping operation record due to configuration: {Section}", ex.Section);
+            }
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 _logger.LogError(ex, "用户 {Name}({Id})身份识别失败", user.UserName, user.Id);
             }

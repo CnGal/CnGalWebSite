@@ -54,19 +54,19 @@ namespace CnGalWebSite.APIServer.Application.Search.Meilisearch
             await EnsureIndexSettings();
 
             try { await UpdateEntries(LastUpdateTime, updateAll); }
-            catch (Exception ex) { _logger.LogError(ex, "更新词条搜索数据失败"); }
+            catch (Exception ex) when (ex is not ConfigurationException) { _logger.LogError(ex, "更新词条搜索数据失败"); }
 
             try { await UpdateArticles(LastUpdateTime, updateAll); }
-            catch (Exception ex) { _logger.LogError(ex, "更新文章搜索数据失败"); }
+            catch (Exception ex) when (ex is not ConfigurationException) { _logger.LogError(ex, "更新文章搜索数据失败"); }
 
             try { await UpdatePeripheries(LastUpdateTime, updateAll); }
-            catch (Exception ex) { _logger.LogError(ex, "更新周边搜索数据失败"); }
+            catch (Exception ex) when (ex is not ConfigurationException) { _logger.LogError(ex, "更新周边搜索数据失败"); }
 
             try { await UpdateTags(LastUpdateTime, updateAll); }
-            catch (Exception ex) { _logger.LogError(ex, "更新标签搜索数据失败"); }
+            catch (Exception ex) when (ex is not ConfigurationException) { _logger.LogError(ex, "更新标签搜索数据失败"); }
 
             try { await UpdateVideos(LastUpdateTime, updateAll); }
-            catch (Exception ex) { _logger.LogError(ex, "更新视频搜索数据失败"); }
+            catch (Exception ex) when (ex is not ConfigurationException) { _logger.LogError(ex, "更新视频搜索数据失败"); }
 
             _logger.LogInformation("更新搜索数据完成");
         }
@@ -350,8 +350,9 @@ namespace CnGalWebSite.APIServer.Application.Search.Meilisearch
                 var taskInfo = await _client.DeleteIndexAsync(_indexName);
                 await _client.WaitForTaskAsync(taskInfo.TaskUid, TaskTimeoutMs);
             }
-            catch
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
+                _logger.LogWarning(ex, "删除搜索索引失败，继续执行清理流程");
             }
         }
 

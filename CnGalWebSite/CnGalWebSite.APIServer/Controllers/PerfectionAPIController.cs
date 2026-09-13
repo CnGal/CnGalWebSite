@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Charts;
+using CnGalWebSite.APIServer.Application.Charts;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Perfections;
 using CnGalWebSite.APIServer.DataReositories;
@@ -36,11 +36,11 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IPerfectionService _perfectionService;
         private readonly IExamineService _examineService;
         private readonly IChartService _chartService;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<AutomationUsersOptions> _automationUsersOptions;
         private readonly IQueryService _queryService;
         private readonly IRepository<PerfectionCheck, long> _perfectionCheckRepository;
 
-        public PerfectionAPIController(IRepository<Examine, long> examineRepository, IConfiguration configuration,
+        public PerfectionAPIController(IRepository<Examine, long> examineRepository, IOptions<AutomationUsersOptions> automationUsersOptions,
         IAppHelper appHelper, IRepository<Perfection, long> perfectionRepository, IQueryService queryService, IRepository<PerfectionCheck, long> perfectionCheckRepository,
         IPerfectionService perfectionService, IRepository<PerfectionOverview, long> perfectionOverviewRepository,
          IExamineService examineService, IChartService chartService)
@@ -51,7 +51,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _perfectionOverviewRepository = perfectionOverviewRepository;
             _examineService = examineService;
             _chartService = chartService;
-            _configuration = configuration;
+            _automationUsersOptions = automationUsersOptions;
             _perfectionRepository = perfectionRepository;
             _queryService = queryService;
             _perfectionCheckRepository = perfectionCheckRepository;
@@ -117,8 +117,9 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<ExaminedNormalListModel>>> GetRecentlyEditListAsync()
         {
+            var automationUsers = _automationUsersOptions.GetOptional(AutomationUsersOptions.SectionName);
             return await _examineService.GetExaminesToNormalListAsync(_examineRepository.GetAll().Where(s => (s.PrepositionExamineId == null || s.PrepositionExamineId == -1) && s.IsPassed == true
-            &&s.ApplicationUserId!= _configuration["ExamineAdminId"]&& s.ApplicationUserId != _configuration["NewsAdminId"]
+            &&s.ApplicationUserId!= automationUsers.ExamineAdminId&& s.ApplicationUserId != automationUsers.NewsAdminId
             && s.Operation != Operation.UserMainPage && s.Operation != Operation.EditUserMain && s.Operation != Operation.PubulishComment && s.Operation != Operation.EditPlayedGameMain && s.Operation != Operation.RequestUserCertification && s.Operation != Operation.EditFavoriteFolderMain).OrderByDescending(s => s.Id).Take(12), true);
         }
 

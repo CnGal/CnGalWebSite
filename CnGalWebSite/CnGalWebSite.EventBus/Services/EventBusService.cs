@@ -70,6 +70,7 @@ namespace CnGalWebSite.EventBus.Services
             }
 
             _eventBus.CreateRpcClient();
+            _rpcClientInited = true;
         }
 
         public async Task<KanbanChatGPTReceiveModel> CallKanbanGroupChatGPT(KanbanGroupGptModel model, CancellationToken cancellationToken = default)

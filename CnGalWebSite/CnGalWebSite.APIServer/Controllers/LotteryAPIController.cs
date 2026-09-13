@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Ranks;
@@ -150,7 +150,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 return model;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return NotFound(ex.Message);
             }
@@ -734,7 +734,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 var number = await _lotteryService.AddUserToLottery(lottery, user, HttpContext, model.Identification);
                 return new Result { Successful = true, Error = number.ToString() };
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Forms;
 using System.Drawing;
 using System;
 using System.Net.Http.Json;
@@ -14,6 +14,9 @@ using Microsoft.Extensions.Configuration;
 using System.Text;
 using System.Net.Http;
 using CnGalWebSite.Extensions;
+using CnGalWebSite.Core.Configuration;
+using CnGalWebSite.DrawingBed.Helper.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace CnGalWebSite.DrawingBed.Helper.Services
 {
@@ -21,17 +24,15 @@ namespace CnGalWebSite.DrawingBed.Helper.Services
     {
         private readonly ILogger<FileUploadService> _logger;
         private readonly IHttpService _httpService;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<ImageApiOptions> _options;
 
-        private readonly string _baseUrl;
+        private string _baseUrl => _options.GetOptional(ImageApiOptions.SectionName).BaseAddress;
 
-        public FileUploadService(ILogger<FileUploadService> logger, IHttpService httpService, IConfiguration configuration)
+        public FileUploadService(ILogger<FileUploadService> logger, IHttpService httpService, IOptions<ImageApiOptions> options)
         {
             _logger = logger;
             _httpService = httpService;
-            _configuration = configuration;
-
-            _baseUrl = configuration["ImageApiPath"];
+            _options = options;
         }
 
         public async Task<UploadResult> UploadImagesAsync(IBrowserFile file, ImageAspectType type,bool gallery)
@@ -149,7 +150,7 @@ namespace CnGalWebSite.DrawingBed.Helper.Services
                     }
 
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     _logger.LogError(ex, "图片转存失败，Url：{url}", item);
                 }
@@ -181,7 +182,7 @@ namespace CnGalWebSite.DrawingBed.Helper.Services
                     return url;
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 _logger.LogError(ex, "转存图片失败：{link}", url);
                 return url;

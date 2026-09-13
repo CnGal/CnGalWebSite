@@ -6,21 +6,22 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
+using CnGalWebSite.Core.Configuration;
 
 namespace CnGalWebSite.IdentityServer.Services.Geetest
 {
     public class GeetestService : IGeetestService
     {
-        private readonly GeetestOptions _options;
+        private readonly IOptions<GeetestOptions> _options;
 
         public GeetestService(IOptions<GeetestOptions> options)
         {
-            _options = options.Value;
+            _options = options;
         }
 
         public GeetestCodeModel GetGeetestCode(GeetestScenario scenario)
         {
-            var credential = _options.GetCredential(scenario);
+            var credential = _options.GetOptional(GeetestOptions.SectionName);
             var model = new GeetestCodeModel
             {
                 Gt = credential.Id,
@@ -40,7 +41,7 @@ namespace CnGalWebSite.IdentityServer.Services.Geetest
 
             try
             {
-                var credential = _options.GetCredential(scenario);
+                var credential = _options.GetOptional(GeetestOptions.SectionName);
 
                 // GT4 validation
                 string sign_token = HmacSha256HMAC(model.LotNumber, credential.Key);
@@ -63,7 +64,7 @@ namespace CnGalWebSite.IdentityServer.Services.Geetest
                 var resultObj = JObject.Parse(responseString);
                 return resultObj["result"]?.ToString() == "success";
             }
-            catch
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return false;
             }

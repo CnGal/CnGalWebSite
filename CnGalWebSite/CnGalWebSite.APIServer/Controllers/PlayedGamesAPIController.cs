@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Examines;
+using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.OperationRecords;
@@ -204,7 +204,11 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 await _operationRecordService.AddOperationRecord(OperationRecordType.Score, entry.Id.ToString(), user, model.Identification, HttpContext);
             }
-            catch (Exception ex)
+            catch (ConfigurationException ex)
+            {
+                _logger.LogWarning("Skipping operation record due to configuration: {Section}", ex.Section);
+            }
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 _logger.LogError(ex, "用户 {Name}({Id})身份识别失败", user.UserName, user.Id);
             }
@@ -233,6 +237,10 @@ namespace CnGalWebSite.APIServer.Controllers
                     try
                     {
                         await _lotteryService.AddUserToLottery(item, user, HttpContext, model.Identification);
+                    }
+                    catch (ConfigurationException ex)
+                    {
+                        _logger.LogWarning("Skipping ancillary lottery due to configuration: {Section}", ex.Section);
                     }
                     catch
                     { }

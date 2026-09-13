@@ -1,4 +1,4 @@
-﻿
+
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.SteamInfors;
@@ -244,7 +244,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 _logger.LogError(ex, "参与抽奖失败");
                 return ex.Message;
@@ -294,7 +294,7 @@ namespace CnGalWebSite.APIServer.Application.Lotteries
             {
                 await _operationRecordService.AddOperationRecord(OperationRecordType.Lottery, lottery.Id.ToString(), user, identification, httpContext);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 _logger.LogError(ex, "用户 {Name}({Id})身份识别失败", user.UserName, user.Id);
             }

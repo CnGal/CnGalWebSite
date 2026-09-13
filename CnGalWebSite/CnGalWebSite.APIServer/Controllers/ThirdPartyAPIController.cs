@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Articles;
+using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -38,14 +38,13 @@ namespace CnGalWebSite.APIServer.Controllers
     public class ThirdPartyAPIController : ControllerBase
     {
         private readonly HttpClient _httpClient;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<BilibiliOptions> _bilibiliOptions;
 
-        public ThirdPartyAPIController(HttpClient httpClient, IConfiguration configuration)
+        public ThirdPartyAPIController(HttpClient httpClient, IOptions<BilibiliOptions> bilibiliOptions)
         {
             _httpClient = httpClient;
-            _configuration = configuration;
+            _bilibiliOptions = bilibiliOptions;
 
-            _httpClient.DefaultRequestHeaders.Add("Cookie", _configuration["BilibiliCookie"]);
         }
 
         /// <summary>
@@ -56,6 +55,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<string>> GetBilibiliVideoInfor([FromQuery]string id)
         {
+            SetCookie();
             return await _httpClient.GetStringAsync($"http://api.bilibili.com/x/web-interface/view/detail?{(id[0] == 'B' || id[0] == 'b' ? $"bvid={id}" : $"aid={id.Replace("av","")}")}");
         }
 
@@ -67,6 +67,7 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet]
         public async Task<ActionResult<List<string>>> GetBilibiliVideoImageImposition([FromQuery] string id)
         {
+            SetCookie();
             var json = await _httpClient.GetStringAsync($"http://api.bilibili.com/pvideo?aid={(id[0] == 'B' || id[0] == 'b' ? id.ToBilibiliAid() : id.Replace("av", ""))}");
             var result = JObject.Parse(json);
 
@@ -78,6 +79,12 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return BadRequest(result["message"].ToString());
             }
+        }
+        private void SetCookie()
+        {
+            var cookie = _bilibiliOptions.GetOptional(BilibiliOptions.SectionName).Cookie;
+            _httpClient.DefaultRequestHeaders.Remove("Cookie");
+            _httpClient.DefaultRequestHeaders.Add("Cookie", cookie);
         }
     }
 }

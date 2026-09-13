@@ -1,4 +1,4 @@
-﻿
+
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.Models;
 using CnGalWebSite.DataModel.Helper;
@@ -28,17 +28,17 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
         private readonly IRepository<Video, long> _videoRepository;
         private readonly IRepository<Periphery, long> _peripheryRepository;
         private readonly IRepository<Tag, int> _tagRepository;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<BackupArchiveOptions> _backupArchiveOptions;
         private readonly IHttpClientFactory _clientFactory;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public BackUpArchiveService(IRepository<BackUpArchive, long> backUpArchiveRepository, IRepository<Entry, long> entryRepository, IRepository<Article, long> articleRepository, IConfiguration configuration, IRepository<Periphery, long> peripheryRepository,
+        public BackUpArchiveService(IRepository<BackUpArchive, long> backUpArchiveRepository, IRepository<Entry, long> entryRepository, IRepository<Article, long> articleRepository, IOptions<BackupArchiveOptions> backupArchiveOptions, IRepository<Periphery, long> peripheryRepository,
         IHttpClientFactory clientFactory, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IWebHostEnvironment webHostEnvironment, IRepository<Tag, int> tagRepository, IRepository<Video, long> videoRepository)
         {
             _backUpArchiveRepository = backUpArchiveRepository;
             _entryRepository = entryRepository;
             _articleRepository = articleRepository;
-            _configuration = configuration;
+            _backupArchiveOptions = backupArchiveOptions;
             _clientFactory = clientFactory;
             _backUpArchiveDetailRepository = backUpArchiveDetailRepository;
             _webHostEnvironment = webHostEnvironment;
@@ -54,7 +54,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
             var client = _clientFactory.CreateClient();
             var url = "https://www.cngal.org/articles/index/" + backUpArchive.ArticleId;
 
-            var response = await client.GetAsync(_configuration["BackUpArchiveUrl"] + url);
+            var response = await client.GetAsync(_backupArchiveOptions.GetOptional(BackupArchiveOptions.SectionName).BaseAddress + url);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 //如果成功则写入数据 不成功也要写
@@ -72,7 +72,7 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
             var BeginTime = DateTime.Now.ToCstTime();
             var client = _clientFactory.CreateClient();
             var url1 = "https://www.cngal.org/entries/index/" + backUpArchive.EntryId;
-            var response1 = await client.GetAsync(_configuration["BackUpArchiveUrl"] + url1);
+            var response1 = await client.GetAsync(_backupArchiveOptions.GetOptional(BackupArchiveOptions.SectionName).BaseAddress + url1);
 
             while(response1.StatusCode == System.Net.HttpStatusCode.Found)
             {

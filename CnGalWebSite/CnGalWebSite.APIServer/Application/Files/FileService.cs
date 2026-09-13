@@ -1,4 +1,4 @@
-﻿
+
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Services;
@@ -25,15 +25,15 @@ namespace CnGalWebSite.APIServer.Application.Files
         private readonly IAppHelper _appHelper;
         private readonly IHttpService _httpService;
         private readonly IFileUploadService _fileUploadService;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<ImageApiOptions> _imageApiOptions;
         private readonly ILogger<FileService> _logger;
         private readonly IRepository<ApplicationUser, string> _userRepository;
 
-        public FileService(IAppHelper appHelper, IConfiguration configuration, IHttpService httpService, IRepository<ApplicationUser, string> userRepository,
+        public FileService(IAppHelper appHelper, IOptions<ImageApiOptions> imageApiOptions, IHttpService httpService, IRepository<ApplicationUser, string> userRepository,
         IRepository<Article, long> articleRepository, IRepository<Entry, int> entryRepository, ILogger<FileService> logger, IRepository<Video, long> videoRepository, IFileUploadService fileUploadService)
         {
             _appHelper = appHelper;
-            _configuration = configuration;
+            _imageApiOptions = imageApiOptions;
             _entryRepository = entryRepository;
             _articleRepository = articleRepository;
             _logger = logger;
@@ -52,7 +52,7 @@ namespace CnGalWebSite.APIServer.Application.Files
         {
             try
             {
-                var result = await _httpService.GetAsync<UploadResult>(_configuration["ImageApiPath"] + "api/files/TransferDepositToTucangCC?url=" + url);
+                var result = await _httpService.GetAsync<UploadResult>(_imageApiOptions.GetOptional(ImageApiOptions.SectionName).BaseAddress + "api/files/TransferDepositToTucangCC?url=" + url);
 
                 if (result.Uploaded)
                 {
@@ -65,7 +65,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 _logger.LogError(ex, "转存图片失败：{url}", url);
                 throw;
@@ -95,7 +95,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                         _logger.LogInformation("转存 用户 - {name}({id}) 主图到 tucang.cc 图床，链接替换为：{url}", item.UserName, item.Id, item.PhotoPath);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     _logger.LogError(ex, "转存用户 - {Name}({Id}) 主图失败", item.UserName, item.Id);
                 }
@@ -120,7 +120,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                         _logger.LogInformation("转存 词条 - {name}({id}) 主图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.MainPicture);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     _logger.LogError(ex, "转存词条 - {Name}({Id}) 主图失败", item.Name, item.Id);
                 }
@@ -145,7 +145,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                         _logger.LogInformation("转存 词条 - {name}({id}) 缩略图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.Thumbnail);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     _logger.LogError(ex, "转存词条 - {Name}({Id}) 缩略图失败", item.Name, item.Id);
                 }
@@ -171,7 +171,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                         _logger.LogInformation("转存 文章 - {name}({id}) 主图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.MainPicture);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     _logger.LogError(ex, "转存文章 - {Name}({Id}) 主图失败", item.Name, item.Id);
                 }
@@ -195,7 +195,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                         _logger.LogInformation("转存 视频 - {name}({id}) 主图到 tucang.cc 图床，链接替换为：{url}", item.Name, item.Id, item.MainPicture);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     _logger.LogError(ex, "转存视频 - {Name}({Id}) 主图失败", item.Name, item.Id);
                 }
@@ -234,7 +234,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                     _logger.LogInformation("转存 词条 - {name}({id}) 相册到 tucang.cc 图床，总计 {count} 张图片", item.Name, item.Id, count);
 
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     _logger.LogError(ex, "转存 词条 - {name}({id}) 相册失败", item.Name, item.Id);
                 }
@@ -273,7 +273,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                     _logger.LogInformation("转存 词条 - {name}({id}) 专题页图片到 tucang.cc 图床，总计 {count} 张图片", item.Name, item.Id, count);
 
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     _logger.LogError(ex, "转存 词条 - {name}({id}) 专题页图片失败", item.Name, item.Id);
                 }

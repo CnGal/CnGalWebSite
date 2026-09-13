@@ -13,8 +13,8 @@ services:
         user: root
 
     ports:
-      - "${BIND_ADDRESS:-0.0.0.0}:${PORT:-2202}:8080"
-      # - "${BIND_ADDRESS:-0.0.0.0}:${HTTPS_PORT:-3302}:8081"
+      - ${PORT:-2202}:8080
+      # - ${HTTPS_PORT:-3302}:8081
 
     env_file:
       - path: .env
@@ -26,7 +26,7 @@ services:
       ClientId: ${ClientId}
       ClientSecret: ${ClientSecret}
       # 图床API
-      ImageApiPath: ${ImageApiPath}
+      ImageApi__BaseAddress: ${ImageApi__BaseAddress:-https://api.cngal.top/}
 
     labels:
       com.centurylinklabs.watchtower.enable: ${WATCHTOWER_ENABLE:-true}

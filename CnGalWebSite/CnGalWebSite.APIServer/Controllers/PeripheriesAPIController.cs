@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Entries;
+using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Peripheries;
@@ -307,7 +307,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     return new Result { Successful = false, Error = ex.Message };
                 }
@@ -321,7 +321,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     peripheryIds = await _peripheryService.GetPeripheryIdsFromNames(peripheryNames);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     return new Result { Successful = false, Error = ex.Message };
                 }
@@ -344,7 +344,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     periphery = await _examineService.AddNewPeripheryExaminesAsync(newPeriphery, user, model.Note);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     return new Result { Successful = false, Error = ex.Message };
 
@@ -352,7 +352,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 return new Result { Successful = true, Error = periphery.Id.ToString() };
             }
-            catch (Exception)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Error = "创建周边的过程中发生未知错误，请确保数据格式正确后联系管理员", Successful = false };
             }
@@ -683,7 +683,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 entryIds = await _entryService.GetEntryIdsFromNames(entryNames);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }
@@ -789,7 +789,7 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 peripheryIds = await _peripheryService.GetPeripheryIdsFromNames(peripheryNames);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }

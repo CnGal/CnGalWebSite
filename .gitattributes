@@ -3,6 +3,12 @@
 ###############################################################################
 * text=auto
 
+# Keep source and configuration line endings consistent across platforms.
+*.cs text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+
 ###############################################################################
 # Set default behavior for command prompt diff.
 #

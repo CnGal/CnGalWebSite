@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.RobotClientX.Models.Messages;
+using CnGalWebSite.RobotClientX.Models.Messages;
 using CnGalWebSite.RobotClientX.Models.Robots;
 using CnGalWebSite.RobotClientX.DataRepositories;
 using CnGalWebSite.RobotClientX.Extentions;
@@ -55,7 +55,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
 
         public void InitEventBus()
         {
-            if (string.IsNullOrWhiteSpace(_configuration["EventBus_HostName"]) == false)
+            try
             {
                 _eventBusService.RecieveQQMessage(async (e) =>
                 {
@@ -65,6 +65,10 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                 {
                     await SendMessage(RobotReplyRange.Group, e.GroupId, e.Message);
                 });
+            }
+            catch (CnGalWebSite.Core.Configuration.ConfigurationException ex)
+            {
+                _logger.LogWarning("Skipping event bus setup: {Section}", ex.Section);
             }
         }
 
@@ -92,7 +96,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                 {
                     await ReplyFromGroupAsync(x);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     _logger.LogError(ex, "无法回复群聊消息");
                 }
@@ -105,7 +109,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                 {
                     await ReplyFromFriendAsync(x);
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     _logger.LogError(ex, "无法回复好友消息");
                 }
@@ -147,7 +151,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     _logger.LogError(ex, "定时任务异常");
                 }
@@ -175,7 +179,7 @@ namespace CnGalWebSite.RobotClientX.Services.QQClients
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     _logger.LogError(ex, "随机任务异常");
                 }

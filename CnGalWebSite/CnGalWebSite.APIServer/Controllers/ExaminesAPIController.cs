@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
@@ -415,7 +415,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     await _examineService.ApplyEditRecordToObject(entry, examineData, examine.Operation);
                 }
-                catch(Exception ex)
+                catch (Exception ex) when (ex is not ConfigurationException)
                 {
                     return new ExamineProcResultModel { Successful = false, Error = "应用审核记录失败，错误信息：" + ex.Message };
                 }

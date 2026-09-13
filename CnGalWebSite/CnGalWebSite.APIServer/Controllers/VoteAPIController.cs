@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Articles;
+using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.OperationRecords;
@@ -363,7 +363,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 peripheryIds = await _peripheryService.GetPeripheryIdsFromNames(peripheryNames);
                 articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }
@@ -389,7 +389,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 peripheryIds = await _peripheryService.GetPeripheryIdsFromNames(peripheryNames);
                 articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }
@@ -642,7 +642,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 peripheryIds = await _peripheryService.GetPeripheryIdsFromNames(peripheryNames);
                 articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }
@@ -668,7 +668,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 peripheryIds = await _peripheryService.GetPeripheryIdsFromNames(peripheryNames);
                 articleIds = await _articleService.GetArticleIdsFromNames(articleNames);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 return new Result { Successful = false, Error = ex.Message };
             }
@@ -864,7 +864,11 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 await _operationRecordService.AddOperationRecord(OperationRecordType.Vote, vote.Id.ToString(), user, model.Identification, HttpContext);
             }
-            catch (Exception ex)
+            catch (ConfigurationException ex)
+            {
+                _logger.LogWarning("Skipping operation record due to configuration: {Section}", ex.Section);
+            }
+            catch (Exception ex) when (ex is not ConfigurationException)
             {
                 _logger.LogError(ex, "用户 {Name}({Id})身份识别失败", user.UserName, user.Id);
             }
