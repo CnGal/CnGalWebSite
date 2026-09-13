@@ -26,7 +26,7 @@ services:
       ClientId: ${ClientId}
       ClientSecret: ${ClientSecret}
       # 图床API
-      ImageApiPath: ${ImageApiPath}
+      ImageApi__BaseAddress: ${ImageApi__BaseAddress:-https://api.cngal.top/}
 
     labels:
       com.centurylinklabs.watchtower.enable: ${WATCHTOWER_ENABLE:-true}

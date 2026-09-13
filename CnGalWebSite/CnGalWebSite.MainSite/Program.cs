@@ -9,7 +9,7 @@ using CnGalWebSite.MainSite.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var apiBaseAddress = builder.Configuration["MainSiteApi:BaseAddress"];
-var imageApiBaseAddress = builder.Configuration["MainSiteApi:ImageApiPath"];
+var imageApiBaseAddress = builder.Configuration["ImageApi:BaseAddress"];
 var taskApiBaseAddress = builder.Configuration["MainSiteApi:TaskApiPath"];
 
 // Add services to the container.

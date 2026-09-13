@@ -2,6 +2,7 @@
 using CnGalWebSite.Components.Services;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DrawingBed.Helper.Services;
+using CnGalWebSite.DrawingBed.Helper.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CnGalWebSite.Components.Extensions
@@ -15,6 +16,7 @@ namespace CnGalWebSite.Components.Extensions
             //查看大图
             services.AddScoped(x => new ImagesLargeViewService());
             //文件上传
+            services.AddImageApiOptions();
             services.AddScoped<IFileUploadService, FileUploadService>();
             //Query
             services.AddScoped<IQueryService, QueryService>();

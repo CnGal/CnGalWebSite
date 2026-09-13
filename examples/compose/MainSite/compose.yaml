@@ -25,7 +25,7 @@ services:
       # 后端API
       MainSiteApi__BaseAddress: ${WebApiPath:-https://api.cngal.org/}
       # 图床API
-      MainSiteApi__ImageApiPath: ${ImageApiPath:-https://api.cngal.top/}
+      ImageApi__BaseAddress: ${ImageApi__BaseAddress:-https://api.cngal.top/}
       # 定时任务API
       MainSiteApi__TaskApiPath: ${TaskApiPath}
 

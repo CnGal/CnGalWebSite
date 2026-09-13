@@ -222,6 +222,7 @@ builder.Services.AddScoped<IHttpService, HttpService>();
 builder.Services.AddScoped<IQueryService, QueryService>();
 
 // 文件上传服务
+CnGalWebSite.DrawingBed.Helper.Configuration.ImageApiOptionsExtensions.AddImageApiOptions(builder.Services);
 builder.Services.AddScoped<IFileUploadService, FileUploadService>();
 
 //本地化
