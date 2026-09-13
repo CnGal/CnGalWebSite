@@ -93,21 +93,7 @@ namespace CnGalWebSite.IdentityServer
             });
 
             //注册极验配置
-            services.Configure<CnGalWebSite.IdentityServer.Models.DataModels.Geetest.GeetestOptions>(options =>
-            {
-                // 优先使用结构化配置 Geetest:Default:Id / Geetest:Default:Key
-                Configuration.GetSection(CnGalWebSite.IdentityServer.Models.DataModels.Geetest.GeetestOptions.SectionName).Bind(options);
-
-                // 回落到旧的平铺配置 GEETEST_ID / GEETEST_KEY
-                if (string.IsNullOrEmpty(options.Default?.Id))
-                {
-                    options.Default = new CnGalWebSite.IdentityServer.Models.DataModels.Geetest.GeetestCredential
-                    {
-                        Id = Configuration["GEETEST_ID"],
-                        Key = Configuration["GEETEST_KEY"]
-                    };
-                }
-            });
+            Services.Geetest.GeetestOptionsValidation.AddGeetestOptions(services);
 
             //自动注入服务到依赖注入容器
             services.RegisterAssemblyPublicNonGenericClasses()
