@@ -1,3 +1,4 @@
+using CnGalWebSite.Core.Configuration;
 using CnGalWebSite.RobotClientX.Models.Messages;
 using CnGalWebSite.RobotClientX.Models.Robots;
 using CnGalWebSite.RobotClientX.DataRepositories;
