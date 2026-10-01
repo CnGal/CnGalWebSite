@@ -47,7 +47,7 @@ namespace CnGalWebSite.DrawingBed.Services
             Directory.CreateDirectory(_audioTempPath);
         }
 
-        public async Task<UploadResult> TransferDepositFile(string url, bool gallery, double x = 0, double y = 0, UploadFileType type = UploadFileType.Image, double cropX = 0, double cropY = 0, double cropW = 0, double cropH = 0)
+        public async Task<UploadResult> TransferDepositFile(string url, bool gallery, double x = 0, double y = 0, UploadFileType type = UploadFileType.Image, double cropX = 0, double cropY = 0, double cropW = 0, double cropH = 0, CancellationToken cancellationToken = default)
         {
             string pathSaveFile = null;
             string pathCutFile = null;
@@ -56,7 +56,7 @@ namespace CnGalWebSite.DrawingBed.Services
             try
             {
 
-                pathSaveFile = await SaveFileFromUrl(url, type);
+                pathSaveFile = await SaveFileFromUrl(url, type, cancellationToken);
                 if (type == UploadFileType.Image)
                 {
                     var pathAfterRectCrop = CropImageByRect(pathSaveFile, cropX, cropY, cropW, cropH);
@@ -106,7 +106,7 @@ namespace CnGalWebSite.DrawingBed.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "外部链接转存失败：{url}", url);
+                _logger.LogError(ex, "外部链接转存失败");
                 throw;
             }
             finally
@@ -225,24 +225,104 @@ namespace CnGalWebSite.DrawingBed.Services
             return newPath;
         }
 
-        public async Task<string> SaveFileFromUrl(string url, UploadFileType type)
+        public async Task<string> SaveFileFromUrl(string url, UploadFileType type, CancellationToken cancellationToken = default)
         {
-            if (url.Contains("http") == false)
+            if (url?.StartsWith("//", StringComparison.Ordinal) == true)
             {
                 url = "https:" + url;
             }
 
-            var response = await _httpClientFactory.CreateClient().GetAsync(url);
-            using var stream = await response.Content.ReadAsStreamAsync();
-            var tempName = new Random().Next() + "." + GetFileSuffixName(url, type);
+            //仅接受 http/https 绝对地址；实际连接及重定向由 AntiSSRF 校验。
+            if (Uri.TryCreate(url, UriKind.Absolute, out var requestUri) == false
+                || (requestUri.Scheme != Uri.UriSchemeHttp && requestUri.Scheme != Uri.UriSchemeHttps))
+            {
+                throw new InvalidOperationException("不支持的链接");
+            }
+
+            using var client = _httpClientFactory.CreateClient("safeOutbound");
+            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            // HeadersRead 后 HttpClient.Timeout 不再覆盖正文，使用同一总时限约束整个下载。
+            timeout.CancelAfter(client.Timeout);
+            using var response = await GetDownloadResponseAsync(client, requestUri, timeout.Token);
+            response.EnsureSuccessStatusCode();
+
+            //下载大小限制：防止匿名端点被用于拉取超大文件耗尽存储
+            const long maxDownloadBytes = 20 * 1024 * 1024;
+            if (response.Content.Headers.ContentLength is long declared && declared > maxDownloadBytes)
+            {
+                throw new HttpRequestException("远程文件不能超过20 MiB", null, System.Net.HttpStatusCode.RequestEntityTooLarge);
+            }
+
+            using var stream = await response.Content.ReadAsStreamAsync(timeout.Token);
+            var tempName = Guid.NewGuid().ToString("N") + "." + GetFileSuffixName(url, type);
 
             //保存图片到本地
             var newPath = Path.Combine(type switch { UploadFileType.Image => _imageTempPath, UploadFileType.Audio => _audioTempPath, _ => _fileTempPath }, tempName);
-            await SaveFile(stream, newPath);
+            try
+            {
+                await SaveFileWithLimit(stream, newPath, maxDownloadBytes, timeout.Token);
+            }
+            catch
+            {
+                // 调用者尚未拿到路径，必须在这里清理超限、取消或写入失败的半文件。
+                DeleteFile(newPath);
+                throw;
+            }
 
-            _logger.LogInformation("下载远程链接里的文件：{file}", url);
+            _logger.LogInformation("下载远程文件完成，来源：{host}", requestUri.Host);
 
             return newPath;
+        }
+
+        private static async Task<HttpResponseMessage> GetDownloadResponseAsync(HttpClient client, Uri uri, CancellationToken cancellationToken)
+        {
+            for (var redirects = 0; ; redirects++)
+            {
+                var response = await client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+                try
+                {
+                    if (redirects == 3 || (int)response.StatusCode is not (300 or 301 or 302 or 303 or 307 or 308)
+                        || response.Headers.Location is not Uri location)
+                    {
+                        return response;
+                    }
+
+                    var next = location.IsAbsoluteUri ? location : new Uri(uri, location);
+                    // 与 .NET 默认行为一致：保留 HTTP 入口，但拒绝任意一跳 HTTPS 降级。
+                    if (uri.Scheme == Uri.UriSchemeHttps && next.Scheme == Uri.UriSchemeHttp)
+                    {
+                        return response;
+                    }
+                    if (!string.IsNullOrEmpty(uri.Fragment) && string.IsNullOrEmpty(next.Fragment))
+                    {
+                        next = new UriBuilder(next) { Fragment = uri.Fragment }.Uri;
+                    }
+                    uri = next;
+                }
+                catch
+                {
+                    response.Dispose();
+                    throw;
+                }
+                response.Dispose();
+            }
+        }
+
+        private static async Task SaveFileWithLimit(Stream source, string destinationPath, long maxBytes, CancellationToken cancellationToken)
+        {
+            using var fs = File.Create(destinationPath);
+            var buffer = new byte[81920];
+            long total = 0;
+            int read;
+            while ((read = await source.ReadAsync(buffer, cancellationToken)) > 0)
+            {
+                total += read;
+                if (total > maxBytes)
+                {
+                    throw new HttpRequestException("远程文件不能超过20 MiB", null, System.Net.HttpStatusCode.RequestEntityTooLarge);
+                }
+                await fs.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
+            }
         }
 
         public string GetSHA1(string path)

@@ -34,6 +34,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microting.EntityFrameworkCore.MySql" Version="10.0.0-preview.3" />
+    <PackageReference Include="Microsoft.Security.AntiSSRF" Version="1.0.0" />
     <PackageReference Include="xFFmpeg.NET" Version="7.2.0" />
 
   </ItemGroup>

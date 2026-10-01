@@ -60,7 +60,7 @@ builder.Services.AddSwaggerGen(c =>
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);
 });
-builder.Services.AddHttpClient();
+builder.Services.AddDrawingBedHttpClients();
 //添加自定义服务
 builder.Services.AddScoped<IQueryService, QueryService>();
 builder.Services.AddScoped<IFileService, FileService>();
