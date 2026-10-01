@@ -31,6 +31,7 @@
     <PackageReference Include="Microting.EntityFrameworkCore.MySql" Version="10.0.0-preview.3" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
   </ItemGroup>
   <ItemGroup>

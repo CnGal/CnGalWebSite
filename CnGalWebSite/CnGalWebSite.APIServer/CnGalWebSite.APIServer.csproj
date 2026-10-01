@@ -51,6 +51,7 @@
     <PackageReference Include="NetCore.AutoRegisterDi" Version="2.2.1" />
     <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
     <PackageReference Include="ReverseMarkdown" Version="4.7.1" />
+    <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="10.0.0" />
     <PackageReference Include="Meilisearch" Version="0.18.0" />
