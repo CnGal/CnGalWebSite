@@ -1,9 +1,10 @@
-using CnGalWebSite.APIServer.Controllers;
+using CnGalWebSite.APIServer.Configuration;
+using CnGalWebSite.Core.Configuration;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Steam;
-using HtmlAgilityPack;
+using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -94,7 +95,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
                 try
                 {
                     var steam = _steamOptions.GetOptional(SteamOptions.SectionName);
-                    var jsonContent = await _httpClient.GetStringAsync(steam.BaseAddress + "IPlayerService/GetOwnedGames/v1/?key=" + steam.ApiToken + "&steamid=" + item + "&skip_unvetted_apps=0&include_played_free_games=1");
+                    var jsonContent = await _httpClient.GetStringAsync(steam.BaseAddress + "IPlayerService/GetOwnedGames/v1/?key=" + steam.ApiToken + "&steamid=" + Uri.EscapeDataString(item) + "&skip_unvetted_apps=0&include_played_free_games=1");
                     var obj = JObject.Parse(jsonContent);
                     var temp = obj["response"].ToObject<UserSteamResponseJson>();
                     steamGames.games.AddRange(temp.games);
@@ -214,7 +215,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             try
             {
                 var steam = _steamOptions.GetOptional(SteamOptions.SectionName);
-                var jsonContent = await _httpClient.GetStringAsync(steam.BaseAddress + "ISteamUser/GetPlayerSummaries/v2/?key=" + steam.ApiToken + "&steamids=" + SteamId);
+                var jsonContent = await _httpClient.GetStringAsync(steam.BaseAddress + "ISteamUser/GetPlayerSummaries/v2/?key=" + steam.ApiToken + "&steamids=" + Uri.EscapeDataString(SteamId));
                 var obj = JObject.Parse(jsonContent);
                 steamUser = obj.ToObject<SteamUserInforJson>();
             }
@@ -273,7 +274,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
         {
             try
             {
-                var jsonContent = await _httpClient.GetStringAsync($"https://api.steampowered.com/IWishlistService/GetWishlist/v1/?steamid={userId}");
+                var jsonContent = await _httpClient.GetStringAsync($"https://api.steampowered.com/IWishlistService/GetWishlist/v1/?steamid={Uri.EscapeDataString(userId)}");
                 if (jsonContent.Contains($"\"appid\":{gameId},"))
                 {
                     return true;
@@ -325,7 +326,7 @@ namespace CnGalWebSite.APIServer.Application.SteamInfors
             {
                 var steam = _steamOptions.GetOptional(SteamOptions.SectionName);
                 var url = steam.BaseAddress + "IPlayerService/GetOwnedGames/v1/?key=" + steam.ApiToken
-                    + "&steamid=" + userId + "&appids_filter[0]=" + gameId + "&skip_unvetted_apps=0&include_played_free_games=1";
+                    + "&steamid=" + Uri.EscapeDataString(userId) + "&appids_filter[0]=" + Uri.EscapeDataString(gameId) + "&skip_unvetted_apps=0&include_played_free_games=1";
                 var jsonContent = await _httpClient.GetStringAsync(url);
                 var obj = JObject.Parse(jsonContent);
                 var games = obj["response"]?["games"] as JArray;

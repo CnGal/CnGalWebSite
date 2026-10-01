@@ -457,12 +457,26 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
 
+            if (model.SteamIds == null)
+                return new Result { Successful = false, Error = "SteamId列表不能为空；解除绑定请提交空列表" };
+
+            var steamId = string.Join(",", model.SteamIds);
+            // 未修改旧绑定时允许保存其它资料；新增或修改绑定使用与前端相同的校验。
+            if (steamId != (user.SteamId ?? ""))
+            {
+                if (!model.TryNormalizeSteamIds(out var normalized))
+                {
+                    return new Result { Successful = false, Error = "请输入正确的 SteamID64（纯数字），多个 ID 请用逗号分隔，不要留空项" };
+                }
+                steamId = string.Join(",", normalized);
+                model.SteamIds = normalized;
+            }
+
             user.Birthday = model.Birthday;
             user.CanComment = model.CanComment;
 
             //判断SteamId是否改变
-            var steamId = string.Join(",", model.SteamIds);
-            if (steamId != user.SteamId)
+            if (steamId != (user.SteamId ?? ""))
             {
                 // 判断SteamId是否已经被绑定
                 //foreach(var item in model.SteamIds)
