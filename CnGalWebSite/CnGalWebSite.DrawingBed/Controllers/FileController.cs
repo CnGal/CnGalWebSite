@@ -24,8 +24,9 @@ namespace CnGalWebSite.DrawingBed.Controllers
         private readonly IUploadService _uploadService;
         private readonly IQueryService _queryService;
         private readonly IRepository<UploadRecord, long> _uploadRecordRepository;
+        private readonly ILogger<FileController> _logger;
 
-        public FileController(IHttpClientFactory clientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, IFileService fileService, IQueryService queryService, IRepository<UploadRecord, long> uploadRecordRepository, IUploadService uploadService)
+        public FileController(IHttpClientFactory clientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, IFileService fileService, IQueryService queryService, IRepository<UploadRecord, long> uploadRecordRepository, IUploadService uploadService, ILogger<FileController> logger)
         {
             _clientFactory = clientFactory;
             _webHostEnvironment = webHostEnvironment;
@@ -34,6 +35,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
             _queryService = queryService;
             _uploadRecordRepository = uploadRecordRepository;
             _uploadService = uploadService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -55,13 +57,14 @@ namespace CnGalWebSite.DrawingBed.Controllers
                 {
                     model.Add(await _fileService.UploadFormFile(item, gallery, x, y, type, cropX, cropY, cropW, cropH));
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
+                    //错误细节可能泄露服务器路径（如 ffmpeg 输出），只记日志不回显
                     model.Add(new UploadResult
                     {
                         Uploaded = false,
                         FileName = item.Name,
-                        Error = ex.Message
+                        Error = "上传失败，请检查文件是否有效"
                     });
                 }
 
@@ -101,17 +104,19 @@ namespace CnGalWebSite.DrawingBed.Controllers
 
             try
             {
-                var result = await _fileService.TransferDepositFile(url, gallery, x, y, type, cropX, cropY, cropW, cropH);
+                var result = await _fileService.TransferDepositFile(url, gallery, x, y, type, cropX, cropY, cropW, cropH, HttpContext.RequestAborted);
 
                 return result;
             }
             catch (Exception ex)
             {
+                //错误细节可能泄露内网探测信息（连接错误/目标地址），只记日志不回显
                 return new UploadResult
                 {
                     Uploaded = false,
                     OriginalUrl = url,
-                    Error = ex.Message
+                    Error = ex is HttpRequestException { StatusCode: System.Net.HttpStatusCode.RequestEntityTooLarge }
+                        ? "远程文件不能超过20 MiB" : "转存失败，请稍后重试"
                 };
             }
 
@@ -129,7 +134,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
             string path = "";
             try
             {
-                path = await _fileService.SaveFileFromUrl(url, UploadFileType.Image);
+                path = await _fileService.SaveFileFromUrl(url, UploadFileType.Image, HttpContext.RequestAborted);
                 var sha1 = _fileService.GetSHA1(path);
                 var result = await _uploadService.UploadToTucangCC(path, $"{sha1}.png");
                 _fileService.DeleteFile(path);
@@ -144,11 +149,14 @@ namespace CnGalWebSite.DrawingBed.Controllers
             catch (Exception ex)
             {
                 _fileService.DeleteFile(path);
+                _logger.LogError(ex, "转存图片到TucangCC失败");
+                //错误细节可能泄露内网探测信息（连接错误/目标地址），只记日志不回显
                 return new UploadResult
                 {
                     Uploaded = false,
                     OriginalUrl = url,
-                    Error = ex.Message
+                    Error = ex is HttpRequestException { StatusCode: System.Net.HttpStatusCode.RequestEntityTooLarge }
+                        ? "远程文件不能超过20 MiB" : "转存失败，请稍后重试"
                 };
             }
 

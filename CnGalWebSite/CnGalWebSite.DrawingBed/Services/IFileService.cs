@@ -5,11 +5,11 @@ namespace CnGalWebSite.DrawingBed.Services
 {
     public interface IFileService
     {
-        Task<UploadResult> TransferDepositFile(string url, bool gallery,double x = 0, double y = 0,  UploadFileType type = UploadFileType.Image, double cropX = 0, double cropY = 0, double cropW = 0, double cropH = 0);
+        Task<UploadResult> TransferDepositFile(string url, bool gallery,double x = 0, double y = 0,  UploadFileType type = UploadFileType.Image, double cropX = 0, double cropY = 0, double cropW = 0, double cropH = 0, CancellationToken cancellationToken = default);
 
         Task<UploadResult> UploadFormFile(IFormFile file,bool gallery, double x = 0, double y = 0,  UploadFileType type = UploadFileType.Image, double cropX = 0, double cropY = 0, double cropW = 0, double cropH = 0);
 
-        Task<string> SaveFileFromUrl(string url, UploadFileType type);
+        Task<string> SaveFileFromUrl(string url, UploadFileType type, CancellationToken cancellationToken = default);
 
         void DeleteFile(string path);
 
