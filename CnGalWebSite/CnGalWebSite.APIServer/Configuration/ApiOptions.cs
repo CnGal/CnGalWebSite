@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.WebUtilities;
+
 namespace CnGalWebSite.APIServer.Configuration;
 
 public sealed class DatabaseOptions
@@ -45,7 +47,22 @@ public sealed class MeilisearchOptions
 public sealed class BackupArchiveOptions
 {
     public const string SectionName = "BackupArchive";
-    public string BaseAddress { get; set; } = "http://web.archive.org/save/";
+    public const string ArchiveSaveBase = "https://web.archive.org/save/";
+    public string BaseAddress { get; set; } = ArchiveSaveBase;
+
+    public bool IsValid()
+    {
+        if (!Uri.TryCreate(BaseAddress, UriKind.Absolute, out var uri) ||
+            (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps) ||
+            uri.UserInfo.Length != 0 || uri.Fragment.Length != 0)
+            return false;
+
+        if (uri.AbsoluteUri == ArchiveSaveBase)
+            return true;
+
+        var query = QueryHelpers.ParseQuery(uri.Query);
+        return query.TryGetValue("url", out var target) && target.Count == 1 && target[0] == ArchiveSaveBase;
+    }
 }
 
 public sealed class SteamOptions

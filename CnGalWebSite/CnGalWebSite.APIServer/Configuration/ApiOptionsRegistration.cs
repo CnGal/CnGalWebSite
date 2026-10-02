@@ -53,7 +53,7 @@ public static class ApiOptionsRegistration
 
         services.AddOptions<BackupArchiveOptions>()
             .BindConfiguration(BackupArchiveOptions.SectionName)
-            .Validate(options => IsHttpAddress(options.BaseAddress));
+            .Validate(options => options.IsValid());
 
         services.AddOptions<SteamOptions>()
             .BindConfiguration(SteamOptions.SectionName)

@@ -96,6 +96,15 @@ namespace CnGalWebSite.APIServer
             services.AddScoped<IRSSHelper, RSSHelper>();
             //添加HTTP请求
             services.AddHttpClient();
+            services.AddHttpClient("backupArchive")
+                .ConfigurePrimaryHttpMessageHandler(() => new System.Net.Http.SocketsHttpHandler
+                {
+                    // BaseAddress 已指定中转；重定向由备份服务限制目标并重新经过中转。
+                    UseProxy = false,
+                    UseCookies = false,
+                    AllowAutoRedirect = false,
+                    ConnectTimeout = TimeSpan.FromSeconds(10)
+                });
             services.AddScoped<IHttpService, HttpService>();
             //添加搜索服务
             services.AddScoped<ISearchHelper, MeilisearchHelper>();

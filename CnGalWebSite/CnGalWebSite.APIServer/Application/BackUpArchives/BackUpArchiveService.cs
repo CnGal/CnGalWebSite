@@ -1,18 +1,25 @@
 
 using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.APIServer.Configuration;
 using CnGalWebSite.APIServer.Models;
+using CnGalWebSite.Core.Configuration;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.BackUpArchives;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Tag = CnGalWebSite.DataModel.Model.Tag;
@@ -30,16 +37,18 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
         private readonly IRepository<Tag, int> _tagRepository;
         private readonly IOptions<BackupArchiveOptions> _backupArchiveOptions;
         private readonly IHttpClientFactory _clientFactory;
+        private readonly ILogger<BackUpArchiveService> _logger;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
         public BackUpArchiveService(IRepository<BackUpArchive, long> backUpArchiveRepository, IRepository<Entry, long> entryRepository, IRepository<Article, long> articleRepository, IOptions<BackupArchiveOptions> backupArchiveOptions, IRepository<Periphery, long> peripheryRepository,
-        IHttpClientFactory clientFactory, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IWebHostEnvironment webHostEnvironment, IRepository<Tag, int> tagRepository, IRepository<Video, long> videoRepository)
+        IHttpClientFactory clientFactory, IRepository<BackUpArchiveDetail, long> backUpArchiveDetailRepository, IWebHostEnvironment webHostEnvironment, IRepository<Tag, int> tagRepository, IRepository<Video, long> videoRepository, ILogger<BackUpArchiveService> logger)
         {
             _backUpArchiveRepository = backUpArchiveRepository;
             _entryRepository = entryRepository;
             _articleRepository = articleRepository;
             _backupArchiveOptions = backupArchiveOptions;
             _clientFactory = clientFactory;
+            _logger = logger;
             _backUpArchiveDetailRepository = backUpArchiveDetailRepository;
             _webHostEnvironment = webHostEnvironment;
             _tagRepository = tagRepository;
@@ -50,46 +59,58 @@ namespace CnGalWebSite.APIServer.Application.BackUpArchives
 
         public async Task BackUpArticle(BackUpArchive backUpArchive)
         {
-            var BeginTime = DateTime.Now.ToCstTime();
-            var client = _clientFactory.CreateClient();
-            var url = "https://www.cngal.org/articles/index/" + backUpArchive.ArticleId;
-
-            var response = await client.GetAsync(_backupArchiveOptions.GetOptional(BackupArchiveOptions.SectionName).BaseAddress + url);
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                //如果成功则写入数据 不成功也要写
-                await UpdateBackUpInfor(backUpArchive, false, (DateTime.Now.ToCstTime() - BeginTime).TotalSeconds);
-            }
-            else
-            {
-                //如果成功则写入数据 不成功也要写
-                await UpdateBackUpInfor(backUpArchive, true, (DateTime.Now.ToCstTime() - BeginTime).TotalSeconds);
-            }
+            await BackUpPage(backUpArchive, "https://www.cngal.org/articles/index/" + backUpArchive.ArticleId);
         }
 
         public async Task BackUpEntry(BackUpArchive backUpArchive, string entryName)
         {
-            var BeginTime = DateTime.Now.ToCstTime();
-            var client = _clientFactory.CreateClient();
-            var url1 = "https://www.cngal.org/entries/index/" + backUpArchive.EntryId;
-            var response1 = await client.GetAsync(_backupArchiveOptions.GetOptional(BackupArchiveOptions.SectionName).BaseAddress + url1);
+            await BackUpPage(backUpArchive, "https://www.cngal.org/entries/index/" + backUpArchive.EntryId);
+        }
 
-            while(response1.StatusCode == System.Net.HttpStatusCode.Found)
+        private async Task BackUpPage(BackUpArchive backUpArchive, string url)
+        {
+            var configuredBase = new Uri(_backupArchiveOptions.GetOptional(BackupArchiveOptions.SectionName).BaseAddress);
+            var query = QueryHelpers.ParseQuery(configuredBase.Query);
+            var useRelay = query.ContainsKey("url");
+            var upstream = new Uri(BackupArchiveOptions.ArchiveSaveBase + url);
+            using var client = _clientFactory.CreateClient("backupArchive");
+            using var timeout = new CancellationTokenSource(client.Timeout);
+            var timer = System.Diagnostics.Stopwatch.StartNew();
+            var success = false;
+            try
             {
-                var newuri = response1.Headers.Location.ToString(); // 跳转的目标地址是在 HTTP-HEAD 中的
-                response1 = await client.GetAsync(newuri);
-            }
+                for (int hop = 0; hop <= 5; hop++)
+                {
+                    // 只信任配置的中转入口；上游重定向也必须重新封装，经同一入口访问。
+                    query["url"] = upstream.AbsoluteUri;
+                    var requestUri = useRelay
+                        ? new Uri(QueryHelpers.AddQueryString(configuredBase.GetLeftPart(UriPartial.Path), query))
+                        : upstream;
+                    using var response = await client.GetAsync(requestUri, HttpCompletionOption.ResponseHeadersRead, timeout.Token);
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        success = true;
+                        break;
+                    }
 
-            if (response1.StatusCode == System.Net.HttpStatusCode.OK )
-            {
-                //如果成功则写入数据 不成功也要写
-                await UpdateBackUpInfor(backUpArchive, false, (DateTime.Now.ToCstTime() - BeginTime).TotalSeconds / 2);
+                    if (hop == 5 || response.StatusCode is not (HttpStatusCode.MovedPermanently or HttpStatusCode.Found or
+                        HttpStatusCode.SeeOther or HttpStatusCode.TemporaryRedirect or HttpStatusCode.PermanentRedirect) ||
+                        response.Headers.Location is not Uri location)
+                        break;
+
+                    if (!Uri.TryCreate(upstream, location, out var next) ||
+                        next.Scheme != Uri.UriSchemeHttps || next.Host != "web.archive.org" || next.Port != 443 || next.UserInfo.Length != 0)
+                        break;
+                    upstream = next;
+                }
+                if (!success)
+                    _logger.LogWarning("归档请求失败或重定向不符合归档策略");
             }
-            else
+            catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException)
             {
-                //如果成功则写入数据 不成功也要写
-                await UpdateBackUpInfor(backUpArchive, true, (DateTime.Now.ToCstTime() - BeginTime).TotalSeconds / 2);
+                _logger.LogError(ex, "归档请求失败");
             }
+            await UpdateBackUpInfor(backUpArchive, !success, timer.Elapsed.TotalSeconds);
         }
 
         public async Task BackUpAllArticles(int maxNum)

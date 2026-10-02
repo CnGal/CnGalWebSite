@@ -42,7 +42,7 @@ services:
 
       # 图床与外部接口
       ImageApi__BaseAddress: ${ImageApi__BaseAddress:-https://api.cngal.top/}
-      BackupArchive__BaseAddress: ${BackupArchive__BaseAddress:-http://web.archive.org/save/}
+      BackupArchive__BaseAddress: ${BackupArchive__BaseAddress:-https://web.archive.org/save/}
       Steam__BaseAddress: ${Steam__BaseAddress:-https://api.steampowered.com/}
       Steam__ApiToken: ${Steam__ApiToken:-}
       IsThereAnyDeal__ApiToken: ${IsThereAnyDeal__ApiToken:-}

@@ -3,6 +3,7 @@ using CnGalWebSite.DataModel.ViewModel.Base;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 
 namespace CnGalWebSite.DataModel.ViewModel.Space
@@ -42,7 +43,7 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
         [Display(Name = "是否公开游玩记录")]
         public bool IsShowGameRecord { get; set; }
 
-        [Display(Name = "SteamID64（64位的数字Id，可用逗号分隔多个Id）")]
+        [Display(Name = "SteamID64（纯数字，可用逗号分隔多个 ID）")]
         public List<string> SteamIds { get; set; }
 
 
@@ -66,6 +67,29 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
 
         public List<UserEditRankIsShow> Ranks { get; set; }
 
+        public bool TryNormalizeSteamIds(out List<string> normalized)
+        {
+            normalized = new List<string>();
+            if (SteamIds == null)
+                return false;
+
+            foreach (var item in SteamIds)
+            {
+                if (item == null || item.Any(char.IsControl))
+                    return false;
+
+                foreach (var part in item.Split(new[] { ',', '，', '、' }))
+                {
+                    var id = part.Trim();
+                    if (id.Any(c => c < '0' || c > '9') ||
+                        !ulong.TryParse(id, NumberStyles.None, CultureInfo.InvariantCulture, out var value) || value == 0)
+                        return false;
+                    normalized.Add(id);
+                }
+            }
+            return true;
+        }
+
         public override Result Validate()
         {
 
@@ -83,19 +107,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Space
             {
                 return new Result { Error = "至少展示一个头衔" };
             }
-            if (SteamIds.Count != 0)
-            {
-                System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex("^(-?[0-9]*[.]*[0-9]{0,3})$");
-
-                foreach (var item in SteamIds)
-                {
-                    if (regex.IsMatch(item) == false)
-                    {
-                        return new Result { Error = "SteamId需为64位纯数字" };
-                    }
-                }
-            }
-
             //处理时间
             if (Birthday != null)
             {

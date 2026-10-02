@@ -38,10 +38,11 @@ namespace CnGalWebSite.APIServer.Application.News
         private readonly IExamineService _examineService;
         private readonly IFileService _fileService;
         private readonly IFileUploadService _fileUploadService;
+        private readonly ILogger<NewsService> _logger;
 
         public NewsService(IOptions<AutomationUsersOptions> automationUsersOptions, IRSSHelper rssHelper, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IFileService fileService, IRepository<ApplicationUser, string> userRepository,
         IRepository<WeiboUserInfor, long> weiboUserInforRepository, IRepository<GameNews, long> gameNewsRepository, IExamineService examineService, IFileUploadService fileUploadService,
-        IRepository<Article, long> articleRepository, IRepository<WeeklyNews, long> weeklyNewsRepository)
+        IRepository<Article, long> articleRepository, IRepository<WeeklyNews, long> weeklyNewsRepository, ILogger<NewsService> logger)
         {
             _automationUsersOptions = automationUsersOptions;
             _rssHelper = rssHelper;
@@ -56,6 +57,7 @@ namespace CnGalWebSite.APIServer.Application.News
             _fileService = fileService;
             _userRepository = userRepository;
             _fileUploadService = fileUploadService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -112,25 +114,37 @@ namespace CnGalWebSite.APIServer.Application.News
                 .Where(s => s.RSS.Type == OriginalRSSType.HeyBox && s.Title != "已删除")
                 .Select(s => s.RSS.Link)
                 .ToListAsync());
-            rss.RemoveAll(r => r.Type == OriginalRSSType.HeyBox && existingHeyBoxLinks.Contains(r.Link));
+            var heyBoxCount = rss.Count(r => r.Type == OriginalRSSType.HeyBox);
+            var skippedHeyBoxCount = rss.RemoveAll(r => r.Type == OriginalRSSType.HeyBox && existingHeyBoxLinks.Contains(r.Link));
+            _logger.LogInformation("小黑盒采集：源返回 {FetchedCount} 条，过滤已有 {SkippedCount} 条，待处理 {PendingCount} 条",
+                heyBoxCount, skippedHeyBoxCount, heyBoxCount - skippedHeyBoxCount);
             rss.Sort((a, b) => a.PublishTime.CompareTo(b.PublishTime));
 
-            // Keep upstream upload failures unchanged; isolate only configuration failures.
-            foreach (var item in rss.Where(r => r.Type == OriginalRSSType.Bilibili).ToList())
+            var uploadedImageCount = 0;
+            var failedCount = 0;
+            var insertedCount = 0;
+            // 两种来源均在链接去重后转存配图；保持配置异常的延迟抛出行为。
+            foreach (var item in rss.Where(r => r.Type == OriginalRSSType.Bilibili || r.Type == OriginalRSSType.HeyBox).ToList())
             {
                 try
                 {
-                    item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
+                    var result = await _fileUploadService.TransformImagesAsync(item.Description);
+                    item.Description = result.Text;
+                    uploadedImageCount += result.UploadResults.Count;
                 }
                 catch (ConfigurationException ex)
                 {
                     configurationError ??= ex;
                     rss.Remove(item);
+                    failedCount++;
+                    _logger.LogError(ex, "动态配图转存配置错误，来源：{Source}，链接：{Link}", item.Type, item.Link);
                 }
             }
 
             if (rss.Count == 0)
             {
+                _logger.LogInformation("动态采集汇总：正文图片转存成功 {ImageCount} 张，入库成功 {InsertedCount} 条，处理异常 {FailedCount} 条",
+                    uploadedImageCount, insertedCount, failedCount);
                 if (configurationError != null)
                     throw configurationError;
                 return;
@@ -146,7 +160,7 @@ namespace CnGalWebSite.APIServer.Application.News
                     var shouldPublish = temp.State == GameNewsState.Publish;
                     temp.State = GameNewsState.Edit;
                     temp = await _gameNewsRepository.InsertAsync(temp);
-
+                    insertedCount++;
 
                     //判断是否需要立即发表
                     if (shouldPublish)
@@ -159,6 +173,7 @@ namespace CnGalWebSite.APIServer.Application.News
                         }
                         catch (Exception ex) when (ex is not ConfigurationException)
                         {
+                            _logger.LogError(ex, "动态自动发布失败，保留待编辑状态，来源：{Source}，链接：{Link}", item.Type, item.Link);
                             temp.State = GameNewsState.Edit;
                             await _gameNewsRepository.UpdateAsync(temp);
                         }
@@ -168,15 +183,20 @@ namespace CnGalWebSite.APIServer.Application.News
                 catch (ConfigurationException ex)
                 {
                     configurationError ??= ex;
+                    failedCount++;
+                    _logger.LogError(ex, "动态处理配置错误，来源：{Source}，链接：{Link}", item.Type, item.Link);
                 }
                 catch (Exception ex)
                 {
-                    // 继续处理其余已导入的新闻项。
+                    failedCount++;
+                    _logger.LogError(ex, "动态处理失败，来源：{Source}，链接：{Link}", item.Type, item.Link);
                 }
 
             }
 
             await _weeklyNewsRepository.UpdateAsync(weekly);
+            _logger.LogInformation("动态采集汇总：正文图片转存成功 {ImageCount} 张，入库成功 {InsertedCount} 条，处理异常 {FailedCount} 条",
+                uploadedImageCount, insertedCount, failedCount);
             if (configurationError != null)
                 throw configurationError;
 

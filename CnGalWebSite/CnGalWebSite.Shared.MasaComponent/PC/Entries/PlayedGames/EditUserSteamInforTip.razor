@@ -81,15 +81,12 @@
     {
         try
         {
-            System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex("^(-?[0-9]*[.]*[0-9]{0,3})$");
-            foreach (var item in Model.SteamIds)
+            if (!Model.TryNormalizeSteamIds(out var steamIds))
             {
-                if (regex.IsMatch(item) == false)
-                {
-                    await PopupService.ToastErrorAsync("编辑用户Steam信息失败", "SteamId需为64位纯数字");
-                    return;
-                }
+                await PopupService.ToastErrorAsync("编辑用户Steam信息失败", "请输入正确的 SteamID64（纯数字），多个 ID 请用逗号分隔，不要留空项");
+                return;
             }
+            Model.SteamIds = steamIds;
 
             var obj = await _httpService.PostAsync<EditUserDataViewModel, Result>("api/space/EditUserData", Model);
             //判断结果

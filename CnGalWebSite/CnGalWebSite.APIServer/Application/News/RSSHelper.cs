@@ -369,14 +369,7 @@ namespace CnGalWebSite.APIServer.Application.News
                     model.Add(heyBoxPost);
                 }
 
-                // 将图片上传到图床
-                foreach (var item in model)
-                {
-                    if (!string.IsNullOrWhiteSpace(item.Description))
-                    {
-                        item.Description = (await _fileUploadService.TransformImagesAsync(item.Description)).Text;
-                    }
-                }
+                // 配图由 NewsService 按链接去重后转存，避免重复下载旧动态的图片。
                 return model;
             }
             catch (Exception ex) when (ex is not ConfigurationException)
