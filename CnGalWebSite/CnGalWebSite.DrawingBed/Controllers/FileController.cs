@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using SixLabors.ImageSharp;
 using System.IO;
 using System.Text;
 
@@ -23,11 +24,12 @@ namespace CnGalWebSite.DrawingBed.Controllers
         private readonly IHttpClientFactory _clientFactory;
         private readonly IFileService _fileService;
         private readonly IUploadService _uploadService;
+        private readonly IRecordService _recordService;
         private readonly IQueryService _queryService;
         private readonly IRepository<UploadRecord, long> _uploadRecordRepository;
         private readonly ILogger<FileController> _logger;
 
-        public FileController(IHttpClientFactory clientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, IFileService fileService, IQueryService queryService, IRepository<UploadRecord, long> uploadRecordRepository, IUploadService uploadService, ILogger<FileController> logger)
+        public FileController(IHttpClientFactory clientFactory, IWebHostEnvironment webHostEnvironment, IConfiguration configuration, IFileService fileService, IQueryService queryService, IRepository<UploadRecord, long> uploadRecordRepository, IUploadService uploadService, ILogger<FileController> logger, IRecordService recordService)
         {
             _clientFactory = clientFactory;
             _webHostEnvironment = webHostEnvironment;
@@ -36,6 +38,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
             _queryService = queryService;
             _uploadRecordRepository = uploadRecordRepository;
             _uploadService = uploadService;
+            _recordService = recordService;
             _logger = logger;
         }
 
@@ -140,7 +143,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
             {
                 path = await _fileService.SaveFileFromUrl(url, UploadFileType.Image, HttpContext.RequestAborted);
                 var sha1 = _fileService.GetSHA1(path);
-                var result = await _uploadService.UploadToTucangCC(path, $"{sha1}.png");
+                var result = await _uploadService.UploadToTucangCC(path, $"{sha1}{Path.GetExtension(path)}");
                 _fileService.DeleteFile(path);
 
                 return new UploadResult
@@ -149,6 +152,11 @@ namespace CnGalWebSite.DrawingBed.Controllers
                     OriginalUrl = url,
                     Uploaded = true
                 };
+            }
+            catch (UnknownImageFormatException)
+            {
+                _fileService.DeleteFile(path);
+                return new UploadResult { Uploaded = false, OriginalUrl = url, Error = "不支持的图片格式，保留原地址" };
             }
             catch (Exception ex)
             {
@@ -205,13 +213,13 @@ namespace CnGalWebSite.DrawingBed.Controllers
                 return new Result { Success = false };
             }
 
-            var file = await _uploadRecordRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Sha1 == sha1);
-            if (file == null)
+            var url = await _recordService.Get(sha1);
+            if (url == null)
             {
                 return new Result { Success = false };
             }
 
-            return new Result { Success = true, Message = file.Url };
+            return new Result { Success = true, Message = url };
 
         }
 
@@ -224,25 +232,10 @@ namespace CnGalWebSite.DrawingBed.Controllers
         [HttpGet]
         public async Task<ActionResult<Result>> GetRandomFileAsync([FromQuery] UploadFileType type)
         {
-            var random = new Random();
-            var length = await _uploadRecordRepository.CountAsync(s => string.IsNullOrWhiteSpace(s.Url) == false && s.Type == type);
-            if (length > 0)
-            {
-                var p = random.Next(0, length);
-                var temp = await _uploadRecordRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Url) == false && s.Type == type).OrderBy(s => s.Id).Skip(p).Take(1).ToListAsync();
-                if (temp.Any())
-                {
-                    return new Result { Success = true, Message = temp[0].Url };
-                }
-                else
-                {
-                    return new Result { Success = false };
-                }
-            }
-            else
-            {
+            if (type is not (UploadFileType.Image or UploadFileType.Audio))
                 return new Result { Success = false };
-            }
+            var url = await _recordService.GetRandom(type);
+            return new Result { Success = url != null, Message = url };
         }
     }
 }
