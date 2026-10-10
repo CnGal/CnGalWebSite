@@ -1,5 +1,6 @@
 # 仅保留 DrawingBed 构建所需的项目和共享编译配置。
 *
+!sixlabors.lic
 !CnGalWebSite/
 CnGalWebSite/*
 !CnGalWebSite/.editorconfig

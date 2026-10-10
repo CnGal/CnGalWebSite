@@ -12,6 +12,9 @@ using System.Reflection;
 using CnGalWebSite.DrawingBed.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
+using CnGalWebSite.DrawingBed.Models.ViewModels;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDrawingBedConfiguration();
@@ -33,6 +36,33 @@ builder.Services.AddDbContextPool<AppDbContext>((provider, options) =>
 });
 
 builder.Services.AddControllers();
+var permitLimit = builder.Configuration.GetValue("UploadRateLimit:PermitLimit", 4);
+var queueLimit = builder.Configuration.GetValue("UploadRateLimit:QueueLimit", 128);
+ArgumentOutOfRangeException.ThrowIfNegativeOrZero(permitLimit, "UploadRateLimit:PermitLimit");
+ArgumentOutOfRangeException.ThrowIfNegative(queueLimit, "UploadRateLimit:QueueLimit");
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        var result = new UploadResult
+        {
+            Uploaded = false,
+            Error = "上传服务繁忙，等待队列已满，请稍后重试"
+        };
+        await context.HttpContext.Response.WriteAsJsonAsync<object>(
+            string.Equals(context.HttpContext.Request.RouteValues["action"]?.ToString(), "Upload", StringComparison.OrdinalIgnoreCase)
+                ? new[] { result } : result, cancellationToken);
+    };
+    // 上传和转存共用处理名额，等待请求按先到先处理，避免无限积压
+    options.AddConcurrencyLimiter("uploads", limiter =>
+    {
+        limiter.PermitLimit = permitLimit;
+        limiter.QueueLimit = queueLimit;
+        limiter.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    });
+});
 //注册Swagger生成器，定义一个或多个Swagger文件
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -125,6 +155,7 @@ app.UseAuthentication();
 
 //添加账户中间件
 app.UseAuthorization();
+app.UseRateLimiter();
 
 
 app.MapControllers().RequireAuthorization("ApiScope"); 

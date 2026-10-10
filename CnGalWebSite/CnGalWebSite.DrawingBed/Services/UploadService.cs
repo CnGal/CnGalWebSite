@@ -7,7 +7,6 @@ using COSXML.Transfer;
 using System.Security.AccessControl;
 using System.Security.Policy;
 using Aliyun.OSS;
-using Microsoft.AspNetCore.StaticFiles;
 using Newtonsoft.Json.Linq;
 using CnGalWebSite.DrawingBed.Configuration;
 using Microsoft.Extensions.Options;
@@ -73,14 +72,17 @@ namespace CnGalWebSite.DrawingBed.Services
 
         public async Task<string> UploadToAliyunOSS(string filePath, string shar1)
         {
+            if (!string.Equals(Path.GetExtension(filePath), ".mp3", StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("仅允许发布转码后的 MP3 音频");
             return await Task.Run(() =>
             {
                 // 填写Object完整路径，完整路径中不能包含Bucket名称，例如exampledir/exampleobject.txt
-                var objectName = $"audio/upload/{DateTime.UtcNow:yyyyMMdd}/{shar1}.mp3";
+                var objectName = $"{UploadFilePolicy.AudioObjectPrefix}{DateTime.UtcNow:yyyyMMdd}/{shar1}.mp3";
                 try
                 {
                     // 上传文件
-                    var result = _aliyunOssClient.PutObject(_aliyunBucketName, objectName, filePath);
+                    var result = _aliyunOssClient.PutObject(_aliyunBucketName, objectName, filePath,
+                        new ObjectMetadata { ContentType = "audio/mpeg", ContentDisposition = "inline" });
                     var url = _aliyunOptions.PublicBaseAddress + objectName;
                     _logger.LogInformation("成功上传音频到OSS：{url}", url);
                     return url;
@@ -95,6 +97,8 @@ namespace CnGalWebSite.DrawingBed.Services
 
         public async Task<string> UploadToTencentOSS(string filePath, string shar1)
         {
+            var extension = Path.GetExtension(filePath).ToLowerInvariant();
+            var contentType = UploadFilePolicy.GetImageContentType(extension);
             // 初始化 TransferConfig
             TransferConfig transferConfig = new TransferConfig();
 
@@ -102,11 +106,15 @@ namespace CnGalWebSite.DrawingBed.Services
             TransferManager transferManager = new TransferManager(_tencentCosXml, transferConfig);
 
             var bucket = _tencentOptions.BucketName; //存储桶，格式：BucketName-APPID
-            var cosPath = $"images/upload/{DateTime.UtcNow:yyyyMMdd}/{shar1}.{filePath.Split('.').LastOrDefault() ?? "png"}"; //对象在存储桶中的位置标识符，即称对象键
+            var cosPath = $"{UploadFilePolicy.ImageObjectPrefix}{DateTime.UtcNow:yyyyMMdd}/{shar1}{extension}";
             var srcPath = filePath;//本地文件绝对路径
 
             // 上传对象
-            COSXMLUploadTask uploadTask = new COSXMLUploadTask(bucket, cosPath);
+            // 上传任务会将这些请求头同时用于普通 PUT 请求和分块上传初始化请求
+            var request = new COSXML.Model.Object.PutObjectRequest(bucket, cosPath, srcPath);
+            request.SetRequestHeader("Content-Type", contentType);
+            request.SetRequestHeader("Content-Disposition", "inline");
+            COSXMLUploadTask uploadTask = new COSXMLUploadTask(request);
             uploadTask.SetSrcPath(srcPath);
 
             try
@@ -137,17 +145,14 @@ namespace CnGalWebSite.DrawingBed.Services
                 using var content = new MultipartFormDataContent();
                 using var fileContent = new StreamContent(File.OpenRead(filePath));
 
-                // 根据文件扩展名设置正确的 Content-Type
-                var contentTypeProvider = new FileExtensionContentTypeProvider();
-                if (contentTypeProvider.TryGetContentType(filePath, out var mimeType))
-                {
-                    fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(mimeType);
-                }
+                var extension = Path.GetExtension(filePath).ToLowerInvariant();
+                var mimeType = UploadFilePolicy.GetImageContentType(extension);
+                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(mimeType);
 
                 content.Add(
                     content: fileContent,
                     name: "file",
-                    fileName: uploadName);
+                    fileName: Path.GetFileNameWithoutExtension(uploadName) + extension);
                 content.Add(new StringContent(_tucangOptions.ApiToken), "token");
 
                 var response = await _httpClient.PostAsync(_tucangOptions.UploadUrl, content);

@@ -366,6 +366,7 @@ FodyWeavers.xsd
 # 配置文件
 .NewCngalWebSite/NewCngalWebSite.APIServer/appsettings.json
 /CnGalWebSite/CnGalWebSite.APIServer/App_Data/WeChat_OfficialAccount
+/CnGalWebSite/CnGalWebSite.DrawingBed/App_Data/uploads/
 /CnGalWebSite/CnGalWebSite.IdentityServer/tempkey.jwk
 /CnGalWebSite/CnGalWebSite.RobotClientX/wwwroot/Data
 /CnGalWebSite/CnGalWebSite.RobotClientX/wwwroot/SensitiveWords

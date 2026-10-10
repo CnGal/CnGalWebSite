@@ -50,6 +50,10 @@ namespace CnGalWebSite.APIServer.Application.Files
         /// <returns></returns>
         public async Task<string> TransferDepositFile(string url)
         {
+            if (Uri.TryCreate(url, UriKind.Absolute, out var uri)
+                && uri.AbsolutePath.EndsWith(".avif", StringComparison.OrdinalIgnoreCase))
+                return null;
+
             try
             {
                 var result = await _httpService.GetAsync<UploadResult>(_imageApiOptions.GetOptional(ImageApiOptions.SectionName).BaseAddress + "api/files/TransferDepositToTucangCC?url=" + url);
@@ -79,7 +83,7 @@ namespace CnGalWebSite.APIServer.Application.Files
         /// <returns></returns>
         public async Task TransferMainImagesToPublic(int maxCount)
         {
-            var users = await _userRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.PhotoPath) == false && string.IsNullOrWhiteSpace(s.UserName) == false && s.PhotoPath.Contains("?") == false && s.PhotoPath.Contains("default") == false)
+            var users = await _userRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.PhotoPath) == false && string.IsNullOrWhiteSpace(s.UserName) == false && s.PhotoPath.Contains("?") == false && s.PhotoPath.Contains("default") == false && !s.PhotoPath.ToLower().EndsWith(".avif"))
                 .OrderBy(s => s.Id)
                 .Take(maxCount).ToListAsync();
 
@@ -104,7 +108,7 @@ namespace CnGalWebSite.APIServer.Application.Files
             _userRepository.Clear();
 
 
-            var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
+            var entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false && !s.MainPicture.ToLower().EndsWith(".avif"))
                 .OrderBy(s => s.Id)
                 .Take(maxCount).ToListAsync();
 
@@ -129,7 +133,7 @@ namespace CnGalWebSite.APIServer.Application.Files
 
             _entryRepository.Clear();
 
-            entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Thumbnail) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Thumbnail.Contains("?") == false && s.Thumbnail.Contains("default") == false)
+            entries = await _entryRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.Thumbnail) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.Thumbnail.Contains("?") == false && s.Thumbnail.Contains("default") == false && !s.Thumbnail.ToLower().EndsWith(".avif"))
                .OrderBy(s => s.Id)
                .Take(maxCount).ToListAsync();
 
@@ -155,7 +159,7 @@ namespace CnGalWebSite.APIServer.Application.Files
             _entryRepository.Clear();
 
 
-            var articles = await _articleRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
+            var articles = await _articleRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false && !s.MainPicture.ToLower().EndsWith(".avif"))
                 .OrderBy(s => s.Id)
                .Take(maxCount).ToListAsync();
 
@@ -179,7 +183,7 @@ namespace CnGalWebSite.APIServer.Application.Files
             _articleRepository.Clear();
 
 
-            var videos = await _videoRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false)
+            var videos = await _videoRepository.GetAll().Where(s => string.IsNullOrWhiteSpace(s.MainPicture) == false && s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false && s.MainPicture.Contains("?") == false && s.MainPicture.Contains("default") == false && !s.MainPicture.ToLower().EndsWith(".avif"))
               .OrderBy(s => s.Id)
               .Take(maxCount).ToListAsync();
 
@@ -207,7 +211,7 @@ namespace CnGalWebSite.APIServer.Application.Files
             var entryPictures = await _entryRepository.GetAll()
                 .Include(s => s.Pictures)
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
-                .Where(s => s.Pictures.Any(s => s.Url.Contains("?") == false && s.Url.Contains("default") == false))
+                .Where(s => s.Pictures.Any(s => s.Url.Contains("?") == false && s.Url.Contains("default") == false && !s.Url.ToLower().EndsWith(".avif")))
                 .OrderBy(s => s.Id)
                 .Take(maxCount)
                 .ToListAsync();
@@ -216,8 +220,8 @@ namespace CnGalWebSite.APIServer.Application.Files
             {
                 try
                 {
-                    var count = item.Pictures.Count(s => s.Url.Contains('?') == false && s.Url.Contains("default") == false);
-                    foreach (var infor in item.Pictures.Where(s => s.Url.Contains('?') == false && s.Url.Contains("default") == false))
+                    var count = item.Pictures.Count(s => s.Url.Contains('?') == false && s.Url.Contains("default") == false && !s.Url.ToLower().EndsWith(".avif"));
+                    foreach (var infor in item.Pictures.Where(s => s.Url.Contains('?') == false && s.Url.Contains("default") == false && !s.Url.ToLower().EndsWith(".avif")))
                     {
                         var temp = await TransferDepositFile(infor.Url);
                         if (string.IsNullOrWhiteSpace(temp) == false)
@@ -246,7 +250,7 @@ namespace CnGalWebSite.APIServer.Application.Files
                 .Include(s => s.WebsiteAddInfor).ThenInclude(s => s.Images)
                 .Where(s => s.IsHidden == false && string.IsNullOrWhiteSpace(s.Name) == false)
                 .Where(s => s.WebsiteAddInfor != null)
-                .Where(s => s.WebsiteAddInfor.Images.Any(s => s.Url.Contains("?") == false && s.Url.Contains("default") == false))
+                .Where(s => s.WebsiteAddInfor.Images.Any(s => s.Url.Contains("?") == false && s.Url.Contains("default") == false && !s.Url.ToLower().EndsWith(".avif")))
                 .OrderBy(s => s.Id)
                 .Take(maxCount)
                 .ToListAsync();
@@ -255,8 +259,8 @@ namespace CnGalWebSite.APIServer.Application.Files
             {
                 try
                 {
-                    var count = item.WebsiteAddInfor.Images.Count(s => s.Url.Contains('?') == false && s.Url.Contains("default") == false);
-                    foreach (var infor in item.WebsiteAddInfor.Images.Where(s => s.Url.Contains('?') == false && s.Url.Contains("default") == false))
+                    var count = item.WebsiteAddInfor.Images.Count(s => s.Url.Contains('?') == false && s.Url.Contains("default") == false && !s.Url.ToLower().EndsWith(".avif"));
+                    foreach (var infor in item.WebsiteAddInfor.Images.Where(s => s.Url.Contains('?') == false && s.Url.Contains("default") == false && !s.Url.ToLower().EndsWith(".avif")))
                     {
                         var temp = await TransferDepositFile(infor.Url);
                         if (string.IsNullOrWhiteSpace(temp) == false)

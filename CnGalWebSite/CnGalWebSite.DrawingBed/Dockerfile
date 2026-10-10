@@ -5,6 +5,8 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends curl ffmpeg \
     && mkdir -p /home/app/.aspnet/DataProtection-Keys \
     && chown -R $APP_UID:root /home/app/.aspnet \
+    && mkdir -p /app/App_Data/uploads \
+    && chown -R $APP_UID:root /app/App_Data \
     && rm -rf /var/lib/apt/lists/*
 
 USER $APP_UID
