@@ -21,6 +21,10 @@ services:
     environment:
       TZ: ${TZ:-Asia/Shanghai}
 
+      # 上传和转存共用的处理并发数与等待队列容量
+      UploadRateLimit__PermitLimit: ${UploadRateLimit__PermitLimit:-4}
+      UploadRateLimit__QueueLimit: ${UploadRateLimit__QueueLimit:-128}
+
       # JWT 鉴权地址
       JwtBearer__Authority: ${JwtBearer__Authority:-https://oauth2.cngal.org}
 
@@ -70,7 +74,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: ${RESOURCES_LIMITS_MEMORY:-500m}
+          memory: ${RESOURCES_LIMITS_MEMORY:-2g}
 
 volumes:
   drawingbed-DataProtection-Keys:

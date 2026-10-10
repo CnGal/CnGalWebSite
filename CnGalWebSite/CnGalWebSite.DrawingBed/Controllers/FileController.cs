@@ -6,6 +6,7 @@ using CnGalWebSite.DrawingBed.Models.ViewModels;
 using CnGalWebSite.DrawingBed.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.Text;
@@ -44,6 +45,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
+        [EnableRateLimiting("uploads")]
         public async Task<ActionResult<List<UploadResult>>> UploadAsync([FromForm] List<IFormFile> files, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type, [FromQuery] bool gallery = false, [FromQuery] double cropX = 0, [FromQuery] double cropY = 0, [FromQuery] double cropW = 0, [FromQuery] double cropH = 0)
         {
             if (files.Count == 0)
@@ -79,6 +81,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
         /// <returns></returns>
         [HttpPost]
         [AllowAnonymous]
+        [EnableRateLimiting("uploads")]
         public async Task<ActionResult<UploadResult>> linkToImgUrlAsync([FromQuery] string url, [FromQuery] double x, [FromQuery] double y, [FromQuery] UploadFileType type, [FromQuery] bool gallery = false, [FromQuery] double cropX = 0, [FromQuery] double cropY = 0, [FromQuery] double cropW = 0, [FromQuery] double cropH = 0)
         {
             if (string.IsNullOrWhiteSpace(url))
@@ -129,6 +132,7 @@ namespace CnGalWebSite.DrawingBed.Controllers
         /// <returns></returns>
         [HttpGet]
         [AllowAnonymous]
+        [EnableRateLimiting("uploads")]
         public async Task<ActionResult<UploadResult>> TransferDepositToTucangCCAsync([FromQuery] string url)
         {
             string path = "";
