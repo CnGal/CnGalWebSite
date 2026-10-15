@@ -26,8 +26,7 @@
         }
         @if (SortValue != SearchSortField.Default)
         {
-            <input type="hidden" name="SortField" value="@SortValue" />
-            <input type="hidden" name="SortDirection" value="@Direction" />
+            <input type="hidden" name="Sort" value="@SearchPageUrl.FormatSort(SortValue, Direction)" />
         }
 
         <div class="search-page__input-wrapper">
@@ -121,7 +120,7 @@
     [SupplyParameterFromQuery(Name = "Times")]
     public string[]? QueryTimes { get; set; }
 
-    [SupplyParameterFromQuery(Name = "SortField")]
+    [SupplyParameterFromQuery(Name = "Sort")]
     public string? QuerySort { get; set; }
 
     [SupplyParameterFromQuery(Name = "Page")]
@@ -131,9 +130,6 @@
     private string SearchText = "";
     private List<string> FilterTypes = [];
     private List<string> FilterTimes = [];
-    [SupplyParameterFromQuery(Name = "SortDirection")]
-    public string? QueryDirection { get; set; }
-
     private SearchSortField SortValue;
     private SortDirection Direction = SortDirection.Descending;
     private int CurrentPage = 1;
@@ -150,7 +146,7 @@
         {
             var parts = new List<string>();
             if (SortValue != SearchSortField.Default)
-                parts.Add($"SortField={SortValue}&SortDirection={Direction}");
+                parts.Add("Sort=" + Uri.EscapeDataString(SearchPageUrl.FormatSort(SortValue, Direction)));
             foreach (var type in FilterTypes)
                 parts.Add("Types=" + Uri.EscapeDataString(type));
             foreach (var time in FilterTimes)
@@ -162,14 +158,11 @@
     protected override async Task OnParametersSetAsync()
     {
         SearchText = QueryText ?? "";
-        if ((!string.IsNullOrEmpty(QuerySort) && (!Enum.TryParse(QuerySort, true, out SortValue) || !Enum.IsDefined(SortValue))) ||
-            (!string.IsNullOrEmpty(QueryDirection) && (!Enum.TryParse(QueryDirection, true, out Direction) || !Enum.IsDefined(Direction))))
+        if (!SearchPageUrl.TryParseSort(QuerySort, out SortValue, out Direction))
         {
             ErrorMessage = "排序字段或方向无效";
             return;
         }
-        if (string.IsNullOrEmpty(QuerySort)) SortValue = SearchSortField.Default;
-        if (string.IsNullOrEmpty(QueryDirection)) Direction = SortDirection.Descending;
         CurrentPage = QueryPage < 1 ? 1 : QueryPage;
         FilterTypes = QueryTypes?.Where(t => !string.IsNullOrWhiteSpace(t)).ToList() ?? [];
         FilterTimes = QueryTimes?.Where(t => !string.IsNullOrWhiteSpace(t)).ToList() ?? [];
@@ -213,7 +206,7 @@
         if (!string.IsNullOrWhiteSpace(SearchText))
             parts.Add("Text=" + Uri.EscapeDataString(SearchText));
         if (SortValue != SearchSortField.Default)
-            parts.Add($"SortField={SortValue}&SortDirection={Direction}");
+            parts.Add("Sort=" + Uri.EscapeDataString(SearchPageUrl.FormatSort(SortValue, Direction)));
         foreach (var type in FilterTypes)
             parts.Add("Types=" + Uri.EscapeDataString(type));
         foreach (var time in FilterTimes)

@@ -175,7 +175,7 @@
         if (!string.IsNullOrWhiteSpace(SearchText))
             parts.Add("Text=" + Uri.EscapeDataString(SearchText));
         if (tSort != SearchSortField.Default)
-            parts.Add($"SortField={tSort}&SortDirection={direction ?? Direction}");
+            parts.Add("Sort=" + Uri.EscapeDataString(SearchPageUrl.FormatSort(tSort, direction ?? Direction)));
         foreach (var tt in tTypes)
             parts.Add("Types=" + Uri.EscapeDataString(tt));
         foreach (var tt in tTimes)

@@ -90,10 +90,7 @@
     public string Text { get; set; }
     [SupplyParameterFromQuery]
     [Parameter]
-    public string SortField { get; set; }
-    [SupplyParameterFromQuery]
-    [Parameter]
-    public string SortDirection { get; set; }
+    public string Sort { get; set; }
 
     [SupplyParameterFromQuery]
     [Parameter]
@@ -126,15 +123,21 @@
         {
             try
             {
-                if (!Enum.TryParse<SearchSortField>(SortField ?? "Default", true, out var field) || !Enum.IsDefined(field) ||
-                    !Enum.TryParse<CnGalWebSite.Core.Models.SortDirection>(SortDirection ?? "Descending", true, out var direction) || !Enum.IsDefined(direction) ||
-                    !SearchInputModel.TryParse(Types, Times, Text, field, direction, Page, InputModel))
+                // LocationChanged can run before query-bound component parameters are refreshed.
+                var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(new Uri(args?.Location ?? NavigationManager.Uri).Query);
+                var types = query.TryGetValue("Types", out var typeValues) ? typeValues.ToArray() : null;
+                var times = query.TryGetValue("Times", out var timeValues) ? timeValues.ToArray() : null;
+                var text = query.TryGetValue("Text", out var textValue) ? textValue.ToString() : string.Empty;
+                var sort = query.TryGetValue("Sort", out var sortValue) ? sortValue.ToString() : null;
+                var page = query.TryGetValue("Page", out var pageValue) && int.TryParse(pageValue, out var parsedPage) ? parsedPage : 1;
+                if (!SearchPageUrl.TryParseSort(sort, out var field, out var direction))
                     throw new ArgumentException("排序字段或方向无效");
+                InputModel = SearchInputModel.Parse(types, times, text, field, direction, Math.Max(1, page));
 
                 //请求数据
                 try
                 {
-                    var url = ToolHelper.WebApiPath + "api/home/search" + NavigationManager.Uri.Replace(NavigationManager.BaseUri, "").Replace("search", "");
+                    var url = ToolHelper.WebApiPath + "api/home/search" + InputModel.ToQueryParameterString();
                     DataModel = await _dataCacheService.SearchViewCatche.GetCache(url);
 
                 }
@@ -148,9 +151,12 @@
                 isReady = true;
                 StateHasChanged();
             }
-            catch
+            catch (Exception ex)
             {
-
+                DataModel = new SearchViewModel();
+                isReady = true;
+                await ErrorHandler.ProcessError(ex, "解析搜索参数失败");
+                StateHasChanged();
             }
         }
 
@@ -166,7 +172,7 @@
     public void OnChanged(int page = 1)
     {
         InputModel.CurrentPage = page;
-        NavigationManager.NavigateTo("/search" + InputModel.ToQueryParameterString());
+        NavigationManager.NavigateTo("/search" + InputModel.ToPageQueryString());
 
 
     }

@@ -469,6 +469,10 @@ namespace CnGalWebSite.APIServer.Application.Search.Meilisearch
                 SearchSortField.Id => "originalId",
                 SearchSortField.LastEditTime => "lastEditTime",
                 SearchSortField.PublishTime => "pubulishTime",
+                // 词条以 ID 表示创建顺序，索引中的 createTime 未记录词条创建时间。
+                SearchSortField.CreateTime when model.Types.Count > 0 && model.Types.All(type =>
+                    type is SearchType.Entry or SearchType.Game or SearchType.Role or
+                        SearchType.ProductionGroup or SearchType.Staff) => "originalId",
                 SearchSortField.CreateTime => "createTime",
                 SearchSortField.ReaderCount => "readerCount",
                 SearchSortField.Default => null,
