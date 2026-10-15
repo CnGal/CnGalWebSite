@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="WinnerOverviewModel" Headers="_headers" DataSource="Model" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard"
+    <DataTableCard TModel="WinnerOverviewModel" TSort="WinnerSortField" DefaultSortField="WinnerSortField.Id" SortFields="_sortFields" LocalSorting="_localSorting" Headers="_headers" DataSource="Model" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard"
                    Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.AwardName!=null&&s.AwardName.Contains(dataTableCard._search))|| (s.RealName!=null&&s.RealName.Contains(dataTableCard._search))|| (s.UserName!=null&&s.UserName.Contains(dataTableCard._search))|| (s.Email!=null&&s.Email.Contains(dataTableCard._search))">
         <ItemColContent>
             @if (context.Header.Value == "actions")
@@ -69,6 +70,35 @@
 </MDialog>
 
  @code {
+    private static readonly IReadOnlyDictionary<string, WinnerSortField> _sortFields = new Dictionary<string, WinnerSortField>
+    {
+        [nameof(WinnerOverviewModel.ActivationCode)] = WinnerSortField.ActivationCode,
+        [nameof(WinnerOverviewModel.Address)] = WinnerSortField.Address,
+        [nameof(WinnerOverviewModel.AwardType)] = WinnerSortField.AwardType,
+        [nameof(WinnerOverviewModel.Email)] = WinnerSortField.Email,
+        [nameof(WinnerOverviewModel.Id)] = WinnerSortField.Id,
+        [nameof(WinnerOverviewModel.Number)] = WinnerSortField.Number,
+        [nameof(WinnerOverviewModel.Phone)] = WinnerSortField.Phone,
+        [nameof(WinnerOverviewModel.RealName)] = WinnerSortField.RealName,
+        [nameof(WinnerOverviewModel.TrackingNumber)] = WinnerSortField.TrackingNumber,
+    };
+
+    private static readonly CnGalWebSite.Core.Services.Query.SortMap<WinnerOverviewModel, WinnerSortField> _localSorting =
+        new CnGalWebSite.Core.Services.Query.SortMap<WinnerOverviewModel, WinnerSortField>(WinnerSortField.Id, WinnerSortField.Id)
+        .Add(WinnerSortField.ActivationCode, item => item.ActivationCode)
+        .Add(WinnerSortField.Address, item => item.Address)
+        .Add(WinnerSortField.AwardId, item => item.AwardId)
+        .Add(WinnerSortField.AwardName, item => item.AwardName)
+        .Add(WinnerSortField.AwardType, item => item.AwardType)
+        .Add(WinnerSortField.Email, item => item.Email)
+        .Add(WinnerSortField.Id, item => item.Id)
+        .Add(WinnerSortField.Number, item => item.Number)
+        .Add(WinnerSortField.Phone, item => item.Phone)
+        .Add(WinnerSortField.PrizeId, item => item.PrizeId)
+        .Add(WinnerSortField.RealName, item => item.RealName)
+        .Add(WinnerSortField.TrackingNumber, item => item.TrackingNumber)
+        .Add(WinnerSortField.UserName, item => item.UserName);
+
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
     [Parameter]
@@ -103,7 +133,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<WinnerOverviewModel> dataTableCard;
+    DataTableCard<WinnerOverviewModel, WinnerSortField> dataTableCard;
 
 
     protected override async Task OnInitializedAsync()

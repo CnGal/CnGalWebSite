@@ -1,24 +1,25 @@
-﻿@using CnGalWebSite.DataModel.ViewModel.Commodities
+@using CnGalWebSite.DataModel.Sorting
+@using CnGalWebSite.DataModel.ViewModel.Commodities
 
 @* CommodityGCoinsRecord — G币变动记录数据表格 *@
 
 <div class="commodity-gcoins-record">
     <CgDataTable Title="G币记录"
-                 TItem="GCoinsRecordOverviewModel"
+                 TItem="GCoinsRecordOverviewModel" TSort="GCoinsRecordSortField"
                  OnServerQuery="OnServerQuery"
-                 DefaultSortField="Time"
+                 DefaultSortField="GCoinsRecordSortField.Time"
                  DefaultSortDesc="true"
                  DefaultPageSize="10"
                  @ref="_dataTable">
-        <CgDataTableColumn TItem="GCoinsRecordOverviewModel"
+        <CgDataTableColumn TItem="GCoinsRecordOverviewModel" TSort="GCoinsRecordSortField"
                            Title="时间"
-                           Field="Time"
+                           SortField="GCoinsRecordSortField.Time" Value="item => item.Time"
                            Width="160px">
             @context.Time.ToString("yyyy-MM-dd HH:mm")
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="GCoinsRecordOverviewModel"
+        <CgDataTableColumn TItem="GCoinsRecordOverviewModel" TSort="GCoinsRecordSortField"
                            Title="G币变动"
-                           Field="Count"
+                           SortField="GCoinsRecordSortField.Count" Value="item => item.Count"
                            Width="100px">
             @if (context.Count > 0)
             {
@@ -33,19 +34,19 @@
                 <span class="commodity-gcoins-record__count--zero">0</span>
             }
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="GCoinsRecordOverviewModel"
+        <CgDataTableColumn TItem="GCoinsRecordOverviewModel" TSort="GCoinsRecordSortField"
                            Title="备注"
-                           Field="Note">
+                           SortField="GCoinsRecordSortField.Note" Value="item => item.Note">
             @(string.IsNullOrWhiteSpace(context.Note) ? "—" : context.Note)
         </CgDataTableColumn>
     </CgDataTable>
 </div>
 
 @code {
-    private CgDataTable<GCoinsRecordOverviewModel>? _dataTable;
+    private CgDataTable<GCoinsRecordOverviewModel, GCoinsRecordSortField>? _dataTable;
 
     [Parameter, EditorRequired]
-    public Func<CgDataTableRequest, Task<CgDataTableResult<GCoinsRecordOverviewModel>>> OnServerQuery { get; set; } = default!;
+    public Func<CgDataTableRequest<GCoinsRecordSortField>, Task<CgDataTableResult<GCoinsRecordOverviewModel>>> OnServerQuery { get; set; } = default!;
 
     public async Task RefreshAsync()
     {

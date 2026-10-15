@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.Application.Examines;
+using CnGalWebSite.DataModel.Sorting;
+using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Favorites;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Users;
@@ -31,6 +32,43 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/Favorites/[action]")]
     public class FavoriteFolderAPIController : ControllerBase
     {
+        private static readonly SortMap<FavoriteFolder, FavoriteFolderSortField> ListFavoriteFoldersSorting =
+            new SortMap<FavoriteFolder, FavoriteFolderSortField>(FavoriteFolderSortField.Id, FavoriteFolderSortField.Id)
+            .Add(FavoriteFolderSortField.Id, s => s.Id)
+            .Add(FavoriteFolderSortField.Name, s => s.Name)
+            .Add(FavoriteFolderSortField.IsDefault, s => s.IsDefault)
+            .Add(FavoriteFolderSortField.BriefIntroduction, s => s.BriefIntroduction)
+            .Add(FavoriteFolderSortField.Count, s => s.Count)
+            .Add(FavoriteFolderSortField.CreateTime, s => s.CreateTime)
+            .Add(FavoriteFolderSortField.UserId, s => s.ApplicationUser.Id)
+            .Add(FavoriteFolderSortField.UserName, s => s.ApplicationUser.UserName)
+            .Add(FavoriteFolderSortField.ShowPublicly, s => s.ShowPublicly)
+            .Add(FavoriteFolderSortField.IsHidden, s => s.IsHidden)
+            .Add(FavoriteFolderSortField.MainImage, s => s.MainImage);
+
+        private static readonly SortMap<FavoriteFolder, FavoriteFolderSortField> ListUserFavoriteFoldersSorting =
+            new SortMap<FavoriteFolder, FavoriteFolderSortField>(FavoriteFolderSortField.Id, FavoriteFolderSortField.Id)
+            .Add(FavoriteFolderSortField.Id, s => s.Id)
+            .Add(FavoriteFolderSortField.Name, s => s.Name)
+            .Add(FavoriteFolderSortField.IsDefault, s => s.IsDefault)
+            .Add(FavoriteFolderSortField.BriefIntroduction, s => s.BriefIntroduction)
+            .Add(FavoriteFolderSortField.Count, s => s.Count)
+            .Add(FavoriteFolderSortField.CreateTime, s => s.CreateTime)
+            .Add(FavoriteFolderSortField.UserId, s => s.ApplicationUser.Id)
+            .Add(FavoriteFolderSortField.UserName, s => s.ApplicationUser.UserName)
+            .Add(FavoriteFolderSortField.ShowPublicly, s => s.ShowPublicly)
+            .Add(FavoriteFolderSortField.IsHidden, s => s.IsHidden)
+            .Add(FavoriteFolderSortField.MainImage, s => s.MainImage);
+
+        private static readonly SortMap<FavoriteObject, FavoriteObjectSortField> ListUserFavoriteObjectsSorting =
+            new SortMap<FavoriteObject, FavoriteObjectSortField>(FavoriteObjectSortField.Id, FavoriteObjectSortField.Id)
+            .Add(FavoriteObjectSortField.Id, s => s.Id)
+            .Add(FavoriteObjectSortField.CreateTime, s => s.CreateTime)
+            .Add(FavoriteObjectSortField.ObjectId, s => s.Entry != null ? s.Entry.Id : s.Article != null ? s.Article.Id : s.Periphery != null ? s.Periphery.Id: s.Video != null ? s.Video.Id:s.Tag != null ? s.Tag.Id: 0)
+            .Add(FavoriteObjectSortField.ObjectName, s => s.Entry != null ? s.Entry.Name : s.Article != null ? s.Article.Name : s.Periphery != null ? s.Periphery.Name : s.Video != null ? s.Video.Name : s.Tag != null ? s.Tag.Name : null)
+            .Add(FavoriteObjectSortField.Type, s => s.Type);
+
+
         
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Article, long> _articleRepository;
@@ -664,7 +702,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 }
             }
 
-            return await _favoriteObjectService.GetPaginatedResult(new PagedSortedAndFilterInput
+            return await _favoriteObjectService.GetPaginatedResult(new PagedSortedAndFilterInput<FavoriteObjectSortField>
             {
                 CurrentPage = currentPage,
                 MaxResultCount = maxResultCount,
@@ -970,12 +1008,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<FavoriteFolderOverviewModel>> ListFavoriteFolders(QueryParameterModel model)
+        public async Task<QueryResultModel<FavoriteFolderOverviewModel, FavoriteFolderSortField>> ListFavoriteFolders(QueryParameterModel<FavoriteFolderSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<FavoriteFolder, long>(_favoriteFolderRepository.GetAll().AsSingleQuery().Include(s=>s.ApplicationUser), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<FavoriteFolder, FavoriteFolderSortField>(_favoriteFolderRepository.GetAll().AsSingleQuery().Include(s=>s.ApplicationUser), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText)), ListFavoriteFoldersSorting);
 
-            return new QueryResultModel<FavoriteFolderOverviewModel>
+            return new QueryResultModel<FavoriteFolderOverviewModel, FavoriteFolderSortField>
             {
                 Items = await items.Select(s => new FavoriteFolderOverviewModel
                 {
@@ -997,7 +1035,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<QueryResultModel<FavoriteFolderOverviewModel>>> ListUserFavoriteFolders(QueryParameterModel model, [FromQuery] string userId)
+        public async Task<ActionResult<QueryResultModel<FavoriteFolderOverviewModel, FavoriteFolderSortField>>> ListUserFavoriteFolders(QueryParameterModel<FavoriteFolderSortField> model, [FromQuery] string userId)
         {
             if (!await _userRepository.AnyAsync(s => s.Id == userId))
             {
@@ -1014,10 +1052,10 @@ namespace CnGalWebSite.APIServer.Controllers
                 return NotFound();
             }
 
-            var (items, total) = await _queryService.QueryAsync<FavoriteFolder, long>(_favoriteFolderRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).Where(s=>s.ApplicationUserId==userId), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<FavoriteFolder, FavoriteFolderSortField>(_favoriteFolderRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).Where(s=>s.ApplicationUserId==userId), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText)), ListUserFavoriteFoldersSorting);
 
-            return new QueryResultModel<FavoriteFolderOverviewModel>
+            return new QueryResultModel<FavoriteFolderOverviewModel, FavoriteFolderSortField>
             {
                 Items = await items.Select(s => new FavoriteFolderOverviewModel
                 {
@@ -1039,7 +1077,7 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<QueryResultModel<FavoriteObjectOverviewModel>>> ListUserFavoriteObjects(QueryParameterModel model, [FromQuery] long folderId)
+        public async Task<ActionResult<QueryResultModel<FavoriteObjectOverviewModel, FavoriteObjectSortField>>> ListUserFavoriteObjects(QueryParameterModel<FavoriteObjectSortField> model, [FromQuery] long folderId)
         {
             //获取当前用户ID
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
@@ -1052,15 +1090,15 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
 
-            var (items, total) = await _queryService.QueryAsync<FavoriteObject, long>(_favoriteObjectRepository.GetAll().AsSingleQuery().Where(s => s.FavoriteFolderId== folderId)
+            var (items, total) = await _queryService.QueryAsync<FavoriteObject, FavoriteObjectSortField>(_favoriteObjectRepository.GetAll().AsSingleQuery().Where(s => s.FavoriteFolderId== folderId)
                 .Include(s => s.Entry)
                 .Include(s => s.Article)
                 .Include(s => s.Periphery)
                 .Include(s => s.Video)
                 .Include(s => s.Tag), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText));
+                s => string.IsNullOrWhiteSpace(model.SearchText), ListUserFavoriteObjectsSorting);
 
-            return new QueryResultModel<FavoriteObjectOverviewModel>
+            return new QueryResultModel<FavoriteObjectOverviewModel, FavoriteObjectSortField>
             {
                 Items = await items.Select(s => new FavoriteObjectOverviewModel
                 {

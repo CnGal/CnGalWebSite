@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="VideoOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <DataTableCard TModel="VideoOverviewModel" TSort="VideoSortField" DefaultSortField="VideoSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -72,6 +73,18 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, VideoSortField> _sortFields = new Dictionary<string, VideoSortField>
+    {
+        [nameof(VideoOverviewModel.CanComment)] = VideoSortField.CanComment,
+        [nameof(VideoOverviewModel.CreateTime)] = VideoSortField.CreateTime,
+        [nameof(VideoOverviewModel.Id)] = VideoSortField.Id,
+        [nameof(VideoOverviewModel.IsHidden)] = VideoSortField.IsHidden,
+        [nameof(VideoOverviewModel.LastEditTime)] = VideoSortField.LastEditTime,
+        [nameof(VideoOverviewModel.Name)] = VideoSortField.Name,
+        [nameof(VideoOverviewModel.Priority)] = VideoSortField.Priority,
+        [nameof(VideoOverviewModel.Type)] = VideoSortField.Type,
+    };
+
     private string _baseUrl = "api/videos/List";
     private string _name = "视频";
 
@@ -93,7 +106,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<VideoOverviewModel> dataTableCard;
+    DataTableCard<VideoOverviewModel, VideoSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

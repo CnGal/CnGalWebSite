@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="EntryOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <DataTableCard TModel="EntryOverviewModel" TSort="EntrySortField" DefaultSortField="EntrySortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -79,6 +80,16 @@
 </MDCard>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, EntrySortField> _sortFields = new Dictionary<string, EntrySortField>
+    {
+        [nameof(EntryOverviewModel.CanComment)] = EntrySortField.CanComment,
+        [nameof(EntryOverviewModel.Id)] = EntrySortField.Id,
+        [nameof(EntryOverviewModel.IsHidden)] = EntrySortField.IsHidden,
+        [nameof(EntryOverviewModel.IsHideOutlink)] = EntrySortField.IsHideOutlink,
+        [nameof(EntryOverviewModel.Name)] = EntrySortField.Name,
+        [nameof(EntryOverviewModel.Priority)] = EntrySortField.Priority,
+    };
+
     private string _baseUrl = "api/entries/List";
     private string _name = "词条";
 
@@ -98,7 +109,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<EntryOverviewModel> dataTableCard;
+    DataTableCard<EntryOverviewModel, EntrySortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

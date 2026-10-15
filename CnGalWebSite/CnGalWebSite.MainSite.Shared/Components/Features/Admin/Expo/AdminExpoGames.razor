@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @inject IAdminQueryService AdminQueryService
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
@@ -5,10 +6,10 @@
 @using CnGalWebSite.DataModel.ViewModel.Expo
 @using CnGalWebSite.SDK.MainSite.Models
 
-<CgDataTable TItem="ExpoGameOverviewModel"
+<CgDataTable TItem="ExpoGameOverviewModel" TSort="ExpoGameSortField"
              Title="展会游戏列表"
              OnServerQuery="OnQueryAsync"
-             DefaultSortField="Id"
+             DefaultSortField="ExpoGameSortField.Id"
              DefaultSortDesc="true"
              @ref="_table">
     <ToolbarContent>
@@ -18,21 +19,21 @@
         </CgButton>
     </ToolbarContent>
     <ChildContent>
-        <CgDataTableColumn TItem="ExpoGameOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="ExpoGameOverviewModel" Title="游戏名称" Field="GameName" Sortable="false" />
-        <CgDataTableColumn TItem="ExpoGameOverviewModel" Title="标签" Sortable="false" Width="100px">
+        <CgDataTableColumn TItem="ExpoGameOverviewModel" TSort="ExpoGameSortField" Title="Id" SortField="ExpoGameSortField.Id" Value="item => item.Id" Width="80px" />
+        <CgDataTableColumn TItem="ExpoGameOverviewModel" TSort="ExpoGameSortField" Title="游戏名称" SortField="ExpoGameSortField.GameName" Value="item => item.GameName" Sortable="false" />
+        <CgDataTableColumn TItem="ExpoGameOverviewModel" TSort="ExpoGameSortField" Title="标签" Sortable="false" Width="100px">
             <ChildContent Context="item">
                 @(item.Tags?.Count ?? 0)
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="ExpoGameOverviewModel" Title="优先级" Field="Priority" Width="80px" />
-        <CgDataTableColumn TItem="ExpoGameOverviewModel" Title="状态" Field="Hidden">
+        <CgDataTableColumn TItem="ExpoGameOverviewModel" TSort="ExpoGameSortField" Title="优先级" SortField="ExpoGameSortField.Priority" Value="item => item.Priority" Width="80px" />
+        <CgDataTableColumn TItem="ExpoGameOverviewModel" TSort="ExpoGameSortField" Title="状态" SortField="ExpoGameSortField.Hidden" Value="item => item.Hidden">
             <ChildContent Context="item">
                 @if (item.Hidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
                 else { <span class="admin-badge admin-badge--visible">可见</span> }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="ExpoGameOverviewModel" Title="操作" Sortable="false" Width="60px">
+        <CgDataTableColumn TItem="ExpoGameOverviewModel" TSort="ExpoGameSortField" Title="操作" Sortable="false" Width="60px">
             <ChildContent Context="item">
                 <div class="admin-actions">
                     <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
@@ -94,14 +95,14 @@
 </CgModal>
 
 @code {
-    private CgDataTable<ExpoGameOverviewModel>? _table;
+    private CgDataTable<ExpoGameOverviewModel, ExpoGameSortField>? _table;
     private bool _showModal;
     private bool _isNew;
     private ExpoGameEditModel? _editModel;
 
-    private async Task<CgDataTableResult<ExpoGameOverviewModel>> OnQueryAsync(CgDataTableRequest request)
+    private async Task<CgDataTableResult<ExpoGameOverviewModel>> OnQueryAsync(CgDataTableRequest<ExpoGameSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetExpoGamesAsync(parameter, CancellationToken.None);
         return result.Success && result.Data is not null ? new CgDataTableResult<ExpoGameOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<ExpoGameOverviewModel>([], 0);
     }

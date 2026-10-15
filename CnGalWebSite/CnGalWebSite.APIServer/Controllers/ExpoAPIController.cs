@@ -1,4 +1,5 @@
-﻿
+using CnGalWebSite.DataModel.Sorting;
+
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.Application.Examines;
@@ -22,6 +23,77 @@ namespace CnGalWebSite.APIServer.Controllers
     [ApiController]
     public class ExpoAPIController : ControllerBase
     {
+        private static readonly SortMap<ExpoGame, ExpoGameSortField> ListGameSorting =
+            new SortMap<ExpoGame, ExpoGameSortField>(ExpoGameSortField.Id, ExpoGameSortField.Id)
+            .Add(ExpoGameSortField.Id, s => s.Id)
+            .Add(ExpoGameSortField.GameId, s => s.Game.Id)
+            .Add(ExpoGameSortField.GameName, s => s.Game.DisplayName)
+            .Add(ExpoGameSortField.Priority, s => s.Priority)
+            .Add(ExpoGameSortField.Hidden, s => s.Hidden);
+
+        private static readonly SortMap<ExpoTag, ExpoTagSortField> ListTagSorting =
+            new SortMap<ExpoTag, ExpoTagSortField>(ExpoTagSortField.Id, ExpoTagSortField.Id)
+            .Add(ExpoTagSortField.Id, s => s.Id)
+            .Add(ExpoTagSortField.Priority, s => s.Priority)
+            .Add(ExpoTagSortField.Hidden, s => s.Hidden)
+            .Add(ExpoTagSortField.Name, s => s.Name);
+
+        private static readonly SortMap<ExpoTask, ExpoTaskSortField> ListTaskSorting =
+            new SortMap<ExpoTask, ExpoTaskSortField>(ExpoTaskSortField.Id, ExpoTaskSortField.Id)
+            .Add(ExpoTaskSortField.Id, s => s.Id)
+            .Add(ExpoTaskSortField.LotteryCount, s => s.LotteryCount)
+            .Add(ExpoTaskSortField.Time, s => s.Time)
+            .Add(ExpoTaskSortField.Type, s => s.Type)
+            .Add(ExpoTaskSortField.UserId, s => s.ApplicationUserId)
+            .Add(ExpoTaskSortField.UserName, s => s.ApplicationUser.UserName);
+
+        private static readonly SortMap<ExpoAward, ExpoAwardSortField> ListAwardSorting =
+            new SortMap<ExpoAward, ExpoAwardSortField>(ExpoAwardSortField.Id, ExpoAwardSortField.Id)
+            .Add(ExpoAwardSortField.Id, s => s.Id)
+            .Add(ExpoAwardSortField.Type, s => s.Type)
+            .Add(ExpoAwardSortField.Count, s => s.Type == ExpoAwardType.NoEntry ? s.Count : s.Prizes.Count)
+            .Add(ExpoAwardSortField.Image, s => s.Image)
+            .Add(ExpoAwardSortField.Name, s => s.Name)
+            .Add(ExpoAwardSortField.Url, s => s.Url)
+            .Add(ExpoAwardSortField.IsEnabled, s => s.IsEnabled)
+            .Add(ExpoAwardSortField.PrizeCount, s => s.Prizes.Count(s => string.IsNullOrWhiteSpace(s.ApplicationUserId) == false));
+
+        private static readonly SortMap<ExpoPrize, ExpoPrizeSortField> ListPrizeSorting =
+            new SortMap<ExpoPrize, ExpoPrizeSortField>(ExpoPrizeSortField.Id, ExpoPrizeSortField.Id)
+            .Add(ExpoPrizeSortField.Id, s => s.Id)
+            .Add(ExpoPrizeSortField.Content, s => s.Content)
+            .Add(ExpoPrizeSortField.UserId, s => s.ApplicationUserId)
+            .Add(ExpoPrizeSortField.UserName, s => s.ApplicationUser == null ? "" : s.ApplicationUser.UserName)
+            .Add(ExpoPrizeSortField.DrawTime, s => s.DrawTime)
+            .Add(ExpoPrizeSortField.AwardId, s => s.AwardId)
+            .Add(ExpoPrizeSortField.AwardName, s => s.Award.Name)
+            .Add(ExpoPrizeSortField.AwardType, s => s.Award.Type);
+
+        private static readonly SortMap<ExpoActivity, ExpoActivitySortField> ListActivitySorting =
+            new SortMap<ExpoActivity, ExpoActivitySortField>(ExpoActivitySortField.Id, ExpoActivitySortField.Id)
+            .Add(ExpoActivitySortField.Id, s => s.Id)
+            .Add(ExpoActivitySortField.Name, s => s.Name)
+            .Add(ExpoActivitySortField.ForegroundImage, s => s.ForegroundImage)
+            .Add(ExpoActivitySortField.BackgroundImage, s => s.BackgroundImage)
+            .Add(ExpoActivitySortField.Description, s => s.Description)
+            .Add(ExpoActivitySortField.Priority, s => s.Priority)
+            .Add(ExpoActivitySortField.Hidden, s => s.Hidden)
+            .Add(ExpoActivitySortField.CreateTime, s => s.CreateTime)
+            .Add(ExpoActivitySortField.TicketCount, s => s.Tickets.Count);
+
+        private static readonly SortMap<ExpoTicket, ExpoTicketSortField> ListTicketSorting =
+            new SortMap<ExpoTicket, ExpoTicketSortField>(ExpoTicketSortField.Id, ExpoTicketSortField.Id)
+            .Add(ExpoTicketSortField.Id, s => s.Id)
+            .Add(ExpoTicketSortField.ActivityId, s => s.ActivityId)
+            .Add(ExpoTicketSortField.ActivityName, s => s.Activity.Name)
+            .Add(ExpoTicketSortField.SeatInfo, s => s.SeatInfo)
+            .Add(ExpoTicketSortField.Nickname, s => s.Nickname)
+            .Add(ExpoTicketSortField.Number, s => s.Number)
+            .Add(ExpoTicketSortField.CreateTime, s => s.CreateTime)
+            .Add(ExpoTicketSortField.Hidden, s => s.Hidden)
+            .Add(ExpoTicketSortField.Image, s => s.Image);
+
+
         public readonly IRepository<ExpoGame, long> _expoGameRepository;
         public readonly IRepository<ExpoTag, long> _expoTagRepository;
         public readonly IRepository<ExpoTask, long> _expoTaskRepository;
@@ -241,12 +313,12 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<ExpoGameOverviewModel>> ListGame(QueryParameterModel model)
+        public async Task<QueryResultModel<ExpoGameOverviewModel, ExpoGameSortField>> ListGame(QueryParameterModel<ExpoGameSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<ExpoGame, long>(_expoGameRepository.GetAll().AsSingleQuery().Include(s => s.Tags).Include(s => s.Game), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Game != null && s.Game.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<ExpoGame, ExpoGameSortField>(_expoGameRepository.GetAll().AsSingleQuery().Include(s => s.Tags).Include(s => s.Game), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Game != null && s.Game.Name.Contains(model.SearchText)), ListGameSorting);
 
-            return new QueryResultModel<ExpoGameOverviewModel>
+            return new QueryResultModel<ExpoGameOverviewModel, ExpoGameSortField>
             {
                 Items = await items.Select(s => new ExpoGameOverviewModel
                 {
@@ -386,12 +458,12 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<ExpoTagOverviewModel>> ListTag(QueryParameterModel model)
+        public async Task<QueryResultModel<ExpoTagOverviewModel, ExpoTagSortField>> ListTag(QueryParameterModel<ExpoTagSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<ExpoTag, long>(_expoTagRepository.GetAll().AsSingleQuery().Include(s => s.Games).ThenInclude(s => s.Game), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name != null && s.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<ExpoTag, ExpoTagSortField>(_expoTagRepository.GetAll().AsSingleQuery().Include(s => s.Games).ThenInclude(s => s.Game), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name != null && s.Name.Contains(model.SearchText)), ListTagSorting);
 
-            return new QueryResultModel<ExpoTagOverviewModel>
+            return new QueryResultModel<ExpoTagOverviewModel, ExpoTagSortField>
             {
                 Items = await items.Select(s => new ExpoTagOverviewModel
                 {
@@ -775,12 +847,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<ExpoTaskOverviewModel>> ListTask(QueryParameterModel model)
+        public async Task<QueryResultModel<ExpoTaskOverviewModel, ExpoTaskSortField>> ListTask(QueryParameterModel<ExpoTaskSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<ExpoTask, long>(_expoTaskRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser != null && s.ApplicationUser.UserName != null && s.ApplicationUser.UserName.Contains(model.SearchText)) || (s.ApplicationUserId != null && s.ApplicationUserId.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<ExpoTask, ExpoTaskSortField>(_expoTaskRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser != null && s.ApplicationUser.UserName != null && s.ApplicationUser.UserName.Contains(model.SearchText)) || (s.ApplicationUserId != null && s.ApplicationUserId.Contains(model.SearchText)), ListTaskSorting);
 
-            return new QueryResultModel<ExpoTaskOverviewModel>
+            return new QueryResultModel<ExpoTaskOverviewModel, ExpoTaskSortField>
             {
                 Items = await items.Select(s => new ExpoTaskOverviewModel
                 {
@@ -975,12 +1047,12 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<ExpoAwardOverviewModel>> ListAward(QueryParameterModel model)
+        public async Task<QueryResultModel<ExpoAwardOverviewModel, ExpoAwardSortField>> ListAward(QueryParameterModel<ExpoAwardSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<ExpoAward, long>(_expoAwardRepository.GetAll().Include(s => s.Prizes), model,
-                s => true);
+            var (items, total) = await _queryService.QueryAsync<ExpoAward, ExpoAwardSortField>(_expoAwardRepository.GetAll().Include(s => s.Prizes), model,
+                s => true, ListAwardSorting);
 
-            return new QueryResultModel<ExpoAwardOverviewModel>
+            return new QueryResultModel<ExpoAwardOverviewModel, ExpoAwardSortField>
             {
                 Items = await items.Select(s => new ExpoAwardOverviewModel
                 {
@@ -1273,15 +1345,15 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<ExpoPrizeOverviewModel>> ListPrize(QueryParameterModel model)
+        public async Task<QueryResultModel<ExpoPrizeOverviewModel, ExpoPrizeSortField>> ListPrize(QueryParameterModel<ExpoPrizeSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<ExpoPrize, long>(_expoPrizeRepository.GetAll().AsSingleQuery().Include(s => s.Award).Include(s => s.ApplicationUser), model,
+            var (items, total) = await _queryService.QueryAsync<ExpoPrize, ExpoPrizeSortField>(_expoPrizeRepository.GetAll().AsSingleQuery().Include(s => s.Award).Include(s => s.ApplicationUser), model,
                 s => string.IsNullOrWhiteSpace(model.SearchText) ||
                      (s.Content != null && s.Content.Contains(model.SearchText)) ||
                      (s.ApplicationUser != null && s.ApplicationUser.UserName != null && s.ApplicationUser.UserName.Contains(model.SearchText)) ||
-                     (s.Award != null && s.Award.Name != null && s.Award.Name.Contains(model.SearchText)));
+                     (s.Award != null && s.Award.Name != null && s.Award.Name.Contains(model.SearchText)), ListPrizeSorting);
 
-            return new QueryResultModel<ExpoPrizeOverviewModel>
+            return new QueryResultModel<ExpoPrizeOverviewModel, ExpoPrizeSortField>
             {
                 Items = await items.Select(s => new ExpoPrizeOverviewModel
                 {
@@ -1679,12 +1751,12 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<ExpoActivityOverviewModel>> ListActivity(QueryParameterModel model)
+        public async Task<QueryResultModel<ExpoActivityOverviewModel, ExpoActivitySortField>> ListActivity(QueryParameterModel<ExpoActivitySortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<ExpoActivity, long>(_expoActivityRepository.GetAll().AsSingleQuery().Include(s => s.Tickets), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name != null && s.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<ExpoActivity, ExpoActivitySortField>(_expoActivityRepository.GetAll().AsSingleQuery().Include(s => s.Tickets), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name != null && s.Name.Contains(model.SearchText)), ListActivitySorting);
 
-            return new QueryResultModel<ExpoActivityOverviewModel>
+            return new QueryResultModel<ExpoActivityOverviewModel, ExpoActivitySortField>
             {
                 Items = await items.Select(s => new ExpoActivityOverviewModel
                 {
@@ -1961,15 +2033,15 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<ExpoTicketOverviewModel>> ListTicket(QueryParameterModel model)
+        public async Task<QueryResultModel<ExpoTicketOverviewModel, ExpoTicketSortField>> ListTicket(QueryParameterModel<ExpoTicketSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<ExpoTicket, long>(_expoTicketRepository.GetAll().AsSingleQuery().Include(s => s.Activity), model,
+            var (items, total) = await _queryService.QueryAsync<ExpoTicket, ExpoTicketSortField>(_expoTicketRepository.GetAll().AsSingleQuery().Include(s => s.Activity), model,
                 s => string.IsNullOrWhiteSpace(model.SearchText) ||
                      (s.SeatInfo != null && s.SeatInfo.Contains(model.SearchText)) ||
                      (s.Nickname != null && s.Nickname.Contains(model.SearchText)) ||
-                     (s.Activity != null && s.Activity.Name != null && s.Activity.Name.Contains(model.SearchText)));
+                     (s.Activity != null && s.Activity.Name != null && s.Activity.Name.Contains(model.SearchText)), ListTicketSorting);
 
-            return new QueryResultModel<ExpoTicketOverviewModel>
+            return new QueryResultModel<ExpoTicketOverviewModel, ExpoTicketSortField>
             {
                 Items = await items.Select(s => new ExpoTicketOverviewModel
                 {

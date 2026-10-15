@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/listfavoritefolders"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -16,14 +17,14 @@
         收藏夹管理
     </h1>
 
-    <CgDataTable TItem="FavoriteFolderOverviewModel"
+    <CgDataTable TItem="FavoriteFolderOverviewModel" TSort="FavoriteFolderSortField"
                  Title="收藏夹列表"
                  OnServerQuery="OnServerQuery"
-                 DefaultSortField="Id"
+                 DefaultSortField="FavoriteFolderSortField.Id"
                  DefaultSortDesc="true">
-        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="名称" Field="Name" />
-        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="图片" Sortable="false" Width="80px">
+        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" TSort="FavoriteFolderSortField" Title="Id" SortField="FavoriteFolderSortField.Id" Value="item => item.Id" Width="80px" />
+        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" TSort="FavoriteFolderSortField" Title="名称" SortField="FavoriteFolderSortField.Name" Value="item => item.Name" />
+        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" TSort="FavoriteFolderSortField" Title="图片" Sortable="false" Width="80px">
             <ChildContent Context="item">
                 @if (!string.IsNullOrWhiteSpace(item.MainImage))
                 {
@@ -31,31 +32,31 @@
                 }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="用户" Field="UserName">
+        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" TSort="FavoriteFolderSortField" Title="用户" SortField="FavoriteFolderSortField.UserName" Value="item => item.UserName">
             <ChildContent Context="item"><span class="admin-cell-name">@item.UserName</span></ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="创建时间" Field="CreateTime">
+        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" TSort="FavoriteFolderSortField" Title="创建时间" SortField="FavoriteFolderSortField.CreateTime" Value="item => item.CreateTime">
             <ChildContent Context="item">@item.CreateTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="数量" Field="Count" Width="80px" />
-        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="状态" Field="IsHidden">
+        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" TSort="FavoriteFolderSortField" Title="数量" SortField="FavoriteFolderSortField.Count" Value="item => item.Count" Width="80px" />
+        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" TSort="FavoriteFolderSortField" Title="状态" SortField="FavoriteFolderSortField.IsHidden" Value="item => item.IsHidden">
             <ChildContent Context="item">
                 @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
                 else { <span class="admin-badge admin-badge--visible">可见</span> }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="公开" Field="ShowPublicly">
+        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" TSort="FavoriteFolderSortField" Title="公开" SortField="FavoriteFolderSortField.ShowPublicly" Value="item => item.ShowPublicly">
             <ChildContent Context="item">
                 @if (item.ShowPublicly) { <span class="admin-badge admin-badge--yes">公开</span> }
                 else { <span class="admin-badge admin-badge--no">私密</span> }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="默认" Field="IsDefault">
+        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" TSort="FavoriteFolderSortField" Title="默认" SortField="FavoriteFolderSortField.IsDefault" Value="item => item.IsDefault">
             <ChildContent Context="item">
                 @if (item.IsDefault) { <span class="admin-badge admin-badge--info">默认</span> }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" Title="操作" Sortable="false" Width="100px">
+        <CgDataTableColumn TItem="FavoriteFolderOverviewModel" TSort="FavoriteFolderSortField" Title="操作" Sortable="false" Width="100px">
             <ChildContent Context="item">
                 <div class="admin-actions">
                     <button class="admin-action-btn admin-action-btn--show" title="查看"
@@ -75,9 +76,9 @@
 @code {
     private CancellationTokenSource? _cts;
 
-    private async Task<CgDataTableResult<FavoriteFolderOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    private async Task<CgDataTableResult<FavoriteFolderOverviewModel>> OnServerQuery(CgDataTableRequest<FavoriteFolderSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetFavoriteFoldersAsync(parameter, _cts?.Token ?? CancellationToken.None);
         return result.Success && result.Data is not null ? new CgDataTableResult<FavoriteFolderOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<FavoriteFolderOverviewModel>([], 0);
     }

@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @using CnGalWebSite.DataModel.ViewModel.EditRecords
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.Core.Models
@@ -9,32 +10,32 @@
 
 @* 监控列表面板（服务端分页） *@
 
-<CgDataTable TItem="UserMonitorOverviewModel"
+<CgDataTable TItem="UserMonitorOverviewModel" TSort="UserMonitorSortField"
              Title="关注的词条"
              OnServerQuery="LoadMonitorsAsync"
-             DefaultSortField="@nameof(UserMonitorOverviewModel.CreateTime)"
+             DefaultSortField="UserMonitorSortField.CreateTime"
              DefaultSortDesc="true"
              @ref="_dataTable">
 
-    <CgDataTableColumn TItem="UserMonitorOverviewModel" Title="添加时间" Field="@nameof(UserMonitorOverviewModel.CreateTime)">
+    <CgDataTableColumn TItem="UserMonitorOverviewModel" TSort="UserMonitorSortField" Title="添加时间" SortField="UserMonitorSortField.CreateTime" Value="item => item.CreateTime">
         <ChildContent Context="item">
             @item.CreateTime.ToString("yyyy-MM-dd HH:mm")
         </ChildContent>
     </CgDataTableColumn>
 
-    <CgDataTableColumn TItem="UserMonitorOverviewModel" Title="名称" Sortable="false">
+    <CgDataTableColumn TItem="UserMonitorOverviewModel" TSort="UserMonitorSortField" Title="名称" Sortable="false">
         <ChildContent Context="item">
             @(item.EntryName ?? "—")
         </ChildContent>
     </CgDataTableColumn>
 
-    <CgDataTableColumn TItem="UserMonitorOverviewModel" Title="类型" Sortable="false">
+    <CgDataTableColumn TItem="UserMonitorOverviewModel" TSort="UserMonitorSortField" Title="类型" Sortable="false">
         <ChildContent Context="item">
             <EntryTypeBadge Type="@item.Type" />
         </ChildContent>
     </CgDataTableColumn>
 
-    <CgDataTableColumn TItem="UserMonitorOverviewModel" Title="操作" Sortable="false" Width="100px">
+    <CgDataTableColumn TItem="UserMonitorOverviewModel" TSort="UserMonitorSortField" Title="操作" Sortable="false" Width="100px">
         <ChildContent Context="item">
             <div class="examine-actions">
                 <button class="examine-action-btn examine-action-btn--view" title="查看" @onclick="() => LookItem(item)">
@@ -50,18 +51,11 @@
 </CgDataTable>
 
 @code {
-    private CgDataTable<UserMonitorOverviewModel>? _dataTable;
+    private CgDataTable<UserMonitorOverviewModel, UserMonitorSortField>? _dataTable;
 
-    private async Task<CgDataTableResult<UserMonitorOverviewModel>> LoadMonitorsAsync(CgDataTableRequest request)
+    private async Task<CgDataTableResult<UserMonitorOverviewModel>> LoadMonitorsAsync(CgDataTableRequest<UserMonitorSortField> request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? "",
-            SortBy = string.IsNullOrWhiteSpace(request.SortField) ? new[] { "CreateTime" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
+        var parameter = request.ToQueryParameter();
 
         var result = await ExamineQueryService.GetUserMonitorsAsync(parameter);
         if (result.Success && result.Data != null)

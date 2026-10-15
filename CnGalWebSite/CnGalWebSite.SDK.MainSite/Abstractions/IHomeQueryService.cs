@@ -10,8 +10,8 @@ public interface IHomeQueryService
     /// <summary>
     /// 搜索词条、文章、标签、视频、周边等内容。
     /// </summary>
-    /// <param name="queryString">完整的查询字符串（以 ? 开头），由 SearchInputModel.ToQueryParameterString() 生成</param>
-    Task<SdkResult<SearchViewModel>> SearchAsync(string queryString, CancellationToken cancellationToken = default);
+    /// <param name="request">包含强类型排序字段和方向的搜索请求</param>
+    Task<SdkResult<SearchViewModel>> SearchAsync(CnGalWebSite.DataModel.Application.Search.Dtos.SearchInputModel request, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 获取广场页聚合数据（随机标签、抽奖列表、投票列表）。

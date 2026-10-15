@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.IdentityServer.Models.Sorting;
+using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.IdentityServer.Data;
@@ -30,6 +31,17 @@ namespace CnGalWebSite.IdentityServer.APIControllers
     [Route("api/clients/[action]")]
     public class ClientAPIController : ControllerBase
     {
+        private static readonly SortMap<Client, IdentityClientSortField> ListSorting =
+            new SortMap<Client, IdentityClientSortField>(IdentityClientSortField.Id, IdentityClientSortField.Id)
+            .Add(IdentityClientSortField.ClientId, s => s.ClientId)
+            .Add(IdentityClientSortField.ClientName, s => s.ClientName)
+            .Add(IdentityClientSortField.ClientUri, s => s.ClientUri)
+            .Add(IdentityClientSortField.Description, s => s.Description)
+            .Add(IdentityClientSortField.Enabled, s => s.Enabled)
+            .Add(IdentityClientSortField.LogoUri, s => s.LogoUri)
+            .Add(IdentityClientSortField.Id, s => s.Id);
+
+
         private readonly IRepository<ConfigurationDbContext, Client, string> _clientRepository;
         private readonly IQueryService _queryService;
         private readonly IExamineService _examineService;
@@ -55,12 +67,12 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         /// <returns></returns>
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<ClientOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<ClientOverviewModel, IdentityClientSortField>> List(QueryParameterModel<IdentityClientSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Client, string>(_clientRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ClientId.Contains(model.SearchText) || s.ClientName.Contains(model.SearchText) || s.Description.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Client, IdentityClientSortField>(_clientRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ClientId.Contains(model.SearchText) || s.ClientName.Contains(model.SearchText) || s.Description.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<ClientOverviewModel>
+            return new QueryResultModel<ClientOverviewModel, IdentityClientSortField>
             {
                 Items = await items.Select(s => new ClientOverviewModel
                 {

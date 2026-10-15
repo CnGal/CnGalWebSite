@@ -1,4 +1,5 @@
-﻿@page "/admin/listmessages"
+@using CnGalWebSite.DataModel.Sorting
+@page "/admin/listmessages"
 @attribute [Authorize(Roles = "Admin")]
 
 @inject IHttpService _httpService
@@ -6,7 +7,7 @@
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="MessageOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <DataTableCard TModel="MessageOverviewModel" TSort="MessageSortField" DefaultSortField="MessageSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -48,6 +49,17 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, MessageSortField> _sortFields = new Dictionary<string, MessageSortField>
+    {
+        [nameof(MessageOverviewModel.Id)] = MessageSortField.Id,
+        [nameof(MessageOverviewModel.IsReaded)] = MessageSortField.IsReaded,
+        [nameof(MessageOverviewModel.PostTime)] = MessageSortField.PostTime,
+        [nameof(MessageOverviewModel.Text)] = MessageSortField.Text,
+        [nameof(MessageOverviewModel.Title)] = MessageSortField.Title,
+        [nameof(MessageOverviewModel.Type)] = MessageSortField.Type,
+        [nameof(MessageOverviewModel.UserId)] = MessageSortField.UserId,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -72,7 +84,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<MessageOverviewModel> dataTableCard;
+    DataTableCard<MessageOverviewModel, MessageSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

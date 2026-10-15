@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/listalmanacs"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -16,10 +17,10 @@
         年鉴管理
     </h1>
 
-    <CgDataTable TItem="AlmanacOverviewModel"
+    <CgDataTable TItem="AlmanacOverviewModel" TSort="AlmanacSortField"
                  Title="年鉴列表"
                  OnServerQuery="OnServerQuery"
-                 DefaultSortField="Id"
+                 DefaultSortField="AlmanacSortField.Id"
                  DefaultSortDesc="true">
         <ToolbarContent>
             <CgButton Variant="outline" OnClick="@(() => NavigationManager.NavigateTo("/almanac/edit"))">
@@ -28,22 +29,22 @@
             </CgButton>
         </ToolbarContent>
         <ChildContent>
-        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="年份" Field="Year" Width="80px" />
-        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="名称" Field="Name" />
-        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="简介" Field="BriefIntroduction">
+        <CgDataTableColumn TItem="AlmanacOverviewModel" TSort="AlmanacSortField" Title="Id" SortField="AlmanacSortField.Id" Value="item => item.Id" Width="80px" />
+        <CgDataTableColumn TItem="AlmanacOverviewModel" TSort="AlmanacSortField" Title="年份" SortField="AlmanacSortField.Year" Value="item => item.Year" Width="80px" />
+        <CgDataTableColumn TItem="AlmanacOverviewModel" TSort="AlmanacSortField" Title="名称" SortField="AlmanacSortField.Name" Value="item => item.Name" />
+        <CgDataTableColumn TItem="AlmanacOverviewModel" TSort="AlmanacSortField" Title="简介" SortField="AlmanacSortField.BriefIntroduction" Value="item => item.BriefIntroduction">
             <ChildContent Context="item">
                 <div class="admin-cell-text">@item.BriefIntroduction</div>
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="词条数" Field="EntryCount" Sortable="false" Width="80px" />
-        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="文章数" Field="ArticleCount" Sortable="false" Width="80px" />
-        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="更新时间" Field="UpdateTime">
+        <CgDataTableColumn TItem="AlmanacOverviewModel" TSort="AlmanacSortField" Title="词条数" SortField="AlmanacSortField.EntryCount" Value="item => item.EntryCount" Sortable="false" Width="80px" />
+        <CgDataTableColumn TItem="AlmanacOverviewModel" TSort="AlmanacSortField" Title="文章数" SortField="AlmanacSortField.ArticleCount" Value="item => item.ArticleCount" Sortable="false" Width="80px" />
+        <CgDataTableColumn TItem="AlmanacOverviewModel" TSort="AlmanacSortField" Title="更新时间" SortField="AlmanacSortField.UpdateTime" Value="item => item.UpdateTime">
             <ChildContent Context="item">
                 @item.UpdateTime.ToString("yyyy-MM-dd HH:mm")
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="AlmanacOverviewModel" Title="操作" Sortable="false" Width="100px">
+        <CgDataTableColumn TItem="AlmanacOverviewModel" TSort="AlmanacSortField" Title="操作" Sortable="false" Width="100px">
             <ChildContent Context="item">
                 <div class="admin-actions">
                     <button class="admin-action-btn admin-action-btn--up" title="编辑"
@@ -64,9 +65,9 @@
 @code {
     private CancellationTokenSource? _cts = new();
 
-    private async Task<CgDataTableResult<AlmanacOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    private async Task<CgDataTableResult<AlmanacOverviewModel>> OnServerQuery(CgDataTableRequest<AlmanacSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         try
         {
             var result = await AdminQueryService.GetAlmanacsAsync(parameter, _cts!.Token);

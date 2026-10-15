@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.News;
@@ -31,6 +32,28 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/news/[action]")]
     public class NewsAPIController : ControllerBase
     {
+        private static readonly SortMap<GameNews, GameNewsSortField> ListGameNewsSorting =
+            new SortMap<GameNews, GameNewsSortField>(GameNewsSortField.Id, GameNewsSortField.Id)
+            .Add(GameNewsSortField.Id, s => s.Id)
+            .Add(GameNewsSortField.State, s => s.State)
+            .Add(GameNewsSortField.Author, s => s.Author)
+            .Add(GameNewsSortField.BriefIntroduction, s => s.BriefIntroduction)
+            .Add(GameNewsSortField.PublishTime, s => s.PublishTime)
+            .Add(GameNewsSortField.Title, s => s.Title)
+            .Add(GameNewsSortField.ArticleId, s => s.ArticleId ?? 0)
+            .Add(GameNewsSortField.RssType, s => s.RSS != null ? s.RSS.Type : (OriginalRSSType?)null);
+
+        private static readonly SortMap<WeeklyNews, WeeklyNewsSortField> ListWeeklyNewsSorting =
+            new SortMap<WeeklyNews, WeeklyNewsSortField>(WeeklyNewsSortField.Id, WeeklyNewsSortField.Id)
+            .Add(WeeklyNewsSortField.Id, s => s.Id)
+            .Add(WeeklyNewsSortField.State, s => s.State)
+            .Add(WeeklyNewsSortField.BriefIntroduction, s => s.BriefIntroduction)
+            .Add(WeeklyNewsSortField.PublishTime, s => s.PublishTime)
+            .Add(WeeklyNewsSortField.Title, s => s.Title)
+            .Add(WeeklyNewsSortField.ArticleId, s => s.ArticleId ?? 0)
+            .Add(WeeklyNewsSortField.CreateTime, s => s.CreateTime);
+
+
 
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IUserService _userService;
@@ -542,12 +565,12 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<GameNewsOverviewModel>> ListGameNews(QueryParameterModel model)
+        public async Task<QueryResultModel<GameNewsOverviewModel, GameNewsSortField>> ListGameNews(QueryParameterModel<GameNewsSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<GameNews, long>(_gameNewsRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Title.Contains(model.SearchText) || s.Author.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<GameNews, GameNewsSortField>(_gameNewsRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Title.Contains(model.SearchText) || s.Author.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText)), ListGameNewsSorting);
 
-            return new QueryResultModel<GameNewsOverviewModel>
+            return new QueryResultModel<GameNewsOverviewModel, GameNewsSortField>
             {
                 Items = await items.Select(s => new GameNewsOverviewModel
                 {
@@ -566,12 +589,12 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<WeeklyNewsOverviewModel>> ListWeeklyNews(QueryParameterModel model)
+        public async Task<QueryResultModel<WeeklyNewsOverviewModel, WeeklyNewsSortField>> ListWeeklyNews(QueryParameterModel<WeeklyNewsSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<WeeklyNews, long>(_weeklyNewsRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Title.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<WeeklyNews, WeeklyNewsSortField>(_weeklyNewsRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Title.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText)), ListWeeklyNewsSorting);
 
-            return new QueryResultModel<WeeklyNewsOverviewModel>
+            return new QueryResultModel<WeeklyNewsOverviewModel, WeeklyNewsSortField>
             {
                 Items = await items.Select(s => new WeeklyNewsOverviewModel
                 {

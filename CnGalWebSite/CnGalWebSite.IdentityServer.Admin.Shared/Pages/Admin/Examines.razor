@@ -1,4 +1,5 @@
-﻿@page "/admin/examines"
+@using CnGalWebSite.IdentityServer.Models.Sorting
+@page "/admin/examines"
 
 @attribute [Authorize(Roles = "Admin")]
 
@@ -8,7 +9,7 @@
 
 @using CnGalWebSite.IdentityServer.Models.ViewModels.Roles
 
-<DataTableCard TModel="ExamineOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+<DataTableCard TModel="ExamineOverviewModel" TSort="IdentityExamineSortField" DefaultSortField="IdentityExamineSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {
@@ -38,6 +39,17 @@
 </MDialog>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, IdentityExamineSortField> _sortFields = new Dictionary<string, IdentityExamineSortField>
+    {
+        ["state"] = IdentityExamineSortField.IsPassed,
+        ["type"] = IdentityExamineSortField.Type,
+        [nameof(ExamineOverviewModel.ApplyTime)] = IdentityExamineSortField.ApplyTime,
+        [nameof(ExamineOverviewModel.Id)] = IdentityExamineSortField.Id,
+        [nameof(ExamineOverviewModel.PassedAdminName)] = IdentityExamineSortField.PassedAdminName,
+        [nameof(ExamineOverviewModel.PassedTime)] = IdentityExamineSortField.PassedTime,
+        [nameof(ExamineOverviewModel.UserName)] = IdentityExamineSortField.UserName,
+    };
+
     private bool _detailDialog;
     private long _detailId;
 
@@ -64,7 +76,7 @@
 
     IEnumerable<string> _roles;
 
-    DataTableCard<ExamineOverviewModel> dataTableCard;
+    DataTableCard<ExamineOverviewModel, IdentityExamineSortField> dataTableCard;
     CnGalWebSite.IdentityServer.Admin.Shared.Components.Exmines.DetailCard detailCard;
 
     [CascadingParameter]

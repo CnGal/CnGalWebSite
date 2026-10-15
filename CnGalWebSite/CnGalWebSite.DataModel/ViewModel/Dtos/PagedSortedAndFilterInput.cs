@@ -1,38 +1,27 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using CnGalWebSite.Core.Models;
 
-namespace CnGalWebSite.DataModel.ViewModel.Dtos
+namespace CnGalWebSite.DataModel.ViewModel.Dtos;
+
+public class PagedAndFilterInput
 {
-    public class PagedSortedAndFilterInput
+    [Range(0, 10000)]
+    public int MaxResultCount { get; set; } = 10;
+    public int CurrentPage { get; set; } = 1;
+    public string FilterText { get; set; }
+    public string ScreeningConditions { get; set; }
+}
+
+public class PagedSortedAndFilterInput<TSort> : PagedAndFilterInput, IValidatableObject where TSort : struct, Enum
+{
+    public IReadOnlyList<SortOption<TSort>> Sorts { get; set; } = Array.Empty<SortOption<TSort>>();
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        public PagedSortedAndFilterInput()
-        {
-            CurrentPage = 1;
-            MaxResultCount = 10;
-            Sorting = "Id desc";
-        }
-        /// <summary>
-        /// 每条分页数
-        /// </summary>
-        [Range(0, 10000)]
-        public int MaxResultCount { get; set; }
-        /// <summary>
-        /// 当前页
-        /// </summary>
-        public int CurrentPage { get; set; }
-
-        /// <summary>
-        /// 排序字段
-        /// </summary>
-        public string Sorting { get; set; }
-
-        /// <summary>
-        /// 查询名称
-        /// </summary>
-        public string FilterText { get; set; }
-
-        /// <summary>
-        /// 筛选条件 也可作为分类条件
-        /// </summary>
-        public string ScreeningConditions { get; set; }
+        if (Sorts == null || Sorts.Any(sort => sort == null || !Enum.IsDefined(sort.Field) || !Enum.IsDefined(sort.Direction)))
+            yield return new ValidationResult("排序字段或方向无效", new[] { nameof(Sorts) });
     }
 }

@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject IEventService _eventService
 
 <MDCard>
-    <DataTableCard TModel="GroupInforTableModel" Headers="_headers" ApiUrl="@(_baseUrl)" SortByItem="@nameof(GroupInforTableModel.RealId)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <DataTableCard TModel="GroupInforTableModel" TSort="GroupInforSortField" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" DefaultSortField="GroupInforSortField.RealId" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
         <ButtonContent>
             <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton OnQueryAsync="@(async ()=>await dataTableCard?.QueryAllAsync())" Name="组织" Class="me-4" />
         </ButtonContent>
@@ -27,6 +28,16 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, GroupInforSortField> _sortFields = new Dictionary<string, GroupInforSortField>
+    {
+        [nameof(GroupInforTableModel.AnotherNameGroup)] = GroupInforSortField.AnotherNameGroup,
+        [nameof(GroupInforTableModel.Bilibili)] = GroupInforSortField.Bilibili,
+        [nameof(GroupInforTableModel.MicroBlog)] = GroupInforSortField.MicroBlog,
+        [nameof(GroupInforTableModel.Name)] = GroupInforSortField.Name,
+        [nameof(GroupInforTableModel.QQgroupGroup)] = GroupInforSortField.QQgroupGroup,
+        [nameof(GroupInforTableModel.RealId)] = GroupInforSortField.RealId,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -50,7 +61,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<GroupInforTableModel> dataTableCard;
+    DataTableCard<GroupInforTableModel, GroupInforSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

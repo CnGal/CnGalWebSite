@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.IdentityServer.Models.Sorting;
+using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.IdentityServer.Data;
@@ -32,6 +33,16 @@ namespace CnGalWebSite.IdentityServer.APIControllers
     [Route("api/apiscopes/[action]")]
     public class ApiScopeAPIController : ControllerBase
     {
+        private static readonly SortMap<ApiScope, IdentityApiScopeSortField> ListSorting =
+            new SortMap<ApiScope, IdentityApiScopeSortField>(IdentityApiScopeSortField.Id, IdentityApiScopeSortField.Id)
+            .Add(IdentityApiScopeSortField.Id, s => s.Id)
+            .Add(IdentityApiScopeSortField.Name, s => s.Name)
+            .Add(IdentityApiScopeSortField.Description, s => s.Description)
+            .Add(IdentityApiScopeSortField.DisplayName, s => s.DisplayName)
+            .Add(IdentityApiScopeSortField.Enabled, s => s.Enabled)
+            .Add(IdentityApiScopeSortField.Required, s => s.Required);
+
+
         private readonly IRepository<ConfigurationDbContext, ApiScope, string> _apiScopeRepository;
         private readonly IQueryService _queryService;
         private readonly IRepository<ApplicationDbContext, ApplicationUser, string> _userRepository;
@@ -51,12 +62,12 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<ApiScopeOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<ApiScopeOverviewModel, IdentityApiScopeSortField>> List(QueryParameterModel<IdentityApiScopeSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<ApiScope, string>(_apiScopeRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.DisplayName.Contains(model.SearchText) || s.Description.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<ApiScope, IdentityApiScopeSortField>(_apiScopeRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.DisplayName.Contains(model.SearchText) || s.Description.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<ApiScopeOverviewModel>
+            return new QueryResultModel<ApiScopeOverviewModel, IdentityApiScopeSortField>
             {
                 Items = await items.Select(s => new ApiScopeOverviewModel
                 {

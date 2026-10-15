@@ -1,4 +1,5 @@
-﻿@page "/admin/listrecommends"
+@using CnGalWebSite.DataModel.Sorting
+@page "/admin/listrecommends"
 
 @attribute [Authorize(Roles = "Admin")]
 
@@ -9,7 +10,7 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="推荐版块"/>
 
 <MDCard>
-    <DataTableCard TModel="RecommendOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <DataTableCard TModel="RecommendOverviewModel" TSort="RecommendSortField" DefaultSortField="RecommendSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -51,6 +52,15 @@
 </MDialog>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, RecommendSortField> _sortFields = new Dictionary<string, RecommendSortField>
+    {
+        ["State"] = RecommendSortField.IsHidden,
+        ["reason"] = RecommendSortField.Reason,
+        [nameof(RecommendOverviewModel.EntryName)] = RecommendSortField.EntryName,
+        [nameof(RecommendOverviewModel.Id)] = RecommendSortField.Id,
+        [nameof(RecommendOverviewModel.UpdateTime)] = RecommendSortField.UpdateTime,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -75,7 +85,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<RecommendOverviewModel> dataTableCard;
+    DataTableCard<RecommendOverviewModel, RecommendSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

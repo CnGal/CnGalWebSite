@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.IdentityServer.Models.Sorting;
+using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.IdentityServer.Data;
@@ -42,6 +43,17 @@ namespace CnGalWebSite.IdentityServer.APIControllers
     [Route("api/examines/[action]")]
     public class ExamineAPIController : ControllerBase
     {
+        private static readonly SortMap<Examine, IdentityExamineSortField> ListSorting =
+            new SortMap<Examine, IdentityExamineSortField>(IdentityExamineSortField.Id, IdentityExamineSortField.Id)
+            .Add(IdentityExamineSortField.ApplyTime, s => s.ApplyTime)
+            .Add(IdentityExamineSortField.IsPassed, s => s.IsPassed)
+            .Add(IdentityExamineSortField.PassedAdminName, s => s.PassedAdminName)
+            .Add(IdentityExamineSortField.PassedTime, s => s.PassedTime)
+            .Add(IdentityExamineSortField.Type, s => s.Type)
+            .Add(IdentityExamineSortField.UserName, s => s.ApplicationUser.UserName)
+            .Add(IdentityExamineSortField.Id, s => s.Id);
+
+
         private readonly IRepository<ApplicationDbContext, Examine, string> _examineRepository;
         private readonly IQueryService _queryService;
         private readonly IRepository<ApplicationDbContext, ApplicationUser, string> _userRepository;
@@ -57,12 +69,12 @@ namespace CnGalWebSite.IdentityServer.APIControllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<ExamineOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<ExamineOverviewModel, IdentityExamineSortField>> List(QueryParameterModel<IdentityExamineSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Examine, string>(_examineRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.PassedAdminName.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Examine, IdentityExamineSortField>(_examineRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.PassedAdminName.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<ExamineOverviewModel>
+            return new QueryResultModel<ExamineOverviewModel, IdentityExamineSortField>
             {
                 Items = await items.Select(s => new ExamineOverviewModel
                 {

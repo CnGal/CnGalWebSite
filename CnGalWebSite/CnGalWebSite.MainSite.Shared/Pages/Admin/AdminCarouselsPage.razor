@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/listcarousels"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -21,10 +22,10 @@
         轮播图管理
     </h1>
 
-    <CgDataTable TItem="CarouselOverviewModel"
+    <CgDataTable TItem="CarouselOverviewModel" TSort="CarouselSortField"
                  Title="轮播图列表"
                  OnServerQuery="OnQueryAsync"
-                 DefaultSortField="Id"
+                 DefaultSortField="CarouselSortField.Id"
                  DefaultSortDesc="true"
                  @ref="_table">
         <ToolbarContent>
@@ -34,21 +35,21 @@
             </CgButton>
         </ToolbarContent>
         <ChildContent>
-            <CgDataTableColumn TItem="CarouselOverviewModel" Title="ID" Field="Id" Width="100px" />
-        <CgDataTableColumn TItem="CarouselOverviewModel" Title="展示图" Width="160px">
+            <CgDataTableColumn TItem="CarouselOverviewModel" TSort="CarouselSortField" Title="ID" SortField="CarouselSortField.Id" Value="item => item.Id" Width="100px" />
+        <CgDataTableColumn TItem="CarouselOverviewModel" TSort="CarouselSortField" Title="展示图" Width="160px">
             <ChildContent Context="context">
                 <img src="@context.Image" alt="轮播图" style="max-height: 40px; border-radius: 4px;" />
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="CarouselOverviewModel" Title="类型" Width="120px">
+        <CgDataTableColumn TItem="CarouselOverviewModel" TSort="CarouselSortField" Title="类型" Width="120px">
             <ChildContent Context="context">
                 <span class="admin-badge @GetTypeColor(context.Type)">@context.Type.GetDisplayName()</span>
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="CarouselOverviewModel" Title="外部链接" Field="Link" />
-        <CgDataTableColumn TItem="CarouselOverviewModel" Title="备注" Field="Note" />
-        <CgDataTableColumn TItem="CarouselOverviewModel" Title="权重" Field="Priority" Sortable="true" Width="100px" />
-        <CgDataTableColumn TItem="CarouselOverviewModel" Title="操作" Width="140px">
+        <CgDataTableColumn TItem="CarouselOverviewModel" TSort="CarouselSortField" Title="外部链接" SortField="CarouselSortField.Link" Value="item => item.Link" />
+        <CgDataTableColumn TItem="CarouselOverviewModel" TSort="CarouselSortField" Title="备注" SortField="CarouselSortField.Note" Value="item => item.Note" />
+        <CgDataTableColumn TItem="CarouselOverviewModel" TSort="CarouselSortField" Title="权重" SortField="CarouselSortField.Priority" Value="item => item.Priority" Sortable="true" Width="100px" />
+        <CgDataTableColumn TItem="CarouselOverviewModel" TSort="CarouselSortField" Title="操作" Width="140px">
             <ChildContent Context="context">
                 <div class="admin-actions">
                     <button class="admin-action-btn admin-action-btn--up" title="增加权重" @onclick="() => OnEditPriorityAsync(context, 1)"><CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" /></button>
@@ -105,22 +106,15 @@
 </CgModal>
 
 @code {
-    private CgDataTable<CarouselOverviewModel>? _table;
+    private CgDataTable<CarouselOverviewModel, CarouselSortField>? _table;
     private bool _showEditModal;
     private bool _isNew;
     private CarouselEditModel? _editModel;
     private CancellationTokenSource? _cts = new();
 
-    private async Task<CgDataTableResult<CarouselOverviewModel>> OnQueryAsync(CgDataTableRequest request)
+    private async Task<CgDataTableResult<CarouselOverviewModel>> OnQueryAsync(CgDataTableRequest<CarouselSortField> request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
+        var parameter = request.ToQueryParameter();
 
         try
         {

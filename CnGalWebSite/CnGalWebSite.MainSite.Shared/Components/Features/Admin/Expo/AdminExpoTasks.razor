@@ -1,24 +1,25 @@
+@using CnGalWebSite.DataModel.Sorting
 @inject IAdminQueryService AdminQueryService
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Expo
 @using CnGalWebSite.SDK.MainSite.Models
 
-<CgDataTable TItem="ExpoTaskOverviewModel"
+<CgDataTable TItem="ExpoTaskOverviewModel" TSort="ExpoTaskSortField"
              Title="展会任务记录"
              OnServerQuery="OnQueryAsync"
-             DefaultSortField="Id"
+             DefaultSortField="ExpoTaskSortField.Id"
              DefaultSortDesc="true"
              @ref="_table">
     <ChildContent>
-        <CgDataTableColumn TItem="ExpoTaskOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="ExpoTaskOverviewModel" Title="任务类型" Field="Type" Sortable="false">
+        <CgDataTableColumn TItem="ExpoTaskOverviewModel" TSort="ExpoTaskSortField" Title="Id" SortField="ExpoTaskSortField.Id" Value="item => item.Id" Width="80px" />
+        <CgDataTableColumn TItem="ExpoTaskOverviewModel" TSort="ExpoTaskSortField" Title="任务类型" SortField="ExpoTaskSortField.Type" Value="item => item.Type" Sortable="false">
             <ChildContent Context="item">
                 @GetTaskTypeName(item.Type)
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="ExpoTaskOverviewModel" Title="用户" Field="UserName" Sortable="false" />
-        <CgDataTableColumn TItem="ExpoTaskOverviewModel" Title="点数" Field="LotteryCount" Width="80px" />
-        <CgDataTableColumn TItem="ExpoTaskOverviewModel" Title="时间" Field="Time" Width="160px">
+        <CgDataTableColumn TItem="ExpoTaskOverviewModel" TSort="ExpoTaskSortField" Title="用户" SortField="ExpoTaskSortField.UserName" Value="item => item.UserName" Sortable="false" />
+        <CgDataTableColumn TItem="ExpoTaskOverviewModel" TSort="ExpoTaskSortField" Title="点数" SortField="ExpoTaskSortField.LotteryCount" Value="item => item.LotteryCount" Width="80px" />
+        <CgDataTableColumn TItem="ExpoTaskOverviewModel" TSort="ExpoTaskSortField" Title="时间" SortField="ExpoTaskSortField.Time" Value="item => item.Time" Width="160px">
             <ChildContent Context="item">
                 @item.Time.ToString("yyyy-MM-dd HH:mm")
             </ChildContent>
@@ -27,11 +28,11 @@
 </CgDataTable>
 
 @code {
-    private CgDataTable<ExpoTaskOverviewModel>? _table;
+    private CgDataTable<ExpoTaskOverviewModel, ExpoTaskSortField>? _table;
 
-    private async Task<CgDataTableResult<ExpoTaskOverviewModel>> OnQueryAsync(CgDataTableRequest request)
+    private async Task<CgDataTableResult<ExpoTaskOverviewModel>> OnQueryAsync(CgDataTableRequest<ExpoTaskSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetExpoTasksAsync(parameter, CancellationToken.None);
         return result.Success && result.Data is not null ? new CgDataTableResult<ExpoTaskOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<ExpoTaskOverviewModel>([], 0);
     }

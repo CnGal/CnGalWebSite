@@ -1,4 +1,6 @@
-﻿<div>
+@using CnGalWebSite.DataModel.Sorting
+@using CnGalWebSite.Core.Models
+<div>
     @foreach (var item in sorts)
     {
         <MChip Class="ma-1" OnClick="@(()=>OnClick(item.Key))" Small
@@ -7,7 +9,7 @@
             @item.Value
         </MChip>
     }
-    @if (current != "")
+    @if (current != SearchSortField.Default)
     {
         @if (asc)
         {
@@ -43,31 +45,29 @@
     public string Color { get; set; }
 
     bool asc = false;
-    string current = "";
+    SearchSortField current;
 
     protected override void OnParametersSet()
     {
-        current = Model.Sorting.Replace(" desc", "");
-        if(current!="")
-        {
-            asc = !Model.Sorting.Contains(" desc");
-        }
+        current = Model.SortField;
+        asc = Model.SortDirection == SortDirection.Ascending;
     }
 
 
-    List<KeyValuePair<string, string>> sorts = new List<KeyValuePair<string, string>>
+    List<KeyValuePair<SearchSortField, string>> sorts = new List<KeyValuePair<SearchSortField, string>>
 {
-        new KeyValuePair<string,string>("","默认排序"),
-        new KeyValuePair<string,string>("LastEditTime","最后编辑时间"),
-        new KeyValuePair<string,string>("PubulishTime","发布时间"),
-        new KeyValuePair<string,string>("CreateTime","创建时间"),
-        new KeyValuePair<string,string>("ReaderCount","热度"),
+        new KeyValuePair<SearchSortField,string>(SearchSortField.Default,"默认排序"),
+        new KeyValuePair<SearchSortField,string>(SearchSortField.LastEditTime,"最后编辑时间"),
+        new KeyValuePair<SearchSortField,string>(SearchSortField.PublishTime,"发布时间"),
+        new KeyValuePair<SearchSortField,string>(SearchSortField.CreateTime,"创建时间"),
+        new KeyValuePair<SearchSortField,string>(SearchSortField.ReaderCount,"热度"),
     };
 
-    public async Task OnClick(string text)
+    public async Task OnClick(SearchSortField text)
     {
         current = text;
-        Model.Sorting = current + (asc ? "" : " desc");
+        Model.SortField = current;
+        Model.SortDirection = asc ? SortDirection.Ascending : SortDirection.Descending;
 
         await OnChanged.InvokeAsync();
     }
@@ -75,7 +75,8 @@
     public  async Task OnSwitchSort(bool value)
     {
         asc = value;
-        Model.Sorting = current + (asc ? "" : " desc");
+        Model.SortField = current;
+        Model.SortDirection = asc ? SortDirection.Ascending : SortDirection.Descending;
 
         await OnChanged.InvokeAsync();
     }

@@ -1,3 +1,5 @@
+@using CnGalWebSite.DataModel.Sorting
+@using CnGalWebSite.Core.Models
 <div class="search-filter-panel">
     @* ── Type filters ── *@
     <div class="search-filter-panel__section">
@@ -77,7 +79,7 @@
                     @sort.Value
                 </a>
             }
-            @if (!string.IsNullOrEmpty(CurrentSortField))
+            @if (CurrentSortField != SearchSortField.Default)
             {
                 <a href="@GetSortOrderToggleUrl()"
                    class="search-filter-panel__tag search-filter-panel__tag--active search-filter-panel__tag--order">
@@ -93,7 +95,8 @@
     [Parameter] public string SearchText { get; set; } = "";
     [Parameter] public List<string> SelectedTypes { get; set; } = [];
     [Parameter] public List<string> SelectedTimes { get; set; } = [];
-    [Parameter] public string CurrentSort { get; set; } = "";
+    [Parameter] public SearchSortField CurrentSort { get; set; }
+    [Parameter] public SortDirection Direction { get; set; } = SortDirection.Descending;
 
     private static readonly KeyValuePair<string, string>[] EntryTypes =
     [
@@ -132,17 +135,17 @@
         return result;
     }
 
-    private static readonly KeyValuePair<string, string>[] SortOptions =
+    private static readonly KeyValuePair<SearchSortField, string>[] SortOptions =
     [
-        new("", "默认排序"),
-        new("LastEditTime", "最后编辑时间"),
-        new("PubulishTime", "发布时间"),
-        new("CreateTime", "创建时间"),
-        new("ReaderCount", "热度"),
+        new(SearchSortField.Default, "默认排序"),
+        new(SearchSortField.LastEditTime, "最后编辑时间"),
+        new(SearchSortField.PublishTime, "发布时间"),
+        new(SearchSortField.CreateTime, "创建时间"),
+        new(SearchSortField.ReaderCount, "热度"),
     ];
 
-    private string CurrentSortField => CurrentSort.Replace(" desc", "");
-    private bool IsAscending => !string.IsNullOrEmpty(CurrentSortField) && !CurrentSort.Contains(" desc");
+    private SearchSortField CurrentSortField => CurrentSort;
+    private bool IsAscending => Direction == SortDirection.Ascending;
 
     private string GetTypeToggleUrl(string type)
     {
@@ -158,19 +161,11 @@
         return BuildUrl(times: times);
     }
 
-    private string GetSortUrl(string field)
-    {
-        var sort = string.IsNullOrEmpty(field) ? "" : field + " desc";
-        return BuildUrl(sort: sort);
-    }
+    private string GetSortUrl(SearchSortField field) => BuildUrl(sort: field, direction: SortDirection.Descending);
 
-    private string GetSortOrderToggleUrl()
-    {
-        var sort = IsAscending ? CurrentSortField + " desc" : CurrentSortField;
-        return BuildUrl(sort: sort);
-    }
+    private string GetSortOrderToggleUrl() => BuildUrl(direction: IsAscending ? SortDirection.Descending : SortDirection.Ascending);
 
-    private string BuildUrl(List<string>? types = null, List<string>? times = null, string? sort = null)
+    private string BuildUrl(List<string>? types = null, List<string>? times = null, SearchSortField? sort = null, SortDirection? direction = null)
     {
         var tTypes = types ?? SelectedTypes;
         var tTimes = times ?? SelectedTimes;
@@ -179,8 +174,8 @@
         var parts = new List<string>();
         if (!string.IsNullOrWhiteSpace(SearchText))
             parts.Add("Text=" + Uri.EscapeDataString(SearchText));
-        if (!string.IsNullOrWhiteSpace(tSort))
-            parts.Add("Sort=" + Uri.EscapeDataString(tSort));
+        if (tSort != SearchSortField.Default)
+            parts.Add("Sort=" + Uri.EscapeDataString(SearchPageUrl.FormatSort(tSort, direction ?? Direction)));
         foreach (var tt in tTypes)
             parts.Add("Types=" + Uri.EscapeDataString(tt));
         foreach (var tt in tTimes)

@@ -1,4 +1,5 @@
-﻿@page "/admin/liststoreinfo"
+@using CnGalWebSite.DataModel.Sorting
+@page "/admin/liststoreinfo"
 
 @attribute [Authorize(Roles = "Admin")]
 
@@ -9,7 +10,7 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="商店信息版块" />
 
 <MDCard>
-    <DataTableCard TModel="StoreInfoOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <DataTableCard TModel="StoreInfoOverviewModel" TSort="StoreInfoSortField" DefaultSortField="StoreInfoSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -73,6 +74,20 @@
 </MDialog>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, StoreInfoSortField> _sortFields = new Dictionary<string, StoreInfoSortField>
+    {
+        ["CutNow"] = StoreInfoSortField.CutNow,
+        ["PlatformType"] = StoreInfoSortField.PlatformType,
+        ["PriceNow"] = StoreInfoSortField.PriceNow,
+        ["State"] = StoreInfoSortField.State,
+        ["UpdateType"] = StoreInfoSortField.UpdateType,
+        [nameof(StoreInfoOverviewModel.Id)] = StoreInfoSortField.Id,
+        [nameof(StoreInfoOverviewModel.Link)] = StoreInfoSortField.Link,
+        [nameof(StoreInfoOverviewModel.Name)] = StoreInfoSortField.Name,
+        [nameof(StoreInfoOverviewModel.PlatformName)] = StoreInfoSortField.PlatformName,
+        [nameof(StoreInfoOverviewModel.UpdateTime)] = StoreInfoSortField.UpdateTime,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -102,7 +117,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<StoreInfoOverviewModel> dataTableCard;
+    DataTableCard<StoreInfoOverviewModel, StoreInfoSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

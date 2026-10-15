@@ -1,4 +1,5 @@
-﻿@page "/admin/listprojectpositions"
+@using CnGalWebSite.ProjectSite.Models.Sorting
+@page "/admin/listprojectpositions"
 
 @inject IHttpService _httpService
 @inject IPopupService PopupService
@@ -6,7 +7,7 @@
 <CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="企划招募版块" />
 
 <MDCard>
-    <DataTableCard TModel="ProjectPositionOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <DataTableCard TModel="ProjectPositionOverviewModel" TSort="ProjectProjectPositionSortField" DefaultSortField="ProjectProjectPositionSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -82,6 +83,20 @@
 
 
  @code {
+    private static readonly IReadOnlyDictionary<string, ProjectProjectPositionSortField> _sortFields = new Dictionary<string, ProjectProjectPositionSortField>
+    {
+        [nameof(ProjectPositionOverviewModel.CreateTime)] = ProjectProjectPositionSortField.CreateTime,
+        [nameof(ProjectPositionOverviewModel.DeadLine)] = ProjectProjectPositionSortField.DeadLine,
+        [nameof(ProjectPositionOverviewModel.Hide)] = ProjectProjectPositionSortField.Hide,
+        [nameof(ProjectPositionOverviewModel.Id)] = ProjectProjectPositionSortField.Id,
+        [nameof(ProjectPositionOverviewModel.PositionType)] = ProjectProjectPositionSortField.PositionType,
+        [nameof(ProjectPositionOverviewModel.PositionTypeName)] = ProjectProjectPositionSortField.PositionTypeName,
+        [nameof(ProjectPositionOverviewModel.Priority)] = ProjectProjectPositionSortField.Priority,
+        [nameof(ProjectPositionOverviewModel.ProjectId)] = ProjectProjectPositionSortField.ProjectId,
+        [nameof(ProjectPositionOverviewModel.Tags)] = ProjectProjectPositionSortField.Tags,
+        [nameof(ProjectPositionOverviewModel.Type)] = ProjectProjectPositionSortField.Type,
+    };
+
     private string _baseUrl = "api/project/listpositions";
     private string _name = "约稿";
 
@@ -108,7 +123,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<ProjectPositionOverviewModel> dataTableCard;
+    DataTableCard<ProjectPositionOverviewModel, ProjectProjectPositionSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

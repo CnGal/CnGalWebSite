@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
@@ -28,7 +29,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
@@ -40,6 +40,25 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/entries/[action]")]
     public class EntriesAPIController : ControllerBase
     {
+        private static readonly SortMap<EntryInformationType, EntryInformationTypeSortField> ListEntryInformationTypesSorting =
+            new SortMap<EntryInformationType, EntryInformationTypeSortField>(EntryInformationTypeSortField.Id, EntryInformationTypeSortField.Id)
+            .Add(EntryInformationTypeSortField.Icon, s => s.Icon)
+            .Add(EntryInformationTypeSortField.IsHidden, s => s.IsHidden)
+            .Add(EntryInformationTypeSortField.Name, s => s.Name)
+            .Add(EntryInformationTypeSortField.Description, s => s.Description)
+            .Add(EntryInformationTypeSortField.Id, s => s.Id);
+
+        private static readonly SortMap<Entry, EntrySortField> ListSorting =
+            new SortMap<Entry, EntrySortField>(EntrySortField.Id, EntrySortField.Id)
+            .Add(EntrySortField.Id, s => s.Id)
+            .Add(EntrySortField.Name, s => s.Name)
+            .Add(EntrySortField.IsHidden, s => s.IsHidden)
+            .Add(EntrySortField.CanComment, s => s.CanComment ?? true)
+            .Add(EntrySortField.Priority, s => s.Priority)
+            .Add(EntrySortField.Type, s => s.Type)
+            .Add(EntrySortField.IsHideOutlink, s => s.IsHideOutlink);
+
+
         
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Tag, int> _tagRepository;
@@ -346,7 +365,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<PagedResultDto<EntryInforTipViewModel>> GetEntryHomeListAsync(PagedSortedAndFilterInput input)
+        public async Task<PagedResultDto<EntryInforTipViewModel>> GetEntryHomeListAsync(PagedSortedAndFilterInput<EntrySortField> input)
         {
             return await _entryService.GetPaginatedResult(input);
         }
@@ -1704,12 +1723,12 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<EntryInformationTypeOverviewModel>> ListEntryInformationTypes(QueryParameterModel model)
+        public async Task<QueryResultModel<EntryInformationTypeOverviewModel, EntryInformationTypeSortField>> ListEntryInformationTypes(QueryParameterModel<EntryInformationTypeSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<EntryInformationType, long>(_entryInformationTypeRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || ( s.Name.Contains(model.SearchText) || s.Description.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<EntryInformationType, EntryInformationTypeSortField>(_entryInformationTypeRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || ( s.Name.Contains(model.SearchText) || s.Description.Contains(model.SearchText)), ListEntryInformationTypesSorting);
 
-            return new QueryResultModel<EntryInformationTypeOverviewModel>
+            return new QueryResultModel<EntryInformationTypeOverviewModel, EntryInformationTypeSortField>
             {
                 Items = await items.Select(s => new EntryInformationTypeOverviewModel
                 {
@@ -1829,12 +1848,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<EntryOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<EntryOverviewModel, EntrySortField>> List(QueryParameterModel<EntrySortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Entry, int>(_entryRepository.GetAll().AsSingleQuery().Where(s=>string.IsNullOrWhiteSpace(s.Name)==false), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Entry, EntrySortField>(_entryRepository.GetAll().AsSingleQuery().Where(s=>string.IsNullOrWhiteSpace(s.Name)==false), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<EntryOverviewModel>
+            return new QueryResultModel<EntryOverviewModel, EntrySortField>
             {
                 Items = await items.Select(s => new EntryOverviewModel
                 {

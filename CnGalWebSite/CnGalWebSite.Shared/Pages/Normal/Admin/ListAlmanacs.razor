@@ -1,4 +1,5 @@
-﻿@page "/admin/listalmanacs"
+@using CnGalWebSite.DataModel.Sorting
+@page "/admin/listalmanacs"
 @attribute [Authorize(Roles = "Admin")]
 
 @inject IHttpService _httpService
@@ -8,7 +9,7 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="年鉴版块" />
 
 <MDCard>
-    <DataTableCard TModel="AlmanacOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <DataTableCard TModel="AlmanacOverviewModel" TSort="AlmanacSortField" DefaultSortField="AlmanacSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -39,6 +40,17 @@
     </DataTableCard>
 </MDCard>
 @code {
+    private static readonly IReadOnlyDictionary<string, AlmanacSortField> _sortFields = new Dictionary<string, AlmanacSortField>
+    {
+        [nameof(AlmanacOverviewModel.ArticleCount)] = AlmanacSortField.ArticleCount,
+        [nameof(AlmanacOverviewModel.BriefIntroduction)] = AlmanacSortField.BriefIntroduction,
+        [nameof(AlmanacOverviewModel.EntryCount)] = AlmanacSortField.EntryCount,
+        [nameof(AlmanacOverviewModel.Id)] = AlmanacSortField.Id,
+        [nameof(AlmanacOverviewModel.Name)] = AlmanacSortField.Name,
+        [nameof(AlmanacOverviewModel.UpdateTime)] = AlmanacSortField.UpdateTime,
+        [nameof(AlmanacOverviewModel.Year)] = AlmanacSortField.Year,
+    };
+
     private string _baseUrl = "api/almanac/List";
     private string _name = "年鉴";
 
@@ -59,7 +71,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<AlmanacOverviewModel> dataTableCard;
+    DataTableCard<AlmanacOverviewModel, AlmanacSortField> dataTableCard;
 
     CnGalWebSite.Shared.MasaComponent.PC.Admin.TimedTasks.EditCard editCard;
     private bool _editDialog;

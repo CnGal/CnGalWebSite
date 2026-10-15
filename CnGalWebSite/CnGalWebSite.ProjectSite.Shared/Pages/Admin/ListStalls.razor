@@ -1,4 +1,5 @@
-﻿@page "/admin/liststalls"
+@using CnGalWebSite.ProjectSite.Models.Sorting
+@page "/admin/liststalls"
 
 @inject IHttpService _httpService
 @inject IPopupService PopupService
@@ -7,7 +8,7 @@
 <CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="创作接稿版块" />
 
 <MDCard>
-    <DataTableCard TModel="StallOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <DataTableCard TModel="StallOverviewModel" TSort="ProjectStallSortField" DefaultSortField="ProjectStallSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -63,6 +64,18 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, ProjectStallSortField> _sortFields = new Dictionary<string, ProjectStallSortField>
+    {
+        [nameof(StallOverviewModel.CreateTime)] = ProjectStallSortField.CreateTime,
+        [nameof(StallOverviewModel.EndTime)] = ProjectStallSortField.EndTime,
+        [nameof(StallOverviewModel.Hide)] = ProjectStallSortField.Hide,
+        [nameof(StallOverviewModel.Id)] = ProjectStallSortField.Id,
+        [nameof(StallOverviewModel.Name)] = ProjectStallSortField.Name,
+        [nameof(StallOverviewModel.Price)] = ProjectStallSortField.Price,
+        [nameof(StallOverviewModel.Priority)] = ProjectStallSortField.Priority,
+        [nameof(StallOverviewModel.UserId)] = ProjectStallSortField.UserId,
+    };
+
     private string _baseUrl = "api/stall/list";
     private string _name = "橱窗";
 
@@ -84,7 +97,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<StallOverviewModel> dataTableCard;
+    DataTableCard<StallOverviewModel, ProjectStallSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

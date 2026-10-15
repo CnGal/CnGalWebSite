@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/lotteries/manage/{Id:long}"
 @attribute [Authorize(Roles = "Admin")]
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
@@ -29,7 +30,7 @@
             {
                 case "participants":
                     <div class="lottery-manage-page__panel">
-                        <CgDataTable TItem="LotteryUserOverviewModel" Title="参与抽奖的用户" OnServerQuery="OnParticipantQuery" DefaultSortField="Id" DefaultSortDesc="true" @ref="_participantTable">
+                        <CgDataTable TItem="LotteryUserOverviewModel" TSort="LotteryUserSortField" Title="参与抽奖的用户" OnServerQuery="OnParticipantQuery" DefaultSortField="LotteryUserSortField.Id" DefaultSortDesc="true" @ref="_participantTable">
                             <ToolbarContent>
                                 <button class="lottery-manage-export-btn" title="导出数据" @onclick="OnExport">
                                     <CgMdiIcon Name="mdiExport" aria-hidden="true" />
@@ -37,16 +38,16 @@
                                 </button>
                             </ToolbarContent>
                             <ChildContent>
-                                <CgDataTableColumn TItem="LotteryUserOverviewModel" Title="Id" Field="LotteryUserId" Width="80px" />
-                                <CgDataTableColumn TItem="LotteryUserOverviewModel" Title="号码" Field="Number" Width="80px" />
-                                <CgDataTableColumn TItem="LotteryUserOverviewModel" Title="用户" Field="Name">
+                                <CgDataTableColumn TItem="LotteryUserOverviewModel" TSort="LotteryUserSortField" Title="Id" SortField="LotteryUserSortField.LotteryUserId" Value="item => item.LotteryUserId" Width="80px" />
+                                <CgDataTableColumn TItem="LotteryUserOverviewModel" TSort="LotteryUserSortField" Title="号码" SortField="LotteryUserSortField.Number" Value="item => item.Number" Width="80px" />
+                                <CgDataTableColumn TItem="LotteryUserOverviewModel" TSort="LotteryUserSortField" Title="用户" SortField="LotteryUserSortField.Name" Value="item => item.Name">
                                     <ChildContent Context="item">
                                         <span class="lottery-manage-user">@item.Name</span>
                                     </ChildContent>
                                 </CgDataTableColumn>
-                                <CgDataTableColumn TItem="LotteryUserOverviewModel" Title="Cookie" Field="Cookie" />
-                                <CgDataTableColumn TItem="LotteryUserOverviewModel" Title="Ip" Field="Ip" />
-                                <CgDataTableColumn TItem="LotteryUserOverviewModel" Title="状态" Field="IsHidden">
+                                <CgDataTableColumn TItem="LotteryUserOverviewModel" TSort="LotteryUserSortField" Title="Cookie" SortField="LotteryUserSortField.Cookie" Value="item => item.Cookie" />
+                                <CgDataTableColumn TItem="LotteryUserOverviewModel" TSort="LotteryUserSortField" Title="Ip" SortField="LotteryUserSortField.Ip" Value="item => item.Ip" />
+                                <CgDataTableColumn TItem="LotteryUserOverviewModel" TSort="LotteryUserSortField" Title="状态" SortField="LotteryUserSortField.IsHidden" Value="item => item.IsHidden">
                                     <ChildContent Context="item">
                                         @if (item.IsHidden)
                                         {
@@ -58,7 +59,7 @@
                                         }
                                     </ChildContent>
                                 </CgDataTableColumn>
-                                <CgDataTableColumn TItem="LotteryUserOverviewModel" Title="操作" Sortable="false" Width="80px">
+                                <CgDataTableColumn TItem="LotteryUserOverviewModel" TSort="LotteryUserSortField" Title="操作" Sortable="false" Width="80px">
                                     <ChildContent Context="item">
                                         <div class="lottery-manage-actions">
                                             @if (item.IsHidden)
@@ -82,16 +83,16 @@
                     break;
                 case "winners":
                     <div class="lottery-manage-page__panel">
-                        <CgDataTable TItem="WinnerOverviewModel" Items="_winners" Title="中奖用户" DefaultSortField="Number">
-                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="号码" Field="Number" Width="80px" />
-                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="用户名" Field="UserName" />
-                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="电子邮箱" Field="Email" />
-                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="类型" Field="AwardType">
+                        <CgDataTable TItem="WinnerOverviewModel" TSort="WinnerSortField" Items="_winners" Title="中奖用户" DefaultSortField="WinnerSortField.Number">
+                            <CgDataTableColumn TItem="WinnerOverviewModel" TSort="WinnerSortField" Title="号码" SortField="WinnerSortField.Number" Value="item => item.Number" Width="80px" />
+                            <CgDataTableColumn TItem="WinnerOverviewModel" TSort="WinnerSortField" Title="用户名" SortField="WinnerSortField.UserName" Value="item => item.UserName" />
+                            <CgDataTableColumn TItem="WinnerOverviewModel" TSort="WinnerSortField" Title="电子邮箱" SortField="WinnerSortField.Email" Value="item => item.Email" />
+                            <CgDataTableColumn TItem="WinnerOverviewModel" TSort="WinnerSortField" Title="类型" SortField="WinnerSortField.AwardType" Value="item => item.AwardType">
                                 <ChildContent Context="item">
                                     <span class="lottery-manage-award-type">@GetAwardTypeText(item.AwardType)</span>
                                 </ChildContent>
                             </CgDataTableColumn>
-                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="激活码" Field="ActivationCode">
+                            <CgDataTableColumn TItem="WinnerOverviewModel" TSort="WinnerSortField" Title="激活码" SortField="WinnerSortField.ActivationCode" Value="item => item.ActivationCode">
                                 <ChildContent Context="item">
                                     @if (item.AwardType == LotteryAwardType.ActivationCode)
                                     {
@@ -103,7 +104,7 @@
                                     }
                                 </ChildContent>
                             </CgDataTableColumn>
-                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="快递单号" Field="TrackingNumber">
+                            <CgDataTableColumn TItem="WinnerOverviewModel" TSort="WinnerSortField" Title="快递单号" SortField="WinnerSortField.TrackingNumber" Value="item => item.TrackingNumber">
                                 <ChildContent Context="item">
                                     @if (item.AwardType == LotteryAwardType.RealThing)
                                     {
@@ -122,10 +123,10 @@
                                     }
                                 </ChildContent>
                             </CgDataTableColumn>
-                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="真实姓名" Field="RealName" />
-                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="地址" Field="Address" />
-                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="电话号码" Field="Phone" />
-                            <CgDataTableColumn TItem="WinnerOverviewModel" Title="操作" Sortable="false" Width="80px">
+                            <CgDataTableColumn TItem="WinnerOverviewModel" TSort="WinnerSortField" Title="真实姓名" SortField="WinnerSortField.RealName" Value="item => item.RealName" />
+                            <CgDataTableColumn TItem="WinnerOverviewModel" TSort="WinnerSortField" Title="地址" SortField="WinnerSortField.Address" Value="item => item.Address" />
+                            <CgDataTableColumn TItem="WinnerOverviewModel" TSort="WinnerSortField" Title="电话号码" SortField="WinnerSortField.Phone" Value="item => item.Phone" />
+                            <CgDataTableColumn TItem="WinnerOverviewModel" TSort="WinnerSortField" Title="操作" Sortable="false" Width="80px">
                                 <ChildContent Context="item">
                                     <div class="lottery-manage-actions">
                                         @if (item.AwardType != LotteryAwardType.Integral)
@@ -195,7 +196,7 @@
     public long Id { get; set; }
 
     private CancellationTokenSource? _cts = new();
-    private CgDataTable<LotteryUserOverviewModel>? _participantTable;
+    private CgDataTable<LotteryUserOverviewModel, LotteryUserSortField>? _participantTable;
 
     private List<WinnerOverviewModel> _winners = [];
 
@@ -226,23 +227,9 @@
         }
     }
 
-    private async Task<CgDataTableResult<LotteryUserOverviewModel>> OnParticipantQuery(CgDataTableRequest request)
+    private async Task<CgDataTableResult<LotteryUserOverviewModel>> OnParticipantQuery(CgDataTableRequest<LotteryUserSortField> request)
     {
-        // ViewModel 属性名映射到 LotteryUser 实体属性名（API 对实体做动态 LINQ 排序）
-        var sortField = request.SortField switch
-        {
-            "LotteryUserId" => "Id",
-            _ => request.SortField
-        };
-
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrEmpty(sortField) ? new[] { "Id" } : new[] { sortField },
-            SortDesc = new[] { request.SortDesc }
-        };
+var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetLotteryUsersAsync(Id, parameter, _cts.Token);
         return result.Success && result.Data is not null
             ? new CgDataTableResult<LotteryUserOverviewModel>(result.Data.Items.ToList(), result.Data.Total)
@@ -319,13 +306,12 @@
         try
         {
             var dataResult = await AdminQueryService.GetLotteryWinnersAsync(Id, _cts.Token);
-            var participantsResult = await AdminQueryService.GetLotteryUsersAsync(Id, new QueryParameterModel
+            var participantsResult = await AdminQueryService.GetLotteryUsersAsync(Id, new QueryParameterModel<LotteryUserSortField>
             {
                 Page = 1,
                 ItemsPerPage = int.MaxValue,
                 SearchText = string.Empty,
-                SortBy = new[] { "LotteryUserId" },
-                SortDesc = new[] { false }
+                Sorts = [new(LotteryUserSortField.LotteryUserId, SortDirection.Ascending)]
             }, _cts.Token);
 
             var json = System.Text.Json.JsonSerializer.Serialize(new

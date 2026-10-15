@@ -13,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System.Collections.Concurrent;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 
 namespace CnGalWebSite.APIServer.Application.Files
 {

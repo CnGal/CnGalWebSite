@@ -1,11 +1,12 @@
-﻿@page "/admin/users"
+@using CnGalWebSite.IdentityServer.Models.Sorting
+@page "/admin/users"
 
 @attribute [Authorize(Roles = "Admin")]
 
 @inject IHttpService _httpService
 @inject IPopupService PopupService
 
-<DataTableCard TModel="UserOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+<DataTableCard TModel="UserOverviewModel" TSort="IdentityUserSortField" DefaultSortField="IdentityUserSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {
@@ -62,6 +63,13 @@
     </CnGalWebSite.Components.Cards.MDCard>
 </MDialog>
 @code {
+    private static readonly IReadOnlyDictionary<string, IdentityUserSortField> _sortFields = new Dictionary<string, IdentityUserSortField>
+    {
+        [nameof(UserOverviewModel.Email)] = IdentityUserSortField.Email,
+        [nameof(UserOverviewModel.Id)] = IdentityUserSortField.Id,
+        [nameof(UserOverviewModel.UserName)] = IdentityUserSortField.UserName,
+    };
+
     private bool _editDialog;
     private UserOverviewModel _editedItem;
     private UserEditModel _tempItem;
@@ -84,7 +92,7 @@
 
     IEnumerable<KeyValuePair<string, string>> _roles;
 
-    DataTableCard<UserOverviewModel> dataTableCard;
+    DataTableCard<UserOverviewModel, IdentityUserSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

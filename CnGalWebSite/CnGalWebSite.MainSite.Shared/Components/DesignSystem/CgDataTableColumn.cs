@@ -4,13 +4,13 @@ using Microsoft.AspNetCore.Components;
 namespace CnGalWebSite.MainSite.Shared.Components.DesignSystem;
 
 /// <summary>
-/// 数据表格列定义组件。不渲染任何 UI，仅向父 <see cref="CgDataTable{TItem}"/> 注册列元数据。
+/// 数据表格列定义组件。不渲染任何 UI，仅向父 <see cref="CgDataTable{TItem, TSort}"/> 注册列元数据。
 /// </summary>
 /// <typeparam name="TItem">行数据类型。</typeparam>
-public class CgDataTableColumn<TItem> : ComponentBase, IDisposable
+public class CgDataTableColumn<TItem, TSort> : ComponentBase, IDisposable where TSort : struct, Enum
 {
     [CascadingParameter]
-    public CgDataTable<TItem>? Parent { get; set; }
+    public CgDataTable<TItem, TSort>? Parent { get; set; }
 
     /// <summary>
     /// 列标题。
@@ -19,14 +19,17 @@ public class CgDataTableColumn<TItem> : ComponentBase, IDisposable
     public string Title { get; set; } = string.Empty;
 
     /// <summary>
-    /// 排序字段名（对应 <typeparamref name="TItem"/> 的属性名）。
+    /// 通过类型化选择器读取行数据。
     /// 为空时该列不可排序。
     /// </summary>
     [Parameter]
-    public string? Field { get; set; }
+    public Func<TItem, object?>? Value { get; set; }
+
+    [Parameter]
+    public TSort? SortField { get; set; }
 
     /// <summary>
-    /// 是否可排序。默认 true（需同时设置 <see cref="Field"/>）。
+    /// 是否可排序。默认 true（需同时设置 <see cref="SortField"/>）。
     /// </summary>
     [Parameter]
     public bool Sortable { get; set; } = true;
@@ -44,9 +47,9 @@ public class CgDataTableColumn<TItem> : ComponentBase, IDisposable
     public string? Width { get; set; }
 
     /// <summary>
-    /// 该列是否真正可参与排序。需要同时满足 Sortable=true 且 Field 不为空。
+    /// 该列是否真正可参与排序。需要同时满足 Sortable=true 且 SortField 和 Value 均已设置。
     /// </summary>
-    public bool CanSort => Sortable && !string.IsNullOrWhiteSpace(Field);
+    public bool CanSort => Sortable && SortField.HasValue && Value != null;
 
     protected override void OnInitialized()
     {

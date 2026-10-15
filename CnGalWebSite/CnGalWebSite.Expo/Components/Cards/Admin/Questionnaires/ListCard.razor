@@ -1,8 +1,9 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService _popupService
 @inject NavigationManager NavigationManager
 
-<CnGalWebSite.Components.DataTables.DataTableCard TModel="QuestionnaireOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+<CnGalWebSite.Components.DataTables.DataTableCard TModel="QuestionnaireOverviewModel" TSort="QuestionnaireSortField" DefaultSortField="QuestionnaireSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {
@@ -57,6 +58,19 @@
 <QuestionAnalysisDialog @ref="questionAnalysisDialog" />
 
 @code {
+    private static readonly IReadOnlyDictionary<string, QuestionnaireSortField> _sortFields = new Dictionary<string, QuestionnaireSortField>
+    {
+        [nameof(QuestionnaireOverviewModel.BeginTime)] = QuestionnaireSortField.BeginTime,
+        [nameof(QuestionnaireOverviewModel.DisplayName)] = QuestionnaireSortField.DisplayName,
+        [nameof(QuestionnaireOverviewModel.EndTime)] = QuestionnaireSortField.EndTime,
+        [nameof(QuestionnaireOverviewModel.Id)] = QuestionnaireSortField.Id,
+        [nameof(QuestionnaireOverviewModel.IsActive)] = QuestionnaireSortField.IsActive,
+        [nameof(QuestionnaireOverviewModel.IsHidden)] = QuestionnaireSortField.IsHidden,
+        [nameof(QuestionnaireOverviewModel.Name)] = QuestionnaireSortField.Name,
+        [nameof(QuestionnaireOverviewModel.Priority)] = QuestionnaireSortField.Priority,
+        [nameof(QuestionnaireOverviewModel.ResponseCount)] = QuestionnaireSortField.ResponseCount,
+    };
+
     private string _baseUrl = "api/questionnaires/List";
     private string _name = "问卷";
 
@@ -79,7 +93,7 @@
         new (){ Text= "操作", Value= "actions", Sortable=false }
     };
 
-    CnGalWebSite.Components.DataTables.DataTableCard<QuestionnaireOverviewModel> dataTableCard;
+    CnGalWebSite.Components.DataTables.DataTableCard<QuestionnaireOverviewModel, QuestionnaireSortField> dataTableCard;
     EditCard editCard;
     StatisticsDialog statisticsCard;
     UserResponsesDialog userResponsesDialog;

@@ -1,4 +1,4 @@
-﻿@inject IHttpService _httpService
+@inject IHttpService _httpService
 @inject NavigationManager NavigationManager
 @inject IDataCacheService _dataCacheService
 @inject IPageModelCatche<List<FavoriteFolderOverviewModel>> _pageModelCatche
@@ -30,7 +30,6 @@ else
 @code {
     public List<FavoriteFolderOverviewModel> Model { get; set; } = new List<FavoriteFolderOverviewModel>();
 
-    public PagedSortedAndFilterInput FavoriteObjectInput { get; set; } = new PagedSortedAndFilterInput();
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

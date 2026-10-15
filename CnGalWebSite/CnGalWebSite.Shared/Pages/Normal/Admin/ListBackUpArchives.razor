@@ -1,4 +1,5 @@
-﻿@page "/admin/listbackuparchives"
+@using CnGalWebSite.DataModel.Sorting
+@page "/admin/listbackuparchives"
 @attribute [Authorize(Roles = "Admin")]
 
 @inject IHttpService _httpService
@@ -6,7 +7,7 @@
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="BackUpArchiveOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <DataTableCard TModel="BackUpArchiveOverviewModel" TSort="BackUpArchiveSortField" DefaultSortField="BackUpArchiveSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -41,6 +42,15 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, BackUpArchiveSortField> _sortFields = new Dictionary<string, BackUpArchiveSortField>
+    {
+        [nameof(BackUpArchiveOverviewModel.Id)] = BackUpArchiveSortField.Id,
+        [nameof(BackUpArchiveOverviewModel.IsLastFail)] = BackUpArchiveSortField.IsLastFail,
+        [nameof(BackUpArchiveOverviewModel.LastBackUpTime)] = BackUpArchiveSortField.LastBackUpTime,
+        [nameof(BackUpArchiveOverviewModel.LastTimeUsed)] = BackUpArchiveSortField.LastTimeUsed,
+        [nameof(BackUpArchiveOverviewModel.Type)] = BackUpArchiveSortField.Type,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -63,7 +73,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<BackUpArchiveOverviewModel> dataTableCard;
+    DataTableCard<BackUpArchiveOverviewModel, BackUpArchiveSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

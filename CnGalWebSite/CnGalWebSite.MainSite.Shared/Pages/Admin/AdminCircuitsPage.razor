@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/listcircuits"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -13,10 +14,10 @@
         线路版块
     </h1>
 
-    <CgDataTable TItem="CircuitHandlerModel"
+    <CgDataTable TItem="CircuitHandlerModel" TSort="CircuitHandlerSortField"
                  Title="线路列表"
                  Items="_items"
-                 DefaultSortField="OpenTime"
+                 DefaultSortField="CircuitHandlerSortField.OpenTime"
                  DefaultSortDesc="true"
                  @ref="_table">
         <ToolbarContent>
@@ -26,18 +27,18 @@
             </CgButton>
         </ToolbarContent>
         <ChildContent>
-            <CgDataTableColumn TItem="CircuitHandlerModel" Title="Id" Field="Id" />
-            <CgDataTableColumn TItem="CircuitHandlerModel" Title="创建时间" Field="OpenTime">
+            <CgDataTableColumn TItem="CircuitHandlerModel" TSort="CircuitHandlerSortField" Title="Id" SortField="CircuitHandlerSortField.Id" Value="item => item.Id" />
+            <CgDataTableColumn TItem="CircuitHandlerModel" TSort="CircuitHandlerSortField" Title="创建时间" SortField="CircuitHandlerSortField.OpenTime" Value="item => item.OpenTime">
                 <ChildContent Context="item">
                     @item.OpenTime.ToString("yyyy-MM-dd HH:mm")
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="CircuitHandlerModel" Title="上次活跃时间" Field="LastActiveTime">
+            <CgDataTableColumn TItem="CircuitHandlerModel" TSort="CircuitHandlerSortField" Title="上次活跃时间" SortField="CircuitHandlerSortField.LastActiveTime" Value="item => item.LastActiveTime">
                 <ChildContent Context="item">
                     @item.LastActiveTime.ToString("yyyy-MM-dd HH:mm")
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="CircuitHandlerModel" Title="状态" Field="IsConnected" Width="100px">
+            <CgDataTableColumn TItem="CircuitHandlerModel" TSort="CircuitHandlerSortField" Title="状态" SortField="CircuitHandlerSortField.IsConnected" Value="item => item.IsConnected" Width="100px">
                 <ChildContent Context="item">
                     @if (item.IsConnected)
                     {
@@ -49,14 +50,14 @@
                     }
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="CircuitHandlerModel" Title="重连次数" Field="ReConnectCount" Width="100px" />
+            <CgDataTableColumn TItem="CircuitHandlerModel" TSort="CircuitHandlerSortField" Title="重连次数" SortField="CircuitHandlerSortField.ReConnectCount" Value="item => item.ReConnectCount" Width="100px" />
         </ChildContent>
     </CgDataTable>
 </div>
 
 @code {
     private List<CircuitHandlerModel> _items = [];
-    private CgDataTable<CircuitHandlerModel>? _table;
+    private CgDataTable<CircuitHandlerModel, CircuitHandlerSortField>? _table;
     private CancellationTokenSource? _cts = new();
 
     protected override void OnInitialized()

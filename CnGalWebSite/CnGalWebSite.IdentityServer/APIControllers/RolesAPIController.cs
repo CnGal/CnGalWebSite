@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.IdentityServer.Models.Sorting;
+using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.IdentityServer.Data;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
@@ -7,7 +8,6 @@ using CnGalWebSite.IdentityServer.Models.ViewModels.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Dynamic.Core;
 using static IdentityServer4.IdentityServerConstants;
 
 namespace CnGalWebSite.IdentityServer.APIControllers
@@ -17,6 +17,18 @@ namespace CnGalWebSite.IdentityServer.APIControllers
     [Route("api/roles/[action]")]
     public class RolesAPIController : ControllerBase
     {
+        private static readonly SortMap<ApplicationRole, IdentityRoleSortField> ListSorting =
+            new SortMap<ApplicationRole, IdentityRoleSortField>(IdentityRoleSortField.Id, IdentityRoleSortField.Id)
+            .Add(IdentityRoleSortField.Id, s => s.Id)
+            .Add(IdentityRoleSortField.Name, s => s.Name);
+
+        private static readonly SortMap<ApplicationUser, IdentityUserSortField> ListUserSorting =
+            new SortMap<ApplicationUser, IdentityUserSortField>(IdentityUserSortField.Id, IdentityUserSortField.Id)
+            .Add(IdentityUserSortField.Email, s => s.Email)
+            .Add(IdentityUserSortField.Id, s => s.Id)
+            .Add(IdentityUserSortField.UserName, s => s.UserName);
+
+
         private readonly IRepository<ApplicationDbContext, ApplicationRole, string> _roleRepository;
         private readonly IQueryService _queryService;
         private readonly IRepository<ApplicationDbContext, ApplicationUser, string> _userRepository;
@@ -35,11 +47,11 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<RoleOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<RoleOverviewModel, IdentityRoleSortField>> List(QueryParameterModel<IdentityRoleSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<ApplicationRole, string>(_roleRepository.GetAll().AsSingleQuery(), model, s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Id.Contains(model.SearchText) || s.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<ApplicationRole, IdentityRoleSortField>(_roleRepository.GetAll().AsSingleQuery(), model, s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Id.Contains(model.SearchText) || s.Name.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<RoleOverviewModel>
+            return new QueryResultModel<RoleOverviewModel, IdentityRoleSortField>
             {
                 Items = await items.Select(s => new RoleOverviewModel
                 {
@@ -108,12 +120,12 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<UserOverviewModel>> ListUser(QueryParameterModel model, [FromQuery] string id)
+        public async Task<QueryResultModel<UserOverviewModel, IdentityUserSortField>> ListUser(QueryParameterModel<IdentityUserSortField> model, [FromQuery] string id)
         {
-            var (items, total) = await _queryService.QueryAsync<ApplicationUser, string>(_userRepository.GetAll().Include(s => s.UserRoles).ThenInclude(s => s.Role), model,
-                s => (string.IsNullOrWhiteSpace(model.SearchText) || (s.Id.Contains(model.SearchText) || s.UserName.Contains(model.SearchText) || s.Email.Contains(model.SearchText))) && s.UserRoles.Select(s => s.Role.Id).Contains(id));
+            var (items, total) = await _queryService.QueryAsync<ApplicationUser, IdentityUserSortField>(_userRepository.GetAll().Include(s => s.UserRoles).ThenInclude(s => s.Role), model,
+                s => (string.IsNullOrWhiteSpace(model.SearchText) || (s.Id.Contains(model.SearchText) || s.UserName.Contains(model.SearchText) || s.Email.Contains(model.SearchText))) && s.UserRoles.Select(s => s.Role.Id).Contains(id), ListUserSorting);
 
-            return new QueryResultModel<UserOverviewModel>
+            return new QueryResultModel<UserOverviewModel, IdentityUserSortField>
             {
                 Items = await items.Select(s => new UserOverviewModel
                 {

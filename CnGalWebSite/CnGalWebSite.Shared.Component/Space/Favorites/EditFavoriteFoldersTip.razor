@@ -1,4 +1,5 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
@@ -10,7 +11,7 @@
 </CnGalWebSite.Shared.MasaComponent.Shared.Components.MasaAlert>
 
 <MDCard>
-    <DataTableCard TModel="FavoriteFolderOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+Id)" OnClickAdd="AddFavoriteFolder" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <DataTableCard TModel="FavoriteFolderOverviewModel" TSort="FavoriteFolderSortField" DefaultSortField="FavoriteFolderSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl+Id)" OnClickAdd="AddFavoriteFolder" Title="@($"{_name}列表")" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -56,6 +57,19 @@
 <CreateFavoriteFolderCard @ref="createFavoriteFolderCard" UserId="@Id" OnCreated="@(()=> dataTableCard.GetDataFromApi())" />
 
 @code {
+    private static readonly IReadOnlyDictionary<string, FavoriteFolderSortField> _sortFields = new Dictionary<string, FavoriteFolderSortField>
+    {
+        [nameof(FavoriteFolderOverviewModel.Count)] = FavoriteFolderSortField.Count,
+        [nameof(FavoriteFolderOverviewModel.CreateTime)] = FavoriteFolderSortField.CreateTime,
+        [nameof(FavoriteFolderOverviewModel.Id)] = FavoriteFolderSortField.Id,
+        [nameof(FavoriteFolderOverviewModel.IsDefault)] = FavoriteFolderSortField.IsDefault,
+        [nameof(FavoriteFolderOverviewModel.IsHidden)] = FavoriteFolderSortField.IsHidden,
+        [nameof(FavoriteFolderOverviewModel.MainImage)] = FavoriteFolderSortField.MainImage,
+        [nameof(FavoriteFolderOverviewModel.Name)] = FavoriteFolderSortField.Name,
+        [nameof(FavoriteFolderOverviewModel.ShowPublicly)] = FavoriteFolderSortField.ShowPublicly,
+        [nameof(FavoriteFolderOverviewModel.UserId)] = FavoriteFolderSortField.UserId,
+    };
+
     [Parameter]
     public string Id { get; set; }
 
@@ -81,7 +95,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<FavoriteFolderOverviewModel> dataTableCard;
+    DataTableCard<FavoriteFolderOverviewModel, FavoriteFolderSortField> dataTableCard;
 
     CreateFavoriteFolderCard createFavoriteFolderCard;
 

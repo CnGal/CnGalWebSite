@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="RankOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <DataTableCard TModel="RankOverviewModel" TSort="RankSortField" DefaultSortField="RankSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -70,6 +71,19 @@
     <EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
 </MDialog>
 @code {
+    private static readonly IReadOnlyDictionary<string, RankSortField> _sortFields = new Dictionary<string, RankSortField>
+    {
+        [nameof(RankOverviewModel.CSS)] = RankSortField.CSS,
+        [nameof(RankOverviewModel.Count)] = RankSortField.Count,
+        [nameof(RankOverviewModel.CreateTime)] = RankSortField.CreateTime,
+        [nameof(RankOverviewModel.Id)] = RankSortField.Id,
+        [nameof(RankOverviewModel.Image)] = RankSortField.Image,
+        [nameof(RankOverviewModel.LastEditTime)] = RankSortField.LastEditTime,
+        [nameof(RankOverviewModel.Name)] = RankSortField.Name,
+        [nameof(RankOverviewModel.Priority)] = RankSortField.Priority,
+        [nameof(RankOverviewModel.Type)] = RankSortField.Type,
+    };
+
     private string _baseUrl = "api/ranks/ListRanks";
     private string _name = "头衔";
 
@@ -92,7 +106,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<RankOverviewModel> dataTableCard;
+    DataTableCard<RankOverviewModel, RankSortField> dataTableCard;
 
     EditCard editCard;
     private bool _editDialog;

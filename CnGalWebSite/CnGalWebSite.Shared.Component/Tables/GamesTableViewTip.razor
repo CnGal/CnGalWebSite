@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject IEventService _eventService
 
 <MDCard>
-    <DataTableCard TModel="BasicInforTableModel" Headers="_headers" ApiUrl="@(_baseUrl)" SortByItem="@nameof(BasicInforTableModel.RealId)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <DataTableCard TModel="BasicInforTableModel" TSort="BasicInforSortField" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" DefaultSortField="BasicInforSortField.RealId" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
         <ButtonContent>
             <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton OnQueryAsync="@(async ()=>await dataTableCard?.QueryAllAsync())" Name="游戏" Class="me-4" />
         </ButtonContent>
@@ -27,6 +28,24 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, BasicInforSortField> _sortFields = new Dictionary<string, BasicInforSortField>
+    {
+        [nameof(BasicInforTableModel.Engine)] = BasicInforSortField.Engine,
+        [nameof(BasicInforTableModel.GameNickname)] = BasicInforSortField.GameNickname,
+        [nameof(BasicInforTableModel.GamePlatforms)] = BasicInforSortField.GamePlatforms,
+        [nameof(BasicInforTableModel.IssueMethod)] = BasicInforSortField.IssueMethod,
+        [nameof(BasicInforTableModel.IssueTime)] = BasicInforSortField.IssueTime,
+        [nameof(BasicInforTableModel.Name)] = BasicInforSortField.Name,
+        [nameof(BasicInforTableModel.OfficialWebsite)] = BasicInforSortField.OfficialWebsite,
+        [nameof(BasicInforTableModel.Original)] = BasicInforSortField.Original,
+        [nameof(BasicInforTableModel.ProductionGroup)] = BasicInforSortField.ProductionGroup,
+        [nameof(BasicInforTableModel.Publisher)] = BasicInforSortField.Publisher,
+        [nameof(BasicInforTableModel.QQgroupGame)] = BasicInforSortField.QQgroupGame,
+        [nameof(BasicInforTableModel.RealId)] = BasicInforSortField.RealId,
+        [nameof(BasicInforTableModel.SteamId)] = BasicInforSortField.SteamId,
+        [nameof(BasicInforTableModel.Tags)] = BasicInforSortField.Tags,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -58,7 +77,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<BasicInforTableModel> dataTableCard;
+    DataTableCard<BasicInforTableModel, BasicInforSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

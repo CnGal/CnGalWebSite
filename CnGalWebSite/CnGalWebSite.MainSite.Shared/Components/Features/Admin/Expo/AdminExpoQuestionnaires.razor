@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @inject IAdminQueryService AdminQueryService
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
@@ -7,10 +8,10 @@
 
 @* ─── 问卷列表 ─── *@
 
-<CgDataTable TItem="QuestionnaireOverviewModel"
+<CgDataTable TItem="QuestionnaireOverviewModel" TSort="QuestionnaireSortField"
              Title="问卷列表"
              OnServerQuery="OnQueryAsync"
-             DefaultSortField="Id"
+             DefaultSortField="QuestionnaireSortField.Id"
              DefaultSortDesc="true"
              @ref="_table">
     <ToolbarContent>
@@ -20,9 +21,9 @@
         </CgButton>
     </ToolbarContent>
     <ChildContent>
-        <CgDataTableColumn TItem="QuestionnaireOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="QuestionnaireOverviewModel" Title="名称" Field="DisplayName" Sortable="false" />
-        <CgDataTableColumn TItem="QuestionnaireOverviewModel" Title="状态" Sortable="false" Width="80px">
+        <CgDataTableColumn TItem="QuestionnaireOverviewModel" TSort="QuestionnaireSortField" Title="Id" SortField="QuestionnaireSortField.Id" Value="item => item.Id" Width="80px" />
+        <CgDataTableColumn TItem="QuestionnaireOverviewModel" TSort="QuestionnaireSortField" Title="名称" SortField="QuestionnaireSortField.DisplayName" Value="item => item.DisplayName" Sortable="false" />
+        <CgDataTableColumn TItem="QuestionnaireOverviewModel" TSort="QuestionnaireSortField" Title="状态" Sortable="false" Width="80px">
             <ChildContent Context="item">
                 @switch (item.Status)
                 {
@@ -44,15 +45,15 @@
                 }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="QuestionnaireOverviewModel" Title="回答数" Field="ResponseCount" Width="80px" />
-        <CgDataTableColumn TItem="QuestionnaireOverviewModel" Title="优先级" Field="Priority" Width="80px" />
-        <CgDataTableColumn TItem="QuestionnaireOverviewModel" Title="隐藏" Field="IsHidden">
+        <CgDataTableColumn TItem="QuestionnaireOverviewModel" TSort="QuestionnaireSortField" Title="回答数" SortField="QuestionnaireSortField.ResponseCount" Value="item => item.ResponseCount" Width="80px" />
+        <CgDataTableColumn TItem="QuestionnaireOverviewModel" TSort="QuestionnaireSortField" Title="优先级" SortField="QuestionnaireSortField.Priority" Value="item => item.Priority" Width="80px" />
+        <CgDataTableColumn TItem="QuestionnaireOverviewModel" TSort="QuestionnaireSortField" Title="隐藏" SortField="QuestionnaireSortField.IsHidden" Value="item => item.IsHidden">
             <ChildContent Context="item">
                 @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
                 else { <span class="admin-badge admin-badge--visible">可见</span> }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="QuestionnaireOverviewModel" Title="操作" Sortable="false" Width="160px">
+        <CgDataTableColumn TItem="QuestionnaireOverviewModel" TSort="QuestionnaireSortField" Title="操作" Sortable="false" Width="160px">
             <ChildContent Context="item">
                 <div class="admin-actions">
                     <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
@@ -197,7 +198,7 @@
 </CgModal>
 
 @code {
-    private CgDataTable<QuestionnaireOverviewModel>? _table;
+    private CgDataTable<QuestionnaireOverviewModel, QuestionnaireSortField>? _table;
     private bool _showModal;
     private bool _isNew;
     private EditQuestionnaireModel? _editModel;
@@ -206,9 +207,9 @@
     private bool _showResponses;
     private UserResponseListModel? _responsesModel;
 
-    private async Task<CgDataTableResult<QuestionnaireOverviewModel>> OnQueryAsync(CgDataTableRequest request)
+    private async Task<CgDataTableResult<QuestionnaireOverviewModel>> OnQueryAsync(CgDataTableRequest<QuestionnaireSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetQuestionnairesAsync(parameter, CancellationToken.None);
         return result.Success && result.Data is not null ? new CgDataTableResult<QuestionnaireOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<QuestionnaireOverviewModel>([], 0);
     }

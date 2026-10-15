@@ -1,8 +1,9 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService _popupService
 @inject NavigationManager NavigationManager
 
-<CnGalWebSite.Components.DataTables.DataTableCard TModel="ExpoPrizeOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" @ref="dataTableCard" ShowAddButton="false">
+<CnGalWebSite.Components.DataTables.DataTableCard TModel="ExpoPrizeOverviewModel" TSort="ExpoPrizeSortField" DefaultSortField="ExpoPrizeSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" @ref="dataTableCard" ShowAddButton="false">
     <ItemColContent>
         @if (context.Header.Value == nameof(ExpoPrizeOverviewModel.DrawTime))
         {
@@ -31,6 +32,15 @@
 </CnGalWebSite.Components.DataTables.DataTableCard>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, ExpoPrizeSortField> _sortFields = new Dictionary<string, ExpoPrizeSortField>
+    {
+        [nameof(ExpoPrizeOverviewModel.AwardName)] = ExpoPrizeSortField.AwardName,
+        [nameof(ExpoPrizeOverviewModel.Content)] = ExpoPrizeSortField.Content,
+        [nameof(ExpoPrizeOverviewModel.DrawTime)] = ExpoPrizeSortField.DrawTime,
+        [nameof(ExpoPrizeOverviewModel.Id)] = ExpoPrizeSortField.Id,
+        [nameof(ExpoPrizeOverviewModel.UserId)] = ExpoPrizeSortField.UserId,
+    };
+
     private string _baseUrl = "api/expo/listprize";
     private string _name = "奖品";
 
@@ -48,7 +58,7 @@
         new (){ Text= "抽奖时间", Value= nameof(ExpoPrizeOverviewModel.DrawTime), Sortable=false}
     };
 
-    CnGalWebSite.Components.DataTables.DataTableCard<ExpoPrizeOverviewModel> dataTableCard;
+    CnGalWebSite.Components.DataTables.DataTableCard<ExpoPrizeOverviewModel, ExpoPrizeSortField> dataTableCard;
 
     protected override void OnInitialized()
     {

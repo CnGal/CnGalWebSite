@@ -1,11 +1,12 @@
-﻿@page "/admin/liststallinformationtypes"
+@using CnGalWebSite.ProjectSite.Models.Sorting
+@page "/admin/liststallinformationtypes"
 
 @inject IHttpService _httpService
 @inject IPopupService PopupService
 <CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="创作接稿附加信息类型版块" />
 
 <MDCard>
-    <DataTableCard TModel="StallInformationTypeOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <DataTableCard TModel="StallInformationTypeOverviewModel" TSort="ProjectStallInformationTypeSortField" DefaultSortField="ProjectStallInformationTypeSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -52,6 +53,17 @@
 </MDialog>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, ProjectStallInformationTypeSortField> _sortFields = new Dictionary<string, ProjectStallInformationTypeSortField>
+    {
+        [nameof(StallInformationTypeOverviewModel.Description)] = ProjectStallInformationTypeSortField.Description,
+        [nameof(StallInformationTypeOverviewModel.Hide)] = ProjectStallInformationTypeSortField.Hide,
+        [nameof(StallInformationTypeOverviewModel.HideInfoCard)] = ProjectStallInformationTypeSortField.HideInfoCard,
+        [nameof(StallInformationTypeOverviewModel.Icon)] = ProjectStallInformationTypeSortField.Icon,
+        [nameof(StallInformationTypeOverviewModel.Id)] = ProjectStallInformationTypeSortField.Id,
+        [nameof(StallInformationTypeOverviewModel.Name)] = ProjectStallInformationTypeSortField.Name,
+        [nameof(StallInformationTypeOverviewModel.Priority)] = ProjectStallInformationTypeSortField.Priority,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -79,7 +91,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<StallInformationTypeOverviewModel> dataTableCard;
+    DataTableCard<StallInformationTypeOverviewModel, ProjectStallInformationTypeSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

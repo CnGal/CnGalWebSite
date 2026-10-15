@@ -1,8 +1,9 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 
 <MDCard>
-    <DataTableCard TModel="EntryInformationTypeOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <DataTableCard TModel="EntryInformationTypeOverviewModel" TSort="EntryInformationTypeSortField" DefaultSortField="EntryInformationTypeSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -37,6 +38,15 @@
 </MDialog>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, EntryInformationTypeSortField> _sortFields = new Dictionary<string, EntryInformationTypeSortField>
+    {
+        [nameof(EntryInformationTypeOverviewModel.Description)] = EntryInformationTypeSortField.Description,
+        [nameof(EntryInformationTypeOverviewModel.Icon)] = EntryInformationTypeSortField.Icon,
+        [nameof(EntryInformationTypeOverviewModel.Id)] = EntryInformationTypeSortField.Id,
+        [nameof(EntryInformationTypeOverviewModel.IsHidden)] = EntryInformationTypeSortField.IsHidden,
+        [nameof(EntryInformationTypeOverviewModel.Name)] = EntryInformationTypeSortField.Name,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -62,7 +72,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<EntryInformationTypeOverviewModel> dataTableCard;
+    DataTableCard<EntryInformationTypeOverviewModel, EntryInformationTypeSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
@@ -135,10 +135,11 @@ public sealed class HomeQueryService(
         return SdkResult<HomeSummaryViewModel>.Ok(model);
     }
 
-    public async Task<SdkResult<SearchViewModel>> SearchAsync(string queryString,
+    public async Task<SdkResult<SearchViewModel>> SearchAsync(CnGalWebSite.DataModel.Application.Search.Dtos.SearchInputModel request,
         CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"main-site:search:{queryString}";
+        var queryString = request.ToQueryParameterString();
+        var cacheKey = $"main-site:typed-sort-v1:search:{queryString}";
         if (memoryCache.TryGetValue(cacheKey, out SearchViewModel? cached) && cached is not null)
         {
             return SdkResult<SearchViewModel>.Ok(cached);

@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.ProjectSite.Models.Sorting;
+using CnGalWebSite.Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,6 +26,33 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
     [ApiController]
     public class ProjectController : ControllerBase
     {
+        private static readonly SortMap<Project, ProjectProjectSortField> ListSorting =
+            new SortMap<Project, ProjectProjectSortField>(ProjectProjectSortField.Id, ProjectProjectSortField.Id)
+            .Add(ProjectProjectSortField.Id, s => s.Id)
+            .Add(ProjectProjectSortField.CreateTime, s => s.CreateTime)
+            .Add(ProjectProjectSortField.EndTime, s => s.EndTime)
+            .Add(ProjectProjectSortField.Name, s => s.Name)
+            .Add(ProjectProjectSortField.UserId, s => s.CreateUserId)
+            .Add(ProjectProjectSortField.UserName, s => s.CreateUser.UserName)
+            .Add(ProjectProjectSortField.Hide, s => s.Hide)
+            .Add(ProjectProjectSortField.Priority, s => s.Priority);
+
+        private static readonly SortMap<ProjectPosition, ProjectProjectPositionSortField> ListPositionsSorting =
+            new SortMap<ProjectPosition, ProjectProjectPositionSortField>(ProjectProjectPositionSortField.Id, ProjectProjectPositionSortField.Id)
+            .Add(ProjectProjectPositionSortField.Id, s => s.Id)
+            .Add(ProjectProjectPositionSortField.CreateTime, s => s.CreateTime)
+            .Add(ProjectProjectPositionSortField.DeadLine, s => s.DeadLine)
+            .Add(ProjectProjectPositionSortField.Description, s => s.Description)
+            .Add(ProjectProjectPositionSortField.PositionType, s => s.PositionType)
+            .Add(ProjectProjectPositionSortField.PositionTypeName, s => s.PositionTypeName)
+            .Add(ProjectProjectPositionSortField.Type, s => s.Type)
+            .Add(ProjectProjectPositionSortField.ProjectId, s => s.ProjectId)
+            .Add(ProjectProjectPositionSortField.ProjectName, s => s.Project.Name)
+            .Add(ProjectProjectPositionSortField.Hide, s => s.Hide)
+            .Add(ProjectProjectPositionSortField.Priority, s => s.Priority)
+            .Add(ProjectProjectPositionSortField.Tags, s => s.Tags);
+
+
         private readonly IRepository<Project, long> _projectRepository;
         private readonly IRepository<ProjectPosition, long> _projectPositionRepository;
         private readonly IRepository<ProjectPositionUser, long> _projectPositionUserRepository;
@@ -285,12 +313,12 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<ProjectOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<ProjectOverviewModel, ProjectProjectSortField>> List(QueryParameterModel<ProjectProjectSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Project, long>(_projectRepository.GetAll().AsSingleQuery().Include(s => s.CreateUser), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.CreateUser.UserName.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Project, ProjectProjectSortField>(_projectRepository.GetAll().AsSingleQuery().Include(s => s.CreateUser), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.CreateUser.UserName.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<ProjectOverviewModel>
+            return new QueryResultModel<ProjectOverviewModel, ProjectProjectSortField>
             {
                 Items = await items.Select(s => new ProjectOverviewModel
                 {
@@ -366,12 +394,12 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<ProjectPositionOverviewModel>> ListPositions(QueryParameterModel model)
+        public async Task<QueryResultModel<ProjectPositionOverviewModel, ProjectProjectPositionSortField>> ListPositions(QueryParameterModel<ProjectProjectPositionSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<ProjectPosition, long>(_projectPositionRepository.GetAll().AsSingleQuery().Include(s => s.Project), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Description.Contains(model.SearchText) || s.Project.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<ProjectPosition, ProjectProjectPositionSortField>(_projectPositionRepository.GetAll().AsSingleQuery().Include(s => s.Project), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Description.Contains(model.SearchText) || s.Project.Name.Contains(model.SearchText)), ListPositionsSorting);
 
-            return new QueryResultModel<ProjectPositionOverviewModel>
+            return new QueryResultModel<ProjectPositionOverviewModel, ProjectProjectPositionSortField>
             {
                 Items = await items.Select(s => new ProjectPositionOverviewModel
                 {

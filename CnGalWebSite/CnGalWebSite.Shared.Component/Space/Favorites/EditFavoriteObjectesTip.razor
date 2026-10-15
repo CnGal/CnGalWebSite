@@ -1,10 +1,11 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 
 @inject NavigationManager NavigationManager
 @inject IPopupService PopupService
 
 <MDCard>
-    <DataTableCard TModel="FavoriteObjectOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+Id)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <DataTableCard TModel="FavoriteObjectOverviewModel" TSort="FavoriteObjectSortField" DefaultSortField="FavoriteObjectSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl+Id)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -34,6 +35,13 @@
 
 <MoveFavoriteFolderTip Id="Id" OnMoved="@( () => { dataTableCard.GetDataFromApi(); })" @ref="moveFavoriteFolderTip" />
 @code {
+    private static readonly IReadOnlyDictionary<string, FavoriteObjectSortField> _sortFields = new Dictionary<string, FavoriteObjectSortField>
+    {
+        [nameof(FavoriteObjectOverviewModel.CreateTime)] = FavoriteObjectSortField.CreateTime,
+        [nameof(FavoriteObjectOverviewModel.Id)] = FavoriteObjectSortField.Id,
+        [nameof(FavoriteObjectOverviewModel.Type)] = FavoriteObjectSortField.Type,
+    };
+
     [Parameter]
     public long Id { get; set; }
 
@@ -56,7 +64,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<FavoriteObjectOverviewModel> dataTableCard;
+    DataTableCard<FavoriteObjectOverviewModel, FavoriteObjectSortField> dataTableCard;
     MoveFavoriteFolderTip moveFavoriteFolderTip;
 
 

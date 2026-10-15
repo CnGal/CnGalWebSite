@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -33,6 +34,18 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/peripheries/[action]")]
     public class PeripheriesAPIController : ControllerBase
     {
+        private static readonly SortMap<Periphery, PeripherySortField> ListSorting =
+            new SortMap<Periphery, PeripherySortField>(PeripherySortField.Id, PeripherySortField.Id)
+            .Add(PeripherySortField.Id, s => s.Id)
+            .Add(PeripherySortField.Name, s => s.Name)
+            .Add(PeripherySortField.IsHidden, s => s.IsHidden)
+            .Add(PeripherySortField.Priority, s => s.Priority)
+            .Add(PeripherySortField.LastEditTime, s => s.LastEditTime)
+            .Add(PeripherySortField.CanComment, s => s.CanComment ?? true)
+            .Add(PeripherySortField.Type, s => s.Type)
+            .Add(PeripherySortField.Category, s => s.Category);
+
+
         
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Examine, long> _examineRepository;
@@ -1099,12 +1112,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<PeripheryOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<PeripheryOverviewModel, PeripherySortField>> List(QueryParameterModel<PeripherySortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Periphery, long>(_peripheryRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Periphery, PeripherySortField>(_peripheryRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<PeripheryOverviewModel>
+            return new QueryResultModel<PeripheryOverviewModel, PeripherySortField>
             {
                 Items = await items.Select(s => new PeripheryOverviewModel
                 {

@@ -1,4 +1,5 @@
-﻿
+using CnGalWebSite.DataModel.Sorting;
+
 
 using CnGalWebSite.APIServer.Application.Articles.Dtos;
 
@@ -18,7 +19,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
     {
         Task<PagedResultDto<Article>> GetPaginatedResult(GetArticleInput input);
 
-        Task<PagedResultDto<ArticleInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input);
+        Task<PagedResultDto<ArticleInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput<ArticleSortField> input);
 
         void UpdateArticleDataMain(Article article, ExamineMain examine);
         void UpdateArticleDataMain(Article article, ArticleMain_1_0 examine);

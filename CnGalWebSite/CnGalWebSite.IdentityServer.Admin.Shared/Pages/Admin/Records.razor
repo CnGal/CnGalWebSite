@@ -1,4 +1,5 @@
-﻿@page "/admin/records"
+@using CnGalWebSite.IdentityServer.Models.Sorting
+@page "/admin/records"
 
 @attribute [Authorize(Roles = "Admin")]
 
@@ -7,7 +8,7 @@
 
 @using CnGalWebSite.IdentityServer.Models.ViewModels.Roles
 
-<DataTableCard TModel="OperationRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" ShowAddButton="false">
+<DataTableCard TModel="OperationRecordOverviewModel" TSort="IdentityOperationRecordSortField" DefaultSortField="IdentityOperationRecordSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" ShowAddButton="false">
     <ItemColContent>
         @if (context.Header.Value == "type")
         {
@@ -21,6 +22,15 @@
 </DataTableCard>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, IdentityOperationRecordSortField> _sortFields = new Dictionary<string, IdentityOperationRecordSortField>
+    {
+        ["type"] = IdentityOperationRecordSortField.Type,
+        [nameof(OperationRecordOverviewModel.Id)] = IdentityOperationRecordSortField.Id,
+        [nameof(OperationRecordOverviewModel.Ip)] = IdentityOperationRecordSortField.Ip,
+        [nameof(OperationRecordOverviewModel.Time)] = IdentityOperationRecordSortField.Time,
+        [nameof(OperationRecordOverviewModel.UserName)] = IdentityOperationRecordSortField.UserName,
+    };
+
     private string _baseUrl = "api/records/";
     private string _name = "操作记录";
 
@@ -40,7 +50,6 @@
 
     IEnumerable<string> _roles;
 
-    DataTableCard<RoleOverviewModel> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/liststoreinfo"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -21,10 +22,10 @@
         商店信息管理
     </h1>
 
-    <CgDataTable TItem="StoreInfoOverviewModel"
+    <CgDataTable TItem="StoreInfoOverviewModel" TSort="StoreInfoSortField"
                  Title="商店信息列表"
                  OnServerQuery="OnQueryAsync"
-                 DefaultSortField="Id"
+                 DefaultSortField="StoreInfoSortField.Id"
                  DefaultSortDesc="true"
                  @ref="_table">
         <ToolbarContent>
@@ -34,25 +35,25 @@
             </CgButton>
         </ToolbarContent>
         <ChildContent>
-            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="ID" Field="Id" Width="80px" />
-            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="名称" Field="Name" />
-            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="平台" Field="PlatformName" Width="100px" />
-            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="平台类型" Field="PlatformType" Width="100px">
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" TSort="StoreInfoSortField" Title="ID" SortField="StoreInfoSortField.Id" Value="item => item.Id" Width="80px" />
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" TSort="StoreInfoSortField" Title="名称" SortField="StoreInfoSortField.Name" Value="item => item.Name" />
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" TSort="StoreInfoSortField" Title="平台" SortField="StoreInfoSortField.PlatformName" Value="item => item.PlatformName" Width="100px" />
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" TSort="StoreInfoSortField" Title="平台类型" SortField="StoreInfoSortField.PlatformType" Value="item => item.PlatformType" Width="100px">
                 <ChildContent Context="item">
                     <span class="admin-badge">@item.PlatformType.GetDisplayName()</span>
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="状态" Field="State">
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" TSort="StoreInfoSortField" Title="状态" SortField="StoreInfoSortField.State" Value="item => item.State">
                 <ChildContent Context="item">
                     <span class="admin-badge admin-badge--info">@item.State.GetDisplayName()</span>
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="现价" Field="PriceNow" Width="80px">
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" TSort="StoreInfoSortField" Title="现价" SortField="StoreInfoSortField.PriceNow" Value="item => item.PriceNow" Width="80px">
                 <ChildContent Context="item">
                     @(item.PriceNow.HasValue ? $"¥{item.PriceNow:0.00}" : "—")
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="折扣" Field="CutNow" Width="80px">
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" TSort="StoreInfoSortField" Title="折扣" SortField="StoreInfoSortField.CutNow" Value="item => item.CutNow" Width="80px">
                 <ChildContent Context="item">
                     @if (item.CutNow.HasValue && item.CutNow > 0)
                     {
@@ -64,17 +65,17 @@
                     }
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="更新方式" Field="UpdateType" Width="100px">
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" TSort="StoreInfoSortField" Title="更新方式" SortField="StoreInfoSortField.UpdateType" Value="item => item.UpdateType" Width="100px">
                 <ChildContent Context="item">
                     <span class="admin-badge">@item.UpdateType.GetDisplayName()</span>
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="更新时间" Field="UpdateTime" Width="160px">
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" TSort="StoreInfoSortField" Title="更新时间" SortField="StoreInfoSortField.UpdateTime" Value="item => item.UpdateTime" Width="160px">
                 <ChildContent Context="item">
                     @item.UpdateTime.ToString("yyyy-MM-dd HH:mm")
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoOverviewModel" Title="操作" Sortable="false" Width="100px">
+            <CgDataTableColumn TItem="StoreInfoOverviewModel" TSort="StoreInfoSortField" Title="操作" Sortable="false" Width="100px">
                 <ChildContent Context="item">
                     <div class="admin-actions">
                         <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
@@ -160,21 +161,14 @@
 
 @code {
     private CancellationTokenSource? _cts;
-    private CgDataTable<StoreInfoOverviewModel>? _table;
+    private CgDataTable<StoreInfoOverviewModel, StoreInfoSortField>? _table;
     private bool _showEditModal;
     private bool _isNew;
     private StoreInfoEditModel? _editModel;
 
-    private async Task<CgDataTableResult<StoreInfoOverviewModel>> OnQueryAsync(CgDataTableRequest request)
+    private async Task<CgDataTableResult<StoreInfoOverviewModel>> OnQueryAsync(CgDataTableRequest<StoreInfoSortField> request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
+        var parameter = request.ToQueryParameter();
 
         var result = await QueryService.GetStoreInfoListAsync(parameter, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data != null)

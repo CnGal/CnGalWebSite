@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard Class="mb-4">
-    <DataTableCard TModel="AlmanacEntryEditModel" Headers="_headers" DataSource="Model" SortByItem="@nameof(AlmanacEntryEditModel.Priority)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard" Rounded
+    <DataTableCard TModel="AlmanacEntryEditModel" TSort="AlmanacEntrySortField" SortFields="_sortFields" LocalSorting="_localSorting" Headers="_headers" DataSource="Model" DefaultSortField="AlmanacEntrySortField.Priority" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard" Rounded
                    Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.EntryName!=null&&s.EntryName.Contains(dataTableCard._search))">
         <ItemColContent>
             @if (context.Header.Value == "actions")
@@ -57,6 +58,24 @@
     <EditCard Items="Model" OnEdited="OnEdited" @ref="editCard" Model="_editedItem" EntryGameItems="EntryGameItems" />
 </MDialog>
 @code {
+    private static readonly IReadOnlyDictionary<string, AlmanacEntrySortField> _sortFields = new Dictionary<string, AlmanacEntrySortField>
+    {
+        [nameof(AlmanacEntryEditModel.EntryName)] = AlmanacEntrySortField.EntryName,
+        [nameof(AlmanacEntryEditModel.Hide)] = AlmanacEntrySortField.Hide,
+        [nameof(AlmanacEntryEditModel.Id)] = AlmanacEntrySortField.Id,
+        [nameof(AlmanacEntryEditModel.Image)] = AlmanacEntrySortField.Image,
+        [nameof(AlmanacEntryEditModel.Priority)] = AlmanacEntrySortField.Priority,
+    };
+
+    private static readonly CnGalWebSite.Core.Services.Query.SortMap<AlmanacEntryEditModel, AlmanacEntrySortField> _localSorting =
+        new CnGalWebSite.Core.Services.Query.SortMap<AlmanacEntryEditModel, AlmanacEntrySortField>(AlmanacEntrySortField.Id, AlmanacEntrySortField.Id)
+        .Add(AlmanacEntrySortField.EntryId, item => item.EntryId)
+        .Add(AlmanacEntrySortField.EntryName, item => item.EntryName)
+        .Add(AlmanacEntrySortField.Hide, item => item.Hide)
+        .Add(AlmanacEntrySortField.Id, item => item.Id)
+        .Add(AlmanacEntrySortField.Image, item => item.Image)
+        .Add(AlmanacEntrySortField.Priority, item => item.Priority);
+
 
     [Parameter]
     public List<AlmanacEntryEditModel> Model { get; set; }
@@ -80,7 +99,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<AlmanacEntryEditModel> dataTableCard;
+    DataTableCard<AlmanacEntryEditModel, AlmanacEntrySortField> dataTableCard;
 
     EditCard editCard;
     private bool _editDialog;

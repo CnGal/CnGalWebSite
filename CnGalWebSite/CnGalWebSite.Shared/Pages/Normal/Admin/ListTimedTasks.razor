@@ -1,4 +1,5 @@
-﻿@page "/admin/listtimedtasks"
+@using CnGalWebSite.TimedTask.Models.Sorting
+@page "/admin/listtimedtasks"
 @attribute [Authorize(Roles = "Admin")]
 
 @inject IHttpService _httpService
@@ -8,7 +9,7 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="定时任务版块" />
 
 <MDCard>
-    <DataTableCard TModel="TimedTaskOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <DataTableCard TModel="TimedTaskOverviewModel" TSort="TimedTaskSortField" DefaultSortField="TimedTaskSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -77,6 +78,17 @@
     <CnGalWebSite.Shared.MasaComponent.PC.Admin.TimedTasks.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
 </MDialog>
 @code {
+    private static readonly IReadOnlyDictionary<string, TimedTaskSortField> _sortFields = new Dictionary<string, TimedTaskSortField>
+    {
+        [nameof(TimedTaskOverviewModel.ExecuteType)] = TimedTaskSortField.ExecuteType,
+        [nameof(TimedTaskOverviewModel.Id)] = TimedTaskSortField.Id,
+        [nameof(TimedTaskOverviewModel.IntervalTime)] = TimedTaskSortField.IntervalTime,
+        [nameof(TimedTaskOverviewModel.IsLastFail)] = TimedTaskSortField.IsLastFail,
+        [nameof(TimedTaskOverviewModel.LastExecutedTime)] = TimedTaskSortField.LastExecutedTime,
+        [nameof(TimedTaskOverviewModel.Parameter)] = TimedTaskSortField.Parameter,
+        [nameof(TimedTaskOverviewModel.Type)] = TimedTaskSortField.Type,
+    };
+
     private string _baseUrl =ToolHelper.TaskApiPath+ "api/timedtasks/List";
     private string _name = "定时任务";
 
@@ -97,7 +109,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<TimedTaskOverviewModel> dataTableCard;
+    DataTableCard<TimedTaskOverviewModel, TimedTaskSortField> dataTableCard;
 
     CnGalWebSite.Shared.MasaComponent.PC.Admin.TimedTasks.EditCard editCard;
     private bool _editDialog;

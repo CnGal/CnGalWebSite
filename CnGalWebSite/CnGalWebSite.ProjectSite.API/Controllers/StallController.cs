@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.ProjectSite.API.DataReositories;
+using CnGalWebSite.ProjectSite.Models.Sorting;
+using CnGalWebSite.ProjectSite.API.DataReositories;
 using CnGalWebSite.ProjectSite.API.Services.Users;
 using CnGalWebSite.ProjectSite.Models.DataModels;
 using CnGalWebSite.ProjectSite.Models.ViewModels.Stalls;
@@ -25,6 +26,29 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
     [ApiController]
     public class StallController : ControllerBase
     {
+        private static readonly SortMap<Stall, ProjectStallSortField> ListSorting =
+            new SortMap<Stall, ProjectStallSortField>(ProjectStallSortField.Id, ProjectStallSortField.Id)
+            .Add(ProjectStallSortField.Id, s => s.Id)
+            .Add(ProjectStallSortField.CreateTime, s => s.CreateTime)
+            .Add(ProjectStallSortField.EndTime, s => s.EndTime)
+            .Add(ProjectStallSortField.Name, s => s.Name)
+            .Add(ProjectStallSortField.UserId, s => s.CreateUserId)
+            .Add(ProjectStallSortField.UserName, s => s.CreateUser.UserName)
+            .Add(ProjectStallSortField.Price, s => s.Price)
+            .Add(ProjectStallSortField.Hide, s => s.Hide)
+            .Add(ProjectStallSortField.Priority, s => s.Priority);
+
+        private static readonly SortMap<StallInformationType, ProjectStallInformationTypeSortField> ListEntryInformationTypesSorting =
+            new SortMap<StallInformationType, ProjectStallInformationTypeSortField>(ProjectStallInformationTypeSortField.Id, ProjectStallInformationTypeSortField.Id)
+            .Add(ProjectStallInformationTypeSortField.Icon, s => s.Icon)
+            .Add(ProjectStallInformationTypeSortField.Hide, s => s.Hide)
+            .Add(ProjectStallInformationTypeSortField.Name, s => s.Name)
+            .Add(ProjectStallInformationTypeSortField.Description, s => s.Description)
+            .Add(ProjectStallInformationTypeSortField.Id, s => s.Id)
+            .Add(ProjectStallInformationTypeSortField.HideInfoCard, s => s.HideInfoCard)
+            .Add(ProjectStallInformationTypeSortField.Priority, s => s.Priority);
+
+
         private readonly IRepository<Stall, long> _stallRepository;
         private readonly IRepository<StallInformationType, long> _stallInformationTypeRepository;
         private readonly IRepository<StallUser, long> _stallUserRepository;
@@ -359,12 +383,12 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<StallOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<StallOverviewModel, ProjectStallSortField>> List(QueryParameterModel<ProjectStallSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Stall, long>(_stallRepository.GetAll().AsSingleQuery().Include(s => s.CreateUser), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.CreateUser.UserName.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Stall, ProjectStallSortField>(_stallRepository.GetAll().AsSingleQuery().Include(s => s.CreateUser), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.CreateUser.UserName.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<StallOverviewModel>
+            return new QueryResultModel<StallOverviewModel, ProjectStallSortField>
             {
                 Items = await items.Select(s => new StallOverviewModel
                 {
@@ -438,12 +462,12 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
         /// <returns></returns>
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<StallInformationTypeOverviewModel>> ListEntryInformationTypes(QueryParameterModel model)
+        public async Task<QueryResultModel<StallInformationTypeOverviewModel, ProjectStallInformationTypeSortField>> ListEntryInformationTypes(QueryParameterModel<ProjectStallInformationTypeSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<StallInformationType, long>(_stallInformationTypeRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.Description.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<StallInformationType, ProjectStallInformationTypeSortField>(_stallInformationTypeRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.Description.Contains(model.SearchText)), ListEntryInformationTypesSorting);
 
-            return new QueryResultModel<StallInformationTypeOverviewModel>
+            return new QueryResultModel<StallInformationTypeOverviewModel, ProjectStallInformationTypeSortField>
             {
                 Items = await items.Select(s => new StallInformationTypeOverviewModel
                 {

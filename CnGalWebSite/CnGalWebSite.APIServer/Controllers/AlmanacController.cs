@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.Application.Articles;
+using CnGalWebSite.DataModel.Sorting;
+using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Users;
@@ -21,6 +22,17 @@ namespace CnGalWebSite.APIServer.Controllers
     [ApiController]
     public class AlmanacController : ControllerBase
     {
+        private static readonly SortMap<Almanac, AlmanacSortField> ListSorting =
+            new SortMap<Almanac, AlmanacSortField>(AlmanacSortField.Id, AlmanacSortField.Id)
+            .Add(AlmanacSortField.Id, s => s.Id)
+            .Add(AlmanacSortField.UpdateTime, s => s.UpdateTime)
+            .Add(AlmanacSortField.Name, s => s.Name)
+            .Add(AlmanacSortField.ArticleCount, s => s.Articles.Count)
+            .Add(AlmanacSortField.BriefIntroduction, s => s.BriefIntroduction)
+            .Add(AlmanacSortField.EntryCount, s => s.Entries.Count)
+            .Add(AlmanacSortField.Year, s => s.Year);
+
+
         public readonly IRepository<Almanac, long> _almanacRepository;
         public readonly IRepository<AlmanacArticle, long> _almanacArticleRepository;
         public readonly IRepository<AlmanacEntry, long> _almanacEntryRepository;
@@ -290,12 +302,12 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<AlmanacOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<AlmanacOverviewModel, AlmanacSortField>> List(QueryParameterModel<AlmanacSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Almanac, long>(_almanacRepository.GetAll().AsSingleQuery().Include(s => s.Articles).Include(s => s.Entries), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Almanac, AlmanacSortField>(_almanacRepository.GetAll().AsSingleQuery().Include(s => s.Articles).Include(s => s.Entries), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<AlmanacOverviewModel>
+            return new QueryResultModel<AlmanacOverviewModel, AlmanacSortField>
             {
                 Items = await items.Select(s => new AlmanacOverviewModel
                 {

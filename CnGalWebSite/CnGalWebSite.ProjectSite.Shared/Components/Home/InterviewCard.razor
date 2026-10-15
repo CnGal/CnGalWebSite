@@ -1,4 +1,4 @@
-﻿@using CnGalWebSite.ProjectSite.Shared.Models.Home
+@using CnGalWebSite.ProjectSite.Shared.Models.Home
 
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
@@ -38,7 +38,7 @@
     {
         try
         {
-            Model = await _httpService.GetAsync<SearchViewModel>(_configuration["CnGalAPI"] + "api/home/Search?Types=Interview&Sort=PubulishTime%20desc");
+            Model = await _httpService.GetAsync<SearchViewModel>(_configuration["CnGalAPI"] + "api/home/Search?Types=Interview&SortField=PublishTime&SortDirection=Descending");
             StateHasChanged();
         }
         catch (Exception ex)

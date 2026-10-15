@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/listlotteries"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -17,34 +18,34 @@
         抽奖管理
     </h1>
 
-    <CgDataTable TItem="LotteryOverviewModel" Title="抽奖列表" OnServerQuery="OnServerQuery" DefaultSortField="Id" DefaultSortDesc="true" @ref="_dataTable">
-        <CgDataTableColumn TItem="LotteryOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="LotteryOverviewModel" Title="名称" Field="Name">
+    <CgDataTable TItem="LotteryOverviewModel" TSort="LotterySortField" Title="抽奖列表" OnServerQuery="OnServerQuery" DefaultSortField="LotterySortField.Id" DefaultSortDesc="true" @ref="_dataTable">
+        <CgDataTableColumn TItem="LotteryOverviewModel" TSort="LotterySortField" Title="Id" SortField="LotterySortField.Id" Value="item => item.Id" Width="80px" />
+        <CgDataTableColumn TItem="LotteryOverviewModel" TSort="LotterySortField" Title="名称" SortField="LotterySortField.Name" Value="item => item.Name">
             <ChildContent Context="item"><a class="admin-cell-name" href="@($"/lotteries/index/{item.Id}")">@item.Name</a></ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="LotteryOverviewModel" Title="抽奖时间" Field="LotteryTime">
+        <CgDataTableColumn TItem="LotteryOverviewModel" TSort="LotterySortField" Title="抽奖时间" SortField="LotterySortField.LotteryTime" Value="item => item.LotteryTime">
             <ChildContent Context="item">@(item.LotteryTime.Year == 1 ? "无" : item.LotteryTime.ToString("yyyy-MM-dd HH:mm"))</ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="LotteryOverviewModel" Title="开始时间" Field="BeginTime">
+        <CgDataTableColumn TItem="LotteryOverviewModel" TSort="LotterySortField" Title="开始时间" SortField="LotterySortField.BeginTime" Value="item => item.BeginTime">
             <ChildContent Context="item">@item.BeginTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="LotteryOverviewModel" Title="结束时间" Field="EndTime">
+        <CgDataTableColumn TItem="LotteryOverviewModel" TSort="LotterySortField" Title="结束时间" SortField="LotterySortField.EndTime" Value="item => item.EndTime">
             <ChildContent Context="item">@item.EndTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="LotteryOverviewModel" Title="优先级" Field="Priority" Width="80px" />
-        <CgDataTableColumn TItem="LotteryOverviewModel" Title="已结束" Field="IsEnd">
+        <CgDataTableColumn TItem="LotteryOverviewModel" TSort="LotterySortField" Title="优先级" SortField="LotterySortField.Priority" Value="item => item.Priority" Width="80px" />
+        <CgDataTableColumn TItem="LotteryOverviewModel" TSort="LotterySortField" Title="已结束" SortField="LotterySortField.IsEnd" Value="item => item.IsEnd">
             <ChildContent Context="item">
                 @if (item.IsEnd) { <span class="admin-badge admin-badge--hidden">已结束</span> }
                 else { <span class="admin-badge admin-badge--visible">进行中</span> }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="LotteryOverviewModel" Title="状态" Field="IsHidden">
+        <CgDataTableColumn TItem="LotteryOverviewModel" TSort="LotterySortField" Title="状态" SortField="LotterySortField.IsHidden" Value="item => item.IsHidden">
             <ChildContent Context="item">
                 @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
                 else { <span class="admin-badge admin-badge--visible">可见</span> }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="LotteryOverviewModel" Title="操作" Sortable="false" Width="150px">
+        <CgDataTableColumn TItem="LotteryOverviewModel" TSort="LotterySortField" Title="操作" Sortable="false" Width="150px">
             <ChildContent Context="item">
                 <div class="admin-actions">
                     <button class="admin-action-btn admin-action-btn--up" title="增加权重" @onclick="() => EditPriority(item, true)"><CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" /></button>
@@ -61,11 +62,11 @@
 
 @code {
     private CancellationTokenSource? _cts = new();
-    private CgDataTable<LotteryOverviewModel>? _dataTable;
+    private CgDataTable<LotteryOverviewModel, LotterySortField>? _dataTable;
 
-    private async Task<CgDataTableResult<LotteryOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    private async Task<CgDataTableResult<LotteryOverviewModel>> OnServerQuery(CgDataTableRequest<LotterySortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetLotteriesAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<LotteryOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<LotteryOverviewModel>([], 0);
     }

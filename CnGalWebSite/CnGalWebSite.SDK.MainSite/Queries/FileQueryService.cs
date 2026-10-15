@@ -1,3 +1,4 @@
+using CnGalWebSite.DrawingBed.Models.Sorting;
 using System.Net.Http.Json;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DrawingBed.Models.ViewModels;
@@ -13,8 +14,8 @@ public sealed class FileQueryService(HttpClient httpClient, ILogger<FileQuerySer
 {
     protected override ILogger Logger => logger;
 
-    public async Task<SdkResult<QueryResultModel<UploadRecordOverviewModel>>> GetUploadRecordsAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+    public async Task<SdkResult<QueryResultModel<UploadRecordOverviewModel, DrawingBedUploadRecordSortField>>> GetUploadRecordsAsync(
+        QueryParameterModel<DrawingBedUploadRecordSortField> parameter, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -28,22 +29,22 @@ public sealed class FileQueryService(HttpClient httpClient, ILogger<FileQuerySer
                 Logger.LogError(
                     "上传记录列表接口请求失败。StatusCode={StatusCode}; BaseAddress={BaseAddress}; ResponseBody={ResponseBody}",
                     (int)response.StatusCode, HttpClient.BaseAddress, TrimForLog(body));
-                return SdkResult<QueryResultModel<UploadRecordOverviewModel>>.Fail(
+                return SdkResult<QueryResultModel<UploadRecordOverviewModel, DrawingBedUploadRecordSortField>>.Fail(
                     "FILES_HTTP_FAILED",
                     $"获取上传记录列表失败（HTTP {(int)response.StatusCode}）");
             }
 
             try
             {
-                var result = Deserialize<QueryResultModel<UploadRecordOverviewModel>>(body);
-                return SdkResult<QueryResultModel<UploadRecordOverviewModel>>.Ok(result!);
+                var result = Deserialize<QueryResultModel<UploadRecordOverviewModel, DrawingBedUploadRecordSortField>>(body);
+                return SdkResult<QueryResultModel<UploadRecordOverviewModel, DrawingBedUploadRecordSortField>>.Ok(result!);
             }
             catch (System.Text.Json.JsonException ex)
             {
                 Logger.LogError(ex,
                     "上传记录列表反序列化失败。BaseAddress={BaseAddress}; ResponseBody={ResponseBody}",
                     HttpClient.BaseAddress, TrimForLog(body));
-                return SdkResult<QueryResultModel<UploadRecordOverviewModel>>.Fail(
+                return SdkResult<QueryResultModel<UploadRecordOverviewModel, DrawingBedUploadRecordSortField>>.Fail(
                     "FILES_DESERIALIZE_FAILED",
                     "上传记录列表数据格式不兼容");
             }
@@ -53,7 +54,7 @@ public sealed class FileQueryService(HttpClient httpClient, ILogger<FileQuerySer
             Logger.LogError(ex,
                 "获取上传记录列表异常。BaseAddress={BaseAddress}",
                 HttpClient.BaseAddress);
-            return SdkResult<QueryResultModel<UploadRecordOverviewModel>>.Fail(
+            return SdkResult<QueryResultModel<UploadRecordOverviewModel, DrawingBedUploadRecordSortField>>.Fail(
                 "FILES_EXCEPTION",
                 "请求上传记录列表时发生异常");
         }

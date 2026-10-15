@@ -1,3 +1,4 @@
+using CnGalWebSite.TimedTask.Models.Sorting;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
@@ -14,8 +15,8 @@ public sealed class TimedTaskService(HttpClient httpClient, ILogger<TimedTaskSer
 
     // ─── 查询 ───
 
-    public async Task<SdkResult<QueryResultModel<TimedTaskOverviewModel>>> GetTimedTasksAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
+    public async Task<SdkResult<QueryResultModel<TimedTaskOverviewModel, TimedTaskSortField>>> GetTimedTasksAsync(
+        QueryParameterModel<TimedTaskSortField> parameter, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -27,18 +28,18 @@ public sealed class TimedTaskService(HttpClient httpClient, ILogger<TimedTaskSer
                 Logger.LogError(
                     "定时任务列表接口请求失败。StatusCode={StatusCode}; BaseAddress={BaseAddress}",
                     (int)response.StatusCode, HttpClient.BaseAddress);
-                return SdkResult<QueryResultModel<TimedTaskOverviewModel>>.Fail(
+                return SdkResult<QueryResultModel<TimedTaskOverviewModel, TimedTaskSortField>>.Fail(
                     "TIMED_TASKS_HTTP_FAILED",
                     $"获取定时任务列表失败（HTTP {(int)response.StatusCode}）");
             }
 
-            var result = await ReadResponseAsync<QueryResultModel<TimedTaskOverviewModel>>(response, cancellationToken);
-            return SdkResult<QueryResultModel<TimedTaskOverviewModel>>.Ok(result!);
+            var result = await ReadResponseAsync<QueryResultModel<TimedTaskOverviewModel, TimedTaskSortField>>(response, cancellationToken);
+            return SdkResult<QueryResultModel<TimedTaskOverviewModel, TimedTaskSortField>>.Ok(result!);
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "获取定时任务列表异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<QueryResultModel<TimedTaskOverviewModel>>.Fail(
+            return SdkResult<QueryResultModel<TimedTaskOverviewModel, TimedTaskSortField>>.Fail(
                 "TIMED_TASKS_EXCEPTION",
                 "请求定时任务列表时发生异常");
         }

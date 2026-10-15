@@ -1,4 +1,5 @@
-﻿
+using CnGalWebSite.DataModel.Sorting;
+
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
 
@@ -9,13 +10,20 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.Favorites
 {
     public class FavoriteObjectService : IFavoriteObjectService
     {
+        private static readonly CnGalWebSite.Core.Services.Query.SortMap<FavoriteObject, FavoriteObjectSortField> ListSorting =
+            new CnGalWebSite.Core.Services.Query.SortMap<FavoriteObject, FavoriteObjectSortField>(FavoriteObjectSortField.Id, FavoriteObjectSortField.Id)
+            .Add(FavoriteObjectSortField.Id, s => s.Id)
+            .Add(FavoriteObjectSortField.CreateTime, s => s.CreateTime)
+            .Add(FavoriteObjectSortField.ObjectId, s => s.Entry != null ? s.Entry.Id : s.Article != null ? s.Article.Id : s.Periphery != null ? s.Periphery.Id: s.Video != null ? s.Video.Id:s.Tag != null ? s.Tag.Id: 0)
+            .Add(FavoriteObjectSortField.ObjectName, s => s.Entry != null ? s.Entry.Name : s.Article != null ? s.Article.Name : s.Periphery != null ? s.Periphery.Name : s.Video != null ? s.Video.Name : s.Tag != null ? s.Tag.Name : null)
+            .Add(FavoriteObjectSortField.Type, s => s.Type);
+
         private readonly IRepository<FavoriteObject, long> _favoriteObjectRepository;
         private readonly IRepository<Entry, long> _entryRepository;
         private readonly IRepository<Article, long> _articleRepository;
@@ -30,7 +38,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
             _entryRepository = entryRepository;
         }
 
-        public async Task<PagedResultDto<FavoriteObjectAloneViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input, long favoriteFolderId)
+        public async Task<PagedResultDto<FavoriteObjectAloneViewModel>> GetPaginatedResult(PagedSortedAndFilterInput<FavoriteObjectSortField> input, long favoriteFolderId)
         {
             IQueryable<FavoriteObject> query;
             //筛选
@@ -48,7 +56,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
             var count = query.Count();
             //根据需求进行排序，然后进行分页逻辑的计算
             //这个特殊方法中当前页数解释为起始位
-            query = query.OrderBy(input.Sorting).Skip((input.CurrentPage-1)* input.MaxResultCount).Take(input.MaxResultCount);
+            query = ListSorting.Apply(query, input.Sorts).Skip((input.CurrentPage-1)* input.MaxResultCount).Take(input.MaxResultCount);
 
             //将结果转换为List集合 加载到内存中
             List<FavoriteObject> models = null;
@@ -114,7 +122,7 @@ namespace CnGalWebSite.APIServer.Application.Favorites
                 MaxResultCount = input.MaxResultCount,
                 Data = dtos,
                 FilterText = input.FilterText,
-                Sorting = input.Sorting,
+
                 ScreeningConditions = input.ScreeningConditions
             };
             return dtos_;

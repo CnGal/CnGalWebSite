@@ -1,4 +1,5 @@
-﻿@page "/tables"
+@using CnGalWebSite.DataModel.Sorting
+@page "/tables"
 @page "/webs/tables"
 @page "/data"
 
@@ -106,62 +107,62 @@
 @switch (tabKey)
 {
     case "games":
-        <CgDataTable TItem="BasicInforTableModel"
+        <CgDataTable TItem="BasicInforTableModel" TSort="BasicInforSortField"
                      Title="游戏列表"
                      OnServerQuery="QueryGamesAsync"
-                     DefaultSortField="RealId"
+                     DefaultSortField="BasicInforSortField.RealId"
                      DefaultSortDesc="true"
                      DefaultPageSize="10">
-            <CgDataTableColumn TItem="BasicInforTableModel" Title="Id" Field="RealId" Width="80px">
+            <CgDataTableColumn TItem="BasicInforTableModel" TSort="BasicInforSortField" Title="Id" SortField="BasicInforSortField.RealId" Value="item => item.RealId" Width="80px">
                 <a href="/entries/index/@context.RealId" class="table-summary__link">@context.RealId</a>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="BasicInforTableModel" Title="名称" Field="Name">
+            <CgDataTableColumn TItem="BasicInforTableModel" TSort="BasicInforSortField" Title="名称" SortField="BasicInforSortField.Name" Value="item => item.Name">
                 <a href="/entries/index/@context.RealId" class="table-summary__link">@context.Name</a>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="BasicInforTableModel" Title="发行时间" Field="IssueTime">
+            <CgDataTableColumn TItem="BasicInforTableModel" TSort="BasicInforSortField" Title="发行时间" SortField="BasicInforSortField.IssueTime" Value="item => item.IssueTime">
                 @(context.IssueTime?.ToString("yyyy-MM-dd") ?? "—")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="BasicInforTableModel" Title="原作" Field="Original"/>
-            <CgDataTableColumn TItem="BasicInforTableModel" Title="制作组" Field="ProductionGroup"/>
-            <CgDataTableColumn TItem="BasicInforTableModel" Title="游戏平台" Field="GamePlatforms" Sortable="false"/>
-            <CgDataTableColumn TItem="BasicInforTableModel" Title="引擎" Field="Engine"/>
-            <CgDataTableColumn TItem="BasicInforTableModel" Title="发行商" Field="Publisher"/>
-            <CgDataTableColumn TItem="BasicInforTableModel" Title="别称" Field="GameNickname" Sortable="false"/>
-            <CgDataTableColumn TItem="BasicInforTableModel" Title="标签" Field="Tags" Sortable="false"/>
-            <CgDataTableColumn TItem="BasicInforTableModel" Title="发行方式" Field="IssueMethod"/>
-            <CgDataTableColumn TItem="BasicInforTableModel" Title="官网" Field="OfficialWebsite" Sortable="false">
+            <CgDataTableColumn TItem="BasicInforTableModel" TSort="BasicInforSortField" Title="原作" SortField="BasicInforSortField.Original" Value="item => item.Original"/>
+            <CgDataTableColumn TItem="BasicInforTableModel" TSort="BasicInforSortField" Title="制作组" SortField="BasicInforSortField.ProductionGroup" Value="item => item.ProductionGroup"/>
+            <CgDataTableColumn TItem="BasicInforTableModel" TSort="BasicInforSortField" Title="游戏平台" SortField="BasicInforSortField.GamePlatforms" Value="item => item.GamePlatforms" Sortable="false"/>
+            <CgDataTableColumn TItem="BasicInforTableModel" TSort="BasicInforSortField" Title="引擎" SortField="BasicInforSortField.Engine" Value="item => item.Engine"/>
+            <CgDataTableColumn TItem="BasicInforTableModel" TSort="BasicInforSortField" Title="发行商" SortField="BasicInforSortField.Publisher" Value="item => item.Publisher"/>
+            <CgDataTableColumn TItem="BasicInforTableModel" TSort="BasicInforSortField" Title="别称" SortField="BasicInforSortField.GameNickname" Value="item => item.GameNickname" Sortable="false"/>
+            <CgDataTableColumn TItem="BasicInforTableModel" TSort="BasicInforSortField" Title="标签" SortField="BasicInforSortField.Tags" Value="item => item.Tags" Sortable="false"/>
+            <CgDataTableColumn TItem="BasicInforTableModel" TSort="BasicInforSortField" Title="发行方式" SortField="BasicInforSortField.IssueMethod" Value="item => item.IssueMethod"/>
+            <CgDataTableColumn TItem="BasicInforTableModel" TSort="BasicInforSortField" Title="官网" SortField="BasicInforSortField.OfficialWebsite" Value="item => item.OfficialWebsite" Sortable="false">
                 @if (!string.IsNullOrWhiteSpace(context.OfficialWebsite))
                 {
                     <a href="@context.OfficialWebsite" target="_blank" rel="noopener" class="table-summary__link">链接</a>
                 }
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="BasicInforTableModel" Title="SteamId" Field="SteamId"/>
-            <CgDataTableColumn TItem="BasicInforTableModel" Title="QQ群" Field="QQgroupGame" Sortable="false"/>
+            <CgDataTableColumn TItem="BasicInforTableModel" TSort="BasicInforSortField" Title="SteamId" SortField="BasicInforSortField.SteamId" Value="item => item.SteamId"/>
+            <CgDataTableColumn TItem="BasicInforTableModel" TSort="BasicInforSortField" Title="QQ群" SortField="BasicInforSortField.QQgroupGame" Value="item => item.QQgroupGame" Sortable="false"/>
         </CgDataTable>
         break;
 
     case "groups":
-        <CgDataTable TItem="GroupInforTableModel"
+        <CgDataTable TItem="GroupInforTableModel" TSort="GroupInforSortField"
                      Title="制作组列表"
                      OnServerQuery="QueryGroupsAsync"
-                     DefaultSortField="RealId"
+                     DefaultSortField="GroupInforSortField.RealId"
                      DefaultSortDesc="true"
                      DefaultPageSize="10">
-            <CgDataTableColumn TItem="GroupInforTableModel" Title="Id" Field="RealId" Width="80px">
+            <CgDataTableColumn TItem="GroupInforTableModel" TSort="GroupInforSortField" Title="Id" SortField="GroupInforSortField.RealId" Value="item => item.RealId" Width="80px">
                 <a href="/entries/index/@context.RealId" class="table-summary__link">@context.RealId</a>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GroupInforTableModel" Title="名称" Field="Name">
+            <CgDataTableColumn TItem="GroupInforTableModel" TSort="GroupInforSortField" Title="名称" SortField="GroupInforSortField.Name" Value="item => item.Name">
                 <a href="/entries/index/@context.RealId" class="table-summary__link">@context.Name</a>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GroupInforTableModel" Title="QQ群" Field="QQgroupGroup" Sortable="false"/>
-            <CgDataTableColumn TItem="GroupInforTableModel" Title="别称" Field="AnotherNameGroup" Sortable="false"/>
-            <CgDataTableColumn TItem="GroupInforTableModel" Title="B站" Field="Bilibili" Sortable="false">
+            <CgDataTableColumn TItem="GroupInforTableModel" TSort="GroupInforSortField" Title="QQ群" SortField="GroupInforSortField.QQgroupGroup" Value="item => item.QQgroupGroup" Sortable="false"/>
+            <CgDataTableColumn TItem="GroupInforTableModel" TSort="GroupInforSortField" Title="别称" SortField="GroupInforSortField.AnotherNameGroup" Value="item => item.AnotherNameGroup" Sortable="false"/>
+            <CgDataTableColumn TItem="GroupInforTableModel" TSort="GroupInforSortField" Title="B站" SortField="GroupInforSortField.Bilibili" Value="item => item.Bilibili" Sortable="false">
                 @if (!string.IsNullOrWhiteSpace(context.Bilibili))
                 {
                     <a href="@context.Bilibili" target="_blank" rel="noopener" class="table-summary__link">链接</a>
                 }
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GroupInforTableModel" Title="微博" Field="MicroBlog" Sortable="false">
+            <CgDataTableColumn TItem="GroupInforTableModel" TSort="GroupInforSortField" Title="微博" SortField="GroupInforSortField.MicroBlog" Value="item => item.MicroBlog" Sortable="false">
                 @if (!string.IsNullOrWhiteSpace(context.MicroBlog))
                 {
                     <a href="@context.MicroBlog" target="_blank" rel="noopener" class="table-summary__link">链接</a>
@@ -171,43 +172,43 @@
         break;
 
     case "staffs":
-        <CgDataTable TItem="StaffInforTableModel"
+        <CgDataTable TItem="StaffInforTableModel" TSort="StaffInforSortField"
                      Title="STAFF列表"
                      OnServerQuery="QueryStaffsAsync"
-                     DefaultSortField="RealId"
+                     DefaultSortField="StaffInforSortField.RealId"
                      DefaultSortDesc="true"
                      DefaultPageSize="10">
-            <CgDataTableColumn TItem="StaffInforTableModel" Title="Id" Field="RealId" Width="80px"/>
-            <CgDataTableColumn TItem="StaffInforTableModel" Title="游戏名称" Field="GameName"/>
-            <CgDataTableColumn TItem="StaffInforTableModel" Title="分组" Field="Subcategory"/>
-            <CgDataTableColumn TItem="StaffInforTableModel" Title="官方职位" Field="PositionOfficial"/>
-            <CgDataTableColumn TItem="StaffInforTableModel" Title="官方称呼" Field="NicknameOfficial"/>
-            <CgDataTableColumn TItem="StaffInforTableModel" Title="通用职位" Field="PositionGeneral"/>
-            <CgDataTableColumn TItem="StaffInforTableModel" Title="隶属组织" Field="SubordinateOrganization"/>
+            <CgDataTableColumn TItem="StaffInforTableModel" TSort="StaffInforSortField" Title="Id" SortField="StaffInforSortField.RealId" Value="item => item.RealId" Width="80px"/>
+            <CgDataTableColumn TItem="StaffInforTableModel" TSort="StaffInforSortField" Title="游戏名称" SortField="StaffInforSortField.GameName" Value="item => item.GameName"/>
+            <CgDataTableColumn TItem="StaffInforTableModel" TSort="StaffInforSortField" Title="分组" SortField="StaffInforSortField.Subcategory" Value="item => item.Subcategory"/>
+            <CgDataTableColumn TItem="StaffInforTableModel" TSort="StaffInforSortField" Title="官方职位" SortField="StaffInforSortField.PositionOfficial" Value="item => item.PositionOfficial"/>
+            <CgDataTableColumn TItem="StaffInforTableModel" TSort="StaffInforSortField" Title="官方称呼" SortField="StaffInforSortField.NicknameOfficial" Value="item => item.NicknameOfficial"/>
+            <CgDataTableColumn TItem="StaffInforTableModel" TSort="StaffInforSortField" Title="通用职位" SortField="StaffInforSortField.PositionGeneral" Value="item => item.PositionGeneral"/>
+            <CgDataTableColumn TItem="StaffInforTableModel" TSort="StaffInforSortField" Title="隶属组织" SortField="StaffInforSortField.SubordinateOrganization" Value="item => item.SubordinateOrganization"/>
         </CgDataTable>
         break;
 
     case "makers":
-        <CgDataTable TItem="MakerInforTableModel"
+        <CgDataTable TItem="MakerInforTableModel" TSort="MakerInforSortField"
                      Title="制作人列表"
                      OnServerQuery="QueryMakersAsync"
-                     DefaultSortField="RealId"
+                     DefaultSortField="MakerInforSortField.RealId"
                      DefaultSortDesc="true"
                      DefaultPageSize="10">
-            <CgDataTableColumn TItem="MakerInforTableModel" Title="Id" Field="RealId" Width="80px">
+            <CgDataTableColumn TItem="MakerInforTableModel" TSort="MakerInforSortField" Title="Id" SortField="MakerInforSortField.RealId" Value="item => item.RealId" Width="80px">
                 <a href="/entries/index/@context.RealId" class="table-summary__link">@context.RealId</a>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="MakerInforTableModel" Title="名称" Field="Name">
+            <CgDataTableColumn TItem="MakerInforTableModel" TSort="MakerInforSortField" Title="名称" SortField="MakerInforSortField.Name" Value="item => item.Name">
                 <a href="/entries/index/@context.RealId" class="table-summary__link">@context.Name</a>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="MakerInforTableModel" Title="别称" Field="AnotherName" Sortable="false"/>
-            <CgDataTableColumn TItem="MakerInforTableModel" Title="B站" Field="Bilibili" Sortable="false">
+            <CgDataTableColumn TItem="MakerInforTableModel" TSort="MakerInforSortField" Title="别称" SortField="MakerInforSortField.AnotherName" Value="item => item.AnotherName" Sortable="false"/>
+            <CgDataTableColumn TItem="MakerInforTableModel" TSort="MakerInforSortField" Title="B站" SortField="MakerInforSortField.Bilibili" Value="item => item.Bilibili" Sortable="false">
                 @if (!string.IsNullOrWhiteSpace(context.Bilibili))
                 {
                     <a href="@context.Bilibili" target="_blank" rel="noopener" class="table-summary__link">链接</a>
                 }
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="MakerInforTableModel" Title="微博" Field="MicroBlog" Sortable="false">
+            <CgDataTableColumn TItem="MakerInforTableModel" TSort="MakerInforSortField" Title="微博" SortField="MakerInforSortField.MicroBlog" Value="item => item.MicroBlog" Sortable="false">
                 @if (!string.IsNullOrWhiteSpace(context.MicroBlog))
                 {
                     <a href="@context.MicroBlog" target="_blank" rel="noopener" class="table-summary__link">链接</a>
@@ -217,83 +218,83 @@
         break;
 
     case "roles":
-        <CgDataTable TItem="RoleInforTableModel"
+        <CgDataTable TItem="RoleInforTableModel" TSort="RoleInforSortField"
                      Title="角色列表"
                      OnServerQuery="QueryRolesAsync"
-                     DefaultSortField="RealId"
+                     DefaultSortField="RoleInforSortField.RealId"
                      DefaultSortDesc="true"
                      DefaultPageSize="10">
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="Id" Field="RealId" Width="80px">
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="Id" SortField="RoleInforSortField.RealId" Value="item => item.RealId" Width="80px">
                 <a href="/entries/index/@context.RealId" class="table-summary__link">@context.RealId</a>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="名称" Field="Name">
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="名称" SortField="RoleInforSortField.Name" Value="item => item.Name">
                 <a href="/entries/index/@context.RealId" class="table-summary__link">@context.Name</a>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="声优" Field="CV"/>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="别称" Field="AnotherNameRole" Sortable="false"/>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="性别" Field="Gender">
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="声优" SortField="RoleInforSortField.CV" Value="item => item.CV"/>
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="别称" SortField="RoleInforSortField.AnotherNameRole" Value="item => item.AnotherNameRole" Sortable="false"/>
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="性别" SortField="RoleInforSortField.Gender" Value="item => item.Gender">
                 @context.Gender.GetDisplayName()
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="身材数据" Field="FigureData" Sortable="false"/>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="身材(主观)" Field="FigureSubjective" Sortable="false"/>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="生日" Field="Birthday">
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="身材数据" SortField="RoleInforSortField.FigureData" Value="item => item.FigureData" Sortable="false"/>
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="身材(主观)" SortField="RoleInforSortField.FigureSubjective" Value="item => item.FigureSubjective" Sortable="false"/>
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="生日" SortField="RoleInforSortField.Birthday" Value="item => item.Birthday">
                 @(context.Birthday?.ToString("MM-dd") ?? "—")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="发色" Field="Haircolor" Sortable="false"/>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="瞳色" Field="Pupilcolor" Sortable="false"/>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="服饰" Field="ClothesAccessories" Sortable="false"/>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="性格" Field="Character" Sortable="false"/>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="角色身份" Field="RoleIdentity" Sortable="false"/>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="血型" Field="BloodType" Sortable="false"/>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="身高" Field="RoleHeight" Sortable="false"/>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="兴趣" Field="RoleTaste" Sortable="false"/>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="年龄" Field="RoleAge" Sortable="false"/>
-            <CgDataTableColumn TItem="RoleInforTableModel" Title="登场游戏" Field="GameName"/>
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="发色" SortField="RoleInforSortField.Haircolor" Value="item => item.Haircolor" Sortable="false"/>
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="瞳色" SortField="RoleInforSortField.Pupilcolor" Value="item => item.Pupilcolor" Sortable="false"/>
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="服饰" SortField="RoleInforSortField.ClothesAccessories" Value="item => item.ClothesAccessories" Sortable="false"/>
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="性格" SortField="RoleInforSortField.Character" Value="item => item.Character" Sortable="false"/>
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="角色身份" SortField="RoleInforSortField.RoleIdentity" Value="item => item.RoleIdentity" Sortable="false"/>
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="血型" SortField="RoleInforSortField.BloodType" Value="item => item.BloodType" Sortable="false"/>
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="身高" SortField="RoleInforSortField.RoleHeight" Value="item => item.RoleHeight" Sortable="false"/>
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="兴趣" SortField="RoleInforSortField.RoleTaste" Value="item => item.RoleTaste" Sortable="false"/>
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="年龄" SortField="RoleInforSortField.RoleAge" Value="item => item.RoleAge" Sortable="false"/>
+            <CgDataTableColumn TItem="RoleInforTableModel" TSort="RoleInforSortField" Title="登场游戏" SortField="RoleInforSortField.GameName" Value="item => item.GameName"/>
         </CgDataTable>
         break;
 
     case "prices":
-        <CgDataTable TItem="StoreInfoViewModel"
+        <CgDataTable TItem="StoreInfoViewModel" TSort="StoreTableSortField"
                      Title="游戏价格列表"
                      OnServerQuery="QueryStoreInfoAsync"
-                     DefaultSortField="Name"
+                     DefaultSortField="StoreTableSortField.Name"
                      DefaultSortDesc="false"
                      DefaultPageSize="10">
-            <CgDataTableColumn TItem="StoreInfoViewModel" Title="名称" Field="Name"/>
-            <CgDataTableColumn TItem="StoreInfoViewModel" Title="平台" Field="PlatformName"/>
-            <CgDataTableColumn TItem="StoreInfoViewModel" Title="状态" Field="State"/>
-            <CgDataTableColumn TItem="StoreInfoViewModel" Title="币种" Field="CurrencyCode"/>
-            <CgDataTableColumn TItem="StoreInfoViewModel" Title="原价" Field="OriginalPrice">
+            <CgDataTableColumn TItem="StoreInfoViewModel" TSort="StoreTableSortField" Title="名称" SortField="StoreTableSortField.Name" Value="item => item.Name"/>
+            <CgDataTableColumn TItem="StoreInfoViewModel" TSort="StoreTableSortField" Title="平台" SortField="StoreTableSortField.PlatformName" Value="item => item.PlatformName"/>
+            <CgDataTableColumn TItem="StoreInfoViewModel" TSort="StoreTableSortField" Title="状态" SortField="StoreTableSortField.State" Value="item => item.State"/>
+            <CgDataTableColumn TItem="StoreInfoViewModel" TSort="StoreTableSortField" Title="币种" SortField="StoreTableSortField.CurrencyCode" Value="item => item.CurrencyCode"/>
+            <CgDataTableColumn TItem="StoreInfoViewModel" TSort="StoreTableSortField" Title="原价" SortField="StoreTableSortField.OriginalPrice" Value="item => item.OriginalPrice">
                 @FormatPrice(context.OriginalPrice)
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoViewModel" Title="现价" Field="PriceNow">
+            <CgDataTableColumn TItem="StoreInfoViewModel" TSort="StoreTableSortField" Title="现价" SortField="StoreTableSortField.PriceNow" Value="item => item.PriceNow">
                 @FormatPrice(context.PriceNow)
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoViewModel" Title="折扣" Field="CutNow">
+            <CgDataTableColumn TItem="StoreInfoViewModel" TSort="StoreTableSortField" Title="折扣" SortField="StoreTableSortField.CutNow" Value="item => item.CutNow">
                 @FormatPercent(context.CutNow)
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoViewModel" Title="史低" Field="PriceLowest">
+            <CgDataTableColumn TItem="StoreInfoViewModel" TSort="StoreTableSortField" Title="史低" SortField="StoreTableSortField.PriceLowest" Value="item => item.PriceLowest">
                 @FormatPrice(context.PriceLowest)
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoViewModel" Title="最高折扣" Field="CutLowest">
+            <CgDataTableColumn TItem="StoreInfoViewModel" TSort="StoreTableSortField" Title="最高折扣" SortField="StoreTableSortField.CutLowest" Value="item => item.CutLowest">
                 @FormatPercent(context.CutLowest)
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoViewModel" Title="游玩时长" Field="PlayTime">
+            <CgDataTableColumn TItem="StoreInfoViewModel" TSort="StoreTableSortField" Title="游玩时长" SortField="StoreTableSortField.PlayTime" Value="item => item.PlayTime">
                 @(context.PlayTime.HasValue ? $"{context.PlayTime.Value} 分钟" : "—")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoViewModel" Title="评测数" Field="EvaluationCount">
+            <CgDataTableColumn TItem="StoreInfoViewModel" TSort="StoreTableSortField" Title="评测数" SortField="StoreTableSortField.EvaluationCount" Value="item => item.EvaluationCount">
                 @(context.EvaluationCount?.ToString("N0") ?? "—")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoViewModel" Title="好评率" Field="RecommendationRate">
+            <CgDataTableColumn TItem="StoreInfoViewModel" TSort="StoreTableSortField" Title="好评率" SortField="StoreTableSortField.RecommendationRate" Value="item => item.RecommendationRate">
                 @FormatPercent(context.RecommendationRate)
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoViewModel" Title="拥有人数(下限)" Field="EstimationOwnersMin">
+            <CgDataTableColumn TItem="StoreInfoViewModel" TSort="StoreTableSortField" Title="拥有人数(下限)" SortField="StoreTableSortField.EstimationOwnersMin" Value="item => item.EstimationOwnersMin">
                 @(context.EstimationOwnersMin?.ToString("N0") ?? "—")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoViewModel" Title="拥有人数(上限)" Field="EstimationOwnersMax">
+            <CgDataTableColumn TItem="StoreInfoViewModel" TSort="StoreTableSortField" Title="拥有人数(上限)" SortField="StoreTableSortField.EstimationOwnersMax" Value="item => item.EstimationOwnersMax">
                 @(context.EstimationOwnersMax?.ToString("N0") ?? "—")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="StoreInfoViewModel" Title="链接" Field="Link" Sortable="false">
+            <CgDataTableColumn TItem="StoreInfoViewModel" TSort="StoreTableSortField" Title="链接" SortField="StoreTableSortField.Link" Value="item => item.Link" Sortable="false">
                 @if (!string.IsNullOrWhiteSpace(context.Link))
                 {
                     <a href="@context.Link" target="_blank" rel="noopener" class="table-summary__link">查看</a>
@@ -303,58 +304,58 @@
         break;
 
     case "scores":
-        <CgDataTable TItem="GameScoreTableModel"
+        <CgDataTable TItem="GameScoreTableModel" TSort="GameScoreSortField"
                      Title="评分列表"
                      OnServerQuery="QueryGameScoresAsync"
-                     DefaultSortField="AllTotalSocre"
+                     DefaultSortField="GameScoreSortField.AllTotalSocre"
                      DefaultSortDesc="true"
                      DefaultPageSize="10">
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="Id" Field="GameId" Width="80px">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="Id" SortField="GameScoreSortField.GameId" Value="item => item.GameId" Width="80px">
                 <a href="/entries/index/@context.GameId" class="table-summary__link">@context.GameId</a>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="游戏名" Field="GameName">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="游戏名" SortField="GameScoreSortField.GameName" Value="item => item.GameName">
                 <a href="/entries/index/@context.GameId" class="table-summary__link">@context.GameName</a>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="配音" Field="AllCVSocre">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="配音" SortField="GameScoreSortField.AllCVSocre" Value="item => item.AllCVSocre">
                 @context.AllCVSocre.ToString("F1")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="程序" Field="AllSystemSocre">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="程序" SortField="GameScoreSortField.AllSystemSocre" Value="item => item.AllSystemSocre">
                 @context.AllSystemSocre.ToString("F1")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="演出" Field="AllShowSocre">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="演出" SortField="GameScoreSortField.AllShowSocre" Value="item => item.AllShowSocre">
                 @context.AllShowSocre.ToString("F1")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="美术" Field="AllPaintSocre">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="美术" SortField="GameScoreSortField.AllPaintSocre" Value="item => item.AllPaintSocre">
                 @context.AllPaintSocre.ToString("F1")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="剧本" Field="AllScriptSocre">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="剧本" SortField="GameScoreSortField.AllScriptSocre" Value="item => item.AllScriptSocre">
                 @context.AllScriptSocre.ToString("F1")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="音乐" Field="AllMusicSocre">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="音乐" SortField="GameScoreSortField.AllMusicSocre" Value="item => item.AllMusicSocre">
                 @context.AllMusicSocre.ToString("F1")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="总分(所有)" Field="AllTotalSocre">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="总分(所有)" SortField="GameScoreSortField.AllTotalSocre" Value="item => item.AllTotalSocre">
                 <strong>@context.AllTotalSocre.ToString("F1")</strong>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="配音" Field="FilterCVSocre">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="配音" SortField="GameScoreSortField.FilterCVSocre" Value="item => item.FilterCVSocre">
                 @context.FilterCVSocre.ToString("F1")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="程序" Field="FilterSystemSocre">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="程序" SortField="GameScoreSortField.FilterSystemSocre" Value="item => item.FilterSystemSocre">
                 @context.FilterSystemSocre.ToString("F1")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="演出" Field="FilterShowSocre">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="演出" SortField="GameScoreSortField.FilterShowSocre" Value="item => item.FilterShowSocre">
                 @context.FilterShowSocre.ToString("F1")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="美术" Field="FilterPaintSocre">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="美术" SortField="GameScoreSortField.FilterPaintSocre" Value="item => item.FilterPaintSocre">
                 @context.FilterPaintSocre.ToString("F1")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="剧本" Field="FilterScriptSocre">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="剧本" SortField="GameScoreSortField.FilterScriptSocre" Value="item => item.FilterScriptSocre">
                 @context.FilterScriptSocre.ToString("F1")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="音乐" Field="FilterMusicSocre">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="音乐" SortField="GameScoreSortField.FilterMusicSocre" Value="item => item.FilterMusicSocre">
                 @context.FilterMusicSocre.ToString("F1")
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="GameScoreTableModel" Title="总分(过滤)" Field="FilterTotalSocre">
+            <CgDataTableColumn TItem="GameScoreTableModel" TSort="GameScoreSortField" Title="总分(过滤)" SortField="GameScoreSortField.FilterTotalSocre" Value="item => item.FilterTotalSocre">
                 <strong>@context.FilterTotalSocre.ToString("F1")</strong>
             </CgDataTableColumn>
         </CgDataTable>
@@ -411,55 +412,48 @@
 
     // ── 服务端查询委托 ──
 
-    private async Task<CgDataTableResult<BasicInforTableModel>> QueryGamesAsync(CgDataTableRequest req)
+    private async Task<CgDataTableResult<BasicInforTableModel>> QueryGamesAsync(CgDataTableRequest<BasicInforSortField> req)
     {
         return await ExecuteQueryAsync(req, (model, ct) => TableService.QueryGamesAsync(model, ct));
     }
 
-    private async Task<CgDataTableResult<GroupInforTableModel>> QueryGroupsAsync(CgDataTableRequest req)
+    private async Task<CgDataTableResult<GroupInforTableModel>> QueryGroupsAsync(CgDataTableRequest<GroupInforSortField> req)
     {
         return await ExecuteQueryAsync(req, (model, ct) => TableService.QueryGroupsAsync(model, ct));
     }
 
-    private async Task<CgDataTableResult<StaffInforTableModel>> QueryStaffsAsync(CgDataTableRequest req)
+    private async Task<CgDataTableResult<StaffInforTableModel>> QueryStaffsAsync(CgDataTableRequest<StaffInforSortField> req)
     {
         return await ExecuteQueryAsync(req, (model, ct) => TableService.QueryStaffsAsync(model, ct));
     }
 
-    private async Task<CgDataTableResult<MakerInforTableModel>> QueryMakersAsync(CgDataTableRequest req)
+    private async Task<CgDataTableResult<MakerInforTableModel>> QueryMakersAsync(CgDataTableRequest<MakerInforSortField> req)
     {
         return await ExecuteQueryAsync(req, (model, ct) => TableService.QueryMakersAsync(model, ct));
     }
 
-    private async Task<CgDataTableResult<RoleInforTableModel>> QueryRolesAsync(CgDataTableRequest req)
+    private async Task<CgDataTableResult<RoleInforTableModel>> QueryRolesAsync(CgDataTableRequest<RoleInforSortField> req)
     {
         return await ExecuteQueryAsync(req, (model, ct) => TableService.QueryRolesAsync(model, ct));
     }
 
-    private async Task<CgDataTableResult<StoreInfoViewModel>> QueryStoreInfoAsync(CgDataTableRequest req)
+    private async Task<CgDataTableResult<StoreInfoViewModel>> QueryStoreInfoAsync(CgDataTableRequest<StoreTableSortField> req)
     {
         return await ExecuteQueryAsync(req, (model, ct) => TableService.QueryStoreInfoAsync(model, ct));
     }
 
-    private async Task<CgDataTableResult<GameScoreTableModel>> QueryGameScoresAsync(CgDataTableRequest req)
+    private async Task<CgDataTableResult<GameScoreTableModel>> QueryGameScoresAsync(CgDataTableRequest<GameScoreSortField> req)
     {
         return await ExecuteQueryAsync(req, (model, ct) => TableService.QueryGameScoresAsync(model, ct));
     }
 
     // ── 通用查询适配 ──
 
-    private async Task<CgDataTableResult<T>> ExecuteQueryAsync<T>(
-        CgDataTableRequest req,
-        Func<QueryParameterModel, CancellationToken, Task<SdkResult<QueryResultModel<T>>>> queryFunc) where T : class
+    private async Task<CgDataTableResult<T>> ExecuteQueryAsync<T, TSort>(
+        CgDataTableRequest<TSort> req,
+        Func<QueryParameterModel<TSort>, CancellationToken, Task<SdkResult<QueryResultModel<T, TSort>>>> queryFunc) where T : class where TSort : struct, Enum
     {
-        var model = new QueryParameterModel
-        {
-            Page = req.Page,
-            ItemsPerPage = req.PageSize,
-            SearchText = req.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrWhiteSpace(req.SortField) ? ["Id"] : [req.SortField],
-            SortDesc = [req.SortDesc],
-        };
+        var model = req.ToQueryParameter();
 
         var result = await queryFunc(model, _cts!.Token);
 
@@ -494,15 +488,6 @@
         try
         {
             var tabDef = _tabs.First(t => t.Key == _activeTab);
-            var allRequest = new QueryParameterModel
-            {
-                Page = 1,
-                ItemsPerPage = 99999,
-                SearchText = string.Empty,
-                SortBy = ["Id"],
-                SortDesc = [true],
-            };
-
             string content;
             string fileName;
             int count;
@@ -510,31 +495,31 @@
             switch (_activeTab)
             {
                 case "games":
-                    var games = await TableService.QueryGamesAsync(allRequest);
+                    var games = await TableService.QueryGamesAsync(new QueryParameterModel<BasicInforSortField> { Page = 1, ItemsPerPage = 99999 });
                     (content, count) = BuildExportContent(games, format);
                     break;
                 case "groups":
-                    var groups = await TableService.QueryGroupsAsync(allRequest);
+                    var groups = await TableService.QueryGroupsAsync(new QueryParameterModel<GroupInforSortField> { Page = 1, ItemsPerPage = 99999 });
                     (content, count) = BuildExportContent(groups, format);
                     break;
                 case "staffs":
-                    var staffs = await TableService.QueryStaffsAsync(allRequest);
+                    var staffs = await TableService.QueryStaffsAsync(new QueryParameterModel<StaffInforSortField> { Page = 1, ItemsPerPage = 99999 });
                     (content, count) = BuildExportContent(staffs, format);
                     break;
                 case "makers":
-                    var makers = await TableService.QueryMakersAsync(allRequest);
+                    var makers = await TableService.QueryMakersAsync(new QueryParameterModel<MakerInforSortField> { Page = 1, ItemsPerPage = 99999 });
                     (content, count) = BuildExportContent(makers, format);
                     break;
                 case "roles":
-                    var roles = await TableService.QueryRolesAsync(allRequest);
+                    var roles = await TableService.QueryRolesAsync(new QueryParameterModel<RoleInforSortField> { Page = 1, ItemsPerPage = 99999 });
                     (content, count) = BuildExportContent(roles, format);
                     break;
                 case "prices":
-                    var prices = await TableService.QueryStoreInfoAsync(allRequest);
+                    var prices = await TableService.QueryStoreInfoAsync(new QueryParameterModel<StoreTableSortField> { Page = 1, ItemsPerPage = 99999 });
                     (content, count) = BuildExportContent(prices, format);
                     break;
                 case "scores":
-                    var scores = await TableService.QueryGameScoresAsync(allRequest);
+                    var scores = await TableService.QueryGameScoresAsync(new QueryParameterModel<GameScoreSortField> { Page = 1, ItemsPerPage = 99999 });
                     (content, count) = BuildExportContent(scores, format);
                     break;
                 default:
@@ -556,8 +541,8 @@
         }
     }
 
-    private static (string Content, int Count) BuildExportContent<T>(
-        SdkResult<QueryResultModel<T>> result, string format) where T : class
+    private static (string Content, int Count) BuildExportContent<T, TSort>(
+        SdkResult<QueryResultModel<T, TSort>> result, string format) where T : class where TSort : struct, Enum
     {
         if (!result.Success || result.Data?.Items == null || !result.Data.Items.Any())
             return (string.Empty, 0);

@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/listmessages"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -16,34 +17,34 @@
         消息管理
     </h1>
 
-    <CgDataTable TItem="MessageOverviewModel"
+    <CgDataTable TItem="MessageOverviewModel" TSort="MessageSortField"
                  Title="消息列表"
                  OnServerQuery="OnServerQuery"
-                 DefaultSortField="Id"
+                 DefaultSortField="MessageSortField.Id"
                  DefaultSortDesc="true">
-        <CgDataTableColumn TItem="MessageOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="MessageOverviewModel" Title="类型" Field="Type">
+        <CgDataTableColumn TItem="MessageOverviewModel" TSort="MessageSortField" Title="Id" SortField="MessageSortField.Id" Value="item => item.Id" Width="80px" />
+        <CgDataTableColumn TItem="MessageOverviewModel" TSort="MessageSortField" Title="类型" SortField="MessageSortField.Type" Value="item => item.Type">
             <ChildContent Context="item">
                 <span class="admin-badge">@item.Type</span>
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="MessageOverviewModel" Title="发送时间" Field="PostTime">
+        <CgDataTableColumn TItem="MessageOverviewModel" TSort="MessageSortField" Title="发送时间" SortField="MessageSortField.PostTime" Value="item => item.PostTime">
             <ChildContent Context="item">@item.PostTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="MessageOverviewModel" Title="标题" Field="Title" />
-        <CgDataTableColumn TItem="MessageOverviewModel" Title="内容" Field="Text">
+        <CgDataTableColumn TItem="MessageOverviewModel" TSort="MessageSortField" Title="标题" SortField="MessageSortField.Title" Value="item => item.Title" />
+        <CgDataTableColumn TItem="MessageOverviewModel" TSort="MessageSortField" Title="内容" SortField="MessageSortField.Text" Value="item => item.Text">
             <ChildContent Context="item"><div class="admin-cell-text">@item.Text</div></ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="MessageOverviewModel" Title="用户" Field="UserName">
+        <CgDataTableColumn TItem="MessageOverviewModel" TSort="MessageSortField" Title="用户" SortField="MessageSortField.UserName" Value="item => item.UserName">
             <ChildContent Context="item"><span class="admin-cell-name">@item.UserName</span></ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="MessageOverviewModel" Title="已读" Field="IsReaded">
+        <CgDataTableColumn TItem="MessageOverviewModel" TSort="MessageSortField" Title="已读" SortField="MessageSortField.IsReaded" Value="item => item.IsReaded">
             <ChildContent Context="item">
                 @if (item.IsReaded) { <span class="admin-badge admin-badge--yes">已读</span> }
                 else { <span class="admin-badge admin-badge--no">未读</span> }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="MessageOverviewModel" Title="操作" Sortable="false" Width="50px">
+        <CgDataTableColumn TItem="MessageOverviewModel" TSort="MessageSortField" Title="操作" Sortable="false" Width="50px">
             <ChildContent Context="item">
                 <div class="admin-actions">
                     @if (!string.IsNullOrWhiteSpace(item.Link))
@@ -61,9 +62,9 @@
 
 @code {
     private CancellationTokenSource? _cts = new();
-    private async Task<CgDataTableResult<MessageOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    private async Task<CgDataTableResult<MessageOverviewModel>> OnServerQuery(CgDataTableRequest<MessageSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetMessagesAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<MessageOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<MessageOverviewModel>([], 0);
     }

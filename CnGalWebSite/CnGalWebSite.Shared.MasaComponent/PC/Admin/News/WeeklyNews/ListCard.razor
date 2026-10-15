@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="WeeklyNewsOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <DataTableCard TModel="WeeklyNewsOverviewModel" TSort="WeeklyNewsSortField" DefaultSortField="WeeklyNewsSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -50,6 +51,16 @@
 <EditWeeklyNewsTip @ref="editWeeklyNewsTip" OnRefreshTable="RefreshTable" />
 
 @code {
+    private static readonly IReadOnlyDictionary<string, WeeklyNewsSortField> _sortFields = new Dictionary<string, WeeklyNewsSortField>
+    {
+        [nameof(WeeklyNewsOverviewModel.BriefIntroduction)] = WeeklyNewsSortField.BriefIntroduction,
+        [nameof(WeeklyNewsOverviewModel.CreateTime)] = WeeklyNewsSortField.CreateTime,
+        [nameof(WeeklyNewsOverviewModel.Id)] = WeeklyNewsSortField.Id,
+        [nameof(WeeklyNewsOverviewModel.PublishTime)] = WeeklyNewsSortField.PublishTime,
+        [nameof(WeeklyNewsOverviewModel.State)] = WeeklyNewsSortField.State,
+        [nameof(WeeklyNewsOverviewModel.Title)] = WeeklyNewsSortField.Title,
+    };
+
     private string _baseUrl = "api/news/ListWeeklyNews";
     private string _name = "周报";
 
@@ -71,7 +82,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<WeeklyNewsOverviewModel> dataTableCard;
+    DataTableCard<WeeklyNewsOverviewModel, WeeklyNewsSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

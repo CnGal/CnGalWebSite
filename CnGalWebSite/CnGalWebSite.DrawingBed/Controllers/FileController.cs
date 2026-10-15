@@ -1,3 +1,4 @@
+using CnGalWebSite.DrawingBed.Models.Sorting;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DrawingBed.DataReositories;
@@ -19,6 +20,18 @@ namespace CnGalWebSite.DrawingBed.Controllers
     [Route("api/files/[action]")]
     public class FileController : ControllerBase
     {
+        private static readonly SortMap<UploadRecord, DrawingBedUploadRecordSortField> ListSorting =
+            new SortMap<UploadRecord, DrawingBedUploadRecordSortField>(DrawingBedUploadRecordSortField.Id, DrawingBedUploadRecordSortField.Id)
+            .Add(DrawingBedUploadRecordSortField.Id, s => s.Id)
+            .Add(DrawingBedUploadRecordSortField.Sha1, s => s.Sha1)
+            .Add(DrawingBedUploadRecordSortField.Size, s => s.Size)
+            .Add(DrawingBedUploadRecordSortField.Duration, s => s.Duration)
+            .Add(DrawingBedUploadRecordSortField.Type, s => s.Type)
+            .Add(DrawingBedUploadRecordSortField.UploadTime, s => s.UploadTime)
+            .Add(DrawingBedUploadRecordSortField.Url, s => s.Url)
+            .Add(DrawingBedUploadRecordSortField.UserId, s => s.UserId);
+
+
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientFactory _clientFactory;
@@ -176,12 +189,12 @@ namespace CnGalWebSite.DrawingBed.Controllers
 
 
         [HttpPost]
-        public async Task<QueryResultModel<UploadRecordOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<UploadRecordOverviewModel, DrawingBedUploadRecordSortField>> List(QueryParameterModel<DrawingBedUploadRecordSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<UploadRecord, long>(_uploadRecordRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Sha1.Contains(model.SearchText) || s.Url.Contains(model.SearchText) || s.UserId.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<UploadRecord, DrawingBedUploadRecordSortField>(_uploadRecordRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Sha1.Contains(model.SearchText) || s.Url.Contains(model.SearchText) || s.UserId.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<UploadRecordOverviewModel>
+            return new QueryResultModel<UploadRecordOverviewModel, DrawingBedUploadRecordSortField>
             {
                 Items = await items.Select(s => new UploadRecordOverviewModel
                 {

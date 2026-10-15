@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Lotteries;
 using CnGalWebSite.APIServer.Application.OperationRecords;
@@ -36,6 +37,32 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/lotteries/[action]")]
     public class LotteryAPIController : ControllerBase
     {
+        private static readonly SortMap<LotteryUser, LotteryUserSortField> ListLotteryUsersSorting =
+            new SortMap<LotteryUser, LotteryUserSortField>(LotteryUserSortField.Id, LotteryUserSortField.Id)
+            .Add(LotteryUserSortField.UserId, s => s.ApplicationUser.Id)
+            .Add(LotteryUserSortField.Name, s => s.ApplicationUser.UserName)
+            .Add(LotteryUserSortField.Number, s => s.Number)
+            .Add(LotteryUserSortField.LotteryUserId, s => s.Id)
+            .Add(LotteryUserSortField.IsHidden, s => s.IsHidden)
+            .Add(LotteryUserSortField.Cookie, s => s.ApplicationUser.OperationRecords.OrderBy(record => record.Id).Select(record => record.Cookie).FirstOrDefault())
+            .Add(LotteryUserSortField.Ip, s => s.ApplicationUser.OperationRecords.OrderBy(record => record.Id).Select(record => record.Ip).FirstOrDefault())
+            .Add(LotteryUserSortField.Id, s => s.Id);
+
+        private static readonly SortMap<Lottery, LotterySortField> ListSorting =
+            new SortMap<Lottery, LotterySortField>(LotterySortField.Id, LotterySortField.Id)
+            .Add(LotterySortField.Id, s => s.Id)
+            .Add(LotterySortField.Name, s => s.Name)
+            .Add(LotterySortField.IsHidden, s => s.IsHidden)
+            .Add(LotterySortField.CanComment, s => s.CanComment ?? true)
+            .Add(LotterySortField.Priority, s => s.Priority)
+            .Add(LotterySortField.Type, s => s.Type)
+            .Add(LotterySortField.LastEditTime, s => s.LastEditTime)
+            .Add(LotterySortField.BeginTime, s => s.BeginTime)
+            .Add(LotterySortField.EndTime, s => s.EndTime)
+            .Add(LotterySortField.IsEnd, s => s.IsEnd)
+            .Add(LotterySortField.LotteryTime, s => s.LotteryTime);
+
+
 
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IAppHelper _appHelper;
@@ -835,13 +862,13 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<LotteryUserOverviewModel>> ListLotteryUsers(QueryParameterModel model, [FromQuery] long lotteryId)
+        public async Task<QueryResultModel<LotteryUserOverviewModel, LotteryUserSortField>> ListLotteryUsers(QueryParameterModel<LotteryUserSortField> model, [FromQuery] long lotteryId)
         {
-            var (items, total) = await _queryService.QueryAsync<LotteryUser, long>(_lotteryUserRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).ThenInclude(s => s.OperationRecords)
+            var (items, total) = await _queryService.QueryAsync<LotteryUser, LotteryUserSortField>(_lotteryUserRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).ThenInclude(s => s.OperationRecords)
                 .Where(s => s.LotteryId == lotteryId), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser.UserName.Contains(model.SearchText)));
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser.UserName.Contains(model.SearchText)), ListLotteryUsersSorting);
 
-            return new QueryResultModel<LotteryUserOverviewModel>
+            return new QueryResultModel<LotteryUserOverviewModel, LotteryUserSortField>
             {
                 Items = await items.Select(s => new LotteryUserOverviewModel
                 {
@@ -850,8 +877,8 @@ namespace CnGalWebSite.APIServer.Controllers
                     Number = s.Number,
                     LotteryUserId = s.Id,
                     IsHidden = s.IsHidden,
-                    Cookie = s.ApplicationUser.OperationRecords.First().Cookie,
-                    Ip = s.ApplicationUser.OperationRecords.First().Ip,
+                    Cookie = s.ApplicationUser.OperationRecords.OrderBy(record => record.Id).Select(record => record.Cookie).FirstOrDefault(),
+                    Ip = s.ApplicationUser.OperationRecords.OrderBy(record => record.Id).Select(record => record.Ip).FirstOrDefault(),
                 }).ToListAsync(),
                 Total = total,
                 Parameter = model
@@ -956,12 +983,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<LotteryOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<LotteryOverviewModel, LotterySortField>> List(QueryParameterModel<LotterySortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Lottery, long>(_lotteryRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Lottery, LotterySortField>(_lotteryRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<LotteryOverviewModel>
+            return new QueryResultModel<LotteryOverviewModel, LotterySortField>
             {
                 Items = await items.Select(s => new LotteryOverviewModel
                 {

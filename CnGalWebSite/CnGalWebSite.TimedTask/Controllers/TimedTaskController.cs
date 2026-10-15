@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.TimedTask.Models.Sorting;
+using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.TimedTask.DataReositories;
 using CnGalWebSite.TimedTask.Models.DataModels;
@@ -16,6 +17,20 @@ namespace CnGalWebSite.TimedTask.Controllers
     [ApiController]
     public class TimedTaskController : ControllerBase
     {
+        private static readonly SortMap<TimedTaskModel, TimedTaskSortField> ListSorting =
+            new SortMap<TimedTaskModel, TimedTaskSortField>(TimedTaskSortField.Id, TimedTaskSortField.Id)
+            .Add(TimedTaskSortField.Id, s => s.Id)
+            .Add(TimedTaskSortField.Type, s => s.Type)
+            .Add(TimedTaskSortField.ExecuteType, s => s.ExecuteType)
+            .Add(TimedTaskSortField.IntervalTime, s => s.IntervalTime)
+            .Add(TimedTaskSortField.EveryTime, s => s.EveryTime)
+            .Add(TimedTaskSortField.LastExecutedTime, s => s.LastExecutedTime)
+            .Add(TimedTaskSortField.Parameter, s => s.Parameter)
+            .Add(TimedTaskSortField.IsPause, s => s.IsPause)
+            .Add(TimedTaskSortField.IsRuning, s => s.IsRuning)
+            .Add(TimedTaskSortField.IsLastFail, s => s.IsLastFail);
+
+
         private readonly IRepository<TimedTaskModel, int> _timedTaskRepository;
         private readonly IQueryService _queryService;
         private readonly ITimedTaskService _timedTaskService;
@@ -29,12 +44,12 @@ namespace CnGalWebSite.TimedTask.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<TimedTaskOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<TimedTaskOverviewModel, TimedTaskSortField>> List(QueryParameterModel<TimedTaskSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<TimedTaskModel, int>(_timedTaskRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<TimedTaskModel, TimedTaskSortField>(_timedTaskRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<TimedTaskOverviewModel>
+            return new QueryResultModel<TimedTaskOverviewModel, TimedTaskSortField>
             {
                 Items = await items.Select(s => new TimedTaskOverviewModel
                 {

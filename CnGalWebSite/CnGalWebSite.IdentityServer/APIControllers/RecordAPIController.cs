@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.IdentityServer.Models.Sorting;
+using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.IdentityServer.Models.DataModels.Account;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Users;
 using CnGalWebSite.IdentityServer.Services.Account;
@@ -20,7 +21,6 @@ using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using static IdentityServer4.IdentityServerConstants;
-using System.Linq.Dynamic.Core;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using CnGalWebSite.IdentityServer.Models.ViewModels.Roles;
@@ -37,6 +37,15 @@ namespace CnGalWebSite.IdentityServer.APIControllers
     [Route("api/records/[action]")]
     public class RecordAPIController
     {
+        private static readonly SortMap<OperationRecord, IdentityOperationRecordSortField> ListSorting =
+            new SortMap<OperationRecord, IdentityOperationRecordSortField>(IdentityOperationRecordSortField.Id, IdentityOperationRecordSortField.Id)
+            .Add(IdentityOperationRecordSortField.Id, s => s.Id)
+            .Add(IdentityOperationRecordSortField.Ip, s => s.Ip)
+            .Add(IdentityOperationRecordSortField.Time, s => s.Time)
+            .Add(IdentityOperationRecordSortField.Type, s => s.Type)
+            .Add(IdentityOperationRecordSortField.UserName, s => s.ApplicationUser.UserName);
+
+
         private readonly IRepository<ApplicationDbContext, OperationRecord, long> _operationRecordRepository;
         private readonly IQueryService _queryService;
         private readonly IRepository<ApplicationDbContext, ApplicationUser, string> _userRepository;
@@ -49,12 +58,12 @@ namespace CnGalWebSite.IdentityServer.APIControllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<OperationRecordOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<OperationRecordOverviewModel, IdentityOperationRecordSortField>> List(QueryParameterModel<IdentityOperationRecordSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<OperationRecord, string>(_operationRecordRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser.UserName.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<OperationRecord, IdentityOperationRecordSortField>(_operationRecordRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser.UserName.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<OperationRecordOverviewModel>
+            return new QueryResultModel<OperationRecordOverviewModel, IdentityOperationRecordSortField>
             {
                 Items = await items.Select(s => new OperationRecordOverviewModel
                 {

@@ -1,4 +1,5 @@
-﻿@page "/admin/listfiles"
+@using CnGalWebSite.DrawingBed.Models.Sorting
+@page "/admin/listfiles"
 
 @attribute [Authorize(Roles = "Admin")]
 
@@ -7,7 +8,7 @@
     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="文件版块"/>
 
     <MDCard>
-    <DataTableCard TModel="UploadRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <DataTableCard TModel="UploadRecordOverviewModel" TSort="DrawingBedUploadRecordSortField" DefaultSortField="DrawingBedUploadRecordSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -42,6 +43,17 @@
     </MDialog>
 
     @code {
+    private static readonly IReadOnlyDictionary<string, DrawingBedUploadRecordSortField> _sortFields = new Dictionary<string, DrawingBedUploadRecordSortField>
+    {
+        ["size"] = DrawingBedUploadRecordSortField.Size,
+        ["type"] = DrawingBedUploadRecordSortField.Type,
+        [nameof(UploadRecordOverviewModel.Duration)] = DrawingBedUploadRecordSortField.Duration,
+        [nameof(UploadRecordOverviewModel.Id)] = DrawingBedUploadRecordSortField.Id,
+        [nameof(UploadRecordOverviewModel.Sha1)] = DrawingBedUploadRecordSortField.Sha1,
+        [nameof(UploadRecordOverviewModel.UploadTime)] = DrawingBedUploadRecordSortField.UploadTime,
+        [nameof(UploadRecordOverviewModel.UserId)] = DrawingBedUploadRecordSortField.UserId,
+    };
+
         private bool _detailDialog;
         private UploadRecordOverviewModel _detailItem;
         private string _baseUrl = ToolHelper.ImageApiPath + "api/files/";
@@ -66,7 +78,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-        DataTableCard<UploadRecordOverviewModel> dataTableCard;
+        DataTableCard<UploadRecordOverviewModel, DrawingBedUploadRecordSortField> dataTableCard;
         CnGalWebSite.Shared.MasaComponent.PC.Admin.UploadRecords.DetailCard detailCard;
 
         [CascadingParameter]

@@ -1,30 +1,31 @@
+@using CnGalWebSite.DataModel.Sorting
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.DataModel.ViewModel.Perfections
 
 @inject IPerfectionQueryService PerfectionQueryService
 
-<CgDataTable TItem="PerfectionOverviewModel"
+<CgDataTable TItem="PerfectionOverviewModel" TSort="PerfectionSortField"
              Title="完善度列表"
              OnServerQuery="LoadPerfectionsAsync"
-             DefaultSortField="@nameof(PerfectionOverviewModel.Id)"
+             DefaultSortField="PerfectionSortField.Id"
              DefaultSortDesc="true"
              @ref="_dataTable">
 
-    <CgDataTableColumn TItem="PerfectionOverviewModel" Title="Id" Field="@nameof(PerfectionOverviewModel.Id)" Width="80px" />
+    <CgDataTableColumn TItem="PerfectionOverviewModel" TSort="PerfectionSortField" Title="Id" SortField="PerfectionSortField.Id" Value="item => item.Id" Width="80px" />
 
-    <CgDataTableColumn TItem="PerfectionOverviewModel" Title="词条名称" Sortable="false">
+    <CgDataTableColumn TItem="PerfectionOverviewModel" TSort="PerfectionSortField" Title="词条名称" Sortable="false">
         <ChildContent Context="item">
             <a href="/entries/index/@item.Id">@item.Name</a>
         </ChildContent>
     </CgDataTableColumn>
 
-    <CgDataTableColumn TItem="PerfectionOverviewModel" Title="完善度" Field="@nameof(PerfectionOverviewModel.Grade)" Sortable="false">
+    <CgDataTableColumn TItem="PerfectionOverviewModel" TSort="PerfectionSortField" Title="完善度" SortField="PerfectionSortField.Grade" Value="item => item.Grade" Sortable="false">
         <ChildContent Context="item">
             @item.Grade.ToString("F1")
         </ChildContent>
     </CgDataTableColumn>
 
-    <CgDataTableColumn TItem="PerfectionOverviewModel" Title="击败全站百分比" Field="@nameof(PerfectionOverviewModel.VictoryPercentage)" Sortable="false">
+    <CgDataTableColumn TItem="PerfectionOverviewModel" TSort="PerfectionSortField" Title="击败全站百分比" SortField="PerfectionSortField.VictoryPercentage" Value="item => item.VictoryPercentage" Sortable="false">
         <ChildContent Context="item">
             @item.VictoryPercentage.ToString("F1")%
         </ChildContent>
@@ -33,18 +34,11 @@
 </CgDataTable>
 
 @code {
-    private CgDataTable<PerfectionOverviewModel>? _dataTable;
+    private CgDataTable<PerfectionOverviewModel, PerfectionSortField>? _dataTable;
 
-    private async Task<CgDataTableResult<PerfectionOverviewModel>> LoadPerfectionsAsync(CgDataTableRequest request)
+    private async Task<CgDataTableResult<PerfectionOverviewModel>> LoadPerfectionsAsync(CgDataTableRequest<PerfectionSortField> request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? "",
-            SortBy = string.IsNullOrWhiteSpace(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
+        var parameter = request.ToQueryParameter();
 
         var result = await PerfectionQueryService.ListPerfectionsAsync(parameter);
 

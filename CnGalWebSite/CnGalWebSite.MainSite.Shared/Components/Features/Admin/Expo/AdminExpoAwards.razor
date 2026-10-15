@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @inject IAdminQueryService AdminQueryService
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
@@ -8,10 +9,10 @@
 
 @* ─── 奖项列表 ─── *@
 
-<CgDataTable TItem="ExpoAwardOverviewModel"
+<CgDataTable TItem="ExpoAwardOverviewModel" TSort="ExpoAwardSortField"
              Title="奖项列表"
              OnServerQuery="OnQueryAwardsAsync"
-             DefaultSortField="Id"
+             DefaultSortField="ExpoAwardSortField.Id"
              DefaultSortDesc="true"
              @ref="_awardTable">
     <ToolbarContent>
@@ -21,28 +22,28 @@
         </CgButton>
     </ToolbarContent>
     <ChildContent>
-        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="名称" Field="Name" Sortable="false" />
-        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="图片" Sortable="false" Width="60px">
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" TSort="ExpoAwardSortField" Title="Id" SortField="ExpoAwardSortField.Id" Value="item => item.Id" Width="80px" />
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" TSort="ExpoAwardSortField" Title="名称" SortField="ExpoAwardSortField.Name" Value="item => item.Name" Sortable="false" />
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" TSort="ExpoAwardSortField" Title="图片" Sortable="false" Width="60px">
             <ChildContent Context="item">
                 @if (!string.IsNullOrWhiteSpace(item.Image))
                 { <img src="@item.Image" alt="奖项图片" style="width: 32px; height: 32px; border-radius: 4px; object-fit: cover;" /> }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="类型" Field="Type" Width="100px">
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" TSort="ExpoAwardSortField" Title="类型" SortField="ExpoAwardSortField.Type" Value="item => item.Type" Width="100px">
             <ChildContent Context="item">
                 @(item.Type == ExpoAwardType.Key ? "激活码" : "无实体")
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="总数" Field="Count" Width="80px" />
-        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="已分配" Field="PrizeCount" Width="80px" />
-        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="状态" Field="IsEnabled">
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" TSort="ExpoAwardSortField" Title="总数" SortField="ExpoAwardSortField.Count" Value="item => item.Count" Width="80px" />
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" TSort="ExpoAwardSortField" Title="已分配" SortField="ExpoAwardSortField.PrizeCount" Value="item => item.PrizeCount" Width="80px" />
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" TSort="ExpoAwardSortField" Title="状态" SortField="ExpoAwardSortField.IsEnabled" Value="item => item.IsEnabled">
             <ChildContent Context="item">
                 @if (item.IsEnabled) { <span class="admin-badge admin-badge--visible">启用</span> }
                 else { <span class="admin-badge admin-badge--hidden">禁用</span> }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="ExpoAwardOverviewModel" Title="操作" Sortable="false" Width="60px">
+        <CgDataTableColumn TItem="ExpoAwardOverviewModel" TSort="ExpoAwardSortField" Title="操作" Sortable="false" Width="60px">
             <ChildContent Context="item">
                 <div class="admin-actions">
                     <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditAwardAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
@@ -56,18 +57,18 @@
 
 @* ─── 奖品列表 ─── *@
 
-<CgDataTable TItem="ExpoPrizeOverviewModel"
+<CgDataTable TItem="ExpoPrizeOverviewModel" TSort="ExpoPrizeSortField"
              Title="奖品记录"
              OnServerQuery="OnQueryPrizesAsync"
-             DefaultSortField="Id"
+             DefaultSortField="ExpoPrizeSortField.Id"
              DefaultSortDesc="true"
              @ref="_prizeTable">
     <ChildContent>
-        <CgDataTableColumn TItem="ExpoPrizeOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="ExpoPrizeOverviewModel" Title="内容" Field="Content" Sortable="false" />
-        <CgDataTableColumn TItem="ExpoPrizeOverviewModel" Title="奖项" Field="AwardName" Sortable="false" />
-        <CgDataTableColumn TItem="ExpoPrizeOverviewModel" Title="用户" Field="UserName" Sortable="false" />
-        <CgDataTableColumn TItem="ExpoPrizeOverviewModel" Title="抽取时间" Field="DrawTime" Width="160px">
+        <CgDataTableColumn TItem="ExpoPrizeOverviewModel" TSort="ExpoPrizeSortField" Title="Id" SortField="ExpoPrizeSortField.Id" Value="item => item.Id" Width="80px" />
+        <CgDataTableColumn TItem="ExpoPrizeOverviewModel" TSort="ExpoPrizeSortField" Title="内容" SortField="ExpoPrizeSortField.Content" Value="item => item.Content" Sortable="false" />
+        <CgDataTableColumn TItem="ExpoPrizeOverviewModel" TSort="ExpoPrizeSortField" Title="奖项" SortField="ExpoPrizeSortField.AwardName" Value="item => item.AwardName" Sortable="false" />
+        <CgDataTableColumn TItem="ExpoPrizeOverviewModel" TSort="ExpoPrizeSortField" Title="用户" SortField="ExpoPrizeSortField.UserName" Value="item => item.UserName" Sortable="false" />
+        <CgDataTableColumn TItem="ExpoPrizeOverviewModel" TSort="ExpoPrizeSortField" Title="抽取时间" SortField="ExpoPrizeSortField.DrawTime" Value="item => item.DrawTime" Width="160px">
             <ChildContent Context="item">
                 @(item.DrawTime > DateTime.MinValue ? item.DrawTime.ToString("yyyy-MM-dd HH:mm") : "-")
             </ChildContent>
@@ -169,24 +170,24 @@
 </CgModal>
 
 @code {
-    private CgDataTable<ExpoAwardOverviewModel>? _awardTable;
-    private CgDataTable<ExpoPrizeOverviewModel>? _prizeTable;
+    private CgDataTable<ExpoAwardOverviewModel, ExpoAwardSortField>? _awardTable;
+    private CgDataTable<ExpoPrizeOverviewModel, ExpoPrizeSortField>? _prizeTable;
     private bool _showModal;
     private bool _isNew;
     private ExpoAwardEditModel? _editModel;
     private bool _isPrizeBatchModalOpen;
     private string _prizeBatchText = string.Empty;
 
-    private async Task<CgDataTableResult<ExpoAwardOverviewModel>> OnQueryAwardsAsync(CgDataTableRequest request)
+    private async Task<CgDataTableResult<ExpoAwardOverviewModel>> OnQueryAwardsAsync(CgDataTableRequest<ExpoAwardSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetExpoAwardsAsync(parameter, CancellationToken.None);
         return result.Success && result.Data is not null ? new CgDataTableResult<ExpoAwardOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<ExpoAwardOverviewModel>([], 0);
     }
 
-    private async Task<CgDataTableResult<ExpoPrizeOverviewModel>> OnQueryPrizesAsync(CgDataTableRequest request)
+    private async Task<CgDataTableResult<ExpoPrizeOverviewModel>> OnQueryPrizesAsync(CgDataTableRequest<ExpoPrizeSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetExpoPrizesAsync(parameter, CancellationToken.None);
         return result.Success && result.Data is not null ? new CgDataTableResult<ExpoPrizeOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<ExpoPrizeOverviewModel>([], 0);
     }

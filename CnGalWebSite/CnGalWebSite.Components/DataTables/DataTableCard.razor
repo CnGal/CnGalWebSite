@@ -1,4 +1,5 @@
-﻿@typeparam TModel where TModel : class, new()
+@typeparam TModel where TModel : class, new()
+@typeparam TSort where TSort : struct, Enum
 
 @inject IHttpService _httpService
 @inject IQueryService _queryService
@@ -9,7 +10,7 @@
             FooterProps="props => { props.ItemsPerPageOptions = new List<OneOf<int, DataItemsPerPageOption>>() { 5,10, 20, 30 }; }"
             MustSort
             Page="_page"
-             SortBy="@SortByItem"
+             SortBy="@InitialSortToken"
              SortDesc="@SortDesc"
              OnOptionsUpdate="HandleOnOptionsUpdate"
              ServerItemsLength="_totalDesserts"
@@ -51,7 +52,13 @@
     [Parameter]
     public string ApiUrl { get; set; }
     [Parameter]
-    public string SortByItem { get; set; } = "Id";
+    public TSort? DefaultSortField { get; set; }
+    [Parameter, EditorRequired]
+    public IReadOnlyDictionary<string, TSort> SortFields { get; set; }
+    [Parameter]
+    public SortMap<TModel, TSort> LocalSorting { get; set; }
+
+    private string InitialSortToken => SortFields.FirstOrDefault(pair => EqualityComparer<TSort>.Default.Equals(pair.Value, DefaultSortField ?? SortFields.First().Value)).Key;
     [Parameter]
     public bool SortDesc { get; set; } = true;
     [Parameter]
@@ -81,7 +88,7 @@
     private IEnumerable<TModel> _items = new List<TModel>();
     private bool _loading = true;
     public string _search;
-    private QueryResultModel<TModel> Data = new QueryResultModel<TModel>();
+    private QueryResultModel<TModel, TSort> Data = new QueryResultModel<TModel, TSort>();
     MDataTable<TModel> _dataTable;
 
     [CascadingParameter]
@@ -95,7 +102,10 @@
 
     protected override void OnInitialized()
     {
-        //CopyOptions(_dataCache.Date.Parameter, new DataOptions());
+        foreach (var header in Headers)
+            header.Sortable = header.Sortable && SortFields.ContainsKey(header.Value);
+        if (DefaultSortField.HasValue)
+            Data.Parameter.Sorts = [new(DefaultSortField.Value, SortDesc ? SortDirection.Descending : SortDirection.Ascending)];
         GetDataFromApi();
     }
 
@@ -126,13 +136,13 @@
     {
         if (string.IsNullOrWhiteSpace(ApiUrl))
         {
-            return await _queryService.QueryAsync<TModel, string>(DataSource.AsQueryable(), Data.Parameter, Predicate == null ? s => true : Predicate);
+            return await _queryService.QueryAsync<TModel, TSort>(DataSource.AsQueryable(), Data.Parameter, Predicate == null ? s => true : Predicate, LocalSorting);
         }
         else
         {
             try
             {
-                Data = await _httpService.PostAsync<QueryParameterModel, QueryResultModel<TModel>>(ApiUrl, Data.Parameter);
+                Data = await _httpService.PostAsync<QueryParameterModel<TSort>, QueryResultModel<TModel, TSort>>(ApiUrl, Data.Parameter);
                 return (Data.Items, Data.Total);
             }
             catch (Exception ex)
@@ -155,8 +165,8 @@
             {
                 var param = Data.Parameter.TryDeepClone();
                 param.ItemsPerPage = int.MaxValue;
-                Data = await _httpService.PostAsync<QueryParameterModel, QueryResultModel<TModel>>(ApiUrl, param);
-                return Data.Items;
+                var allData = await _httpService.PostAsync<QueryParameterModel<TSort>, QueryResultModel<TModel, TSort>>(ApiUrl, param);
+                return allData.Items;
             }
             catch (Exception ex)
             {
@@ -166,14 +176,17 @@
         }
     }
 
-    public void CopyOptions(QueryParameterModel parameter, DataOptions options)
+    public void CopyOptions(QueryParameterModel<TSort> parameter, DataOptions options)
     {
-        parameter.SortBy = options.SortBy;
-        parameter.SortDesc = options.SortDesc;
-        parameter.MultiSort = options.MultiSort;
-        parameter.MustSort = options.MustSort;
-        parameter.GroupBy = options.GroupBy;
-        parameter.GroupDesc = options.GroupDesc;
+        var fields = options.SortBy.ToArray();
+        var directions = options.SortDesc.ToArray();
+        var sorts = new List<SortOption<TSort>>();
+        for (var i = 0; i < fields.Length; i++)
+        {
+            if (SortFields.TryGetValue(fields[i], out var field))
+                sorts.Add(new(field, i < directions.Length && directions[i] ? SortDirection.Descending : SortDirection.Ascending));
+        }
+        parameter.Sorts = sorts;
         parameter.ItemsPerPage = options.ItemsPerPage == 0 ? 10 : options.ItemsPerPage;
         parameter.Page = options.Page == 0 ? 1 : options.Page;
     }

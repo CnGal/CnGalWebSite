@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.Application.BackUpArchives;
+using CnGalWebSite.DataModel.Sorting;
+using CnGalWebSite.APIServer.Application.BackUpArchives;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
@@ -24,6 +25,17 @@ namespace CnGalWebSite.APIServer.Controllers
 
     public class BackUpArchiveAPIController : ControllerBase
     {
+        private static readonly SortMap<BackUpArchive, BackUpArchiveSortField> ListSorting =
+            new SortMap<BackUpArchive, BackUpArchiveSortField>(BackUpArchiveSortField.Id, BackUpArchiveSortField.Id)
+            .Add(BackUpArchiveSortField.Id, s => s.Id)
+            .Add(BackUpArchiveSortField.LastBackUpTime, s => s.LastBackUpTime)
+            .Add(BackUpArchiveSortField.IsLastFail, s => s.IsLastFail)
+            .Add(BackUpArchiveSortField.LastTimeUsed, s => s.LastTimeUsed)
+            .Add(BackUpArchiveSortField.Type, s => s.Entry!=null? BackUpArchiveType.Entry: BackUpArchiveType.Article)
+            .Add(BackUpArchiveSortField.ObjectId, s => s.Entry != null ? s.Entry.Id : s.Article != null ? s.Article.Id : 0)
+            .Add(BackUpArchiveSortField.ObjectName, s => s.Entry != null ? s.Entry.Name : s.Article != null ? s.Article.Name : null);
+
+
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<BackUpArchive, long> _backUpArchiveRepository;
         private readonly IQueryService _queryService;
@@ -39,12 +51,12 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<BackUpArchiveOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<BackUpArchiveOverviewModel, BackUpArchiveSortField>> List(QueryParameterModel<BackUpArchiveSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<BackUpArchive, long>(_backUpArchiveRepository.GetAll().AsSingleQuery().Include(s=>s.Entry).Include(s=>s.Article), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || ((s.Article!=null&&s.Article.Name.Contains(model.SearchText)) || (s.Entry != null && s.Entry.Name.Contains(model.SearchText))));
+            var (items, total) = await _queryService.QueryAsync<BackUpArchive, BackUpArchiveSortField>(_backUpArchiveRepository.GetAll().AsSingleQuery().Include(s=>s.Entry).Include(s=>s.Article), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || ((s.Article!=null&&s.Article.Name.Contains(model.SearchText)) || (s.Entry != null && s.Entry.Name.Contains(model.SearchText))), ListSorting);
 
-            return new QueryResultModel<BackUpArchiveOverviewModel>
+            return new QueryResultModel<BackUpArchiveOverviewModel, BackUpArchiveSortField>
             {
                 Items = await items.Select(s => new BackUpArchiveOverviewModel
                 {

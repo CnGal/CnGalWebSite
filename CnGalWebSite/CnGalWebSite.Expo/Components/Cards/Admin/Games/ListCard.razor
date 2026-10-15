@@ -1,8 +1,9 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService _popupService
 @inject NavigationManager NavigationManager
 
-<CnGalWebSite.Components.DataTables.DataTableCard TModel="ExpoGameOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+<CnGalWebSite.Components.DataTables.DataTableCard TModel="ExpoGameOverviewModel" TSort="ExpoGameSortField" DefaultSortField="ExpoGameSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {
@@ -38,6 +39,14 @@
 <EditCard OnEdited="OnEdited" @ref="editCard" GameNames="EntryGameItems" TagNames="TagItems" />
 
 @code {
+    private static readonly IReadOnlyDictionary<string, ExpoGameSortField> _sortFields = new Dictionary<string, ExpoGameSortField>
+    {
+        [nameof(ExpoGameOverviewModel.GameName)] = ExpoGameSortField.GameName,
+        [nameof(ExpoGameOverviewModel.Hidden)] = ExpoGameSortField.Hidden,
+        [nameof(ExpoGameOverviewModel.Id)] = ExpoGameSortField.Id,
+        [nameof(ExpoGameOverviewModel.Priority)] = ExpoGameSortField.Priority,
+    };
+
     private string _baseUrl = "api/expo/listgame";
     private string _name = "游戏";
 
@@ -56,7 +65,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    CnGalWebSite.Components.DataTables.DataTableCard<ExpoGameOverviewModel> dataTableCard;
+    CnGalWebSite.Components.DataTables.DataTableCard<ExpoGameOverviewModel, ExpoGameSortField> dataTableCard;
 
     EditCard editCard;
 

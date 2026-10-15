@@ -1,4 +1,5 @@
-﻿@page "/admin/listcomments"
+@using CnGalWebSite.DataModel.Sorting
+@page "/admin/listcomments"
 @attribute [Authorize(Roles = "Admin")]
 
 @inject IHttpService _httpService
@@ -8,7 +9,7 @@
 <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip Title="评论版块" />
 
 <MDCard>
-    <DataTableCard TModel="CommentOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <DataTableCard TModel="CommentOverviewModel" TSort="CommentSortField" DefaultSortField="CommentSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -66,6 +67,17 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, CommentSortField> _sortFields = new Dictionary<string, CommentSortField>
+    {
+        [nameof(CommentOverviewModel.CommentTime)] = CommentSortField.CommentTime,
+        [nameof(CommentOverviewModel.Id)] = CommentSortField.Id,
+        [nameof(CommentOverviewModel.IsHidden)] = CommentSortField.IsHidden,
+        [nameof(CommentOverviewModel.ObjectName)] = CommentSortField.ObjectName,
+        [nameof(CommentOverviewModel.Priority)] = CommentSortField.Priority,
+        [nameof(CommentOverviewModel.Text)] = CommentSortField.Text,
+        [nameof(CommentOverviewModel.UserName)] = CommentSortField.UserName,
+    };
+
     private string _baseUrl = "api/comments/List";
     private string _name = "评论";
 
@@ -86,7 +98,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<CommentOverviewModel> dataTableCard;
+    DataTableCard<CommentOverviewModel, CommentSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject IEventService _eventService
 
 <MDCard>
-    <DataTableCard TModel="MakerInforTableModel" Headers="_headers" ApiUrl="@(_baseUrl)" SortByItem="@nameof(MakerInforTableModel.RealId)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <DataTableCard TModel="MakerInforTableModel" TSort="MakerInforSortField" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" DefaultSortField="MakerInforSortField.RealId" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
         <ButtonContent>
             <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton OnQueryAsync="@(async ()=>await dataTableCard?.QueryAllAsync())" Name="制作人" Class="me-4" />
         </ButtonContent>
@@ -27,6 +28,15 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, MakerInforSortField> _sortFields = new Dictionary<string, MakerInforSortField>
+    {
+        [nameof(MakerInforTableModel.AnotherName)] = MakerInforSortField.AnotherName,
+        [nameof(MakerInforTableModel.Bilibili)] = MakerInforSortField.Bilibili,
+        [nameof(MakerInforTableModel.MicroBlog)] = MakerInforSortField.MicroBlog,
+        [nameof(MakerInforTableModel.Name)] = MakerInforSortField.Name,
+        [nameof(MakerInforTableModel.RealId)] = MakerInforSortField.RealId,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -49,7 +59,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<MakerInforTableModel> dataTableCard;
+    DataTableCard<MakerInforTableModel, MakerInforSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

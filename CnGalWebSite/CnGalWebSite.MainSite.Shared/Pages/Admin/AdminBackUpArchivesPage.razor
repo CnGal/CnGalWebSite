@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/listbackuparchives"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -17,27 +18,27 @@
         备份管理
     </h1>
 
-    <CgDataTable TItem="BackUpArchiveOverviewModel"
+    <CgDataTable TItem="BackUpArchiveOverviewModel" TSort="BackUpArchiveSortField"
                  Title="备份列表"
                  OnServerQuery="OnServerQuery"
-                 DefaultSortField="Id"
+                 DefaultSortField="BackUpArchiveSortField.Id"
                  DefaultSortDesc="true"
                  @ref="_dataTable">
-        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" Title="最后备份时间" Field="LastBackUpTime">
+        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" TSort="BackUpArchiveSortField" Title="Id" SortField="BackUpArchiveSortField.Id" Value="item => item.Id" Width="80px" />
+        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" TSort="BackUpArchiveSortField" Title="最后备份时间" SortField="BackUpArchiveSortField.LastBackUpTime" Value="item => item.LastBackUpTime">
             <ChildContent Context="item">@item.LastBackUpTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" Title="用时" Field="LastTimeUsed" Width="100px">
+        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" TSort="BackUpArchiveSortField" Title="用时" SortField="BackUpArchiveSortField.LastTimeUsed" Value="item => item.LastTimeUsed" Width="100px">
             <ChildContent Context="item">
                 @item.LastTimeUsed.ToString("0.0 秒")
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" Title="目标" Field="Type" Width="100px">
+        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" TSort="BackUpArchiveSortField" Title="目标" SortField="BackUpArchiveSortField.Type" Value="item => item.Type" Width="100px">
             <ChildContent Context="item">
                 <span class="admin-badge">@item.Type</span>
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" Title="状态" Field="IsLastFail" Width="80px">
+        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" TSort="BackUpArchiveSortField" Title="状态" SortField="BackUpArchiveSortField.IsLastFail" Value="item => item.IsLastFail" Width="80px">
             <ChildContent Context="item">
                 @if (item.IsLastFail)
                 {
@@ -49,7 +50,7 @@
                 }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" Title="操作" Sortable="false" Width="50px">
+        <CgDataTableColumn TItem="BackUpArchiveOverviewModel" TSort="BackUpArchiveSortField" Title="操作" Sortable="false" Width="50px">
             <ChildContent Context="item">
                 <div class="admin-actions">
                     <button class="admin-action-btn admin-action-btn--run" title="执行备份" @onclick="() => RunBackUp(item)">
@@ -62,12 +63,12 @@
 </div>
 
 @code {
-    private CgDataTable<BackUpArchiveOverviewModel>? _dataTable;
+    private CgDataTable<BackUpArchiveOverviewModel, BackUpArchiveSortField>? _dataTable;
     private CancellationTokenSource? _cts = new();
 
-    private async Task<CgDataTableResult<BackUpArchiveOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    private async Task<CgDataTableResult<BackUpArchiveOverviewModel>> OnServerQuery(CgDataTableRequest<BackUpArchiveSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         try
         {
             var result = await AdminQueryService.GetBackUpArchivesAsync(parameter, _cts!.Token);

@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-<DataTableCard TModel="ArticleOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+<DataTableCard TModel="ArticleOverviewModel" TSort="ArticleSortField" DefaultSortField="ArticleSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {
@@ -71,6 +72,17 @@
 </MDCard>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, ArticleSortField> _sortFields = new Dictionary<string, ArticleSortField>
+    {
+        [nameof(ArticleOverviewModel.CanComment)] = ArticleSortField.CanComment,
+        [nameof(ArticleOverviewModel.CreateTime)] = ArticleSortField.CreateTime,
+        [nameof(ArticleOverviewModel.Id)] = ArticleSortField.Id,
+        [nameof(ArticleOverviewModel.IsHidden)] = ArticleSortField.IsHidden,
+        [nameof(ArticleOverviewModel.LastEditTime)] = ArticleSortField.LastEditTime,
+        [nameof(ArticleOverviewModel.Name)] = ArticleSortField.Name,
+        [nameof(ArticleOverviewModel.Priority)] = ArticleSortField.Priority,
+    };
+
     private string _baseUrl = "api/articles/List";
     private string _name = "文章";
 
@@ -91,7 +103,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<ArticleOverviewModel> dataTableCard;
+    DataTableCard<ArticleOverviewModel, ArticleSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

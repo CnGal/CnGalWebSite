@@ -1,3 +1,5 @@
+using CnGalWebSite.DataModel.Sorting;
+using CnGalWebSite.Core.Models;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Home;
 using CnGalWebSite.APIServer.Application.Search;
@@ -6,7 +8,6 @@ using CnGalWebSite.APIServer.Application.Stores;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX; 
-using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.DataModel.Application.Search.Dtos;
 using CnGalWebSite.DataModel.Model;
@@ -27,7 +28,6 @@ using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
@@ -38,6 +38,24 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/home/[action]")]
     public class HomeAPIController : ControllerBase
     {
+        private static readonly SortMap<Carousel, CarouselSortField> ListCarouselsSorting =
+            new SortMap<Carousel, CarouselSortField>(CarouselSortField.Id, CarouselSortField.Id)
+            .Add(CarouselSortField.Id, s => s.Id)
+            .Add(CarouselSortField.Priority, s => s.Priority)
+            .Add(CarouselSortField.Type, s => s.Type)
+            .Add(CarouselSortField.Image, s => s.Image)
+            .Add(CarouselSortField.Link, s => s.Link)
+            .Add(CarouselSortField.Note, s => s.Note);
+
+        private static readonly SortMap<FriendLink, FriendLinkSortField> ListFriendLinksSorting =
+            new SortMap<FriendLink, FriendLinkSortField>(FriendLinkSortField.Id, FriendLinkSortField.Id)
+            .Add(FriendLinkSortField.Id, s => s.Id)
+            .Add(FriendLinkSortField.Priority, s => s.Priority)
+            .Add(FriendLinkSortField.Image, s => s.Image)
+            .Add(FriendLinkSortField.Link, s => s.Link)
+            .Add(FriendLinkSortField.Name, s => s.Name);
+
+
         private readonly ISearchHelper _searchHelper;
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Article, long> _articleRepository;
@@ -264,19 +282,24 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <param name="Types"></param>
         /// <param name="Times">时间戳 格式 13位 xxx-xxx</param>
         /// <param name="Text"></param>
-        /// <param name="Sort"></param>
+        /// <param name="sortField">排序字段</param>
+        /// <param name="sortDirection">排序方向</param>
         /// <param name="Page"></param>
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet]
-        public async Task<ActionResult<SearchViewModel>> SearchAsync([FromQuery] string[] Types, [FromQuery] string[] Times, [FromQuery] string Text, [FromQuery] string Sort, [FromQuery] int Page)
+        public async Task<ActionResult<SearchViewModel>> SearchAsync([FromQuery] string[] Types, [FromQuery] string[] Times, [FromQuery] string Text, [FromQuery] SearchSortField sortField, [FromQuery] int Page, [FromQuery] SortDirection sortDirection = SortDirection.Descending)
         {
             try
             {
                 return new SearchViewModel
                 {
-                    pagedResultDto = await _searchHelper.QueryAsync(SearchInputModel.Parse(Types, Times, Text, Sort, Page))
+                    pagedResultDto = await _searchHelper.QueryAsync(SearchInputModel.Parse(Types, Times, Text, sortField, sortDirection, Page))
                 };
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (Exception ex) when (ex is not ConfigurationException)
             {
@@ -739,12 +762,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<CarouselOverviewModel>> ListCarousels(QueryParameterModel model)
+        public async Task<QueryResultModel<CarouselOverviewModel, CarouselSortField>> ListCarousels(QueryParameterModel<CarouselSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Carousel, long>(_carouselRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Note.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Carousel, CarouselSortField>(_carouselRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Note.Contains(model.SearchText)), ListCarouselsSorting);
 
-            return new QueryResultModel<CarouselOverviewModel>
+            return new QueryResultModel<CarouselOverviewModel, CarouselSortField>
             {
                 Items = await items.Select(s => new CarouselOverviewModel
                 {
@@ -834,12 +857,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<FriendLinkOverviewModel>> ListFriendLinks(QueryParameterModel model)
+        public async Task<QueryResultModel<FriendLinkOverviewModel, FriendLinkSortField>> ListFriendLinks(QueryParameterModel<FriendLinkSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<FriendLink, int>(_friendLinkRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<FriendLink, FriendLinkSortField>(_friendLinkRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)), ListFriendLinksSorting);
 
-            return new QueryResultModel<FriendLinkOverviewModel>
+            return new QueryResultModel<FriendLinkOverviewModel, FriendLinkSortField>
             {
                 Items = await items.Select(s => new FriendLinkOverviewModel
                 {

@@ -1,10 +1,11 @@
-﻿@page "/admin/events"
+@using CnGalWebSite.RobotClientX.Models.Sorting
+@page "/admin/events"
 
 @inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject IRepository<RobotEvent> _robotEventRepository
 
-<DataTableCard TModel="RobotEvent" Headers="_headers" DataSource="_robotEventRepository.GetAll()" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
+<DataTableCard TModel="RobotEvent" TSort="RobotRobotEventSortField" DefaultSortField="RobotRobotEventSortField.Id" SortFields="_sortFields" LocalSorting="_localSorting" Headers="_headers" DataSource="_robotEventRepository.GetAll()" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
                Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.Note.Contains(dataTableCard._search)|| s.Text.Contains(dataTableCard._search))">
     <ItemColContent>
         @if (context.Header.Value == "actions")
@@ -76,6 +77,29 @@
 </MDialog>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, RobotRobotEventSortField> _sortFields = new Dictionary<string, RobotRobotEventSortField>
+    {
+        [nameof(RobotEvent.DelaySecond)] = RobotRobotEventSortField.DelaySecond,
+        [nameof(RobotEvent.Id)] = RobotRobotEventSortField.Id,
+        [nameof(RobotEvent.IsHidden)] = RobotRobotEventSortField.IsHidden,
+        [nameof(RobotEvent.Note)] = RobotRobotEventSortField.Note,
+        [nameof(RobotEvent.Probability)] = RobotRobotEventSortField.Probability,
+        [nameof(RobotEvent.Text)] = RobotRobotEventSortField.Text,
+        [nameof(RobotEvent.Time)] = RobotRobotEventSortField.Time,
+        [nameof(RobotEvent.Type)] = RobotRobotEventSortField.Type,
+    };
+
+    private static readonly CnGalWebSite.Core.Services.Query.SortMap<RobotEvent, RobotRobotEventSortField> _localSorting =
+        new CnGalWebSite.Core.Services.Query.SortMap<RobotEvent, RobotRobotEventSortField>(RobotRobotEventSortField.Id, RobotRobotEventSortField.Id)
+        .Add(RobotRobotEventSortField.DelaySecond, item => item.DelaySecond)
+        .Add(RobotRobotEventSortField.Id, item => item.Id)
+        .Add(RobotRobotEventSortField.IsHidden, item => item.IsHidden)
+        .Add(RobotRobotEventSortField.Note, item => item.Note)
+        .Add(RobotRobotEventSortField.Probability, item => item.Probability)
+        .Add(RobotRobotEventSortField.Text, item => item.Text)
+        .Add(RobotRobotEventSortField.Time, item => item.Time)
+        .Add(RobotRobotEventSortField.Type, item => item.Type);
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -104,7 +128,7 @@
 
     List<KeyValuePair<string, string>> _scopes;
 
-    DataTableCard<RobotEvent> dataTableCard;
+    DataTableCard<RobotEvent, RobotRobotEventSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

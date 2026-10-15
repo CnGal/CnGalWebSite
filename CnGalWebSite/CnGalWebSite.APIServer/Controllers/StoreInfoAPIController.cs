@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.DataModel.Sorting;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
@@ -30,6 +31,21 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/storeinfo/[action]")]
     public class StoreInfoAPIController : ControllerBase
     {
+        private static readonly SortMap<StoreInfo, StoreInfoSortField> ListSorting =
+            new SortMap<StoreInfo, StoreInfoSortField>(StoreInfoSortField.Id, StoreInfoSortField.Id)
+            .Add(StoreInfoSortField.State, s => s.State)
+            .Add(StoreInfoSortField.CutNow, s => s.CutNow)
+            .Add(StoreInfoSortField.EntryId, s => s.EntryId)
+            .Add(StoreInfoSortField.Link, s => s.Link)
+            .Add(StoreInfoSortField.Name, s => s.Name)
+            .Add(StoreInfoSortField.PlatformName, s => s.PlatformName)
+            .Add(StoreInfoSortField.PlatformType, s => s.PlatformType)
+            .Add(StoreInfoSortField.PriceNow, s => s.PriceNow)
+            .Add(StoreInfoSortField.UpdateTime, s => s.UpdateTime)
+            .Add(StoreInfoSortField.UpdateType, s => s.UpdateType)
+            .Add(StoreInfoSortField.Id, s => s.Id);
+
+
 
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Tag, int> _tagRepository;
@@ -175,12 +191,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<StoreInfoOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<StoreInfoOverviewModel, StoreInfoSortField>> List(QueryParameterModel<StoreInfoSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<StoreInfo, string>(_storeInfoRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.PlatformName.Contains(model.SearchText) || s.Link.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<StoreInfo, StoreInfoSortField>(_storeInfoRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.PlatformName.Contains(model.SearchText) || s.Link.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<StoreInfoOverviewModel>
+            return new QueryResultModel<StoreInfoOverviewModel, StoreInfoSortField>
             {
                 Items = await items.Select(s => new StoreInfoOverviewModel
                 {
