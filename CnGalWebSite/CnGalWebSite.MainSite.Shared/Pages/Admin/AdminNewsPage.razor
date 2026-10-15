@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/listnews"
 @attribute [Authorize(Roles = "Editor")]
 @layout AdminLayout
@@ -41,14 +42,14 @@
         <PanelTemplate>
             @if (context == "gamenews")
             {
-                <CgDataTable TItem="GameNewsOverviewModel"
+                <CgDataTable TItem="GameNewsOverviewModel" TSort="GameNewsSortField"
                              Title="游戏动态列表"
                              OnServerQuery="OnQueryGameNews"
-                             DefaultSortField="Id"
+                             DefaultSortField="GameNewsSortField.Id"
                              DefaultSortDesc="true"
                              @ref="_gameNewsTable">
-                    <CgDataTableColumn TItem="GameNewsOverviewModel" Title="Id" Field="Id" Width="80px" />
-                    <CgDataTableColumn TItem="GameNewsOverviewModel" Title="标题" Field="Title">
+                    <CgDataTableColumn TItem="GameNewsOverviewModel" TSort="GameNewsSortField" Title="Id" SortField="GameNewsSortField.Id" Value="item => item.Id" Width="80px" />
+                    <CgDataTableColumn TItem="GameNewsOverviewModel" TSort="GameNewsSortField" Title="标题" SortField="GameNewsSortField.Title" Value="item => item.Title">
                         <ChildContent Context="item">
                             @if (item.ArticleId > 0)
                             {
@@ -60,13 +61,13 @@
                             }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="GameNewsOverviewModel" Title="作者" Field="Author" Width="120px" />
-                    <CgDataTableColumn TItem="GameNewsOverviewModel" Title="状态" Field="State">
+                    <CgDataTableColumn TItem="GameNewsOverviewModel" TSort="GameNewsSortField" Title="作者" SortField="GameNewsSortField.Author" Value="item => item.Author" Width="120px" />
+                    <CgDataTableColumn TItem="GameNewsOverviewModel" TSort="GameNewsSortField" Title="状态" SortField="GameNewsSortField.State" Value="item => item.State">
                         <ChildContent Context="item">
                             <span class="admin-badge @GetStateBadgeClass(item.State)">@item.State.GetDisplayName()</span>
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="GameNewsOverviewModel" Title="来源类型" Field="RssType" Width="120px" Sortable="false">
+                    <CgDataTableColumn TItem="GameNewsOverviewModel" TSort="GameNewsSortField" Title="来源类型" SortField="GameNewsSortField.RssType" Value="item => item.RssType" Width="120px" Sortable="false">
                         <ChildContent Context="item">
                             @if (item.RssType.HasValue)
                             {
@@ -78,12 +79,12 @@
                             }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="GameNewsOverviewModel" Title="发布时间" Field="PublishTime" Width="160px">
+                    <CgDataTableColumn TItem="GameNewsOverviewModel" TSort="GameNewsSortField" Title="发布时间" SortField="GameNewsSortField.PublishTime" Value="item => item.PublishTime" Width="160px">
                         <ChildContent Context="item">
                             @item.PublishTime.ToString("yyyy-MM-dd HH:mm")
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="GameNewsOverviewModel" Title="操作" Sortable="false" Width="220px">
+                    <CgDataTableColumn TItem="GameNewsOverviewModel" TSort="GameNewsSortField" Title="操作" Sortable="false" Width="220px">
                         <ChildContent Context="item">
                             <div class="admin-actions">
                                 <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OpenEditGameNewsModal(item.Id)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
@@ -104,14 +105,14 @@
             }
             else if (context == "weeklynews")
             {
-                <CgDataTable TItem="WeeklyNewsOverviewModel"
+                <CgDataTable TItem="WeeklyNewsOverviewModel" TSort="WeeklyNewsSortField"
                              Title="周报列表"
                              OnServerQuery="OnQueryWeeklyNews"
-                             DefaultSortField="Id"
+                             DefaultSortField="WeeklyNewsSortField.Id"
                              DefaultSortDesc="true"
                              @ref="_weeklyNewsTable">
-                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="Id" Field="Id" Width="80px" />
-                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="标题" Field="Title">
+                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" TSort="WeeklyNewsSortField" Title="Id" SortField="WeeklyNewsSortField.Id" Value="item => item.Id" Width="80px" />
+                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" TSort="WeeklyNewsSortField" Title="标题" SortField="WeeklyNewsSortField.Title" Value="item => item.Title">
                         <ChildContent Context="item">
                             @if (item.ArticleId > 0)
                             {
@@ -123,22 +124,22 @@
                             }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="状态" Field="State">
+                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" TSort="WeeklyNewsSortField" Title="状态" SortField="WeeklyNewsSortField.State" Value="item => item.State">
                         <ChildContent Context="item">
                             <span class="admin-badge @GetStateBadgeClass(item.State)">@item.State.GetDisplayName()</span>
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="发布时间" Field="PublishTime" Width="160px">
+                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" TSort="WeeklyNewsSortField" Title="发布时间" SortField="WeeklyNewsSortField.PublishTime" Value="item => item.PublishTime" Width="160px">
                         <ChildContent Context="item">
                             @item.PublishTime.ToString("yyyy-MM-dd HH:mm")
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="创建时间" Field="CreateTime" Width="160px">
+                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" TSort="WeeklyNewsSortField" Title="创建时间" SortField="WeeklyNewsSortField.CreateTime" Value="item => item.CreateTime" Width="160px">
                         <ChildContent Context="item">
                             @item.CreateTime.ToString("yyyy-MM-dd HH:mm")
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" Title="操作" Sortable="false" Width="220px">
+                    <CgDataTableColumn TItem="WeeklyNewsOverviewModel" TSort="WeeklyNewsSortField" Title="操作" Sortable="false" Width="220px">
                         <ChildContent Context="item">
                             <div class="admin-actions">
                                 <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OpenEditWeeklyNewsModal(item.Id)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
@@ -348,8 +349,8 @@
 
 @code {
     private CancellationTokenSource? _cts;
-    private CgDataTable<GameNewsOverviewModel>? _gameNewsTable;
-    private CgDataTable<WeeklyNewsOverviewModel>? _weeklyNewsTable;
+    private CgDataTable<GameNewsOverviewModel, GameNewsSortField>? _gameNewsTable;
+    private CgDataTable<WeeklyNewsOverviewModel, WeeklyNewsSortField>? _weeklyNewsTable;
 
     private readonly IReadOnlyList<CgTabItem> _tabs =
     [
@@ -405,16 +406,9 @@
 
     // ═══════════════════  列表查询  ═══════════════════
 
-    private async Task<CgDataTableResult<GameNewsOverviewModel>> OnQueryGameNews(CgDataTableRequest request)
+    private async Task<CgDataTableResult<GameNewsOverviewModel>> OnQueryGameNews(CgDataTableRequest<GameNewsSortField> request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
+        var parameter = request.ToQueryParameter();
 
         var result = await AdminQueryService.GetGameNewsAsync(parameter, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data is not null)
@@ -424,16 +418,9 @@
         return new CgDataTableResult<GameNewsOverviewModel>([], 0);
     }
 
-    private async Task<CgDataTableResult<WeeklyNewsOverviewModel>> OnQueryWeeklyNews(CgDataTableRequest request)
+    private async Task<CgDataTableResult<WeeklyNewsOverviewModel>> OnQueryWeeklyNews(CgDataTableRequest<WeeklyNewsSortField> request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
+        var parameter = request.ToQueryParameter();
 
         var result = await AdminQueryService.GetWeeklyNewsAsync(parameter, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data is not null)

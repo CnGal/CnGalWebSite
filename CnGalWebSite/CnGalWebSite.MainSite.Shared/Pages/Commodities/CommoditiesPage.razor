@@ -1,4 +1,5 @@
-﻿@page "/commodities"
+@using CnGalWebSite.DataModel.Sorting
+@page "/commodities"
 @page "/commodities/{Type}"
 
 @rendermode InteractiveServer
@@ -286,18 +287,11 @@ else
     // ── G币记录查询（服务端分页） ──
 
     private async Task<CgDataTableResult<GCoinsRecordOverviewModel>> QueryGCoinsRecordAsync(
-        CgDataTableRequest req)
+        CgDataTableRequest<GCoinsRecordSortField> req)
     {
         if (_cts is null) return new CgDataTableResult<GCoinsRecordOverviewModel>([], 0);
 
-        var model = new QueryParameterModel
-        {
-            Page = req.Page,
-            ItemsPerPage = req.PageSize,
-            SearchText = req.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrWhiteSpace(req.SortField) ? ["Time"] : [req.SortField],
-            SortDesc = [req.SortDesc],
-        };
+        var model = req.ToQueryParameter();
 
         var result = await CommodityService.ListGCoinsRecordAsync(model, _cts.Token);
         if (result.Success && result.Data is not null)

@@ -1,10 +1,11 @@
-﻿@page "/admin/faces"
+@using CnGalWebSite.RobotClientX.Models.Sorting
+@page "/admin/faces"
 
 @inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject IRepository<RobotFace> _robotFaceRepository
 
-<DataTableCard TModel="RobotFace" Headers="_headers" DataSource="_robotFaceRepository.GetAll()" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
+<DataTableCard TModel="RobotFace" TSort="RobotRobotFaceSortField" DefaultSortField="RobotRobotFaceSortField.Id" SortFields="_sortFields" LocalSorting="_localSorting" Headers="_headers" DataSource="_robotFaceRepository.GetAll()" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
                Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.Note.Contains(dataTableCard._search)|| s.Key.Contains(dataTableCard._search)|| s.Value.Contains(dataTableCard._search))">
     <ItemColContent>
         @if (context.Header.Value == "actions")
@@ -30,6 +31,23 @@
 </MDialog>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, RobotRobotFaceSortField> _sortFields = new Dictionary<string, RobotRobotFaceSortField>
+    {
+        [nameof(RobotFace.Id)] = RobotRobotFaceSortField.Id,
+        [nameof(RobotFace.IsHidden)] = RobotRobotFaceSortField.IsHidden,
+        [nameof(RobotFace.Key)] = RobotRobotFaceSortField.Key,
+        [nameof(RobotFace.Note)] = RobotRobotFaceSortField.Note,
+        [nameof(RobotFace.Value)] = RobotRobotFaceSortField.Value,
+    };
+
+    private static readonly CnGalWebSite.Core.Services.Query.SortMap<RobotFace, RobotRobotFaceSortField> _localSorting =
+        new CnGalWebSite.Core.Services.Query.SortMap<RobotFace, RobotRobotFaceSortField>(RobotRobotFaceSortField.Id, RobotRobotFaceSortField.Id)
+        .Add(RobotRobotFaceSortField.Id, item => item.Id)
+        .Add(RobotRobotFaceSortField.IsHidden, item => item.IsHidden)
+        .Add(RobotRobotFaceSortField.Key, item => item.Key)
+        .Add(RobotRobotFaceSortField.Note, item => item.Note)
+        .Add(RobotRobotFaceSortField.Value, item => item.Value);
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -55,7 +73,7 @@
 
     List<KeyValuePair<string, string>> _scopes;
 
-    DataTableCard<RobotFace> dataTableCard;
+    DataTableCard<RobotFace, RobotRobotFaceSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using System.Net.Http.Json;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.Model;
@@ -116,7 +117,7 @@ public sealed class CommodityQueryService(
         }
     }
 
-    public async Task<SdkResult<QueryResultModel<GCoinsRecordOverviewModel>>> ListGCoinsRecordAsync(QueryParameterModel model, CancellationToken cancellationToken = default)
+    public async Task<SdkResult<QueryResultModel<GCoinsRecordOverviewModel, GCoinsRecordSortField>>> ListGCoinsRecordAsync(QueryParameterModel<GCoinsRecordSortField> model, CancellationToken cancellationToken = default)
     {
         const string entityDescription = "G币变动记录";
 
@@ -135,23 +136,23 @@ public sealed class CommodityQueryService(
                     HttpClient.BaseAddress,
                     TrimForLog(body));
 
-                return SdkResult<QueryResultModel<GCoinsRecordOverviewModel>>.Fail(
+                return SdkResult<QueryResultModel<GCoinsRecordOverviewModel, GCoinsRecordSortField>>.Fail(
                     "COMMODITY_RECORD_HTTP_FAILED",
                     $"获取{entityDescription}失败（HTTP {(int)response.StatusCode}）");
             }
 
-            var result = await response.Content.ReadFromJsonAsync<QueryResultModel<GCoinsRecordOverviewModel>>(
+            var result = await response.Content.ReadFromJsonAsync<QueryResultModel<GCoinsRecordOverviewModel, GCoinsRecordSortField>>(
                 SdkJsonSerializerOptions.Default,
                 cancellationToken);
 
             if (result is null)
             {
-                return SdkResult<QueryResultModel<GCoinsRecordOverviewModel>>.Fail(
+                return SdkResult<QueryResultModel<GCoinsRecordOverviewModel, GCoinsRecordSortField>>.Fail(
                     "COMMODITY_RECORD_EMPTY_RESPONSE",
                     $"{entityDescription}数据为空");
             }
 
-            return SdkResult<QueryResultModel<GCoinsRecordOverviewModel>>.Ok(result);
+            return SdkResult<QueryResultModel<GCoinsRecordOverviewModel, GCoinsRecordSortField>>.Ok(result);
         }
         catch (Exception ex)
         {
@@ -161,7 +162,7 @@ public sealed class CommodityQueryService(
                 ListRecordPath,
                 HttpClient.BaseAddress);
 
-            return SdkResult<QueryResultModel<GCoinsRecordOverviewModel>>.Fail(
+            return SdkResult<QueryResultModel<GCoinsRecordOverviewModel, GCoinsRecordSortField>>.Fail(
                 "COMMODITY_RECORD_EXCEPTION",
                 $"请求{entityDescription}时发生异常");
         }

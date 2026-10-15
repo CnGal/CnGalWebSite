@@ -219,7 +219,7 @@ public sealed class SpaceQueryService(
 
     public async Task<SdkResult<UserEditRecordsViewModel>> GetUserEditRecordsAsync(string userId, int currentPage = 1, int maxResultCount = 12, CancellationToken cancellationToken = default)
     {
-        var path = $"api/space/GetUserEditRecord?userId={userId}&sorting=ApplyTime desc&maxResultCount={maxResultCount}&currentPage={currentPage}&screeningConditions=全部";
+        var path = $"api/space/GetUserEditRecord?userId={userId}&sortField=ApplyTime&sortDirection=Descending&maxResultCount={maxResultCount}&currentPage={currentPage}&screeningConditions=全部";
         var result = await GetAsync<PagedResultDto<ExaminedNormalListModel>>(path, "SPACE", "用户编辑记录", cancellationToken);
 
         if (!result.Success || result.Data is null)

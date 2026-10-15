@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="CarouselOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" SortByItem="@nameof(CarouselOverviewModel.Priority)" @ref="dataTableCard">
+    <DataTableCard TModel="CarouselOverviewModel" TSort="CarouselSortField" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" DefaultSortField="CarouselSortField.Priority" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -44,6 +45,16 @@
     <EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
 </MDialog>
 @code {
+    private static readonly IReadOnlyDictionary<string, CarouselSortField> _sortFields = new Dictionary<string, CarouselSortField>
+    {
+        [nameof(CarouselOverviewModel.Id)] = CarouselSortField.Id,
+        [nameof(CarouselOverviewModel.Image)] = CarouselSortField.Image,
+        [nameof(CarouselOverviewModel.Link)] = CarouselSortField.Link,
+        [nameof(CarouselOverviewModel.Note)] = CarouselSortField.Note,
+        [nameof(CarouselOverviewModel.Priority)] = CarouselSortField.Priority,
+        [nameof(CarouselOverviewModel.Type)] = CarouselSortField.Type,
+    };
+
     private string _baseUrl = "api/home/ListCarousels";
     private string _name = "轮播图";
 
@@ -63,7 +74,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<CarouselOverviewModel> dataTableCard;
+    DataTableCard<CarouselOverviewModel, CarouselSortField> dataTableCard;
 
     EditCard editCard;
     private bool _editDialog;

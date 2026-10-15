@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/listvideos"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -17,38 +18,38 @@
         视频管理
     </h1>
 
-    <CgDataTable TItem="VideoOverviewModel"
+    <CgDataTable TItem="VideoOverviewModel" TSort="VideoSortField"
                  Title="视频列表"
                  OnServerQuery="OnServerQuery"
-                 DefaultSortField="Id"
+                 DefaultSortField="VideoSortField.Id"
                  DefaultSortDesc="true"
                  @ref="_dataTable">
-        <CgDataTableColumn TItem="VideoOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="VideoOverviewModel" Title="名称" Field="Name">
+        <CgDataTableColumn TItem="VideoOverviewModel" TSort="VideoSortField" Title="Id" SortField="VideoSortField.Id" Value="item => item.Id" Width="80px" />
+        <CgDataTableColumn TItem="VideoOverviewModel" TSort="VideoSortField" Title="名称" SortField="VideoSortField.Name" Value="item => item.Name">
             <ChildContent Context="item">
                 <a class="admin-cell-name" href="@($"/videos/index/{item.Id}")">@item.Name</a>
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="VideoOverviewModel" Title="创建时间" Field="CreateTime">
+        <CgDataTableColumn TItem="VideoOverviewModel" TSort="VideoSortField" Title="创建时间" SortField="VideoSortField.CreateTime" Value="item => item.CreateTime">
             <ChildContent Context="item">@item.CreateTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="VideoOverviewModel" Title="最后编辑" Field="LastEditTime">
+        <CgDataTableColumn TItem="VideoOverviewModel" TSort="VideoSortField" Title="最后编辑" SortField="VideoSortField.LastEditTime" Value="item => item.LastEditTime">
             <ChildContent Context="item">@item.LastEditTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="VideoOverviewModel" Title="优先级" Field="Priority" Width="80px" />
-        <CgDataTableColumn TItem="VideoOverviewModel" Title="状态" Field="IsHidden">
+        <CgDataTableColumn TItem="VideoOverviewModel" TSort="VideoSortField" Title="优先级" SortField="VideoSortField.Priority" Value="item => item.Priority" Width="80px" />
+        <CgDataTableColumn TItem="VideoOverviewModel" TSort="VideoSortField" Title="状态" SortField="VideoSortField.IsHidden" Value="item => item.IsHidden">
             <ChildContent Context="item">
                 @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
                 else { <span class="admin-badge admin-badge--visible">可见</span> }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="VideoOverviewModel" Title="留言板" Field="CanComment">
+        <CgDataTableColumn TItem="VideoOverviewModel" TSort="VideoSortField" Title="留言板" SortField="VideoSortField.CanComment" Value="item => item.CanComment">
             <ChildContent Context="item">
                 @if (item.CanComment) { <span class="admin-badge admin-badge--yes">开启</span> }
                 else { <span class="admin-badge admin-badge--no">关闭</span> }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="VideoOverviewModel" Title="操作" Sortable="false" Width="150px">
+        <CgDataTableColumn TItem="VideoOverviewModel" TSort="VideoSortField" Title="操作" Sortable="false" Width="150px">
             <ChildContent Context="item">
                 <div class="admin-actions">
                     <button class="admin-action-btn admin-action-btn--up" title="增加权重" @onclick="() => EditPriority(item, true)"><CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" /></button>
@@ -65,11 +66,11 @@
 
 @code {
     private CancellationTokenSource? _cts = new();
-    private CgDataTable<VideoOverviewModel>? _dataTable;
+    private CgDataTable<VideoOverviewModel, VideoSortField>? _dataTable;
 
-    private async Task<CgDataTableResult<VideoOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    private async Task<CgDataTableResult<VideoOverviewModel>> OnServerQuery(CgDataTableRequest<VideoSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetVideosAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<VideoOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<VideoOverviewModel>([], 0);
     }

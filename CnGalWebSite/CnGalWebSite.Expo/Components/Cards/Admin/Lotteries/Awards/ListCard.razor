@@ -1,8 +1,9 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService _popupService
 @inject NavigationManager NavigationManager
 
-<CnGalWebSite.Components.DataTables.DataTableCard TModel="ExpoAwardOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+<CnGalWebSite.Components.DataTables.DataTableCard TModel="ExpoAwardOverviewModel" TSort="ExpoAwardSortField" DefaultSortField="ExpoAwardSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {
@@ -46,6 +47,17 @@
 <EditCard OnEdited="OnEdited" @ref="editCard" />
 
 @code {
+    private static readonly IReadOnlyDictionary<string, ExpoAwardSortField> _sortFields = new Dictionary<string, ExpoAwardSortField>
+    {
+        [nameof(ExpoAwardOverviewModel.Count)] = ExpoAwardSortField.Count,
+        [nameof(ExpoAwardOverviewModel.Id)] = ExpoAwardSortField.Id,
+        [nameof(ExpoAwardOverviewModel.Image)] = ExpoAwardSortField.Image,
+        [nameof(ExpoAwardOverviewModel.IsEnabled)] = ExpoAwardSortField.IsEnabled,
+        [nameof(ExpoAwardOverviewModel.Name)] = ExpoAwardSortField.Name,
+        [nameof(ExpoAwardOverviewModel.PrizeCount)] = ExpoAwardSortField.PrizeCount,
+        [nameof(ExpoAwardOverviewModel.Type)] = ExpoAwardSortField.Type,
+    };
+
     private string _baseUrl = "api/expo/listaward";
     private string _name = "奖项";
 
@@ -66,7 +78,7 @@
         new (){ Text= "操作", Value= "actions", Sortable=false }
     };
 
-    CnGalWebSite.Components.DataTables.DataTableCard<ExpoAwardOverviewModel> dataTableCard;
+    CnGalWebSite.Components.DataTables.DataTableCard<ExpoAwardOverviewModel, ExpoAwardSortField> dataTableCard;
 
     EditCard editCard;
 

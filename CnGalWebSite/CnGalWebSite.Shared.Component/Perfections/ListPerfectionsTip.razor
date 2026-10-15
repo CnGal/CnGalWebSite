@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="PerfectionOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <DataTableCard TModel="PerfectionOverviewModel" TSort="PerfectionSortField" DefaultSortField="PerfectionSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == nameof(PerfectionOverviewModel.Name))
             {
@@ -21,6 +22,14 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, PerfectionSortField> _sortFields = new Dictionary<string, PerfectionSortField>
+    {
+        [nameof(PerfectionOverviewModel.Grade)] = PerfectionSortField.Grade,
+        [nameof(PerfectionOverviewModel.Id)] = PerfectionSortField.Id,
+        [nameof(PerfectionOverviewModel.Name)] = PerfectionSortField.Name,
+        [nameof(PerfectionOverviewModel.VictoryPercentage)] = PerfectionSortField.VictoryPercentage,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -41,5 +50,5 @@
           new (){ Text= "击败全站词条百分比", Value= nameof(PerfectionOverviewModel.VictoryPercentage)},
     };
 
-    DataTableCard<PerfectionOverviewModel> dataTableCard;
+    DataTableCard<PerfectionOverviewModel, PerfectionSortField> dataTableCard;
 }

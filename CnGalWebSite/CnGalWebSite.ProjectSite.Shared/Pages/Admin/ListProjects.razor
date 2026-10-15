@@ -1,4 +1,5 @@
-﻿@page "/admin/listprojects"
+@using CnGalWebSite.ProjectSite.Models.Sorting
+@page "/admin/listprojects"
 
 @inject IHttpService _httpService
 @inject IPopupService PopupService
@@ -6,7 +7,7 @@
 <CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="企划版块" />
 
 <MDCard>
-    <DataTableCard TModel="ProjectOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <DataTableCard TModel="ProjectOverviewModel" TSort="ProjectProjectSortField" DefaultSortField="ProjectProjectSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -62,6 +63,17 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, ProjectProjectSortField> _sortFields = new Dictionary<string, ProjectProjectSortField>
+    {
+        [nameof(ProjectOverviewModel.CreateTime)] = ProjectProjectSortField.CreateTime,
+        [nameof(ProjectOverviewModel.EndTime)] = ProjectProjectSortField.EndTime,
+        [nameof(ProjectOverviewModel.Hide)] = ProjectProjectSortField.Hide,
+        [nameof(ProjectOverviewModel.Id)] = ProjectProjectSortField.Id,
+        [nameof(ProjectOverviewModel.Name)] = ProjectProjectSortField.Name,
+        [nameof(ProjectOverviewModel.Priority)] = ProjectProjectSortField.Priority,
+        [nameof(ProjectOverviewModel.UserId)] = ProjectProjectSortField.UserId,
+    };
+
     private string _baseUrl = "api/project/list";
     private string _name = "企划";
 
@@ -82,7 +94,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<ProjectOverviewModel> dataTableCard;
+    DataTableCard<ProjectOverviewModel, ProjectProjectSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

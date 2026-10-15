@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject IEventService _eventService
 
 <MDCard>
-    <DataTableCard TModel="RoleInforTableModel" Headers="_headers" ApiUrl="@(_baseUrl)" SortByItem="@nameof(RoleInforTableModel.RealId)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <DataTableCard TModel="RoleInforTableModel" TSort="RoleInforSortField" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" DefaultSortField="RoleInforSortField.RealId" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
         <ButtonContent>
             <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton OnQueryAsync="@(async ()=>await dataTableCard?.QueryAllAsync())" Name="角色" Class="me-4" />
         </ButtonContent>
@@ -24,6 +25,28 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, RoleInforSortField> _sortFields = new Dictionary<string, RoleInforSortField>
+    {
+        [nameof(RoleInforTableModel.AnotherNameRole)] = RoleInforSortField.AnotherNameRole,
+        [nameof(RoleInforTableModel.Birthday)] = RoleInforSortField.Birthday,
+        [nameof(RoleInforTableModel.BloodType)] = RoleInforSortField.BloodType,
+        [nameof(RoleInforTableModel.CV)] = RoleInforSortField.CV,
+        [nameof(RoleInforTableModel.Character)] = RoleInforSortField.Character,
+        [nameof(RoleInforTableModel.ClothesAccessories)] = RoleInforSortField.ClothesAccessories,
+        [nameof(RoleInforTableModel.FigureData)] = RoleInforSortField.FigureData,
+        [nameof(RoleInforTableModel.FigureSubjective)] = RoleInforSortField.FigureSubjective,
+        [nameof(RoleInforTableModel.GameName)] = RoleInforSortField.GameName,
+        [nameof(RoleInforTableModel.Gender)] = RoleInforSortField.Gender,
+        [nameof(RoleInforTableModel.Haircolor)] = RoleInforSortField.Haircolor,
+        [nameof(RoleInforTableModel.Name)] = RoleInforSortField.Name,
+        [nameof(RoleInforTableModel.Pupilcolor)] = RoleInforSortField.Pupilcolor,
+        [nameof(RoleInforTableModel.RealId)] = RoleInforSortField.RealId,
+        [nameof(RoleInforTableModel.RoleAge)] = RoleInforSortField.RoleAge,
+        [nameof(RoleInforTableModel.RoleHeight)] = RoleInforSortField.RoleHeight,
+        [nameof(RoleInforTableModel.RoleIdentity)] = RoleInforSortField.RoleIdentity,
+        [nameof(RoleInforTableModel.RoleTaste)] = RoleInforSortField.RoleTaste,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -59,7 +82,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<RoleInforTableModel> dataTableCard;
+    DataTableCard<RoleInforTableModel, RoleInforSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

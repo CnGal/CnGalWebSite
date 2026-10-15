@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -31,7 +32,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
@@ -42,6 +42,19 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/space/[action]")]
     public class SpaceAPIController : ControllerBase
     {
+        private static readonly SortMap<Message, MessageSortField> ListMessagesSorting =
+            new SortMap<Message, MessageSortField>(MessageSortField.Id, MessageSortField.Id)
+            .Add(MessageSortField.Id, s => s.Id)
+            .Add(MessageSortField.Type, s => s.Type)
+            .Add(MessageSortField.PostTime, s => s.PostTime)
+            .Add(MessageSortField.Text, s => s.Text)
+            .Add(MessageSortField.Title, s => s.Title)
+            .Add(MessageSortField.UserId, s => s.ApplicationUser.Id)
+            .Add(MessageSortField.UserName, s => s.ApplicationUser.UserName)
+            .Add(MessageSortField.Link, s => s.Link)
+            .Add(MessageSortField.IsReaded, s => s.IsReaded);
+
+
 
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<UserAddress, long> _userAddressRepository;
@@ -248,12 +261,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<PagedResultDto<ExaminedNormalListModel>> GetUserEditRecordAsync([FromQuery] string userId, [FromQuery] string sorting, [FromQuery] int maxResultCount, [FromQuery] int currentPage, [FromQuery] string screeningConditions)
+        public async Task<PagedResultDto<ExaminedNormalListModel>> GetUserEditRecordAsync([FromQuery] string userId, [FromQuery, System.ComponentModel.DataAnnotations.EnumDataType(typeof(ExamineSortField))] ExamineSortField sortField, [FromQuery, System.ComponentModel.DataAnnotations.EnumDataType(typeof(SortDirection))] SortDirection sortDirection, [FromQuery] int maxResultCount, [FromQuery] int currentPage, [FromQuery] string screeningConditions)
         {
             return await _examineService.GetPaginatedResult(new GetExamineInput
             {
                 ScreeningConditions = screeningConditions,
-                Sorting = sorting,
+                Sorts = [new(sortField, sortDirection)],
                 CurrentPage = currentPage,
                 MaxResultCount = maxResultCount,
                 UserId = userId
@@ -582,12 +595,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<MessageOverviewModel>> ListMessages(QueryParameterModel model)
+        public async Task<QueryResultModel<MessageOverviewModel, MessageSortField>> ListMessages(QueryParameterModel<MessageSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Message, int>(_messageRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Text.Contains(model.SearchText) || s.Title.Contains(model.SearchText) || s.LinkTitle.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Message, MessageSortField>(_messageRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Text.Contains(model.SearchText) || s.Title.Contains(model.SearchText) || s.LinkTitle.Contains(model.SearchText)), ListMessagesSorting);
 
-            return new QueryResultModel<MessageOverviewModel>
+            return new QueryResultModel<MessageOverviewModel, MessageSortField>
             {
                 Items = await items.Select(s => new MessageOverviewModel
                 {

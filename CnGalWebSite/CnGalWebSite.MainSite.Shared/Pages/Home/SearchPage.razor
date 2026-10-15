@@ -1,3 +1,5 @@
+@using CnGalWebSite.DataModel.Sorting
+@using CnGalWebSite.Core.Models
 @page "/search"
 
 @inject IHomeQueryService HomeQueryService
@@ -22,9 +24,10 @@
         {
             <input type="hidden" name="Times" value="@time" />
         }
-        @if (!string.IsNullOrEmpty(SortValue))
+        @if (SortValue != SearchSortField.Default)
         {
-            <input type="hidden" name="Sort" value="@SortValue" />
+            <input type="hidden" name="SortField" value="@SortValue" />
+            <input type="hidden" name="SortDirection" value="@Direction" />
         }
 
         <div class="search-page__input-wrapper">
@@ -50,7 +53,7 @@
     <SearchFilterPanel SearchText="@SearchText"
                        SelectedTypes="FilterTypes"
                        SelectedTimes="FilterTimes"
-                       CurrentSort="@SortValue" />
+                       CurrentSort="@SortValue" Direction="@Direction" />
 
     @* ── Results ── *@
     @if (IsLoading)
@@ -118,7 +121,7 @@
     [SupplyParameterFromQuery(Name = "Times")]
     public string[]? QueryTimes { get; set; }
 
-    [SupplyParameterFromQuery(Name = "Sort")]
+    [SupplyParameterFromQuery(Name = "SortField")]
     public string? QuerySort { get; set; }
 
     [SupplyParameterFromQuery(Name = "Page")]
@@ -128,7 +131,11 @@
     private string SearchText = "";
     private List<string> FilterTypes = [];
     private List<string> FilterTimes = [];
-    private string SortValue = "";
+    [SupplyParameterFromQuery(Name = "SortDirection")]
+    public string? QueryDirection { get; set; }
+
+    private SearchSortField SortValue;
+    private SortDirection Direction = SortDirection.Descending;
     private int CurrentPage = 1;
 
     private SearchViewModel? SearchResult;
@@ -142,8 +149,8 @@
         get
         {
             var parts = new List<string>();
-            if (!string.IsNullOrWhiteSpace(SortValue))
-                parts.Add("Sort=" + Uri.EscapeDataString(SortValue));
+            if (SortValue != SearchSortField.Default)
+                parts.Add($"SortField={SortValue}&SortDirection={Direction}");
             foreach (var type in FilterTypes)
                 parts.Add("Types=" + Uri.EscapeDataString(type));
             foreach (var time in FilterTimes)
@@ -155,7 +162,14 @@
     protected override async Task OnParametersSetAsync()
     {
         SearchText = QueryText ?? "";
-        SortValue = QuerySort ?? "";
+        if ((!string.IsNullOrEmpty(QuerySort) && (!Enum.TryParse(QuerySort, true, out SortValue) || !Enum.IsDefined(SortValue))) ||
+            (!string.IsNullOrEmpty(QueryDirection) && (!Enum.TryParse(QueryDirection, true, out Direction) || !Enum.IsDefined(Direction))))
+        {
+            ErrorMessage = "排序字段或方向无效";
+            return;
+        }
+        if (string.IsNullOrEmpty(QuerySort)) SortValue = SearchSortField.Default;
+        if (string.IsNullOrEmpty(QueryDirection)) Direction = SortDirection.Descending;
         CurrentPage = QueryPage < 1 ? 1 : QueryPage;
         FilterTypes = QueryTypes?.Where(t => !string.IsNullOrWhiteSpace(t)).ToList() ?? [];
         FilterTimes = QueryTimes?.Where(t => !string.IsNullOrWhiteSpace(t)).ToList() ?? [];
@@ -172,7 +186,7 @@
 
         try
         {
-            var result = await HomeQueryService.SearchAsync(BuildQueryString());
+            var result = await HomeQueryService.SearchAsync(CnGalWebSite.DataModel.Application.Search.Dtos.SearchInputModel.Parse(FilterTypes.ToArray(), FilterTimes.ToArray(), SearchText, SortValue, Direction, CurrentPage));
             if (result.Success && result.Data is not null)
             {
                 SearchResult = result.Data;
@@ -189,22 +203,6 @@
         }
     }
 
-    private string BuildQueryString()
-    {
-        var parts = new List<string>();
-        if (!string.IsNullOrWhiteSpace(SearchText))
-            parts.Add("Text=" + Uri.EscapeDataString(SearchText));
-        if (!string.IsNullOrWhiteSpace(SortValue))
-            parts.Add("Sort=" + Uri.EscapeDataString(SortValue));
-        if (CurrentPage > 1)
-            parts.Add("Page=" + CurrentPage);
-        foreach (var type in FilterTypes)
-            parts.Add("Types=" + Uri.EscapeDataString(type));
-        foreach (var time in FilterTimes)
-            parts.Add("Times=" + Uri.EscapeDataString(time));
-        return parts.Count == 0 ? "" : "?" + string.Join("&", parts);
-    }
-
     /// <summary>
     /// Build href template for CgPagination link mode.
     /// Produces "/search?Text=xxx&Types=A&Page={0}" with {0} as page placeholder.
@@ -214,8 +212,8 @@
         var parts = new List<string>();
         if (!string.IsNullOrWhiteSpace(SearchText))
             parts.Add("Text=" + Uri.EscapeDataString(SearchText));
-        if (!string.IsNullOrWhiteSpace(SortValue))
-            parts.Add("Sort=" + Uri.EscapeDataString(SortValue));
+        if (SortValue != SearchSortField.Default)
+            parts.Add($"SortField={SortValue}&SortDirection={Direction}");
         foreach (var type in FilterTypes)
             parts.Add("Types=" + Uri.EscapeDataString(type));
         foreach (var time in FilterTimes)

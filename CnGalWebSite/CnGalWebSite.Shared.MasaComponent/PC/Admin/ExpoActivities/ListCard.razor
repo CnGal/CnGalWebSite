@@ -1,9 +1,10 @@
+@using CnGalWebSite.DataModel.Sorting
 @inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="ExpoActivityOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" SortByItem="@nameof(ExpoActivityOverviewModel.Priority)" @ref="dataTableCard">
+    <DataTableCard TModel="ExpoActivityOverviewModel" TSort="ExpoActivitySortField" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" DefaultSortField="ExpoActivitySortField.Priority" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -52,6 +53,19 @@
     <EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
 </MDialog>
 @code {
+    private static readonly IReadOnlyDictionary<string, ExpoActivitySortField> _sortFields = new Dictionary<string, ExpoActivitySortField>
+    {
+        [nameof(ExpoActivityOverviewModel.BackgroundImage)] = ExpoActivitySortField.BackgroundImage,
+        [nameof(ExpoActivityOverviewModel.CreateTime)] = ExpoActivitySortField.CreateTime,
+        [nameof(ExpoActivityOverviewModel.Description)] = ExpoActivitySortField.Description,
+        [nameof(ExpoActivityOverviewModel.ForegroundImage)] = ExpoActivitySortField.ForegroundImage,
+        [nameof(ExpoActivityOverviewModel.Hidden)] = ExpoActivitySortField.Hidden,
+        [nameof(ExpoActivityOverviewModel.Id)] = ExpoActivitySortField.Id,
+        [nameof(ExpoActivityOverviewModel.Name)] = ExpoActivitySortField.Name,
+        [nameof(ExpoActivityOverviewModel.Priority)] = ExpoActivitySortField.Priority,
+        [nameof(ExpoActivityOverviewModel.TicketCount)] = ExpoActivitySortField.TicketCount,
+    };
+
     private string _baseUrl = "api/expo/ListActivity";
     private string _name = "活动";
 
@@ -74,7 +88,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<ExpoActivityOverviewModel> dataTableCard;
+    DataTableCard<ExpoActivityOverviewModel, ExpoActivitySortField> dataTableCard;
 
     EditCard editCard;
     private bool _editDialog;

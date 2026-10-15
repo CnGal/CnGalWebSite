@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Favorites;
 using CnGalWebSite.DataModel.ViewModel.Space;
@@ -79,7 +80,7 @@ public sealed class FavoriteFolderQueryService(
         }
 
         var path = $"api/favorites/ListUserFavoriteFolders?userId={userId}";
-        var queryParam = new CnGalWebSite.Core.Models.QueryParameterModel
+        var queryParam = new CnGalWebSite.Core.Models.QueryParameterModel<FavoriteFolderSortField>
         {
             Page = 1,
             ItemsPerPage = 1000, // large enough to get all folders
@@ -102,7 +103,7 @@ public sealed class FavoriteFolderQueryService(
                 return SdkResult<IReadOnlyList<FavoriteFolderSummaryItem>>.Fail("FAVORITE_FOLDER_ALL_HTTP_FAILED", $"获取全部收藏夹列表失败（HTTP {(int)response.StatusCode})");
             }
 
-            var queryResult = Deserialize<CnGalWebSite.Core.Models.QueryResultModel<FavoriteFolderOverviewModel>>(responseBody);
+            var queryResult = Deserialize<CnGalWebSite.Core.Models.QueryResultModel<FavoriteFolderOverviewModel, FavoriteFolderSortField>>(responseBody);
             IReadOnlyList<FavoriteFolderSummaryItem> data = (queryResult?.Items?.Select(f => new FavoriteFolderSummaryItem
             {
                 Id = f.Id,
@@ -145,7 +146,7 @@ public sealed class FavoriteFolderQueryService(
         }
 
         var path = $"api/favorites/ListUserFavoriteObjects?folderId={folderId}";
-        var queryParam = new CnGalWebSite.Core.Models.QueryParameterModel
+        var queryParam = new CnGalWebSite.Core.Models.QueryParameterModel<FavoriteObjectSortField>
         {
             Page = page,
             ItemsPerPage = pageSize,
@@ -168,7 +169,7 @@ public sealed class FavoriteFolderQueryService(
                 return SdkResult<IReadOnlyList<FavoriteObjectOverviewModel>>.Fail("FAVORITE_FOLDER_OBJECTS_HTTP_FAILED", $"获取收藏对象列表失败（HTTP {(int)response.StatusCode})");
             }
 
-            var queryResult = Deserialize<CnGalWebSite.Core.Models.QueryResultModel<FavoriteObjectOverviewModel>>(responseBody);
+            var queryResult = Deserialize<CnGalWebSite.Core.Models.QueryResultModel<FavoriteObjectOverviewModel, FavoriteObjectSortField>>(responseBody);
             IReadOnlyList<FavoriteObjectOverviewModel> data = queryResult?.Items?.ToList() ?? [];
             memoryCache.Set(cacheKey, data, FolderDetailCacheDuration);
             return SdkResult<IReadOnlyList<FavoriteObjectOverviewModel>>.Ok(data);

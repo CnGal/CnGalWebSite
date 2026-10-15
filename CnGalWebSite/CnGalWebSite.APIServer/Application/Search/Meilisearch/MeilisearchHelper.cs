@@ -1,3 +1,5 @@
+using CnGalWebSite.DataModel.Sorting;
+using CnGalWebSite.Core.Models;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.DataReositories;
@@ -461,41 +463,21 @@ namespace CnGalWebSite.APIServer.Application.Search.Meilisearch
             var sortList = new List<string>();
             var filterParts = new List<string>();
 
-            // 可排序字段白名单
-            var validSortFields = new HashSet<string> { "lastEditTime", "pubulishTime", "createTime", "readerCount", "originalId" };
-
-            // 初始化排序
-            if (string.IsNullOrWhiteSpace(model.Sorting) == false)
+            if (!Enum.IsDefined(model.SortDirection)) throw new ArgumentException("无效的排序方向");
+            var field = model.SortField switch
             {
-                var isAscending = !model.Sorting.Contains(" desc");
-                var sortField = model.Sorting.Replace(" desc", "");
-                var f = sortField[0].ToString();
-                var sortString = f.ToLower() + sortField[1..^0];
-                sortString = sortString.Replace("id", "originalId");
-
-                // 仅在字段名有效时使用自定义排序，否则回退到默认
-                if (validSortFields.Contains(sortString))
-                {
-                    sortList.Add(isAscending ? $"{sortString}:asc" : $"{sortString}:desc");
-                }
-                else
-                {
-                    _logger.LogWarning("无效的排序字段: {sortField}，使用默认排序", sortString);
-                    if (string.IsNullOrWhiteSpace(model.FilterText))
-                    {
-                        sortList.Add("lastEditTime:desc");
-                    }
-                }
-            }
-            else
-            {
-                if (string.IsNullOrWhiteSpace(model.FilterText))
-                {
-                    sortList.Add("lastEditTime:desc");
-                }
-                // 有搜索词时不指定排序，使用 Meilisearch 默认的相关性排序
-            }
-
+                SearchSortField.Id => "originalId",
+                SearchSortField.LastEditTime => "lastEditTime",
+                SearchSortField.PublishTime => "pubulishTime",
+                SearchSortField.CreateTime => "createTime",
+                SearchSortField.ReaderCount => "readerCount",
+                SearchSortField.Default => null,
+                _ => throw new ArgumentException("无效的排序字段")
+            };
+            if (field != null)
+                sortList.Add(field + (model.SortDirection == SortDirection.Descending ? ":desc" : ":asc"));
+            else if (string.IsNullOrWhiteSpace(model.FilterText))
+                sortList.Add("lastEditTime:desc");
 
             // 筛选时间
             if (model.Times.Any())

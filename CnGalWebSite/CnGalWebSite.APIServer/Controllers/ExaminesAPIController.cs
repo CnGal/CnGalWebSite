@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.DataReositories;
@@ -18,7 +19,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Linq.Dynamic.Core;
 using CnGalWebSite.DataModel.ViewModel.EditRecords;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Users;
@@ -45,6 +45,39 @@ namespace CnGalWebSite.APIServer.Controllers
     [ApiController]
     public class ExaminesAPIController : ControllerBase
     {
+        private static readonly SortMap<UserMonitor, UserMonitorSortField> ListUserMonitorsSorting =
+            new SortMap<UserMonitor, UserMonitorSortField>(UserMonitorSortField.Id, UserMonitorSortField.Id)
+            .Add(UserMonitorSortField.CreateTime, s => s.CreateTime)
+            .Add(UserMonitorSortField.EntryId, s => s.Entry.Id)
+            .Add(UserMonitorSortField.EntryName, s => s.Entry.Name)
+            .Add(UserMonitorSortField.Type, s => s.Entry.Type)
+            .Add(UserMonitorSortField.Id, s => s.Id);
+
+        private static readonly SortMap<UserReviewEditRecord, UserReviewEditRecordSortField> ListUserReviewEditRecordsSorting =
+            new SortMap<UserReviewEditRecord, UserReviewEditRecordSortField>(UserReviewEditRecordSortField.Id, UserReviewEditRecordSortField.Id)
+            .Add(UserReviewEditRecordSortField.ExamineId, s => s.ExamineId.Value)
+            .Add(UserReviewEditRecordSortField.State, s => s.State)
+            .Add(UserReviewEditRecordSortField.EntryId, s => s.Examine.Entry.Id)
+            .Add(UserReviewEditRecordSortField.EntryName, s => s.Examine.Entry.DisplayName)
+            .Add(UserReviewEditRecordSortField.Operation, s => s.Examine.Operation)
+            .Add(UserReviewEditRecordSortField.UserId, s => s.Examine.ApplicationUserId)
+            .Add(UserReviewEditRecordSortField.UserName, s => s.Examine.ApplicationUser.UserName)
+            .Add(UserReviewEditRecordSortField.ReviewedTime, s => s.ReviewedTime)
+            .Add(UserReviewEditRecordSortField.Id, s => s.Id);
+
+        private static readonly SortMap<Examine, ExamineSortField> ListExaminesSorting =
+            new SortMap<Examine, ExamineSortField>(ExamineSortField.Id, ExamineSortField.Id)
+            .Add(ExamineSortField.Id, s => s.Id)
+            .Add(ExamineSortField.Operation, s => s.Operation)
+            .Add(ExamineSortField.IsPassed, s => s.IsPassed)
+            .Add(ExamineSortField.PassedTime, s => s.PassedTime)
+            .Add(ExamineSortField.ApplyTime, s => s.ApplyTime)
+            .Add(ExamineSortField.Comments, s => s.Comments)
+            .Add(ExamineSortField.ApplicationUserId, s => s.ApplicationUserId)
+            .Add(ExamineSortField.UserName, s => s.ApplicationUser.UserName)
+            .Add(ExamineSortField.PassedAdminName, s => s.PassedAdminName);
+
+
         
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Examine, long> _examineRepository;
@@ -813,13 +846,13 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPost]
-        public async Task<QueryResultModel<UserMonitorOverviewModel>> ListUserMonitors(QueryParameterModel model)
+        public async Task<QueryResultModel<UserMonitorOverviewModel, UserMonitorSortField>> ListUserMonitors(QueryParameterModel<UserMonitorSortField> model)
         {
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            var (items, total) = await _queryService.QueryAsync<UserMonitor, long>(_userMonitorsRepository.GetAll().Include(s=>s.Entry).AsSingleQuery().Where(s=>s.Entry!=null).Where(s=>s.ApplicationUserId== user.Id), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Entry.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<UserMonitor, UserMonitorSortField>(_userMonitorsRepository.GetAll().Include(s=>s.Entry).AsSingleQuery().Where(s=>s.Entry!=null).Where(s=>s.ApplicationUserId== user.Id), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Entry.Name.Contains(model.SearchText)), ListUserMonitorsSorting);
 
-            return new QueryResultModel<UserMonitorOverviewModel>
+            return new QueryResultModel<UserMonitorOverviewModel, UserMonitorSortField>
             {
                 Items = await items.Select(s => new UserMonitorOverviewModel
                 {
@@ -840,16 +873,16 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPost]
-        public async Task<QueryResultModel<UserReviewEditRecordOverviewModel>> ListUserReviewEditRecords(QueryParameterModel model)
+        public async Task<QueryResultModel<UserReviewEditRecordOverviewModel, UserReviewEditRecordSortField>> ListUserReviewEditRecords(QueryParameterModel<UserReviewEditRecordSortField> model)
         {
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-            var (items, total) = await _queryService.QueryAsync<UserReviewEditRecord, long>(_userReviewEditRecordRepository.GetAll().AsSingleQuery()
+            var (items, total) = await _queryService.QueryAsync<UserReviewEditRecord, UserReviewEditRecordSortField>(_userReviewEditRecordRepository.GetAll().AsSingleQuery()
                 .Include(s => s.Examine).ThenInclude(s => s.Entry)
                 .Include(s => s.Examine).ThenInclude(s => s.ApplicationUser)
                 .Where(s => s.ExamineId != null &&s.Examine!=null&&s.Examine.Entry!=null && s.ApplicationUserId == user.Id), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Examine.Entry.Name.Contains(model.SearchText)|| s.Examine.ApplicationUser.UserName.Contains(model.SearchText)));
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Examine.Entry.Name.Contains(model.SearchText)|| s.Examine.ApplicationUser.UserName.Contains(model.SearchText)), ListUserReviewEditRecordsSorting);
 
-            return new QueryResultModel<UserReviewEditRecordOverviewModel>
+            return new QueryResultModel<UserReviewEditRecordOverviewModel, UserReviewEditRecordSortField>
             {
                 Items = await items.Select(s => new UserReviewEditRecordOverviewModel
                 {
@@ -872,7 +905,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPost]
-        public async Task<QueryResultModel<ExamineOverviewModel>> ListExamines(QueryParameterModel model)
+        public async Task<QueryResultModel<ExamineOverviewModel, ExamineSortField>> ListExamines(QueryParameterModel<ExamineSortField> model)
         {
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             var _query = _examineRepository.GetAll().Include(s => s.ApplicationUser).AsNoTracking();
@@ -890,10 +923,10 @@ namespace CnGalWebSite.APIServer.Controllers
                     _query = _query.Where(s => s.EntryId == userCertification.EntryId);
                 }
             }
-            var (items, total) = await _queryService.QueryAsync<Examine, long>(_query.AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser.UserName.Contains(model.SearchText) || s.Comments.Contains(model.SearchText) || s.PassedAdminName.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Examine, ExamineSortField>(_query.AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser.UserName.Contains(model.SearchText) || s.Comments.Contains(model.SearchText) || s.PassedAdminName.Contains(model.SearchText)), ListExaminesSorting);
 
-            return new QueryResultModel<ExamineOverviewModel>
+            return new QueryResultModel<ExamineOverviewModel, ExamineSortField>
             {
                 Items = await items.Select(s => new ExamineOverviewModel
                 {

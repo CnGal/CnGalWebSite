@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.ProjectSite.API.DataReositories;
+using CnGalWebSite.ProjectSite.Models.Sorting;
+using CnGalWebSite.ProjectSite.API.DataReositories;
 using CnGalWebSite.ProjectSite.API.Services.Users;
 using CnGalWebSite.ProjectSite.Models.DataModels;
 using CnGalWebSite.ProjectSite.Models.ViewModels.Comments;
@@ -20,6 +21,20 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
     [ApiController]
     public class CommentController : ControllerBase
     {
+        private static readonly SortMap<Comment, ProjectCommentSortField> ListSorting =
+            new SortMap<Comment, ProjectCommentSortField>(ProjectCommentSortField.Id, ProjectCommentSortField.Id)
+            .Add(ProjectCommentSortField.Id, s => s.Id)
+            .Add(ProjectCommentSortField.CreateTime, s => s.CreateTime)
+            .Add(ProjectCommentSortField.UserId, s => s.UserId)
+            .Add(ProjectCommentSortField.UserName, s => s.User.UserName)
+            .Add(ProjectCommentSortField.Hide, s => s.Hide)
+            .Add(ProjectCommentSortField.PageId, s => s.PageId)
+            .Add(ProjectCommentSortField.Text, s => s.Text)
+            .Add(ProjectCommentSortField.Type, s => s.Type)
+            .Add(ProjectCommentSortField.PageType, s => s.PageType)
+            .Add(ProjectCommentSortField.Priority, s => s.Priority);
+
+
         private readonly IRepository<Comment, long> _commentRepository;
         private readonly IRepository<ProjectPositionUser, long> _projectPositionUserRepository;
         private readonly IRepository<StallUser, long> _stallUserRepository;
@@ -280,12 +295,12 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<CommentOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<CommentOverviewModel, ProjectCommentSortField>> List(QueryParameterModel<ProjectCommentSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Comment, long>(_commentRepository.GetAll().AsSingleQuery().Include(s => s.User), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Text.Contains(model.SearchText) || s.User.UserName.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Comment, ProjectCommentSortField>(_commentRepository.GetAll().AsSingleQuery().Include(s => s.User), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Text.Contains(model.SearchText) || s.User.UserName.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<CommentOverviewModel>
+            return new QueryResultModel<CommentOverviewModel, ProjectCommentSortField>
             {
                 Items = await items.Select(s => new CommentOverviewModel
                 {

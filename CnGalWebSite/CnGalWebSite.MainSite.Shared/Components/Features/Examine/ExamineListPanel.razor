@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.Core.Models
@@ -9,50 +10,50 @@
 
 @* 审核列表面板（服务端分页） *@
 
-<CgDataTable TItem="ExamineOverviewModel"
+<CgDataTable TItem="ExamineOverviewModel" TSort="ExamineSortField"
              Title="审核列表"
              OnServerQuery="LoadExaminesAsync"
-             DefaultSortField="@nameof(ExamineOverviewModel.PassedTime)"
+             DefaultSortField="ExamineSortField.PassedTime"
              DefaultSortDesc="true"
              @ref="_dataTable">
 
-    <CgDataTableColumn TItem="ExamineOverviewModel" Title="Id" Field="@nameof(ExamineOverviewModel.Id)" Width="80px" />
+    <CgDataTableColumn TItem="ExamineOverviewModel" TSort="ExamineSortField" Title="Id" SortField="ExamineSortField.Id" Value="item => item.Id" Width="80px" />
 
-    <CgDataTableColumn TItem="ExamineOverviewModel" Title="操作" Field="@nameof(ExamineOverviewModel.Operation)" Sortable="false">
+    <CgDataTableColumn TItem="ExamineOverviewModel" TSort="ExamineSortField" Title="操作" SortField="ExamineSortField.Operation" Value="item => item.Operation" Sortable="false">
         <ChildContent Context="item">
             @item.Operation.GetDisplayName()
         </ChildContent>
     </CgDataTableColumn>
 
-    <CgDataTableColumn TItem="ExamineOverviewModel" Title="状态" Field="@nameof(ExamineOverviewModel.IsPassed)" Sortable="false">
+    <CgDataTableColumn TItem="ExamineOverviewModel" TSort="ExamineSortField" Title="状态" SortField="ExamineSortField.IsPassed" Value="item => item.IsPassed" Sortable="false">
         <ChildContent Context="item">
             <ExamineStatusBadge IsPassed="@item.IsPassed" />
         </ChildContent>
     </CgDataTableColumn>
 
-    <CgDataTableColumn TItem="ExamineOverviewModel" Title="处理时间" Field="@nameof(ExamineOverviewModel.PassedTime)">
+    <CgDataTableColumn TItem="ExamineOverviewModel" TSort="ExamineSortField" Title="处理时间" SortField="ExamineSortField.PassedTime" Value="item => item.PassedTime">
         <ChildContent Context="item">
             @(item.PassedTime?.ToString("yyyy-MM-dd HH:mm") ?? "—")
         </ChildContent>
     </CgDataTableColumn>
 
-    <CgDataTableColumn TItem="ExamineOverviewModel" Title="申请时间" Field="@nameof(ExamineOverviewModel.ApplyTime)">
+    <CgDataTableColumn TItem="ExamineOverviewModel" TSort="ExamineSortField" Title="申请时间" SortField="ExamineSortField.ApplyTime" Value="item => item.ApplyTime">
         <ChildContent Context="item">
             @item.ApplyTime.ToString("yyyy-MM-dd HH:mm")
         </ChildContent>
     </CgDataTableColumn>
 
-    <CgDataTableColumn TItem="ExamineOverviewModel" Title="申请人" Sortable="false">
+    <CgDataTableColumn TItem="ExamineOverviewModel" TSort="ExamineSortField" Title="申请人" Sortable="false">
         <ChildContent Context="item">
             <a class="examine-user-link" href="/space/index/@item.ApplicationUserId">@(item.UserName ?? "—")</a>
         </ChildContent>
     </CgDataTableColumn>
 
-    <CgDataTableColumn TItem="ExamineOverviewModel" Title="处理人" Field="@nameof(ExamineOverviewModel.PassedAdminName)" Sortable="false" />
+    <CgDataTableColumn TItem="ExamineOverviewModel" TSort="ExamineSortField" Title="处理人" SortField="ExamineSortField.PassedAdminName" Value="item => item.PassedAdminName" Sortable="false" />
 
-    <CgDataTableColumn TItem="ExamineOverviewModel" Title="批注" Field="@nameof(ExamineOverviewModel.Comments)" Sortable="false" />
+    <CgDataTableColumn TItem="ExamineOverviewModel" TSort="ExamineSortField" Title="批注" SortField="ExamineSortField.Comments" Value="item => item.Comments" Sortable="false" />
 
-    <CgDataTableColumn TItem="ExamineOverviewModel" Title="操作" Sortable="false" Width="140px">
+    <CgDataTableColumn TItem="ExamineOverviewModel" TSort="ExamineSortField" Title="操作" Sortable="false" Width="140px">
         <ChildContent Context="item">
             <div class="examine-actions">
                 <button class="examine-action-btn examine-action-btn--view" title="查看" @onclick="() => LookItem(item)">
@@ -74,18 +75,11 @@
 </CgDataTable>
 
 @code {
-    private CgDataTable<ExamineOverviewModel>? _dataTable;
+    private CgDataTable<ExamineOverviewModel, ExamineSortField>? _dataTable;
 
-    private async Task<CgDataTableResult<ExamineOverviewModel>> LoadExaminesAsync(CgDataTableRequest request)
+    private async Task<CgDataTableResult<ExamineOverviewModel>> LoadExaminesAsync(CgDataTableRequest<ExamineSortField> request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? "",
-            SortBy = string.IsNullOrWhiteSpace(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
+        var parameter = request.ToQueryParameter();
 
         var result = await ExamineQueryService.GetExaminesAsync(parameter);
         if (result.Success && result.Data != null)

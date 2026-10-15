@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace CnGalWebSite.DataModel.ViewModel.Dtos
 {
-    public class PagedResultDto<TEntity> : PagedSortedAndFilterInput
+    public class PagedResultDto<TEntity> : PagedAndFilterInput
     {
         /// <summary>
         /// 数据总合计

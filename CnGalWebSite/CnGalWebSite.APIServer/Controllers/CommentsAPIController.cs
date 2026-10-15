@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Comments;
 using CnGalWebSite.APIServer.Application.Comments.Dtos;
 using CnGalWebSite.APIServer.Application.Examines;
@@ -38,6 +39,19 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/comments/[action]")]
     public class CommentsAPIController : ControllerBase
     {
+        private static readonly SortMap<Comment, CommentSortField> ListSorting =
+            new SortMap<Comment, CommentSortField>(CommentSortField.Id, CommentSortField.Id)
+            .Add(CommentSortField.Id, s => s.Id)
+            .Add(CommentSortField.Type, s => s.Type)
+            .Add(CommentSortField.CommentTime, s => s.CommentTime)
+            .Add(CommentSortField.Text, s => s.Text)
+            .Add(CommentSortField.UserId, s => s.ApplicationUser.Id)
+            .Add(CommentSortField.UserName, s => s.ApplicationUser.UserName)
+            .Add(CommentSortField.IsHidden, s => s.IsHidden)
+            .Add(CommentSortField.Priority, s => s.Priority)
+            .Add(CommentSortField.ObjectName, s => s.Entry != null ? s.Entry.Name : s.Article != null ? s.Article.Name : s.Periphery != null ? s.Periphery.Name : s.Video != null ? s.Video.Name : s.UserSpaceCommentManager != null ? s.UserSpaceCommentManager.ApplicationUser.UserName : s.Vote != null ? s.Vote.Name : s.Lottery != null ? s.Lottery.Name : s.ParentCodeNavigation != null ? "回复：Id" + s.ParentCodeNavigation.Id : null);
+
+
 
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Article, long> _articleRepository;
@@ -456,9 +470,9 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<CommentOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<CommentOverviewModel, CommentSortField>> List(QueryParameterModel<CommentSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Comment, long>(_commentRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Text) == false)
+            var (items, total) = await _queryService.QueryAsync<Comment, CommentSortField>(_commentRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Text) == false)
                 .Include(s => s.ApplicationUser)
                 .Include(s => s.Entry)
                 .Include(s => s.Article)
@@ -467,9 +481,9 @@ namespace CnGalWebSite.APIServer.Controllers
                 .Include(s => s.Vote)
                 .Include(s => s.Lottery)
                 .Include(s => s.ParentCodeNavigation), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || ((s.Text.Contains(model.SearchText))));
+                s => string.IsNullOrWhiteSpace(model.SearchText) || ((s.Text.Contains(model.SearchText))), ListSorting);
 
-            return new QueryResultModel<CommentOverviewModel>
+            return new QueryResultModel<CommentOverviewModel, CommentSortField>
             {
                 Items = await items.Select(s => new CommentOverviewModel
                 {

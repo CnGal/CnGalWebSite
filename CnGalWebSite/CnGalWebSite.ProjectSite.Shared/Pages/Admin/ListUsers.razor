@@ -1,4 +1,5 @@
-﻿@page "/admin/listusers"
+@using CnGalWebSite.ProjectSite.Models.Sorting
+@page "/admin/listusers"
 
 @inject IHttpService _httpService
 @inject IPopupService PopupService
@@ -7,7 +8,7 @@
 <CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="用户版块" />
 
 <MDCard>
-    <DataTableCard TModel="UserOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <DataTableCard TModel="UserOverviewModel" TSort="ProjectUserSortField" DefaultSortField="ProjectUserSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == nameof(UserOverviewModel.Name))
             {
@@ -42,6 +43,18 @@
 </MDCard>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, ProjectUserSortField> _sortFields = new Dictionary<string, ProjectUserSortField>
+    {
+        [nameof(UserOverviewModel.Avatar)] = ProjectUserSortField.Avatar,
+        [nameof(UserOverviewModel.BackgroundImage)] = ProjectUserSortField.BackgroundImage,
+        [nameof(UserOverviewModel.Email)] = ProjectUserSortField.Email,
+        [nameof(UserOverviewModel.Id)] = ProjectUserSortField.Id,
+        [nameof(UserOverviewModel.Name)] = ProjectUserSortField.Name,
+        [nameof(UserOverviewModel.RegistTime)] = ProjectUserSortField.RegistTime,
+        [nameof(UserOverviewModel.Tags)] = ProjectUserSortField.Tags,
+        [nameof(UserOverviewModel.Type)] = ProjectUserSortField.Type,
+    };
+
     private string _baseUrl = "api/user/list";
     private string _name = "用户";
 
@@ -62,7 +75,7 @@
           new (){ Text= "注册时间", Value= nameof(UserOverviewModel.RegistTime)},
     };
 
-    DataTableCard<UserOverviewModel> dataTableCard;
+    DataTableCard<UserOverviewModel, ProjectUserSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

@@ -1,4 +1,5 @@
-﻿
+using CnGalWebSite.DataModel.Sorting;
+
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Users.Dtos;
@@ -21,7 +22,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -30,6 +30,19 @@ namespace CnGalWebSite.APIServer.Application.Users
 {
     public class UserService : IUserService
     {
+        private static readonly CnGalWebSite.Core.Services.Query.SortMap<ApplicationUser, UserSortField> ListSorting =
+            new CnGalWebSite.Core.Services.Query.SortMap<ApplicationUser, UserSortField>(UserSortField.Id, UserSortField.Id)
+            .Add(UserSortField.Id, s => s.Id)
+            .Add(UserSortField.PersonalSignature, s => s.PersonalSignature)
+            .Add(UserSortField.CanComment, s => s.CanComment??false)
+            .Add(UserSortField.DisplayContributionValue, s => s.DisplayContributionValue)
+            .Add(UserSortField.DisplayIntegral, s => s.DisplayIntegral)
+            .Add(UserSortField.Email, s => s.Email)
+            .Add(UserSortField.LastOnlineTime, s => s.LastOnlineTime)
+            .Add(UserSortField.OnlineTime, s => s.OnlineTime)
+            .Add(UserSortField.RegistTime, s => s.RegistTime)
+            .Add(UserSortField.UserName, s => s.UserName);
+
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<UserIntegral, string> _userIntegralRepository;
         private readonly IRepository<ThirdPartyLoginInfor, long> _thirdPartyLoginInforRepository;
@@ -84,7 +97,7 @@ namespace CnGalWebSite.APIServer.Application.Users
             //统计查询数据的总条数
             var count = query.Count();
             //根据需求进行排序，然后进行分页逻辑的计算
-            query = query.OrderBy(input.Sorting).Skip((input.CurrentPage - 1) * input.MaxResultCount).Take(input.MaxResultCount);
+            query = ListSorting.Apply(query, input.Sorts).Skip((input.CurrentPage - 1) * input.MaxResultCount).Take(input.MaxResultCount);
 
             //将结果转换为List集合 加载到内存中
             List<ApplicationUser> models = null;
@@ -105,7 +118,7 @@ namespace CnGalWebSite.APIServer.Application.Users
                 MaxResultCount = input.MaxResultCount,
                 Data = models,
                 FilterText = input.FilterText,
-                Sorting = input.Sorting,
+
                 ScreeningConditions = input.ScreeningConditions
             };
 

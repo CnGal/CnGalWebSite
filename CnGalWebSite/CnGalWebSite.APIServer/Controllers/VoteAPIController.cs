@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -32,6 +33,19 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/votes/[action]")]
     public class VoteAPIController : ControllerBase
     {
+        private static readonly SortMap<Vote, VoteSortField> ListSorting =
+            new SortMap<Vote, VoteSortField>(VoteSortField.Id, VoteSortField.Id)
+            .Add(VoteSortField.Id, s => s.Id)
+            .Add(VoteSortField.Name, s => s.Name)
+            .Add(VoteSortField.IsHidden, s => s.IsHidden)
+            .Add(VoteSortField.CanComment, s => s.CanComment ?? true)
+            .Add(VoteSortField.Priority, s => s.Priority)
+            .Add(VoteSortField.Type, s => s.Type)
+            .Add(VoteSortField.LastEditTime, s => s.LastEditTime)
+            .Add(VoteSortField.BeginTime, s => s.BeginTime)
+            .Add(VoteSortField.EndTime, s => s.EndTime);
+
+
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Article, long> _articleRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
@@ -953,12 +967,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<VoteOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<VoteOverviewModel, VoteSortField>> List(QueryParameterModel<VoteSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Vote, long>(_voteRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Vote, VoteSortField>(_voteRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<VoteOverviewModel>
+            return new QueryResultModel<VoteOverviewModel, VoteSortField>
             {
                 Items = await items.Select(s => new VoteOverviewModel
                 {

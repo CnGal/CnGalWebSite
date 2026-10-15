@@ -1,3 +1,5 @@
+using CnGalWebSite.DataModel.Sorting;
+using CnGalWebSite.Core.Models;
 #if false
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Search;
@@ -14,7 +16,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 using Typesense;
@@ -548,39 +549,25 @@ namespace CnGalWebSite.APIServer.Application.Typesense
 
         public async Task<PagedResultDto<SearchAloneModel>> QueryAsync(SearchInputModel model)
         {
-            var sortString = "";
             var filterString = new StringBuilder();
-            var isAscending = !model.Sorting.Contains(" desc");
-            model.Sorting = model.Sorting.Replace(" desc", "");
-
-            //初始化排序
-            if (string.IsNullOrWhiteSpace(model.Sorting) == false)
+            if (!Enum.IsDefined(model.SortDirection)) throw new ArgumentException("无效的排序方向");
+            var field = model.SortField switch
             {
-                var f = model.Sorting[0].ToString();
-                sortString = f.ToLower() + model.Sorting[1..^0];
-            }
-            else
+                SearchSortField.Id => "originalId",
+                SearchSortField.LastEditTime => "lastEditTime",
+                SearchSortField.PublishTime => "pubulishTime",
+                SearchSortField.CreateTime => "createTime",
+                SearchSortField.ReaderCount => "readerCount",
+                SearchSortField.Default => null,
+                _ => throw new ArgumentException("无效的排序字段")
+            };
+            var direction = model.SortDirection;
+            if (field == null)
             {
-                if (string.IsNullOrWhiteSpace(model.FilterText))
-                {
-                    sortString = "lastEditTime";
-                    isAscending = false;
-                }
-                else
-                {
-                    sortString = "_text_match";
-                }
+                field = string.IsNullOrWhiteSpace(model.FilterText) ? "lastEditTime" : "_text_match";
+                direction = SortDirection.Descending;
             }
-
-            sortString = sortString.Replace("id", "originalId");
-            if (isAscending == false)
-            {
-                sortString += ":desc";
-            }
-            else
-            {
-                sortString += ":asc";
-            }
+            var sortString = field + (direction == SortDirection.Descending ? ":desc" : ":asc");
 
             //设置搜索字段
             var query = new SearchParameters(model.FilterText, "name,displayName,anotherName,briefIntroduction,mainPage");

@@ -1,4 +1,5 @@
-﻿@page "/admin/listcarousels"
+@using CnGalWebSite.ProjectSite.Models.Sorting
+@page "/admin/listcarousels"
 
 @inject IHttpService _httpService
 @inject IPopupService PopupService
@@ -6,7 +7,7 @@
 <CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="轮播图版块" />
 
 <MDCard>
-    <DataTableCard TModel="CarouselOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" SortByItem="@nameof(CarouselOverviewModel.Priority)" @ref="dataTableCard">
+    <DataTableCard TModel="CarouselOverviewModel" TSort="ProjectCarouselSortField" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" DefaultSortField="ProjectCarouselSortField.Priority" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -43,6 +44,15 @@
     <CnGalWebSite.ProjectSite.Shared.Components.Admin.Carousels.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
 </MDialog>
 @code {
+    private static readonly IReadOnlyDictionary<string, ProjectCarouselSortField> _sortFields = new Dictionary<string, ProjectCarouselSortField>
+    {
+        [nameof(CarouselOverviewModel.Id)] = ProjectCarouselSortField.Id,
+        [nameof(CarouselOverviewModel.Image)] = ProjectCarouselSortField.Image,
+        [nameof(CarouselOverviewModel.Link)] = ProjectCarouselSortField.Link,
+        [nameof(CarouselOverviewModel.Note)] = ProjectCarouselSortField.Note,
+        [nameof(CarouselOverviewModel.Priority)] = ProjectCarouselSortField.Priority,
+    };
+
     private string _baseUrl = "api/admin/ListCarousels";
     private string _name = "轮播图";
 
@@ -61,7 +71,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<CarouselOverviewModel> dataTableCard;
+    DataTableCard<CarouselOverviewModel, ProjectCarouselSortField> dataTableCard;
 
     CnGalWebSite.ProjectSite.Shared.Components.Admin.Carousels.EditCard editCard;
     private bool _editDialog;

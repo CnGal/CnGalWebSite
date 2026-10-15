@@ -1,4 +1,6 @@
-﻿@page "/search"
+@using CnGalWebSite.DataModel.Sorting
+@using CnGalWebSite.Core.Models
+@page "/search"
 
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
@@ -88,7 +90,10 @@
     public string Text { get; set; }
     [SupplyParameterFromQuery]
     [Parameter]
-    public string Sort { get; set; }
+    public string SortField { get; set; }
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string SortDirection { get; set; }
 
     [SupplyParameterFromQuery]
     [Parameter]
@@ -121,7 +126,10 @@
         {
             try
             {
-                SearchInputModel.TryParse(Types, Times, Text, Sort, Page, InputModel);
+                if (!Enum.TryParse<SearchSortField>(SortField ?? "Default", true, out var field) || !Enum.IsDefined(field) ||
+                    !Enum.TryParse<CnGalWebSite.Core.Models.SortDirection>(SortDirection ?? "Descending", true, out var direction) || !Enum.IsDefined(direction) ||
+                    !SearchInputModel.TryParse(Types, Times, Text, field, direction, Page, InputModel))
+                    throw new ArgumentException("排序字段或方向无效");
 
                 //请求数据
                 try

@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/listfriendlinks"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -21,10 +22,10 @@
         友情链接管理
     </h1>
 
-    <CgDataTable TItem="FriendLinkOverviewModel"
+    <CgDataTable TItem="FriendLinkOverviewModel" TSort="FriendLinkSortField"
                  Title="友情链接列表"
                  OnServerQuery="OnQueryAsync"
-                 DefaultSortField="Id"
+                 DefaultSortField="FriendLinkSortField.Id"
                  DefaultSortDesc="true"
                  @ref="_table">
         <ToolbarContent>
@@ -34,16 +35,16 @@
             </CgButton>
         </ToolbarContent>
         <ChildContent>
-            <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="ID" Field="Id" Width="100px" />
-        <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="展示图" Width="100px">
+            <CgDataTableColumn TItem="FriendLinkOverviewModel" TSort="FriendLinkSortField" Title="ID" SortField="FriendLinkSortField.Id" Value="item => item.Id" Width="100px" />
+        <CgDataTableColumn TItem="FriendLinkOverviewModel" TSort="FriendLinkSortField" Title="展示图" Width="100px">
             <ChildContent Context="context">
                 <img src="@context.Image" alt="友情链接" style="max-height: 40px; border-radius: 4px;" />
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="名称" Field="Name" />
-        <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="链接" Field="Link" />
-        <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="权重" Field="Priority" Sortable="true" Width="100px" />
-        <CgDataTableColumn TItem="FriendLinkOverviewModel" Title="操作" Width="140px">
+        <CgDataTableColumn TItem="FriendLinkOverviewModel" TSort="FriendLinkSortField" Title="名称" SortField="FriendLinkSortField.Name" Value="item => item.Name" />
+        <CgDataTableColumn TItem="FriendLinkOverviewModel" TSort="FriendLinkSortField" Title="链接" SortField="FriendLinkSortField.Link" Value="item => item.Link" />
+        <CgDataTableColumn TItem="FriendLinkOverviewModel" TSort="FriendLinkSortField" Title="权重" SortField="FriendLinkSortField.Priority" Value="item => item.Priority" Sortable="true" Width="100px" />
+        <CgDataTableColumn TItem="FriendLinkOverviewModel" TSort="FriendLinkSortField" Title="操作" Width="140px">
             <ChildContent Context="context">
                 <div class="admin-actions">
                     <button class="admin-action-btn admin-action-btn--up" title="增加权重" @onclick="() => OnEditPriorityAsync(context, 1)"><CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" /></button>
@@ -96,21 +97,14 @@
 
 @code {
     private CancellationTokenSource? _cts;
-    private CgDataTable<FriendLinkOverviewModel>? _table;
+    private CgDataTable<FriendLinkOverviewModel, FriendLinkSortField>? _table;
     private bool _showEditModal;
     private bool _isNew;
     private FriendLinkEditModel? _editModel;
 
-    private async Task<CgDataTableResult<FriendLinkOverviewModel>> OnQueryAsync(CgDataTableRequest request)
+    private async Task<CgDataTableResult<FriendLinkOverviewModel>> OnQueryAsync(CgDataTableRequest<FriendLinkSortField> request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
+        var parameter = request.ToQueryParameter();
 
         var result = await QueryService.GetFriendLinksAsync(parameter, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data != null)

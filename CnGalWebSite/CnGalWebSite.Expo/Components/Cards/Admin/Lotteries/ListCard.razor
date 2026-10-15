@@ -1,8 +1,9 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService _popupService
 @inject NavigationManager NavigationManager
 
-<CnGalWebSite.Components.DataTables.DataTableCard TModel="ExpoTaskOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+<CnGalWebSite.Components.DataTables.DataTableCard TModel="ExpoTaskOverviewModel" TSort="ExpoTaskSortField" DefaultSortField="ExpoTaskSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
     <ItemColContent>
         @if (context.Header.Value == nameof(ExpoTaskOverviewModel.UserId))
         {
@@ -21,6 +22,15 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, ExpoTaskSortField> _sortFields = new Dictionary<string, ExpoTaskSortField>
+    {
+        [nameof(ExpoTaskOverviewModel.Id)] = ExpoTaskSortField.Id,
+        [nameof(ExpoTaskOverviewModel.LotteryCount)] = ExpoTaskSortField.LotteryCount,
+        [nameof(ExpoTaskOverviewModel.Time)] = ExpoTaskSortField.Time,
+        [nameof(ExpoTaskOverviewModel.Type)] = ExpoTaskSortField.Type,
+        [nameof(ExpoTaskOverviewModel.UserId)] = ExpoTaskSortField.UserId,
+    };
+
     private string _baseUrl = "api/expo/listtask";
     private string _name = "任务";
 
@@ -39,5 +49,5 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    CnGalWebSite.Components.DataTables.DataTableCard<ExpoTaskOverviewModel> dataTableCard;
+    CnGalWebSite.Components.DataTables.DataTableCard<ExpoTaskOverviewModel, ExpoTaskSortField> dataTableCard;
 }

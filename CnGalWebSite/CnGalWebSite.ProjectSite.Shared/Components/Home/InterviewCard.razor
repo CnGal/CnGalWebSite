@@ -1,4 +1,4 @@
-﻿@using CnGalWebSite.ProjectSite.Shared.Models.Home
+@using CnGalWebSite.ProjectSite.Shared.Models.Home
 
 @inject IHttpService _httpService
 @inject NavigationManager NavigationManager
@@ -8,7 +8,7 @@
 @if (Model != null)
 {
     <div class="home-interview-card mb-4">
-        <CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="访谈" Icon="@IconType.Article.ToIconString()" ShowMoreButton Href="https://www.cngal.org/search?Sort=PubulishTime%20desc&Types=Interview" Target="_blank">
+        <CnGalWebSite.Components.Containers.MasaTitleContainer Outline Title="访谈" Icon="@IconType.Article.ToIconString()" ShowMoreButton Href="https://www.cngal.org/search?SortField=PublishTime&SortDirection=Descending&Types=Interview" Target="_blank">
              <CnGalWebSite.ProjectSite.Shared.Components.Shared.SlideGroup Items="Model.pagedResultDto.Data.Select(s=>s.Article)">
                      <MDCard Class="item" Href="@($"https://www.cngal.org/articles/index/{context.Id}")" Target="_blank">
                          <img class="image" src="@context.MainImage" alt="@context.Name" loading="lazy" />
@@ -38,7 +38,7 @@
     {
         try
         {
-            Model = await _httpService.GetAsync<SearchViewModel>(_configuration["CnGalAPI"] + "api/home/Search?Types=Interview&Sort=PubulishTime%20desc");
+            Model = await _httpService.GetAsync<SearchViewModel>(_configuration["CnGalAPI"] + "api/home/Search?Types=Interview&SortField=PublishTime&SortDirection=Descending");
             StateHasChanged();
         }
         catch (Exception ex)

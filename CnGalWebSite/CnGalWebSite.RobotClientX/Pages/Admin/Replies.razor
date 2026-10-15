@@ -1,10 +1,11 @@
-﻿@page "/admin/replies"
+@using CnGalWebSite.RobotClientX.Models.Sorting
+@page "/admin/replies"
 
 @inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject IRepository<RobotReply> _robotReplyRepository
 
-<DataTableCard TModel="RobotReply" Headers="_headers" DataSource="_robotReplyRepository.GetAll()" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
+<DataTableCard TModel="RobotReply" TSort="RobotRobotReplySortField" DefaultSortField="RobotRobotReplySortField.Id" SortFields="_sortFields" LocalSorting="_localSorting" Headers="_headers" DataSource="_robotReplyRepository.GetAll()" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
                Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.Key.Contains(dataTableCard._search) || s.Value.Contains(dataTableCard._search))">
     <ItemColContent>
         @if (context.Header.Value == "actions")
@@ -60,6 +61,31 @@
 </MDialog>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, RobotRobotReplySortField> _sortFields = new Dictionary<string, RobotRobotReplySortField>
+    {
+        ["AfterTime"] = RobotRobotReplySortField.AfterTime,
+        ["BeforeTime"] = RobotRobotReplySortField.BeforeTime,
+        ["IsHidden"] = RobotRobotReplySortField.IsHidden,
+        ["Range"] = RobotRobotReplySortField.Range,
+        ["key"] = RobotRobotReplySortField.Key,
+        ["value"] = RobotRobotReplySortField.Value,
+        [nameof(RobotReply.Id)] = RobotRobotReplySortField.Id,
+        [nameof(RobotReply.Priority)] = RobotRobotReplySortField.Priority,
+        [nameof(RobotReply.UpdateTime)] = RobotRobotReplySortField.UpdateTime,
+    };
+
+    private static readonly CnGalWebSite.Core.Services.Query.SortMap<RobotReply, RobotRobotReplySortField> _localSorting =
+        new CnGalWebSite.Core.Services.Query.SortMap<RobotReply, RobotRobotReplySortField>(RobotRobotReplySortField.Id, RobotRobotReplySortField.Id)
+        .Add(RobotRobotReplySortField.AfterTime, item => item.AfterTime)
+        .Add(RobotRobotReplySortField.BeforeTime, item => item.BeforeTime)
+        .Add(RobotRobotReplySortField.Id, item => item.Id)
+        .Add(RobotRobotReplySortField.IsHidden, item => item.IsHidden)
+        .Add(RobotRobotReplySortField.Key, item => item.Key)
+        .Add(RobotRobotReplySortField.Priority, item => item.Priority)
+        .Add(RobotRobotReplySortField.Range, item => item.Range)
+        .Add(RobotRobotReplySortField.UpdateTime, item => item.UpdateTime)
+        .Add(RobotRobotReplySortField.Value, item => item.Value);
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -89,7 +115,7 @@
 
     List<KeyValuePair<string, string>> _scopes;
 
-    DataTableCard<RobotReply> dataTableCard;
+    DataTableCard<RobotReply, RobotRobotReplySortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

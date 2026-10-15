@@ -1,4 +1,5 @@
-﻿@page "/admin/listfriendlinks"
+@using CnGalWebSite.ProjectSite.Models.Sorting
+@page "/admin/listfriendlinks"
 
 @inject IHttpService _httpService
 @inject IPopupService PopupService
@@ -6,7 +7,7 @@
 <CnGalWebSite.ProjectSite.Shared.Components.Shared.TitleCard Title="友情链接版块" />
 
 <MDCard>
-    <DataTableCard TModel="FriendLinkOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" SortByItem="@nameof(CarouselOverviewModel.Priority)" @ref="dataTableCard">
+    <DataTableCard TModel="FriendLinkOverviewModel" TSort="ProjectFriendLinkSortField" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" DefaultSortField="ProjectFriendLinkSortField.Priority" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -44,6 +45,15 @@
     <CnGalWebSite.ProjectSite.Shared.Components.Admin.FriendLinks.EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
 </MDialog>
 @code {
+    private static readonly IReadOnlyDictionary<string, ProjectFriendLinkSortField> _sortFields = new Dictionary<string, ProjectFriendLinkSortField>
+    {
+        [nameof(FriendLinkOverviewModel.Id)] = ProjectFriendLinkSortField.Id,
+        [nameof(FriendLinkOverviewModel.Image)] = ProjectFriendLinkSortField.Image,
+        [nameof(FriendLinkOverviewModel.Link)] = ProjectFriendLinkSortField.Link,
+        [nameof(FriendLinkOverviewModel.Name)] = ProjectFriendLinkSortField.Name,
+        [nameof(FriendLinkOverviewModel.Priority)] = ProjectFriendLinkSortField.Priority,
+    };
+
     private string _baseUrl = "api/admin/ListFriendLinks";
     private string _name = "友情链接";
 
@@ -62,7 +72,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<FriendLinkOverviewModel> dataTableCard;
+    DataTableCard<FriendLinkOverviewModel, ProjectFriendLinkSortField> dataTableCard;
 
     CnGalWebSite.ProjectSite.Shared.Components.Admin.FriendLinks.EditCard editCard;
     private bool _editDialog;

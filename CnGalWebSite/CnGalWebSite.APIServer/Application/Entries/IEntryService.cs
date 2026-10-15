@@ -1,4 +1,5 @@
-﻿
+using CnGalWebSite.DataModel.Sorting;
+
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
 
 using CnGalWebSite.DataModel.ExamineModel.Entries;
@@ -18,7 +19,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
     {
         Task<PagedResultDto<Entry>> GetPaginatedResult(GetEntryInput input);
 
-        Task<PagedResultDto<EntryInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input);
+        Task<PagedResultDto<EntryInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput<EntrySortField> input);
 
         void UpdateEntryDataMain(Entry entry, ExamineMain examine);
 

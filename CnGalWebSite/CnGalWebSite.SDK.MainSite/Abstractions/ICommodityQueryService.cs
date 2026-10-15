@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Commodities;
@@ -25,5 +26,5 @@ public interface ICommodityQueryService
     /// <summary>
     /// 获取 G 币变动记录（服务端分页）
     /// </summary>
-    Task<SdkResult<QueryResultModel<GCoinsRecordOverviewModel>>> ListGCoinsRecordAsync(QueryParameterModel model, CancellationToken cancellationToken = default);
+    Task<SdkResult<QueryResultModel<GCoinsRecordOverviewModel, GCoinsRecordSortField>>> ListGCoinsRecordAsync(QueryParameterModel<GCoinsRecordSortField> model, CancellationToken cancellationToken = default);
 }

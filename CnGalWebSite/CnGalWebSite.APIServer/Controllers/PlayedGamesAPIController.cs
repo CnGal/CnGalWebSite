@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Lotteries;
@@ -36,6 +37,21 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/playedgame/[action]")]
     public class PlayedGamesAPIController : ControllerBase
     {
+        private static readonly SortMap<PlayedGame, GameRecordSortField> ListSorting =
+            new SortMap<PlayedGame, GameRecordSortField>(GameRecordSortField.Id, GameRecordSortField.Id)
+            .Add(GameRecordSortField.Id, s => s.Id)
+            .Add(GameRecordSortField.ShowPublicly, s => s.ShowPublicly)
+            .Add(GameRecordSortField.TotalSocre, s => s.TotalSocre)
+            .Add(GameRecordSortField.IsHidden, s => s.IsHidden)
+            .Add(GameRecordSortField.LastEditTime, s => s.LastEditTime)
+            .Add(GameRecordSortField.PlayImpressions, s => s.PlayImpressions)
+            .Add(GameRecordSortField.Type, s => s.Type)
+            .Add(GameRecordSortField.GameId, s => s.Entry.Id)
+            .Add(GameRecordSortField.GameName, s => s.Entry.Name)
+            .Add(GameRecordSortField.UserName, s => s.ApplicationUser.UserName)
+            .Add(GameRecordSortField.UserId, s => s.ApplicationUser.Id);
+
+
 
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<SteamAppRreview, int> _steamAppRreviewRepository;
@@ -608,12 +624,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<GameRecordOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<GameRecordOverviewModel, GameRecordSortField>> List(QueryParameterModel<GameRecordSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<PlayedGame, long>(_playedGameRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).Include(s => s.Entry).Where(s => s.Entry != null && s.ApplicationUser != null), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.PlayImpressions.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<PlayedGame, GameRecordSortField>(_playedGameRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).Include(s => s.Entry).Where(s => s.Entry != null && s.ApplicationUser != null), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.PlayImpressions.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<GameRecordOverviewModel>
+            return new QueryResultModel<GameRecordOverviewModel, GameRecordSortField>
             {
                 Items = await items.Select(s => new GameRecordOverviewModel
                 {

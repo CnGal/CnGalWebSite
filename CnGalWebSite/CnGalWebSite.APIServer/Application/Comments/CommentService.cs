@@ -20,7 +20,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.Comments
@@ -118,7 +117,7 @@ namespace CnGalWebSite.APIServer.Application.Comments
             //统计查询数据的总条数 不包括子评论
             var count = query.Count();
             //根据需求进行排序，然后进行分页逻辑的计算
-            query = query.OrderBy("Priority desc");
+            query = query.OrderByDescending(s => s.Priority);
             //将结果转换为List集合 加载到内存中
             var tempQuery = await query.ToListAsync();
             //加载预览评论

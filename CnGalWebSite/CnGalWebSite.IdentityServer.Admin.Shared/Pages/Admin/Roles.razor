@@ -1,4 +1,5 @@
-﻿@page "/admin/roles"
+@using CnGalWebSite.IdentityServer.Models.Sorting
+@page "/admin/roles"
 
 @attribute [Authorize(Roles = "Admin")]
 
@@ -7,7 +8,7 @@
 
 @using CnGalWebSite.IdentityServer.Models.ViewModels.Roles
 
-<DataTableCard TModel="RoleOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+<DataTableCard TModel="RoleOverviewModel" TSort="IdentityRoleSortField" DefaultSortField="IdentityRoleSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {
@@ -52,6 +53,12 @@
 </MDialog>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, IdentityRoleSortField> _sortFields = new Dictionary<string, IdentityRoleSortField>
+    {
+        [nameof(RoleOverviewModel.Id)] = IdentityRoleSortField.Id,
+        [nameof(RoleOverviewModel.Name)] = IdentityRoleSortField.Name,
+    };
+
     private bool _editDialog;
     private bool _detailDialog;
     private RoleOverviewModel _editedItem;
@@ -73,7 +80,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<RoleOverviewModel> dataTableCard;
+    DataTableCard<RoleOverviewModel, IdentityRoleSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

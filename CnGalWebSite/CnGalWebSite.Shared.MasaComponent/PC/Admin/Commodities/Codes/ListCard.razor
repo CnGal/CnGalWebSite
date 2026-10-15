@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="CommodityCodeOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+    <DataTableCard TModel="CommodityCodeOverviewModel" TSort="CommodityCodeSortField" DefaultSortField="CommodityCodeSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
         <ButtonContent>
             <MButton Color="primary" Rounded
                      Dark
@@ -74,6 +75,19 @@
 </MDialog>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, CommodityCodeSortField> _sortFields = new Dictionary<string, CommodityCodeSortField>
+    {
+        [nameof(CommodityCodeOverviewModel.Code)] = CommodityCodeSortField.Code,
+        [nameof(CommodityCodeOverviewModel.Count)] = CommodityCodeSortField.Count,
+        [nameof(CommodityCodeOverviewModel.CreateTime)] = CommodityCodeSortField.CreateTime,
+        [nameof(CommodityCodeOverviewModel.Hide)] = CommodityCodeSortField.Hide,
+        [nameof(CommodityCodeOverviewModel.Id)] = CommodityCodeSortField.Id,
+        [nameof(CommodityCodeOverviewModel.RedeemedTime)] = CommodityCodeSortField.RedeemedTime,
+        [nameof(CommodityCodeOverviewModel.Type)] = CommodityCodeSortField.Type,
+        [nameof(CommodityCodeOverviewModel.UpdateTime)] = CommodityCodeSortField.UpdateTime,
+        [nameof(CommodityCodeOverviewModel.UserId)] = CommodityCodeSortField.UserId,
+    };
+
     private string _baseUrl = "api/commodities/listcode";
     private string _name = "商品";
 
@@ -96,7 +110,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<CommodityCodeOverviewModel> dataTableCard;
+    DataTableCard<CommodityCodeOverviewModel, CommodityCodeSortField> dataTableCard;
 
     CnGalWebSite.Shared.MasaComponent.PC.Admin.Commodities.Codes.EditCard editCard;
     CnGalWebSite.Shared.MasaComponent.PC.Admin.Commodities.Codes.ImportCard importCard;

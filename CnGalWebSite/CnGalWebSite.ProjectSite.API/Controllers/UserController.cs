@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.ProjectSite.API.DataReositories;
+using CnGalWebSite.ProjectSite.Models.Sorting;
+using CnGalWebSite.ProjectSite.API.DataReositories;
 using CnGalWebSite.ProjectSite.API.Services.Users;
 using CnGalWebSite.ProjectSite.Models.DataModels;
 using CnGalWebSite.ProjectSite.Models.ViewModels.Projects;
@@ -23,6 +24,18 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
     [Route("api/[controller]/[action]")]
     public class UserController : ControllerBase
     {
+        private static readonly SortMap<ApplicationUser, ProjectUserSortField> ListSorting =
+            new SortMap<ApplicationUser, ProjectUserSortField>(ProjectUserSortField.Id, ProjectUserSortField.Id)
+            .Add(ProjectUserSortField.Id, s => s.Id)
+            .Add(ProjectUserSortField.Avatar, s => s.Avatar)
+            .Add(ProjectUserSortField.BackgroundImage, s => s.BackgroundImage)
+            .Add(ProjectUserSortField.Name, s => s.UserName)
+            .Add(ProjectUserSortField.RegistTime, s => s.RegistTime)
+            .Add(ProjectUserSortField.Email, s => s.Email)
+            .Add(ProjectUserSortField.Type, s => s.Type)
+            .Add(ProjectUserSortField.Tags, s => s.Tags);
+
+
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
         private readonly IProjectService _projectService;
@@ -309,12 +322,12 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
         [Authorize(Roles ="Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<UserOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<UserOverviewModel, ProjectUserSortField>> List(QueryParameterModel<ProjectUserSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<ApplicationUser, string>(_userRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.UserName.Contains(model.SearchText) || s.Email.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<ApplicationUser, ProjectUserSortField>(_userRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.UserName.Contains(model.SearchText) || s.Email.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<UserOverviewModel>
+            return new QueryResultModel<UserOverviewModel, ProjectUserSortField>
             {
                 Items = await items.Select(s => new UserOverviewModel
                 {

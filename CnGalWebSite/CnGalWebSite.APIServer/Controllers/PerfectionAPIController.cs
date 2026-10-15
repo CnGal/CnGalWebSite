@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Charts;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Perfections;
@@ -19,7 +20,6 @@ using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Controllers
@@ -29,6 +29,24 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/perfections/[action]")]
     public class PerfectionAPIController : ControllerBase
     {
+        private static readonly SortMap<Perfection, PerfectionSortField> ListPerfectionsSorting =
+            new SortMap<Perfection, PerfectionSortField>(PerfectionSortField.RecordId, PerfectionSortField.RecordId)
+            .Add(PerfectionSortField.Id, s => s.EntryId)
+            .Add(PerfectionSortField.RecordId, s => s.Id)
+            .Add(PerfectionSortField.Name, s => s.Entry.Name)
+            .Add(PerfectionSortField.Grade, s => s.Grade)
+            .Add(PerfectionSortField.VictoryPercentage, s => s.VictoryPercentage);
+
+        private static readonly SortMap<PerfectionCheck, PerfectionCheckSortField> ListPerfectionChecksSorting =
+            new SortMap<PerfectionCheck, PerfectionCheckSortField>(PerfectionCheckSortField.RecordId, PerfectionCheckSortField.RecordId)
+            .Add(PerfectionCheckSortField.Id, s => s.Perfection.EntryId)
+            .Add(PerfectionCheckSortField.RecordId, s => s.Id)
+            .Add(PerfectionCheckSortField.Name, s => s.Perfection.Entry.Name)
+            .Add(PerfectionCheckSortField.Type, s => s.CheckType)
+            .Add(PerfectionCheckSortField.Grade, s => s.Grade)
+            .Add(PerfectionCheckSortField.VictoryPercentage, s => s.VictoryPercentage);
+
+
         private readonly IRepository<Examine, long> _examineRepository;
         private readonly IRepository<PerfectionOverview, long> _perfectionOverviewRepository;
         private readonly IRepository<Perfection, long> _perfectionRepository;
@@ -125,13 +143,13 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<QueryResultModel<PerfectionOverviewModel>> ListPerfections(QueryParameterModel model)
+        public async Task<QueryResultModel<PerfectionOverviewModel, PerfectionSortField>> ListPerfections(QueryParameterModel<PerfectionSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Perfection, long>(_perfectionRepository.GetAll().AsSingleQuery().Include(s => s.Entry)
+            var (items, total) = await _queryService.QueryAsync<Perfection, PerfectionSortField>(_perfectionRepository.GetAll().AsSingleQuery().Include(s => s.Entry)
                 .Where(s => s.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Entry.Name) == false && s.Entry.Type == EntryType.Game), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Entry.Name.Contains(model.SearchText)));
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Entry.Name.Contains(model.SearchText)), ListPerfectionsSorting);
 
-            return new QueryResultModel<PerfectionOverviewModel>
+            return new QueryResultModel<PerfectionOverviewModel, PerfectionSortField>
             {
                 Items = await items.Select(s => new PerfectionOverviewModel
                 {
@@ -147,13 +165,13 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<QueryResultModel<PerfectionCheckOverviewModel>> ListPerfectionChecks(QueryParameterModel model)
+        public async Task<QueryResultModel<PerfectionCheckOverviewModel, PerfectionCheckSortField>> ListPerfectionChecks(QueryParameterModel<PerfectionCheckSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<PerfectionCheck, long>(_perfectionCheckRepository.GetAll().AsSingleQuery().Include(s => s.Perfection).ThenInclude(s => s.Entry)
+            var (items, total) = await _queryService.QueryAsync<PerfectionCheck, PerfectionCheckSortField>(_perfectionCheckRepository.GetAll().AsSingleQuery().Include(s => s.Perfection).ThenInclude(s => s.Entry)
                 .Where(s => s.Perfection.Entry.IsHidden == false && string.IsNullOrWhiteSpace(s.Perfection.Entry.Name) == false && s.Perfection.Entry.Type == EntryType.Game), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Perfection.Entry.Name.Contains(model.SearchText)));
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Perfection.Entry.Name.Contains(model.SearchText)), ListPerfectionChecksSorting);
 
-            return new QueryResultModel<PerfectionCheckOverviewModel>
+            return new QueryResultModel<PerfectionCheckOverviewModel, PerfectionCheckSortField>
             {
                 Items = await items.Select(s => new PerfectionCheckOverviewModel
                 {

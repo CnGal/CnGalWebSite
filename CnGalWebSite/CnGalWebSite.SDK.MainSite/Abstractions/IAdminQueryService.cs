@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Almanacs;
@@ -46,71 +47,71 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询评论列表（服务端分页）。
     /// </summary>
-    Task<SdkResult<QueryResultModel<CommentOverviewModel>>> GetCommentsAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<CommentOverviewModel, CommentSortField>>> GetCommentsAsync(
+        QueryParameterModel<CommentSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询词条列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<EntryOverviewModel>>> GetEntriesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<EntryOverviewModel, EntrySortField>>> GetEntriesAsync(
+        QueryParameterModel<EntrySortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询文章列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<ArticleOverviewModel>>> GetArticlesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<ArticleOverviewModel, ArticleSortField>>> GetArticlesAsync(
+        QueryParameterModel<ArticleSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询视频列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<VideoOverviewModel>>> GetVideosAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<VideoOverviewModel, VideoSortField>>> GetVideosAsync(
+        QueryParameterModel<VideoSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询标签列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<TagOverviewModel>>> GetTagsAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<TagOverviewModel, TagSortField>>> GetTagsAsync(
+        QueryParameterModel<TagSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询用户列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<UserOverviewModel>>> GetUsersAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<UserOverviewModel, UserSortField>>> GetUsersAsync(
+        QueryParameterModel<UserSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询消息列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<MessageOverviewModel>>> GetMessagesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<MessageOverviewModel, MessageSortField>>> GetMessagesAsync(
+        QueryParameterModel<MessageSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询收藏夹列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<FavoriteFolderOverviewModel>>> GetFavoriteFoldersAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<FavoriteFolderOverviewModel, FavoriteFolderSortField>>> GetFavoriteFoldersAsync(
+        QueryParameterModel<FavoriteFolderSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询备份列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<BackUpArchiveOverviewModel>>> GetBackUpArchivesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<BackUpArchiveOverviewModel, BackUpArchiveSortField>>> GetBackUpArchivesAsync(
+        QueryParameterModel<BackUpArchiveSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询商店信息列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<StoreInfoOverviewModel>>> GetStoreInfoListAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<StoreInfoOverviewModel, StoreInfoSortField>>> GetStoreInfoListAsync(
+        QueryParameterModel<StoreInfoSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -123,8 +124,8 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询推荐列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<RecommendOverviewModel>>> GetRecommendsAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<RecommendOverviewModel, RecommendSortField>>> GetRecommendsAsync(
+        QueryParameterModel<RecommendSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -137,23 +138,23 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询年鉴列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<AlmanacOverviewModel>>> GetAlmanacsAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<AlmanacOverviewModel, AlmanacSortField>>> GetAlmanacsAsync(
+        QueryParameterModel<AlmanacSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询抽奖列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<LotteryOverviewModel>>> GetLotteriesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<LotteryOverviewModel, LotterySortField>>> GetLotteriesAsync(
+        QueryParameterModel<LotterySortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询抽奖参与用户列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<LotteryUserOverviewModel>>> GetLotteryUsersAsync(
+    Task<SdkResult<QueryResultModel<LotteryUserOverviewModel, LotteryUserSortField>>> GetLotteryUsersAsync(
         long lotteryId,
-        QueryParameterModel parameter,
+        QueryParameterModel<LotteryUserSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -166,15 +167,15 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询周边列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<PeripheryOverviewModel>>> GetPeripheriesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<PeripheryOverviewModel, PeripherySortField>>> GetPeripheriesAsync(
+        QueryParameterModel<PeripherySortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询投票列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<VoteOverviewModel>>> GetVotesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<VoteOverviewModel, VoteSortField>>> GetVotesAsync(
+        QueryParameterModel<VoteSortField> parameter,
         CancellationToken cancellationToken = default);
 
     // ─── 网站设置 ───
@@ -182,15 +183,15 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询轮播图列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<CarouselOverviewModel>>> GetCarouselsAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<CarouselOverviewModel, CarouselSortField>>> GetCarouselsAsync(
+        QueryParameterModel<CarouselSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询友情链接列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<FriendLinkOverviewModel>>> GetFriendLinksAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<FriendLinkOverviewModel, FriendLinkSortField>>> GetFriendLinksAsync(
+        QueryParameterModel<FriendLinkSortField> parameter,
         CancellationToken cancellationToken = default);
 
     Task<SdkResult<CarouselEditModel>> GetCarouselEditAsync(int id, CancellationToken cancellationToken = default);
@@ -202,15 +203,15 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询游戏动态列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<GameNewsOverviewModel>>> GetGameNewsAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<GameNewsOverviewModel, GameNewsSortField>>> GetGameNewsAsync(
+        QueryParameterModel<GameNewsSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询周报列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<WeeklyNewsOverviewModel>>> GetWeeklyNewsAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<WeeklyNewsOverviewModel, WeeklyNewsSortField>>> GetWeeklyNewsAsync(
+        QueryParameterModel<WeeklyNewsSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -246,15 +247,15 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询展会活动列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<ExpoActivityOverviewModel>>> GetExpoActivitiesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<ExpoActivityOverviewModel, ExpoActivitySortField>>> GetExpoActivitiesAsync(
+        QueryParameterModel<ExpoActivitySortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询展会票根列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<ExpoTicketOverviewModel>>> GetExpoTicketsAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<ExpoTicketOverviewModel, ExpoTicketSortField>>> GetExpoTicketsAsync(
+        QueryParameterModel<ExpoTicketSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -274,8 +275,8 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询展会游戏列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<ExpoGameOverviewModel>>> GetExpoGamesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<ExpoGameOverviewModel, ExpoGameSortField>>> GetExpoGamesAsync(
+        QueryParameterModel<ExpoGameSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -288,8 +289,8 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询展会标签列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<ExpoTagOverviewModel>>> GetExpoTagsExpoAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<ExpoTagOverviewModel, ExpoTagSortField>>> GetExpoTagsExpoAsync(
+        QueryParameterModel<ExpoTagSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -302,15 +303,15 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询展会任务列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<ExpoTaskOverviewModel>>> GetExpoTasksAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<ExpoTaskOverviewModel, ExpoTaskSortField>>> GetExpoTasksAsync(
+        QueryParameterModel<ExpoTaskSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询展会奖项列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<ExpoAwardOverviewModel>>> GetExpoAwardsAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<ExpoAwardOverviewModel, ExpoAwardSortField>>> GetExpoAwardsAsync(
+        QueryParameterModel<ExpoAwardSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -323,8 +324,8 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询展会奖品列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<ExpoPrizeOverviewModel>>> GetExpoPrizesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<ExpoPrizeOverviewModel, ExpoPrizeSortField>>> GetExpoPrizesAsync(
+        QueryParameterModel<ExpoPrizeSortField> parameter,
         CancellationToken cancellationToken = default);
 
     // ─── 问卷管理 ───
@@ -332,8 +333,8 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询问卷列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<QuestionnaireOverviewModel>>> GetQuestionnairesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<QuestionnaireOverviewModel, QuestionnaireSortField>>> GetQuestionnairesAsync(
+        QueryParameterModel<QuestionnaireSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -376,15 +377,15 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询商品列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<CommodityOverviewModel>>> GetCommoditiesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<CommodityOverviewModel, CommoditySortField>>> GetCommoditiesAsync(
+        QueryParameterModel<CommoditySortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询兑换码列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<CommodityCodeOverviewModel>>> GetCommodityCodesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<CommodityCodeOverviewModel, CommodityCodeSortField>>> GetCommodityCodesAsync(
+        QueryParameterModel<CommodityCodeSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -406,15 +407,15 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询游玩记录列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<GameRecordOverviewModel>>> GetPlayedGamesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<GameRecordOverviewModel, GameRecordSortField>>> GetPlayedGamesAsync(
+        QueryParameterModel<GameRecordSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询基础信息类型列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<EntryInformationTypeOverviewModel>>> GetEntryInformationTypesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<EntryInformationTypeOverviewModel, EntryInformationTypeSortField>>> GetEntryInformationTypesAsync(
+        QueryParameterModel<EntryInformationTypeSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -429,8 +430,8 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询头衔列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<RankOverviewModel>>> GetRanksAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<RankOverviewModel, RankSortField>>> GetRanksAsync(
+        QueryParameterModel<RankSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -443,15 +444,15 @@ public interface IAdminQueryService
     /// <summary>
     /// 分页查询用户认证列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<UserCertificationOverviewModel>>> GetUserCertificationsAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<UserCertificationOverviewModel, UserCertificationSortField>>> GetUserCertificationsAsync(
+        QueryParameterModel<UserCertificationSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询操作记录列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<OperationRecordOverviewModel>>> GetOperationRecordsAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<OperationRecordOverviewModel, OperationRecordSortField>>> GetOperationRecordsAsync(
+        QueryParameterModel<OperationRecordSortField> parameter,
         CancellationToken cancellationToken = default);
 
     // ─── 数据图表 ───

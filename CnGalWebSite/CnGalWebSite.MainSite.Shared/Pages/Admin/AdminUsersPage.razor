@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/listusers"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -32,39 +33,39 @@
         <PanelTemplate>
             @if (context == "users")
             {
-                <CgDataTable TItem="UserOverviewModel"
+                <CgDataTable TItem="UserOverviewModel" TSort="UserSortField"
                              Title="用户列表"
                              OnServerQuery="OnServerQuery"
-                             DefaultSortField="RegistTime"
+                             DefaultSortField="UserSortField.RegistTime"
                              DefaultSortDesc="true"
                              @ref="_dataTable">
-                    <CgDataTableColumn TItem="UserOverviewModel" Title="用户名" Field="UserName">
+                    <CgDataTableColumn TItem="UserOverviewModel" TSort="UserSortField" Title="用户名" SortField="UserSortField.UserName" Value="item => item.UserName">
                         <ChildContent Context="item">
                             <a class="admin-cell-name" href="@($"/space/index/{item.Id}")">@item.UserName</a>
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="UserOverviewModel" Title="邮箱" Field="Email" />
-                    <CgDataTableColumn TItem="UserOverviewModel" Title="个性签名" Field="PersonalSignature">
+                    <CgDataTableColumn TItem="UserOverviewModel" TSort="UserSortField" Title="邮箱" SortField="UserSortField.Email" Value="item => item.Email" />
+                    <CgDataTableColumn TItem="UserOverviewModel" TSort="UserSortField" Title="个性签名" SortField="UserSortField.PersonalSignature" Value="item => item.PersonalSignature">
                         <ChildContent Context="item"><div class="admin-cell-text">@item.PersonalSignature</div></ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="UserOverviewModel" Title="注册时间" Field="RegistTime">
+                    <CgDataTableColumn TItem="UserOverviewModel" TSort="UserSortField" Title="注册时间" SortField="UserSortField.RegistTime" Value="item => item.RegistTime">
                         <ChildContent Context="item">@item.RegistTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="UserOverviewModel" Title="最后在线" Field="LastOnlineTime">
+                    <CgDataTableColumn TItem="UserOverviewModel" TSort="UserSortField" Title="最后在线" SortField="UserSortField.LastOnlineTime" Value="item => item.LastOnlineTime">
                         <ChildContent Context="item">@item.LastOnlineTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="UserOverviewModel" Title="在线时长(h)" Field="OnlineTime">
+                    <CgDataTableColumn TItem="UserOverviewModel" TSort="UserSortField" Title="在线时长(h)" SortField="UserSortField.OnlineTime" Value="item => item.OnlineTime">
                         <ChildContent Context="item">@((item.OnlineTime / 3600.0).ToString("0.0"))</ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="UserOverviewModel" Title="贡献值" Field="DisplayContributionValue" Width="80px" />
-                    <CgDataTableColumn TItem="UserOverviewModel" Title="积分" Field="DisplayIntegral" Width="80px" />
-                    <CgDataTableColumn TItem="UserOverviewModel" Title="留言板" Field="CanComment">
+                    <CgDataTableColumn TItem="UserOverviewModel" TSort="UserSortField" Title="贡献值" SortField="UserSortField.DisplayContributionValue" Value="item => item.DisplayContributionValue" Width="80px" />
+                    <CgDataTableColumn TItem="UserOverviewModel" TSort="UserSortField" Title="积分" SortField="UserSortField.DisplayIntegral" Value="item => item.DisplayIntegral" Width="80px" />
+                    <CgDataTableColumn TItem="UserOverviewModel" TSort="UserSortField" Title="留言板" SortField="UserSortField.CanComment" Value="item => item.CanComment">
                         <ChildContent Context="item">
                             @if (item.CanComment) { <span class="admin-badge admin-badge--yes">开启</span> }
                             else { <span class="admin-badge admin-badge--no">关闭</span> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="UserOverviewModel" Title="操作" Sortable="false" Width="50px">
+                    <CgDataTableColumn TItem="UserOverviewModel" TSort="UserSortField" Title="操作" Sortable="false" Width="50px">
                         <ChildContent Context="item">
                             <div class="admin-actions">
                                 @if (item.CanComment)
@@ -78,10 +79,10 @@
             }
             else if (context == "ranks")
             {
-                <CgDataTable TItem="RankOverviewModel"
+                <CgDataTable TItem="RankOverviewModel" TSort="RankSortField"
                              Title="头衔列表"
                              OnServerQuery="OnQueryRanks"
-                             DefaultSortField="Id"
+                             DefaultSortField="RankSortField.Id"
                              DefaultSortDesc="true"
                              @ref="_rankTable">
                     <ToolbarContent>
@@ -91,14 +92,14 @@
                         </CgButton>
                     </ToolbarContent>
                     <ChildContent>
-                    <CgDataTableColumn TItem="RankOverviewModel" Title="Id" Field="Id" Width="80px" />
-                    <CgDataTableColumn TItem="RankOverviewModel" Title="名称" Field="Name" />
-                    <CgDataTableColumn TItem="RankOverviewModel" Title="显示文本" Field="Text" />
-                    <CgDataTableColumn TItem="RankOverviewModel" Title="类型" Field="Type">
+                    <CgDataTableColumn TItem="RankOverviewModel" TSort="RankSortField" Title="Id" SortField="RankSortField.Id" Value="item => item.Id" Width="80px" />
+                    <CgDataTableColumn TItem="RankOverviewModel" TSort="RankSortField" Title="名称" SortField="RankSortField.Name" Value="item => item.Name" />
+                    <CgDataTableColumn TItem="RankOverviewModel" TSort="RankSortField" Title="显示文本" SortField="RankSortField.Text" Value="item => item.Text" />
+                    <CgDataTableColumn TItem="RankOverviewModel" TSort="RankSortField" Title="类型" SortField="RankSortField.Type" Value="item => item.Type">
                         <ChildContent Context="item"><span class="admin-badge">@item.Type.GetDisplayName()</span></ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="RankOverviewModel" Title="人数" Field="Count" Width="80px" />
-                    <CgDataTableColumn TItem="RankOverviewModel" Title="样式" Sortable="false">
+                    <CgDataTableColumn TItem="RankOverviewModel" TSort="RankSortField" Title="人数" SortField="RankSortField.Count" Value="item => item.Count" Width="80px" />
+                    <CgDataTableColumn TItem="RankOverviewModel" TSort="RankSortField" Title="样式" Sortable="false">
                         <ChildContent Context="item">
                             @if (item.Type == RankType.Rank || !string.IsNullOrWhiteSpace(item.CSS) || !string.IsNullOrWhiteSpace(item.Styles))
                             {
@@ -106,23 +107,23 @@
                             }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="RankOverviewModel" Title="优先级" Field="Priority" Width="80px" />
-                    <CgDataTableColumn TItem="RankOverviewModel" Title="图片" Sortable="false" Width="60px">
+                    <CgDataTableColumn TItem="RankOverviewModel" TSort="RankSortField" Title="优先级" SortField="RankSortField.Priority" Value="item => item.Priority" Width="80px" />
+                    <CgDataTableColumn TItem="RankOverviewModel" TSort="RankSortField" Title="图片" Sortable="false" Width="60px">
                         <ChildContent Context="item">
                             @if (!string.IsNullOrWhiteSpace(item.Image))
                             { <img src="@item.Image" alt="头衔图片" style="width: 32px; height: 32px; border-radius: 4px;" /> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="RankOverviewModel" Title="状态" Field="IsHidden">
+                    <CgDataTableColumn TItem="RankOverviewModel" TSort="RankSortField" Title="状态" SortField="RankSortField.IsHidden" Value="item => item.IsHidden">
                         <ChildContent Context="item">
                             @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
                             else { <span class="admin-badge admin-badge--visible">可见</span> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="RankOverviewModel" Title="创建时间" Field="CreateTime">
+                    <CgDataTableColumn TItem="RankOverviewModel" TSort="RankSortField" Title="创建时间" SortField="RankSortField.CreateTime" Value="item => item.CreateTime">
                         <ChildContent Context="item">@item.CreateTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="RankOverviewModel" Title="操作" Sortable="false" Width="180px">
+                    <CgDataTableColumn TItem="RankOverviewModel" TSort="RankSortField" Title="操作" Sortable="false" Width="180px">
                         <ChildContent Context="item">
                             <div class="admin-actions">
                                 <button class="admin-action-btn admin-action-btn--up" title="增加优先级" @onclick="() => OnEditRankPriorityAsync(item, 1)"><CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" /></button>
@@ -140,58 +141,58 @@
             }
             else if (context == "certifications")
             {
-                <CgDataTable TItem="UserCertificationOverviewModel"
+                <CgDataTable TItem="UserCertificationOverviewModel" TSort="UserCertificationSortField"
                              Title="认证列表"
                              OnServerQuery="OnQueryCertifications"
-                             DefaultSortField="Id"
+                             DefaultSortField="UserCertificationSortField.Id"
                              DefaultSortDesc="true">
-                    <CgDataTableColumn TItem="UserCertificationOverviewModel" Title="Id" Field="Id" Width="80px" />
-                    <CgDataTableColumn TItem="UserCertificationOverviewModel" Title="用户" Field="UserName">
+                    <CgDataTableColumn TItem="UserCertificationOverviewModel" TSort="UserCertificationSortField" Title="Id" SortField="UserCertificationSortField.Id" Value="item => item.Id" Width="80px" />
+                    <CgDataTableColumn TItem="UserCertificationOverviewModel" TSort="UserCertificationSortField" Title="用户" SortField="UserCertificationSortField.UserName" Value="item => item.UserName">
                         <ChildContent Context="item">
                             <a class="admin-cell-name" href="@($"/space/index/{item.UserId}")">@item.UserName</a>
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="UserCertificationOverviewModel" Title="词条" Field="EntryName">
+                    <CgDataTableColumn TItem="UserCertificationOverviewModel" TSort="UserCertificationSortField" Title="词条" SortField="UserCertificationSortField.EntryName" Value="item => item.EntryName">
                         <ChildContent Context="item">
                             @if (item.EntryId > 0)
                             { <a class="admin-cell-name" href="@($"/entries/index/{item.EntryId}")">@item.EntryName</a> }
                             else { <span>@item.EntryName</span> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="UserCertificationOverviewModel" Title="词条类型" Field="EntryType">
+                    <CgDataTableColumn TItem="UserCertificationOverviewModel" TSort="UserCertificationSortField" Title="词条类型" SortField="UserCertificationSortField.EntryType" Value="item => item.EntryType">
                         <ChildContent Context="item"><span class="admin-badge">@item.EntryType</span></ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="UserCertificationOverviewModel" Title="认证时间" Field="CertificationTime">
+                    <CgDataTableColumn TItem="UserCertificationOverviewModel" TSort="UserCertificationSortField" Title="认证时间" SortField="UserCertificationSortField.CertificationTime" Value="item => item.CertificationTime">
                         <ChildContent Context="item">@item.CertificationTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
                     </CgDataTableColumn>
                 </CgDataTable>
             }
             else if (context == "operationrecords")
             {
-                <CgDataTable TItem="OperationRecordOverviewModel"
+                <CgDataTable TItem="OperationRecordOverviewModel" TSort="OperationRecordSortField"
                              Title="操作记录列表"
                              OnServerQuery="OnQueryOperationRecords"
-                             DefaultSortField="Id"
+                             DefaultSortField="OperationRecordSortField.Id"
                              DefaultSortDesc="true">
-                    <CgDataTableColumn TItem="OperationRecordOverviewModel" Title="Id" Field="Id" Width="80px" />
-                    <CgDataTableColumn TItem="OperationRecordOverviewModel" Title="类型" Field="Type">
+                    <CgDataTableColumn TItem="OperationRecordOverviewModel" TSort="OperationRecordSortField" Title="Id" SortField="OperationRecordSortField.Id" Value="item => item.Id" Width="80px" />
+                    <CgDataTableColumn TItem="OperationRecordOverviewModel" TSort="OperationRecordSortField" Title="类型" SortField="OperationRecordSortField.Type" Value="item => item.Type">
                         <ChildContent Context="item"><span class="admin-badge">@item.Type</span></ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="OperationRecordOverviewModel" Title="用户" Field="UserName">
+                    <CgDataTableColumn TItem="OperationRecordOverviewModel" TSort="OperationRecordSortField" Title="用户" SortField="OperationRecordSortField.UserName" Value="item => item.UserName">
                         <ChildContent Context="item">
                             <a class="admin-cell-name" href="@($"/space/index/{item.UserId}")">@item.UserName</a>
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="OperationRecordOverviewModel" Title="目标Id" Field="ObjectId" Width="100px" />
-                    <CgDataTableColumn TItem="OperationRecordOverviewModel" Title="Ip" Field="Ip" Width="120px" />
-                    <CgDataTableColumn TItem="OperationRecordOverviewModel" Title="Cookie" Field="Cookie">
+                    <CgDataTableColumn TItem="OperationRecordOverviewModel" TSort="OperationRecordSortField" Title="目标Id" SortField="OperationRecordSortField.ObjectId" Value="item => item.ObjectId" Width="100px" />
+                    <CgDataTableColumn TItem="OperationRecordOverviewModel" TSort="OperationRecordSortField" Title="Ip" SortField="OperationRecordSortField.Ip" Value="item => item.Ip" Width="120px" />
+                    <CgDataTableColumn TItem="OperationRecordOverviewModel" TSort="OperationRecordSortField" Title="Cookie" SortField="OperationRecordSortField.Cookie" Value="item => item.Cookie">
                         <ChildContent Context="item">
                             <span style="font-family: monospace; font-size: 0.75rem;" title="@item.Cookie">
                                 @(item.Cookie?.Length > 20 ? item.Cookie[..20] + "…" : item.Cookie)
                             </span>
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="OperationRecordOverviewModel" Title="操作时间" Field="OperationTime">
+                    <CgDataTableColumn TItem="OperationRecordOverviewModel" TSort="OperationRecordSortField" Title="操作时间" SortField="OperationRecordSortField.OperationTime" Value="item => item.OperationTime">
                         <ChildContent Context="item">@item.OperationTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
                     </CgDataTableColumn>
                 </CgDataTable>
@@ -266,8 +267,8 @@
 
 @code {
     private CancellationTokenSource? _cts = new();
-    private CgDataTable<UserOverviewModel>? _dataTable;
-    private CgDataTable<RankOverviewModel>? _rankTable;
+    private CgDataTable<UserOverviewModel, UserSortField>? _dataTable;
+    private CgDataTable<RankOverviewModel, RankSortField>? _rankTable;
     private bool _showRankModal;
     private bool _isNewRank;
     private RankEditModel? _rankEditModel;
@@ -282,36 +283,36 @@
 
     // ─── 用户查询 ───
 
-    private async Task<CgDataTableResult<UserOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    private async Task<CgDataTableResult<UserOverviewModel>> OnServerQuery(CgDataTableRequest<UserSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "RegistTime" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetUsersAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<UserOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<UserOverviewModel>([], 0);
     }
 
     // ─── 头衔查询 ───
 
-    private async Task<CgDataTableResult<RankOverviewModel>> OnQueryRanks(CgDataTableRequest request)
+    private async Task<CgDataTableResult<RankOverviewModel>> OnQueryRanks(CgDataTableRequest<RankSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetRanksAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<RankOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<RankOverviewModel>([], 0);
     }
 
     // ─── 认证查询 ───
 
-    private async Task<CgDataTableResult<UserCertificationOverviewModel>> OnQueryCertifications(CgDataTableRequest request)
+    private async Task<CgDataTableResult<UserCertificationOverviewModel>> OnQueryCertifications(CgDataTableRequest<UserCertificationSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetUserCertificationsAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<UserCertificationOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<UserCertificationOverviewModel>([], 0);
     }
 
     // ─── 操作记录查询 ───
 
-    private async Task<CgDataTableResult<OperationRecordOverviewModel>> OnQueryOperationRecords(CgDataTableRequest request)
+    private async Task<CgDataTableResult<OperationRecordOverviewModel>> OnQueryOperationRecords(CgDataTableRequest<OperationRecordSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetOperationRecordsAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<OperationRecordOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<OperationRecordOverviewModel>([], 0);
     }

@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/listarticles"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -17,30 +18,30 @@
         文章管理
     </h1>
 
-    <CgDataTable TItem="ArticleOverviewModel"
+    <CgDataTable TItem="ArticleOverviewModel" TSort="ArticleSortField"
                  Title="文章列表"
                  OnServerQuery="OnServerQuery"
-                 DefaultSortField="Id"
+                 DefaultSortField="ArticleSortField.Id"
                  DefaultSortDesc="true"
                  @ref="_dataTable">
-        <CgDataTableColumn TItem="ArticleOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="ArticleOverviewModel" Title="名称" Field="Name">
+        <CgDataTableColumn TItem="ArticleOverviewModel" TSort="ArticleSortField" Title="Id" SortField="ArticleSortField.Id" Value="item => item.Id" Width="80px" />
+        <CgDataTableColumn TItem="ArticleOverviewModel" TSort="ArticleSortField" Title="名称" SortField="ArticleSortField.Name" Value="item => item.Name">
             <ChildContent Context="item">
                 <a class="admin-cell-name" href="@($"/articles/index/{item.Id}")">@item.Name</a>
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="ArticleOverviewModel" Title="创建时间" Field="CreateTime">
+        <CgDataTableColumn TItem="ArticleOverviewModel" TSort="ArticleSortField" Title="创建时间" SortField="ArticleSortField.CreateTime" Value="item => item.CreateTime">
             <ChildContent Context="item">
                 @item.CreateTime.ToString("yyyy-MM-dd HH:mm")
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="ArticleOverviewModel" Title="最后编辑" Field="LastEditTime">
+        <CgDataTableColumn TItem="ArticleOverviewModel" TSort="ArticleSortField" Title="最后编辑" SortField="ArticleSortField.LastEditTime" Value="item => item.LastEditTime">
             <ChildContent Context="item">
                 @item.LastEditTime.ToString("yyyy-MM-dd HH:mm")
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="ArticleOverviewModel" Title="优先级" Field="Priority" Width="80px" />
-        <CgDataTableColumn TItem="ArticleOverviewModel" Title="状态" Field="IsHidden">
+        <CgDataTableColumn TItem="ArticleOverviewModel" TSort="ArticleSortField" Title="优先级" SortField="ArticleSortField.Priority" Value="item => item.Priority" Width="80px" />
+        <CgDataTableColumn TItem="ArticleOverviewModel" TSort="ArticleSortField" Title="状态" SortField="ArticleSortField.IsHidden" Value="item => item.IsHidden">
             <ChildContent Context="item">
                 @if (item.IsHidden)
                 {
@@ -52,7 +53,7 @@
                 }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="ArticleOverviewModel" Title="留言板" Field="CanComment">
+        <CgDataTableColumn TItem="ArticleOverviewModel" TSort="ArticleSortField" Title="留言板" SortField="ArticleSortField.CanComment" Value="item => item.CanComment">
             <ChildContent Context="item">
                 @if (item.CanComment)
                 {
@@ -64,7 +65,7 @@
                 }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="ArticleOverviewModel" Title="操作" Sortable="false" Width="150px">
+        <CgDataTableColumn TItem="ArticleOverviewModel" TSort="ArticleSortField" Title="操作" Sortable="false" Width="150px">
             <ChildContent Context="item">
                 <div class="admin-actions">
                     <button class="admin-action-btn admin-action-btn--up" title="增加权重"
@@ -111,18 +112,11 @@
 
 @code {
     private CancellationTokenSource? _cts = new();
-    private CgDataTable<ArticleOverviewModel>? _dataTable;
+    private CgDataTable<ArticleOverviewModel, ArticleSortField>? _dataTable;
 
-    private async Task<CgDataTableResult<ArticleOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    private async Task<CgDataTableResult<ArticleOverviewModel>> OnServerQuery(CgDataTableRequest<ArticleSortField> request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetArticlesAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null
             ? new CgDataTableResult<ArticleOverviewModel>(result.Data.Items.ToList(), result.Data.Total)

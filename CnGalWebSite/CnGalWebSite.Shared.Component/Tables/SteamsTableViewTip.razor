@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject IEventService _eventService
 
 <MDCard>
-    <DataTableCard TModel="StoreInfoViewModel" Headers="_headers" ApiUrl="@(_baseUrl)" SortByItem="@nameof(StoreInfoViewModel.Link)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <DataTableCard TModel="StoreInfoViewModel" TSort="StoreTableSortField" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" DefaultSortField="StoreTableSortField.Link" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
         <ButtonContent>
             <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton OnQueryAsync="@(async ()=>await dataTableCard?.QueryAllAsync())" Name="商店信息" Class="me-4" />
         </ButtonContent>
@@ -27,6 +28,27 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, StoreTableSortField> _sortFields = new Dictionary<string, StoreTableSortField>
+    {
+        [nameof(StoreInfoViewModel.CurrencyCode)] = StoreTableSortField.CurrencyCode,
+        [nameof(StoreInfoViewModel.CutLowest)] = StoreTableSortField.CutLowest,
+        [nameof(StoreInfoViewModel.CutNow)] = StoreTableSortField.CutNow,
+        [nameof(StoreInfoViewModel.EstimationOwnersMax)] = StoreTableSortField.EstimationOwnersMax,
+        [nameof(StoreInfoViewModel.EstimationOwnersMin)] = StoreTableSortField.EstimationOwnersMin,
+        [nameof(StoreInfoViewModel.EvaluationCount)] = StoreTableSortField.EvaluationCount,
+        [nameof(StoreInfoViewModel.Link)] = StoreTableSortField.Link,
+        [nameof(StoreInfoViewModel.OriginalPrice)] = StoreTableSortField.OriginalPrice,
+        [nameof(StoreInfoViewModel.PlatformName)] = StoreTableSortField.PlatformName,
+        [nameof(StoreInfoViewModel.PlatformType)] = StoreTableSortField.PlatformType,
+        [nameof(StoreInfoViewModel.PlayTime)] = StoreTableSortField.PlayTime,
+        [nameof(StoreInfoViewModel.PriceLowest)] = StoreTableSortField.PriceLowest,
+        [nameof(StoreInfoViewModel.PriceNow)] = StoreTableSortField.PriceNow,
+        [nameof(StoreInfoViewModel.RecommendationRate)] = StoreTableSortField.RecommendationRate,
+        [nameof(StoreInfoViewModel.State)] = StoreTableSortField.State,
+        [nameof(StoreInfoViewModel.UpdateTime)] = StoreTableSortField.UpdateTime,
+        [nameof(StoreInfoViewModel.UpdateType)] = StoreTableSortField.UpdateType,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -61,7 +83,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<StoreInfoViewModel> dataTableCard;
+    DataTableCard<StoreInfoViewModel, StoreTableSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

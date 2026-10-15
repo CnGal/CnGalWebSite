@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="PeripheryOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <DataTableCard TModel="PeripheryOverviewModel" TSort="PeripherySortField" DefaultSortField="PeripherySortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -72,6 +73,18 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, PeripherySortField> _sortFields = new Dictionary<string, PeripherySortField>
+    {
+        [nameof(PeripheryOverviewModel.CanComment)] = PeripherySortField.CanComment,
+        [nameof(PeripheryOverviewModel.Category)] = PeripherySortField.Category,
+        [nameof(PeripheryOverviewModel.Id)] = PeripherySortField.Id,
+        [nameof(PeripheryOverviewModel.IsHidden)] = PeripherySortField.IsHidden,
+        [nameof(PeripheryOverviewModel.LastEditTime)] = PeripherySortField.LastEditTime,
+        [nameof(PeripheryOverviewModel.Name)] = PeripherySortField.Name,
+        [nameof(PeripheryOverviewModel.Priority)] = PeripherySortField.Priority,
+        [nameof(PeripheryOverviewModel.Type)] = PeripherySortField.Type,
+    };
+
     private string _baseUrl = "api/peripheries/List";
     private string _name = "周边";
 
@@ -93,7 +106,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<PeripheryOverviewModel> dataTableCard;
+    DataTableCard<PeripheryOverviewModel, PeripherySortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

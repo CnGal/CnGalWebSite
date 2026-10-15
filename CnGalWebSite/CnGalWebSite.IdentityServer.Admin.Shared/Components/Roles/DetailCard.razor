@@ -1,4 +1,5 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.IdentityServer.Models.Sorting
+@inject IHttpService _httpService
 
 
 @if (Model == null)
@@ -19,7 +20,7 @@ else
             @Model.Id
         </MCardText>
         <MCardActions>
-            <DataTableCard TModel="UserOverviewModel" Headers="_headers" ApiUrl="@($"api/roles/listuser?id={Id}")" Title="@($"用户列表")" ShowAddButton="false" Class="w-100">
+            <DataTableCard TModel="UserOverviewModel" TSort="IdentityUserSortField" DefaultSortField="IdentityUserSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@($"api/roles/listuser?id={Id}")" Title="@($"用户列表")" ShowAddButton="false" Class="w-100">
                 <ItemColContent>
                     @if (context.Header.Value == "roles")
                     {
@@ -40,6 +41,13 @@ else
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, IdentityUserSortField> _sortFields = new Dictionary<string, IdentityUserSortField>
+    {
+        [nameof(UserOverviewModel.Email)] = IdentityUserSortField.Email,
+        [nameof(UserOverviewModel.Id)] = IdentityUserSortField.Id,
+        [nameof(UserOverviewModel.UserName)] = IdentityUserSortField.UserName,
+    };
+
     [Parameter]
     public string Id { get; set; }
 

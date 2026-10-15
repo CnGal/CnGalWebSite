@@ -1,10 +1,11 @@
-﻿@page "/admin/groups"
+@using CnGalWebSite.RobotClientX.Models.Sorting
+@page "/admin/groups"
 
 @inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject IRepository<RobotGroup> _robotGroupRepository
 
-<DataTableCard TModel="RobotGroup" Headers="_headers" DataSource="_robotGroupRepository.GetAll()" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
+<DataTableCard TModel="RobotGroup" TSort="RobotRobotGroupSortField" DefaultSortField="RobotRobotGroupSortField.Id" SortFields="_sortFields" LocalSorting="_localSorting" Headers="_headers" DataSource="_robotGroupRepository.GetAll()" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard"
                 Predicate="s => dataTableCard==null ||string.IsNullOrWhiteSpace(dataTableCard._search) || (s.Note.Contains(dataTableCard._search))">
     <ItemColContent>
         @if (context.Header.Value == "actions")
@@ -34,6 +35,23 @@
 </MDialog>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, RobotRobotGroupSortField> _sortFields = new Dictionary<string, RobotRobotGroupSortField>
+    {
+        [nameof(RobotGroup.ForceMatch)] = RobotRobotGroupSortField.ForceMatch,
+        [nameof(RobotGroup.GroupId)] = RobotRobotGroupSortField.GroupId,
+        [nameof(RobotGroup.Id)] = RobotRobotGroupSortField.Id,
+        [nameof(RobotGroup.IsHidden)] = RobotRobotGroupSortField.IsHidden,
+        [nameof(RobotGroup.Note)] = RobotRobotGroupSortField.Note,
+    };
+
+    private static readonly CnGalWebSite.Core.Services.Query.SortMap<RobotGroup, RobotRobotGroupSortField> _localSorting =
+        new CnGalWebSite.Core.Services.Query.SortMap<RobotGroup, RobotRobotGroupSortField>(RobotRobotGroupSortField.Id, RobotRobotGroupSortField.Id)
+        .Add(RobotRobotGroupSortField.ForceMatch, item => item.ForceMatch)
+        .Add(RobotRobotGroupSortField.GroupId, item => item.GroupId)
+        .Add(RobotRobotGroupSortField.Id, item => item.Id)
+        .Add(RobotRobotGroupSortField.IsHidden, item => item.IsHidden)
+        .Add(RobotRobotGroupSortField.Note, item => item.Note);
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -59,7 +77,7 @@
 
     List<KeyValuePair<string, string>> _scopes;
 
-    DataTableCard<RobotGroup> dataTableCard;
+    DataTableCard<RobotGroup, RobotRobotGroupSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

@@ -1,16 +1,18 @@
-﻿using CnGalWebSite.DataModel.ViewModel.Dtos;
-using CnGalWebSite.Helper.Extensions;
+using CnGalWebSite.DataModel.Sorting;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.DataModel.ViewModel.Dtos;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace CnGalWebSite.DataModel.Application.Search.Dtos
 {
-    public class SearchInputModel : PagedSortedAndFilterInput
+    public class SearchInputModel : PagedAndFilterInput
     {
-        public SearchInputModel()
-        {
-            Sorting = "";
-        }
+        public SearchSortField SortField { get; set; } = SearchSortField.Default;
+        public SortDirection SortDirection { get; set; } = SortDirection.Descending;
 
         /// <summary>
         /// 类型过滤 对自身‘或’的关系 对其他条件‘且’的关系
@@ -28,11 +30,11 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
 
             if (string.IsNullOrWhiteSpace(FilterText) == false)
             {
-                temp.Add("Text=" + FilterText);
+                temp.Add("Text=" + Uri.EscapeDataString(FilterText));
             }
-            if (string.IsNullOrWhiteSpace(Sorting) == false)
+            if (SortField != SearchSortField.Default)
             {
-                temp.Add("Sort=" + Sorting);
+                temp.Add($"SortField={SortField}&SortDirection={SortDirection}");
             }
             if (CurrentPage != 1)
             {
@@ -158,10 +160,10 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
         }
 
 
-        public static SearchInputModel Parse(string[] Types, string[] Times, string Text, string Sort, int Page)
+        public static SearchInputModel Parse(string[] Types, string[] Times, string Text, SearchSortField sortField, SortDirection sortDirection, int Page)
         {
             var model = new SearchInputModel();
-            if (TryParse(Types, Times, Text, Sort, Page, model))
+            if (TryParse(Types, Times, Text, sortField, sortDirection, Page, model))
             {
                 return model;
             }
@@ -170,7 +172,7 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
                 throw new ArgumentException();
             }
         }
-        public static bool TryParse(string[] Types, string[] Times, string Text, string Sort, int Page, SearchInputModel model)
+        public static bool TryParse(string[] Types, string[] Times, string Text, SearchSortField sortField, SortDirection sortDirection, int Page, SearchInputModel model)
         {
             try
             {
@@ -206,7 +208,9 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
                         }
                     }
                 }
-                model.Sorting = Sort ?? "";
+                if (!Enum.IsDefined(sortField) || !Enum.IsDefined(sortDirection)) return false;
+                model.SortField = sortField;
+                model.SortDirection = sortDirection;
                 model.CurrentPage = Page == 0 ? 1 : Page;
                 model.FilterText = Text ?? "";
 
@@ -257,8 +261,8 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
             try
             {
                 var times = Text.Split('-');
-                model.AfterTime = times[0].TransTime();
-                model.BeforeTime = times[1].TransTime();
+                model.AfterTime = new DateTime(1970, 1, 1, 8, 0, 0).AddMilliseconds(long.Parse(times[0]));
+                model.BeforeTime = new DateTime(1970, 1, 1, 8, 0, 0).AddMilliseconds(long.Parse(times[1]));
 
                 return true;
 
@@ -272,7 +276,7 @@ namespace CnGalWebSite.DataModel.Application.Search.Dtos
 
         public override string ToString()
         {
-            return $"{AfterTime.ToUnixTimeMilliseconds()}-{BeforeTime.ToUnixTimeMilliseconds()}";
+            return $"{new DateTimeOffset(AfterTime).ToUnixTimeMilliseconds()}-{new DateTimeOffset(BeforeTime).ToUnixTimeMilliseconds()}";
         }
 
     }

@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Users;
@@ -34,6 +35,41 @@ namespace CnGalWebSite.APIServer.Controllers
     [Authorize]
     public class AccountAPIController : ControllerBase
     {
+        private static readonly SortMap<ApplicationUser, UserSortField> ListUsersSorting =
+            new SortMap<ApplicationUser, UserSortField>(UserSortField.Id, UserSortField.Id)
+            .Add(UserSortField.Id, s => s.Id)
+            .Add(UserSortField.PersonalSignature, s => s.PersonalSignature)
+            .Add(UserSortField.CanComment, s => s.CanComment??false)
+            .Add(UserSortField.DisplayContributionValue, s => s.DisplayContributionValue)
+            .Add(UserSortField.DisplayIntegral, s => s.DisplayIntegral)
+            .Add(UserSortField.Email, s => s.Email)
+            .Add(UserSortField.LastOnlineTime, s => s.LastOnlineTime)
+            .Add(UserSortField.OnlineTime, s => s.OnlineTime)
+            .Add(UserSortField.RegistTime, s => s.RegistTime)
+            .Add(UserSortField.UserName, s => s.UserName);
+
+        private static readonly SortMap<UserCertification, UserCertificationSortField> ListUserCertificationsSorting =
+            new SortMap<UserCertification, UserCertificationSortField>(UserCertificationSortField.Id, UserCertificationSortField.Id)
+            .Add(UserCertificationSortField.Id, s => s.Id)
+            .Add(UserCertificationSortField.UserName, s => s.ApplicationUser.UserName)
+            .Add(UserCertificationSortField.UserId, s => s.ApplicationUserId)
+            .Add(UserCertificationSortField.CertificationTime, s => s.CertificationTime)
+            .Add(UserCertificationSortField.EntryId, s => s.Entry.Id)
+            .Add(UserCertificationSortField.EntryName, s => s.Entry.Name)
+            .Add(UserCertificationSortField.EntryType, s => s.Entry.Type);
+
+        private static readonly SortMap<OperationRecord, OperationRecordSortField> ListOperationRecordsSorting =
+            new SortMap<OperationRecord, OperationRecordSortField>(OperationRecordSortField.Id, OperationRecordSortField.Id)
+            .Add(OperationRecordSortField.Id, s => s.Id)
+            .Add(OperationRecordSortField.UserName, s => s.ApplicationUser.UserName)
+            .Add(OperationRecordSortField.UserId, s => s.ApplicationUserId)
+            .Add(OperationRecordSortField.Cookie, s => s.Cookie)
+            .Add(OperationRecordSortField.Ip, s => s.Ip)
+            .Add(OperationRecordSortField.ObjectId, s => s.ObjectId)
+            .Add(OperationRecordSortField.Type, s => s.Type)
+            .Add(OperationRecordSortField.OperationTime, s => s.OperationTime);
+
+
         
         
         private readonly IAppHelper _appHelper;
@@ -189,12 +225,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<UserOverviewModel>> ListUsers(QueryParameterModel model)
+        public async Task<QueryResultModel<UserOverviewModel, UserSortField>> ListUsers(QueryParameterModel<UserSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<ApplicationUser, string>(_userRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || ( s.UserName.Contains(model.SearchText) || s.Email.Contains(model.SearchText) || s.PersonalSignature.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<ApplicationUser, UserSortField>(_userRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || ( s.UserName.Contains(model.SearchText) || s.Email.Contains(model.SearchText) || s.PersonalSignature.Contains(model.SearchText)), ListUsersSorting);
 
-            return new QueryResultModel<UserOverviewModel>
+            return new QueryResultModel<UserOverviewModel, UserSortField>
             {
                 Items = await items.Select(s => new UserOverviewModel
                 {
@@ -215,12 +251,12 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<UserCertificationOverviewModel>> ListUserCertifications(QueryParameterModel model)
+        public async Task<QueryResultModel<UserCertificationOverviewModel, UserCertificationSortField>> ListUserCertifications(QueryParameterModel<UserCertificationSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<UserCertification, long>(_userCertificationRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).Include(s=>s.Entry).Where(s=>s.ApplicationUser!=null&&s.Entry!=null), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser.UserName.Contains(model.SearchText) || s.Entry.Name.Contains(model.SearchText) ));
+            var (items, total) = await _queryService.QueryAsync<UserCertification, UserCertificationSortField>(_userCertificationRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).Include(s=>s.Entry).Where(s=>s.ApplicationUser!=null&&s.Entry!=null), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser.UserName.Contains(model.SearchText) || s.Entry.Name.Contains(model.SearchText) ), ListUserCertificationsSorting);
 
-            return new QueryResultModel<UserCertificationOverviewModel>
+            return new QueryResultModel<UserCertificationOverviewModel, UserCertificationSortField>
             {
                 Items = await items.Select(s => new UserCertificationOverviewModel
                 {
@@ -239,12 +275,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<OperationRecordOverviewModel>> ListOperationRecords(QueryParameterModel model)
+        public async Task<QueryResultModel<OperationRecordOverviewModel, OperationRecordSortField>> ListOperationRecords(QueryParameterModel<OperationRecordSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<OperationRecord, long>(_operationRecordRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).Where(s => s.ApplicationUser != null), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser.UserName.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<OperationRecord, OperationRecordSortField>(_operationRecordRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser).Where(s => s.ApplicationUser != null), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.ApplicationUser.UserName.Contains(model.SearchText)), ListOperationRecordsSorting);
 
-            return new QueryResultModel<OperationRecordOverviewModel>
+            return new QueryResultModel<OperationRecordOverviewModel, OperationRecordSortField>
             {
                 Items = await items.Select(s => new OperationRecordOverviewModel
                 {

@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.DataModel.Sorting;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Questionnaires;
 using CnGalWebSite.APIServer.DataReositories;
@@ -26,6 +27,21 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/questionnaires/[action]")]
     public class QuestionnaireAPIController : ControllerBase
     {
+        private static readonly SortMap<Questionnaire, QuestionnaireSortField> ListAsyncSorting =
+            new SortMap<Questionnaire, QuestionnaireSortField>(QuestionnaireSortField.Id, QuestionnaireSortField.Id)
+            .Add(QuestionnaireSortField.Id, s => s.Id)
+            .Add(QuestionnaireSortField.Name, s => s.Name)
+            .Add(QuestionnaireSortField.DisplayName, s => s.DisplayName)
+            .Add(QuestionnaireSortField.CreateTime, s => s.CreateTime)
+            .Add(QuestionnaireSortField.LastEditTime, s => s.LastEditTime)
+            .Add(QuestionnaireSortField.BeginTime, s => s.BeginTime)
+            .Add(QuestionnaireSortField.EndTime, s => s.EndTime)
+            .Add(QuestionnaireSortField.IsActive, s => s.IsActive)
+            .Add(QuestionnaireSortField.IsHidden, s => s.IsHidden)
+            .Add(QuestionnaireSortField.ResponseCount, s => s.ResponseCount)
+            .Add(QuestionnaireSortField.Priority, s => s.Priority);
+
+
         private readonly IRepository<Questionnaire, long> _questionnaireRepository;
         private readonly IRepository<QuestionnaireQuestion, long> _questionRepository;
         private readonly IRepository<QuestionOption, long> _optionRepository;
@@ -629,14 +645,14 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<ActionResult<QueryResultModel<QuestionnaireOverviewModel>>> ListAsync(QueryParameterModel model)
+        public async Task<ActionResult<QueryResultModel<QuestionnaireOverviewModel, QuestionnaireSortField>>> ListAsync(QueryParameterModel<QuestionnaireSortField> model)
         {
             try
             {
-                var (items, total) = await _queryService.QueryAsync<Questionnaire, long>(_questionnaireRepository.GetAll().AsNoTracking(), model,
-                    s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.DisplayName.Contains(model.SearchText)));
+                var (items, total) = await _queryService.QueryAsync<Questionnaire, QuestionnaireSortField>(_questionnaireRepository.GetAll().AsNoTracking(), model,
+                    s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.DisplayName.Contains(model.SearchText)), ListAsyncSorting);
 
-                return Ok(new QueryResultModel<QuestionnaireOverviewModel>
+                return Ok(new QueryResultModel<QuestionnaireOverviewModel, QuestionnaireSortField>
                 {
                     Items = await items.Select(q => new QuestionnaireOverviewModel
                     {

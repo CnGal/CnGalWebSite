@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
@@ -47,14 +48,14 @@ public interface IPerfectionQueryService
     /// <summary>
     /// 分页查询完善度列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<PerfectionOverviewModel>>> ListPerfectionsAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<PerfectionOverviewModel, PerfectionSortField>>> ListPerfectionsAsync(
+        QueryParameterModel<PerfectionSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询完善度单项检查列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<PerfectionCheckOverviewModel>>> ListPerfectionChecksAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<PerfectionCheckOverviewModel, PerfectionCheckSortField>>> ListPerfectionChecksAsync(
+        QueryParameterModel<PerfectionCheckSortField> parameter,
         CancellationToken cancellationToken = default);
 }

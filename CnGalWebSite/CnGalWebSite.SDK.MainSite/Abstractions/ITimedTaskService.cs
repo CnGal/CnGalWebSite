@@ -1,3 +1,4 @@
+using CnGalWebSite.TimedTask.Models.Sorting;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.TimedTask.Models.ViewModels;
@@ -12,8 +13,8 @@ public interface ITimedTaskService
     /// <summary>
     /// 分页查询定时任务列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<TimedTaskOverviewModel>>> GetTimedTasksAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<TimedTaskOverviewModel, TimedTaskSortField>>> GetTimedTasksAsync(
+        QueryParameterModel<TimedTaskSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>

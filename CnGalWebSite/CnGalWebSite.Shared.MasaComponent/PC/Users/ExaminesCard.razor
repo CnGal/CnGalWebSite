@@ -1,4 +1,5 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IDataCacheService _dataCacheService
 
 
@@ -140,7 +141,7 @@ else
 
     bool isReady;
 
-    public string Sorting { get; set; } = "Id desc";
+    public ExamineSortField SortField { get; set; } = ExamineSortField.Id;
     public string ScreeningConditions { get; set; } = "All";
 
     public PagedResultDto<ExaminedNormalListModel> pagedResultDto = new PagedResultDto<ExaminedNormalListModel>();
@@ -176,10 +177,10 @@ else
         switch (type)
         {
             case  ExaminedNormalListSortType.EditTime:
-                Sorting = "Id desc";
+                SortField = ExamineSortField.Id;
                 break;
             case ExaminedNormalListSortType.ExamineTime:
-                Sorting = "PassedTime desc";
+                SortField = ExamineSortField.PassedTime;
                 break;
         }
         await OnPageClick(_dataCacheService.SpaceViewCache.ExaminesCurrentPage);
@@ -202,7 +203,7 @@ else
         _dataCacheService.SpaceViewCache.ExaminesCurrentPage = pageIndex;
         try
         {
-            pagedResultDto = await _dataCacheService.UserExaminesDataCatche.GetCache($"?userId={Id}&sorting={Sorting}&maxResultCount={10}&currentPage={pageIndex}&ScreeningConditions={ScreeningConditions}");
+            pagedResultDto = await _dataCacheService.UserExaminesDataCatche.GetCache($"?userId={Id}&sortField={SortField}&sortDirection=Descending&maxResultCount={10}&currentPage={pageIndex}&ScreeningConditions={ScreeningConditions}");
             StateHasChanged();
         }
         catch (Exception ex)

@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject IEventService _eventService
 
 <MDCard>
-    <DataTableCard TModel="StaffInforTableModel" Headers="_headers" ApiUrl="@(_baseUrl)" SortByItem="@nameof(StaffInforTableModel.RealId)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <DataTableCard TModel="StaffInforTableModel" TSort="StaffInforSortField" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" DefaultSortField="StaffInforSortField.RealId" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
         <ButtonContent>
             <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton OnQueryAsync="@(async ()=>await dataTableCard?.QueryAllAsync())" Name="STAFF" Class="me-4" />
         </ButtonContent>
@@ -27,6 +28,17 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, StaffInforSortField> _sortFields = new Dictionary<string, StaffInforSortField>
+    {
+        [nameof(StaffInforTableModel.GameName)] = StaffInforSortField.GameName,
+        [nameof(StaffInforTableModel.NicknameOfficial)] = StaffInforSortField.NicknameOfficial,
+        [nameof(StaffInforTableModel.PositionGeneral)] = StaffInforSortField.PositionGeneral,
+        [nameof(StaffInforTableModel.PositionOfficial)] = StaffInforSortField.PositionOfficial,
+        [nameof(StaffInforTableModel.RealId)] = StaffInforSortField.RealId,
+        [nameof(StaffInforTableModel.Subcategory)] = StaffInforSortField.Subcategory,
+        [nameof(StaffInforTableModel.SubordinateOrganization)] = StaffInforSortField.SubordinateOrganization,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -51,7 +63,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<StaffInforTableModel> dataTableCard;
+    DataTableCard<StaffInforTableModel, StaffInforSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

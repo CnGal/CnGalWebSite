@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/listrecommends"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -21,10 +22,10 @@
         推荐管理
     </h1>
 
-    <CgDataTable TItem="RecommendOverviewModel"
+    <CgDataTable TItem="RecommendOverviewModel" TSort="RecommendSortField"
                  Title="推荐列表"
                  OnServerQuery="OnQueryAsync"
-                 DefaultSortField="Id"
+                 DefaultSortField="RecommendSortField.Id"
                  DefaultSortDesc="true"
                  @ref="_table">
         <ToolbarContent>
@@ -34,14 +35,14 @@
             </CgButton>
         </ToolbarContent>
         <ChildContent>
-            <CgDataTableColumn TItem="RecommendOverviewModel" Title="ID" Field="Id" Width="80px" />
-            <CgDataTableColumn TItem="RecommendOverviewModel" Title="状态" Field="IsHidden">
+            <CgDataTableColumn TItem="RecommendOverviewModel" TSort="RecommendSortField" Title="ID" SortField="RecommendSortField.Id" Value="item => item.Id" Width="80px" />
+            <CgDataTableColumn TItem="RecommendOverviewModel" TSort="RecommendSortField" Title="状态" SortField="RecommendSortField.IsHidden" Value="item => item.IsHidden">
                 <ChildContent Context="item">
                     @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
                     else { <span class="admin-badge admin-badge--visible">可见</span> }
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="RecommendOverviewModel" Title="关联词条" Field="EntryName">
+            <CgDataTableColumn TItem="RecommendOverviewModel" TSort="RecommendSortField" Title="关联词条" SortField="RecommendSortField.EntryName" Value="item => item.EntryName">
                 <ChildContent Context="item">
                     @if (item.EntryId > 0)
                     {
@@ -53,13 +54,13 @@
                     }
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="RecommendOverviewModel" Title="原因" Field="Reason">
+            <CgDataTableColumn TItem="RecommendOverviewModel" TSort="RecommendSortField" Title="原因" SortField="RecommendSortField.Reason" Value="item => item.Reason">
                 <ChildContent Context="item"><div class="admin-cell-text">@item.Reason.GetDisplayName()</div></ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="RecommendOverviewModel" Title="更新时间" Field="UpdateTime">
+            <CgDataTableColumn TItem="RecommendOverviewModel" TSort="RecommendSortField" Title="更新时间" SortField="RecommendSortField.UpdateTime" Value="item => item.UpdateTime">
                 <ChildContent Context="item">@item.UpdateTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="RecommendOverviewModel" Title="操作" Sortable="false" Width="100px">
+            <CgDataTableColumn TItem="RecommendOverviewModel" TSort="RecommendSortField" Title="操作" Sortable="false" Width="100px">
                 <ChildContent Context="item">
                     <div class="admin-actions">
                         <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
@@ -113,21 +114,14 @@
 
 @code {
     private CancellationTokenSource? _cts;
-    private CgDataTable<RecommendOverviewModel>? _table;
+    private CgDataTable<RecommendOverviewModel, RecommendSortField>? _table;
     private bool _showEditModal;
     private bool _isNew;
     private RecommendEditModel? _editModel;
 
-    private async Task<CgDataTableResult<RecommendOverviewModel>> OnQueryAsync(CgDataTableRequest request)
+    private async Task<CgDataTableResult<RecommendOverviewModel>> OnQueryAsync(CgDataTableRequest<RecommendSortField> request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
+        var parameter = request.ToQueryParameter();
 
         var result = await QueryService.GetRecommendsAsync(parameter, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data != null)

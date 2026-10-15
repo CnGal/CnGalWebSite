@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Comments;
@@ -45,7 +46,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Message = CnGalWebSite.DataModel.Model.Message;
 using Tag = CnGalWebSite.DataModel.Model.Tag;
@@ -54,6 +54,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
 {
     public class ExamineService : IExamineService
     {
+        private static readonly CnGalWebSite.Core.Services.Query.SortMap<Examine, ExamineSortField> ListSorting =
+            new CnGalWebSite.Core.Services.Query.SortMap<Examine, ExamineSortField>(ExamineSortField.Id, ExamineSortField.Id)
+            .Add(ExamineSortField.Id, s => s.Id)
+            .Add(ExamineSortField.Operation, s => s.Operation)
+            .Add(ExamineSortField.IsPassed, s => s.IsPassed)
+            .Add(ExamineSortField.PassedTime, s => s.PassedTime)
+            .Add(ExamineSortField.ApplyTime, s => s.ApplyTime)
+            .Add(ExamineSortField.Comments, s => s.Comments)
+            .Add(ExamineSortField.ApplicationUserId, s => s.ApplicationUserId)
+            .Add(ExamineSortField.UserName, s => s.ApplicationUser.UserName)
+            .Add(ExamineSortField.PassedAdminName, s => s.PassedAdminName);
+
         private readonly IRepository<Examine, int> _examineRepository;
         private readonly IAppHelper _appHelper;
         private readonly IRepository<Disambig, int> _disambigRepository;
@@ -204,8 +216,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
             var count = query.Count();
             //根据需求进行排序，然后进行分页逻辑的计算
             query = input.IsVisual
-                ? query.OrderBy(input.Sorting).Skip(input.CurrentPage).Take(input.MaxResultCount)
-                : query.OrderBy(input.Sorting).Skip((input.CurrentPage - 1) * input.MaxResultCount).Take(input.MaxResultCount);
+                ? ListSorting.Apply(query, input.Sorts).Skip(input.CurrentPage).Take(input.MaxResultCount)
+                : ListSorting.Apply(query, input.Sorts).Skip((input.CurrentPage - 1) * input.MaxResultCount).Take(input.MaxResultCount);
 
             //将结果转换为List集合 加载到内存中
             var models = count != 0 ? await GetExaminesToNormalListAsync(query, false) : new List<ExaminedNormalListModel>();
@@ -216,7 +228,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 MaxResultCount = input.MaxResultCount,
                 Data = models,
                 FilterText = input.FilterText,
-                Sorting = input.Sorting,
+
                 ScreeningConditions = input.ScreeningConditions
             };
             return dtos;

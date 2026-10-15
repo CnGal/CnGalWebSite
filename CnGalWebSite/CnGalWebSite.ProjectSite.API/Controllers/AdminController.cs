@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.Core.Helpers;
+using CnGalWebSite.ProjectSite.Models.Sorting;
+using CnGalWebSite.Core.Helpers;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.ProjectSite.API.DataReositories;
@@ -18,6 +19,23 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
     [ApiController]
     public class AdminController : ControllerBase
     {
+        private static readonly SortMap<Carousel, ProjectCarouselSortField> ListCarouselsSorting =
+            new SortMap<Carousel, ProjectCarouselSortField>(ProjectCarouselSortField.Id, ProjectCarouselSortField.Id)
+            .Add(ProjectCarouselSortField.Id, s => s.Id)
+            .Add(ProjectCarouselSortField.Priority, s => s.Priority)
+            .Add(ProjectCarouselSortField.Image, s => s.Image)
+            .Add(ProjectCarouselSortField.Link, s => s.Link)
+            .Add(ProjectCarouselSortField.Note, s => s.Note);
+
+        private static readonly SortMap<FriendLink, ProjectFriendLinkSortField> ListFriendLinksSorting =
+            new SortMap<FriendLink, ProjectFriendLinkSortField>(ProjectFriendLinkSortField.Id, ProjectFriendLinkSortField.Id)
+            .Add(ProjectFriendLinkSortField.Id, s => s.Id)
+            .Add(ProjectFriendLinkSortField.Priority, s => s.Priority)
+            .Add(ProjectFriendLinkSortField.Image, s => s.Image)
+            .Add(ProjectFriendLinkSortField.Link, s => s.Link)
+            .Add(ProjectFriendLinkSortField.Name, s => s.Name);
+
+
         private readonly IRepository<Carousel, long> _carouselRepository;
         private readonly IRepository<FriendLink, long> _friendLinkRepository;
         private readonly IQueryService _queryService;
@@ -51,12 +69,12 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<CarouselOverviewModel>> ListCarousels(QueryParameterModel model)
+        public async Task<QueryResultModel<CarouselOverviewModel, ProjectCarouselSortField>> ListCarousels(QueryParameterModel<ProjectCarouselSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Carousel, long>(_carouselRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Note.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Carousel, ProjectCarouselSortField>(_carouselRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Note.Contains(model.SearchText)), ListCarouselsSorting);
 
-            return new QueryResultModel<CarouselOverviewModel>
+            return new QueryResultModel<CarouselOverviewModel, ProjectCarouselSortField>
             {
                 Items = await items.Select(s => new CarouselOverviewModel
                 {
@@ -142,12 +160,12 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<FriendLinkOverviewModel>> ListFriendLinks(QueryParameterModel model)
+        public async Task<QueryResultModel<FriendLinkOverviewModel, ProjectFriendLinkSortField>> ListFriendLinks(QueryParameterModel<ProjectFriendLinkSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<FriendLink, int>(_friendLinkRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<FriendLink, ProjectFriendLinkSortField>(_friendLinkRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)), ListFriendLinksSorting);
 
-            return new QueryResultModel<FriendLinkOverviewModel>
+            return new QueryResultModel<FriendLinkOverviewModel, ProjectFriendLinkSortField>
             {
                 Items = await items.Select(s => new FriendLinkOverviewModel
                 {

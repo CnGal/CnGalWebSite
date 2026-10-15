@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="ExamineOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" SortByItem="@nameof(ExamineOverviewModel.PassedTime)" @ref="dataTableCard"
+    <DataTableCard TModel="ExamineOverviewModel" TSort="ExamineSortField" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" DefaultSortField="ExamineSortField.PassedTime" @ref="dataTableCard"
                    LoadingText="找不到数据欸......可以尝试申请用户认证哦~">
         <ItemColContent>
             @if (context.Header.Value == "actions")
@@ -54,6 +55,18 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, ExamineSortField> _sortFields = new Dictionary<string, ExamineSortField>
+    {
+        [nameof(ExamineOverviewModel.ApplicationUserId)] = ExamineSortField.ApplicationUserId,
+        [nameof(ExamineOverviewModel.ApplyTime)] = ExamineSortField.ApplyTime,
+        [nameof(ExamineOverviewModel.Comments)] = ExamineSortField.Comments,
+        [nameof(ExamineOverviewModel.Id)] = ExamineSortField.Id,
+        [nameof(ExamineOverviewModel.IsPassed)] = ExamineSortField.IsPassed,
+        [nameof(ExamineOverviewModel.Operation)] = ExamineSortField.Operation,
+        [nameof(ExamineOverviewModel.PassedAdminName)] = ExamineSortField.PassedAdminName,
+        [nameof(ExamineOverviewModel.PassedTime)] = ExamineSortField.PassedTime,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -79,7 +92,7 @@
         new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<ExamineOverviewModel> dataTableCard;
+    DataTableCard<ExamineOverviewModel, ExamineSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="UserReviewEditRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" SortByItem="@nameof(UserReviewEditRecordOverviewModel.ReviewedTime)" @ref="dataTableCard"
+    <DataTableCard TModel="UserReviewEditRecordOverviewModel" TSort="UserReviewEditRecordSortField" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" DefaultSortField="UserReviewEditRecordSortField.ReviewedTime" @ref="dataTableCard"
                    LoadingText="找不到数据欸......可以前往词条页面关注一些词条，点击编辑按钮就能看到入口哦~">
         <ItemColContent>
             @if (context.Header.Value == "actions")
@@ -50,6 +51,15 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, UserReviewEditRecordSortField> _sortFields = new Dictionary<string, UserReviewEditRecordSortField>
+    {
+        [nameof(UserReviewEditRecordOverviewModel.EntryName)] = UserReviewEditRecordSortField.EntryName,
+        [nameof(UserReviewEditRecordOverviewModel.Operation)] = UserReviewEditRecordSortField.Operation,
+        [nameof(UserReviewEditRecordOverviewModel.ReviewedTime)] = UserReviewEditRecordSortField.ReviewedTime,
+        [nameof(UserReviewEditRecordOverviewModel.State)] = UserReviewEditRecordSortField.State,
+        [nameof(UserReviewEditRecordOverviewModel.UserName)] = UserReviewEditRecordSortField.UserName,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -67,7 +77,7 @@
         new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<UserReviewEditRecordOverviewModel> dataTableCard;
+    DataTableCard<UserReviewEditRecordOverviewModel, UserReviewEditRecordSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

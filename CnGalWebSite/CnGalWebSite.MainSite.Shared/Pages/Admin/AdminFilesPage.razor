@@ -1,3 +1,4 @@
+@using CnGalWebSite.DrawingBed.Models.Sorting
 @page "/admin/listfiles"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -16,13 +17,13 @@
         上传记录
     </h1>
 
-    <CgDataTable TItem="UploadRecordOverviewModel"
+    <CgDataTable TItem="UploadRecordOverviewModel" TSort="DrawingBedUploadRecordSortField"
                  Title="上传记录列表"
                  OnServerQuery="OnQueryFiles"
-                 DefaultSortField="Id"
+                 DefaultSortField="DrawingBedUploadRecordSortField.Id"
                  DefaultSortDesc="true">
-        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="预览" Sortable="false" Width="80px">
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" TSort="DrawingBedUploadRecordSortField" Title="Id" SortField="DrawingBedUploadRecordSortField.Id" Value="item => item.Id" Width="80px" />
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" TSort="DrawingBedUploadRecordSortField" Title="预览" Sortable="false" Width="80px">
             <ChildContent Context="item">
                 @if (item.Type == UploadFileType.Image && !string.IsNullOrWhiteSpace(item.Url))
                 {
@@ -34,12 +35,12 @@
                 }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="类型" Field="Type">
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" TSort="DrawingBedUploadRecordSortField" Title="类型" SortField="DrawingBedUploadRecordSortField.Type" Value="item => item.Type">
             <ChildContent Context="item">
                 <span class="admin-badge">@item.Type</span>
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="大小" Field="Size" Width="100px">
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" TSort="DrawingBedUploadRecordSortField" Title="大小" SortField="DrawingBedUploadRecordSortField.Size" Value="item => item.Size" Width="100px">
             <ChildContent Context="item">
                 @if (item.Size.HasValue)
                 {
@@ -47,20 +48,20 @@
                 }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="Sha1" Field="Sha1" Width="120px">
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" TSort="DrawingBedUploadRecordSortField" Title="Sha1" SortField="DrawingBedUploadRecordSortField.Sha1" Value="item => item.Sha1" Width="120px">
             <ChildContent Context="item">
                 <span style="font-family: monospace; font-size: 0.75rem;" title="@item.Sha1">
                     @(item.Sha1?.Length > 10 ? item.Sha1[..10] + "…" : item.Sha1)
                 </span>
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="时长" Field="Duration" Width="80px">
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" TSort="DrawingBedUploadRecordSortField" Title="时长" SortField="DrawingBedUploadRecordSortField.Duration" Value="item => item.Duration" Width="80px">
             <ChildContent Context="item">
                 @(item.Duration?.ToString(@"hh\:mm\:ss") ?? "—")
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="用户Id" Field="UserId" Width="120px" />
-        <CgDataTableColumn TItem="UploadRecordOverviewModel" Title="上传时间" Field="UploadTime" Width="160px">
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" TSort="DrawingBedUploadRecordSortField" Title="用户Id" SortField="DrawingBedUploadRecordSortField.UserId" Value="item => item.UserId" Width="120px" />
+        <CgDataTableColumn TItem="UploadRecordOverviewModel" TSort="DrawingBedUploadRecordSortField" Title="上传时间" SortField="DrawingBedUploadRecordSortField.UploadTime" Value="item => item.UploadTime" Width="160px">
             <ChildContent Context="item">
                 @item.UploadTime.ToString("yyyy-MM-dd HH:mm")
             </ChildContent>
@@ -70,16 +71,9 @@
 
 @code {
     private CancellationTokenSource? _cts = new();
-    private async Task<CgDataTableResult<UploadRecordOverviewModel>> OnQueryFiles(CgDataTableRequest request)
+    private async Task<CgDataTableResult<UploadRecordOverviewModel>> OnQueryFiles(CgDataTableRequest<DrawingBedUploadRecordSortField> request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
+        var parameter = request.ToQueryParameter();
 
         var result = await FileQueryService.GetUploadRecordsAsync(parameter, _cts.Token);
         if (result.Success && result.Data is not null)

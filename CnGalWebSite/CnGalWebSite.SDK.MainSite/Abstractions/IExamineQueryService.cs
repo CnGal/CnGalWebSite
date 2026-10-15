@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.EditRecords;
@@ -12,22 +13,22 @@ public interface IExamineQueryService
     /// <summary>
     /// 分页查询审核列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<ExamineOverviewModel>>> GetExaminesAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<ExamineOverviewModel, ExamineSortField>>> GetExaminesAsync(
+        QueryParameterModel<ExamineSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询用户审阅记录列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<UserReviewEditRecordOverviewModel>>> GetUserReviewEditRecordsAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<UserReviewEditRecordOverviewModel, UserReviewEditRecordSortField>>> GetUserReviewEditRecordsAsync(
+        QueryParameterModel<UserReviewEditRecordSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// 分页查询用户监控列表。
     /// </summary>
-    Task<SdkResult<QueryResultModel<UserMonitorOverviewModel>>> GetUserMonitorsAsync(
-        QueryParameterModel parameter,
+    Task<SdkResult<QueryResultModel<UserMonitorOverviewModel, UserMonitorSortField>>> GetUserMonitorsAsync(
+        QueryParameterModel<UserMonitorSortField> parameter,
         CancellationToken cancellationToken = default);
 
     /// <summary>

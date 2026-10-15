@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.ProjectSite.API.DataReositories;
+using CnGalWebSite.ProjectSite.Models.Sorting;
+using CnGalWebSite.ProjectSite.API.DataReositories;
 using CnGalWebSite.ProjectSite.Models.DataModels;
 using CnGalWebSite.ProjectSite.Models.ViewModels.Messages;
 using Microsoft.AspNetCore.Authorization;
@@ -17,6 +18,20 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
     [ApiController]
     public class MessageController : ControllerBase
     {
+        private static readonly SortMap<Message, ProjectMessageSortField> ListSorting =
+            new SortMap<Message, ProjectMessageSortField>(ProjectMessageSortField.Id, ProjectMessageSortField.Id)
+            .Add(ProjectMessageSortField.Id, s => s.Id)
+            .Add(ProjectMessageSortField.CreateTime, s => s.CreateTime)
+            .Add(ProjectMessageSortField.UserId, s => s.UserId)
+            .Add(ProjectMessageSortField.UserName, s => s.User.UserName)
+            .Add(ProjectMessageSortField.Hide, s => s.Hide)
+            .Add(ProjectMessageSortField.PageId, s => s.PageId)
+            .Add(ProjectMessageSortField.Text, s => s.Text)
+            .Add(ProjectMessageSortField.Type, s => s.Type)
+            .Add(ProjectMessageSortField.PageType, s => s.PageType)
+            .Add(ProjectMessageSortField.Read, s => s.Read);
+
+
         private readonly IRepository<Message, long> _messageRepository;
         private readonly IUserService _userService;
         private readonly IQueryService _queryService;
@@ -75,12 +90,12 @@ namespace CnGalWebSite.ProjectSite.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<MessageOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<MessageOverviewModel, ProjectMessageSortField>> List(QueryParameterModel<ProjectMessageSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Message, long>(_messageRepository.GetAll().AsSingleQuery().Include(s => s.User), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Text.Contains(model.SearchText) || s.User.UserName.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Message, ProjectMessageSortField>(_messageRepository.GetAll().AsSingleQuery().Include(s => s.User), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Text.Contains(model.SearchText) || s.User.UserName.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<MessageOverviewModel>
+            return new QueryResultModel<MessageOverviewModel, ProjectMessageSortField>
             {
                 Items = await items.Select(s => new MessageOverviewModel
                 {

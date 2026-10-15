@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="GameRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <DataTableCard TModel="GameRecordOverviewModel" TSort="GameRecordSortField" DefaultSortField="GameRecordSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -76,6 +77,19 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, GameRecordSortField> _sortFields = new Dictionary<string, GameRecordSortField>
+    {
+        [nameof(GameRecordOverviewModel.GameName)] = GameRecordSortField.GameName,
+        [nameof(GameRecordOverviewModel.Id)] = GameRecordSortField.Id,
+        [nameof(GameRecordOverviewModel.IsHidden)] = GameRecordSortField.IsHidden,
+        [nameof(GameRecordOverviewModel.LastEditTime)] = GameRecordSortField.LastEditTime,
+        [nameof(GameRecordOverviewModel.PlayImpressions)] = GameRecordSortField.PlayImpressions,
+        [nameof(GameRecordOverviewModel.ShowPublicly)] = GameRecordSortField.ShowPublicly,
+        [nameof(GameRecordOverviewModel.TotalSocre)] = GameRecordSortField.TotalSocre,
+        [nameof(GameRecordOverviewModel.Type)] = GameRecordSortField.Type,
+        [nameof(GameRecordOverviewModel.UserName)] = GameRecordSortField.UserName,
+    };
+
     private string _baseUrl = "api/playedgame/List";
     private string _name = "游玩记录";
 
@@ -98,7 +112,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<GameRecordOverviewModel> dataTableCard;
+    DataTableCard<GameRecordOverviewModel, GameRecordSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

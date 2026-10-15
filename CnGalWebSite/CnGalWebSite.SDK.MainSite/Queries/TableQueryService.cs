@@ -1,3 +1,5 @@
+using CnGalWebSite.DataModel.Sorting;
+using CnGalWebSite.Core.Services.Query;
 using System.Net.Http.Json;
 using System.Text.Json;
 using CnGalWebSite.Core.Models;
@@ -24,7 +26,7 @@ public class TableQueryService(HttpClient httpClient, IMemoryCache memoryCache, 
 
     public async Task<SdkResult<TableViewModel>> GetTableSummaryAsync(CancellationToken cancellationToken = default)
     {
-        const string cacheKey = "main-site:table-summary";
+        const string cacheKey = "main-site:typed-sort-v1:table-summary";
         if (memoryCache.TryGetValue(cacheKey, out TableViewModel? cached) && cached is not null)
         {
             return SdkResult<TableViewModel>.Ok(cached);
@@ -44,72 +46,70 @@ public class TableQueryService(HttpClient httpClient, IMemoryCache memoryCache, 
         return result;
     }
 
-    public Task<SdkResult<QueryResultModel<BasicInforTableModel>>> QueryGamesAsync(
-        QueryParameterModel request, CancellationToken cancellationToken = default)
+    public Task<SdkResult<QueryResultModel<BasicInforTableModel, BasicInforSortField>>> QueryGamesAsync(
+        QueryParameterModel<BasicInforSortField> request, CancellationToken cancellationToken = default)
     {
-        return PostQueryWithCacheAsync<BasicInforTableModel>("api/tables/ListGames", request, "游戏列表", cancellationToken);
+        return PostQueryWithCacheAsync<BasicInforTableModel, BasicInforSortField>("api/tables/ListGames", request, "游戏列表", cancellationToken);
     }
 
-    public Task<SdkResult<QueryResultModel<GroupInforTableModel>>> QueryGroupsAsync(
-        QueryParameterModel request, CancellationToken cancellationToken = default)
+    public Task<SdkResult<QueryResultModel<GroupInforTableModel, GroupInforSortField>>> QueryGroupsAsync(
+        QueryParameterModel<GroupInforSortField> request, CancellationToken cancellationToken = default)
     {
-        return PostQueryWithCacheAsync<GroupInforTableModel>("api/tables/ListGroups", request, "制作组列表", cancellationToken);
+        return PostQueryWithCacheAsync<GroupInforTableModel, GroupInforSortField>("api/tables/ListGroups", request, "制作组列表", cancellationToken);
     }
 
-    public Task<SdkResult<QueryResultModel<StaffInforTableModel>>> QueryStaffsAsync(
-        QueryParameterModel request, CancellationToken cancellationToken = default)
+    public Task<SdkResult<QueryResultModel<StaffInforTableModel, StaffInforSortField>>> QueryStaffsAsync(
+        QueryParameterModel<StaffInforSortField> request, CancellationToken cancellationToken = default)
     {
-        return PostQueryWithCacheAsync<StaffInforTableModel>("api/tables/ListStaffs", request, "STAFF列表", cancellationToken);
+        return PostQueryWithCacheAsync<StaffInforTableModel, StaffInforSortField>("api/tables/ListStaffs", request, "STAFF列表", cancellationToken);
     }
 
-    public Task<SdkResult<QueryResultModel<MakerInforTableModel>>> QueryMakersAsync(
-        QueryParameterModel request, CancellationToken cancellationToken = default)
+    public Task<SdkResult<QueryResultModel<MakerInforTableModel, MakerInforSortField>>> QueryMakersAsync(
+        QueryParameterModel<MakerInforSortField> request, CancellationToken cancellationToken = default)
     {
-        return PostQueryWithCacheAsync<MakerInforTableModel>("api/tables/ListMakers", request, "制作人列表", cancellationToken);
+        return PostQueryWithCacheAsync<MakerInforTableModel, MakerInforSortField>("api/tables/ListMakers", request, "制作人列表", cancellationToken);
     }
 
-    public Task<SdkResult<QueryResultModel<RoleInforTableModel>>> QueryRolesAsync(
-        QueryParameterModel request, CancellationToken cancellationToken = default)
+    public Task<SdkResult<QueryResultModel<RoleInforTableModel, RoleInforSortField>>> QueryRolesAsync(
+        QueryParameterModel<RoleInforSortField> request, CancellationToken cancellationToken = default)
     {
-        return PostQueryWithCacheAsync<RoleInforTableModel>("api/tables/ListRoles", request, "角色列表", cancellationToken);
+        return PostQueryWithCacheAsync<RoleInforTableModel, RoleInforSortField>("api/tables/ListRoles", request, "角色列表", cancellationToken);
     }
 
-    public Task<SdkResult<QueryResultModel<StoreInfoViewModel>>> QueryStoreInfoAsync(
-        QueryParameterModel request, CancellationToken cancellationToken = default)
+    public Task<SdkResult<QueryResultModel<StoreInfoViewModel, StoreTableSortField>>> QueryStoreInfoAsync(
+        QueryParameterModel<StoreTableSortField> request, CancellationToken cancellationToken = default)
     {
-        return PostQueryWithCacheAsync<StoreInfoViewModel>("api/tables/ListStoreInfo", request, "游戏价格列表", cancellationToken);
+        return PostQueryWithCacheAsync<StoreInfoViewModel, StoreTableSortField>("api/tables/ListStoreInfo", request, "游戏价格列表", cancellationToken);
     }
 
-    public Task<SdkResult<QueryResultModel<GameScoreTableModel>>> QueryGameScoresAsync(
-        QueryParameterModel request, CancellationToken cancellationToken = default)
+    public Task<SdkResult<QueryResultModel<GameScoreTableModel, GameScoreSortField>>> QueryGameScoresAsync(
+        QueryParameterModel<GameScoreSortField> request, CancellationToken cancellationToken = default)
     {
-        return PostQueryWithCacheAsync<GameScoreTableModel>("api/tables/ListGameScores", request, "游戏评分列表", cancellationToken);
+        return PostQueryWithCacheAsync<GameScoreTableModel, GameScoreSortField>("api/tables/ListGameScores", request, "游戏评分列表", cancellationToken);
     }
 
     // ── 缓存键生成 ──
 
-    private static string BuildCacheKey(string path, QueryParameterModel request)
+    private static string BuildCacheKey<TSort>(string path, QueryParameterModel<TSort> request) where TSort : struct, Enum
     {
-        var sortBy = request.SortBy != null ? string.Join(",", request.SortBy) : "";
-        var sortDesc = request.SortDesc != null ? string.Join(",", request.SortDesc) : "";
-        return $"main-site:table:{path}:p{request.Page}:s{request.ItemsPerPage}:sb{sortBy}:sd{sortDesc}:q{request.SearchText}";
+        return $"main-site:typed-sort-v1:table:{path}:p{request.Page}:s{request.ItemsPerPage}:sorts{SortCacheKey.Create(request.Sorts)}:q{request.SearchText}";
     }
 
     // ── 带缓存的 POST 分页查询 ──
 
-    private async Task<SdkResult<QueryResultModel<T>>> PostQueryWithCacheAsync<T>(
+    private async Task<SdkResult<QueryResultModel<T, TSort>>> PostQueryWithCacheAsync<T, TSort>(
         string path,
-        QueryParameterModel request,
+        QueryParameterModel<TSort> request,
         string entityDescription,
-        CancellationToken cancellationToken) where T : class
+        CancellationToken cancellationToken) where T : class where TSort : struct, Enum
     {
         var cacheKey = BuildCacheKey(path, request);
-        if (memoryCache.TryGetValue(cacheKey, out QueryResultModel<T>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out QueryResultModel<T, TSort>? cached) && cached is not null)
         {
-            return SdkResult<QueryResultModel<T>>.Ok(cached);
+            return SdkResult<QueryResultModel<T, TSort>>.Ok(cached);
         }
 
-        var result = await PostQueryAsync<T>(path, request, entityDescription, cancellationToken);
+        var result = await PostQueryAsync<T, TSort>(path, request, entityDescription, cancellationToken);
 
         if (result.Success && result.Data is not null)
         {
@@ -121,11 +121,11 @@ public class TableQueryService(HttpClient httpClient, IMemoryCache memoryCache, 
 
     // ── 通用 POST 分页查询 ──
 
-    private async Task<SdkResult<QueryResultModel<T>>> PostQueryAsync<T>(
+    private async Task<SdkResult<QueryResultModel<T, TSort>>> PostQueryAsync<T, TSort>(
         string path,
-        QueryParameterModel request,
+        QueryParameterModel<TSort> request,
         string entityDescription,
-        CancellationToken cancellationToken) where T : class
+        CancellationToken cancellationToken) where T : class where TSort : struct, Enum
     {
         try
         {
@@ -141,17 +141,17 @@ public class TableQueryService(HttpClient httpClient, IMemoryCache memoryCache, 
                     (int)response.StatusCode,
                     HttpClient.BaseAddress,
                     TrimForLog(responseBody));
-                return SdkResult<QueryResultModel<T>>.Fail("TABLE_QUERY_FAILED", $"获取{entityDescription}失败（HTTP {(int)response.StatusCode}）");
+                return SdkResult<QueryResultModel<T, TSort>>.Fail("TABLE_QUERY_FAILED", $"获取{entityDescription}失败（HTTP {(int)response.StatusCode}）");
             }
 
             try
             {
-                var data = Deserialize<QueryResultModel<T>>(responseBody);
+                var data = Deserialize<QueryResultModel<T, TSort>>(responseBody);
                 if (data is null)
                 {
-                    return SdkResult<QueryResultModel<T>>.Fail("TABLE_EMPTY_RESPONSE", $"{entityDescription}数据为空");
+                    return SdkResult<QueryResultModel<T, TSort>>.Fail("TABLE_EMPTY_RESPONSE", $"{entityDescription}数据为空");
                 }
-                return SdkResult<QueryResultModel<T>>.Ok(data);
+                return SdkResult<QueryResultModel<T, TSort>>.Ok(data);
             }
             catch (JsonException ex)
             {
@@ -162,7 +162,7 @@ public class TableQueryService(HttpClient httpClient, IMemoryCache memoryCache, 
                     path,
                     HttpClient.BaseAddress,
                     TrimForLog(responseBody));
-                return SdkResult<QueryResultModel<T>>.Fail("TABLE_DESERIALIZE_FAILED", $"{entityDescription}数据格式不兼容");
+                return SdkResult<QueryResultModel<T, TSort>>.Fail("TABLE_DESERIALIZE_FAILED", $"{entityDescription}数据格式不兼容");
             }
         }
         catch (Exception ex)
@@ -173,7 +173,7 @@ public class TableQueryService(HttpClient httpClient, IMemoryCache memoryCache, 
                 entityDescription,
                 path,
                 HttpClient.BaseAddress);
-            return SdkResult<QueryResultModel<T>>.Fail("TABLE_QUERY_EXCEPTION", $"请求{entityDescription}时发生异常");
+            return SdkResult<QueryResultModel<T, TSort>>.Fail("TABLE_QUERY_EXCEPTION", $"请求{entityDescription}时发生异常");
         }
     }
 }

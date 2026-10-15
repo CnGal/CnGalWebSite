@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @using CnGalWebSite.DataModel.ViewModel.EditRecords
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.Core.Models
@@ -9,44 +10,44 @@
 
 @* 审阅记录列表面板（服务端分页） *@
 
-<CgDataTable TItem="UserReviewEditRecordOverviewModel"
+<CgDataTable TItem="UserReviewEditRecordOverviewModel" TSort="UserReviewEditRecordSortField"
              Title="审阅记录列表"
              OnServerQuery="LoadReviewRecordsAsync"
-             DefaultSortField="@nameof(UserReviewEditRecordOverviewModel.ReviewedTime)"
+             DefaultSortField="UserReviewEditRecordSortField.ReviewedTime"
              DefaultSortDesc="true"
              @ref="_dataTable">
 
-    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" Title="审阅时间" Field="@nameof(UserReviewEditRecordOverviewModel.ReviewedTime)">
+    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" TSort="UserReviewEditRecordSortField" Title="审阅时间" SortField="UserReviewEditRecordSortField.ReviewedTime" Value="item => item.ReviewedTime">
         <ChildContent Context="item">
             @(item.ReviewedTime?.ToString("yyyy-MM-dd HH:mm") ?? "—")
         </ChildContent>
     </CgDataTableColumn>
 
-    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" Title="词条名称" Sortable="false">
+    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" TSort="UserReviewEditRecordSortField" Title="词条名称" Sortable="false">
         <ChildContent Context="item">
             @(item.EntryName ?? "—")
         </ChildContent>
     </CgDataTableColumn>
 
-    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" Title="操作" Sortable="false">
+    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" TSort="UserReviewEditRecordSortField" Title="操作" Sortable="false">
         <ChildContent Context="item">
             @item.Operation.GetDisplayName()
         </ChildContent>
     </CgDataTableColumn>
 
-    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" Title="状态" Sortable="false">
+    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" TSort="UserReviewEditRecordSortField" Title="状态" Sortable="false">
         <ChildContent Context="item">
             <ReviewStateBadge State="@item.State" />
         </ChildContent>
     </CgDataTableColumn>
 
-    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" Title="编辑者" Sortable="false">
+    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" TSort="UserReviewEditRecordSortField" Title="编辑者" Sortable="false">
         <ChildContent Context="item">
             <a class="examine-user-link" href="/space/index/@item.UserId">@(item.UserName ?? "—")</a>
         </ChildContent>
     </CgDataTableColumn>
 
-    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" Title="操作" Sortable="false" Width="120px">
+    <CgDataTableColumn TItem="UserReviewEditRecordOverviewModel" TSort="UserReviewEditRecordSortField" Title="操作" Sortable="false" Width="120px">
         <ChildContent Context="item">
             <div class="examine-actions">
                 <button class="examine-action-btn examine-action-btn--view" title="查看" @onclick="() => LookItem(item)">
@@ -68,18 +69,11 @@
 </CgDataTable>
 
 @code {
-    private CgDataTable<UserReviewEditRecordOverviewModel>? _dataTable;
+    private CgDataTable<UserReviewEditRecordOverviewModel, UserReviewEditRecordSortField>? _dataTable;
 
-    private async Task<CgDataTableResult<UserReviewEditRecordOverviewModel>> LoadReviewRecordsAsync(CgDataTableRequest request)
+    private async Task<CgDataTableResult<UserReviewEditRecordOverviewModel>> LoadReviewRecordsAsync(CgDataTableRequest<UserReviewEditRecordSortField> request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? "",
-            SortBy = string.IsNullOrWhiteSpace(request.SortField) ? new[] { "ReviewedTime" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
+        var parameter = request.ToQueryParameter();
 
         var result = await ExamineQueryService.GetUserReviewEditRecordsAsync(parameter);
         if (result.Success && result.Data != null)

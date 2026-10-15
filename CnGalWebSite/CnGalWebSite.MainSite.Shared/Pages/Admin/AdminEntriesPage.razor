@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/listentries"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -30,38 +31,38 @@
         <PanelTemplate>
             @if (context == "entries")
             {
-                <CgDataTable TItem="EntryOverviewModel"
+                <CgDataTable TItem="EntryOverviewModel" TSort="EntrySortField"
                              Title="词条列表"
                              OnServerQuery="OnServerQuery"
-                             DefaultSortField="Id"
+                             DefaultSortField="EntrySortField.Id"
                              DefaultSortDesc="true"
                              @ref="_dataTable">
-                    <CgDataTableColumn TItem="EntryOverviewModel" Title="Id" Field="Id" Width="80px" />
-                    <CgDataTableColumn TItem="EntryOverviewModel" Title="名称" Field="Name">
+                    <CgDataTableColumn TItem="EntryOverviewModel" TSort="EntrySortField" Title="Id" SortField="EntrySortField.Id" Value="item => item.Id" Width="80px" />
+                    <CgDataTableColumn TItem="EntryOverviewModel" TSort="EntrySortField" Title="名称" SortField="EntrySortField.Name" Value="item => item.Name">
                         <ChildContent Context="item">
                             <a class="admin-cell-name" href="@($"/entries/index/{item.Id}")">@item.Name</a>
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="EntryOverviewModel" Title="优先级" Field="Priority" Width="80px" />
-                    <CgDataTableColumn TItem="EntryOverviewModel" Title="状态" Field="IsHidden">
+                    <CgDataTableColumn TItem="EntryOverviewModel" TSort="EntrySortField" Title="优先级" SortField="EntrySortField.Priority" Value="item => item.Priority" Width="80px" />
+                    <CgDataTableColumn TItem="EntryOverviewModel" TSort="EntrySortField" Title="状态" SortField="EntrySortField.IsHidden" Value="item => item.IsHidden">
                         <ChildContent Context="item">
                             @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
                             else { <span class="admin-badge admin-badge--visible">可见</span> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="EntryOverviewModel" Title="外链" Field="IsHideOutlink">
+                    <CgDataTableColumn TItem="EntryOverviewModel" TSort="EntrySortField" Title="外链" SortField="EntrySortField.IsHideOutlink" Value="item => item.IsHideOutlink">
                         <ChildContent Context="item">
                             @if (item.IsHideOutlink) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
                             else { <span class="admin-badge admin-badge--visible">可见</span> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="EntryOverviewModel" Title="留言板" Field="CanComment">
+                    <CgDataTableColumn TItem="EntryOverviewModel" TSort="EntrySortField" Title="留言板" SortField="EntrySortField.CanComment" Value="item => item.CanComment">
                         <ChildContent Context="item">
                             @if (item.CanComment) { <span class="admin-badge admin-badge--yes">开启</span> }
                             else { <span class="admin-badge admin-badge--no">关闭</span> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="EntryOverviewModel" Title="操作" Sortable="false" Width="180px">
+                    <CgDataTableColumn TItem="EntryOverviewModel" TSort="EntrySortField" Title="操作" Sortable="false" Width="180px">
                         <ChildContent Context="item">
                             <div class="admin-actions">
                                 <button class="admin-action-btn admin-action-btn--up" title="增加权重" @onclick="() => EditPriority(item, true)"><CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" /></button>
@@ -85,50 +86,50 @@
             }
             else if (context == "playedgames")
             {
-                <CgDataTable TItem="GameRecordOverviewModel"
+                <CgDataTable TItem="GameRecordOverviewModel" TSort="GameRecordSortField"
                              Title="游玩记录列表"
                              OnServerQuery="OnQueryPlayedGames"
-                             DefaultSortField="Id"
+                             DefaultSortField="GameRecordSortField.Id"
                              DefaultSortDesc="true"
                              @ref="_playedGameTable">
-                    <CgDataTableColumn TItem="GameRecordOverviewModel" Title="Id" Field="Id" Width="80px" />
-                    <CgDataTableColumn TItem="GameRecordOverviewModel" Title="游戏" Field="GameName">
+                    <CgDataTableColumn TItem="GameRecordOverviewModel" TSort="GameRecordSortField" Title="Id" SortField="GameRecordSortField.Id" Value="item => item.Id" Width="80px" />
+                    <CgDataTableColumn TItem="GameRecordOverviewModel" TSort="GameRecordSortField" Title="游戏" SortField="GameRecordSortField.GameName" Value="item => item.GameName">
                         <ChildContent Context="item">
                             @if (item.GameId > 0)
                             { <a class="admin-cell-name" href="@($"/entries/index/{item.GameId}")">@item.GameName</a> }
                             else { <span>@item.GameName</span> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="GameRecordOverviewModel" Title="用户" Field="UserName">
+                    <CgDataTableColumn TItem="GameRecordOverviewModel" TSort="GameRecordSortField" Title="用户" SortField="GameRecordSortField.UserName" Value="item => item.UserName">
                         <ChildContent Context="item">
                             <a class="admin-cell-name" href="@($"/space/index/{item.UserId}")">@item.UserName</a>
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="GameRecordOverviewModel" Title="类型" Field="Type">
+                    <CgDataTableColumn TItem="GameRecordOverviewModel" TSort="GameRecordSortField" Title="类型" SortField="GameRecordSortField.Type" Value="item => item.Type">
                         <ChildContent Context="item"><span class="admin-badge">@item.Type</span></ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="GameRecordOverviewModel" Title="总分" Field="TotalSocre" Width="80px" />
-                    <CgDataTableColumn TItem="GameRecordOverviewModel" Title="评语" Field="PlayImpressions" Sortable="false">
+                    <CgDataTableColumn TItem="GameRecordOverviewModel" TSort="GameRecordSortField" Title="总分" SortField="GameRecordSortField.TotalSocre" Value="item => item.TotalSocre" Width="80px" />
+                    <CgDataTableColumn TItem="GameRecordOverviewModel" TSort="GameRecordSortField" Title="评语" SortField="GameRecordSortField.PlayImpressions" Value="item => item.PlayImpressions" Sortable="false">
                         <ChildContent Context="item">
                             <div class="admin-cell-text">@item.PlayImpressions</div>
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="GameRecordOverviewModel" Title="公开" Field="ShowPublicly">
+                    <CgDataTableColumn TItem="GameRecordOverviewModel" TSort="GameRecordSortField" Title="公开" SortField="GameRecordSortField.ShowPublicly" Value="item => item.ShowPublicly">
                         <ChildContent Context="item">
                             @if (item.ShowPublicly) { <span class="admin-badge admin-badge--yes">公开</span> }
                             else { <span class="admin-badge admin-badge--no">私密</span> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="GameRecordOverviewModel" Title="状态" Field="IsHidden">
+                    <CgDataTableColumn TItem="GameRecordOverviewModel" TSort="GameRecordSortField" Title="状态" SortField="GameRecordSortField.IsHidden" Value="item => item.IsHidden">
                         <ChildContent Context="item">
                             @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
                             else { <span class="admin-badge admin-badge--visible">可见</span> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="GameRecordOverviewModel" Title="最后编辑" Field="LastEditTime">
+                    <CgDataTableColumn TItem="GameRecordOverviewModel" TSort="GameRecordSortField" Title="最后编辑" SortField="GameRecordSortField.LastEditTime" Value="item => item.LastEditTime">
                         <ChildContent Context="item">@item.LastEditTime.ToString("yyyy-MM-dd HH:mm")</ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="GameRecordOverviewModel" Title="操作" Sortable="false" Width="120px">
+                    <CgDataTableColumn TItem="GameRecordOverviewModel" TSort="GameRecordSortField" Title="操作" Sortable="false" Width="120px">
                         <ChildContent Context="item">
                             <div class="admin-actions">
                                 @if (item.ShowPublicly)
@@ -146,10 +147,10 @@
             }
             else if (context == "infotypes")
             {
-                <CgDataTable TItem="EntryInformationTypeOverviewModel"
+                <CgDataTable TItem="EntryInformationTypeOverviewModel" TSort="EntryInformationTypeSortField"
                              Title="基础信息类型列表"
                              OnServerQuery="OnQueryInfoTypes"
-                             DefaultSortField="Id"
+                             DefaultSortField="EntryInformationTypeSortField.Id"
                              DefaultSortDesc="true"
                              @ref="_infoTypeTable">
                     <ToolbarContent>
@@ -159,18 +160,18 @@
                         </CgButton>
                     </ToolbarContent>
                     <ChildContent>
-                    <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" Title="Id" Field="Id" Width="80px" />
-                    <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" Title="名称" Field="Name" />
-                    <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" Title="介绍" Field="Description">
+                    <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" TSort="EntryInformationTypeSortField" Title="Id" SortField="EntryInformationTypeSortField.Id" Value="item => item.Id" Width="80px" />
+                    <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" TSort="EntryInformationTypeSortField" Title="名称" SortField="EntryInformationTypeSortField.Name" Value="item => item.Name" />
+                    <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" TSort="EntryInformationTypeSortField" Title="介绍" SortField="EntryInformationTypeSortField.Description" Value="item => item.Description">
                         <ChildContent Context="item"><div class="admin-cell-text">@item.Description</div></ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" Title="图标" Field="Icon" Width="80px">
+                    <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" TSort="EntryInformationTypeSortField" Title="图标" SortField="EntryInformationTypeSortField.Icon" Value="item => item.Icon" Width="80px">
                         <ChildContent Context="item">
                             @if (!string.IsNullOrWhiteSpace(item.Icon))
                             { <CgMdiIcon Name="@item.Icon" aria-hidden="true" /> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" Title="支持类型" Sortable="false">
+                    <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" TSort="EntryInformationTypeSortField" Title="支持类型" Sortable="false">
                         <ChildContent Context="item">
                             @foreach (var t in item.Types)
                             {
@@ -178,13 +179,13 @@
                             }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" Title="状态" Field="IsHidden">
+                    <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" TSort="EntryInformationTypeSortField" Title="状态" SortField="EntryInformationTypeSortField.IsHidden" Value="item => item.IsHidden">
                         <ChildContent Context="item">
                             @if (item.IsHidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
                             else { <span class="admin-badge admin-badge--visible">可见</span> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" Title="操作" Sortable="false" Width="60px">
+                    <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" TSort="EntryInformationTypeSortField" Title="操作" Sortable="false" Width="60px">
                         <ChildContent Context="item">
                             <div class="admin-actions">
                                 <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditInfoTypeAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
@@ -247,9 +248,9 @@
 
 @code {
     private CancellationTokenSource? _cts = new();
-    private CgDataTable<EntryOverviewModel>? _dataTable;
-    private CgDataTable<GameRecordOverviewModel>? _playedGameTable;
-    private CgDataTable<EntryInformationTypeOverviewModel>? _infoTypeTable;
+    private CgDataTable<EntryOverviewModel, EntrySortField>? _dataTable;
+    private CgDataTable<GameRecordOverviewModel, GameRecordSortField>? _playedGameTable;
+    private CgDataTable<EntryInformationTypeOverviewModel, EntryInformationTypeSortField>? _infoTypeTable;
     private bool _showInfoTypeModal;
     private bool _isNewInfoType;
     private EntryInformationTypeEditModel? _infoTypeEditModel;
@@ -263,27 +264,27 @@
 
     // ─── 词条查询 ───
 
-    private async Task<CgDataTableResult<EntryOverviewModel>> OnServerQuery(CgDataTableRequest request)
+    private async Task<CgDataTableResult<EntryOverviewModel>> OnServerQuery(CgDataTableRequest<EntrySortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetEntriesAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<EntryOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<EntryOverviewModel>([], 0);
     }
 
     // ─── 游玩记录查询 ───
 
-    private async Task<CgDataTableResult<GameRecordOverviewModel>> OnQueryPlayedGames(CgDataTableRequest request)
+    private async Task<CgDataTableResult<GameRecordOverviewModel>> OnQueryPlayedGames(CgDataTableRequest<GameRecordSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetPlayedGamesAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<GameRecordOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<GameRecordOverviewModel>([], 0);
     }
 
     // ─── 基础信息类型查询 ───
 
-    private async Task<CgDataTableResult<EntryInformationTypeOverviewModel>> OnQueryInfoTypes(CgDataTableRequest request)
+    private async Task<CgDataTableResult<EntryInformationTypeOverviewModel>> OnQueryInfoTypes(CgDataTableRequest<EntryInformationTypeSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetEntryInformationTypesAsync(parameter, _cts.Token);
         return result.Success && result.Data is not null ? new CgDataTableResult<EntryInformationTypeOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<EntryInformationTypeOverviewModel>([], 0);
     }

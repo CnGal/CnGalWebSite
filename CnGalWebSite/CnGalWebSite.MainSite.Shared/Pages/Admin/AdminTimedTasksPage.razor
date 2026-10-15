@@ -1,3 +1,4 @@
+@using CnGalWebSite.TimedTask.Models.Sorting
 @page "/admin/listtimedtasks"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -18,10 +19,10 @@
         定时任务
     </h1>
 
-    <CgDataTable TItem="TimedTaskOverviewModel"
+    <CgDataTable TItem="TimedTaskOverviewModel" TSort="TimedTaskSortField"
                  Title="定时任务列表"
                  OnServerQuery="OnQueryTimedTasks"
-                 DefaultSortField="Id"
+                 DefaultSortField="TimedTaskSortField.Id"
                  DefaultSortDesc="true"
                  @ref="_table">
         <ToolbarContent>
@@ -31,23 +32,23 @@
             </CgButton>
         </ToolbarContent>
         <ChildContent>
-            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="Id" Field="Id" Width="60px" />
-            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="名称" Field="Type">
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" TSort="TimedTaskSortField" Title="Id" SortField="TimedTaskSortField.Id" Value="item => item.Id" Width="60px" />
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" TSort="TimedTaskSortField" Title="名称" SortField="TimedTaskSortField.Type" Value="item => item.Type">
                 <ChildContent Context="item">
                     <span class="admin-badge">@item.Type</span>
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="参数" Field="Parameter" Width="120px">
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" TSort="TimedTaskSortField" Title="参数" SortField="TimedTaskSortField.Parameter" Value="item => item.Parameter" Width="120px">
                 <ChildContent Context="item">
                     <span title="@item.Parameter">@(item.Parameter?.Length > 20 ? item.Parameter[..20] + "…" : item.Parameter ?? "—")</span>
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="类型" Field="ExecuteType">
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" TSort="TimedTaskSortField" Title="类型" SortField="TimedTaskSortField.ExecuteType" Value="item => item.ExecuteType">
                 <ChildContent Context="item">
                     <span class="admin-badge">@item.ExecuteType</span>
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="时间" Field="IntervalTime" Width="100px">
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" TSort="TimedTaskSortField" Title="时间" SortField="TimedTaskSortField.IntervalTime" Value="item => item.IntervalTime" Width="100px">
                 <ChildContent Context="item">
                     @if (item.ExecuteType == TimedTaskExecuteType.EveryDay)
                     {
@@ -59,12 +60,12 @@
                     }
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="上次执行" Field="LastExecutedTime" Width="160px">
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" TSort="TimedTaskSortField" Title="上次执行" SortField="TimedTaskSortField.LastExecutedTime" Value="item => item.LastExecutedTime" Width="160px">
                 <ChildContent Context="item">
                     @(item.LastExecutedTime?.ToString("yyyy-MM-dd HH:mm") ?? "—")
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="状态" Field="IsLastFail" Width="100px">
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" TSort="TimedTaskSortField" Title="状态" SortField="TimedTaskSortField.IsLastFail" Value="item => item.IsLastFail" Width="100px">
                 <ChildContent Context="item">
                     @if (item.IsRuning)
                     {
@@ -84,7 +85,7 @@
                     }
                 </ChildContent>
             </CgDataTableColumn>
-            <CgDataTableColumn TItem="TimedTaskOverviewModel" Title="操作" Sortable="false" Width="180px">
+            <CgDataTableColumn TItem="TimedTaskOverviewModel" TSort="TimedTaskSortField" Title="操作" Sortable="false" Width="180px">
                 <ChildContent Context="item">
                     <div class="admin-actions">
                         <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
@@ -165,21 +166,14 @@
 
 @code {
     private CancellationTokenSource? _cts;
-    private CgDataTable<TimedTaskOverviewModel>? _table;
+    private CgDataTable<TimedTaskOverviewModel, TimedTaskSortField>? _table;
     private bool _showEditModal;
     private bool _isNew;
     private TimedTaskEditModel? _editModel;
 
-    private async Task<CgDataTableResult<TimedTaskOverviewModel>> OnQueryTimedTasks(CgDataTableRequest request)
+    private async Task<CgDataTableResult<TimedTaskOverviewModel>> OnQueryTimedTasks(CgDataTableRequest<TimedTaskSortField> request)
     {
-        var parameter = new QueryParameterModel
-        {
-            Page = request.Page,
-            ItemsPerPage = request.PageSize,
-            SearchText = request.SearchText ?? string.Empty,
-            SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField },
-            SortDesc = new[] { request.SortDesc }
-        };
+        var parameter = request.ToQueryParameter();
 
         var result = await TimedTaskService.GetTimedTasksAsync(parameter, _cts?.Token ?? CancellationToken.None);
         if (result.Success && result.Data is not null)

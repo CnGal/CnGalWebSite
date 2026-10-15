@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.Application.Ranks;
+using CnGalWebSite.DataModel.Sorting;
+using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
@@ -21,6 +22,22 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/ranks/[action]")]
     public class RanksAPIController : ControllerBase
     {
+        private static readonly SortMap<Rank, RankSortField> ListRanksSorting =
+            new SortMap<Rank, RankSortField>(RankSortField.Id, RankSortField.Id)
+            .Add(RankSortField.Id, s => s.Id)
+            .Add(RankSortField.Name, s => s.Name)
+            .Add(RankSortField.IsHidden, s => s.IsHidden)
+            .Add(RankSortField.CreateTime, s => s.CreateTime)
+            .Add(RankSortField.Styles, s => s.Styles)
+            .Add(RankSortField.CSS, s => s.CSS)
+            .Add(RankSortField.LastEditTime, s => s.LastEditTime)
+            .Add(RankSortField.Text, s => s.Text)
+            .Add(RankSortField.Priority, s => s.Priority)
+            .Add(RankSortField.Count, s => s.RankUsers.Count)
+            .Add(RankSortField.Type, s => s.Type)
+            .Add(RankSortField.Image, s => s.Image);
+
+
         private readonly IRepository<Rank, long> _rankRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
         private readonly IRepository<RankUser, long> _rankUserRepository;
@@ -171,12 +188,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<RankOverviewModel>> ListRanks(QueryParameterModel model)
+        public async Task<QueryResultModel<RankOverviewModel, RankSortField>> ListRanks(QueryParameterModel<RankSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Rank, long>(_rankRepository.GetAll().AsSingleQuery().Include(s=>s.RankUsers), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Styles.Contains(model.SearchText) || s.CSS.Contains(model.SearchText) || s.Name.Contains(model.SearchText) || s.Text.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Rank, RankSortField>(_rankRepository.GetAll().AsSingleQuery().Include(s=>s.RankUsers), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Styles.Contains(model.SearchText) || s.CSS.Contains(model.SearchText) || s.Name.Contains(model.SearchText) || s.Text.Contains(model.SearchText)), ListRanksSorting);
 
-            return new QueryResultModel<RankOverviewModel>
+            return new QueryResultModel<RankOverviewModel, RankSortField>
             {
                 Items = await items.Select(s => new RankOverviewModel
                 {

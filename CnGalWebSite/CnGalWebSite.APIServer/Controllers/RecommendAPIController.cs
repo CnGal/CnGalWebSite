@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.Application.Helper;
+using CnGalWebSite.DataModel.Sorting;
+using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.SteamInfors;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
@@ -28,6 +29,16 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/recommends/[action]")]
     public class RecommendAPIController : ControllerBase
     {
+        private static readonly SortMap<Recommend, RecommendSortField> ListSorting =
+            new SortMap<Recommend, RecommendSortField>(RecommendSortField.Id, RecommendSortField.Id)
+            .Add(RecommendSortField.EntryId, s => s.EntryId)
+            .Add(RecommendSortField.EntryName, s => s.Entry.Name)
+            .Add(RecommendSortField.IsHidden, s => s.IsHidden)
+            .Add(RecommendSortField.Reason, s => s.Reason)
+            .Add(RecommendSortField.Id, s => s.Id)
+            .Add(RecommendSortField.UpdateTime, s => s.UpdateTime);
+
+
         private readonly IRepository<Recommend, long> _recommendRepository;
         private readonly IQueryService _queryService;
 
@@ -39,12 +50,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<RecommendOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<RecommendOverviewModel, RecommendSortField>> List(QueryParameterModel<RecommendSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Recommend, string>(_recommendRepository.GetAll().AsSingleQuery().Include(s => s.Entry), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Entry.Name != null && (s.Entry.Name.Contains(model.SearchText) || s.Id.ToString().Contains(model.SearchText))));
+            var (items, total) = await _queryService.QueryAsync<Recommend, RecommendSortField>(_recommendRepository.GetAll().AsSingleQuery().Include(s => s.Entry), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Entry.Name != null && (s.Entry.Name.Contains(model.SearchText) || s.Id.ToString().Contains(model.SearchText))), ListSorting);
 
-            return new QueryResultModel<RecommendOverviewModel>
+            return new QueryResultModel<RecommendOverviewModel, RecommendSortField>
             {
                 Items = await items.Select(s => new RecommendOverviewModel
                 {

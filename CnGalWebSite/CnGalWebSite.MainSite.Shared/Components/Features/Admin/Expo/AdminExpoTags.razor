@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @inject IAdminQueryService AdminQueryService
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
@@ -5,10 +6,10 @@
 @using CnGalWebSite.DataModel.ViewModel.Expo
 @using CnGalWebSite.SDK.MainSite.Models
 
-<CgDataTable TItem="ExpoTagOverviewModel"
+<CgDataTable TItem="ExpoTagOverviewModel" TSort="ExpoTagSortField"
              Title="展会标签列表"
              OnServerQuery="OnQueryAsync"
-             DefaultSortField="Id"
+             DefaultSortField="ExpoTagSortField.Id"
              DefaultSortDesc="true"
              @ref="_table">
     <ToolbarContent>
@@ -18,21 +19,21 @@
         </CgButton>
     </ToolbarContent>
     <ChildContent>
-        <CgDataTableColumn TItem="ExpoTagOverviewModel" Title="Id" Field="Id" Width="80px" />
-        <CgDataTableColumn TItem="ExpoTagOverviewModel" Title="名称" Field="Name" Sortable="false" />
-        <CgDataTableColumn TItem="ExpoTagOverviewModel" Title="关联游戏数" Sortable="false" Width="100px">
+        <CgDataTableColumn TItem="ExpoTagOverviewModel" TSort="ExpoTagSortField" Title="Id" SortField="ExpoTagSortField.Id" Value="item => item.Id" Width="80px" />
+        <CgDataTableColumn TItem="ExpoTagOverviewModel" TSort="ExpoTagSortField" Title="名称" SortField="ExpoTagSortField.Name" Value="item => item.Name" Sortable="false" />
+        <CgDataTableColumn TItem="ExpoTagOverviewModel" TSort="ExpoTagSortField" Title="关联游戏数" Sortable="false" Width="100px">
             <ChildContent Context="item">
                 @(item.Games?.Count ?? 0)
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="ExpoTagOverviewModel" Title="优先级" Field="Priority" Width="80px" />
-        <CgDataTableColumn TItem="ExpoTagOverviewModel" Title="状态" Field="Hidden">
+        <CgDataTableColumn TItem="ExpoTagOverviewModel" TSort="ExpoTagSortField" Title="优先级" SortField="ExpoTagSortField.Priority" Value="item => item.Priority" Width="80px" />
+        <CgDataTableColumn TItem="ExpoTagOverviewModel" TSort="ExpoTagSortField" Title="状态" SortField="ExpoTagSortField.Hidden" Value="item => item.Hidden">
             <ChildContent Context="item">
                 @if (item.Hidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
                 else { <span class="admin-badge admin-badge--visible">可见</span> }
             </ChildContent>
         </CgDataTableColumn>
-        <CgDataTableColumn TItem="ExpoTagOverviewModel" Title="操作" Sortable="false" Width="60px">
+        <CgDataTableColumn TItem="ExpoTagOverviewModel" TSort="ExpoTagSortField" Title="操作" Sortable="false" Width="60px">
             <ChildContent Context="item">
                 <div class="admin-actions">
                     <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
@@ -94,14 +95,14 @@
 </CgModal>
 
 @code {
-    private CgDataTable<ExpoTagOverviewModel>? _table;
+    private CgDataTable<ExpoTagOverviewModel, ExpoTagSortField>? _table;
     private bool _showModal;
     private bool _isNew;
     private ExpoTagEditModel? _editModel;
 
-    private async Task<CgDataTableResult<ExpoTagOverviewModel>> OnQueryAsync(CgDataTableRequest request)
+    private async Task<CgDataTableResult<ExpoTagOverviewModel>> OnQueryAsync(CgDataTableRequest<ExpoTagSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetExpoTagsExpoAsync(parameter, CancellationToken.None);
         return result.Success && result.Data is not null ? new CgDataTableResult<ExpoTagOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<ExpoTagOverviewModel>([], 0);
     }

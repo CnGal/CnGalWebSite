@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="OperationRecordOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false">
+    <DataTableCard TModel="OperationRecordOverviewModel" TSort="OperationRecordSortField" DefaultSortField="OperationRecordSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -34,6 +35,17 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, OperationRecordSortField> _sortFields = new Dictionary<string, OperationRecordSortField>
+    {
+        [nameof(OperationRecordOverviewModel.Cookie)] = OperationRecordSortField.Cookie,
+        [nameof(OperationRecordOverviewModel.Id)] = OperationRecordSortField.Id,
+        [nameof(OperationRecordOverviewModel.Ip)] = OperationRecordSortField.Ip,
+        [nameof(OperationRecordOverviewModel.ObjectId)] = OperationRecordSortField.ObjectId,
+        [nameof(OperationRecordOverviewModel.OperationTime)] = OperationRecordSortField.OperationTime,
+        [nameof(OperationRecordOverviewModel.Type)] = OperationRecordSortField.Type,
+        [nameof(OperationRecordOverviewModel.UserName)] = OperationRecordSortField.UserName,
+    };
+
     private string _baseUrl = "api/account/ListOperationRecords";
     private string _name = "操作记录";
 

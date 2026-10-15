@@ -1,4 +1,5 @@
-﻿@page "/admin/apiscopes"
+@using CnGalWebSite.IdentityServer.Models.Sorting
+@page "/admin/apiscopes"
 
 @attribute [Authorize(Roles = "Admin")]
 
@@ -8,7 +9,7 @@
 
 @using CnGalWebSite.IdentityServer.Models.ViewModels.Roles
 
-<DataTableCard TModel="ApiScopeOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+<DataTableCard TModel="ApiScopeOverviewModel" TSort="IdentityApiScopeSortField" DefaultSortField="IdentityApiScopeSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {
@@ -37,6 +38,16 @@
 </MDialog>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, IdentityApiScopeSortField> _sortFields = new Dictionary<string, IdentityApiScopeSortField>
+    {
+        ["enable"] = IdentityApiScopeSortField.Enabled,
+        ["required"] = IdentityApiScopeSortField.Required,
+        [nameof(ApiScopeOverviewModel.Description)] = IdentityApiScopeSortField.Description,
+        [nameof(ApiScopeOverviewModel.DisplayName)] = IdentityApiScopeSortField.DisplayName,
+        [nameof(ApiScopeOverviewModel.Id)] = IdentityApiScopeSortField.Id,
+        [nameof(ApiScopeOverviewModel.Name)] = IdentityApiScopeSortField.Name,
+    };
+
     private bool _editDialog;
     private int _editedItemId;
     private bool _detailDialog;
@@ -62,7 +73,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<ApiScopeOverviewModel> dataTableCard;
+    DataTableCard<ApiScopeOverviewModel, IdentityApiScopeSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

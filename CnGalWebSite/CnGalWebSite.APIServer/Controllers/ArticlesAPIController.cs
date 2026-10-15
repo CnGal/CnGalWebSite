@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
@@ -39,6 +40,18 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/articles/[action]")]
     public class ArticlesAPIController : ControllerBase
     {
+        private static readonly SortMap<Article, ArticleSortField> ListSorting =
+            new SortMap<Article, ArticleSortField>(ArticleSortField.Id, ArticleSortField.Id)
+            .Add(ArticleSortField.Id, s => s.Id)
+            .Add(ArticleSortField.Name, s => s.Name)
+            .Add(ArticleSortField.IsHidden, s => s.IsHidden)
+            .Add(ArticleSortField.CanComment, s => s.CanComment ?? true)
+            .Add(ArticleSortField.Priority, s => s.Priority)
+            .Add(ArticleSortField.Type, s => s.Type)
+            .Add(ArticleSortField.CreateTime, s => s.CreateTime)
+            .Add(ArticleSortField.LastEditTime, s => s.LastEditTime);
+
+
         
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
@@ -957,7 +970,7 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<PagedResultDto<ArticleInforTipViewModel>> GetArticleHomeListAsync(PagedSortedAndFilterInput input)
+        public async Task<PagedResultDto<ArticleInforTipViewModel>> GetArticleHomeListAsync(PagedSortedAndFilterInput<ArticleSortField> input)
         {
             return await _articleService.GetPaginatedResult(input);
         }
@@ -1282,12 +1295,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<ArticleOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<ArticleOverviewModel, ArticleSortField>> List(QueryParameterModel<ArticleSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Article, long>(_articleRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Article, ArticleSortField>(_articleRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<ArticleOverviewModel>
+            return new QueryResultModel<ArticleOverviewModel, ArticleSortField>
             {
                 Items = await items.Select(s => new ArticleOverviewModel
                 {

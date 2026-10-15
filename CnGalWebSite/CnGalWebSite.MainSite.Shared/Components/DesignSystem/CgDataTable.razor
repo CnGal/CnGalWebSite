@@ -1,6 +1,7 @@
-﻿@using Microsoft.Extensions.Logging
+@using Microsoft.Extensions.Logging
 @typeparam TItem
-@inject ILogger<CgDataTable<TItem>> Logger
+@typeparam TSort where TSort : struct, Enum
+@inject ILogger<CgDataTable<TItem, TSort>> Logger
 
 <div class="cg-datatable">
     @* ── 工具栏 ── *@
@@ -61,7 +62,7 @@
                                         @if (col.CanSort)
                                         {
                                             <span class="cg-datatable__sort-icons">
-                                                @if (_sortField == col.Field)
+                                                @if (EqualityComparer<TSort?>.Default.Equals(_sortField, col.SortField))
                                                 {
                                                     <CgMdiIcon Name="@(_sortDesc ? "mdiArrowDown" : "mdiArrowUp")"
                                                                class="cg-datatable__sort-icon cg-datatable__sort-icon--active"
@@ -91,9 +92,9 @@
                                         {
                                             @col.ChildContent(item)
                                         }
-                                        else if (col.Field != null)
+                                        else if (col.Value != null)
                                         {
-                                            @GetPropertyValue(item, col.Field)
+                                            @col.Value!(item)
                                         }
                                     </td>
                                 }
@@ -127,12 +128,12 @@
 </div>
 
 @code {
-    private readonly List<CgDataTableColumn<TItem>> _columns = new();
+    private readonly List<CgDataTableColumn<TItem, TSort>> _columns = new();
 
     // ── 状态 ──
     private int _currentPage = 1;
     private int _pageSize;
-    private string? _sortField;
+    private TSort? _sortField;
     private bool _sortDesc;
     private string? _search;
     private bool _loading;
@@ -157,7 +158,7 @@
     /// 与 <see cref="Items"/> 互斥，<see cref="OnServerQuery"/> 优先。
     /// </summary>
     [Parameter]
-    public Func<CgDataTableRequest, Task<CgDataTableResult<TItem>>>? OnServerQuery { get; set; }
+    public Func<CgDataTableRequest<TSort>, Task<CgDataTableResult<TItem>>>? OnServerQuery { get; set; }
 
     /// <summary>
     /// 工具栏标题。
@@ -178,10 +179,10 @@
     public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
-    /// 默认排序字段名。
+    /// 默认排序字段。
     /// </summary>
     [Parameter]
-    public string? DefaultSortField { get; set; }
+    public TSort? DefaultSortField { get; set; }
 
     /// <summary>
     /// 默认是否降序。
@@ -203,7 +204,7 @@
 
     // ── 列注册 ──
 
-    public void AddColumn(CgDataTableColumn<TItem> column)
+    public void AddColumn(CgDataTableColumn<TItem, TSort> column)
     {
         if (!_columns.Contains(column))
         {
@@ -212,7 +213,7 @@
         }
     }
 
-    public void RemoveColumn(CgDataTableColumn<TItem> column)
+    public void RemoveColumn(CgDataTableColumn<TItem, TSort> column)
     {
         _columns.Remove(column);
     }
@@ -268,8 +269,8 @@
             {
                 foreach (var col in _columns)
                 {
-                    if (col.Field == null) continue;
-                    var val = GetPropertyValue(item, col.Field);
+                    if (col.Value == null) continue;
+                    var val = col.Value(item);
                     if (val != null && val.ToString()!.ToLowerInvariant().Contains(searchLower))
                         return true;
                 }
@@ -278,11 +279,12 @@
         }
 
         // 排序
-        if (!string.IsNullOrWhiteSpace(_sortField))
+        if (_sortField.HasValue)
         {
-            filtered = _sortDesc
-                ? filtered.OrderByDescending(item => GetPropertyValue(item, _sortField!))
-                : filtered.OrderBy(item => GetPropertyValue(item, _sortField!));
+            var column = _columns.FirstOrDefault(col => EqualityComparer<TSort?>.Default.Equals(col.SortField, _sortField));
+            if (column?.Value != null) filtered = _sortDesc
+                ? filtered.OrderByDescending(item => column.Value(item))
+                : filtered.OrderBy(item => column.Value(item));
         }
 
         var allFiltered = filtered.ToList();
@@ -312,7 +314,7 @@
 
         try
         {
-            var request = new CgDataTableRequest(
+            var request = new CgDataTableRequest<TSort>(
                 Page: _currentPage,
                 PageSize: _pageSize,
                 SortField: _sortField,
@@ -348,17 +350,17 @@
 
     // ── 事件处理 ──
 
-    private async Task OnSortClicked(CgDataTableColumn<TItem> col)
+    private async Task OnSortClicked(CgDataTableColumn<TItem, TSort> col)
     {
         if (!col.CanSort) return;
 
-        if (_sortField == col.Field)
+        if (EqualityComparer<TSort?>.Default.Equals(_sortField, col.SortField))
         {
             _sortDesc = !_sortDesc;
         }
         else
         {
-            _sortField = col.Field;
+            _sortField = col.SortField;
             _sortDesc = false;
         }
 
@@ -401,30 +403,21 @@
         }
     }
 
-    // ── 反射读属性 ──
-
-    private static object? GetPropertyValue(TItem? item, string propertyName)
-    {
-        if (item == null) return null;
-        var prop = typeof(TItem).GetProperty(propertyName);
-        return prop?.GetValue(item);
-    }
-
     // ── 样式辅助 ──
 
-    private string GetHeaderClass(CgDataTableColumn<TItem> col)
+    private string GetHeaderClass(CgDataTableColumn<TItem, TSort> col)
     {
         var cls = "cg-datatable__th";
         if (col.CanSort)
             cls += " cg-datatable__th--sortable";
-        if (_sortField == col.Field)
+        if (EqualityComparer<TSort?>.Default.Equals(_sortField, col.SortField))
             cls += " cg-datatable__th--sorted";
         return cls;
     }
 
-    private string? GetAriaSortValue(CgDataTableColumn<TItem> col)
+    private string? GetAriaSortValue(CgDataTableColumn<TItem, TSort> col)
     {
-        if (!col.CanSort || _sortField != col.Field) return null;
+        if (!col.CanSort || !EqualityComparer<TSort?>.Default.Equals(_sortField, col.SortField)) return null;
         return _sortDesc ? "descending" : "ascending";
     }
 

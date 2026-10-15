@@ -1,4 +1,6 @@
-﻿
+using CnGalWebSite.DataModel.Sorting;
+using CnGalWebSite.DataModel.Model;
+
 using CnGalWebSite.APIServer.Application.Users.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.DataReositories;
@@ -10,13 +12,24 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.Messages
 {
     public class MessageService : IMessageService
     {
+        private static readonly CnGalWebSite.Core.Services.Query.SortMap<Message, MessageSortField> ListSorting =
+            new CnGalWebSite.Core.Services.Query.SortMap<Message, MessageSortField>(MessageSortField.Id, MessageSortField.Id)
+            .Add(MessageSortField.Id, s => s.Id)
+            .Add(MessageSortField.Type, s => s.Type)
+            .Add(MessageSortField.PostTime, s => s.PostTime)
+            .Add(MessageSortField.Text, s => s.Text)
+            .Add(MessageSortField.Title, s => s.Title)
+            .Add(MessageSortField.UserId, s => s.ApplicationUser.Id)
+            .Add(MessageSortField.UserName, s => s.ApplicationUser.UserName)
+            .Add(MessageSortField.Link, s => s.Link)
+            .Add(MessageSortField.IsReaded, s => s.IsReaded);
+
         private readonly IRepository<DataModel.Model.Message, long> _messageRepository;
 
         public MessageService(IRepository<DataModel.Model.Message, long> messageRepository)
@@ -40,12 +53,12 @@ namespace CnGalWebSite.APIServer.Application.Messages
             //根据需求进行排序，然后进行分页逻辑的计算
             if (input.IsVisual)
             {
-                query = query.OrderBy(input.Sorting).Skip(input.CurrentPage).Take(input.MaxResultCount);
+                query = ListSorting.Apply(query, input.Sorts).Skip(input.CurrentPage).Take(input.MaxResultCount);
 
             }
             else
             {
-                query = query.OrderBy(input.Sorting).Skip((input.CurrentPage - 1) * input.MaxResultCount).Take(input.MaxResultCount);
+                query = ListSorting.Apply(query, input.Sorts).Skip((input.CurrentPage - 1) * input.MaxResultCount).Take(input.MaxResultCount);
 
             }
 
@@ -75,7 +88,7 @@ namespace CnGalWebSite.APIServer.Application.Messages
                 MaxResultCount = input.MaxResultCount,
                 Data = models,
                 FilterText = input.FilterText,
-                Sorting = input.Sorting,
+
                 ScreeningConditions = input.ScreeningConditions
             };
 

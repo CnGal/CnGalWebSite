@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
@@ -39,6 +40,14 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/tags/[action]")]
     public class TagsAPIController : ControllerBase
     {
+        private static readonly SortMap<Tag, TagSortField> ListSorting =
+            new SortMap<Tag, TagSortField>(TagSortField.Id, TagSortField.Id)
+            .Add(TagSortField.Id, s => s.Id)
+            .Add(TagSortField.Name, s => s.Name)
+            .Add(TagSortField.IsHidden, s => s.IsHidden)
+            .Add(TagSortField.LastEditTime, s => s.LastEditTime);
+
+
         
         private readonly IRepository<Tag, int> _tagRepository;
         private readonly IRepository<Entry, int> _entryRepository;
@@ -1053,12 +1062,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<TagOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<TagOverviewModel, TagSortField>> List(QueryParameterModel<TagSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Tag, int>(_tagRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Tag, TagSortField>(_tagRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<TagOverviewModel>
+            return new QueryResultModel<TagOverviewModel, TagSortField>
             {
                 Items = await items.Select(s => new TagOverviewModel
                 {

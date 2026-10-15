@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="FriendLinkOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" SortByItem="@nameof(CarouselOverviewModel.Priority)" @ref="dataTableCard">
+    <DataTableCard TModel="FriendLinkOverviewModel" TSort="FriendLinkSortField" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" OnClickAdd="AddItem" DefaultSortField="FriendLinkSortField.Priority" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -41,6 +42,15 @@
     <EditCard Id="_editedItemId" OnEdited="OnEdited" @ref="editCard" />
 </MDialog>
 @code {
+    private static readonly IReadOnlyDictionary<string, FriendLinkSortField> _sortFields = new Dictionary<string, FriendLinkSortField>
+    {
+        [nameof(FriendLinkOverviewModel.Id)] = FriendLinkSortField.Id,
+        [nameof(FriendLinkOverviewModel.Image)] = FriendLinkSortField.Image,
+        [nameof(FriendLinkOverviewModel.Link)] = FriendLinkSortField.Link,
+        [nameof(FriendLinkOverviewModel.Name)] = FriendLinkSortField.Name,
+        [nameof(FriendLinkOverviewModel.Priority)] = FriendLinkSortField.Priority,
+    };
+
     private string _baseUrl = "api/home/ListFriendLinks";
     private string _name = "友情链接";
 
@@ -59,7 +69,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<FriendLinkOverviewModel> dataTableCard;
+    DataTableCard<FriendLinkOverviewModel, FriendLinkSortField> dataTableCard;
 
     EditCard editCard;
     private bool _editDialog;

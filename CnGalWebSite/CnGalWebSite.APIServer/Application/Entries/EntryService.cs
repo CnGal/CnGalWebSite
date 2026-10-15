@@ -1,4 +1,5 @@
-﻿
+using CnGalWebSite.DataModel.Sorting;
+
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -27,7 +28,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -39,6 +39,16 @@ namespace CnGalWebSite.APIServer.Application.Entries
 {
     public partial class EntryService : IEntryService
     {
+        private static readonly CnGalWebSite.Core.Services.Query.SortMap<Entry, EntrySortField> ListSorting =
+            new CnGalWebSite.Core.Services.Query.SortMap<Entry, EntrySortField>(EntrySortField.Id, EntrySortField.Id)
+            .Add(EntrySortField.Id, s => s.Id)
+            .Add(EntrySortField.Name, s => s.Name)
+            .Add(EntrySortField.IsHidden, s => s.IsHidden)
+            .Add(EntrySortField.CanComment, s => s.CanComment ?? true)
+            .Add(EntrySortField.Priority, s => s.Priority)
+            .Add(EntrySortField.Type, s => s.Type)
+            .Add(EntrySortField.IsHideOutlink, s => s.IsHideOutlink);
+
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<Article, int> _articleRepository;
         private readonly IRepository<Examine, long> _examineRepository;
@@ -111,7 +121,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             //统计查询数据的总条数
             var count = query.Count();
             //根据需求进行排序，然后进行分页逻辑的计算
-            query = query.OrderBy(input.Sorting).Skip((input.CurrentPage - 1) * input.MaxResultCount).Take(input.MaxResultCount);
+            query = ListSorting.Apply(query, input.Sorts).Skip((input.CurrentPage - 1) * input.MaxResultCount).Take(input.MaxResultCount);
 
             //将结果转换为List集合 加载到内存中
             List<Entry> models = null;
@@ -132,14 +142,14 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 MaxResultCount = input.MaxResultCount,
                 Data = models,
                 FilterText = input.FilterText,
-                Sorting = input.Sorting,
+
                 ScreeningConditions = input.ScreeningConditions
             };
 
             return dtos;
         }
 
-        public async Task<PagedResultDto<EntryInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput input)
+        public async Task<PagedResultDto<EntryInforTipViewModel>> GetPaginatedResult(PagedSortedAndFilterInput<EntrySortField> input)
         {
             var query = _entryRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false);
             //判断是否是条件筛选
@@ -171,7 +181,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             var count = query.Count();
             //根据需求进行排序，然后进行分页逻辑的计算
             //这个特殊方法中当前页数解释为起始位
-            query = query.OrderBy(input.Sorting).Skip(input.CurrentPage).Take(input.MaxResultCount);
+            query = ListSorting.Apply(query, input.Sorts).Skip(input.CurrentPage).Take(input.MaxResultCount);
 
             //将结果转换为List集合 加载到内存中
             List<Entry> models = null;
@@ -200,7 +210,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 MaxResultCount = input.MaxResultCount,
                 Data = dtos,
                 FilterText = input.FilterText,
-                Sorting = input.Sorting,
+
                 ScreeningConditions = input.ScreeningConditions
             };
             return dtos_;

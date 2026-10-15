@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using System.Net.Http.Json;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
@@ -65,9 +66,9 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
 
     // ─── 通用分页查询辅助方法 ───
 
-    private async Task<SdkResult<QueryResultModel<T>>> QueryListAsync<T>(
+    private async Task<SdkResult<QueryResultModel<T, TSort>>> QueryListAsync<T, TSort>(
         string apiPath, string errorDomain, string displayName,
-        QueryParameterModel parameter, CancellationToken cancellationToken) where T : class
+        QueryParameterModel<TSort> parameter, CancellationToken cancellationToken) where T : class where TSort : struct, Enum
     {
         try
         {
@@ -81,22 +82,22 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
                 Logger.LogError(
                     "{DisplayName}列表接口请求失败。Path={Path}; StatusCode={StatusCode}; BaseAddress={BaseAddress}; ResponseBody={ResponseBody}",
                     displayName, apiPath, (int)response.StatusCode, HttpClient.BaseAddress, TrimForLog(body));
-                return SdkResult<QueryResultModel<T>>.Fail(
+                return SdkResult<QueryResultModel<T, TSort>>.Fail(
                     $"{errorDomain}_HTTP_FAILED",
                     $"获取{displayName}列表失败（HTTP {(int)response.StatusCode}）");
             }
 
             try
             {
-                var result = Deserialize<QueryResultModel<T>>(body);
-                return SdkResult<QueryResultModel<T>>.Ok(result!);
+                var result = Deserialize<QueryResultModel<T, TSort>>(body);
+                return SdkResult<QueryResultModel<T, TSort>>.Ok(result!);
             }
             catch (System.Text.Json.JsonException ex)
             {
                 Logger.LogError(ex,
                     "{DisplayName}列表反序列化失败。Path={Path}; BaseAddress={BaseAddress}; ResponseBody={ResponseBody}",
                     displayName, apiPath, HttpClient.BaseAddress, TrimForLog(body));
-                return SdkResult<QueryResultModel<T>>.Fail(
+                return SdkResult<QueryResultModel<T, TSort>>.Fail(
                     $"{errorDomain}_DESERIALIZE_FAILED",
                     $"{displayName}列表数据格式不兼容");
             }
@@ -106,7 +107,7 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
             Logger.LogError(ex,
                 "获取{DisplayName}列表异常。Path={Path}; BaseAddress={BaseAddress}",
                 displayName, apiPath, HttpClient.BaseAddress);
-            return SdkResult<QueryResultModel<T>>.Fail(
+            return SdkResult<QueryResultModel<T, TSort>>.Fail(
                 $"{errorDomain}_EXCEPTION",
                 $"请求{displayName}列表时发生异常");
         }
@@ -114,60 +115,60 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
 
     // ─── 各领域分页查询 ───
 
-    public Task<SdkResult<QueryResultModel<CommentOverviewModel>>> GetCommentsAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<CommentOverviewModel>("api/comments/List", "ADMIN_COMMENTS", "评论", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<CommentOverviewModel, CommentSortField>>> GetCommentsAsync(
+        QueryParameterModel<CommentSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<CommentOverviewModel, CommentSortField>("api/comments/List", "ADMIN_COMMENTS", "评论", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<EntryOverviewModel>>> GetEntriesAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<EntryOverviewModel>("api/entries/List", "ADMIN_ENTRIES", "词条", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<EntryOverviewModel, EntrySortField>>> GetEntriesAsync(
+        QueryParameterModel<EntrySortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<EntryOverviewModel, EntrySortField>("api/entries/List", "ADMIN_ENTRIES", "词条", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<ArticleOverviewModel>>> GetArticlesAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<ArticleOverviewModel>("api/articles/List", "ADMIN_ARTICLES", "文章", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<ArticleOverviewModel, ArticleSortField>>> GetArticlesAsync(
+        QueryParameterModel<ArticleSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<ArticleOverviewModel, ArticleSortField>("api/articles/List", "ADMIN_ARTICLES", "文章", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<VideoOverviewModel>>> GetVideosAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<VideoOverviewModel>("api/videos/List", "ADMIN_VIDEOS", "视频", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<VideoOverviewModel, VideoSortField>>> GetVideosAsync(
+        QueryParameterModel<VideoSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<VideoOverviewModel, VideoSortField>("api/videos/List", "ADMIN_VIDEOS", "视频", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<TagOverviewModel>>> GetTagsAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<TagOverviewModel>("api/tags/List", "ADMIN_TAGS", "标签", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<TagOverviewModel, TagSortField>>> GetTagsAsync(
+        QueryParameterModel<TagSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<TagOverviewModel, TagSortField>("api/tags/List", "ADMIN_TAGS", "标签", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<UserOverviewModel>>> GetUsersAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<UserOverviewModel>("api/account/ListUsers", "ADMIN_USERS", "用户", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<UserOverviewModel, UserSortField>>> GetUsersAsync(
+        QueryParameterModel<UserSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<UserOverviewModel, UserSortField>("api/account/ListUsers", "ADMIN_USERS", "用户", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<MessageOverviewModel>>> GetMessagesAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<MessageOverviewModel>("api/space/ListMessages", "ADMIN_MESSAGES", "消息", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<MessageOverviewModel, MessageSortField>>> GetMessagesAsync(
+        QueryParameterModel<MessageSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<MessageOverviewModel, MessageSortField>("api/space/ListMessages", "ADMIN_MESSAGES", "消息", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<FavoriteFolderOverviewModel>>> GetFavoriteFoldersAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<FavoriteFolderOverviewModel>("api/Favorites/ListFavoriteFolders", "ADMIN_FAVORITES", "收藏夹", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<FavoriteFolderOverviewModel, FavoriteFolderSortField>>> GetFavoriteFoldersAsync(
+        QueryParameterModel<FavoriteFolderSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<FavoriteFolderOverviewModel, FavoriteFolderSortField>("api/Favorites/ListFavoriteFolders", "ADMIN_FAVORITES", "收藏夹", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<BackUpArchiveOverviewModel>>> GetBackUpArchivesAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<BackUpArchiveOverviewModel>("api/backuparchives/list", "ADMIN_BACKUPS", "备份", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<BackUpArchiveOverviewModel, BackUpArchiveSortField>>> GetBackUpArchivesAsync(
+        QueryParameterModel<BackUpArchiveSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<BackUpArchiveOverviewModel, BackUpArchiveSortField>("api/backuparchives/list", "ADMIN_BACKUPS", "备份", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<StoreInfoOverviewModel>>> GetStoreInfoListAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<StoreInfoOverviewModel>("api/storeinfo/list", "ADMIN_STOREINFO", "商店信息", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<StoreInfoOverviewModel, StoreInfoSortField>>> GetStoreInfoListAsync(
+        QueryParameterModel<StoreInfoSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<StoreInfoOverviewModel, StoreInfoSortField>("api/storeinfo/list", "ADMIN_STOREINFO", "商店信息", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<RecommendOverviewModel>>> GetRecommendsAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<RecommendOverviewModel>("api/recommends/list", "ADMIN_RECOMMENDS", "推荐", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<RecommendOverviewModel, RecommendSortField>>> GetRecommendsAsync(
+        QueryParameterModel<RecommendSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<RecommendOverviewModel, RecommendSortField>("api/recommends/list", "ADMIN_RECOMMENDS", "推荐", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<AlmanacOverviewModel>>> GetAlmanacsAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<AlmanacOverviewModel>("api/almanac/List", "ADMIN_ALMANACS", "年鉴", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<AlmanacOverviewModel, AlmanacSortField>>> GetAlmanacsAsync(
+        QueryParameterModel<AlmanacSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<AlmanacOverviewModel, AlmanacSortField>("api/almanac/List", "ADMIN_ALMANACS", "年鉴", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<LotteryOverviewModel>>> GetLotteriesAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<LotteryOverviewModel>("api/lotteries/List", "ADMIN_LOTTERIES", "抽奖", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<LotteryOverviewModel, LotterySortField>>> GetLotteriesAsync(
+        QueryParameterModel<LotterySortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<LotteryOverviewModel, LotterySortField>("api/lotteries/List", "ADMIN_LOTTERIES", "抽奖", parameter, cancellationToken);
 
-    public async Task<SdkResult<QueryResultModel<LotteryUserOverviewModel>>> GetLotteryUsersAsync(
-        long lotteryId, QueryParameterModel parameter, CancellationToken cancellationToken = default)
+    public async Task<SdkResult<QueryResultModel<LotteryUserOverviewModel, LotteryUserSortField>>> GetLotteryUsersAsync(
+        long lotteryId, QueryParameterModel<LotteryUserSortField> parameter, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -182,29 +183,29 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
                 Logger.LogError(
                     "抽奖参与用户列表请求失败。LotteryId={LotteryId}; StatusCode={StatusCode}; ResponseBody={ResponseBody}",
                     lotteryId, (int)response.StatusCode, TrimForLog(body));
-                return SdkResult<QueryResultModel<LotteryUserOverviewModel>>.Fail(
+                return SdkResult<QueryResultModel<LotteryUserOverviewModel, LotteryUserSortField>>.Fail(
                     "ADMIN_LOTTERY_USERS_HTTP_FAILED",
                     $"获取参与用户列表失败（HTTP {(int)response.StatusCode}）");
             }
 
             try
             {
-                var result = Deserialize<QueryResultModel<LotteryUserOverviewModel>>(body);
-                return SdkResult<QueryResultModel<LotteryUserOverviewModel>>.Ok(result!);
+                var result = Deserialize<QueryResultModel<LotteryUserOverviewModel, LotteryUserSortField>>(body);
+                return SdkResult<QueryResultModel<LotteryUserOverviewModel, LotteryUserSortField>>.Ok(result!);
             }
             catch (System.Text.Json.JsonException ex)
             {
                 Logger.LogError(ex,
                     "抽奖参与用户列表反序列化失败。LotteryId={LotteryId}; ResponseBody={ResponseBody}",
                     lotteryId, TrimForLog(body));
-                return SdkResult<QueryResultModel<LotteryUserOverviewModel>>.Fail(
+                return SdkResult<QueryResultModel<LotteryUserOverviewModel, LotteryUserSortField>>.Fail(
                     "ADMIN_LOTTERY_USERS_DESERIALIZE_FAILED", "参与用户列表数据格式不兼容");
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "获取抽奖参与用户列表异常。LotteryId={LotteryId}", lotteryId);
-            return SdkResult<QueryResultModel<LotteryUserOverviewModel>>.Fail(
+            return SdkResult<QueryResultModel<LotteryUserOverviewModel, LotteryUserSortField>>.Fail(
                 "ADMIN_LOTTERY_USERS_EXCEPTION", "请求参与用户列表时发生异常");
         }
     }
@@ -215,23 +216,23 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
             $"api/lotteries/GetWinnerDatas/{lotteryId}",
             "ADMIN_LOTTERY_WINNERS", "中奖用户列表", cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<PeripheryOverviewModel>>> GetPeripheriesAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<PeripheryOverviewModel>("api/peripheries/List", "ADMIN_PERIPHERIES", "周边", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<PeripheryOverviewModel, PeripherySortField>>> GetPeripheriesAsync(
+        QueryParameterModel<PeripherySortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<PeripheryOverviewModel, PeripherySortField>("api/peripheries/List", "ADMIN_PERIPHERIES", "周边", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<VoteOverviewModel>>> GetVotesAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<VoteOverviewModel>("api/votes/List", "ADMIN_VOTES", "投票", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<VoteOverviewModel, VoteSortField>>> GetVotesAsync(
+        QueryParameterModel<VoteSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<VoteOverviewModel, VoteSortField>("api/votes/List", "ADMIN_VOTES", "投票", parameter, cancellationToken);
 
     // ─── 网站设置 ───
 
-    public Task<SdkResult<QueryResultModel<CarouselOverviewModel>>> GetCarouselsAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<CarouselOverviewModel>("api/home/ListCarousels", "ADMIN_CAROUSELS", "轮播图", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<CarouselOverviewModel, CarouselSortField>>> GetCarouselsAsync(
+        QueryParameterModel<CarouselSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<CarouselOverviewModel, CarouselSortField>("api/home/ListCarousels", "ADMIN_CAROUSELS", "轮播图", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<FriendLinkOverviewModel>>> GetFriendLinksAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<FriendLinkOverviewModel>("api/home/ListFriendLinks", "ADMIN_FRIENDLINKS", "友情链接", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<FriendLinkOverviewModel, FriendLinkSortField>>> GetFriendLinksAsync(
+        QueryParameterModel<FriendLinkSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<FriendLinkOverviewModel, FriendLinkSortField>("api/home/ListFriendLinks", "ADMIN_FRIENDLINKS", "友情链接", parameter, cancellationToken);
 
     public Task<SdkResult<CarouselEditModel>> GetCarouselEditAsync(
         int id, CancellationToken cancellationToken = default)
@@ -247,13 +248,13 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
 
     // ─── 动态/周报 ───
 
-    public Task<SdkResult<QueryResultModel<GameNewsOverviewModel>>> GetGameNewsAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<GameNewsOverviewModel>("api/news/ListGameNews", "ADMIN_GAME_NEWS", "游戏动态", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<GameNewsOverviewModel, GameNewsSortField>>> GetGameNewsAsync(
+        QueryParameterModel<GameNewsSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<GameNewsOverviewModel, GameNewsSortField>("api/news/ListGameNews", "ADMIN_GAME_NEWS", "游戏动态", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<WeeklyNewsOverviewModel>>> GetWeeklyNewsAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<WeeklyNewsOverviewModel>("api/news/ListWeeklyNews", "ADMIN_WEEKLY_NEWS", "周报", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<WeeklyNewsOverviewModel, WeeklyNewsSortField>>> GetWeeklyNewsAsync(
+        QueryParameterModel<WeeklyNewsSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<WeeklyNewsOverviewModel, WeeklyNewsSortField>("api/news/ListWeeklyNews", "ADMIN_WEEKLY_NEWS", "周报", parameter, cancellationToken);
 
     public Task<SdkResult<EditGameNewsModel>> GetGameNewsEditAsync(
         long id, CancellationToken cancellationToken = default)
@@ -281,23 +282,23 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
 
     // ─── 展会管理 ───
 
-    public Task<SdkResult<QueryResultModel<ExpoActivityOverviewModel>>> GetExpoActivitiesAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<ExpoActivityOverviewModel>("api/expo/ListActivity", "ADMIN_EXPO_ACTIVITIES", "展会活动", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<ExpoActivityOverviewModel, ExpoActivitySortField>>> GetExpoActivitiesAsync(
+        QueryParameterModel<ExpoActivitySortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<ExpoActivityOverviewModel, ExpoActivitySortField>("api/expo/ListActivity", "ADMIN_EXPO_ACTIVITIES", "展会活动", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<ExpoTicketOverviewModel>>> GetExpoTicketsAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<ExpoTicketOverviewModel>("api/expo/ListTicket", "ADMIN_EXPO_TICKETS", "展会票根", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<ExpoTicketOverviewModel, ExpoTicketSortField>>> GetExpoTicketsAsync(
+        QueryParameterModel<ExpoTicketSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<ExpoTicketOverviewModel, ExpoTicketSortField>("api/expo/ListTicket", "ADMIN_EXPO_TICKETS", "展会票根", parameter, cancellationToken);
 
     // ─── 小卖铺 ───
 
-    public Task<SdkResult<QueryResultModel<CommodityOverviewModel>>> GetCommoditiesAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<CommodityOverviewModel>("api/commodities/List", "ADMIN_COMMODITIES", "商品", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<CommodityOverviewModel, CommoditySortField>>> GetCommoditiesAsync(
+        QueryParameterModel<CommoditySortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<CommodityOverviewModel, CommoditySortField>("api/commodities/List", "ADMIN_COMMODITIES", "商品", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<CommodityCodeOverviewModel>>> GetCommodityCodesAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<CommodityCodeOverviewModel>("api/commodities/ListCode", "ADMIN_COMMODITY_CODES", "兑换码", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<CommodityCodeOverviewModel, CommodityCodeSortField>>> GetCommodityCodesAsync(
+        QueryParameterModel<CommodityCodeSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<CommodityCodeOverviewModel, CommodityCodeSortField>("api/commodities/ListCode", "ADMIN_COMMODITY_CODES", "兑换码", parameter, cancellationToken);
 
     // ─── 展会编辑模型查询（P2 CRUD） ───
 
@@ -315,9 +316,9 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
 
     // ─── 展会扩展管理 ───
 
-    public Task<SdkResult<QueryResultModel<ExpoGameOverviewModel>>> GetExpoGamesAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<ExpoGameOverviewModel>("api/expo/ListGame", "ADMIN_EXPO_GAMES", "展会游戏", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<ExpoGameOverviewModel, ExpoGameSortField>>> GetExpoGamesAsync(
+        QueryParameterModel<ExpoGameSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<ExpoGameOverviewModel, ExpoGameSortField>("api/expo/ListGame", "ADMIN_EXPO_GAMES", "展会游戏", parameter, cancellationToken);
 
     public Task<SdkResult<ExpoGameEditModel>> GetExpoGameEditAsync(
         long id, CancellationToken cancellationToken = default)
@@ -325,9 +326,9 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
             $"api/expo/EditGame?id={id}", dto => dto,
             "ADMIN_EXPO_GAME", "展会游戏", id, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<ExpoTagOverviewModel>>> GetExpoTagsExpoAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<ExpoTagOverviewModel>("api/expo/ListTag", "ADMIN_EXPO_TAGS", "展会标签", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<ExpoTagOverviewModel, ExpoTagSortField>>> GetExpoTagsExpoAsync(
+        QueryParameterModel<ExpoTagSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<ExpoTagOverviewModel, ExpoTagSortField>("api/expo/ListTag", "ADMIN_EXPO_TAGS", "展会标签", parameter, cancellationToken);
 
     public Task<SdkResult<ExpoTagEditModel>> GetExpoTagEditAsync(
         long id, CancellationToken cancellationToken = default)
@@ -335,13 +336,13 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
             $"api/expo/EditTag?id={id}", dto => dto,
             "ADMIN_EXPO_TAG", "展会标签", id, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<ExpoTaskOverviewModel>>> GetExpoTasksAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<ExpoTaskOverviewModel>("api/expo/ListTask", "ADMIN_EXPO_TASKS", "展会任务", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<ExpoTaskOverviewModel, ExpoTaskSortField>>> GetExpoTasksAsync(
+        QueryParameterModel<ExpoTaskSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<ExpoTaskOverviewModel, ExpoTaskSortField>("api/expo/ListTask", "ADMIN_EXPO_TASKS", "展会任务", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<ExpoAwardOverviewModel>>> GetExpoAwardsAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<ExpoAwardOverviewModel>("api/expo/ListAward", "ADMIN_EXPO_AWARDS", "展会奖项", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<ExpoAwardOverviewModel, ExpoAwardSortField>>> GetExpoAwardsAsync(
+        QueryParameterModel<ExpoAwardSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<ExpoAwardOverviewModel, ExpoAwardSortField>("api/expo/ListAward", "ADMIN_EXPO_AWARDS", "展会奖项", parameter, cancellationToken);
 
     public Task<SdkResult<ExpoAwardEditModel>> GetExpoAwardEditAsync(
         long id, CancellationToken cancellationToken = default)
@@ -349,15 +350,15 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
             $"api/expo/EditAward?id={id}", dto => dto,
             "ADMIN_EXPO_AWARD", "展会奖项", id, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<ExpoPrizeOverviewModel>>> GetExpoPrizesAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<ExpoPrizeOverviewModel>("api/expo/ListPrize", "ADMIN_EXPO_PRIZES", "展会奖品", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<ExpoPrizeOverviewModel, ExpoPrizeSortField>>> GetExpoPrizesAsync(
+        QueryParameterModel<ExpoPrizeSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<ExpoPrizeOverviewModel, ExpoPrizeSortField>("api/expo/ListPrize", "ADMIN_EXPO_PRIZES", "展会奖品", parameter, cancellationToken);
 
     // ─── 问卷管理 ───
 
-    public Task<SdkResult<QueryResultModel<QuestionnaireOverviewModel>>> GetQuestionnairesAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<QuestionnaireOverviewModel>("api/questionnaires/List", "ADMIN_QUESTIONNAIRES", "问卷", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<QuestionnaireOverviewModel, QuestionnaireSortField>>> GetQuestionnairesAsync(
+        QueryParameterModel<QuestionnaireSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<QuestionnaireOverviewModel, QuestionnaireSortField>("api/questionnaires/List", "ADMIN_QUESTIONNAIRES", "问卷", parameter, cancellationToken);
 
     public Task<SdkResult<EditQuestionnaireModel>> GetQuestionnaireEditAsync(
         long id, CancellationToken cancellationToken = default)
@@ -405,27 +406,27 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
 
     // ─── 词条子功能 ───
 
-    public Task<SdkResult<QueryResultModel<GameRecordOverviewModel>>> GetPlayedGamesAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<GameRecordOverviewModel>("api/playedgame/List", "ADMIN_PLAYED_GAMES", "游玩记录", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<GameRecordOverviewModel, GameRecordSortField>>> GetPlayedGamesAsync(
+        QueryParameterModel<GameRecordSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<GameRecordOverviewModel, GameRecordSortField>("api/playedgame/List", "ADMIN_PLAYED_GAMES", "游玩记录", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<EntryInformationTypeOverviewModel>>> GetEntryInformationTypesAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<EntryInformationTypeOverviewModel>("api/entries/ListEntryInformationTypes", "ADMIN_ENTRY_INFO_TYPES", "基础信息类型", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<EntryInformationTypeOverviewModel, EntryInformationTypeSortField>>> GetEntryInformationTypesAsync(
+        QueryParameterModel<EntryInformationTypeSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<EntryInformationTypeOverviewModel, EntryInformationTypeSortField>("api/entries/ListEntryInformationTypes", "ADMIN_ENTRY_INFO_TYPES", "基础信息类型", parameter, cancellationToken);
 
     // ─── 用户子功能 ───
 
-    public Task<SdkResult<QueryResultModel<RankOverviewModel>>> GetRanksAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<RankOverviewModel>("api/ranks/ListRanks", "ADMIN_RANKS", "头衔", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<RankOverviewModel, RankSortField>>> GetRanksAsync(
+        QueryParameterModel<RankSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<RankOverviewModel, RankSortField>("api/ranks/ListRanks", "ADMIN_RANKS", "头衔", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<UserCertificationOverviewModel>>> GetUserCertificationsAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<UserCertificationOverviewModel>("api/account/ListUserCertifications", "ADMIN_CERTIFICATIONS", "认证", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<UserCertificationOverviewModel, UserCertificationSortField>>> GetUserCertificationsAsync(
+        QueryParameterModel<UserCertificationSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<UserCertificationOverviewModel, UserCertificationSortField>("api/account/ListUserCertifications", "ADMIN_CERTIFICATIONS", "认证", parameter, cancellationToken);
 
-    public Task<SdkResult<QueryResultModel<OperationRecordOverviewModel>>> GetOperationRecordsAsync(
-        QueryParameterModel parameter, CancellationToken cancellationToken = default)
-        => QueryListAsync<OperationRecordOverviewModel>("api/account/ListOperationRecords", "ADMIN_OP_RECORDS", "操作记录", parameter, cancellationToken);
+    public Task<SdkResult<QueryResultModel<OperationRecordOverviewModel, OperationRecordSortField>>> GetOperationRecordsAsync(
+        QueryParameterModel<OperationRecordSortField> parameter, CancellationToken cancellationToken = default)
+        => QueryListAsync<OperationRecordOverviewModel, OperationRecordSortField>("api/account/ListOperationRecords", "ADMIN_OP_RECORDS", "操作记录", parameter, cancellationToken);
 
     // ─── 数据图表 ───
 

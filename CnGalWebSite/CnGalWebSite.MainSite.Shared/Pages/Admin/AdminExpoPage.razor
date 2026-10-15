@@ -1,3 +1,4 @@
+@using CnGalWebSite.DataModel.Sorting
 @page "/admin/manageexpo"
 @attribute [Authorize(Roles = "Admin")]
 @layout AdminLayout
@@ -27,10 +28,10 @@
         <PanelTemplate>
             @if (context == "activities")
             {
-                <CgDataTable TItem="ExpoActivityOverviewModel"
+                <CgDataTable TItem="ExpoActivityOverviewModel" TSort="ExpoActivitySortField"
                              Title="活动列表"
                              OnServerQuery="OnQueryActivities"
-                             DefaultSortField="Id"
+                             DefaultSortField="ExpoActivitySortField.Id"
                              DefaultSortDesc="true"
                              @ref="_activityTable">
                     <ToolbarContent>
@@ -40,34 +41,34 @@
                         </CgButton>
                     </ToolbarContent>
                     <ChildContent>
-                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="Id" Field="Id" Width="80px" />
-                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="名称" Field="Name" />
-                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="前景图" Sortable="false" Width="60px">
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" TSort="ExpoActivitySortField" Title="Id" SortField="ExpoActivitySortField.Id" Value="item => item.Id" Width="80px" />
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" TSort="ExpoActivitySortField" Title="名称" SortField="ExpoActivitySortField.Name" Value="item => item.Name" />
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" TSort="ExpoActivitySortField" Title="前景图" Sortable="false" Width="60px">
                         <ChildContent Context="item">
                             @if (!string.IsNullOrWhiteSpace(item.ForegroundImage))
                             { <img src="@item.ForegroundImage" alt="前景图" style="width: 32px; height: 32px; border-radius: 4px; object-fit: cover;" /> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="背景图" Sortable="false" Width="60px">
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" TSort="ExpoActivitySortField" Title="背景图" Sortable="false" Width="60px">
                         <ChildContent Context="item">
                             @if (!string.IsNullOrWhiteSpace(item.BackgroundImage))
                             { <img src="@item.BackgroundImage" alt="背景图" style="width: 32px; height: 32px; border-radius: 4px; object-fit: cover;" /> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="优先级" Field="Priority" Width="80px" />
-                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="票根数" Field="TicketCount" Width="80px" />
-                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="状态" Field="Hidden">
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" TSort="ExpoActivitySortField" Title="优先级" SortField="ExpoActivitySortField.Priority" Value="item => item.Priority" Width="80px" />
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" TSort="ExpoActivitySortField" Title="票根数" SortField="ExpoActivitySortField.TicketCount" Value="item => item.TicketCount" Width="80px" />
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" TSort="ExpoActivitySortField" Title="状态" SortField="ExpoActivitySortField.Hidden" Value="item => item.Hidden">
                         <ChildContent Context="item">
                             @if (item.Hidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
                             else { <span class="admin-badge admin-badge--visible">可见</span> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="创建时间" Field="CreateTime" Width="160px">
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" TSort="ExpoActivitySortField" Title="创建时间" SortField="ExpoActivitySortField.CreateTime" Value="item => item.CreateTime" Width="160px">
                         <ChildContent Context="item">
                             @item.CreateTime.ToString("yyyy-MM-dd HH:mm")
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" Title="操作" Sortable="false" Width="60px">
+                    <CgDataTableColumn TItem="ExpoActivityOverviewModel" TSort="ExpoActivitySortField" Title="操作" Sortable="false" Width="60px">
                         <ChildContent Context="item">
                             <div class="admin-actions">
                                 <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditActivityAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
@@ -79,10 +80,10 @@
             }
             else if (context == "tickets")
             {
-                <CgDataTable TItem="ExpoTicketOverviewModel"
+                <CgDataTable TItem="ExpoTicketOverviewModel" TSort="ExpoTicketSortField"
                              Title="票根列表"
                              OnServerQuery="OnQueryTickets"
-                             DefaultSortField="Id"
+                             DefaultSortField="ExpoTicketSortField.Id"
                              DefaultSortDesc="true"
                              @ref="_ticketTable">
                     <ToolbarContent>
@@ -92,29 +93,29 @@
                         </CgButton>
                     </ToolbarContent>
                     <ChildContent>
-                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="Id" Field="Id" Width="80px" />
-                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="昵称" Field="Nickname" />
-                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="活动" Field="ActivityName" />
-                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="座位" Field="SeatInfo" />
-                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="编号" Field="Number" Width="80px" />
-                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="图片" Sortable="false" Width="60px">
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" TSort="ExpoTicketSortField" Title="Id" SortField="ExpoTicketSortField.Id" Value="item => item.Id" Width="80px" />
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" TSort="ExpoTicketSortField" Title="昵称" SortField="ExpoTicketSortField.Nickname" Value="item => item.Nickname" />
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" TSort="ExpoTicketSortField" Title="活动" SortField="ExpoTicketSortField.ActivityName" Value="item => item.ActivityName" />
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" TSort="ExpoTicketSortField" Title="座位" SortField="ExpoTicketSortField.SeatInfo" Value="item => item.SeatInfo" />
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" TSort="ExpoTicketSortField" Title="编号" SortField="ExpoTicketSortField.Number" Value="item => item.Number" Width="80px" />
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" TSort="ExpoTicketSortField" Title="图片" Sortable="false" Width="60px">
                         <ChildContent Context="item">
                             @if (!string.IsNullOrWhiteSpace(item.Image))
                             { <img src="@item.Image" alt="票根图片" style="width: 32px; height: 32px; border-radius: 4px; object-fit: cover;" /> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="状态" Field="Hidden">
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" TSort="ExpoTicketSortField" Title="状态" SortField="ExpoTicketSortField.Hidden" Value="item => item.Hidden">
                         <ChildContent Context="item">
                             @if (item.Hidden) { <span class="admin-badge admin-badge--hidden">已隐藏</span> }
                             else { <span class="admin-badge admin-badge--visible">可见</span> }
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="创建时间" Field="CreateTime" Width="160px">
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" TSort="ExpoTicketSortField" Title="创建时间" SortField="ExpoTicketSortField.CreateTime" Value="item => item.CreateTime" Width="160px">
                         <ChildContent Context="item">
                             @item.CreateTime.ToString("yyyy-MM-dd HH:mm")
                         </ChildContent>
                     </CgDataTableColumn>
-                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" Title="操作" Sortable="false" Width="60px">
+                    <CgDataTableColumn TItem="ExpoTicketOverviewModel" TSort="ExpoTicketSortField" Title="操作" Sortable="false" Width="60px">
                         <ChildContent Context="item">
                             <div class="admin-actions">
                                 <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditTicketAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
@@ -236,8 +237,8 @@
 
 @code {
     private CancellationTokenSource? _cts;
-    private CgDataTable<ExpoActivityOverviewModel>? _activityTable;
-    private CgDataTable<ExpoTicketOverviewModel>? _ticketTable;
+    private CgDataTable<ExpoActivityOverviewModel, ExpoActivitySortField>? _activityTable;
+    private CgDataTable<ExpoTicketOverviewModel, ExpoTicketSortField>? _ticketTable;
     private bool _showActivityModal;
     private bool _isNewActivity;
     private ExpoActivityEditModel? _activityEditModel;
@@ -258,18 +259,18 @@
 
     // ─── 活动查询 ───
 
-    private async Task<CgDataTableResult<ExpoActivityOverviewModel>> OnQueryActivities(CgDataTableRequest request)
+    private async Task<CgDataTableResult<ExpoActivityOverviewModel>> OnQueryActivities(CgDataTableRequest<ExpoActivitySortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetExpoActivitiesAsync(parameter, _cts?.Token ?? CancellationToken.None);
         return result.Success && result.Data is not null ? new CgDataTableResult<ExpoActivityOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<ExpoActivityOverviewModel>([], 0);
     }
 
     // ─── 票根查询 ───
 
-    private async Task<CgDataTableResult<ExpoTicketOverviewModel>> OnQueryTickets(CgDataTableRequest request)
+    private async Task<CgDataTableResult<ExpoTicketOverviewModel>> OnQueryTickets(CgDataTableRequest<ExpoTicketSortField> request)
     {
-        var parameter = new QueryParameterModel { Page = request.Page, ItemsPerPage = request.PageSize, SearchText = request.SearchText ?? string.Empty, SortBy = string.IsNullOrEmpty(request.SortField) ? new[] { "Id" } : new[] { request.SortField }, SortDesc = new[] { request.SortDesc } };
+        var parameter = request.ToQueryParameter();
         var result = await AdminQueryService.GetExpoTicketsAsync(parameter, _cts?.Token ?? CancellationToken.None);
         return result.Success && result.Data is not null ? new CgDataTableResult<ExpoTicketOverviewModel>(result.Data.Items.ToList(), result.Data.Total) : new CgDataTableResult<ExpoTicketOverviewModel>([], 0);
     }

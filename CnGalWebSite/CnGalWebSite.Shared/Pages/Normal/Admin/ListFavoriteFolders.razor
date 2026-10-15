@@ -1,4 +1,5 @@
-﻿@page "/admin/listfavoritefolders"
+@using CnGalWebSite.DataModel.Sorting
+@page "/admin/listfavoritefolders"
 
 @attribute [Authorize(Roles = "Admin")]
 
@@ -8,7 +9,7 @@
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="FavoriteFolderOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <DataTableCard TModel="FavoriteFolderOverviewModel" TSort="FavoriteFolderSortField" DefaultSortField="FavoriteFolderSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -55,6 +56,19 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, FavoriteFolderSortField> _sortFields = new Dictionary<string, FavoriteFolderSortField>
+    {
+        [nameof(FavoriteFolderOverviewModel.Count)] = FavoriteFolderSortField.Count,
+        [nameof(FavoriteFolderOverviewModel.CreateTime)] = FavoriteFolderSortField.CreateTime,
+        [nameof(FavoriteFolderOverviewModel.Id)] = FavoriteFolderSortField.Id,
+        [nameof(FavoriteFolderOverviewModel.IsDefault)] = FavoriteFolderSortField.IsDefault,
+        [nameof(FavoriteFolderOverviewModel.IsHidden)] = FavoriteFolderSortField.IsHidden,
+        [nameof(FavoriteFolderOverviewModel.MainImage)] = FavoriteFolderSortField.MainImage,
+        [nameof(FavoriteFolderOverviewModel.Name)] = FavoriteFolderSortField.Name,
+        [nameof(FavoriteFolderOverviewModel.ShowPublicly)] = FavoriteFolderSortField.ShowPublicly,
+        [nameof(FavoriteFolderOverviewModel.UserId)] = FavoriteFolderSortField.UserId,
+    };
+
     private string _baseUrl = "api/Favorites/ListFavoriteFolders";
     private string _name = "收藏夹";
 
@@ -77,7 +91,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<FavoriteFolderOverviewModel> dataTableCard;
+    DataTableCard<FavoriteFolderOverviewModel, FavoriteFolderSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.OperationRecords;
 using CnGalWebSite.APIServer.Application.Users;
@@ -25,6 +26,44 @@ namespace CnGalWebSite.APIServer.Controllers
     [ApiController]
     public class CommodityAPIController : ControllerBase
     {
+        private static readonly SortMap<Commodity, CommoditySortField> ListSorting =
+            new SortMap<Commodity, CommoditySortField>(CommoditySortField.Id, CommoditySortField.Id)
+            .Add(CommoditySortField.BriefIntroduction, s => s.BriefIntroduction)
+            .Add(CommoditySortField.Id, s => s.Id)
+            .Add(CommoditySortField.Name, s => s.Name)
+            .Add(CommoditySortField.Price, s => s.Price)
+            .Add(CommoditySortField.Type, s => s.Type)
+            .Add(CommoditySortField.Value, s => s.Value)
+            .Add(CommoditySortField.UserCount, s => s.Users.Count)
+            .Add(CommoditySortField.IsHidden, s => s.IsHidden)
+            .Add(CommoditySortField.Priority, s => s.Priority)
+            .Add(CommoditySortField.Image, s => s.Image)
+            .Add(CommoditySortField.LastEditTime, s => s.LastEditTime);
+
+        private static readonly SortMap<CommodityCode, CommodityCodeSortField> ListCodeSorting =
+            new SortMap<CommodityCode, CommodityCodeSortField>(CommodityCodeSortField.Id, CommodityCodeSortField.Id)
+            .Add(CommodityCodeSortField.Id, s => s.Id)
+            .Add(CommodityCodeSortField.CanRedeemed, s => s.CanRedeemed)
+            .Add(CommodityCodeSortField.Code, s => s.Code)
+            .Add(CommodityCodeSortField.Count, s => s.Count)
+            .Add(CommodityCodeSortField.CreateTime, s => s.CreateTime)
+            .Add(CommodityCodeSortField.UpdateTime, s => s.UpdateTime)
+            .Add(CommodityCodeSortField.Hide, s => s.Hide)
+            .Add(CommodityCodeSortField.Redeemed, s => s.Redeemed)
+            .Add(CommodityCodeSortField.RedeemedTime, s => s.RedeemedTime)
+            .Add(CommodityCodeSortField.Type, s => s.Type)
+            .Add(CommodityCodeSortField.UserId, s => s.ApplicationUser == null ? "" : s.ApplicationUser.Id)
+            .Add(CommodityCodeSortField.UserName, s => s.ApplicationUser == null ? "" : s.ApplicationUser.UserName);
+
+        private static readonly SortMap<UserIntegral, GCoinsRecordSortField> ListGCoinsRecordSorting =
+            new SortMap<UserIntegral, GCoinsRecordSortField>(GCoinsRecordSortField.Id, GCoinsRecordSortField.Id)
+            .Add(GCoinsRecordSortField.SourceType, s => s.SourceType)
+            .Add(GCoinsRecordSortField.Count, s => s.Count)
+            .Add(GCoinsRecordSortField.Time, s => s.Time)
+            .Add(GCoinsRecordSortField.Id, s => s.Id)
+            .Add(GCoinsRecordSortField.Note, s => s.Note);
+
+
         private readonly IRepository<Commodity, long> _commodityRepository;
         private readonly IRepository<CommodityCode, long> _commodityCodeRepository;
         private readonly IRepository<ApplicationUserCommodity, long> _commodityUserRepository;
@@ -126,12 +165,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<CommodityOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<CommodityOverviewModel, CommoditySortField>> List(QueryParameterModel<CommoditySortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Commodity, long>(_commodityRepository.GetAll().AsSingleQuery().Include(s => s.Users), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText) || s.Value.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Commodity, CommoditySortField>(_commodityRepository.GetAll().AsSingleQuery().Include(s => s.Users), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.BriefIntroduction.Contains(model.SearchText) || s.Value.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<CommodityOverviewModel>
+            return new QueryResultModel<CommodityOverviewModel, CommoditySortField>
             {
                 Items = await items.Select(s => new CommodityOverviewModel
                 {
@@ -309,12 +348,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<CommodityCodeOverviewModel>> ListCode(QueryParameterModel model)
+        public async Task<QueryResultModel<CommodityCodeOverviewModel, CommodityCodeSortField>> ListCode(QueryParameterModel<CommodityCodeSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<CommodityCode, long>(_commodityCodeRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Code.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<CommodityCode, CommodityCodeSortField>(_commodityCodeRepository.GetAll().AsSingleQuery().Include(s => s.ApplicationUser), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Code.Contains(model.SearchText)), ListCodeSorting);
 
-            return new QueryResultModel<CommodityCodeOverviewModel>
+            return new QueryResultModel<CommodityCodeOverviewModel, CommodityCodeSortField>
             {
                 Items = await items.Select(s => new CommodityCodeOverviewModel
                 {
@@ -406,21 +445,21 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         [HttpPost]
-        public async Task<QueryResultModel<GCoinsRecordOverviewModel>> ListGCoinsRecord(QueryParameterModel model)
+        public async Task<QueryResultModel<GCoinsRecordOverviewModel, GCoinsRecordSortField>> ListGCoinsRecord(QueryParameterModel<GCoinsRecordSortField> model)
         {
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             if (user == null)
             {
-                return new QueryResultModel<GCoinsRecordOverviewModel>
+                return new QueryResultModel<GCoinsRecordOverviewModel, GCoinsRecordSortField>
                 {
                     Parameter = model
                 };
             }
 
-            var (items, total) = await _queryService.QueryAsync<UserIntegral, long>(_userIntegralRepository.GetAll().AsSingleQuery().Where(s => s.Type == UserIntegralType.GCoins && s.ApplicationUserId == user.Id), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Note.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<UserIntegral, GCoinsRecordSortField>(_userIntegralRepository.GetAll().AsSingleQuery().Where(s => s.Type == UserIntegralType.GCoins && s.ApplicationUserId == user.Id), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Note.Contains(model.SearchText)), ListGCoinsRecordSorting);
 
-            return new QueryResultModel<GCoinsRecordOverviewModel>
+            return new QueryResultModel<GCoinsRecordOverviewModel, GCoinsRecordSortField>
             {
                 Items = await items.Select(s => new GCoinsRecordOverviewModel
                 {

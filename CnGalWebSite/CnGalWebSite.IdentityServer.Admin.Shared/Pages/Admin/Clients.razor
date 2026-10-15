@@ -1,4 +1,5 @@
-﻿@page "/admin/clients"
+@using CnGalWebSite.IdentityServer.Models.Sorting
+@page "/admin/clients"
 
 @attribute [Authorize(Roles = "Admin")]
 
@@ -8,7 +9,7 @@
 
 @using CnGalWebSite.IdentityServer.Models.ViewModels.Roles
 
-<DataTableCard TModel="ClientOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+<DataTableCard TModel="ClientOverviewModel" TSort="IdentityClientSortField" DefaultSortField="IdentityClientSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {
@@ -41,6 +42,17 @@
 </MDialog>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, IdentityClientSortField> _sortFields = new Dictionary<string, IdentityClientSortField>
+    {
+        [nameof(ClientOverviewModel.ClientId)] = IdentityClientSortField.ClientId,
+        [nameof(ClientOverviewModel.ClientName)] = IdentityClientSortField.ClientName,
+        [nameof(ClientOverviewModel.Description)] = IdentityClientSortField.Description,
+        [nameof(ClientOverviewModel.Id)] = IdentityClientSortField.Id,
+        ["enable"] = IdentityClientSortField.Enabled,
+        ["link"] = IdentityClientSortField.ClientUri,
+        ["logo"] = IdentityClientSortField.LogoUri,
+    };
+
     private bool _editDialog;
     private int _editedItemId;
     private bool _detailDialog;
@@ -71,7 +83,7 @@
 
     List<KeyValuePair<string, string>> _scopes;
 
-    DataTableCard<ClientOverviewModel> dataTableCard;
+    DataTableCard<ClientOverviewModel, IdentityClientSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

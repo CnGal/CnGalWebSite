@@ -1,4 +1,5 @@
-﻿@page "/admin/identityresources"
+@using CnGalWebSite.IdentityServer.Models.Sorting
+@page "/admin/identityresources"
 
 @attribute [Authorize(Roles = "Admin")]
 
@@ -8,7 +9,7 @@
 
 @using CnGalWebSite.IdentityServer.Models.ViewModels.Roles
 
-<DataTableCard TModel="IdentityResourceOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
+<DataTableCard TModel="IdentityResourceOverviewModel" TSort="IdentityIdentityResourceSortField" DefaultSortField="IdentityIdentityResourceSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl+"list")" Title="@($"{_name}列表")" OnClickAdd="AddItem" @ref="dataTableCard">
     <ItemColContent>
         @if (context.Header.Value == "actions")
         {
@@ -37,6 +38,16 @@
 </MDialog>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, IdentityIdentityResourceSortField> _sortFields = new Dictionary<string, IdentityIdentityResourceSortField>
+    {
+        ["enable"] = IdentityIdentityResourceSortField.Enabled,
+        ["required"] = IdentityIdentityResourceSortField.Required,
+        [nameof(IdentityResourceOverviewModel.Description)] = IdentityIdentityResourceSortField.Description,
+        [nameof(IdentityResourceOverviewModel.DisplayName)] = IdentityIdentityResourceSortField.DisplayName,
+        [nameof(IdentityResourceOverviewModel.Id)] = IdentityIdentityResourceSortField.Id,
+        [nameof(IdentityResourceOverviewModel.Name)] = IdentityIdentityResourceSortField.Name,
+    };
+
     private bool _editDialog;
     private int _editedItemId;
     private bool _detailDialog;
@@ -62,7 +73,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<IdentityResourceOverviewModel> dataTableCard;
+    DataTableCard<IdentityResourceOverviewModel, IdentityIdentityResourceSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

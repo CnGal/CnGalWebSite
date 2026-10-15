@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject IEventService _eventService
 
 <MDCard>
-    <DataTableCard TModel="GameScoreTableModel" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
+    <DataTableCard TModel="GameScoreTableModel" TSort="GameScoreSortField" DefaultSortField="GameScoreSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" ShowAddButton="false" Title="@($"{_name}列表")" @ref="dataTableCard">
         <ButtonContent>
             <CnGalWebSite.Shared.MasaComponent.Shared.Buttons.ExportButton OnQueryAsync="@(async ()=>await dataTableCard?.QueryAllAsync())" Name="评分" Class="me-4" />
         </ButtonContent>
@@ -27,6 +28,26 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, GameScoreSortField> _sortFields = new Dictionary<string, GameScoreSortField>
+    {
+        [nameof(GameScoreTableModel.AllCVSocre)] = GameScoreSortField.AllCVSocre,
+        [nameof(GameScoreTableModel.AllMusicSocre)] = GameScoreSortField.AllMusicSocre,
+        [nameof(GameScoreTableModel.AllPaintSocre)] = GameScoreSortField.AllPaintSocre,
+        [nameof(GameScoreTableModel.AllScriptSocre)] = GameScoreSortField.AllScriptSocre,
+        [nameof(GameScoreTableModel.AllShowSocre)] = GameScoreSortField.AllShowSocre,
+        [nameof(GameScoreTableModel.AllSystemSocre)] = GameScoreSortField.AllSystemSocre,
+        [nameof(GameScoreTableModel.AllTotalSocre)] = GameScoreSortField.AllTotalSocre,
+        [nameof(GameScoreTableModel.FilterCVSocre)] = GameScoreSortField.FilterCVSocre,
+        [nameof(GameScoreTableModel.FilterMusicSocre)] = GameScoreSortField.FilterMusicSocre,
+        [nameof(GameScoreTableModel.FilterPaintSocre)] = GameScoreSortField.FilterPaintSocre,
+        [nameof(GameScoreTableModel.FilterScriptSocre)] = GameScoreSortField.FilterScriptSocre,
+        [nameof(GameScoreTableModel.FilterShowSocre)] = GameScoreSortField.FilterShowSocre,
+        [nameof(GameScoreTableModel.FilterSystemSocre)] = GameScoreSortField.FilterSystemSocre,
+        [nameof(GameScoreTableModel.FilterTotalSocre)] = GameScoreSortField.FilterTotalSocre,
+        [nameof(GameScoreTableModel.GameId)] = GameScoreSortField.GameId,
+        [nameof(GameScoreTableModel.GameName)] = GameScoreSortField.GameName,
+    };
+
     private bool _editDialog;
     private long _editedItemId;
     private bool _detailDialog;
@@ -59,7 +80,7 @@
           new (){ Text= "总分（过滤后）", Value= nameof(GameScoreTableModel.FilterTotalSocre)},
     };
 
-    DataTableCard<GameScoreTableModel> dataTableCard;
+    DataTableCard<GameScoreTableModel, GameScoreSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

@@ -1,4 +1,5 @@
-﻿using CnGalWebSite.APIServer.DataReositories;
+using CnGalWebSite.IdentityServer.Models.Sorting;
+using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.Core.Services.Query;
 using CnGalWebSite.IdentityServer.Data;
@@ -35,6 +36,16 @@ namespace CnGalWebSite.IdentityServer.APIControllers
     [Route("api/identityresources/[action]")]
     public class IdentityResourceAPIController : ControllerBase
     {
+        private static readonly SortMap<IdentityResource, IdentityIdentityResourceSortField> ListSorting =
+            new SortMap<IdentityResource, IdentityIdentityResourceSortField>(IdentityIdentityResourceSortField.Id, IdentityIdentityResourceSortField.Id)
+            .Add(IdentityIdentityResourceSortField.Id, s => s.Id)
+            .Add(IdentityIdentityResourceSortField.Name, s => s.Name)
+            .Add(IdentityIdentityResourceSortField.Description, s => s.Description)
+            .Add(IdentityIdentityResourceSortField.DisplayName, s => s.DisplayName)
+            .Add(IdentityIdentityResourceSortField.Enabled, s => s.Enabled)
+            .Add(IdentityIdentityResourceSortField.Required, s => s.Required);
+
+
         private readonly IRepository<ConfigurationDbContext, IdentityResource, string> _identityResourceRepository;
         private readonly IQueryService _queryService;
         private readonly IRepository<ApplicationDbContext, ApplicationUser, string> _userRepository;
@@ -56,12 +67,12 @@ namespace CnGalWebSite.IdentityServer.APIControllers
 
 
         [HttpPost]
-        public async Task<QueryResultModel<IdentityResourceOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<IdentityResourceOverviewModel, IdentityIdentityResourceSortField>> List(QueryParameterModel<IdentityIdentityResourceSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<IdentityResource, string>(_identityResourceRepository.GetAll().AsSingleQuery(), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.DisplayName.Contains(model.SearchText) || s.Description.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<IdentityResource, IdentityIdentityResourceSortField>(_identityResourceRepository.GetAll().AsSingleQuery(), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText) || s.DisplayName.Contains(model.SearchText) || s.Description.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<IdentityResourceOverviewModel>
+            return new QueryResultModel<IdentityResourceOverviewModel, IdentityIdentityResourceSortField>
             {
                 Items = await items.Select(s => new IdentityResourceOverviewModel
                 {

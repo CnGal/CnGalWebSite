@@ -1,8 +1,9 @@
-﻿
+using CnGalWebSite.DataModel.Sorting;
+
 
 namespace CnGalWebSite.APIServer.ExamineX
 {
-    public class GetExamineInput : PagedSortedAndFilterInput
+    public class GetExamineInput : PagedSortedAndFilterInput<ExamineSortField>
     {
         public bool IsVisual { get; set; }
 
@@ -10,7 +11,7 @@ namespace CnGalWebSite.APIServer.ExamineX
 
         public GetExamineInput()
         {
-            Sorting = "Id";
+            Sorts = [new(ExamineSortField.Id, CnGalWebSite.Core.Models.SortDirection.Ascending)];
             ScreeningConditions = "待审核";
         }
     }

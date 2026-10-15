@@ -1,10 +1,11 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 @inject ICircuitHandlerService _circuitHandlerService
 
 <MDCard>
-    <DataTableCard TModel="CircuitHandlerModel" ShowAddButton="false" Headers="_headers" DataSource="_circuitHandlerService.GetItems()" Title="@($"{_name}列表")" SortByItem="@nameof(CircuitHandlerModel.OpenTime)" @ref="dataTableCard">
+    <DataTableCard TModel="CircuitHandlerModel" TSort="CircuitHandlerSortField" SortFields="_sortFields" LocalSorting="_localSorting" ShowAddButton="false" Headers="_headers" DataSource="_circuitHandlerService.GetItems()" Title="@($"{_name}列表")" DefaultSortField="CircuitHandlerSortField.OpenTime" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -35,6 +36,23 @@
 </MDCard>
 
 @code {
+    private static readonly IReadOnlyDictionary<string, CircuitHandlerSortField> _sortFields = new Dictionary<string, CircuitHandlerSortField>
+    {
+        [nameof(CircuitHandlerModel.Id)] = CircuitHandlerSortField.Id,
+        [nameof(CircuitHandlerModel.IsConnected)] = CircuitHandlerSortField.IsConnected,
+        [nameof(CircuitHandlerModel.LastActiveTime)] = CircuitHandlerSortField.LastActiveTime,
+        [nameof(CircuitHandlerModel.OpenTime)] = CircuitHandlerSortField.OpenTime,
+        [nameof(CircuitHandlerModel.ReConnectCount)] = CircuitHandlerSortField.ReConnectCount,
+    };
+
+    private static readonly CnGalWebSite.Core.Services.Query.SortMap<CircuitHandlerModel, CircuitHandlerSortField> _localSorting =
+        new CnGalWebSite.Core.Services.Query.SortMap<CircuitHandlerModel, CircuitHandlerSortField>(CircuitHandlerSortField.Id, CircuitHandlerSortField.Id)
+        .Add(CircuitHandlerSortField.Id, item => item.Id)
+        .Add(CircuitHandlerSortField.IsConnected, item => item.IsConnected)
+        .Add(CircuitHandlerSortField.LastActiveTime, item => item.LastActiveTime)
+        .Add(CircuitHandlerSortField.OpenTime, item => item.OpenTime)
+        .Add(CircuitHandlerSortField.ReConnectCount, item => item.ReConnectCount);
+
     private string _name = "线路";
 
     private List<DataTableHeader<CircuitHandlerModel>> _headers = new List<DataTableHeader<CircuitHandlerModel>>
@@ -51,7 +69,7 @@
           new (){ Text= "重连次数", Value= nameof(CircuitHandlerModel.ReConnectCount)},
     };
 
-    DataTableCard<CircuitHandlerModel> dataTableCard;
+    DataTableCard<CircuitHandlerModel, CircuitHandlerSortField> dataTableCard;
 
     public void Refresh()
     {

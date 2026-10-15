@@ -1,9 +1,10 @@
-﻿@inject IHttpService _httpService
+@using CnGalWebSite.DataModel.Sorting
+@inject IHttpService _httpService
 @inject IPopupService PopupService
 @inject NavigationManager NavigationManager
 
 <MDCard>
-    <DataTableCard TModel="UserOverviewModel" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
+    <DataTableCard TModel="UserOverviewModel" TSort="UserSortField" DefaultSortField="UserSortField.Id" SortFields="_sortFields" Headers="_headers" ApiUrl="@(_baseUrl)" Title="@($"{_name}列表")" ShowAddButton="false" @ref="dataTableCard">
         <ItemColContent>
             @if (context.Header.Value == "actions")
             {
@@ -59,6 +60,20 @@
 
 
 @code {
+    private static readonly IReadOnlyDictionary<string, UserSortField> _sortFields = new Dictionary<string, UserSortField>
+    {
+        [nameof(UserOverviewModel.CanComment)] = UserSortField.CanComment,
+        [nameof(UserOverviewModel.DisplayContributionValue)] = UserSortField.DisplayContributionValue,
+        [nameof(UserOverviewModel.DisplayIntegral)] = UserSortField.DisplayIntegral,
+        [nameof(UserOverviewModel.Email)] = UserSortField.Email,
+        [nameof(UserOverviewModel.Id)] = UserSortField.Id,
+        [nameof(UserOverviewModel.LastOnlineTime)] = UserSortField.LastOnlineTime,
+        [nameof(UserOverviewModel.OnlineTime)] = UserSortField.OnlineTime,
+        [nameof(UserOverviewModel.PersonalSignature)] = UserSortField.PersonalSignature,
+        [nameof(UserOverviewModel.RegistTime)] = UserSortField.RegistTime,
+        [nameof(UserOverviewModel.UserName)] = UserSortField.UserName,
+    };
+
     private string _baseUrl = "api/account/ListUsers";
     private string _name = "用户";
 
@@ -82,7 +97,7 @@
           new (){ Text= "操作", Value= "actions",Sortable=false }
     };
 
-    DataTableCard<UserOverviewModel> dataTableCard;
+    DataTableCard<UserOverviewModel, UserSortField> dataTableCard;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }

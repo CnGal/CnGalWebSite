@@ -1,3 +1,4 @@
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
@@ -30,6 +31,18 @@ namespace CnGalWebSite.APIServer.Controllers
     [Route("api/videos/[action]")]
     public class VideoAPIController : ControllerBase
     {
+        private static readonly SortMap<Video, VideoSortField> ListSorting =
+            new SortMap<Video, VideoSortField>(VideoSortField.Id, VideoSortField.Id)
+            .Add(VideoSortField.Id, s => s.Id)
+            .Add(VideoSortField.Name, s => s.Name)
+            .Add(VideoSortField.IsHidden, s => s.IsHidden)
+            .Add(VideoSortField.CanComment, s => s.CanComment)
+            .Add(VideoSortField.Priority, s => s.Priority)
+            .Add(VideoSortField.Type, s => s.Type)
+            .Add(VideoSortField.CreateTime, s => s.CreateTime)
+            .Add(VideoSortField.LastEditTime, s => s.LastEditTime);
+
+
         
         private readonly IRepository<Entry, int> _entryRepository;
         private readonly IRepository<ApplicationUser, string> _userRepository;
@@ -929,12 +942,12 @@ namespace CnGalWebSite.APIServer.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost]
-        public async Task<QueryResultModel<VideoOverviewModel>> List(QueryParameterModel model)
+        public async Task<QueryResultModel<VideoOverviewModel, VideoSortField>> List(QueryParameterModel<VideoSortField> model)
         {
-            var (items, total) = await _queryService.QueryAsync<Video, long>(_videoRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
-                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)));
+            var (items, total) = await _queryService.QueryAsync<Video, VideoSortField>(_videoRepository.GetAll().AsSingleQuery().Where(s => string.IsNullOrWhiteSpace(s.Name) == false), model,
+                s => string.IsNullOrWhiteSpace(model.SearchText) || (s.Name.Contains(model.SearchText)), ListSorting);
 
-            return new QueryResultModel<VideoOverviewModel>
+            return new QueryResultModel<VideoOverviewModel, VideoSortField>
             {
                 Items = await items.Select(s => new VideoOverviewModel
                 {

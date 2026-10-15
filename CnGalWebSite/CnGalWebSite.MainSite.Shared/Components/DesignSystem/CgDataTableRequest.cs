@@ -1,11 +1,14 @@
+using CnGalWebSite.Core.Models;
+
 namespace CnGalWebSite.MainSite.Shared.Components.DesignSystem;
 
-/// <summary>
-/// 数据表格服务端查询请求参数。
-/// </summary>
-public sealed record CgDataTableRequest(
-    int Page,
-    int PageSize,
-    string? SortField,
-    bool SortDesc,
-    string? SearchText);
+public sealed record CgDataTableRequest<TSort>(int Page, int PageSize, TSort? SortField,
+    bool SortDesc, string? SearchText) where TSort : struct, Enum
+{
+    public QueryParameterModel<TSort> ToQueryParameter() => new()
+    {
+        Page = Page, ItemsPerPage = PageSize, SearchText = SearchText ?? string.Empty,
+        Sorts = SortField.HasValue
+            ? [new(SortField.Value, SortDesc ? SortDirection.Descending : SortDirection.Ascending)] : []
+    };
+}
