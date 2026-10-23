@@ -14,6 +14,9 @@ public abstract class QueryServiceBase(HttpClient httpClient)
     /// </summary>
     protected abstract ILogger Logger { get; }
 
+    /// <summary>仅由明确采用取消异常契约的查询服务开启。</summary>
+    protected virtual bool PropagateCancellation => false;
+
     // ──────── 底层辅助 ────────
 
     protected static async Task<(HttpResponseMessage Response, string Body)> GetAsyncWithBody(
@@ -22,8 +25,12 @@ public abstract class QueryServiceBase(HttpClient httpClient)
         CancellationToken cancellationToken)
     {
         var response = await httpClient.GetAsync(path, cancellationToken);
-        var body = await response.Content.ReadAsStringAsync(cancellationToken);
-        return (response, body);
+        try
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            return (response, body);
+        }
+        catch { response.Dispose(); throw; }
     }
 
     protected static T? Deserialize<T>(string responseBody)
@@ -66,6 +73,7 @@ public abstract class QueryServiceBase(HttpClient httpClient)
         try
         {
             var (response, responseBody) = await GetAsyncWithBody(HttpClient, path, cancellationToken);
+            using var responseLifetime = response;
 
             if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
@@ -118,6 +126,10 @@ public abstract class QueryServiceBase(HttpClient httpClient)
 
             return SdkResult<TResult>.Ok(mapFunc(dto));
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return SdkResult<TResult>.Fail($"{errorCodePrefix}_CANCELED", "请求已取消");
+        }
         catch (Exception ex)
         {
             Logger.LogError(
@@ -146,6 +158,7 @@ public abstract class QueryServiceBase(HttpClient httpClient)
         try
         {
             var (response, responseBody) = await GetAsyncWithBody(HttpClient, path, cancellationToken);
+            using var responseLifetime = response;
 
             if (!response.IsSuccessStatusCode)
             {
@@ -189,6 +202,10 @@ public abstract class QueryServiceBase(HttpClient httpClient)
                 return [];
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return [];
+        }
         catch (Exception ex)
         {
             Logger.LogError(
@@ -220,6 +237,7 @@ public abstract class QueryServiceBase(HttpClient httpClient)
         try
         {
             var (response, responseBody) = await GetAsyncWithBody(HttpClient, path, cancellationToken);
+            using var responseLifetime = response;
 
             if (!response.IsSuccessStatusCode)
             {
@@ -262,6 +280,10 @@ public abstract class QueryServiceBase(HttpClient httpClient)
                 return default;
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return default;
+        }
         catch (Exception ex)
         {
             Logger.LogError(
@@ -294,6 +316,7 @@ public abstract class QueryServiceBase(HttpClient httpClient)
         try
         {
             var (response, responseBody) = await GetAsyncWithBody(HttpClient, path, cancellationToken);
+            using var responseLifetime = response;
 
             if (!response.IsSuccessStatusCode)
             {
@@ -326,6 +349,11 @@ public abstract class QueryServiceBase(HttpClient httpClient)
                 return SdkResult<T>.Fail($"{errorCodePrefix}_DESERIALIZE_FAILED", $"{entityDescription}数据格式不兼容");
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            if (PropagateCancellation) throw;
+            return SdkResult<T>.Fail($"{errorCodePrefix}_CANCELED", "请求已取消");
+        }
         catch (Exception ex)
         {
             Logger.LogError(
@@ -350,7 +378,7 @@ public abstract class QueryServiceBase(HttpClient httpClient)
     {
         try
         {
-            var response = await HttpClient.PostAsJsonAsync(path, new { }, SdkJsonSerializerOptions.Default, cancellationToken);
+            using var response = await HttpClient.PostAsJsonAsync(path, new { }, SdkJsonSerializerOptions.Default, cancellationToken);
             var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
 
             if (!response.IsSuccessStatusCode)
@@ -383,6 +411,10 @@ public abstract class QueryServiceBase(HttpClient httpClient)
 
                 return SdkResult<T>.Fail($"{errorCodePrefix}_DESERIALIZE_FAILED", $"{entityDescription}数据格式不兼容");
             }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return SdkResult<T>.Fail($"{errorCodePrefix}_CANCELED", "请求已取消");
         }
         catch (Exception ex)
         {

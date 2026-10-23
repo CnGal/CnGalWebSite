@@ -1,192 +1,60 @@
 using System.Net;
 using System.Net.Http.Headers;
-using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace CnGalWebSite.SDK.MainSite.AspNet.Auth;
 
-public sealed class AccessTokenHandler : DelegatingHandler
+/// <summary>由应用作用域创建；InnerHandler 为工厂维护的共享传输管线。</summary>
+public sealed class AccessTokenHandler(CircuitTokenStore tokenStore) : DelegatingHandler
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly CookieOidcRefresher _cookieOidcRefresher;
-    private readonly IOptions<MainSiteOidcOptions> _oidcOptions;
-
-    public AccessTokenHandler(
-        IHttpContextAccessor httpContextAccessor,
-        CookieOidcRefresher cookieOidcRefresher,
-        IOptions<MainSiteOidcOptions> oidcOptions)
-    {
-        _httpContextAccessor = httpContextAccessor;
-        _cookieOidcRefresher = cookieOidcRefresher;
-        _oidcOptions = oidcOptions;
-    }
-
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var httpContext = _httpContextAccessor.HttpContext;
-        var tokenStore = httpContext?.RequestServices.GetService<CircuitTokenStore>();
-        var refreshLeadTime = TimeSpan.FromMinutes(Math.Max(1, _oidcOptions.Value.RefreshLeadTimeMinutes));
-        var oidcScheme = MainSiteOidcOptions.OidcScheme;
-
-        await EnsureTokenAsync(httpContext, tokenStore, refreshLeadTime, oidcScheme, cancellationToken);
-
-        var accessToken = tokenStore?.AccessToken
-            ?? (httpContext is not null ? await httpContext.GetTokenAsync("access_token") : null);
-
-        if (string.IsNullOrWhiteSpace(accessToken) is false)
+        var snapshot = await tokenStore.GetSnapshotAsync(cancellationToken);
+        if (snapshot is not null)
         {
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", snapshot.AccessToken);
         }
 
-        HttpResponseMessage response;
+        var response = await base.SendAsync(request, cancellationToken);
+        if (response.StatusCode != HttpStatusCode.Unauthorized || snapshot is null) return response;
+
+        AuthenticationSnapshot? refreshed;
+        try { refreshed = await tokenStore.RefreshAsync(snapshot, cancellationToken); }
+        catch { response.Dispose(); throw; }
+        if (refreshed is null || refreshed.AccessToken == snapshot.AccessToken
+            || refreshed.ExpiresAt <= DateTimeOffset.UtcNow || refreshed.CacheScope.IdentityChanged.IsCancellationRequested) return response;
+
+        // 查询绑定的旧身份会在刷新时失效，由查询层用新身份至多重试一次。
+        // 其他 SDK 调用保留现有的 401 刷新后重试行为。
         try
         {
-            response = await base.SendAsync(request, cancellationToken);
+            using var retry = await CloneHttpRequestMessageAsync(request, cancellationToken);
+            retry.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshed.AccessToken);
+            return await base.SendAsync(retry, cancellationToken);
         }
-        catch (TaskCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-            return CreateEmptyResponse(request);
-        }
-
-        if (response.StatusCode != HttpStatusCode.Unauthorized || httpContext is null)
-        {
-            return response;
-        }
-
-        var refreshResult = await _cookieOidcRefresher.TryRefreshAsync(httpContext, oidcScheme, forceRefresh: true);
-        if (refreshResult is not null)
-        {
-            var newExpiresAt = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(refreshResult.Value.ExpiresIn);
-            tokenStore?.StoreTokens(refreshResult.Value.AccessToken, refreshResult.Value.RefreshToken, newExpiresAt);
-
-            var retryRequest = await CloneHttpRequestMessageAsync(request, cancellationToken);
-            retryRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshResult.Value.AccessToken);
-
-            response.Dispose();
-            try
-            {
-                response = await base.SendAsync(retryRequest, cancellationToken);
-            }
-            catch (TaskCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-                return CreateEmptyResponse(retryRequest);
-            }
-        }
-        else
-        {
-            tokenStore?.Clear();
-            await SignOutIfHeadersWritableAsync(httpContext);
-        }
-
-        return response;
-    }
-
-    private static HttpResponseMessage CreateEmptyResponse(HttpRequestMessage request)
-    {
-        return new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent("{}"),
-            RequestMessage = request
-        };
-    }
-
-    private static async Task SignOutIfHeadersWritableAsync(HttpContext httpContext)
-    {
-        if (httpContext.Response.HasStarted)
-        {
-            return;
-        }
-
-        try
-        {
-            await httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        }
-        catch (InvalidOperationException) when (httpContext.Response.HasStarted)
-        {
-            // Blazor InteractiveServer can issue SDK requests after the HTTP response has started.
-            // In that phase cookies cannot be changed; the next normal HTTP request will validate auth again.
-        }
-    }
-
-    private async Task EnsureTokenAsync(
-        HttpContext? httpContext,
-        CircuitTokenStore? tokenStore,
-        TimeSpan refreshLeadTime,
-        string oidcScheme,
-        CancellationToken cancellationToken)
-    {
-        if (tokenStore?.AccessToken is not null)
-        {
-            if (tokenStore.NeedsRefresh(refreshLeadTime) && httpContext is not null)
-            {
-                var refreshResult = await _cookieOidcRefresher.TryRefreshAsync(httpContext, oidcScheme);
-                if (refreshResult is not null)
-                {
-                    var newExpiresAt = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(refreshResult.Value.ExpiresIn);
-                    tokenStore.StoreTokens(refreshResult.Value.AccessToken, refreshResult.Value.RefreshToken, newExpiresAt);
-                }
-            }
-            return;
-        }
-
-        if (httpContext is null || tokenStore is null)
-        {
-            return;
-        }
-
-        var accessToken = await httpContext.GetTokenAsync("access_token");
-        if (string.IsNullOrWhiteSpace(accessToken))
-        {
-            return;
-        }
-
-        var refreshToken = await httpContext.GetTokenAsync("refresh_token");
-        var expiresAtText = await httpContext.GetTokenAsync("expires_at");
-        DateTimeOffset.TryParse(expiresAtText, out var expiresAt);
-        tokenStore.StoreTokens(accessToken, refreshToken ?? string.Empty, expiresAt);
-
-        if (tokenStore.NeedsRefresh(refreshLeadTime))
-        {
-            var refreshResult = await _cookieOidcRefresher.TryRefreshAsync(httpContext, oidcScheme);
-            if (refreshResult is not null)
-            {
-                var newExpiresAt = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(refreshResult.Value.ExpiresIn);
-                tokenStore.StoreTokens(refreshResult.Value.AccessToken, refreshResult.Value.RefreshToken, newExpiresAt);
-            }
-        }
+        finally { response.Dispose(); }
     }
 
     private static async Task<HttpRequestMessage> CloneHttpRequestMessageAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
-        var clone = new HttpRequestMessage(request.Method, request.RequestUri);
-
-        if (request.Content is not null)
+        var clone = new HttpRequestMessage(request.Method, request.RequestUri)
         {
-            var contentBytes = await request.Content.ReadAsByteArrayAsync(cancellationToken);
-            clone.Content = new ByteArrayContent(contentBytes);
-            if (request.Content.Headers.ContentType is not null)
+            Version = request.Version,
+            VersionPolicy = request.VersionPolicy
+        };
+        try
+        {
+            if (request.Content is not null)
             {
-                clone.Content.Headers.ContentType = request.Content.Headers.ContentType;
+                clone.Content = new ByteArrayContent(await request.Content.ReadAsByteArrayAsync(cancellationToken));
+                foreach (var header in request.Content.Headers)
+                {
+                    clone.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                }
             }
+            foreach (var header in request.Headers) clone.Headers.TryAddWithoutValidation(header.Key, header.Value);
+            foreach (var (key, value) in request.Options) clone.Options.TryAdd(key, value);
+            return clone;
         }
-
-        foreach (var header in request.Headers)
-        {
-            clone.Headers.TryAddWithoutValidation(header.Key, header.Value);
-        }
-
-        foreach (var (key, value) in request.Options)
-        {
-            clone.Options.TryAdd(key, value);
-        }
-
-        clone.Version = request.Version;
-        clone.VersionPolicy = request.VersionPolicy;
-
-        return clone;
+        catch { clone.Dispose(); throw; }
     }
 }

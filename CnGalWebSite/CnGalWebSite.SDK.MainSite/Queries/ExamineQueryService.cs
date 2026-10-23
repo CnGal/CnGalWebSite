@@ -1,6 +1,7 @@
 using CnGalWebSite.DataModel.Sorting;
-using CnGalWebSite.Core.Services.Query;
 using System.Net.Http.Json;
+using System.Security.Cryptography;
+using System.Text.Json;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
@@ -18,29 +19,52 @@ using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
-public sealed class ExamineQueryService(HttpClient httpClient, IMemoryCache memoryCache, ILogger<ExamineQueryService> logger)
+public sealed class ExamineQueryService(
+    HttpClient httpClient,
+    IMemoryCache memoryCache,
+    ILogger<ExamineQueryService> logger,
+    ExamineUserCache userCache,
+    ICurrentUserAccessor currentUserAccessor)
     : QueryServiceBase(httpClient), IExamineQueryService
 {
-    private static readonly TimeSpan ContentCenterCacheDuration = TimeSpan.FromMinutes(2);
-
     protected override ILogger Logger => logger;
+    protected override bool PropagateCancellation => true;
 
     private static readonly TimeSpan ListCacheDuration = TimeSpan.FromMinutes(2);
 
-    private async Task<SdkResult<QueryResultModel<T, TSort>>> QueryListAsync<T, TSort>(
-        string apiPath, string errorDomain, string displayName,
-        QueryParameterModel<TSort> parameter, CancellationToken cancellationToken) where T : class where TSort : struct, Enum
+    private Task<SdkResult<QueryResultModel<T, TSort>>> QueryListAsync<T, TSort>(
+        string apiPath,
+        string errorDomain,
+        string displayName,
+        QueryParameterModel<TSort> parameter,
+        CancellationToken cancellationToken) where T : class where TSort : struct, Enum
     {
-        var cacheKey = $"main-site:typed-sort-v1:examine-list:{apiPath}:p{parameter.Page}:s{parameter.ItemsPerPage}:sorts{SortCacheKey.Create(parameter.Sorts)}:q{parameter.SearchText}";
-        if (memoryCache.TryGetValue(cacheKey, out QueryResultModel<T, TSort>? cached) && cached is not null)
+        // 固定请求参数，避免等待身份期间调用方修改参数，导致键与请求体不一致。
+        var query = new QueryParameterModel<TSort>
         {
-            return SdkResult<QueryResultModel<T, TSort>>.Ok(cached);
-        }
+            Page = parameter.Page,
+            ItemsPerPage = parameter.ItemsPerPage,
+            SearchText = parameter.SearchText,
+            Sorts = parameter.Sorts?.ToArray()!
+        };
+        var queryHash = Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(query, SdkJsonSerializerOptions.Default)));
+        var requestKey = ExamineCacheKeys.List<TSort>(apiPath, queryHash);
+        return WithIdentityAsync((scope, token) => userCache.GetOrCreateAsync(
+            HttpClient.BaseAddress, scope, requestKey,
+            loadToken => LoadListAsync<T, TSort>(apiPath, errorDomain, displayName, query, loadToken), token,
+            apiPath == "api/examines/ListExamines" ? userCache.GetReviewQueueGeneration(HttpClient.BaseAddress) : null), cancellationToken);
+    }
 
+    private async Task<SdkResult<QueryResultModel<T, TSort>>> LoadListAsync<T, TSort>(
+        string apiPath,
+        string errorDomain,
+        string displayName,
+        QueryParameterModel<TSort> parameter,
+        CancellationToken cancellationToken) where T : class where TSort : struct, Enum
+    {
         try
         {
-            var response = await HttpClient.PostAsJsonAsync(
-                apiPath, parameter, SdkJsonSerializerOptions.Default, cancellationToken);
+            using var response = await HttpClient.PostAsJsonAsync(apiPath, parameter, SdkJsonSerializerOptions.Default, cancellationToken);
 
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
 
@@ -57,7 +81,6 @@ public sealed class ExamineQueryService(HttpClient httpClient, IMemoryCache memo
             try
             {
                 var result = Deserialize<QueryResultModel<T, TSort>>(body);
-                memoryCache.Set(cacheKey, result, ListCacheDuration);
                 return SdkResult<QueryResultModel<T, TSort>>.Ok(result!);
             }
             catch (System.Text.Json.JsonException ex)
@@ -69,6 +92,11 @@ public sealed class ExamineQueryService(HttpClient httpClient, IMemoryCache memo
                     $"{errorDomain}_DESERIALIZE_FAILED",
                     $"{displayName}列表数据格式不兼容");
             }
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            // 调用方取消直接传播；HTTP 超时仍走既有失败结果。
+            throw;
         }
         catch (Exception ex)
         {
@@ -101,27 +129,19 @@ public sealed class ExamineQueryService(HttpClient httpClient, IMemoryCache memo
 
     // ─── 用户内容中心概览 ───
 
-    public async Task<SdkResult<UserContentCenterViewModel>> GetUserContentCenterAsync(
+    public Task<SdkResult<UserContentCenterViewModel>> GetUserContentCenterAsync(
         CancellationToken cancellationToken = default)
     {
-        var cacheKey = "main-site:typed-sort-v1:user-content-center";
-        if (memoryCache.TryGetValue(cacheKey, out UserContentCenterViewModel? cached) && cached is not null)
-        {
-            return SdkResult<UserContentCenterViewModel>.Ok(cached);
-        }
-
-        var result = await GetAsync<UserContentCenterViewModel>(
-            "api/examines/GetUserContentCenterView",
-            "EXAMINE_CONTENT_CENTER",
-            "用户内容中心",
-            cancellationToken);
-
-        if (result.Success && result.Data is not null)
-        {
-            memoryCache.Set(cacheKey, result.Data, ContentCenterCacheDuration);
-        }
-
-        return result;
+        return WithIdentityAsync((scope, cancellation) => userCache.GetOrCreateAsync(
+            HttpClient.BaseAddress,
+            scope,
+            ExamineCacheKeys.ContentCenter,
+            token => GetAsync<UserContentCenterViewModel>(
+                "api/examines/GetUserContentCenterView",
+                "EXAMINE_CONTENT_CENTER",
+                "用户内容中心",
+                token),
+            cancellation, userCache.GetReviewQueueGeneration(HttpClient.BaseAddress)), cancellationToken);
     }
 
     // ─── 编辑记录概览 ───
@@ -129,7 +149,8 @@ public sealed class ExamineQueryService(HttpClient httpClient, IMemoryCache memo
     public async Task<SdkResult<ExaminesOverviewViewModel>> GetExaminesOverviewAsync(
         long examineId, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"main-site:typed-sort-v1:examine-overview:{examineId}";
+        cancellationToken.ThrowIfCancellationRequested();
+        var cacheKey = ExamineCacheKeys.Overview(examineId);
         if (memoryCache.TryGetValue(cacheKey, out ExaminesOverviewViewModel? cached) && cached is not null)
         {
             return SdkResult<ExaminesOverviewViewModel>.Ok(cached);
@@ -151,44 +172,44 @@ public sealed class ExamineQueryService(HttpClient httpClient, IMemoryCache memo
 
     // ─── 单条审核详情 ───
 
-    public async Task<SdkResult<ExamineViewModel>> GetExamineDetailAsync(
+    public Task<SdkResult<ExamineViewModel>> GetExamineDetailAsync(
         long examineId, CancellationToken cancellationToken = default)
+        => WithIdentityAsync((scope, token) => GetExamineDetailAsync(examineId, scope, token), cancellationToken);
+
+    private Task<SdkResult<ExamineViewModel>> GetExamineDetailAsync(
+        long examineId, CurrentUserCacheScope? scope, CancellationToken cancellationToken)
     {
-        var cacheKey = $"main-site:typed-sort-v1:examine-detail:{examineId}";
-        if (memoryCache.TryGetValue(cacheKey, out ExamineViewModel? cached) && cached is not null)
-        {
-            return SdkResult<ExamineViewModel>.Ok(cached);
-        }
-
-        var result = await GetAsync<ExamineViewModel>(
-            $"api/examines/GetExamineView/{examineId}",
-            "EXAMINE_DETAIL",
-            "审核详情",
-            cancellationToken);
-
-        if (result.Success && result.Data is not null)
-        {
-            memoryCache.Set(cacheKey, result.Data, ListCacheDuration);
-        }
-
-        return result;
+        return userCache.GetOrCreateAsync(
+            HttpClient.BaseAddress,
+            scope,
+            ExamineCacheKeys.Detail(examineId),
+            token => GetAsync<ExamineViewModel>(
+                $"api/examines/GetExamineView/{examineId}",
+                "EXAMINE_DETAIL",
+                "审核详情",
+                token),
+            cancellationToken, userCache.GetExamineGeneration(HttpClient.BaseAddress, examineId));
     }
 
     // ─── 对比审核（两个版本的 Before/After） ───
 
-    public async Task<SdkResult<ExamineViewModel>> GetContrastExamineAsync(
+    public Task<SdkResult<ExamineViewModel>> GetContrastExamineAsync(
         long contrastId, long currentId, CancellationToken cancellationToken = default)
+        => WithIdentityAsync((scope, token) => GetContrastExamineAsync(contrastId, currentId, scope, token), cancellationToken);
+
+    private async Task<SdkResult<ExamineViewModel>> GetContrastExamineAsync(
+        long contrastId, long currentId, CurrentUserCacheScope? scope, CancellationToken cancellationToken)
     {
         // 分别加载两条审核记录的详情
         // BeforeModel 取自 contrastId 的 AfterModel（对比版本的终态）
         // AfterModel 取自 currentId 的 AfterModel（当前版本的终态）
-        var contrastResult = await GetExamineDetailAsync(contrastId, cancellationToken);
+        var contrastResult = await GetExamineDetailAsync(contrastId, scope, cancellationToken);
         if (!contrastResult.Success || contrastResult.Data is null)
         {
             return contrastResult;
         }
 
-        var currentResult = await GetExamineDetailAsync(currentId, cancellationToken);
+        var currentResult = await GetExamineDetailAsync(currentId, scope, cancellationToken);
         if (!currentResult.Success || currentResult.Data is null)
         {
             return currentResult;
@@ -225,12 +246,40 @@ public sealed class ExamineQueryService(HttpClient httpClient, IMemoryCache memo
         return SdkResult<ExamineViewModel>.Ok(combined);
     }
 
+    private async Task<SdkResult<T>> WithIdentityAsync<T>(
+        Func<CurrentUserCacheScope?, CancellationToken, Task<SdkResult<T>>> query,
+        CancellationToken cancellationToken)
+    {
+        for (var attempt = 0; attempt < 2; attempt++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var scope = await currentUserAccessor.GetCacheScopeAsync(cancellationToken);
+            using var linked = scope?.IdentityChanged.CanBeCanceled == true
+                ? CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, scope.IdentityChanged)
+                : null;
+            try
+            {
+                scope?.IdentityChanged.ThrowIfCancellationRequested();
+                var result = await query(scope, linked?.Token ?? cancellationToken);
+                scope?.IdentityChanged.ThrowIfCancellationRequested();
+                if (!result.Success) cancellationToken.ThrowIfCancellationRequested();
+                return result;
+            }
+            catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && scope?.IdentityChanged.IsCancellationRequested == true)
+            {
+                // 身份或令牌变更后重新取得快照，整个查询（包括双版本对比）最多重试一次。
+            }
+        }
+        return SdkResult<T>.Fail("EXAMINE_AUTH_CONTEXT_CHANGED", "登录状态已变更，请重新加载");
+    }
+
     // ─── 词条编辑记录列表 ───
 
     public async Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetEntryEditRecordsAsync(
         int entryId, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"main-site:typed-sort-v1:entry-edit-records:{entryId}";
+        cancellationToken.ThrowIfCancellationRequested();
+        var cacheKey = ExamineCacheKeys.EntryEditRecords(entryId);
         if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached) && cached is not null)
         {
             return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(cached);
@@ -264,7 +313,8 @@ public sealed class ExamineQueryService(HttpClient httpClient, IMemoryCache memo
     public async Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetArticleEditRecordsAsync(
         long articleId, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"main-site:typed-sort-v1:article-edit-records:{articleId}";
+        cancellationToken.ThrowIfCancellationRequested();
+        var cacheKey = ExamineCacheKeys.ArticleEditRecords(articleId);
         if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached) && cached is not null)
         {
             return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(cached);
@@ -298,7 +348,8 @@ public sealed class ExamineQueryService(HttpClient httpClient, IMemoryCache memo
     public async Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetVideoEditRecordsAsync(
         long videoId, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"main-site:typed-sort-v1:video-edit-records:{videoId}";
+        cancellationToken.ThrowIfCancellationRequested();
+        var cacheKey = ExamineCacheKeys.VideoEditRecords(videoId);
         if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached) && cached is not null)
         {
             return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(cached);
@@ -332,7 +383,8 @@ public sealed class ExamineQueryService(HttpClient httpClient, IMemoryCache memo
     public async Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetTagEditRecordsAsync(
         long tagId, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"main-site:typed-sort-v1:tag-edit-records:{tagId}";
+        cancellationToken.ThrowIfCancellationRequested();
+        var cacheKey = ExamineCacheKeys.TagEditRecords(tagId);
         if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached) && cached is not null)
         {
             return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(cached);
@@ -366,7 +418,8 @@ public sealed class ExamineQueryService(HttpClient httpClient, IMemoryCache memo
     public async Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetPeripheryEditRecordsAsync(
         long peripheryId, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"main-site:typed-sort-v1:periphery-edit-records:{peripheryId}";
+        cancellationToken.ThrowIfCancellationRequested();
+        var cacheKey = ExamineCacheKeys.PeripheryEditRecords(peripheryId);
         if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached) && cached is not null)
         {
             return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(cached);

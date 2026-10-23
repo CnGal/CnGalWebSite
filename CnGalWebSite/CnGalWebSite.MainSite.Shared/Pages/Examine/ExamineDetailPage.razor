@@ -65,39 +65,26 @@
     private bool _isLoading = true;
     private bool _isError;
     private string _errorMessage = string.Empty;
-    private bool _initialized;
-    private bool _selfNavigating;
+    private long? _loadedId;
+    private bool _disposed;
     private CancellationTokenSource? _cts;
 
-    protected override async Task OnParametersSetAsync()
+    protected override Task OnParametersSetAsync()
     {
-        // Only reload on first render or self-initiated navigation.
-        // When navigating away, Blazor resets query params and fires this method;
-        // _selfNavigating is false in that case, so we skip the reload.
-        if (_initialized && !_selfNavigating)
-        {
-            return;
-        }
-        _selfNavigating = false;
-        _initialized = true;
-
-        // Cancel any in-flight operation and create new CTS for this parameter set
-        _cts?.Cancel();
-        _cts?.Dispose();
-        _cts = new CancellationTokenSource();
-
-        try
-        {
-            await LoadDataAsync();
-        }
-        catch (OperationCanceledException)
-        {
-            // Component disposed or parameters changed, ignore.
-        }
+        return _loadedId == Id || _disposed ? Task.CompletedTask : LoadDataAsync();
     }
 
     private async Task LoadDataAsync()
     {
+        if (_disposed) return;
+        var id = Id;
+        _loadedId = id;
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+        var token = _cts.Token;
+        _isError = false;
+        _model = null;
         if (Id <= 0)
         {
             _isLoading = false;
@@ -105,27 +92,36 @@
         }
 
         _isLoading = true;
-        _isError = false;
-        _model = null;
         StateHasChanged();
 
-        var result = await ExamineQueryService.GetExamineDetailAsync(Id, _cts!.Token);
-
-        if (result.Success && result.Data is not null)
+        try
         {
-            _model = result.Data;
+            var result = await ExamineQueryService.GetExamineDetailAsync(id, token);
+            if (_disposed || token.IsCancellationRequested) return;
+            if (result.Success && result.Data is not null)
+            {
+                _model = result.Data;
+            }
+            else
+            {
+                _isError = true;
+                _errorMessage = result.Error?.Message ?? "获取审核详情失败";
+            }
         }
-        else
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
-            _isError = true;
-            _errorMessage = result.Error?.Message ?? "获取审核详情失败";
+            // 首次加载、重试及参数切换统一在加载入口处理预期取消。
         }
-
-        _isLoading = false;
+        finally
+        {
+            if (!_disposed && !token.IsCancellationRequested) _isLoading = false;
+        }
     }
 
     public void Dispose()
     {
+        if (_disposed) return;
+        _disposed = true;
         _cts?.Cancel();
         _cts?.Dispose();
     }

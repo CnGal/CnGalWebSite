@@ -12,7 +12,9 @@ namespace CnGalWebSite.SDK.MainSite.Commands;
 public sealed class PeripheryCommandService(
     HttpClient httpClient,
     IMemoryCache memoryCache,
-    ILogger<PeripheryCommandService> logger) : CommandServiceBase(httpClient), IPeripheryCommandService
+    ILogger<PeripheryCommandService> logger,
+    ExamineUserCache userCache,
+    ICurrentUserAccessor currentUserAccessor) : CommandServiceBase(httpClient), IPeripheryCommandService
 {
     protected override ILogger Logger => logger;
 
@@ -110,8 +112,14 @@ public sealed class PeripheryCommandService(
 
     public async Task<SdkResult<long>> SubmitEditAsync(PeripheryEditRequest request, CancellationToken cancellationToken = default)
     {
+        var writeAttempted = false;
+        string? userId = null;
+        long? cacheEntityId = null;
         try
         {
+            userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
+            cacheEntityId = request.IsCreate ? null : request.Data.Main.Id;
+            writeAttempted = true;
             if (request.IsCreate)
             {
                 var response = await PostAsJsonRawAsync("api/peripheries/CreatePeriphery", request.Data, cancellationToken);
@@ -119,7 +127,7 @@ public sealed class PeripheryCommandService(
 
                 if (result?.Successful == true && long.TryParse(result.Error, out var newId))
                 {
-                    InvalidatePeripheryCaches(newId);
+                    cacheEntityId = newId;
                     return SdkResult<long>.Ok(newId);
                 }
 
@@ -138,9 +146,9 @@ public sealed class PeripheryCommandService(
 
                 foreach (var res in responses)
                 {
-                    if (res is { Successful: false })
+                    if (res?.Successful != true)
                     {
-                        errors.Add(res.Error ?? "某个部分保存失败");
+                        errors.Add(res?.Error ?? "某个部分保存失败");
                     }
                 }
 
@@ -149,7 +157,6 @@ public sealed class PeripheryCommandService(
                     return SdkResult<long>.Fail("PERIPHERY_EDIT_PARTIAL_FAILED", string.Join("；", errors));
                 }
 
-                InvalidatePeripheryCaches(request.Data.Main.Id);
                 return SdkResult<long>.Ok(request.Data.Main.Id);
             }
         }
@@ -157,6 +164,19 @@ public sealed class PeripheryCommandService(
         {
             logger.LogError(ex, "提交周边编辑数据异常。IsCreate={IsCreate}; BaseAddress={BaseAddress}", request.IsCreate, HttpClient.BaseAddress);
             return SdkResult<long>.Fail("PERIPHERY_SUBMIT_EXCEPTION", "提交周边数据时发生异常");
+        }
+        finally
+        {
+            // 分块写入可能部分成功，异常或取消时服务端结果也可能不确定。
+            if (writeAttempted)
+            {
+                if (cacheEntityId.HasValue)
+                {
+                    InvalidatePeripheryCaches(cacheEntityId.Value);
+                }
+                userCache.Invalidate(HttpClient.BaseAddress, userId);
+                userCache.InvalidateReviewQueue(HttpClient.BaseAddress);
+            }
         }
     }
 
@@ -226,7 +246,6 @@ public sealed class PeripheryCommandService(
     private void InvalidatePeripheryCaches(long peripheryId)
     {
         memoryCache.Remove($"main-site:periphery-detail:{peripheryId}");
-        memoryCache.Remove($"main-site:periphery-edit-records:{peripheryId}");
-        memoryCache.Remove("main-site:user-content-center");
+        memoryCache.Remove(ExamineCacheKeys.PeripheryEditRecords(peripheryId));
     }
 }

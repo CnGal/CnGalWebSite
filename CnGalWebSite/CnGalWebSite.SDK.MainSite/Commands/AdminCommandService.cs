@@ -108,7 +108,7 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
             foreach (var id in ids)
             {
                 memoryCache.Remove($"main-site:entry-detail:{id}");
-                memoryCache.Remove($"main-site:entry-edit-records:{id}");
+                memoryCache.Remove(ExamineCacheKeys.EntryEditRecords(id));
             }
         }
         return result;
@@ -153,7 +153,7 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
             foreach (var id in ids)
             {
                 memoryCache.Remove($"main-site:article-detail:{id}");
-                memoryCache.Remove($"main-site:article-edit-records:{id}");
+                memoryCache.Remove(ExamineCacheKeys.ArticleEditRecords(id));
             }
             memoryCache.Remove("main-site:home-summary");
         }
@@ -182,7 +182,7 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
             foreach (var id in ids)
             {
                 memoryCache.Remove($"main-site:video-detail:{id}");
-                memoryCache.Remove($"main-site:video-edit-records:{id}");
+                memoryCache.Remove(ExamineCacheKeys.VideoEditRecords(id));
             }
             memoryCache.Remove("main-site:home-summary");
         }
@@ -206,7 +206,7 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
             foreach (var id in ids)
             {
                 memoryCache.Remove($"main-site:tag-detail:{id}");
-                memoryCache.Remove($"main-site:tag-edit-records:{id}");
+                memoryCache.Remove(ExamineCacheKeys.TagEditRecords(id));
             }
             memoryCache.Remove("main-site:tag-tree");
         }
@@ -267,7 +267,7 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
             foreach (var id in ids)
             {
                 memoryCache.Remove($"main-site:periphery-detail:{id}");
-                memoryCache.Remove($"main-site:periphery-edit-records:{id}");
+                memoryCache.Remove(ExamineCacheKeys.PeripheryEditRecords(id));
             }
         }
         return result;

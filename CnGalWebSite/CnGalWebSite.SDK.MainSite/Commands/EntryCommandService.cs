@@ -14,7 +14,9 @@ namespace CnGalWebSite.SDK.MainSite.Commands;
 public sealed class EntryCommandService(
     HttpClient httpClient,
     IMemoryCache memoryCache,
-    ILogger<EntryCommandService> logger) : CommandServiceBase(httpClient), IEntryCommandService
+    ILogger<EntryCommandService> logger,
+    ExamineUserCache userCache,
+    ICurrentUserAccessor currentUserAccessor) : CommandServiceBase(httpClient), IEntryCommandService
 {
     protected override ILogger Logger => logger;
 
@@ -138,8 +140,14 @@ public sealed class EntryCommandService(
 
     public async Task<SdkResult<long>> SubmitEditAsync(EntryEditRequest request, CancellationToken cancellationToken = default)
     {
+        var writeAttempted = false;
+        string? userId = null;
+        long? cacheEntityId = null;
         try
         {
+            userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
+            cacheEntityId = request.IsCreate ? null : request.Data.Id;
+            writeAttempted = true;
             if (request.IsCreate)
             {
                 var response = await PostAsJsonRawAsync("api/entries/EstablishEntry", request.Data, cancellationToken);
@@ -147,7 +155,7 @@ public sealed class EntryCommandService(
                 
                 if (result?.Successful == true && long.TryParse(result.Error, out var newId))
                 {
-                    InvalidateEntryCaches(newId);
+                    cacheEntityId = newId;
                     return SdkResult<long>.Ok(newId);
                 }
                 
@@ -171,9 +179,9 @@ public sealed class EntryCommandService(
 
                 foreach (var res in responses)
                 {
-                    if (res is { Successful: false })
+                    if (res?.Successful != true)
                     {
-                        errors.Add(res.Error ?? "某个部分保存失败");
+                        errors.Add(res?.Error ?? "某个部分保存失败");
                     }
                 }
 
@@ -182,7 +190,6 @@ public sealed class EntryCommandService(
                     return SdkResult<long>.Fail("ENTRY_EDIT_PARTIAL_FAILED", string.Join("；", errors));
                 }
                 
-                InvalidateEntryCaches(request.Data.Id);
                 return SdkResult<long>.Ok(request.Data.Id); // 此时 Data.Id 就是原词条的 Id
             }
         }
@@ -190,6 +197,19 @@ public sealed class EntryCommandService(
         {
             logger.LogError(ex, "提交词条编辑数据异常。IsCreate={IsCreate}; BaseAddress={BaseAddress}", request.IsCreate, HttpClient.BaseAddress);
             return SdkResult<long>.Fail("ENTRY_SUBMIT_EXCEPTION", "提交词条数据时发生异常");
+        }
+        finally
+        {
+            // 分块写入可能部分成功，异常或取消时服务端结果也可能不确定。
+            if (writeAttempted)
+            {
+                if (cacheEntityId.HasValue)
+                {
+                    InvalidateEntryCaches(cacheEntityId.Value);
+                }
+                userCache.Invalidate(HttpClient.BaseAddress, userId);
+                userCache.InvalidateReviewQueue(HttpClient.BaseAddress);
+            }
         }
     }
 
@@ -215,8 +235,7 @@ public sealed class EntryCommandService(
     private void InvalidateEntryCaches(long entryId)
     {
         memoryCache.Remove($"main-site:entry-detail:{entryId}");
-        memoryCache.Remove($"main-site:entry-edit-records:{entryId}");
-        memoryCache.Remove("main-site:user-content-center");
+        memoryCache.Remove(ExamineCacheKeys.EntryEditRecords(entryId));
         memoryCache.Remove("main-site:home-summary");
     }
 }

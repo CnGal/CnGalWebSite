@@ -8,6 +8,10 @@ using CnGalWebSite.SDK.MainSite.Models;
 
 namespace CnGalWebSite.SDK.MainSite.Abstractions;
 
+/// <summary>
+/// 审核查询。调用方取消时抛出 OperationCanceledException；HTTP 超时仍返回失败结果。
+/// 身份变化时最多重试一次，再次变化返回 EXAMINE_AUTH_CONTEXT_CHANGED。
+/// </summary>
 public interface IExamineQueryService
 {
     /// <summary>
