@@ -10,8 +10,12 @@ using CnGalWebSite.SDK.MainSite.Services.Toolbox;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Http;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
 
@@ -123,9 +127,10 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddMainSiteSdk(this IServiceCollection services, string apiBaseAddress, string imageApiBaseAddress, string taskApiBaseAddress)
     {
         services.AddMainSiteSdkCore(apiBaseAddress, imageApiBaseAddress, taskApiBaseAddress);
-        services.AddSingleton<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();
+        services.AddScoped<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();
         services.AddScoped<CircuitTokenStore>();
         services.AddTransient<AccessTokenHandler>();
+        services.TryAddEnumerable(ServiceDescriptor.Scoped<CircuitHandler, AuthenticationCircuitHandler>());
         services.AddScoped(typeof(IToolboxLocalRepository<>), typeof(ToolboxLocalRepository<>));
 
         var apiBase = new Uri(EnsureTrailingSlash(apiBaseAddress));
@@ -178,7 +183,8 @@ public static class ServiceCollectionExtensions
         where TInterface : class
         where TImpl : class, TInterface
     {
-        var builder = services.AddHttpClient<TInterface, TImpl>(client =>
+        var clientName = typeof(TInterface).FullName!;
+        var builder = services.AddHttpClient(clientName, client =>
         {
             client.BaseAddress = baseAddress;
             client.Timeout = TimeSpan.FromSeconds(30);
@@ -191,12 +197,21 @@ public static class ServiceCollectionExtensions
             EnableMultipleHttp2Connections = true,
         });
 
-        builder.AddHttpMessageHandler<AccessTokenHandler>();
-
         builder.AddStandardResilienceHandler(options =>
         {
             options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(12);
             options.CircuitBreaker.MinimumThroughput = 4;
+        });
+
+        services.AddTransient<TInterface>(provider =>
+        {
+            // 工厂的处理器作用域与 circuit 不同；只让传输/重试管线由工厂池化。
+            var handler = provider.GetRequiredService<AccessTokenHandler>();
+            handler.InnerHandler = provider.GetRequiredService<IHttpMessageHandlerFactory>().CreateHandler(clientName);
+            var client = new HttpClient(handler, disposeHandler: false);
+            var clientOptions = provider.GetRequiredService<IOptionsMonitor<HttpClientFactoryOptions>>().Get(clientName);
+            foreach (var configure in clientOptions.HttpClientActions) configure(client);
+            return ActivatorUtilities.CreateInstance<TImpl>(provider, client);
         });
     }
 

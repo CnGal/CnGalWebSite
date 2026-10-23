@@ -1,9 +1,11 @@
 ﻿using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Commands;
+using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Queries;
 using CnGalWebSite.SDK.MainSite.Services.Toolbox;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace CnGalWebSite.SDK.MainSite.Extensions;
 
@@ -12,6 +14,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddMainSiteSdkCore(this IServiceCollection services, string apiBaseAddress, string imageApiBaseAddress, string taskApiBaseAddress)
     {
         services.AddMemoryCache();
+        services.TryAddSingleton<ExamineUserCache>();
         services.AddSingleton<ICurrentUserAccessor, NullCurrentUserAccessor>();
 
         var apiBase = new Uri(EnsureTrailingSlash(apiBaseAddress));

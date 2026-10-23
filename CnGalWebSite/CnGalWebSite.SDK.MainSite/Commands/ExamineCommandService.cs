@@ -9,16 +9,26 @@ using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
-public sealed class ExamineCommandService(HttpClient httpClient, IMemoryCache memoryCache, ILogger<ExamineCommandService> logger)
+public sealed class ExamineCommandService(
+    HttpClient httpClient,
+    IMemoryCache memoryCache,
+    ILogger<ExamineCommandService> logger,
+    ExamineUserCache userCache,
+    ICurrentUserAccessor currentUserAccessor)
     : CommandServiceBase(httpClient), IExamineCommandService
 {
     protected override ILogger Logger => logger;
 
     public async Task<SdkResult<bool>> ProcExamineAsync(long id, bool isPassed, string comments = "", CancellationToken cancellationToken = default)
     {
+        string? userId = null;
+        var writeAttempted = false;
+        ExamineProcResultModel? result = null;
         try
         {
-            var result = await PostAsJsonAsync<ExamineProcModel, ExamineProcResultModel>(
+            userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
+            writeAttempted = true;
+            result = await PostAsJsonAsync<ExamineProcModel, ExamineProcResultModel>(
                 "api/examines/proc",
                 new ExamineProcModel { Id = id, IsPassed = isPassed, Comments = comments },
                 cancellationToken);
@@ -28,10 +38,6 @@ public sealed class ExamineCommandService(HttpClient httpClient, IMemoryCache me
                 return SdkResult<bool>.Fail("EXAMINE_PROC_FAILED", result?.Error ?? "审核处理失败");
             }
 
-            memoryCache.Remove("main-site:user-content-center");
-            memoryCache.Remove($"main-site:examine-detail:{id}");
-            memoryCache.Remove($"main-site:examine-overview:{id}");
-            InvalidateEntityCaches(result);
             return SdkResult<bool>.Ok(true);
         }
         catch (Exception ex)
@@ -39,12 +45,31 @@ public sealed class ExamineCommandService(HttpClient httpClient, IMemoryCache me
             Logger.LogError(ex, "审核处理异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
             return SdkResult<bool>.Fail("EXAMINE_PROC_EXCEPTION", "审核处理时发生异常");
         }
+        finally
+        {
+            if (writeAttempted)
+            {
+                memoryCache.Remove(ExamineCacheKeys.Overview(id));
+                userCache.InvalidateExamine(HttpClient.BaseAddress, id);
+                userCache.InvalidateReviewQueue(HttpClient.BaseAddress);
+                userCache.Invalidate(HttpClient.BaseAddress, userId);
+                if (result is not null)
+                {
+                    userCache.Invalidate(HttpClient.BaseAddress, result.ApplicationUserId);
+                    InvalidateEntityCaches(result);
+                }
+            }
+        }
     }
 
     public async Task<SdkResult<bool>> EditReviewStateAsync(long[] examineIds, EditRecordReviewState state, CancellationToken cancellationToken = default)
     {
+        string? userId = null;
+        var writeAttempted = false;
         try
         {
+            userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
+            writeAttempted = true;
             var result = await PostAsJsonAsync<EditUserReviewEditRecordStateModel, Result>(
                 "api/examines/EditUserReviewEditRecordState",
                 new EditUserReviewEditRecordStateModel { ExamineIds = examineIds, State = state },
@@ -61,12 +86,23 @@ public sealed class ExamineCommandService(HttpClient httpClient, IMemoryCache me
             Logger.LogError(ex, "审阅状态修改异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
             return SdkResult<bool>.Fail("EXAMINE_REVIEW_STATE_EXCEPTION", "审阅状态修改时发生异常");
         }
+        finally
+        {
+            if (writeAttempted)
+            {
+                userCache.Invalidate(HttpClient.BaseAddress, userId);
+            }
+        }
     }
 
     public async Task<SdkResult<bool>> EditUserMonitorsAsync(int[] ids, bool inMonitor, CancellationToken cancellationToken = default)
     {
+        string? userId = null;
+        var writeAttempted = false;
         try
         {
+            userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
+            writeAttempted = true;
             var result = await PostAsJsonAsync<EditUserMonitorsModel, Result>(
                 "api/examines/EditUserMonitors",
                 new EditUserMonitorsModel { Ids = ids, InMonitor = inMonitor },
@@ -82,6 +118,13 @@ public sealed class ExamineCommandService(HttpClient httpClient, IMemoryCache me
         {
             Logger.LogError(ex, "监控设置修改异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
             return SdkResult<bool>.Fail("EXAMINE_MONITOR_EXCEPTION", "监控设置修改时发生异常");
+        }
+        finally
+        {
+            if (writeAttempted)
+            {
+                userCache.Invalidate(HttpClient.BaseAddress, userId);
+            }
         }
     }
 
@@ -100,7 +143,7 @@ public sealed class ExamineCommandService(HttpClient httpClient, IMemoryCache me
                 if (result.EntryId.HasValue)
                 {
                     memoryCache.Remove($"main-site:entry-detail:{result.EntryId.Value}");
-                    memoryCache.Remove($"main-site:entry-edit-records:{result.EntryId.Value}");
+                    memoryCache.Remove(ExamineCacheKeys.EntryEditRecords(result.EntryId.Value));
                 }
                 memoryCache.Remove("main-site:home-summary");
                 break;
@@ -111,7 +154,7 @@ public sealed class ExamineCommandService(HttpClient httpClient, IMemoryCache me
                 if (result.ArticleId.HasValue)
                 {
                     memoryCache.Remove($"main-site:article-detail:{result.ArticleId.Value}");
-                    memoryCache.Remove($"main-site:article-edit-records:{result.ArticleId.Value}");
+                    memoryCache.Remove(ExamineCacheKeys.ArticleEditRecords(result.ArticleId.Value));
                 }
                 memoryCache.Remove("main-site:home-summary");
                 break;
@@ -122,7 +165,7 @@ public sealed class ExamineCommandService(HttpClient httpClient, IMemoryCache me
                 if (result.TagId.HasValue)
                 {
                     memoryCache.Remove($"main-site:tag-detail:{result.TagId.Value}");
-                    memoryCache.Remove($"main-site:tag-edit-records:{result.TagId.Value}");
+                    memoryCache.Remove(ExamineCacheKeys.TagEditRecords(result.TagId.Value));
                     memoryCache.Remove("main-site:tag-tree");
                 }
                 break;
@@ -134,7 +177,7 @@ public sealed class ExamineCommandService(HttpClient httpClient, IMemoryCache me
                 if (result.VideoId.HasValue)
                 {
                     memoryCache.Remove($"main-site:video-detail:{result.VideoId.Value}");
-                    memoryCache.Remove($"main-site:video-edit-records:{result.VideoId.Value}");
+                    memoryCache.Remove(ExamineCacheKeys.VideoEditRecords(result.VideoId.Value));
                 }
                 memoryCache.Remove("main-site:home-summary");
                 break;
@@ -146,7 +189,7 @@ public sealed class ExamineCommandService(HttpClient httpClient, IMemoryCache me
                 if (result.PeripheryId.HasValue)
                 {
                     memoryCache.Remove($"main-site:periphery-detail:{result.PeripheryId.Value}");
-                    memoryCache.Remove($"main-site:periphery-edit-records:{result.PeripheryId.Value}");
+                    memoryCache.Remove(ExamineCacheKeys.PeripheryEditRecords(result.PeripheryId.Value));
                 }
                 break;
 

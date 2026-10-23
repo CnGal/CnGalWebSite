@@ -12,7 +12,9 @@ namespace CnGalWebSite.SDK.MainSite.Commands;
 public sealed class TagCommandService(
     HttpClient httpClient,
     IMemoryCache memoryCache,
-    ILogger<TagCommandService> logger) : CommandServiceBase(httpClient), ITagCommandService
+    ILogger<TagCommandService> logger,
+    ExamineUserCache userCache,
+    ICurrentUserAccessor currentUserAccessor) : CommandServiceBase(httpClient), ITagCommandService
 {
     protected override ILogger Logger => logger;
 
@@ -96,8 +98,14 @@ public sealed class TagCommandService(
 
     public async Task<SdkResult<long>> SubmitEditAsync(TagEditRequest request, CancellationToken cancellationToken = default)
     {
+        var writeAttempted = false;
+        string? userId = null;
+        long? cacheEntityId = null;
         try
         {
+            userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
+            cacheEntityId = request.IsCreate ? null : request.Data.Main.Id;
+            writeAttempted = true;
             if (request.IsCreate)
             {
                 var response = await PostAsJsonRawAsync("api/tags/CreateTag", request.Data, cancellationToken);
@@ -105,7 +113,7 @@ public sealed class TagCommandService(
 
                 if (result?.Successful == true && long.TryParse(result.Error, out var newId))
                 {
-                    InvalidateTagCaches(newId);
+                    cacheEntityId = newId;
                     return SdkResult<long>.Ok(newId);
                 }
 
@@ -123,9 +131,9 @@ public sealed class TagCommandService(
 
                 foreach (var res in responses)
                 {
-                    if (res is { Successful: false })
+                    if (res?.Successful != true)
                     {
-                        errors.Add(res.Error ?? "某个部分保存失败");
+                        errors.Add(res?.Error ?? "某个部分保存失败");
                     }
                 }
 
@@ -134,7 +142,6 @@ public sealed class TagCommandService(
                     return SdkResult<long>.Fail("TAG_EDIT_PARTIAL_FAILED", string.Join("；", errors));
                 }
 
-                InvalidateTagCaches(request.Data.Main.Id);
                 return SdkResult<long>.Ok(request.Data.Main.Id);
             }
         }
@@ -142,6 +149,19 @@ public sealed class TagCommandService(
         {
             logger.LogError(ex, "提交标签编辑数据异常。IsCreate={IsCreate}; BaseAddress={BaseAddress}", request.IsCreate, HttpClient.BaseAddress);
             return SdkResult<long>.Fail("TAG_SUBMIT_EXCEPTION", "提交标签数据时发生异常");
+        }
+        finally
+        {
+            // 分块写入可能部分成功，异常或取消时服务端结果也可能不确定。
+            if (writeAttempted)
+            {
+                if (cacheEntityId.HasValue)
+                {
+                    InvalidateTagCaches(cacheEntityId.Value);
+                }
+                userCache.Invalidate(HttpClient.BaseAddress, userId);
+                userCache.InvalidateReviewQueue(HttpClient.BaseAddress);
+            }
         }
     }
 
@@ -154,7 +174,6 @@ public sealed class TagCommandService(
     {
         memoryCache.Remove($"main-site:tag-detail:{tagId}");
         memoryCache.Remove("main-site:tag-tree");
-        memoryCache.Remove($"main-site:tag-edit-records:{tagId}");
-        memoryCache.Remove("main-site:user-content-center");
+        memoryCache.Remove(ExamineCacheKeys.TagEditRecords(tagId));
     }
 }

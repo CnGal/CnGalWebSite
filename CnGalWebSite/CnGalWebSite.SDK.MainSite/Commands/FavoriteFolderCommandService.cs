@@ -21,6 +21,7 @@ public sealed class FavoriteFolderCommandService(
     {
         try
         {
+            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var result =
                 await PostAsJsonAsync<EditFavoriteFolderViewModel, Result>("api/favorites/EditFavoriteFolder",
                     model, cancellationToken);
@@ -34,7 +35,7 @@ public sealed class FavoriteFolderCommandService(
                 return SdkResult<bool>.Fail("FAVORITE_FOLDER_EDIT_FAILED", result.Error ?? "编辑收藏夹失败");
             }
 
-            InvalidateFolderCaches(model.Id);
+            InvalidateFolderCaches(model.Id, userId);
             return SdkResult<bool>.Ok(true);
         }
         catch (Exception ex)
@@ -50,6 +51,7 @@ public sealed class FavoriteFolderCommandService(
     {
         try
         {
+            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var result =
                 await PostAsJsonAsync<CreateFavoriteFolderViewModel, Result>("api/favorites/CreateFavoriteFolder",
                     model, cancellationToken);
@@ -63,7 +65,7 @@ public sealed class FavoriteFolderCommandService(
                 return SdkResult<bool>.Fail("FAVORITE_FOLDER_CREATE_FAILED", result.Error ?? "创建收藏夹失败");
             }
 
-            InvalidateUserFolderListCache();
+            InvalidateUserFolderListCache(userId);
             return SdkResult<bool>.Ok(true);
         }
         catch (Exception ex)
@@ -78,6 +80,7 @@ public sealed class FavoriteFolderCommandService(
     {
         try
         {
+            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var result = await PostAsJsonAsync<DeleteFavoriteObjectsModel, Result>(
                 "api/favorites/UserDeleteFavoriteObject",
                 new DeleteFavoriteObjectsModel { FavorieFolderId = folderId, Ids = objectIds },
@@ -93,7 +96,7 @@ public sealed class FavoriteFolderCommandService(
                 return SdkResult<bool>.Fail("FAVORITE_OBJECT_DELETE_FAILED", result.Error ?? "删除收藏对象失败");
             }
 
-            InvalidateFolderCaches(folderId);
+            InvalidateFolderCaches(folderId, userId);
             return SdkResult<bool>.Ok(true);
         }
         catch (Exception ex)
@@ -109,6 +112,7 @@ public sealed class FavoriteFolderCommandService(
     {
         try
         {
+            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var result = await PostAsJsonAsync<DeleteFavoriteFoldersModel, Result>(
                 "api/favorites/UserDeleteFavoriteFolderAsync",
                 new DeleteFavoriteFoldersModel { Ids = folderIds },
@@ -126,7 +130,7 @@ public sealed class FavoriteFolderCommandService(
 
             foreach (var folderId in folderIds)
             {
-                InvalidateFolderCaches(folderId);
+                InvalidateFolderCaches(folderId, userId);
             }
 
             return SdkResult<bool>.Ok(true);
@@ -143,6 +147,7 @@ public sealed class FavoriteFolderCommandService(
     {
         try
         {
+            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var result = await PostAsJsonAsync<MoveFavoriteObjectsModel, Result>(
                 "api/favorites/MoveFavoriteObjects",
                 model,
@@ -159,11 +164,11 @@ public sealed class FavoriteFolderCommandService(
             }
 
             // Invalidate source folder cache
-            InvalidateFolderCaches(model.CurrentFolderId);
+            InvalidateFolderCaches(model.CurrentFolderId, userId);
             // Invalidate target folder caches
             foreach (var folderId in model.FolderIds)
             {
-                InvalidateFolderCaches(folderId);
+                InvalidateFolderCaches(folderId, userId);
             }
 
             return SdkResult<bool>.Ok(true);
@@ -179,21 +184,20 @@ public sealed class FavoriteFolderCommandService(
     /// <summary>
     /// 清空指定收藏夹的详情缓存，以及当前用户的收藏夹列表缓存和空间详情缓存
     /// </summary>
-    private void InvalidateFolderCaches(long folderId)
+    private void InvalidateFolderCaches(long folderId, string? userId)
     {
         // 清空收藏夹详情缓存
         memoryCache.Remove($"main-site:favorite-folder-detail:{folderId}");
 
         // 清空当前用户的收藏夹列表缓存与空间详情缓存
-        InvalidateUserFolderListCache();
+        InvalidateUserFolderListCache(userId);
     }
 
     /// <summary>
     /// 清空当前用户的收藏夹列表缓存和空间详情缓存
     /// </summary>
-    private void InvalidateUserFolderListCache()
+    private void InvalidateUserFolderListCache(string? userId)
     {
-        var userId = GetCurrentUserId();
         if (string.IsNullOrEmpty(userId))
         {
             return;
@@ -204,18 +208,13 @@ public sealed class FavoriteFolderCommandService(
         memoryCache.Remove($"main-site:space-detail:{userId}");
     }
 
-    private string? GetCurrentUserId()
-    {
-        return currentUserAccessor.GetCurrentUserId();
-    }
-
     public async Task<SdkResult<bool>> AddFavoriteObjectAsync(long objectId, FavoriteObjectType type,
         CancellationToken cancellationToken = default)
     {
         try
         {
             // First, get the user's default folder ids
-            var userId = GetCurrentUserId();
+            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             if (string.IsNullOrEmpty(userId))
             {
                 return SdkResult<bool>.Fail("FAVORITE_NOT_AUTHENTICATED", "未登录，无法收藏");
@@ -251,7 +250,7 @@ public sealed class FavoriteFolderCommandService(
                 return SdkResult<bool>.Fail("FAVORITE_ADD_FAILED", result.Error ?? "收藏失败");
             }
 
-            InvalidateUserFolderListCache();
+            InvalidateUserFolderListCache(userId);
             foreach (var folderId in defaultFolderIds)
             {
                 memoryCache.Remove($"main-site:favorite-folder-detail:{folderId}");
@@ -272,6 +271,7 @@ public sealed class FavoriteFolderCommandService(
     {
         try
         {
+            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var result = await PostAsJsonAsync<UnFavoriteObjectsModel, Result>(
                 "api/favorites/UnFavoriteObjects",
                 new UnFavoriteObjectsModel { ObjectId = objectId, Type = type },
@@ -287,7 +287,7 @@ public sealed class FavoriteFolderCommandService(
                 return SdkResult<bool>.Fail("FAVORITE_REMOVE_FAILED", result.Error ?? "取消收藏失败");
             }
 
-            InvalidateUserFolderListCache();
+            InvalidateUserFolderListCache(userId);
             memoryCache.Remove($"main-site:relate-favorite-folders:{(int)type}:{objectId}");
             return SdkResult<bool>.Ok(true);
         }

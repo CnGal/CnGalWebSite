@@ -12,7 +12,9 @@ namespace CnGalWebSite.SDK.MainSite.Commands;
 public sealed class ArticleCommandService(
     HttpClient httpClient,
     IMemoryCache memoryCache,
-    ILogger<ArticleCommandService> logger) : CommandServiceBase(httpClient), IArticleCommandService
+    ILogger<ArticleCommandService> logger,
+    ExamineUserCache userCache,
+    ICurrentUserAccessor currentUserAccessor) : CommandServiceBase(httpClient), IArticleCommandService
 {
     protected override ILogger Logger => logger;
 
@@ -114,8 +116,14 @@ public sealed class ArticleCommandService(
 
     public async Task<SdkResult<long>> SubmitEditAsync(ArticleEditRequest request, CancellationToken cancellationToken = default)
     {
+        var writeAttempted = false;
+        string? userId = null;
+        long? cacheEntityId = null;
         try
         {
+            userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
+            cacheEntityId = request.IsCreate ? null : request.Data.Main.Id;
+            writeAttempted = true;
             if (request.IsCreate)
             {
                 var response = await PostAsJsonRawAsync("api/articles/Create", request.Data, cancellationToken);
@@ -123,7 +131,7 @@ public sealed class ArticleCommandService(
 
                 if (result?.Successful == true && long.TryParse(result.Error, out var newId))
                 {
-                    InvalidateArticleCaches(newId);
+                    cacheEntityId = newId;
                     return SdkResult<long>.Ok(newId);
                 }
 
@@ -141,9 +149,9 @@ public sealed class ArticleCommandService(
 
                 foreach (var res in responses)
                 {
-                    if (res is { Successful: false })
+                    if (res?.Successful != true)
                     {
-                        errors.Add(res.Error ?? "某个部分保存失败");
+                        errors.Add(res?.Error ?? "某个部分保存失败");
                     }
                 }
 
@@ -152,7 +160,6 @@ public sealed class ArticleCommandService(
                     return SdkResult<long>.Fail("ARTICLE_EDIT_PARTIAL_FAILED", string.Join("；", errors));
                 }
 
-                InvalidateArticleCaches(request.Data.Main.Id);
                 return SdkResult<long>.Ok(request.Data.Main.Id);
             }
         }
@@ -160,6 +167,19 @@ public sealed class ArticleCommandService(
         {
             logger.LogError(ex, "提交文章编辑数据异常。IsCreate={IsCreate}; BaseAddress={BaseAddress}", request.IsCreate, HttpClient.BaseAddress);
             return SdkResult<long>.Fail("ARTICLE_SUBMIT_EXCEPTION", "提交文章数据时发生异常");
+        }
+        finally
+        {
+            // 分块写入可能部分成功，异常或取消时服务端结果也可能不确定。
+            if (writeAttempted)
+            {
+                if (cacheEntityId.HasValue)
+                {
+                    InvalidateArticleCaches(cacheEntityId.Value);
+                }
+                userCache.Invalidate(HttpClient.BaseAddress, userId);
+                userCache.InvalidateReviewQueue(HttpClient.BaseAddress);
+            }
         }
     }
 
@@ -171,8 +191,7 @@ public sealed class ArticleCommandService(
     private void InvalidateArticleCaches(long articleId)
     {
         memoryCache.Remove($"main-site:article-detail:{articleId}");
-        memoryCache.Remove($"main-site:article-edit-records:{articleId}");
-        memoryCache.Remove("main-site:user-content-center");
+        memoryCache.Remove(ExamineCacheKeys.ArticleEditRecords(articleId));
         memoryCache.Remove("main-site:home-summary");
     }
 }

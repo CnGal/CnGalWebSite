@@ -1,5 +1,7 @@
 ﻿using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Text.Json;
 using System.Security.Claims;
 using CnGalWebSite.SDK.MainSite.Models;
 using Microsoft.AspNetCore.Authentication;
@@ -8,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 
@@ -39,16 +42,23 @@ public sealed class CookieOidcRefresher(
         }
 
         var refreshToken = validateContext.Properties.GetTokenValue("refresh_token");
-        var oidcConfiguration = await oidcOptions.ConfigurationManager!.GetConfigurationAsync(validateContext.HttpContext.RequestAborted);
-        var result = await TryRefreshCoreAsync(oidcOptions, oidcConfiguration, refreshToken, validateContext.HttpContext.RequestAborted);
+        TokenRefreshResult? result;
+        try { result = await TryRefreshAsync(refreshToken ?? string.Empty, oidcScheme, validateContext.HttpContext.RequestAborted); }
+        catch (Exception ex) when (IsTransient(ex) && !validateContext.HttpContext.RequestAborted.IsCancellationRequested)
+        {
+            if (accessTokenExpiration <= oidcOptions.TimeProvider.GetUtcNow()) validateContext.RejectPrincipal();
+            return;
+        }
 
-        if (result is null)
+        var subject = validateContext.Principal?.FindFirst("sub");
+        var refreshedSubject = result?.ClaimsIdentity.FindFirst("sub");
+        if (result is null || subject is null || subject.Value != refreshedSubject?.Value || subject.Issuer != refreshedSubject.Issuer)
         {
             validateContext.RejectPrincipal();
             return;
         }
 
-        var expiresAt = now + TimeSpan.FromSeconds(result.Value.ExpiresIn);
+        var expiresAt = oidcOptions.TimeProvider.GetUtcNow() + TimeSpan.FromSeconds(result.Value.ExpiresIn);
         validateContext.ShouldRenew = true;
         validateContext.ReplacePrincipal(new ClaimsPrincipal(result.Value.ClaimsIdentity));
         validateContext.Properties.StoreTokens([
@@ -60,26 +70,31 @@ public sealed class CookieOidcRefresher(
         ]);
     }
 
-    public async Task<TokenRefreshResult?> TryRefreshAsync(HttpContext httpContext, string oidcScheme, bool forceRefresh = false)
+    /// <summary>使用当前作用域内最新的刷新令牌，不重新读取旧 Cookie。</summary>
+    public async Task<TokenRefreshResult?> TryRefreshAsync(string refreshToken, string oidcScheme, CancellationToken cancellationToken)
     {
-        var accessTokenExpirationText = await httpContext.GetTokenAsync("expires_at");
-        if (!DateTimeOffset.TryParse(accessTokenExpirationText, out var accessTokenExpiration))
-        {
-            return null;
-        }
-
+        if (string.IsNullOrWhiteSpace(refreshToken)) return null;
         var oidcOptions = oidcOptionsMonitor.Get(oidcScheme);
-        var now = oidcOptions.TimeProvider!.GetUtcNow();
-        var refreshLeadTime = TimeSpan.FromMinutes(Math.Max(1, mainSiteOidcOptions.Value.RefreshLeadTimeMinutes));
-        if (forceRefresh is false && now + refreshLeadTime < accessTokenExpiration)
+        try
+        {
+            var configuration = await oidcOptions.ConfigurationManager!.GetConfigurationAsync(cancellationToken).WaitAsync(cancellationToken);
+            return await TryRefreshCoreAsync(oidcOptions, configuration, refreshToken, cancellationToken);
+        }
+        catch (Exception ex) when (ex is JsonException or SecurityTokenException or OpenIdConnectProtocolException or ArgumentException)
         {
             return null;
         }
-
-        var refreshToken = await httpContext.GetTokenAsync("refresh_token");
-        var oidcConfiguration = await oidcOptions.ConfigurationManager!.GetConfigurationAsync(httpContext.RequestAborted);
-        return await TryRefreshCoreAsync(oidcOptions, oidcConfiguration, refreshToken, httpContext.RequestAborted);
     }
+
+    internal static bool IsTransient(Exception exception) => exception switch
+    {
+        HttpRequestException request => request.StatusCode is null or HttpStatusCode.TooManyRequests or >= HttpStatusCode.InternalServerError,
+        OperationCanceledException => true, // 调用入口须排除调用方、身份及作用域取消。
+        IOException io when io.Data[HttpDocumentRetriever.StatusCode] is HttpStatusCode status
+            => status is HttpStatusCode.TooManyRequests or >= HttpStatusCode.InternalServerError,
+        IOException or InvalidOperationException when exception.InnerException is { } inner => IsTransient(inner),
+        _ => false
+    };
 
     private async Task<TokenRefreshResult?> TryRefreshCoreAsync(
         OpenIdConnectOptions oidcOptions,
@@ -107,6 +122,8 @@ public sealed class CookieOidcRefresher(
 
         if (!refreshResponse.IsSuccessStatusCode)
         {
+            if (refreshResponse.StatusCode is HttpStatusCode.TooManyRequests or >= HttpStatusCode.InternalServerError)
+                throw new HttpRequestException("Token endpoint temporarily unavailable", null, refreshResponse.StatusCode);
             return null;
         }
 
@@ -131,7 +148,8 @@ public sealed class CookieOidcRefresher(
         }
 
         var validatedIdToken = JwtSecurityTokenConverter.Convert(validationResult.SecurityToken as JsonWebToken);
-        validatedIdToken!.Payload["nonce"] = null;
+        if (validatedIdToken is null) return null;
+        validatedIdToken.Payload["nonce"] = null;
         _oidcTokenValidator.ValidateTokenResponse(new()
         {
             ProtocolMessage = message,
@@ -139,13 +157,15 @@ public sealed class CookieOidcRefresher(
             ValidatedIdToken = validatedIdToken,
         });
 
-        var expiresIn = int.Parse(message.ExpiresIn, NumberStyles.Integer, CultureInfo.InvariantCulture);
+        if (string.IsNullOrWhiteSpace(message.AccessToken)
+            || !int.TryParse(message.ExpiresIn, NumberStyles.Integer, CultureInfo.InvariantCulture, out var expiresIn)
+            || expiresIn <= 0) return null;
 
         return new TokenRefreshResult
         {
             AccessToken = message.AccessToken,
             IdToken = message.IdToken,
-            RefreshToken = message.RefreshToken,
+            RefreshToken = string.IsNullOrWhiteSpace(message.RefreshToken) ? refreshToken : message.RefreshToken,
             TokenType = message.TokenType,
             ExpiresIn = expiresIn,
             ClaimsIdentity = validationResult.ClaimsIdentity,

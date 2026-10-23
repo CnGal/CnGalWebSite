@@ -45,6 +45,7 @@ public sealed class PlayedGameCommandService(
     {
         try
         {
+            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var result = await PostAsJsonAsync<EditGameRecordModel, Result>("api/playedgame/EditGameRecord", model, cancellationToken);
             if (result is null)
             {
@@ -56,7 +57,7 @@ public sealed class PlayedGameCommandService(
                 return SdkResult<bool>.Fail("PLAYED_GAME_SAVE_FAILED", result.Error ?? "保存游玩记录失败");
             }
 
-            InvalidatePlayedGameCaches(model.GameId);
+            InvalidatePlayedGameCaches(model.GameId, userId);
             return SdkResult<bool>.Ok(true);
         }
         catch (HttpRequestException ex)
@@ -76,6 +77,7 @@ public sealed class PlayedGameCommandService(
     {
         try
         {
+            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var request = new HiddenGameRecordModel
             {
                 GameIds = [gameId],
@@ -93,7 +95,7 @@ public sealed class PlayedGameCommandService(
                 return SdkResult<bool>.Fail("PLAYED_GAME_HIDDEN_FAILED", result.Error ?? "修改隐藏状态失败");
             }
 
-            InvalidatePlayedGameCaches(gameId);
+            InvalidatePlayedGameCaches(gameId, userId);
             return SdkResult<bool>.Ok(true);
         }
         catch (HttpRequestException ex)
@@ -109,10 +111,9 @@ public sealed class PlayedGameCommandService(
         }
     }
 
-    private void InvalidatePlayedGameCaches(int gameId)
+    private void InvalidatePlayedGameCaches(int gameId, string? userId)
     {
         memoryCache.Remove($"main-site:played-game-overview:{gameId}");
-        var userId = currentUserAccessor.GetCurrentUserId();
         if (!string.IsNullOrEmpty(userId))
         {
             memoryCache.Remove($"main-site:user-game-records:{userId}");
