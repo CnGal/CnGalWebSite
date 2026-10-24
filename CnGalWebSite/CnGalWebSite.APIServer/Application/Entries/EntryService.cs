@@ -2657,6 +2657,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             model.Games = games;
             model.others = others;
             model.news = news;
+            model.videos = videos;
 
             return model;
         }
