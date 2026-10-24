@@ -3,12 +3,10 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using CnGalWebSite.SDK.MainSite.Abstractions;
-using CnGalWebSite.SDK.MainSite.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace CnGalWebSite.SDK.MainSite.AspNet.Auth;
 
@@ -19,7 +17,6 @@ namespace CnGalWebSite.SDK.MainSite.AspNet.Auth;
 public sealed class CircuitTokenStore(
     IHttpContextAccessor httpContextAccessor,
     CookieOidcRefresher refresher,
-    IOptions<MainSiteOidcOptions> options,
     ILogger<CircuitTokenStore> logger) : IDisposable
 {
     private readonly object _gate = new();
@@ -27,7 +24,6 @@ public sealed class CircuitTokenStore(
     private AuthenticationSnapshot? _snapshot;
     private string? _sourcePrincipalKey;
     private TaskCompletionSource? _initialization;
-    private Task<AuthenticationSnapshot?>? _refresh;
     private long _identityVersion;
     private bool _isCircuit;
     private bool _initialized;
@@ -76,10 +72,7 @@ public sealed class CircuitTokenStore(
         }
 
         var snapshot = CurrentSnapshot;
-        var leadTime = TimeSpan.FromMinutes(Math.Max(1, options.Value.RefreshLeadTimeMinutes));
-        return snapshot is not null && DateTimeOffset.UtcNow + leadTime >= snapshot.ExpiresAt
-            ? await RefreshAsync(snapshot, waiting.Token)
-            : snapshot;
+        return snapshot is null ? null : await RefreshAsync(snapshot, waiting.Token, forceRefresh: false);
     }
 
     private async Task InitializeRequestAsync(HttpContext? context, long version, TaskCompletionSource completion)
@@ -126,7 +119,6 @@ public sealed class CircuitTokenStore(
             version = ++_identityVersion;
             previous = _snapshot;
             _snapshot = null;
-            _refresh = null;
             completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
             _initialization?.TrySetResult();
             _initialization = completion;
@@ -172,73 +164,29 @@ public sealed class CircuitTokenStore(
         // 同时校验当前请求主体，避免把其他身份的票据绑定到 circuit。
         if (principalKey is null || principalKey != AuthenticationSnapshot.GetPrincipalKey(context.User)
             || (expectedPrincipalKey is not null && principalKey != expectedPrincipalKey)) return Missing("principal-mismatch");
-        var accessToken = ticket.Properties?.GetTokenValue("access_token");
-        if (string.IsNullOrWhiteSpace(accessToken)
-            || !DateTimeOffset.TryParse(ticket.Properties?.GetTokenValue("expires_at"), out var expiresAt)) return Missing("token-missing");
-        return new AuthenticationSnapshot(ticket.Principal, accessToken,
-            ticket.Properties?.GetTokenValue("refresh_token") ?? string.Empty, expiresAt, version);
+        var tokens = await refresher.GetSessionTokensAsync(ticket.Principal, null, _lifetime.Token);
+        return tokens is null ? Missing("session-missing") : new AuthenticationSnapshot(tokens, version);
     }
 
     // 仅在 _gate 内调用；旧请求不能取得新登录代次的凭据，即使 sub 又变回原值。
     private AuthenticationSnapshot? SameIdentitySnapshot(AuthenticationSnapshot expected)
         => !_disposed && _snapshot is { } current && current.IdentityVersion == expected.IdentityVersion
-            && current.ExpiresAt > DateTimeOffset.UtcNow ? current : null;
+            && current.ExpiresAt > DateTimeOffset.UtcNow && !current.CacheScope.IdentityChanged.IsCancellationRequested ? current : null;
 
-    internal async Task<AuthenticationSnapshot?> RefreshAsync(AuthenticationSnapshot expected, CancellationToken cancellationToken)
+    internal async Task<AuthenticationSnapshot?> RefreshAsync(AuthenticationSnapshot expected, CancellationToken cancellationToken, bool forceRefresh = true)
     {
-        TaskCompletionSource<AuthenticationSnapshot?>? completion = null;
-        Task<AuthenticationSnapshot?> refresh;
         CancellationToken lifetime;
         lock (_gate)
         {
             if (_disposed || !ReferenceEquals(_snapshot, expected)) return SameIdentitySnapshot(expected);
             lifetime = _lifetime.Token;
-            if (_refresh is null)
-            {
-                completion = new(TaskCreationOptions.RunContinuationsAsynchronously);
-                _refresh = completion.Task;
-            }
-            refresh = _refresh;
         }
-        if (completion is not null) _ = RefreshCoreAsync(expected, completion, lifetime);
-        // 请求取消只退出本次等待；共享刷新受作用域寿命和独立超时控制。
-        return await refresh.WaitAsync(cancellationToken);
-    }
-
-    private async Task RefreshCoreAsync(AuthenticationSnapshot expected,
-        TaskCompletionSource<AuthenticationSnapshot?> completion, CancellationToken lifetime)
-    {
-        AuthenticationSnapshot? replacement = null;
-        try
-        {
-            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(lifetime, expected.CacheScope.IdentityChanged);
-            timeout.CancelAfter(TimeSpan.FromSeconds(30));
-            var result = await refresher.TryRefreshAsync(expected.RefreshToken, MainSiteOidcOptions.OidcScheme, timeout.Token);
-            if (result is not null)
-            {
-                var principal = new ClaimsPrincipal(result.Value.ClaimsIdentity);
-                var subject = principal.FindFirst("sub");
-                var previousSubject = expected.Principal.FindFirst("sub");
-                if (principal.Identity?.IsAuthenticated == true && subject is not null
-                    && subject.Value == previousSubject?.Value && subject.Issuer == previousSubject.Issuer)
-                {
-                    replacement = new AuthenticationSnapshot(principal, result.Value.AccessToken,
-                        result.Value.RefreshToken, DateTimeOffset.UtcNow.AddSeconds(result.Value.ExpiresIn), expected.IdentityVersion);
-                }
-            }
-        }
-        catch (Exception ex) when (CookieOidcRefresher.IsTransient(ex)
-            && !lifetime.IsCancellationRequested && !expected.CacheScope.IdentityChanged.IsCancellationRequested
-            && expected.ExpiresAt > DateTimeOffset.UtcNow)
-        {
-            replacement = expected;
-            logger.LogWarning("SDK 令牌刷新暂时失败，保留仍有效的快照。Reason=transient-refresh-failure");
-        }
-        catch (OperationCanceledException) { }
-        catch (Exception)
-        {
-            logger.LogWarning("SDK 令牌刷新失败，旧认证快照已失效");
-        }
+        using var waiting = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, lifetime);
+        var tokens = await refresher.GetSessionTokensAsync(expected.Principal,
+            forceRefresh ? expected.AccessToken : null, waiting.Token);
+        AuthenticationSnapshot? replacement = tokens is null ? null
+            : tokens.AccessToken == expected.AccessToken && !expected.CacheScope.IdentityChanged.IsCancellationRequested
+                ? expected : new AuthenticationSnapshot(tokens, expected.IdentityVersion);
 
         AuthenticationSnapshot? current;
         var replaced = false;
@@ -251,13 +199,12 @@ public sealed class CircuitTokenStore(
                 replaced = !ReferenceEquals(replacement, expected);
                 _snapshot = replacement;
                 replacement = null;
-                _refresh = null;
             }
             current = SameIdentitySnapshot(expected);
         }
         replacement?.Invalidate();
         if (replaced) expected.Invalidate();
-        completion.TrySetResult(current);
+        return current;
     }
 
     internal void Clear()
@@ -269,7 +216,6 @@ public sealed class CircuitTokenStore(
             _ticketEstablished = true;
             previous = _snapshot;
             _snapshot = null;
-            _refresh = null;
             _initialization?.TrySetResult();
             _initialization = null;
         }
@@ -291,15 +237,15 @@ public sealed class CircuitTokenStore(
 
 internal sealed class AuthenticationSnapshot
 {
-    private readonly CancellationTokenSource _changed = new();
+    private readonly CancellationTokenSource _changed;
     private int _invalidated;
 
-    internal AuthenticationSnapshot(ClaimsPrincipal principal, string accessToken, string refreshToken, DateTimeOffset expiresAt, long identityVersion)
+    internal AuthenticationSnapshot(SessionTokenStore.Tokens tokens, long identityVersion)
     {
-        Principal = principal.Clone();
-        AccessToken = accessToken;
-        RefreshToken = refreshToken;
-        ExpiresAt = expiresAt;
+        _changed = CancellationTokenSource.CreateLinkedTokenSource(tokens.Changed);
+        Principal = new ClaimsPrincipal(tokens.Principal.Identities.Select(identity => identity.Clone()));
+        AccessToken = tokens.AccessToken;
+        ExpiresAt = tokens.ExpiresAt;
         IdentityVersion = identityVersion;
         UserId = Principal.FindFirst("sub")!.Value;
         PrincipalKey = GetPrincipalKey(Principal)!;
@@ -307,7 +253,7 @@ internal sealed class AuthenticationSnapshot
         var authorizationKey = Convert.ToHexString(SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(new
         {
             PrincipalKey,
-            TokenGeneration = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(accessToken)))
+            TokenGeneration = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(AccessToken)))
         })));
         CacheScope = new(UserId, authorizationKey) { IdentityChanged = _changed.Token };
     }
@@ -316,7 +262,6 @@ internal sealed class AuthenticationSnapshot
     internal string UserId { get; }
     internal string PrincipalKey { get; }
     internal string AccessToken { get; }
-    internal string RefreshToken { get; }
     internal DateTimeOffset ExpiresAt { get; }
     internal long IdentityVersion { get; }
     internal CurrentUserCacheScope CacheScope { get; }

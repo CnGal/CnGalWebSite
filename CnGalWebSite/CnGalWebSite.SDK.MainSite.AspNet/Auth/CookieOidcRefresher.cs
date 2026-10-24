@@ -18,59 +18,37 @@ namespace CnGalWebSite.SDK.MainSite.AspNet.Auth;
 
 public sealed class CookieOidcRefresher(
     IOptionsMonitor<OpenIdConnectOptions> oidcOptionsMonitor,
-    IOptions<MainSiteOidcOptions> mainSiteOidcOptions)
+    SessionTokenStore sessions)
 {
     private readonly OpenIdConnectProtocolValidator _oidcTokenValidator = new()
     {
         RequireNonce = false,
     };
 
-    public async Task ValidateOrRefreshCookieAsync(CookieValidatePrincipalContext validateContext, string oidcScheme)
+    public async Task ValidateOrRefreshCookieAsync(CookieValidatePrincipalContext validateContext)
     {
-        var accessTokenExpirationText = validateContext.Properties.GetTokenValue("expires_at");
-        if (!DateTimeOffset.TryParse(accessTokenExpirationText, out var accessTokenExpiration))
+        var tokens = validateContext.Principal is { } principal
+            ? await GetSessionTokensAsync(principal, null, validateContext.HttpContext.RequestAborted)
+            : null;
+        if (tokens is null || tokens.Changed.IsCancellationRequested)
         {
-            return;
-        }
-
-        var oidcOptions = oidcOptionsMonitor.Get(oidcScheme);
-        var now = oidcOptions.TimeProvider!.GetUtcNow();
-        var refreshLeadTime = TimeSpan.FromMinutes(Math.Max(1, mainSiteOidcOptions.Value.RefreshLeadTimeMinutes));
-        if (now + refreshLeadTime < accessTokenExpiration)
-        {
-            return;
-        }
-
-        var refreshToken = validateContext.Properties.GetTokenValue("refresh_token");
-        TokenRefreshResult? result;
-        try { result = await TryRefreshAsync(refreshToken ?? string.Empty, oidcScheme, validateContext.HttpContext.RequestAborted); }
-        catch (Exception ex) when (IsTransient(ex) && !validateContext.HttpContext.RequestAborted.IsCancellationRequested)
-        {
-            if (accessTokenExpiration <= oidcOptions.TimeProvider.GetUtcNow()) validateContext.RejectPrincipal();
-            return;
-        }
-
-        var subject = validateContext.Principal?.FindFirst("sub");
-        var refreshedSubject = result?.ClaimsIdentity.FindFirst("sub");
-        if (result is null || subject is null || subject.Value != refreshedSubject?.Value || subject.Issuer != refreshedSubject.Issuer)
-        {
+            sessions.Remove(validateContext.Principal);
             validateContext.RejectPrincipal();
             return;
         }
 
-        var expiresAt = oidcOptions.TimeProvider.GetUtcNow() + TimeSpan.FromSeconds(result.Value.ExpiresIn);
-        validateContext.ShouldRenew = true;
-        validateContext.ReplacePrincipal(new ClaimsPrincipal(result.Value.ClaimsIdentity));
+        validateContext.ShouldRenew = validateContext.Properties.GetTokenValue("id_token") != tokens.IdToken;
+        validateContext.ReplacePrincipal(new ClaimsPrincipal(tokens.Principal.Identities.Select(identity => identity.Clone())));
         validateContext.Properties.StoreTokens([
-            new() { Name = "access_token", Value = result.Value.AccessToken },
-            new() { Name = "id_token", Value = result.Value.IdToken },
-            new() { Name = "refresh_token", Value = result.Value.RefreshToken },
-            new() { Name = "token_type", Value = result.Value.TokenType },
-            new() { Name = "expires_at", Value = expiresAt.ToString("o", CultureInfo.InvariantCulture) },
+            new() { Name = "id_token", Value = tokens.IdToken },
         ]);
     }
 
-    /// <summary>使用当前作用域内最新的刷新令牌，不重新读取旧 Cookie。</summary>
+    internal Task<SessionTokenStore.Tokens?> GetSessionTokensAsync(ClaimsPrincipal principal, string? rejectedAccessToken,
+        CancellationToken cancellationToken) => sessions.GetAsync(principal, rejectedAccessToken,
+            (token, cancellation) => TryRefreshAsync(token, MainSiteOidcOptions.OidcScheme, cancellation), cancellationToken);
+
+    /// <summary>仅由会话存储协调刷新；不重新读取 Cookie 中的旧令牌。</summary>
     public async Task<TokenRefreshResult?> TryRefreshAsync(string refreshToken, string oidcScheme, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(refreshToken)) return null;

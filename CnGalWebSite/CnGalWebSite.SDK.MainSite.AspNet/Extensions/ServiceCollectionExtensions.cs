@@ -8,6 +8,7 @@ using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Queries;
 using CnGalWebSite.SDK.MainSite.Services.Toolbox;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Components.Server.Circuits;
@@ -39,6 +40,7 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
         services.AddSingleton<IMainSiteAuthRequestService, MainSiteAuthRequestService>();
         services.AddSingleton<CookieOidcRefresher>();
+        services.AddSingleton<SessionTokenStore>();
         services.Configure<MainSiteOidcOptions>(configuration.GetSection(MainSiteOidcOptions.SectionName));
 
         services.AddAuthentication(options =>
@@ -113,10 +115,20 @@ public static class ServiceCollectionExtensions
         });
 
         services.AddOptions<CookieAuthenticationOptions>(CookieAuthenticationDefaults.AuthenticationScheme)
-            .Configure<CookieOidcRefresher>((cookieOptions, refresher) =>
+            .Configure<CookieOidcRefresher, SessionTokenStore>((cookieOptions, refresher, sessions) =>
             {
+                cookieOptions.Events.OnSigningIn = async context =>
+                {
+                    var previous = await context.HttpContext.AuthenticateAsync(context.Scheme.Name);
+                    sessions.Create(context.Principal!, context.Properties, previous.Principal);
+                };
+                cookieOptions.Events.OnSigningOut = async context =>
+                {
+                    var ticket = await context.HttpContext.AuthenticateAsync(context.Scheme.Name);
+                    sessions.Remove(ticket.Principal);
+                };
                 cookieOptions.Events.OnValidatePrincipal = context =>
-                    refresher.ValidateOrRefreshCookieAsync(context, MainSiteOidcOptions.OidcScheme);
+                    refresher.ValidateOrRefreshCookieAsync(context);
             });
 
         services.AddAuthorization();

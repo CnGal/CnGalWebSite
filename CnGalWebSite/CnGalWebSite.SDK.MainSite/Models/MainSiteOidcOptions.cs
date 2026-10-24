@@ -18,4 +18,8 @@ public sealed class MainSiteOidcOptions
     public int PersistentLoginDays { get; init; } = 30;
 
     public int RefreshLeadTimeMinutes { get; init; } = 5;
+
+    public int MaxSessions { get; init; } = 10_000;
+
+    public int MaxSessionsPerUser { get; init; } = 20;
 }
