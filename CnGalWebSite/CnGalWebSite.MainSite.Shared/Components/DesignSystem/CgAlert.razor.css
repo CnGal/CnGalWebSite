@@ -9,6 +9,12 @@
     border: 1px solid transparent;
     border-left: 4px solid transparent;
     align-items: center;
+    /* 提示条后若有内容则留出间距；父容器已有 gap 时可通过该变量归零。 */
+    margin-block-end: var(--cg-alert-margin-bottom, var(--cg-spacing-4));
+}
+
+.cg-alert:last-child {
+    margin-block-end: 0;
 }
 
 ::deep .cg-alert__icon {

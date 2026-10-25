@@ -18,3 +18,8 @@
     margin-left: var(--cg-spacing-4);
     color: var(--cg-color-text-secondary);
 }
+
+/* CgAlert 所在容器已通过 gap 提供间距，避免重复添加底部间距 */
+.bind-steam-container > ::deep .cg-alert {
+    --cg-alert-margin-bottom: 0;
+}

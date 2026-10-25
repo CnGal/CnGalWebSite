@@ -166,16 +166,6 @@
     pointer-events: none;
 }
 
-/* ── 消息提示 ── */
-.cg-image-upload__message {
-    font-size: var(--cg-font-size-sm);
-    line-height: 1.4;
-}
-
-.cg-image-upload__message--error {
-    color: var(--cg-color-error);
-}
-
 /* ── 裁剪对话框 ── */
 .cg-image-upload__cropper {
     display: flex;
@@ -211,7 +201,7 @@
 .cg-image-upload__crop-overlay {
     position: absolute;
     border: 2px solid var(--cg-color-primary);
-    background: color-mix(in oklab, var(--cg-color-primary) 12%, transparent);
+    background: transparent;
     cursor: move;
     box-sizing: border-box;
 }

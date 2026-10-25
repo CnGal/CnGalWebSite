@@ -93,3 +93,11 @@
         align-items: start;
     }
 }
+
+/* CgAlert 所在容器已通过 gap 提供间距，避免重复添加底部间距 */
+.periphery-page > ::deep .cg-alert,
+.periphery-main-col > ::deep .cg-alert,
+.periphery-side-col > ::deep .cg-alert,
+.periphery-layout--mobile > ::deep .cg-alert {
+    --cg-alert-margin-bottom: 0;
+}

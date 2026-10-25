@@ -57,3 +57,8 @@
     font-weight: var(--cg-font-weight-bold);
     color: var(--cg-color-primary);
 }
+
+/* CgAlert 所在容器已通过 gap 提供间距，避免重复添加底部间距 */
+.lottery-op-card > ::deep .cg-alert {
+    --cg-alert-margin-bottom: 0;
+}

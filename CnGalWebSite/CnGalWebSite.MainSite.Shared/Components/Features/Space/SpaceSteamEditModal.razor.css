@@ -105,3 +105,8 @@
     border-radius: var(--cg-radius-md);
     font-size: var(--cg-font-size-sm);
 }
+
+/* CgAlert 所在容器已通过 gap 提供间距，避免重复添加底部间距 */
+.space-steam-edit > ::deep .cg-alert {
+    --cg-alert-margin-bottom: 0;
+}

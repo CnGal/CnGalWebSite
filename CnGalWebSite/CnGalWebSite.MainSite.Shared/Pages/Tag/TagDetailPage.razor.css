@@ -87,3 +87,9 @@
         gap: var(--cg-spacing-6);
     }
 }
+
+/* CgAlert 所在容器已通过 gap 提供间距，避免重复添加底部间距 */
+.tag-page > ::deep .cg-alert,
+.tag-footer-related > ::deep .cg-alert {
+    --cg-alert-margin-bottom: 0;
+}

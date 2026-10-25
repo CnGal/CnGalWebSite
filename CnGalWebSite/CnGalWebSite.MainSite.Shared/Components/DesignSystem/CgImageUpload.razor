@@ -5,6 +5,7 @@
 @implements IAsyncDisposable
 @inject IJSRuntime JSRuntime
 @inject IFileCommandService FileCommandService
+@inject ICgToastService ToastService
 
 <div class="cg-image-upload @Class">
     @if (ShowPreview)
@@ -79,10 +80,6 @@
         </div>
     }
 
-    @if (!string.IsNullOrWhiteSpace(_errorMessage))
-    {
-        <div class="cg-image-upload__message cg-image-upload__message--error">@_errorMessage</div>
-    }
 </div>
 
 <CgModal IsOpen="@_cropDialogOpen" Title="裁剪图片" OnClose="CloseCropDialogAsync">
@@ -121,7 +118,6 @@
     private const long MaxUploadBytes = 10 * 1024 * 1024;
     private readonly string _inputId = $"cg-image-upload-{Guid.NewGuid():N}";
     private bool _isUploading;
-    private string? _errorMessage;
     private string? _localImagePath;
     private bool _cropDialogOpen;
     private IBrowserFile? _pendingFile;
@@ -211,7 +207,6 @@
             return;
         }
 
-        _errorMessage = null;
         if (Multiple)
         {
             foreach (var file in args.GetMultipleFiles())
@@ -225,7 +220,7 @@
         var selected = args.File;
         if (selected.Size > MaxUploadBytes)
         {
-            _errorMessage = "上传失败：图片过大（最大 10MB）";
+            ShowErrorToast("图片上传失败", $"图片过大，最大支持 {MaxUploadBytes / 1024 / 1024}MB");
             return;
         }
 
@@ -247,12 +242,12 @@
         catch (IOException)
         {
             ResetPendingCrop();
-            _errorMessage = "上传失败：图片过大（最大 10MB）";
+            ShowErrorToast("图片上传失败", $"图片过大，最大支持 {MaxUploadBytes / 1024 / 1024}MB");
         }
         catch (Exception ex)
         {
             ResetPendingCrop();
-            _errorMessage = $"读取图片失败：{ex.Message}";
+            ShowErrorToast("读取图片失败", ex.Message);
         }
     }
 
@@ -263,7 +258,7 @@
         _cropDialogOpen = false;
     }
 
-    private async Task UploadSingleFileAsync(IBrowserFile file, bool cropped, ImageCropRect? cropRect = null)
+    private async Task<bool> UploadSingleFileAsync(IBrowserFile file, bool cropped, ImageCropRect? cropRect = null)
     {
         _isUploading = true;
         try
@@ -275,24 +270,29 @@
                 cropped ? cropRect : null,
                 _lifetime.Token);
 
-            if (result is null)
+            if (!result.Success || result.Data is null)
             {
-                _errorMessage = "上传失败";
-                return;
+                ShowErrorToast("图片上传失败", result.Error?.Message ?? "上传失败，请稍后重试");
+                return false;
             }
 
-            if (_disposed) return;
-            await ChangeImageUrlAsync(result.Url);
-            _errorMessage = null;
+            if (_disposed) return false;
+            await ChangeImageUrlAsync(result.Data.Url);
+            return true;
         }
-        catch (OperationCanceledException) when (_lifetime.IsCancellationRequested) { }
+        catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
+        {
+            return false;
+        }
         catch (IOException)
         {
-            _errorMessage = "上传失败：图片过大（最大 10MB）";
+            ShowErrorToast("图片上传失败", $"图片过大，最大支持 {MaxUploadBytes / 1024 / 1024}MB");
+            return false;
         }
         catch (Exception ex)
         {
-            _errorMessage = $"上传失败：{ex.Message}";
+            ShowErrorToast("图片上传失败", ex.Message);
+            return false;
         }
         finally
         {
@@ -312,16 +312,19 @@
         {
             if (_cropController is null)
             {
-                _errorMessage = "裁剪器尚未准备好，请稍后重试或直接上传";
+                ShowErrorToast("裁剪上传失败", "裁剪器尚未准备好，请稍后重试或直接上传");
                 return;
             }
             _cropRect = await _cropController.InvokeAsync<CropRect>("getRect");
             var cropRect = new ImageCropRect(_cropRect.X, _cropRect.Y, _cropRect.Width, _cropRect.Height);
-            await UploadSingleFileAsync(_pendingFile, cropped: true, cropRect: cropRect);
+            if (await UploadSingleFileAsync(_pendingFile, cropped: true, cropRect: cropRect) is false)
+            {
+                return;
+            }
         }
         catch (Exception ex)
         {
-            _errorMessage = $"裁剪上传失败：{ex.Message}";
+            ShowErrorToast("裁剪上传失败", ex.Message);
             return;
         }
         finally
@@ -339,8 +342,10 @@
             return;
         }
 
-        await UploadSingleFileAsync(_pendingFile, cropped: false);
-        _cropDialogOpen = false;
+        if (await UploadSingleFileAsync(_pendingFile, cropped: false))
+        {
+            _cropDialogOpen = false;
+        }
     }
 
     private Task CloseCropDialogAsync()
@@ -353,7 +358,6 @@
 
     private async Task OnCleanAsync(MouseEventArgs _)
     {
-        _errorMessage = null;
         await ChangeImageUrlAsync(null);
     }
 
@@ -393,7 +397,11 @@
             _cropController = await module.InvokeAsync<IJSObjectReference>("create", _cropStageRef, _cropRect, GetTargetRatio(Type), _callback);
             if (_disposed) { await _cropController.InvokeVoidAsync("dispose"); await _cropController.DisposeAsync(); return; }
         }
-        catch (JSException ex) { _errorMessage = "裁剪器加载失败，可以直接上传"; Console.Error.WriteLine($"CgImageUpload crop: {ex.Message}"); }
+        catch (JSException ex)
+        {
+            ShowErrorToast("裁剪器加载失败", "可以直接上传图片");
+            Console.Error.WriteLine($"CgImageUpload crop: {ex.Message}");
+        }
     }
 
     [JSInvokable]
@@ -408,6 +416,11 @@
             "import",
             "./_content/CnGalWebSite.MainSite.Shared/Components/DesignSystem/CgImageUpload.razor.js");
         return _jsModule;
+    }
+
+    private void ShowErrorToast(string title, string? detail)
+    {
+        ToastService.Show(title, detail, "error");
     }
 
     private static double? GetTargetRatio(ImageAspectType type)

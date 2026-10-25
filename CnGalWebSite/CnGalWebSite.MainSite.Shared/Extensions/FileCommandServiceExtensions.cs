@@ -1,4 +1,5 @@
 using CnGalWebSite.SDK.MainSite.Abstractions;
+using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.Files;
 using Microsoft.AspNetCore.Components.Forms;
 
@@ -9,7 +10,7 @@ public static class FileCommandServiceExtensions
     private const long MaxImageUploadBytes = 10 * 1024 * 1024;
     private const long MaxAudioUploadBytes = 50 * 1024 * 1024;
 
-    public static async Task<ImageUploadResult?> UploadImageAsync(
+    public static async Task<SdkResult<ImageUploadResult>> UploadImageAsync(
         this IFileCommandService service,
         IBrowserFile file,
         ImageAspectType aspectType,
@@ -22,10 +23,17 @@ public static class FileCommandServiceExtensions
             stream, file.Name, aspectType, gallery, cropRect, ct);
         if (!result.Success || string.IsNullOrWhiteSpace(result.Data))
         {
-            return null;
+            return SdkResult<ImageUploadResult>.Fail(
+                result.Error?.Code ?? "FILE_UPLOAD_FAILED",
+                result.Error?.Message ?? "上传失败",
+                result.Error?.StatusCode);
         }
 
-        return new ImageUploadResult { Url = result.Data, FileName = file.Name };
+        return SdkResult<ImageUploadResult>.Ok(new ImageUploadResult
+        {
+            Url = result.Data,
+            FileName = file.Name
+        });
     }
 
     public static async Task<AudioUploadResult?> UploadAudioAsync(
