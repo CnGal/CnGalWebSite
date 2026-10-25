@@ -10,6 +10,8 @@ internal static class SdkFailure
     {
         if (exception is SdkIdentityChangedException)
             return SdkResult<T>.Fail("SDK_IDENTITY_CHANGED", exception.Message);
+        if (exception is SdkBusinessException business)
+            return SdkResult<T>.Fail(code.Replace("_EXCEPTION", "_FAILED"), business.Message, business.StatusCode);
         if (exception is TimeoutException or TimeoutRejectedException or OperationCanceledException)
             return SdkResult<T>.Fail(code.Replace("_EXCEPTION", "_TIMEOUT"), "请求超时，请稍后重试");
         if (exception is HttpRequestException http)

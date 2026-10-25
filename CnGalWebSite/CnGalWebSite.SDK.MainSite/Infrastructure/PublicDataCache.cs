@@ -36,45 +36,20 @@ public sealed class PublicDataCache(IMemoryCache storage, ICurrentUserAccessor u
 
     private object Key(object key, ReadScope scope) => (_source, scope.CacheVersion, key);
 
-    private bool IsGenerationCurrent(ReadScope scope) => _generation is null
-        ? scope.CacheVersion == 0
-        : scope.CacheVersion == Volatile.Read(ref _generation.Value);
-
-    private bool IsCompletionValid(ReadScope scope)
-    {
-        if (scope.IdentityVersion != user.IdentityVersion)
-        {
-            return false;
-        }
-
-        // Anonymous responses can outlive a write. Refuse to surface data that
-        // was fetched before an invalidation; callers show a retryable error.
-        return !scope.Anonymous
-            || (IsGenerationCurrent(scope) && user.GetIdentityState() == CurrentIdentityState.Anonymous);
-    }
-
     public SdkResult<T> Complete<T>(T value, ReadScope scope)
-    {
-        if (scope.IdentityVersion != user.IdentityVersion)
-        {
-            return SdkResult<T>.Fail("SDK_IDENTITY_CHANGED", "会话身份已改变，请重新加载页面");
-        }
-
-        return IsCompletionValid(scope)
-            ? SdkResult<T>.Ok(value)
-            : SdkResult<T>.Fail("SDK_DATA_CHANGED", "数据已在请求期间更新，请重新加载页面");
-    }
+        => CompleteResult(SdkResult<T>.Ok(value), scope);
 
     public SdkResult<T> CompleteResult<T>(SdkResult<T> result, ReadScope scope)
     {
-        if (scope.IdentityVersion != user.IdentityVersion)
+        if (scope.IdentityVersion != user.IdentityVersion
+            || (scope.Anonymous && user.GetIdentityState() != CurrentIdentityState.Anonymous))
         {
             return SdkResult<T>.Fail("SDK_IDENTITY_CHANGED", "会话身份已改变，请重新加载页面");
         }
 
-        return IsCompletionValid(scope)
-            ? result
-            : SdkResult<T>.Fail("SDK_DATA_CHANGED", "数据已在请求期间更新，请重新加载页面");
+        // A write invalidates cache access and refill, not the read's response.
+        // Return its snapshot (or original failure) without retrying unrelated work.
+        return result;
     }
 
     public bool TryGetValue<T>(object key, out T? value, ReadScope scope)
@@ -91,7 +66,8 @@ public sealed class PublicDataCache(IMemoryCache storage, ICurrentUserAccessor u
 
     public void Invalidate()
     {
-        // All related lists and in-flight responses expire together; old keys age out through their short TTL.
+        // Old entries become unreachable and in-flight reads cannot refill them.
+        // Entries from previous generations age out through their short TTL.
         if (_generation is not null) Interlocked.Increment(ref _generation.Value);
     }
 

@@ -156,6 +156,7 @@ CnGalWebSite.SDK.MainSite.AspNet
 - **`SdkResult<T>`**：统一结果模型（`Success` + `Data` / `Error(Code, Message, StatusCode)`）。
 - **`QueryServiceBase`**：封装 `GetAsyncWithBody`、`Deserialize<T>`、`TrimForLog` 及 `GetSingleAsync`、`GetListSafeAsync`、`GetResultSafeAsync`、`GetAsync`、`PostAsync`。
 - **`CommandServiceBase`**：封装 `GetFromJsonAsync`、`PostAsJsonAsync`、`PostAsJsonRawAsync`、`ReadResponseAsync`，写请求出口会推进对应 API 来源的公共缓存失效代次。
+- **`SdkResponse` / `SdkFailure`**：统一 Command 响应读取和异常映射；4xx JSON 中明确的业务拒绝保留提示和 HTTP 状态码，其他 HTTP 错误不回显原始正文。
 - **`SdkJsonSerializerOptions`**：统一 Web JSON 配置、字符串枚举转换和 DateTime 转换。
 - **`PublicDataCache`**：按 API 来源、身份代次和失效代次封装匿名公共缓存；查询开始时调用 `BeginQueryAsync` 捕获作用域。
 - **`SdkRequestPolicy`**：只有显式标记 `AllowReplay` 的请求允许重试；GET 读取辅助方法会设置该标记，写接口统一使用 POST。标准弹性处理器和 `AccessTokenHandler` 的 401 刷新重发都只作用于可重放请求。
@@ -166,7 +167,7 @@ CnGalWebSite.SDK.MainSite.AspNet
 
 - `ICurrentUserAccessor` 显式区分 `Unknown`、`Anonymous`、`Authenticated` 并提供身份代次；登录或身份未确定时不得写入匿名公共缓存。
 - `SessionTokenStore`、`CircuitTokenStore`、`AuthenticationCircuitHandler` 和 `AuthenticatedSdkClients` 负责令牌快照、Circuit 生命周期和认证传输；POST 默认不自动重发，`GetFromJsonAsync` 仅用于可安全重试的 GET 读取，写接口统一使用 POST。
-- `PublicDataCache` 失效采用来源级代次推进，旧代次响应不得回填；缓存对象按只读快照使用。
+- `PublicDataCache` 失效采用来源级代次推进，旧代次响应不得回填；并发读取仍返回其正常快照或原始错误，不因其他用户的写操作失败或重试。身份变化仍会拦截旧结果；缓存对象按只读快照使用。
 - `PublicHtmlCachePolicy` 不是路由白名单：页面只要通过 `PageResponseState` 标记成功，且请求为匿名 GET、响应为 200、无 `Authorization` / `Set-Cookie`、无 MiniMode Cookie 或查询参数、除主题 Cookie 外无其他 Cookie，即可共享缓存。主题只由客户端脚本应用；MiniMode 会改变 SSR 输出，因此被明确排除。
 
 ### 5.5 SEO、主题与通知

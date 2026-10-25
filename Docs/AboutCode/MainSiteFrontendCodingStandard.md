@@ -290,11 +290,13 @@
 - 交互页面可使用 `ICgToastService` 进行轻量级操作反馈通知（成功/失败/警告/信息），服务通过 `AddMainSiteSharedServices()` 注册。
 - 静态公共页面应通过 `PageResponseState` 上报结果，供 `PublicHtmlCachePolicy` 决定是否允许共享缓存。
 - 不可恢复错误要有明确回退路径（返回首页、重试等）。
+- Command 响应中的 4xx JSON 业务拒绝（`Successful=false` 且 `Error` 非空）应通过 `SdkResponse` / `SdkFailure` 保留业务提示和 HTTP 状态码；非约定格式及 5xx 响应继续显示通用 HTTP 错误，不直接回显响应正文。
 
 ### 7.4 缓存与身份（MUST）
 
 - SDK 公共数据缓存只保存确认匿名、身份代次未变化的数据；`PublicDataCache.BeginQueryAsync` 每次查询捕获身份与失效代次。
 - 写请求通过 `CommandServiceBase` 推进对应 API 来源的失效代次；旧代次结果不得回填。
+- 缓存失效只影响缓存命中和回填，不把并发读取的正常快照或原始错误改为页面失败，也不因此重发请求；身份代次变化仍必须拒绝旧身份结果。
 - HTML 是否可共享只由 `PublicHtmlCachePolicy` 决定；默认 `private, no-store`。当前实现要求页面通过 `PageResponseState` 标记成功、请求为 GET、响应 200、未认证、无 `Authorization` / `Set-Cookie`、无 MiniMode Cookie 或查询参数，且除主题 Cookie 外无其他 Cookie。
 - 因此新增/改造静态公共页面时必须调用 `PageResponseState.Succeeded()` / `Failed(...)`；未上报结果的页面不会被共享缓存。
 

@@ -24,8 +24,7 @@ public abstract class CommandServiceBase(HttpClient httpClient, PublicDataCache 
     {
         using var request = SdkRequestPolicy.Read(HttpMethod.Get, requestUri);
         using var response = await HttpClient.SendAsync(request, cancellationToken);
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<T>(SdkJsonSerializerOptions.Default, cancellationToken);
+        return await ReadResponseAsync<T>(response, cancellationToken);
     }
 
     /// <summary>
@@ -37,8 +36,7 @@ public abstract class CommandServiceBase(HttpClient httpClient, PublicDataCache 
         CancellationToken cancellationToken)
     {
         using var response = await PostAsJsonRawAsync(requestUri, request, cancellationToken);
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<TResponse>(SdkJsonSerializerOptions.Default, cancellationToken);
+        return await ReadResponseAsync<TResponse>(response, cancellationToken);
     }
 
     /// <summary>
@@ -57,7 +55,7 @@ public abstract class CommandServiceBase(HttpClient httpClient, PublicDataCache 
         }
         finally
         {
-            // A lost response can still mean the write committed. Expire both cached and in-flight reads.
+            // A lost response can still mean the write committed. Invalidate cached data and prevent stale refill.
             if (!readOnly) PublicCache.Invalidate();
         }
     }
@@ -67,6 +65,6 @@ public abstract class CommandServiceBase(HttpClient httpClient, PublicDataCache 
     /// </summary>
     protected static Task<T?> ReadResponseAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken)
     {
-        return response.Content.ReadFromJsonAsync<T>(SdkJsonSerializerOptions.Default, cancellationToken);
+        return SdkResponse.ReadAsync<T>(response, cancellationToken);
     }
 }
