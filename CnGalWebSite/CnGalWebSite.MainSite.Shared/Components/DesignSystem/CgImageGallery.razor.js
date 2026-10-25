@@ -8,6 +8,16 @@ export function mount(root, { signal }) {
     let dialog;
     const owned = selector => [...root.querySelectorAll(selector)].filter(el => el.closest('cg-image-gallery') === root);
     const slides = () => owned('.cg-image-gallery__preview-slide');
+    const updateFilmstripState = () => {
+        for (const track of owned('.cg-image-gallery__filmstrip-track, .cg-image-gallery__fullscreen-filmstrip-track')) {
+            const strip = track.parentElement;
+            if (!strip) continue;
+            const scrollable = track.scrollWidth > track.clientWidth + 1;
+            strip.classList.toggle('cg-image-gallery__filmstrip--scrollable', scrollable);
+        }
+    };
+    const resizeObserver = new ResizeObserver(updateFilmstripState);
+    resizeObserver.observe(root);
     function render() {
         const items = slides();
         if (!items.length) return;
@@ -27,6 +37,7 @@ export function mount(root, { signal }) {
         const counter = root.querySelector('[data-cg-image-gallery-counter]');
         const count = `${selected + 1} / ${items.length}`;
         if (counter && counter.textContent !== count) counter.textContent = count;
+        requestAnimationFrame(updateFilmstripState);
     }
     function update() {
         const element = root.querySelector('dialog');
@@ -62,7 +73,12 @@ export function mount(root, { signal }) {
             if (target.matches('.cg-image-gallery__preview-slide')) dialog.open(target);
             return;
         }
-        if (target.matches('.cg-image-gallery__preview-fullscreen-btn')) { update(); dialog?.open(target); return; }
+        if (target.matches('.cg-image-gallery__preview-fullscreen-btn')) {
+            update();
+            dialog?.open(target);
+            requestAnimationFrame(updateFilmstripState);
+            return;
+        }
         if (target.className?.includes('filmstrip-btn')) {
             const track = target.parentElement.querySelector('[class$="filmstrip-track"]');
             track?.scrollBy({ left: track.clientWidth * (target.className.includes('--prev') ? -0.8 : 0.8), behavior: 'smooth' });
@@ -74,6 +90,17 @@ export function mount(root, { signal }) {
     }, { signal });
     const stopObserving = observeContent(root, update, record => !record.target.closest?.('dialog')
         && (record.type === 'childList' || record.type === 'attributes'));
-    signal.addEventListener('abort', stopObserving, { once: true });
-    return { update, suspend: () => dialog?.close(), dispose() { stopObserving(); dialog?.dispose(); } };
+    signal.addEventListener('abort', () => {
+        stopObserving();
+        resizeObserver.disconnect();
+    }, { once: true });
+    return {
+        update,
+        suspend: () => dialog?.close(),
+        dispose() {
+            stopObserving();
+            resizeObserver.disconnect();
+            dialog?.dispose();
+        }
+    };
 }

@@ -43,11 +43,14 @@
 
         @* ── 胶片缩略图区 ── *@
         <div class="cg-image-gallery__filmstrip">
-            <button type="button"
-                    class="cg-image-gallery__filmstrip-btn cg-image-gallery__filmstrip-btn--prev"
-                    aria-label="向左滚动">
-                <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
-            </button>
+            @if (total > 1)
+            {
+                <button type="button"
+                        class="cg-image-gallery__filmstrip-btn cg-image-gallery__filmstrip-btn--prev"
+                        aria-label="向左滚动">
+                    <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
+                </button>
+            }
 
             <div class="cg-image-gallery__filmstrip-track">
                 @for (var i = 0; i < total; i++)
@@ -68,11 +71,14 @@
                 }
             </div>
 
-            <button type="button"
-                    class="cg-image-gallery__filmstrip-btn cg-image-gallery__filmstrip-btn--next"
-                    aria-label="向右滚动">
-                <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
-            </button>
+            @if (total > 1)
+            {
+                <button type="button"
+                        class="cg-image-gallery__filmstrip-btn cg-image-gallery__filmstrip-btn--next"
+                        aria-label="向右滚动">
+                    <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+                </button>
+            }
         </div>
 
         @* ── 全屏模态层（默认隐藏，JS 控制显示） ── *@
@@ -99,11 +105,14 @@
 
             @* 主图区域 *@
             <div class="cg-image-gallery__fullscreen-main">
-                <button type="button"
-                        class="cg-image-gallery__fullscreen-nav cg-image-gallery__fullscreen-nav--prev"
-                        aria-label="上一张">
-                    <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
-                </button>
+                @if (total > 1)
+                {
+                    <button type="button"
+                            class="cg-image-gallery__fullscreen-nav cg-image-gallery__fullscreen-nav--prev"
+                            aria-label="上一张">
+                        <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
+                    </button>
+                }
 
                 <div class="cg-image-gallery__fullscreen-image-wrap">
                     <img src="@items[0].Url"
@@ -112,11 +121,14 @@
                          data-cg-image-gallery-fs-image />
                 </div>
 
-                <button type="button"
-                        class="cg-image-gallery__fullscreen-nav cg-image-gallery__fullscreen-nav--next"
-                        aria-label="下一张">
-                    <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
-                </button>
+                @if (total > 1)
+                {
+                    <button type="button"
+                            class="cg-image-gallery__fullscreen-nav cg-image-gallery__fullscreen-nav--next"
+                            aria-label="下一张">
+                        <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
+                    </button>
+                }
             </div>
 
             @* 全屏底部的缩略图胶片 *@
