@@ -14,11 +14,10 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddMainSiteSharedServices(this IServiceCollection services)
     {
+        services.AddScoped<PageResponseState>();
         services.AddScoped<ICgToastService, CgToastService>();
         services.AddScoped<ICgDeviceIdentificationService, CgDeviceIdentificationService>();
         services.AddScoped<IMiniModeService, MiniModeService>();
-        services.AddScoped<ICgThemeService, CgThemeService>();
-        services.AddScoped<IPageMetaService, PageMetaService>();
         services.AddScoped<IKanbanSettingService, KanbanSettingService>();
         services.AddScoped<IKanbanUserDataService, KanbanUserDataService>();
         services.AddScoped<IKanbanEventService, KanbanEventService>();

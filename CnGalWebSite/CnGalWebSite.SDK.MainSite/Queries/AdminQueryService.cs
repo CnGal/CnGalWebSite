@@ -72,7 +72,7 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
     {
         try
         {
-            var response = await HttpClient.PostAsJsonAsync(
+            using var response = await HttpClient.PostAsJsonAsync(
                 apiPath, parameter, SdkJsonSerializerOptions.Default, cancellationToken);
 
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -102,12 +102,13 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
                     $"{displayName}列表数据格式不兼容");
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex,
                 "获取{DisplayName}列表异常。Path={Path}; BaseAddress={BaseAddress}",
                 displayName, apiPath, HttpClient.BaseAddress);
-            return SdkResult<QueryResultModel<T, TSort>>.Fail(
+            return SdkFailure.FromException<QueryResultModel<T, TSort>>(ex,
                 $"{errorDomain}_EXCEPTION",
                 $"请求{displayName}列表时发生异常");
         }
@@ -170,9 +171,10 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
     public async Task<SdkResult<QueryResultModel<LotteryUserOverviewModel, LotteryUserSortField>>> GetLotteryUsersAsync(
         long lotteryId, QueryParameterModel<LotteryUserSortField> parameter, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var response = await HttpClient.PostAsJsonAsync(
+            using var response = await HttpClient.PostAsJsonAsync(
                 $"api/lotteries/ListLotteryUsers?lotteryId={lotteryId}",
                 parameter, SdkJsonSerializerOptions.Default, cancellationToken);
 
@@ -202,10 +204,11 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
                     "ADMIN_LOTTERY_USERS_DESERIALIZE_FAILED", "参与用户列表数据格式不兼容");
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "获取抽奖参与用户列表异常。LotteryId={LotteryId}", lotteryId);
-            return SdkResult<QueryResultModel<LotteryUserOverviewModel, LotteryUserSortField>>.Fail(
+            return SdkFailure.FromException<QueryResultModel<LotteryUserOverviewModel, LotteryUserSortField>>(ex,
                 "ADMIN_LOTTERY_USERS_EXCEPTION", "请求参与用户列表时发生异常");
         }
     }
@@ -239,7 +242,7 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
         => GetSingleAsync<CarouselEditModel, CarouselEditModel>(
             $"api/home/EditCarousel?id={id}", dto => dto,
             "ADMIN_CAROUSEL", "轮播图", id, cancellationToken);
-            
+
     public Task<SdkResult<FriendLinkEditModel>> GetFriendLinkEditAsync(
         int id, CancellationToken cancellationToken = default)
         => GetSingleAsync<FriendLinkEditModel, FriendLinkEditModel>(
@@ -434,6 +437,7 @@ public sealed class AdminQueryService(HttpClient httpClient, ILogger<AdminQueryS
         LineChartType type, DateTime afterTime, DateTime beforeTime,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var afterMs = afterTime.ToUnixTimeMilliseconds();
         var beforeMs = beforeTime.ToUnixTimeMilliseconds();
         return await GetAsync<LineChartModel>(

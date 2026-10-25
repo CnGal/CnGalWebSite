@@ -147,3 +147,8 @@
     font-weight: var(--cg-font-weight-normal);
     color: var(--cg-color-text-muted);
 }
+
+/* CgAlert 所在容器已通过 gap 提供间距，避免重复添加底部间距 */
+.admin-index-page > ::deep .cg-alert {
+    --cg-alert-margin-bottom: 0;
+}

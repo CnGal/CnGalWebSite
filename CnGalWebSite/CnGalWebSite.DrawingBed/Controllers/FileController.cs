@@ -75,9 +75,19 @@ namespace CnGalWebSite.DrawingBed.Controllers
                 {
                     model.Add(await _fileService.UploadFormFile(item, gallery, x, y, type, cropX, cropY, cropW, cropH));
                 }
+                catch (InvalidDataException ex)
+                {
+                    // 文件校验异常的消息由 UploadFilePolicy 生成，不包含服务器路径，可安全返回给用户。
+                    model.Add(new UploadResult
+                    {
+                        Uploaded = false,
+                        FileName = item.Name,
+                        Error = ex.Message
+                    });
+                }
                 catch (Exception)
                 {
-                    //错误细节可能泄露服务器路径（如 ffmpeg 输出），只记日志不回显
+                    // 其他异常可能泄露服务器路径（如 ffmpeg 输出），只记日志不回显。
                     model.Add(new UploadResult
                     {
                         Uploaded = false,

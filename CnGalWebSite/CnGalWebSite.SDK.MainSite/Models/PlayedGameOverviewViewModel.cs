@@ -1,6 +1,7 @@
 namespace CnGalWebSite.SDK.MainSite.Models;
 
 using CnGalWebSite.DataModel.ViewModel.Ranks;
+using System.Text.Json.Serialization;
 
 /// <summary>
 /// 词条评分概览 ViewModel（面向 EntryDetailPage 静态展示）。
@@ -43,6 +44,8 @@ public sealed class PlayedGameOverviewViewModel
     /// <summary>
     /// 当前登录用户 Id。
     /// </summary>
+    // Blazor omits null parameters by default; required nullable members must remain present when round-tripped.
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public required string? CurrentUserId { get; init; }
 
     /// <summary>
@@ -86,6 +89,7 @@ public sealed class UserScoreItem
     public required double CVScore { get; init; }
     public required double TotalScore { get; init; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public required string? PlayImpressions { get; init; }
     public required DateTime LastEditTime { get; init; }
 

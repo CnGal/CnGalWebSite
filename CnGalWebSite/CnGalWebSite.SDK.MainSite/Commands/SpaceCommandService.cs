@@ -4,20 +4,21 @@ using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.SpaceEdit;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class SpaceCommandService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
-    ILogger<SpaceCommandService> logger) : CommandServiceBase(httpClient), ISpaceCommandService
+    PublicDataCache publicCache,
+    ILogger<SpaceCommandService> logger) : CommandServiceBase(httpClient, publicCache), ISpaceCommandService
 {
+
     protected override ILogger Logger => logger;
 
     public async Task<SdkResult<SpaceEditViewModel>> GetSpaceEditAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             // 并发获取个人资料和个人主页数据
@@ -34,15 +35,17 @@ public sealed class SpaceCommandService(
 
             return SdkResult<SpaceEditViewModel>.Ok(model);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取用户编辑数据异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<SpaceEditViewModel>.Fail("SPACE_EDIT_QUERY_EXCEPTION", "请求用户编辑数据时发生异常");
+            return SdkFailure.FromException<SpaceEditViewModel>(ex, "SPACE_EDIT_QUERY_EXCEPTION", "请求用户编辑数据时发生异常");
         }
     }
 
     public async Task<SdkResult<string>> SubmitEditAsync(SpaceEditViewModel model, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var errors = new List<string>();
@@ -67,52 +70,43 @@ public sealed class SpaceCommandService(
 
             // 清空对应用户的空间详情、游玩记录、Steam 信息缓存
             var userId = model.UserData.Id ?? string.Empty;
-            InvalidateUserCaches(userId);
 
             // 返回用户 ID 以供跳转
             return SdkResult<string>.Ok(userId);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "提交用户编辑数据异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<string>.Fail("SPACE_EDIT_SUBMIT_EXCEPTION", "提交用户编辑数据时发生异常");
+            return SdkFailure.FromException<string>(ex, "SPACE_EDIT_SUBMIT_EXCEPTION", "提交用户编辑数据时发生异常");
         }
     }
 
     public async Task<SdkResult<string>> RefreshSteamInfoAsync(string? userId = null, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var result = await PostAsJsonAsync<object, Result>("api/playedgame/RefreshPlayedGameSteamInfor", null!, cancellationToken);
             if (result is { Successful: true })
             {
-                // 清空相关缓存，确保后续查询获取最新数据
-                if (!string.IsNullOrEmpty(userId))
-                {
-                    InvalidateUserCaches(userId);
-                }
 
                 return SdkResult<string>.Ok("刷新成功");
             }
 
             return SdkResult<string>.Fail("STEAM_REFRESH_FAILED", result?.Error ?? "刷新 Steam 信息失败");
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "刷新 Steam 信息异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<string>.Fail("STEAM_REFRESH_EXCEPTION", "刷新 Steam 信息时发生异常");
+            return SdkFailure.FromException<string>(ex, "STEAM_REFRESH_EXCEPTION", "刷新 Steam 信息时发生异常");
         }
-    }
-
-    private void InvalidateUserCaches(string userId)
-    {
-        memoryCache.Remove($"main-site:space-detail:{userId}");
-        memoryCache.Remove($"main-site:user-game-records:{userId}");
-        memoryCache.Remove($"main-site:user-steam-info:{userId}");
     }
 
     public async Task<SdkResult<string>> ReadAllMessagesAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var result = await PostAsJsonAsync<object, Result>("api/space/ReadedAllMessages/", null!, cancellationToken);
@@ -124,15 +118,17 @@ public sealed class SpaceCommandService(
 
             return SdkResult<string>.Fail("MESSAGE_READ_ALL_FAILED", result?.Error ?? "标记消息已读失败");
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "标记所有消息已读异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<string>.Fail("MESSAGE_READ_ALL_EXCEPTION", "标记消息已读时发生异常");
+            return SdkFailure.FromException<string>(ex, "MESSAGE_READ_ALL_EXCEPTION", "标记消息已读时发生异常");
         }
     }
 
     public async Task<SdkResult<string>> SignInAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var result = await PostAsJsonAsync<object, Result>("api/space/signIn", null!, cancellationToken);
@@ -144,18 +140,24 @@ public sealed class SpaceCommandService(
 
             return SdkResult<string>.Fail("SIGN_IN_FAILED", result?.Error ?? "签到失败");
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "每日签到异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<string>.Fail("SIGN_IN_EXCEPTION", "签到时发生异常");
+            return SdkFailure.FromException<string>(ex, "SIGN_IN_EXCEPTION", "签到时发生异常");
         }
     }
 
     public async Task<SdkResult<string>> MakeUserOnlineAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var result = await GetFromJsonAsync<Result>("api/account/MakeUserOnline", cancellationToken);
+            // Heartbeat only changes the current user's online state; it does not invalidate public data.
+            using var response = await PostAsJsonRawAsync(
+                "api/account/MakeUserOnline", new object(), cancellationToken, readOnly: true);
+            response.EnsureSuccessStatusCode();
+            var result = await ReadResponseAsync<Result>(response, cancellationToken);
 
             if (result is { Successful: true })
             {
@@ -164,29 +166,33 @@ public sealed class SpaceCommandService(
 
             return SdkResult<string>.Fail("MAKE_ONLINE_FAILED", result?.Error ?? "更新在线状态失败");
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "更新在线状态异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<string>.Fail("MAKE_ONLINE_EXCEPTION", "更新在线状态时发生异常");
+            return SdkFailure.FromException<string>(ex, "MAKE_ONLINE_EXCEPTION", "更新在线状态时发生异常");
         }
     }
 
     public async Task<SdkResult<EditUserAddressModel>> GetUserAddressAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var model = await GetFromJsonAsync<EditUserAddressModel>("api/space/EditUserAddress", cancellationToken);
             return SdkResult<EditUserAddressModel>.Ok(model ?? new EditUserAddressModel());
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取用户地址异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<EditUserAddressModel>.Fail("ADDRESS_QUERY_EXCEPTION", "获取用户地址时发生异常");
+            return SdkFailure.FromException<EditUserAddressModel>(ex, "ADDRESS_QUERY_EXCEPTION", "获取用户地址时发生异常");
         }
     }
 
     public async Task<SdkResult<bool>> EditUserAddressAsync(EditUserAddressModel model, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var result = await PostAsJsonAsync<EditUserAddressModel, Result>("api/space/EditUserAddress", model, cancellationToken);
@@ -197,15 +203,17 @@ public sealed class SpaceCommandService(
 
             return SdkResult<bool>.Fail("ADDRESS_EDIT_FAILED", result?.Error ?? "保存地址失败");
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "保存用户地址异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail("ADDRESS_EDIT_EXCEPTION", "保存用户地址时发生异常");
+            return SdkFailure.FromException<bool>(ex, "ADDRESS_EDIT_EXCEPTION", "保存用户地址时发生异常");
         }
     }
 
     public async Task<SdkResult<string>> GetBindGroupQQCodeAsync(UnBindGroupQQModel model, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var result = await PostAsJsonAsync<UnBindGroupQQModel, Result>("api/space/GetBindGroupQQCode", model, cancellationToken);
@@ -217,15 +225,17 @@ public sealed class SpaceCommandService(
 
             return SdkResult<string>.Fail("QQ_BIND_CODE_FAILED", result?.Error ?? "获取身份识别码失败");
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取绑定群聊 QQ 身份识别码异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<string>.Fail("QQ_BIND_CODE_EXCEPTION", "获取身份识别码时发生异常");
+            return SdkFailure.FromException<string>(ex, "QQ_BIND_CODE_EXCEPTION", "获取身份识别码时发生异常");
         }
     }
 
     public async Task<SdkResult<string>> UnBindGroupQQAsync(UnBindGroupQQModel model, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var result = await PostAsJsonAsync<UnBindGroupQQModel, Result>("api/space/UnBindGroupQQ", model, cancellationToken);
@@ -236,15 +246,17 @@ public sealed class SpaceCommandService(
 
             return SdkResult<string>.Fail("QQ_UNBIND_FAILED", result?.Error ?? "解除绑定失败");
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "解除群聊 QQ 绑定异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<string>.Fail("QQ_UNBIND_EXCEPTION", "解除绑定时发生异常");
+            return SdkFailure.FromException<string>(ex, "QQ_UNBIND_EXCEPTION", "解除绑定时发生异常");
         }
     }
 
     public async Task<SdkResult<string>> EditUserCertificationAsync(EditUserCertificationModel model, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var result = await PostAsJsonAsync<EditUserCertificationModel, Result>("api/space/EditUserCertification", model, cancellationToken);
@@ -257,24 +269,27 @@ public sealed class SpaceCommandService(
             var errorTitle = string.IsNullOrWhiteSpace(model.EntryName) ? "取消认证失败" : "提交用户认证申请失败";
             return SdkResult<string>.Fail("CERTIFICATION_EDIT_FAILED", result?.Error ?? errorTitle);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "提交用户认证申请异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<string>.Fail("CERTIFICATION_EDIT_EXCEPTION", "提交用户认证申请时发生异常");
+            return SdkFailure.FromException<string>(ex, "CERTIFICATION_EDIT_EXCEPTION", "提交用户认证申请时发生异常");
         }
     }
 
     public async Task<SdkResult<List<string>>> GetAllNotCertificatedEntriesAsync(EntryType type, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var result = await GetFromJsonAsync<List<string>>($"api/space/GetAllNotCertificatedEntries?type={type}", cancellationToken);
             return SdkResult<List<string>>.Ok(result ?? []);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取未认证词条列表异常。Type={Type}; BaseAddress={BaseAddress}", type, HttpClient.BaseAddress);
-            return SdkResult<List<string>>.Fail("CERTIFICATION_ENTRIES_EXCEPTION", "获取未认证词条列表时发生异常");
+            return SdkFailure.FromException<List<string>>(ex, "CERTIFICATION_ENTRIES_EXCEPTION", "获取未认证词条列表时发生异常");
         }
     }
 }

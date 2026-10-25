@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.HealthCheck.Models;
+using CnGalWebSite.HealthCheck.Models;
 using CnGalWebSite.MainSite.Components;
 using CnGalWebSite.MainSite.Shared;
 using CnGalWebSite.MainSite.Shared.Services;
@@ -78,48 +78,29 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 //添加状态检查终结点
 app.UseHealthChecks("/healthz", ServiceStatus.Options);
 
-app.UseAuthentication();
-app.UseAuthorization();
-
-// 覆写 SSR 页面的 Cache-Control，按登录状态区分缓存策略
+// Only audited anonymous static routes may be shared by a CDN.
 app.Use(async (context, next) =>
 {
     context.Response.OnStarting(() =>
     {
-        var contentType = context.Response.ContentType;
-        var isMiniModeRequest = string.Equals(
-            context.Request.Cookies[MiniModeConstants.CookieName],
-            MiniModeConstants.CookieValue,
-            StringComparison.OrdinalIgnoreCase)
-            || string.Equals(
-                context.Request.Query[MiniModeConstants.QueryParameterName],
-                MiniModeConstants.QueryParameterValue,
-                StringComparison.OrdinalIgnoreCase);
-        if (contentType != null
-            && contentType.StartsWith("text/html", StringComparison.OrdinalIgnoreCase)
-            && context.Response.StatusCode == 200)
+        if (context.Response.ContentType?.StartsWith("text/html", StringComparison.OrdinalIgnoreCase) == true)
         {
-            if (isMiniModeRequest)
-            {
-                // 迷你模式会改变 SSR 输出，禁止共享缓存污染普通页面。
-                context.Response.Headers.CacheControl = "private, no-cache, no-store";
-            }
-            else if (context.User.Identity?.IsAuthenticated != true)
-            {
-                // 未登录：CDN 可缓存 5 分钟，浏览器不缓存（避免登录后看到旧页面）
-                context.Response.Headers.CacheControl = "public, s-maxage=300, max-age=0, must-revalidate";
-            }
-            else
-            {
-                // 已登录：任何缓存层都不得缓存
-                context.Response.Headers.CacheControl = "private, no-cache, no-store";
-            }
+            var page = context.RequestServices.GetRequiredService<PageResponseState>();
+            if (page.FailureStatusCode is { } status && context.Response.StatusCode == 200)
+                context.Response.StatusCode = status;
+            context.Response.Headers.CacheControl = PublicHtmlCachePolicy.CanShare(context)
+                ? "public, s-maxage=300, max-age=0, must-revalidate"
+                : "private, no-store";
             context.Response.Headers.Remove("Pragma");
         }
         return Task.CompletedTask;
     });
     await next();
 });
+
+// Register the cache callback first so it sees cookies added by authentication's OnStarting callback.
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapMainSiteAuthenticationEndpoints();

@@ -1,3 +1,5 @@
+@using CnGalWebSite.MainSite.Shared.Services.Editing
+@inject IJSRuntime JS
 @page "/videos/create"
 @page "/videos/edit/{Id:long}"
 
@@ -14,41 +16,41 @@
 @inject NavigationManager NavigationManager
 @inject ILocalStorageService LocalStorage
 @inject ICgToastService ToastService
-@implements IDisposable
+@implements IAsyncDisposable
 
-<CgPageMeta Title="@(IsCreate ? "发布视频" : "编辑视频")" />
+<CgPageMeta Title="@(Session.IsCreate ? "发布视频" : "编辑视频")" />
 
-@if (IsLoading)
+@if (Session.IsLoading)
 {
     <section class="video-edit-loading" aria-label="加载中">
         <div class="video-edit-loading-spinner"></div>
         <p>正在获取数据...</p>
     </section>
 }
-else if (LoadErrorMessage != null)
+else if (Session.LoadErrorMessage != null)
 {
     <section class="video-edit-error">
         <h1>加载失败</h1>
-        <p>@LoadErrorMessage</p>
-        <CgButton Variant="primary" OnClick="LoadDataAsync">重试</CgButton>
+        <p>@Session.LoadErrorMessage</p>
+        <CgButton Variant="primary" OnClick="Session.LoadDataAsync">重试</CgButton>
     </section>
 }
-else if (Model != null)
+else if (Session.Model != null)
 {
-    <article class="video-edit-page">
+    <article class="video-edit-page" @ref="_editRoot" data-cg-edit-root>
         <div class="video-edit-layout">
-            <VideoEditorSidebar IsCreate="IsCreate"
-                                IsSubmitting="IsSubmitting"
-                                HasDraftRecovered="HasDraftRecovered"
-                                OnDiscardDraft="DiscardDraft"
-                                OnSubmit="SubmitAsync"
-                                OnCancel="Cancel" />
+            <VideoEditorSidebar IsCreate="Session.IsCreate"
+                                IsSubmitting="Session.IsSubmitting"
+                                HasDraftRecovered="Session.HasDraftRecovered"
+                                OnDiscardDraft="Session.DiscardDraft"
+                                OnSubmit="Session.SubmitAsync"
+                                OnCancel="Session.Cancel" />
 
             <main class="video-edit-main">
-                <VideoMainEditor Model="Model.Data.Main" />
-                <VideoImagesEditor Model="Model.Data.Images" />
-                <VideoRelevancesEditor Model="Model.Data.Relevances" MetaOptions="Model.MetaOptions" />
-                <VideoMainPageEditor Model="Model.Data.MainPage" />
+                <VideoMainEditor Model="Session.Model.Data.Main" />
+                <VideoImagesEditor Model="Session.Model.Data.Images" />
+                <VideoRelevancesEditor Model="Session.Model.Data.Relevances" MetaOptions="Session.Model.MetaOptions" />
+                <VideoMainPageEditor Model="Session.Model.Data.MainPage" />
             </main>
         </div>
 
@@ -56,184 +58,23 @@ else if (Model != null)
 }
 
 @code {
-    [Parameter]
-    public long? Id { get; set; }
+    [Parameter] public long? Id { get; set; }
 
-    private bool IsCreate => Id is null or <= 0;
-
-    private bool IsLoading = true;
-    private string? LoadErrorMessage;
-
-    private bool IsSubmitting = false;
-
-    private VideoEditViewModel? Model;
-
-    private CancellationTokenSource? _cts;
-    private System.Threading.Timer? _autoSaveTimer;
-    private string DraftKey => IsCreate ? "VideoDraft_Create" : $"VideoDraft_Edit_{Id}";
-
-    private bool HasDraftRecovered = false;
-    private CreateVideoViewModel? OriginalData;
-
-    protected override async Task OnInitializedAsync()
+    private EditSessionHost<VideoEditSession>? _sessions;
+    private VideoEditSession Session => _sessions!.Current;
+    private ElementReference _editRoot;
+    protected override Task OnParametersSetAsync()
     {
-        _cts = new CancellationTokenSource();
-        await LoadDataAsync();
-        _autoSaveTimer = new System.Threading.Timer(AutoSaveCallback, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
-    }
-
-    private void AutoSaveCallback(object? state)
-    {
-        _ = InvokeAsync(async () =>
+        _sessions ??= new(() => InvokeAsync(StateHasChanged));
+        return _sessions.SetAsync($"{Id}", () =>
         {
-            if (Model != null && !IsSubmitting && !IsLoading)
-            {
-                try
-                {
-                    await LocalStorage.SetItemAsync(DraftKey, Model.Data);
-                }
-                catch { /* Ignore local storage errors */ }
-            }
+            var session = new VideoEditSession(VideoCommandService, NavigationManager, LocalStorage, ToastService) { Id = Id };
+            session.Draft.Dispatch = work => InvokeAsync(work);
+            session.Draft.FlushInputs = () => CgMarkdownEditor.FlushAllAsync(JS, _editRoot);
+            return session;
         });
     }
 
-    public void Dispose()
-    {
-        _autoSaveTimer?.Dispose();
-        _cts?.Cancel();
-        _cts?.Dispose();
-    }
+    public ValueTask DisposeAsync() => _sessions?.DisposeAsync() ?? ValueTask.CompletedTask;
 
-    private async Task LoadDataAsync()
-    {
-        IsLoading = true;
-        LoadErrorMessage = null;
-        StateHasChanged();
-
-        try
-        {
-            SdkResult<VideoEditViewModel> result;
-            if (IsCreate)
-            {
-                result = await VideoCommandService.GetVideoCreateTemplateAsync(_cts!.Token);
-            }
-            else
-            {
-                result = await VideoCommandService.GetVideoEditAsync(Id!.Value, _cts!.Token);
-            }
-
-            if (result.Success && result.Data != null)
-            {
-                Model = result.Data;
-                OriginalData = JsonSerializer.Deserialize<CreateVideoViewModel>(JsonSerializer.Serialize(result.Data.Data));
-
-                // 尝试恢复草稿
-                try
-                {
-                    var draft = await LocalStorage.GetItemAsync<CreateVideoViewModel>(DraftKey);
-                    if (draft != null)
-                    {
-                        Model.Data = draft;
-                        HasDraftRecovered = true;
-                    }
-                }
-                catch { }
-
-                // 加载候选列表
-                var metaResult = await VideoCommandService.GetVideoEditMetaOptionsAsync(_cts!.Token);
-                if (metaResult.Success && metaResult.Data != null)
-                {
-                    Model.MetaOptions = metaResult.Data;
-                }
-            }
-            else
-            {
-                LoadErrorMessage = result.Error?.Message ?? "获取编辑数据失败";
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            // Cancelled, do nothing
-        }
-        catch (Exception ex)
-        {
-            LoadErrorMessage = "发生未知错误：" + ex.Message;
-        }
-        finally
-        {
-            IsLoading = false;
-            StateHasChanged();
-        }
-    }
-
-    private async Task DiscardDraft()
-    {
-        if (OriginalData != null && Model != null)
-        {
-            Model.Data = JsonSerializer.Deserialize<CreateVideoViewModel>(JsonSerializer.Serialize(OriginalData))!;
-            HasDraftRecovered = false;
-            await LocalStorage.RemoveItemAsync(DraftKey);
-            StateHasChanged();
-        }
-    }
-
-    private async Task SubmitAsync()
-    {
-        if (Model == null || IsSubmitting) return;
-
-        var validationResult = Model.Data.Validate();
-        if (!validationResult.Successful)
-        {
-            ToastService.Show("校验失败", validationResult.Error ?? "请检查表单是否填写正确", "error");
-            return;
-        }
-
-        IsSubmitting = true;
-        StateHasChanged();
-
-        try
-        {
-            var request = new VideoEditRequest
-            {
-                IsCreate = IsCreate,
-                Data = Model.Data
-            };
-
-            var result = await VideoCommandService.SubmitEditAsync(request, _cts!.Token);
-            if (result.Success)
-            {
-                await LocalStorage.RemoveItemAsync(DraftKey);
-                NavigationManager.NavigateTo($"/videos/index/{result.Data}");
-            }
-            else
-            {
-                ToastService.Show("提交失败", result.Error?.Message ?? "提交审核时出现问题", "error");
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            // Cancelled, do nothing
-        }
-        catch (Exception ex)
-        {
-            ToastService.Show("发生错误", ex.Message, "error");
-        }
-        finally
-        {
-            IsSubmitting = false;
-            StateHasChanged();
-        }
-    }
-
-    private void Cancel()
-    {
-        if (IsCreate)
-        {
-            NavigationManager.NavigateTo("/");
-        }
-        else
-        {
-            NavigationManager.NavigateTo($"/videos/index/{Id}");
-        }
-    }
 }

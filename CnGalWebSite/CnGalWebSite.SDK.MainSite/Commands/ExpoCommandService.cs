@@ -9,8 +9,8 @@ using Microsoft.Extensions.Logging;
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class ExpoCommandService(
-    HttpClient httpClient,
-    ILogger<ExpoCommandService> logger) : CommandServiceBase(httpClient), IExpoCommandService
+    HttpClient httpClient, PublicDataCache publicCache,
+    ILogger<ExpoCommandService> logger) : CommandServiceBase(httpClient, publicCache), IExpoCommandService
 {
     protected override ILogger Logger => logger;
 
@@ -19,10 +19,11 @@ public sealed class ExpoCommandService(
 
     public async Task<SdkResult<bool>> FinishTaskAsync(ExpoTaskType type, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var model = new ExpoFinshTaskModel { Type = type };
-            var response = await HttpClient.PostAsJsonAsync(FinishTaskPath, model, SdkJsonSerializerOptions.Default, cancellationToken);
+            using var response = await PostAsJsonRawAsync(FinishTaskPath, model, cancellationToken);
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
 
             if (!response.IsSuccessStatusCode)
@@ -57,19 +58,21 @@ public sealed class ExpoCommandService(
                 return SdkResult<bool>.Fail("EXPO_FINISH_TASK_DESERIALIZE", "完成任务响应格式不兼容");
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "完成任务异常。Type={Type}", type);
-            return SdkResult<bool>.Fail("EXPO_FINISH_TASK_EXCEPTION", "请求完成任务时发生异常");
+            return SdkFailure.FromException<bool>(ex, "EXPO_FINISH_TASK_EXCEPTION", "请求完成任务时发生异常");
         }
     }
 
     public async Task<SdkResult<long?>> LotteryAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             // LotteryAsync uses POST with no body parameter — send empty JSON object
-            var response = await HttpClient.PostAsJsonAsync(LotteryPath, new { }, SdkJsonSerializerOptions.Default, cancellationToken);
+            using var response = await PostAsJsonRawAsync(LotteryPath, new { }, cancellationToken);
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
 
             if (!response.IsSuccessStatusCode)
@@ -110,16 +113,17 @@ public sealed class ExpoCommandService(
                 return SdkResult<long?>.Fail("EXPO_LOTTERY_DESERIALIZE", "抽奖响应格式不兼容");
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "抽奖请求异常");
-            return SdkResult<long?>.Fail("EXPO_LOTTERY_EXCEPTION", "请求抽奖时发生异常");
+            return SdkFailure.FromException<long?>(ex, "EXPO_LOTTERY_EXCEPTION", "请求抽奖时发生异常");
         }
     }
 
     private static string TrimForLog(string text, int maxLength = 800)
     {
         if (string.IsNullOrWhiteSpace(text)) return string.Empty;
-        return text.Length <= maxLength ? text : $"{text[..maxLength]}...(truncated)";
+        return $"[response body omitted; length={text.Length}]";
     }
 }

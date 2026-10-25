@@ -4,6 +4,8 @@
     然后委托 CgAtmosphere 渲染。
 *@
 @inject ISpaceQueryService SpaceQueryService
+@using Microsoft.AspNetCore.Http
+@implements IDisposable
 
 @if (!string.IsNullOrWhiteSpace(_bgImage) || !string.IsNullOrWhiteSpace(_smallBgImage))
 {
@@ -12,12 +14,23 @@
 
 @code {
     [Parameter] public string? UserId { get; set; }
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
 
     private string? _bgImage;
     private string? _smallBgImage;
+    private CancellationTokenSource? _request;
+    private string? _loadedUserId;
+    private long _requestVersion;
+    private bool _disposed;
 
     protected override async Task OnParametersSetAsync()
     {
+        if (_disposed || _loadedUserId == UserId) return;
+        var version = ++_requestVersion;
+        _request?.Cancel();
+        _loadedUserId = UserId;
+        _bgImage = null;
+        _smallBgImage = null;
         if (string.IsNullOrWhiteSpace(UserId))
         {
             _bgImage = null;
@@ -25,18 +38,28 @@
             return;
         }
 
+        using var request = CancellationTokenSource.CreateLinkedTokenSource(HttpContext?.RequestAborted ?? CancellationToken.None);
+        _request = request;
         try
         {
-            var result = await SpaceQueryService.GetSpaceDetailAsync(UserId);
+            var result = await SpaceQueryService.GetSpaceDetailAsync(UserId, request.Token);
+            if (request.IsCancellationRequested || version != _requestVersion) return;
             if (result.Success && result.Data is not null)
             {
                 _bgImage = result.Data.MBgImage;
                 _smallBgImage = result.Data.SBgImage;
             }
         }
+        catch (OperationCanceledException) when (request.IsCancellationRequested)
+        {
+            if (version == _requestVersion) _loadedUserId = null;
+        }
         catch
         {
             // 获取用户背景失败时静默降级
         }
+        finally { if (ReferenceEquals(_request, request)) _request = null; }
     }
+
+    public void Dispose() { _disposed = true; ++_requestVersion; _request?.Cancel(); }
 }

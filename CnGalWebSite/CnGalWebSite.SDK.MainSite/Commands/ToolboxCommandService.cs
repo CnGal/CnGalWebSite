@@ -16,13 +16,14 @@ using ReverseMarkdown;
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class ToolboxCommandService(
-    HttpClient httpClient,
-    ILogger<ToolboxCommandService> logger) : CommandServiceBase(httpClient), IToolboxCommandService
+    HttpClient httpClient, PublicDataCache publicCache,
+    ILogger<ToolboxCommandService> logger) : CommandServiceBase(httpClient, publicCache), IToolboxCommandService
 {
     protected override ILogger Logger => logger;
 
     public async Task<SdkResult<ToolboxBilibiliVideoInfo>> GetBilibiliVideoInfoAsync(string id, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var json = await HttpClient.GetStringAsync($"api/thirdparties/GetBilibiliVideoInfor?id={Uri.EscapeDataString(id)}", cancellationToken);
@@ -57,29 +58,33 @@ public sealed class ToolboxCommandService(
                 OriginalAuthor = view["owner"]?["name"]?.GetValue<string>() ?? string.Empty
             });
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取 B 站视频信息异常。BilibiliId={BilibiliId}; BaseAddress={BaseAddress}", id, HttpClient.BaseAddress);
-            return SdkResult<ToolboxBilibiliVideoInfo>.Fail("TOOLBOX_BILIBILI_QUERY_EXCEPTION", "请求 B 站视频信息时发生异常");
+            return SdkFailure.FromException<ToolboxBilibiliVideoInfo>(ex, "TOOLBOX_BILIBILI_QUERY_EXCEPTION", "请求 B 站视频信息时发生异常");
         }
     }
 
     public async Task<SdkResult<IReadOnlyList<string>>> GetBilibiliVideoImageImpositionAsync(string id, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var images = await GetFromJsonAsync<List<string>>($"api/thirdparties/GetBilibiliVideoImageImposition?id={Uri.EscapeDataString(id)}", cancellationToken);
             return SdkResult<IReadOnlyList<string>>.Ok(images ?? []);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取 B 站视频快照异常。BilibiliId={BilibiliId}; BaseAddress={BaseAddress}", id, HttpClient.BaseAddress);
-            return SdkResult<IReadOnlyList<string>>.Fail("TOOLBOX_BILIBILI_IMAGES_EXCEPTION", "请求 B 站视频快照时发生异常");
+            return SdkFailure.FromException<IReadOnlyList<string>>(ex, "TOOLBOX_BILIBILI_IMAGES_EXCEPTION", "请求 B 站视频快照时发生异常");
         }
     }
 
     public async Task<SdkResult<int>> GetEntryIdAsync(string name, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var id = await GetFromJsonAsync<int>($"api/entries/GetId/{SdkToolHelper.Base64EncodeUrl(name)}", cancellationToken);
@@ -87,10 +92,11 @@ public sealed class ToolboxCommandService(
                 ? SdkResult<int>.Fail("TOOLBOX_ENTRY_NOT_FOUND", $"未找到词条：{name}")
                 : SdkResult<int>.Ok(id);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取词条 Id 异常。EntryName={EntryName}; BaseAddress={BaseAddress}", name, HttpClient.BaseAddress);
-            return SdkResult<int>.Fail("TOOLBOX_ENTRY_ID_EXCEPTION", "请求词条 Id 时发生异常");
+            return SdkFailure.FromException<int>(ex, "TOOLBOX_ENTRY_ID_EXCEPTION", "请求词条 Id 时发生异常");
         }
     }
 
@@ -132,6 +138,7 @@ public sealed class ToolboxCommandService(
 
     public async Task<SdkResult<SteamAppDetailsViewModel>> GetSteamAppDetailsAsync(string steamId, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var json = await HttpClient.GetStringAsync($"api/steam/GetSteamAppDetails/{Uri.EscapeDataString(steamId)}", cancellationToken);
@@ -223,10 +230,11 @@ public sealed class ToolboxCommandService(
                 ReleaseDate = releaseDate,
             });
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取 Steam 应用详情异常。SteamId={SteamId}; BaseAddress={BaseAddress}", steamId, HttpClient.BaseAddress);
-            return SdkResult<SteamAppDetailsViewModel>.Fail("TOOLBOX_STEAM_QUERY_EXCEPTION", "请求 Steam 应用详情时发生异常");
+            return SdkFailure.FromException<SteamAppDetailsViewModel>(ex, "TOOLBOX_STEAM_QUERY_EXCEPTION", "请求 Steam 应用详情时发生异常");
         }
     }
 
@@ -257,10 +265,11 @@ public sealed class ToolboxCommandService(
 
             return SdkResult<bool>.Fail(errorCode, result?.Error ?? "提交失败");
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "工具箱提交请求异常。Path={Path}; BaseAddress={BaseAddress}; ErrorCode={ErrorCode}", path, HttpClient.BaseAddress, errorCode);
-            return SdkResult<bool>.Fail($"{errorCode}_EXCEPTION", "提交时发生异常");
+            return SdkFailure.FromException<bool>(ex, $"{errorCode}_EXCEPTION", "提交时发生异常");
         }
     }
 
@@ -294,7 +303,7 @@ public sealed class ToolboxCommandService(
     {
         try
         {
-            var response = await HttpClient.GetAsync(path, cancellationToken);
+            using var response = await HttpClient.GetAsync(path, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 logger.LogWarning(
@@ -314,6 +323,7 @@ public sealed class ToolboxCommandService(
 
             return SdkResult<T>.Ok(data);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(
@@ -322,7 +332,7 @@ public sealed class ToolboxCommandService(
                 description,
                 path,
                 HttpClient.BaseAddress);
-            return SdkResult<T>.Fail($"{errorCodePrefix}_EXCEPTION", $"请求{description}时发生异常");
+            return SdkFailure.FromException<T>(ex, $"{errorCodePrefix}_EXCEPTION", $"请求{description}时发生异常");
         }
     }
 }

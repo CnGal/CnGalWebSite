@@ -10,7 +10,7 @@ public sealed class KanbanEventService : IKanbanEventService, IAsyncDisposable
 {
     private readonly ILocalStorageService _localStorage;
     private readonly IKanbanRemoteConfigService _remoteConfig;
-    private readonly IJSRuntime _jsRuntime;
+    private readonly IKanbanLive2DService _live2D;
     private readonly NavigationManager _navigation;
     private readonly ILogger<KanbanEventService> _logger;
 
@@ -19,36 +19,59 @@ public sealed class KanbanEventService : IKanbanEventService, IAsyncDisposable
     private DateTime _lastInteractionTime = DateTime.Now;
     private DateTime _lastIdleCheckTime = DateTime.MinValue;
     private readonly List<KanbanDialogBoxModel> _dialogQueue = new(3);
-    private DotNetObjectReference<KanbanEventService>? _objRef;
-    private IJSObjectReference? _module;
+    private long _runVersion;
+    private Task _hoverDelivery = Task.CompletedTask;
     private readonly Random _random = new(DateTime.Now.Microsecond);
 
     private const string LocalStorageKey = "kanban_events";
-    private const string ModulePath = "/_content/CnGalWebSite.MainSite.Shared/scripts/cg-kanban-live2d.js";
 
     public event Action<KanbanDialogBoxModel>? OnDialogTriggered;
 
     public KanbanEventService(
         ILocalStorageService localStorage,
         IKanbanRemoteConfigService remoteConfig,
-        IJSRuntime jsRuntime,
+        IKanbanLive2DService live2D,
         NavigationManager navigation,
         ILogger<KanbanEventService> logger)
     {
         _localStorage = localStorage;
         _remoteConfig = remoteConfig;
-        _jsRuntime = jsRuntime;
+        _live2D = live2D;
         _navigation = navigation;
         _logger = logger;
     }
 
     public async Task StartAsync(CancellationToken ct)
     {
+        var version = ++_runVersion;
         await LoadAsync();
+        ct.ThrowIfCancellationRequested();
+        _navigation.LocationChanged -= OnLocationChanged;
         _navigation.LocationChanged += OnLocationChanged;
-        await InitMouseOverEvent();
-        await Task.Delay(2000, ct);
-        await RunEventLoopAsync(ct);
+        _live2D.MouseOverTriggered -= OnMouseOver;
+        _live2D.MouseOverTriggered += OnMouseOver;
+        try
+        {
+            await InitMouseOverEvent();
+            await Task.Delay(2000, ct);
+            await RunEventLoopAsync(ct);
+        }
+        finally
+        {
+            if (version == _runVersion)
+            {
+                _navigation.LocationChanged -= OnLocationChanged;
+                _live2D.MouseOverTriggered -= OnMouseOver;
+                await _live2D.ConfigureHoverAsync([]);
+            }
+        }
+    }
+
+    private void OnMouseOver(int index) => _hoverDelivery = DeliverHoverAsync(index);
+    private async Task DeliverHoverAsync(int index)
+    {
+        try { await TriggerMouseOverEventAsync(index); }
+        catch (Exception ex) { _logger.LogWarning(ex, "看板娘悬停业务处理失败"); }
     }
 
     public void NotifyUserInteraction()
@@ -104,20 +127,8 @@ public sealed class KanbanEventService : IKanbanEventService, IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         _navigation.LocationChanged -= OnLocationChanged;
-        _objRef?.Dispose();
-        if (_module is not null)
-        {
-            try
-            {
-                await _module.DisposeAsync();
-            }
-            catch (JSDisconnectedException)
-            {
-                // JS 运行时已随 circuit 断开，无需远程清理
-            }
-        }
-
-        GC.SuppressFinalize(this);
+        _live2D.MouseOverTriggered -= OnMouseOver;
+        await _hoverDelivery;
     }
 
     private async Task LoadAsync()
@@ -145,21 +156,9 @@ public sealed class KanbanEventService : IKanbanEventService, IAsyncDisposable
 
     private async Task InitMouseOverEvent()
     {
-        try
-        {
-            _module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", ModulePath);
-            _objRef = DotNetObjectReference.Create(this);
-
-            var selectors = (_eventGroup?.MouseOverEvents ?? [])
-                .Select((s, i) => new { s.Selector, Index = i })
-                .ToList();
-
-            await _module.InvokeVoidAsync("initMouseOverEvent", _objRef, selectors);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "初始化鼠标悬停事件失败");
-        }
+        var targets = (_eventGroup?.MouseOverEvents ?? [])
+            .Select((item, index) => new KanbanHoverTarget(item.Selector, index)).ToList();
+        await _live2D.ConfigureHoverAsync(targets);
     }
 
     private async Task RunEventLoopAsync(CancellationToken ct)

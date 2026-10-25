@@ -71,7 +71,7 @@
                     <CgImageUpload @bind-Value="_editModel.Image"
                                    />
                 </CgFormGroup>
-                
+
                 <CgFormGroup Label="类型">
                     <CgEnumSelect TEnum="CarouselType" @bind-Value="_editModel.Type" />
                 </CgFormGroup>
@@ -192,7 +192,7 @@
     private async Task SaveAsync()
     {
         if (_editModel == null) return;
-        
+
         try
         {
             var result = await CommandService.EditCarouselAsync(_editModel, _cts!.Token);

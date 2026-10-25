@@ -4,16 +4,17 @@ using CnGalWebSite.DataModel.ViewModel.Stores;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class StoreInfoQueryService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<StoreInfoQueryService> logger) : QueryServiceBase(httpClient), IStoreInfoQueryService
 {
+    private readonly PublicDataCache memoryCache = publicCache.ForSource(httpClient.BaseAddress);
+
     private static readonly TimeSpan StoreInfoCacheDuration = TimeSpan.FromMinutes(5);
 
     protected override ILogger Logger => logger;
@@ -21,10 +22,13 @@ public sealed class StoreInfoQueryService(
     public async Task<SdkResult<IReadOnlyList<DiscountGameItem>>> GetAllGameStoreInfoAsync(
         CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         const string cacheKey = "main-site:all-game-store-info";
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<DiscountGameItem>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<DiscountGameItem>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<DiscountGameItem>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<DiscountGameItem>>(cached, cacheRead);
         }
 
         var result = await GetAsync<List<StoreInfoCardModel>>(
@@ -43,9 +47,12 @@ public sealed class StoreInfoQueryService(
 
         IReadOnlyList<DiscountGameItem> items = result.Data.Select(MapToViewModel).ToList();
 
-        memoryCache.Set(cacheKey, items, StoreInfoCacheDuration);
+        cancellationToken.ThrowIfCancellationRequested();
 
-        return SdkResult<IReadOnlyList<DiscountGameItem>>.Ok(items);
+        memoryCache.Set(cacheKey, items, StoreInfoCacheDuration, cacheRead);
+
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<IReadOnlyList<DiscountGameItem>>(items, cacheRead);
     }
 
     private static DiscountGameItem MapToViewModel(StoreInfoCardModel dto)
@@ -71,10 +78,13 @@ public sealed class StoreInfoQueryService(
     public async Task<SdkResult<GameRevenueInfoViewModel>> GetGameRevenueInfoAsync(
         int year, int page, int max, int order, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:game-revenue-info:{year}:{page}:{max}:{order}";
-        if (memoryCache.TryGetValue(cacheKey, out GameRevenueInfoViewModel? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out GameRevenueInfoViewModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<GameRevenueInfoViewModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<GameRevenueInfoViewModel>(cached, cacheRead);
         }
 
         var result = await GetAsync<GameRevenueInfoViewModel>(
@@ -91,18 +101,24 @@ public sealed class StoreInfoQueryService(
                 result.Error?.StatusCode);
         }
 
-        memoryCache.Set(cacheKey, result.Data, StoreInfoCacheDuration);
+        cancellationToken.ThrowIfCancellationRequested();
 
-        return SdkResult<GameRevenueInfoViewModel>.Ok(result.Data);
+        memoryCache.Set(cacheKey, result.Data, StoreInfoCacheDuration, cacheRead);
+
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<GameRevenueInfoViewModel>(result.Data, cacheRead);
     }
 
     public async Task<SdkResult<IReadOnlyList<CnGalGenerationYearItem>>> GetCnGalGenerationAsync(
         CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         const string cacheKey = "main-site:cngal-generation";
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<CnGalGenerationYearItem>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<CnGalGenerationYearItem>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<CnGalGenerationYearItem>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<CnGalGenerationYearItem>>(cached, cacheRead);
         }
 
         var result = await GetAsync<List<CnGalGenerationYearModel>>(
@@ -130,8 +146,11 @@ public sealed class StoreInfoQueryService(
                 })],
             })];
 
-        memoryCache.Set(cacheKey, items, StoreInfoCacheDuration);
+        cancellationToken.ThrowIfCancellationRequested();
 
-        return SdkResult<IReadOnlyList<CnGalGenerationYearItem>>.Ok(items);
+        memoryCache.Set(cacheKey, items, StoreInfoCacheDuration, cacheRead);
+
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<IReadOnlyList<CnGalGenerationYearItem>>(items, cacheRead);
     }
 }

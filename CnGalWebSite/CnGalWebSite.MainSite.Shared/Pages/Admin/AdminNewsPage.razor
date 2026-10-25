@@ -164,7 +164,7 @@
     @if (_editingGameNews != null)
     {
         <CgFormSection Title="基本信息" Icon="mdiInformationOutline" Flat>
-            
+
             <CgFormGroup Label="主图">
                     <CgImageUpload @bind-Value="_editingGameNews.MainPicture" Type=" SDK.MainSite.Models.Files.ImageAspectType._16_9" ShowCropper />
             </CgFormGroup>
@@ -219,7 +219,7 @@
 
         <CgFormSection Title="正文" Icon="mdiTextBoxOutline" Flat>
             <CgFormGroup Label="正文内容 (Markdown)">
-                <CgMarkdownEditor @bind-Value="_editingGameNews.MainPage" Placeholder="请输入正文内容（支持Markdown）" />
+                <CgMarkdownEditor @ref="_gameNewsEditor" @bind-Value="_editingGameNews.MainPage" Placeholder="请输入正文内容（支持Markdown）" />
             </CgFormGroup>
         </CgFormSection>
     }
@@ -236,7 +236,7 @@
     @if (_editingWeeklyNews != null)
     {
         <CgFormSection Title="基本信息" Icon="mdiInformationOutline" Flat>
-            
+
             <CgFormGroup Label="主图链接">
                 <CgImageUpload @bind-Value="_editingWeeklyNews.MainPicture" Type=" SDK.MainSite.Models.Files.ImageAspectType._16_9" ShowCropper/>
             </CgFormGroup>
@@ -284,7 +284,7 @@
 
         <CgFormSection Title="正文" Icon="mdiTextBoxOutline" Flat>
             <CgFormGroup Label="正文内容 (Markdown)">
-                <CgMarkdownEditor @bind-Value="_editingWeeklyNews.MainPage" Placeholder="请输入正文内容（支持Markdown）" />
+                <CgMarkdownEditor @ref="_weeklyNewsEditor" @bind-Value="_editingWeeklyNews.MainPage" Placeholder="请输入正文内容（支持Markdown）" />
             </CgFormGroup>
         </CgFormSection>
     }
@@ -351,6 +351,7 @@
     private CancellationTokenSource? _cts;
     private CgDataTable<GameNewsOverviewModel, GameNewsSortField>? _gameNewsTable;
     private CgDataTable<WeeklyNewsOverviewModel, WeeklyNewsSortField>? _weeklyNewsTable;
+    private CgMarkdownEditor? _gameNewsEditor, _weeklyNewsEditor;
 
     private readonly IReadOnlyList<CgTabItem> _tabs =
     [
@@ -469,6 +470,7 @@
 
     private async Task SaveGameNews(MouseEventArgs _)
     {
+        if (_gameNewsEditor is not null) await _gameNewsEditor.FlushAsync();
         if (_editingGameNews == null) return;
 
         if (_gameNewsPublishTime.HasValue)
@@ -552,6 +554,7 @@
 
     private async Task SaveWeeklyNews(MouseEventArgs _)
     {
+        if (_weeklyNewsEditor is not null) await _weeklyNewsEditor.FlushAsync();
         if (_editingWeeklyNews == null) return;
 
         if (_weeklyNewsPublishTime.HasValue)
@@ -593,7 +596,7 @@
     private async Task ResetWeeklyNewsInModal()
     {
         if (_editingWeeklyNews == null) return;
-        
+
         var id = _editingWeeklyNews.Id;
         var result = await AdminCommandService.ResetWeeklyNewsAsync(id, _cts?.Token ?? CancellationToken.None);
         if (result.Success)

@@ -3,6 +3,7 @@
 @rendermode InteractiveServer
 
 @inject IEntryQueryService EntryQueryService
+@inject PageResponseState PageResponse
 @inject NavigationManager NavigationManager
 @implements IDisposable
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
@@ -169,6 +170,7 @@
 
         _cts?.Cancel();
         _cts = new CancellationTokenSource();
+        PageResponse.Begin();
 
         IsLoading = true;
         ErrorMessage = null;
@@ -193,10 +195,12 @@
             if (result.Success && result.Data is not null)
             {
                 CardItems = result.Data;
+                PageResponse.Succeeded();
             }
             else
             {
                 ErrorMessage = result.Error?.Message ?? "获取游戏发布时间列表失败";
+                PageResponse.Failed(result.Error);
             }
         }
         else
@@ -218,10 +222,12 @@
             if (result.Success && result.Data is not null)
             {
                 TimelineItems = result.Data;
+                PageResponse.Succeeded();
             }
             else
             {
                 ErrorMessage = result.Error?.Message ?? "获取游戏发布时间线失败";
+                PageResponse.Failed(result.Error);
             }
         }
 

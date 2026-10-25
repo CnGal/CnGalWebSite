@@ -3,10 +3,11 @@ using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Tables;
+using System.Text.Json.Serialization;
 
 namespace CnGalWebSite.SDK.MainSite.Models;
 
-public sealed class HomeSummaryViewModel
+public sealed record HomeSummaryViewModel
 {
     public required string HeroTitle { get; init; }
 
@@ -14,7 +15,7 @@ public sealed class HomeSummaryViewModel
 
     public required IReadOnlyList<CarouselViewModel> Carousels { get; init; }
 
-    public required IReadOnlyList<HotRecommendItemModel> HotRecommends { get; set; }
+    public required IReadOnlyList<HotRecommendItemModel> HotRecommends { get; init; }
 
     public required IReadOnlyList<PublishedGameItemModel> PublishedGames { get; init; }
 
@@ -42,8 +43,9 @@ public sealed class HomeSummaryViewModel
 
     public required IReadOnlyList<HomeCommunityLinkViewModel> CommunityLinks { get; init; }
 
-    public required IReadOnlyList<EvaluationItemModel> Evaluations { get; set; }
+    public required IReadOnlyList<EvaluationItemModel> Evaluations { get; init; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public required HomeSupportLinkViewModel? SupportLink { get; init; }
 
     public required IReadOnlyList<HotTagItemModel> HotTags { get; init; }

@@ -14,8 +14,6 @@ public abstract class QueryServiceBase(HttpClient httpClient)
     /// </summary>
     protected abstract ILogger Logger { get; }
 
-    /// <summary>仅由明确采用取消异常契约的查询服务开启。</summary>
-    protected virtual bool PropagateCancellation => false;
 
     // ──────── 底层辅助 ────────
 
@@ -24,7 +22,8 @@ public abstract class QueryServiceBase(HttpClient httpClient)
         string path,
         CancellationToken cancellationToken)
     {
-        var response = await httpClient.GetAsync(path, cancellationToken);
+        using var request = SdkRequestPolicy.Read(HttpMethod.Get, path);
+        var response = await httpClient.SendAsync(request, cancellationToken);
         try
         {
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -45,7 +44,7 @@ public abstract class QueryServiceBase(HttpClient httpClient)
             return string.Empty;
         }
 
-        return text.Length <= maxLength ? text : $"{text[..maxLength]}...(truncated)";
+        return $"[response body omitted; length={text.Length}]";
     }
 
     // ──────── 模板方法：获取单个实体 ────────
@@ -139,7 +138,7 @@ public abstract class QueryServiceBase(HttpClient httpClient)
                 entityId,
                 path,
                 HttpClient.BaseAddress);
-            return SdkResult<TResult>.Fail($"{errorCodePrefix}_QUERY_EXCEPTION", $"请求{entityDescription}详情时发生异常");
+            return SdkFailure.FromException<TResult>(ex, $"{errorCodePrefix}_QUERY_EXCEPTION", $"请求{entityDescription}详情时发生异常");
         }
     }
 
@@ -204,7 +203,7 @@ public abstract class QueryServiceBase(HttpClient httpClient)
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            return [];
+            throw;
         }
         catch (Exception ex)
         {
@@ -282,7 +281,7 @@ public abstract class QueryServiceBase(HttpClient httpClient)
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            return default;
+            throw;
         }
         catch (Exception ex)
         {
@@ -328,7 +327,7 @@ public abstract class QueryServiceBase(HttpClient httpClient)
                     HttpClient.BaseAddress,
                     TrimForLog(responseBody));
 
-                return SdkResult<T>.Fail($"{errorCodePrefix}_HTTP_FAILED", $"获取{entityDescription}失败（HTTP {(int)response.StatusCode}）");
+                return SdkResult<T>.Fail($"{errorCodePrefix}_HTTP_FAILED", $"获取{entityDescription}失败（HTTP {(int)response.StatusCode}）", (int)response.StatusCode);
             }
 
             try
@@ -351,8 +350,7 @@ public abstract class QueryServiceBase(HttpClient httpClient)
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            if (PropagateCancellation) throw;
-            return SdkResult<T>.Fail($"{errorCodePrefix}_CANCELED", "请求已取消");
+            throw;
         }
         catch (Exception ex)
         {
@@ -363,7 +361,7 @@ public abstract class QueryServiceBase(HttpClient httpClient)
                 path,
                 HttpClient.BaseAddress);
 
-            return SdkResult<T>.Fail($"{errorCodePrefix}_EXCEPTION", $"请求{entityDescription}数据时发生异常");
+            return SdkFailure.FromException<T>(ex, $"{errorCodePrefix}_EXCEPTION", $"请求{entityDescription}数据时发生异常");
         }
     }
 
@@ -378,7 +376,9 @@ public abstract class QueryServiceBase(HttpClient httpClient)
     {
         try
         {
-            using var response = await HttpClient.PostAsJsonAsync(path, new { }, SdkJsonSerializerOptions.Default, cancellationToken);
+            using var request = new HttpRequestMessage(HttpMethod.Post, path)
+            { Content = JsonContent.Create(new { }, options: SdkJsonSerializerOptions.Default) };
+            using var response = await HttpClient.SendAsync(request, cancellationToken);
             var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
 
             if (!response.IsSuccessStatusCode)
@@ -391,7 +391,7 @@ public abstract class QueryServiceBase(HttpClient httpClient)
                     HttpClient.BaseAddress,
                     TrimForLog(responseBody));
 
-                return SdkResult<T>.Fail($"{errorCodePrefix}_HTTP_FAILED", $"获取{entityDescription}失败（HTTP {(int)response.StatusCode}）");
+                return SdkResult<T>.Fail($"{errorCodePrefix}_HTTP_FAILED", $"获取{entityDescription}失败（HTTP {(int)response.StatusCode}）", (int)response.StatusCode);
             }
 
             try
@@ -425,7 +425,7 @@ public abstract class QueryServiceBase(HttpClient httpClient)
                 path,
                 HttpClient.BaseAddress);
 
-            return SdkResult<T>.Fail($"{errorCodePrefix}_EXCEPTION", $"请求{entityDescription}数据时发生异常");
+            return SdkFailure.FromException<T>(ex, $"{errorCodePrefix}_EXCEPTION", $"请求{entityDescription}数据时发生异常");
         }
     }
 }

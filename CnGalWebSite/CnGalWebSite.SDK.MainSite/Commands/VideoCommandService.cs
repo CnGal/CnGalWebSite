@@ -4,18 +4,18 @@ using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.VideoEdit;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class VideoCommandService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<VideoCommandService> logger,
     ExamineUserCache userCache,
-    ICurrentUserAccessor currentUserAccessor) : CommandServiceBase(httpClient), IVideoCommandService
+    ICurrentUserAccessor currentUserAccessor) : CommandServiceBase(httpClient, publicCache), IVideoCommandService
 {
+
     protected override ILogger Logger => logger;
 
     public Task<SdkResult<VideoEditViewModel>> GetVideoCreateTemplateAsync(CancellationToken cancellationToken = default)
@@ -36,6 +36,7 @@ public sealed class VideoCommandService(
 
             return Task.FromResult(SdkResult<VideoEditViewModel>.Ok(model));
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取视频创建模板异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
@@ -45,6 +46,7 @@ public sealed class VideoCommandService(
 
     public async Task<SdkResult<VideoEditViewModel>> GetVideoEditAsync(long id, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var mainTask = GetFromJsonAsync<EditVideoMainViewModel>($"api/videos/EditMain/{id}", cancellationToken);
@@ -79,15 +81,17 @@ public sealed class VideoCommandService(
 
             return SdkResult<VideoEditViewModel>.Ok(model);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取视频编辑数据异常。VideoId={VideoId}; BaseAddress={BaseAddress}", id, HttpClient.BaseAddress);
-            return SdkResult<VideoEditViewModel>.Fail("VIDEO_EDIT_QUERY_EXCEPTION", "请求视频编辑数据时发生异常");
+            return SdkFailure.FromException<VideoEditViewModel>(ex, "VIDEO_EDIT_QUERY_EXCEPTION", "请求视频编辑数据时发生异常");
         }
     }
 
     public async Task<SdkResult<VideoEditMetaOptions>> GetVideoEditMetaOptionsAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var gamesTask = GetFromJsonAsync<List<string>>("api/entries/GetAllEntries/0", cancellationToken);
@@ -111,31 +115,30 @@ public sealed class VideoCommandService(
 
             return SdkResult<VideoEditMetaOptions>.Ok(model);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取视频候选列表数据异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<VideoEditMetaOptions>.Fail("VIDEO_META_OPTIONS_EXCEPTION", "请求视频候选列表数据时发生异常");
+            return SdkFailure.FromException<VideoEditMetaOptions>(ex, "VIDEO_META_OPTIONS_EXCEPTION", "请求视频候选列表数据时发生异常");
         }
     }
 
     public async Task<SdkResult<long>> SubmitEditAsync(VideoEditRequest request, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var writeAttempted = false;
         string? userId = null;
-        long? cacheEntityId = null;
         try
         {
             userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
-            cacheEntityId = request.IsCreate ? null : request.Data.Main.Id;
             writeAttempted = true;
             if (request.IsCreate)
             {
-                var response = await PostAsJsonRawAsync("api/videos/Create", request.Data, cancellationToken);
+                using var response = await PostAsJsonRawAsync("api/videos/Create", request.Data, cancellationToken);
                 var result = await ReadResponseAsync<Result>(response, cancellationToken);
 
                 if (result?.Successful == true && long.TryParse(result.Error, out var newId))
                 {
-                    cacheEntityId = newId;
                     return SdkResult<long>.Ok(newId);
                 }
 
@@ -168,20 +171,17 @@ public sealed class VideoCommandService(
                 return SdkResult<long>.Ok(request.Data.Main.Id);
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "提交视频编辑数据异常。IsCreate={IsCreate}; BaseAddress={BaseAddress}", request.IsCreate, HttpClient.BaseAddress);
-            return SdkResult<long>.Fail("VIDEO_SUBMIT_EXCEPTION", "提交视频数据时发生异常");
+            return SdkFailure.FromException<long>(ex, "VIDEO_SUBMIT_EXCEPTION", "提交视频数据时发生异常");
         }
         finally
         {
             // 分块写入可能部分成功，异常或取消时服务端结果也可能不确定。
             if (writeAttempted)
             {
-                if (cacheEntityId.HasValue)
-                {
-                    InvalidateVideoCaches(cacheEntityId.Value);
-                }
                 userCache.Invalidate(HttpClient.BaseAddress, userId);
                 userCache.InvalidateReviewQueue(HttpClient.BaseAddress);
             }
@@ -191,12 +191,5 @@ public sealed class VideoCommandService(
     private Task<Result?> SubmitPartAsync<T>(string path, T model, CancellationToken cancellationToken)
     {
         return PostAsJsonAsync<T, Result>(path, model, cancellationToken);
-    }
-
-    private void InvalidateVideoCaches(long videoId)
-    {
-        memoryCache.Remove($"main-site:video-detail:{videoId}");
-        memoryCache.Remove(ExamineCacheKeys.VideoEditRecords(videoId));
-        memoryCache.Remove("main-site:home-summary");
     }
 }

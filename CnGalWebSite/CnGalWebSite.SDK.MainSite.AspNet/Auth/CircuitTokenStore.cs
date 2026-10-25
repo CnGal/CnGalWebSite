@@ -26,9 +26,28 @@ public sealed class CircuitTokenStore(
     private TaskCompletionSource? _initialization;
     private long _identityVersion;
     private bool _isCircuit;
+    private CurrentIdentityState _circuitIdentityState = CurrentIdentityState.Unknown;
     private bool _initialized;
     private bool _ticketEstablished;
     private bool _disposed;
+
+    internal long IdentityVersion { get { lock (_gate) return _identityVersion; } }
+
+    internal CurrentIdentityState IdentityState
+    {
+        get
+        {
+            lock (_gate)
+            {
+                if (_disposed) return CurrentIdentityState.Unknown;
+                if (_isCircuit) return _circuitIdentityState;
+                return httpContextAccessor.HttpContext is { } context
+                    ? context.User.Identity?.IsAuthenticated == true
+                        ? CurrentIdentityState.Authenticated : CurrentIdentityState.Anonymous
+                    : CurrentIdentityState.Unknown;
+            }
+        }
+    }
 
     internal AuthenticationSnapshot? CurrentSnapshot
     {
@@ -103,6 +122,8 @@ public sealed class CircuitTokenStore(
     internal async Task SetCircuitUserAsync(ClaimsPrincipal principal, bool retryInitialization = false)
     {
         var principalKey = AuthenticationSnapshot.GetPrincipalKey(principal);
+        var identityState = principal.Identity?.IsAuthenticated == true
+            ? CurrentIdentityState.Authenticated : CurrentIdentityState.Anonymous;
         AuthenticationSnapshot? previous;
         TaskCompletionSource completion;
         long version;
@@ -111,8 +132,10 @@ public sealed class CircuitTokenStore(
             if (_disposed) return;
             _isCircuit = true;
             _initialized = true;
+            var identityChanged = identityState != _circuitIdentityState || principalKey != _sourcePrincipalKey;
+            _circuitIdentityState = identityState;
             // 仅连接恢复可重试从未建立成功的票据；失效或刷新中的旧凭据不能复活。
-            if (principalKey == _sourcePrincipalKey && (_ticketEstablished || !retryInitialization || principalKey is null))
+            if (!identityChanged && (_ticketEstablished || !retryInitialization || principalKey is null))
                 return;
             _sourcePrincipalKey = principalKey;
             _ticketEstablished = false;

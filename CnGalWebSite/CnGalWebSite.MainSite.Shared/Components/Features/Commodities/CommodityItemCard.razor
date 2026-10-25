@@ -1,4 +1,4 @@
-﻿@using CnGalWebSite.DataModel.ViewModel.Commodities
+@using CnGalWebSite.DataModel.ViewModel.Commodities
 @using Microsoft.Extensions.Logging
 @inject ILogger<CommodityItemCard> Logger
 
@@ -11,7 +11,7 @@
              alt="@Model.Name"
              class="commodity-item-card__image"
              loading="lazy"
-             onerror="this.style.display='none';this.parentElement.classList.add('commodity-item-card__image-wrapper--broken')" />
+             data-cg-image-fallback />
     </div>
 
     @* 商品信息 *@
@@ -36,7 +36,7 @@
                 {
                         <CgMdiIcon Name="mdiCheckBold" aria-hidden="true" />
                         <div>已解锁</div>
-                 
+
                 }
                 else
                 {

@@ -1,4 +1,4 @@
-﻿/* ── CommodityCodeRedeem ── */
+/* ── CommodityCodeRedeem ── */
 .commodity-code-redeem {
     display: flex;
     flex-direction: column;
@@ -102,4 +102,9 @@
     height: auto;
     display: block;
     object-fit: cover;
+}
+
+/* CgAlert 所在容器已通过 gap 提供间距，避免重复添加底部间距 */
+.commodity-code-redeem > ::deep .cg-alert {
+    --cg-alert-margin-bottom: 0;
 }

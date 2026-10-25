@@ -3,25 +3,25 @@ using CnGalWebSite.DataModel.ViewModel.Favorites;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class FavoriteFolderCommandService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ICurrentUserAccessor currentUserAccessor,
-    ILogger<FavoriteFolderCommandService> logger) : CommandServiceBase(httpClient), IFavoriteFolderCommandService
+    ILogger<FavoriteFolderCommandService> logger) : CommandServiceBase(httpClient, publicCache), IFavoriteFolderCommandService
 {
+
     protected override ILogger Logger => logger;
 
     public async Task<SdkResult<bool>> EditFavoriteFolderAsync(EditFavoriteFolderViewModel model,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var result =
                 await PostAsJsonAsync<EditFavoriteFolderViewModel, Result>("api/favorites/EditFavoriteFolder",
                     model, cancellationToken);
@@ -34,24 +34,23 @@ public sealed class FavoriteFolderCommandService(
             {
                 return SdkResult<bool>.Fail("FAVORITE_FOLDER_EDIT_FAILED", result.Error ?? "编辑收藏夹失败");
             }
-
-            InvalidateFolderCaches(model.Id, userId);
             return SdkResult<bool>.Ok(true);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "编辑收藏夹异常。FolderId={FolderId}; BaseAddress={BaseAddress}", model.Id,
                 HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail("FAVORITE_FOLDER_EDIT_EXCEPTION", "编辑收藏夹时发生异常");
+            return SdkFailure.FromException<bool>(ex, "FAVORITE_FOLDER_EDIT_EXCEPTION", "编辑收藏夹时发生异常");
         }
     }
 
     public async Task<SdkResult<bool>> CreateFavoriteFolderAsync(CreateFavoriteFolderViewModel model,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var result =
                 await PostAsJsonAsync<CreateFavoriteFolderViewModel, Result>("api/favorites/CreateFavoriteFolder",
                     model, cancellationToken);
@@ -64,23 +63,22 @@ public sealed class FavoriteFolderCommandService(
             {
                 return SdkResult<bool>.Fail("FAVORITE_FOLDER_CREATE_FAILED", result.Error ?? "创建收藏夹失败");
             }
-
-            InvalidateUserFolderListCache(userId);
             return SdkResult<bool>.Ok(true);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "创建收藏夹异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail("FAVORITE_FOLDER_CREATE_EXCEPTION", "创建收藏夹时发生异常");
+            return SdkFailure.FromException<bool>(ex, "FAVORITE_FOLDER_CREATE_EXCEPTION", "创建收藏夹时发生异常");
         }
     }
 
     public async Task<SdkResult<bool>> DeleteFavoriteObjectsAsync(long folderId, long[] objectIds,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var result = await PostAsJsonAsync<DeleteFavoriteObjectsModel, Result>(
                 "api/favorites/UserDeleteFavoriteObject",
                 new DeleteFavoriteObjectsModel { FavorieFolderId = folderId, Ids = objectIds },
@@ -95,24 +93,23 @@ public sealed class FavoriteFolderCommandService(
             {
                 return SdkResult<bool>.Fail("FAVORITE_OBJECT_DELETE_FAILED", result.Error ?? "删除收藏对象失败");
             }
-
-            InvalidateFolderCaches(folderId, userId);
             return SdkResult<bool>.Ok(true);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "删除收藏对象异常。FolderId={FolderId}; BaseAddress={BaseAddress}", folderId,
                 HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail("FAVORITE_OBJECT_DELETE_EXCEPTION", "删除收藏对象时发生异常");
+            return SdkFailure.FromException<bool>(ex, "FAVORITE_OBJECT_DELETE_EXCEPTION", "删除收藏对象时发生异常");
         }
     }
 
     public async Task<SdkResult<bool>> DeleteFavoriteFolderAsync(long[] folderIds,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var result = await PostAsJsonAsync<DeleteFavoriteFoldersModel, Result>(
                 "api/favorites/UserDeleteFavoriteFolderAsync",
                 new DeleteFavoriteFoldersModel { Ids = folderIds },
@@ -128,26 +125,22 @@ public sealed class FavoriteFolderCommandService(
                 return SdkResult<bool>.Fail("FAVORITE_FOLDER_DELETE_FAILED", result.Error ?? "删除收藏夹失败");
             }
 
-            foreach (var folderId in folderIds)
-            {
-                InvalidateFolderCaches(folderId, userId);
-            }
-
             return SdkResult<bool>.Ok(true);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "删除收藏夹异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail("FAVORITE_FOLDER_DELETE_EXCEPTION", "删除收藏夹时发生异常");
+            return SdkFailure.FromException<bool>(ex, "FAVORITE_FOLDER_DELETE_EXCEPTION", "删除收藏夹时发生异常");
         }
     }
 
     public async Task<SdkResult<bool>> MoveFavoriteObjectsAsync(MoveFavoriteObjectsModel model,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var result = await PostAsJsonAsync<MoveFavoriteObjectsModel, Result>(
                 "api/favorites/MoveFavoriteObjects",
                 model,
@@ -163,54 +156,21 @@ public sealed class FavoriteFolderCommandService(
                 return SdkResult<bool>.Fail("FAVORITE_OBJECT_MOVE_FAILED", result.Error ?? "移动收藏对象失败");
             }
 
-            // Invalidate source folder cache
-            InvalidateFolderCaches(model.CurrentFolderId, userId);
-            // Invalidate target folder caches
-            foreach (var folderId in model.FolderIds)
-            {
-                InvalidateFolderCaches(folderId, userId);
-            }
-
             return SdkResult<bool>.Ok(true);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "移动收藏对象异常。CurrentFolderId={FolderId}; BaseAddress={BaseAddress}", model.CurrentFolderId,
                 HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail("FAVORITE_OBJECT_MOVE_EXCEPTION", "移动收藏对象时发生异常");
+            return SdkFailure.FromException<bool>(ex, "FAVORITE_OBJECT_MOVE_EXCEPTION", "移动收藏对象时发生异常");
         }
-    }
-
-    /// <summary>
-    /// 清空指定收藏夹的详情缓存，以及当前用户的收藏夹列表缓存和空间详情缓存
-    /// </summary>
-    private void InvalidateFolderCaches(long folderId, string? userId)
-    {
-        // 清空收藏夹详情缓存
-        memoryCache.Remove($"main-site:favorite-folder-detail:{folderId}");
-
-        // 清空当前用户的收藏夹列表缓存与空间详情缓存
-        InvalidateUserFolderListCache(userId);
-    }
-
-    /// <summary>
-    /// 清空当前用户的收藏夹列表缓存和空间详情缓存
-    /// </summary>
-    private void InvalidateUserFolderListCache(string? userId)
-    {
-        if (string.IsNullOrEmpty(userId))
-        {
-            return;
-        }
-
-        memoryCache.Remove($"main-site:user-favorite-folders:{userId}");
-        memoryCache.Remove($"main-site:user-all-favorite-folders:{userId}");
-        memoryCache.Remove($"main-site:space-detail:{userId}");
     }
 
     public async Task<SdkResult<bool>> AddFavoriteObjectAsync(long objectId, FavoriteObjectType type,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             // First, get the user's default folder ids
@@ -249,29 +209,23 @@ public sealed class FavoriteFolderCommandService(
             {
                 return SdkResult<bool>.Fail("FAVORITE_ADD_FAILED", result.Error ?? "收藏失败");
             }
-
-            InvalidateUserFolderListCache(userId);
-            foreach (var folderId in defaultFolderIds)
-            {
-                memoryCache.Remove($"main-site:favorite-folder-detail:{folderId}");
-            }
-            memoryCache.Remove($"main-site:relate-favorite-folders:{(int)type}:{objectId}");
             return SdkResult<bool>.Ok(true);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "收藏对象异常。ObjectId={ObjectId}; Type={Type}; BaseAddress={BaseAddress}",
                 objectId, type, HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail("FAVORITE_ADD_EXCEPTION", "收藏时发生异常");
+            return SdkFailure.FromException<bool>(ex, "FAVORITE_ADD_EXCEPTION", "收藏时发生异常");
         }
     }
 
     public async Task<SdkResult<bool>> UnFavoriteObjectAsync(long objectId, FavoriteObjectType type,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var result = await PostAsJsonAsync<UnFavoriteObjectsModel, Result>(
                 "api/favorites/UnFavoriteObjects",
                 new UnFavoriteObjectsModel { ObjectId = objectId, Type = type },
@@ -286,22 +240,21 @@ public sealed class FavoriteFolderCommandService(
             {
                 return SdkResult<bool>.Fail("FAVORITE_REMOVE_FAILED", result.Error ?? "取消收藏失败");
             }
-
-            InvalidateUserFolderListCache(userId);
-            memoryCache.Remove($"main-site:relate-favorite-folders:{(int)type}:{objectId}");
             return SdkResult<bool>.Ok(true);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "取消收藏异常。ObjectId={ObjectId}; Type={Type}; BaseAddress={BaseAddress}",
                 objectId, type, HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail("FAVORITE_REMOVE_EXCEPTION", "取消收藏时发生异常");
+            return SdkFailure.FromException<bool>(ex, "FAVORITE_REMOVE_EXCEPTION", "取消收藏时发生异常");
         }
     }
 
     public async Task<SdkResult<bool>> IsObjectFavoritedAsync(long objectId, FavoriteObjectType type,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var result = await GetFromJsonAsync<IsObjectInUserFavoriteFolderResult>(
@@ -314,6 +267,7 @@ public sealed class FavoriteFolderCommandService(
 
             return SdkResult<bool>.Ok(result.Result);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "检查收藏状态异常。ObjectId={ObjectId}; Type={Type}; BaseAddress={BaseAddress}",

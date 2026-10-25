@@ -70,6 +70,7 @@ public sealed partial class ToolboxArticleRepostService(
         {
             article = GenerateArticle(model, metaResult.Data.EntryGameItems);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Report(model, ToolboxOutputLevel.Error, $"生成文章失败：{ex.Message}");
@@ -122,6 +123,7 @@ public sealed partial class ToolboxArticleRepostService(
             Report(model, ToolboxOutputLevel.Error, "链接格式不正确或暂不支持该平台");
             return false;
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Report(model, ToolboxOutputLevel.Error, $"获取文章失败：{ex.Message}");

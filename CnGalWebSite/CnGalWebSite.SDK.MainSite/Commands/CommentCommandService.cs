@@ -3,7 +3,6 @@ using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
@@ -11,9 +10,10 @@ namespace CnGalWebSite.SDK.MainSite.Commands;
 /// <summary>
 /// 评论写操作服务实现。
 /// </summary>
-public sealed class CommentCommandService(HttpClient httpClient, IMemoryCache memoryCache, ILogger<CommentCommandService> logger)
-    : CommandServiceBase(httpClient), ICommentCommandService
+public sealed class CommentCommandService(HttpClient httpClient, PublicDataCache publicCache, ILogger<CommentCommandService> logger)
+    : CommandServiceBase(httpClient, publicCache), ICommentCommandService
 {
+
     protected override ILogger Logger { get; } = logger;
 
     public async Task<SdkResult<bool>> PublishCommentAsync(
@@ -22,6 +22,7 @@ public sealed class CommentCommandService(HttpClient httpClient, IMemoryCache me
         string text,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var model = new PublishCommentModel
@@ -44,26 +45,21 @@ public sealed class CommentCommandService(HttpClient httpClient, IMemoryCache me
                 Logger.LogWarning("发表评论失败。Error={Error}", result.Error);
                 return SdkResult<bool>.Fail("COMMENT_PUBLISH_FAILED", result.Error ?? "发表评论失败");
             }
-
-            InvalidateCommentCache(type, objectId);
             return SdkResult<bool>.Ok(true);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "发表评论异常。Type={Type}; ObjectId={ObjectId}", type, objectId);
-            return SdkResult<bool>.Fail("COMMENT_PUBLISH_EXCEPTION", "发表评论时发生异常");
+            return SdkFailure.FromException<bool>(ex, "COMMENT_PUBLISH_EXCEPTION", "发表评论时发生异常");
         }
-    }
-
-    private void InvalidateCommentCache(CommentType type, string objectId)
-    {
-        memoryCache.Remove($"main-site:comments:{(int)type}:{objectId}");
     }
 
     public async Task<SdkResult<bool>> DeleteCommentAsync(
         long commentId,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var model = new HiddenCommentModel
@@ -88,10 +84,11 @@ public sealed class CommentCommandService(HttpClient httpClient, IMemoryCache me
 
             return SdkResult<bool>.Ok(true);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "删除评论异常。CommentId={CommentId}", commentId);
-            return SdkResult<bool>.Fail("COMMENT_DELETE_EXCEPTION", "删除评论时发生异常");
+            return SdkFailure.FromException<bool>(ex, "COMMENT_DELETE_EXCEPTION", "删除评论时发生异常");
         }
     }
 }

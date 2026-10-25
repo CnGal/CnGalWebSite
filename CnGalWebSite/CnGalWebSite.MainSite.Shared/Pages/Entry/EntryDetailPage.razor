@@ -1,9 +1,6 @@
-﻿@page "/entries/index/{Id:int}"
-@inject IEntryQueryService EntryQueryService
-@inject IPlayedGameQueryService PlayedGameQueryService
-@inject IPeripheryQueryService PeripheryQueryService
-@inject IFavoriteFolderQueryService FavoriteFolderQueryService
-@inject IExamineQueryService ExamineQueryService
+@inject PageResponseState PageResponse
+@inject IEntryPageQueryService EntryPageQueryService
+@page "/entries/index/{Id:int}"
 
 
 @inject NavigationManager NavigationManager
@@ -20,11 +17,11 @@
 @using CnGalWebSite.Extensions
 @using System.Text.Json.Nodes
 
-<CgPageMeta Title="@(Model?.Name)" Description="@(Model?.BriefIntroduction)" Image="@(Model?.MainPicture)" />
+<CgPageMeta Title="@(Model?.Name)" Description="@(Model?.BriefIntroduction)" Image="@(Model?.MainPicture)" StructuredData="@GenerateStructuredDataJson()" />
 
 @if (Model is not null)
 {
-    <CgStructuredData Data="@GenerateStructuredDataJson()" />
+
     <TrackingMeta Type="entry" Id="@Model.Id.ToString()" Name="@Model.Name" />
 }
 
@@ -112,18 +109,20 @@ else if (Model is not null)
                 </div>
 
                 <div class="entry-cell entry-cell--periphery">
+                    @if (_page?.Periphery.Error is { } peripheryError) { <CgAlert>@peripheryError.Message</CgAlert> }
                     <EntryPeripheryCard Model="PeripheryOverview" />
                 </div>
 
                 <div class="entry-cell entry-cell--score">
                     <CgMiniModeContainer>
+                        @if (_page?.Score?.Error is { } scoreError) { <CgAlert>@scoreError.Message</CgAlert> }
                         @* 仅游戏类词条显示评分区域 *@
                         @if (Model.Type == EntryType.Game)
                         {
                             @* 登录用户使用交互式评分区域（支持编辑后实时刷新），未登录用户使用静态渲染 *@
                             <AuthorizeView>
                                 <Authorized>
-                                    <EntryScoreSection EntryId="Id" />
+                                    <EntryScoreSection EntryId="Id" InitialModel="ScoreOverview" HasInitialResult="true" />
                                 </Authorized>
                                 <NotAuthorized>
                                     @if (ScoreOverview is not null)
@@ -202,11 +201,13 @@ else if (Model is not null)
 
                 <div class="entry-cell entry-cell--records">
                     <CgMiniModeContainer>
+                        @if (_page?.EditRecords.Error is { } recordsError) { <CgAlert>@recordsError.Message</CgAlert> }
                         <EntryEditRecordCard Records="EditRecords" />
                     </CgMiniModeContainer>
                 </div>
 
                 <div class="entry-cell entry-cell--catalog">
+                    @if (_page?.Catalog.Error is { } catalogError) { <CgAlert>@catalogError.Message</CgAlert> }
                     <EntryCatalogCard Folders="RelateFolders" />
                 </div>
             </div>
@@ -232,74 +233,37 @@ else
     private IReadOnlyList<ExaminedNormalListModel>? EditRecords;
     private string? ErrorMessage;
     private CancellationTokenSource? _cts;
+    private long _requestVersion;
+    private EntryPageModel? _page;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Model?.Id == Id)
-        {
-            return;
-        }
-
+        if (Model?.Id == Id) return;
+        PageResponse.Begin();
+        var version = ++_requestVersion;
         _cts?.Cancel();
-        _cts = new CancellationTokenSource();
-        var ct = _cts.Token;
-
-        Model = null;
-        ScoreOverview = null;
-        PeripheryOverview = null;
-        RelateFolders = null;
-        EditRecords = null;
-        ErrorMessage = null;
-
+        _cts?.Dispose();
+        using var request = new CancellationTokenSource();
+        _cts = request;
+        Model = null; ScoreOverview = null; PeripheryOverview = null;
+        RelateFolders = null; EditRecords = null; ErrorMessage = null; _page = null;
         try
         {
-            // 并行请求词条详情、周边概览、相关目录、编辑记录
-            // 注意：评分概览仅对游戏类型有效，延迟到确认类型后再请求
-            var entryTask = EntryQueryService.GetEntryDetailAsync(Id, ct);
-            var peripheryTask = PeripheryQueryService.GetEntryOverviewPeripheriesAsync(Id, ct);
-            var catalogTask = FavoriteFolderQueryService.GetRelateFavoriteFoldersAsync(FavoriteObjectType.Entry, Id, ct);
-            var editRecordsTask = ExamineQueryService.GetEntryEditRecordsAsync(Id, ct);
-
-            var result = await entryTask;
-            if (result.Success && result.Data is not null)
+            var result = await EntryPageQueryService.GetAsync(Id, request.Token);
+            if (request.IsCancellationRequested || version != _requestVersion) return;
+            if (result.Success && result.Data is { } page)
             {
-                ErrorMessage = null;
-                Model = result.Data;
-
-                // 仅游戏类词条加载评分概览
-                if (Model.Type == EntryType.Game)
-                {
-                    var scoreResult = await PlayedGameQueryService.GetOverviewAsync(Id, ct);
-                    ScoreOverview = scoreResult.Success ? scoreResult.Data : null;
-                }
-                else
-                {
-                    ScoreOverview = null;
-                }
-
-                // 加载周边概览
-                var peripheryResult = await peripheryTask;
-                PeripheryOverview = peripheryResult.Success ? peripheryResult.Data : null;
-
-                // 加载相关目录
-                var catalogResult = await catalogTask;
-                RelateFolders = catalogResult.Success ? catalogResult.Data : null;
-
-                // 加载编辑记录
-                var editRecordsResult = await editRecordsTask;
-                EditRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
-
-                return;
+                PageResponse.Succeeded();
+                _page = page; Model = page.Entry;
+                ScoreOverview = page.Score?.Data;
+                PeripheryOverview = page.Periphery.Data;
+                RelateFolders = page.Catalog.Data;
+                EditRecords = page.EditRecords.Data;
             }
-
-            Model = null;
-            ScoreOverview = null;
-            PeripheryOverview = null;
-            RelateFolders = null;
-            EditRecords = null;
-            ErrorMessage = result.Error?.Message ?? "请稍后重试";
+            else { PageResponse.Failed(result.Error); ErrorMessage = result.Error?.Message ?? "请稍后重试"; }
         }
-        catch (OperationCanceledException) { }
+        catch (OperationCanceledException) when (request.IsCancellationRequested) { }
+        finally { if (ReferenceEquals(_cts, request)) _cts = null; }
     }
 
     private string GenerateStructuredDataJson()
@@ -360,6 +324,7 @@ else
 
     public void Dispose()
     {
+        _requestVersion++;
         _cts?.Cancel();
         _cts?.Dispose();
     }

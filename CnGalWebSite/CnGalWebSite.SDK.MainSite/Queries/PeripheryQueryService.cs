@@ -2,26 +2,30 @@ using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class PeripheryQueryService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<PeripheryQueryService> logger) : QueryServiceBase(httpClient), IPeripheryQueryService
 {
+    private readonly PublicDataCache memoryCache = publicCache.ForSource(httpClient.BaseAddress);
+
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
 
     protected override ILogger Logger => logger;
 
     public async Task<SdkResult<PeripheryDetailViewModel>> GetPeripheryDetailAsync(long id, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"main-site:periphery-detail:{id}";
-        if (memoryCache.TryGetValue(cacheKey, out PeripheryDetailViewModel? cached) && cached is not null)
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        var cacheKey = PublicCacheKeys.Detail("periphery", id);
+        if (memoryCache.TryGetValue(cacheKey, out PeripheryDetailViewModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<PeripheryDetailViewModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<PeripheryDetailViewModel>(cached, cacheRead);
         }
 
         var result = await GetSingleAsync<PeripheryViewModel, PeripheryDetailViewModel>(
@@ -34,18 +38,23 @@ public sealed class PeripheryQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, CacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, CacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     public async Task<SdkResult<GameOverviewPeripheryListModel>> GetEntryOverviewPeripheriesAsync(int entryId, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:entry-periphery-overview:{entryId}";
-        if (memoryCache.TryGetValue(cacheKey, out GameOverviewPeripheryListModel? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out GameOverviewPeripheryListModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<GameOverviewPeripheryListModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<GameOverviewPeripheryListModel>(cached, cacheRead);
         }
 
         var path = $"api/peripheries/GetEntryOverviewPeripheries/{entryId}";
@@ -57,14 +66,18 @@ public sealed class PeripheryQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, CacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, CacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     public async Task<SdkResult<IReadOnlyList<GameOverviewPeripheryListModel>>> GetUserOverviewPeripheriesAsync(string userId, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var path = $"api/peripheries/GetUserOverviewPeripheries/{userId}";
         var result = await GetAsync<List<GameOverviewPeripheryListModel>>(
             path,
@@ -80,7 +93,8 @@ public sealed class PeripheryQueryService(
                 result.Error?.StatusCode);
         }
 
-        return SdkResult<IReadOnlyList<GameOverviewPeripheryListModel>>.Ok(result.Data);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<IReadOnlyList<GameOverviewPeripheryListModel>>(result.Data, cacheRead);
     }
 
     private static PeripheryDetailViewModel MapToViewModel(PeripheryViewModel dto)

@@ -8,6 +8,16 @@ namespace CnGalWebSite.SDK.MainSite.Abstractions;
 /// </summary>
 public interface ICurrentUserAccessor
 {
+    CurrentIdentityState GetIdentityState() => CurrentIdentityState.Unknown;
+
+    long IdentityVersion => 0;
+
+    ValueTask<CurrentIdentityState> GetIdentityStateAsync(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return ValueTask.FromResult(GetIdentityState());
+    }
+
     string? GetCurrentUserId();
 
     ValueTask<string?> GetCurrentUserIdAsync(CancellationToken cancellationToken = default)
@@ -22,6 +32,8 @@ public interface ICurrentUserAccessor
         return ValueTask.FromResult<CurrentUserCacheScope?>(null);
     }
 }
+
+public enum CurrentIdentityState { Unknown, Anonymous, Authenticated }
 
 /// <summary>
 /// 用户缓存隔离作用域。AuthorizationKey 应是可信身份及权限上下文的摘要，不得使用原始令牌。

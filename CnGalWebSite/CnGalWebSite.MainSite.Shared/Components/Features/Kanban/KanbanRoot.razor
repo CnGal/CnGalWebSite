@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web
 @using CnGalWebSite.MainSite.Shared.Services
 @using CnGalWebSite.MainSite.Shared.Services.KanbanModels
 @inject IKanbanLive2DService Live2DService
@@ -9,10 +9,14 @@
 @inject ICommodityQueryService CommodityService
 @inject IKanbanCommodityOwnershipService OwnershipService
 @inject IJSRuntime JS
-@implements IDisposable
-@rendermode InteractiveServer
+@implements IAsyncDisposable
+@inject ILogger<KanbanRoot> Logger
 
-<div id="kanban-live2d" class="kanban-live2d @(_settingsLoaded ? "" : "kanban-live2d--hidden")" style="@GetStyleString()">
+<cg-owned @ref="_root" id="kanban-live2d" class="kanban-live2d @(_settingsLoaded ? "" : "kanban-live2d--hidden")" style="@GetStyleString()">
+    @if (_loadError is not null)
+    {
+        <CgAlert>@_loadError</CgAlert><CgButton OnClick="RetryLive2D">重试</CgButton>
+    }
     <KanbanMainCard Width="@Live2DService.Kanban.Size.Width" Height="@Live2DService.Kanban.Size.Height" />
 
     <button class="kanban-resize-handle" type="button"
@@ -51,14 +55,17 @@
         </ToolboxContent>
     </KanbanButtonGroup>
     <KanbanDialogBox Model="_currentDialog" OnClose="HandleDialogClose" />
-</div>
+</cg-owned>
 
 @code {
+    private ElementReference _root;
+    private bool _disposed;
+    private string? _loadError;
     private bool _isReady;
     private bool _settingsLoaded;
     private bool _live2DInitializationPending;
     private bool _live2DInitializationStarted;
-    private CancellationTokenSource? _cts;
+    private readonly CancellationTokenSource _cts = new();
     private Task? _eventLoopTask;
 
     private List<KanbanClothesModel>? _clothes;
@@ -83,6 +90,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (_disposed) return;
         if (firstRender)
         {
             // 先加载设置，确保 canvas 在 Live2D 初始化前已是正确尺寸
@@ -95,7 +103,7 @@
             Live2DService.DialogBox.Position.Bottom = SettingService.DialogBox.Position.Bottom;
 
             await UserDataService.LoadAsync();
-            _cts = new CancellationTokenSource();
+            if (_disposed) return;
 
             _settingsLoaded = true;
             _live2DInitializationPending = true;
@@ -108,9 +116,12 @@
             // 等设置渲染到 DOM 后再初始化 Live2D，避免引擎读取到尚未创建或尺寸未更新的 canvas。
             _live2DInitializationPending = false;
             _live2DInitializationStarted = true;
-            await Live2DService.InitAsync("cngal形象", 0);
+            try { await Live2DService.InitAsync("cngal形象", 0, _root); }
+            catch (JSException ex) { _loadError = "看板娘加载失败"; Logger.LogWarning(ex, "Kanban module initialization failed"); StateHasChanged(); return; }
 
+            if (_disposed) return;
             await LoadSettingsDataAsync();
+            if (_disposed) return;
 
             if (_cts is not null)
             {
@@ -167,7 +178,8 @@
     {
         try
         {
-            await JS.InvokeVoidAsync("eval", "window.scrollTo({top:0,behavior:'smooth'})");
+            await using var module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/CnGalWebSite.MainSite.Shared/scripts/site-shell.js");
+            await module.InvokeVoidAsync("scrollToTop");
         }
         catch
         {
@@ -239,17 +251,22 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    public void Dispose()
+    private Task RetryLive2D() { _loadError = null; _live2DInitializationPending = true; _live2DInitializationStarted = false; StateHasChanged(); return Task.CompletedTask; }
+
+    public async ValueTask DisposeAsync()
     {
+        _disposed = true;
         _cts?.Cancel();
-        _cts?.Dispose();
+
 
         Live2DService.Live2DInitialized -= OnLive2DInitialized;
         Live2DService.CustomEventTriggered -= OnCustomEventTriggered;
         EventService.OnDialogTriggered -= OnDialogTriggered;
         OwnershipService.OwnershipChanged -= OnOwnershipChanged;
 
-        _ = Live2DService.ReleaseLive2D();
+        if (_eventLoopTask is not null) { try { await _eventLoopTask; } catch (OperationCanceledException) { } }
+        await Live2DService.ReleaseLive2D(_root);
+        _cts.Dispose();
         GC.SuppressFinalize(this);
     }
 }

@@ -1,3 +1,5 @@
+@implements IDisposable
+@inject PageResponseState PageResponse
 @using CnGalWebSite.DataModel.Sorting
 @using CnGalWebSite.Core.Models
 @page "/search"
@@ -110,6 +112,9 @@
 <CgBottomNav ActiveTab="search" />
 
 @code {
+    private CancellationTokenSource? _request;
+    private long _requestVersion;
+    public void Dispose() { _requestVersion++; _request?.Cancel(); _request?.Dispose(); }
     // ── URL query parameters ──
     [SupplyParameterFromQuery(Name = "Text")]
     public string? QueryText { get; set; }
@@ -160,6 +165,9 @@
         SearchText = QueryText ?? "";
         if (!SearchPageUrl.TryParseSort(QuerySort, out SortValue, out Direction))
         {
+            _requestVersion++; _request?.Cancel();
+            IsLoading = false; SearchResult = null;
+            PageResponse.Failed(400);
             ErrorMessage = "排序字段或方向无效";
             return;
         }
@@ -174,25 +182,34 @@
 
     private async Task ExecuteSearchAsync()
     {
+        PageResponse.Begin();
+        var version = ++_requestVersion;
+        _request?.Cancel(); _request?.Dispose();
+        using var request = new CancellationTokenSource();
+        _request = request;
         IsLoading = true;
         ErrorMessage = null;
 
         try
         {
-            var result = await HomeQueryService.SearchAsync(CnGalWebSite.DataModel.Application.Search.Dtos.SearchInputModel.Parse(FilterTypes.ToArray(), FilterTimes.ToArray(), SearchText, SortValue, Direction, CurrentPage));
+            var result = await HomeQueryService.SearchAsync(CnGalWebSite.DataModel.Application.Search.Dtos.SearchInputModel.Parse(FilterTypes.ToArray(), FilterTimes.ToArray(), SearchText, SortValue, Direction, CurrentPage), request.Token);
+            if (request.IsCancellationRequested || version != _requestVersion) return;
             if (result.Success && result.Data is not null)
             {
+                PageResponse.Succeeded();
                 SearchResult = result.Data;
             }
             else
             {
+                PageResponse.Failed(result.Error);
                 ErrorMessage = result.Error?.Message ?? "获取搜索结果失败";
                 SearchResult = null;
             }
         }
+        catch (OperationCanceledException) when (request.IsCancellationRequested) { }
         finally
         {
-            IsLoading = false;
+            if (ReferenceEquals(_request, request)) { _request = null; IsLoading = false; }
         }
     }
 

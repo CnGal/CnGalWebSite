@@ -1,20 +1,26 @@
-@* 统一页面标题与 SEO meta 标签，对齐旧站 TitleTip 组件行为
-   实现方式：通过 IPageMetaService 将 meta 值写入 scoped 服务，
-   App.razor 在渲染 <head> 时直接读取，绕过 HeadContent/HeadOutlet 时序问题 *@
-@using CnGalWebSite.MainSite.Shared.Services
-@inject IPageMetaService PageMetaService
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
 
 <PageTitle>@ComputedTitle</PageTitle>
 <HeadContent>
     <meta name="description" content="@ComputedDescription">
     <meta itemprop="name" content="@ComputedTitle" />
     <meta itemprop="image" content="@ComputedImage" />
+    @if (!string.IsNullOrWhiteSpace(StructuredData))
+    {
+        <CgStructuredData Data="@StructuredData" />
+    }
+    @AdditionalHeadContent
 </HeadContent>
 
 @code {
     private const string SiteName = "CnGal 中文GalGame资料站";
     private const string DefaultDescription = "CnGal资料站的建站目的是收集，索引国产gal及中文化galgame资料、文章、攻略，为galgame同好们提供方便。";
     private const string DefaultImage = "https://app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png";
+
+    private IJSObjectReference? _metaModule;
+    private string? _lastMetaSignature;
+    private bool _disposed;
 
     /// <summary>
     /// 页面标题。为空时使用默认站名。
@@ -43,10 +49,79 @@
     private string ComputedImage =>
         string.IsNullOrWhiteSpace(Image) ? DefaultImage : Image;
 
-    protected override void OnParametersSet()
+    [Parameter] public string? StructuredData { get; set; }
+    [Parameter] public RenderFragment? AdditionalHeadContent { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        base.OnParametersSet();
-        // 将 meta 值写入 scoped 服务（值变更时自动通知 App.razor 刷新 <head>）
-        PageMetaService.SetMeta(Title, Description, Image);
+        if (_disposed)
+        {
+            return;
+        }
+
+        // HeadContent is emitted during static SSR. Interactive pages with
+        // prerender:false do not have a static head, so mirror the same values
+        // into document.head once the circuit is alive. Running on every render
+        // also handles dynamic titles (for example after detail data loads).
+        var signature = string.Join('\n',
+            ComputedTitle,
+            ComputedDescription,
+            ComputedImage,
+            StructuredData ?? string.Empty);
+        if (signature == _lastMetaSignature)
+        {
+            return;
+        }
+
+        _lastMetaSignature = signature;
+        try
+        {
+            _metaModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/CnGalWebSite.MainSite.Shared/scripts/site-shell.js");
+            if (_disposed)
+            {
+                return;
+            }
+
+            await _metaModule.InvokeVoidAsync(
+                "updatePageMeta",
+                ComputedTitle,
+                ComputedDescription,
+                ComputedImage,
+                StructuredData);
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+        catch (InvalidOperationException)
+        {
+            // Static SSR has no interactive JS runtime. HeadContent above already
+            // produced the server-rendered head in that case.
+        }
+        catch (JSException ex)
+        {
+            Console.Error.WriteLine($"CgPageMeta update: {ex.Message}");
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _disposed = true;
+        if (_metaModule is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await _metaModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+        catch (TaskCanceledException)
+        {
+        }
     }
 }

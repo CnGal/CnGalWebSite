@@ -1,4 +1,4 @@
-﻿@page "/sedai"
+@page "/sedai"
 @page "/entries/sedai"
 
 @rendermode InteractiveServer
@@ -9,6 +9,7 @@
 @using CnGalWebSite.SDK.MainSite.Models
 
 @inject IStoreInfoQueryService StoreInfoQueryService
+@inject PageResponseState PageResponse
 @inject IJSRuntime JS
 @inject ICgToastService ToastService
 @implements IAsyncDisposable
@@ -155,6 +156,7 @@
 
     private async Task LoadAsync()
     {
+        PageResponse.Begin();
         _errorMessage = null;
         _years = null;
         _selected.Clear();
@@ -163,10 +165,12 @@
         if (result.Success && result.Data is not null)
         {
             _years = result.Data;
+            PageResponse.Succeeded();
             return;
         }
 
         _errorMessage = result.Error?.Message ?? "请稍后重试";
+        PageResponse.Failed(result.Error);
     }
 
     private static string GameKey(int year, CnGalGenerationGameItem game)
@@ -209,7 +213,7 @@
     {
         return _jsModule ??= await JS.InvokeAsync<IJSObjectReference>(
             "import",
-            "./_content/CnGalWebSite.MainSite.Shared/scripts/cg-save-image.js");
+            "./_content/CnGalWebSite.MainSite.Shared/Pages/Entry/CnGalGenerationPage.razor.js");
     }
 
     private async Task DownloadAsImage()

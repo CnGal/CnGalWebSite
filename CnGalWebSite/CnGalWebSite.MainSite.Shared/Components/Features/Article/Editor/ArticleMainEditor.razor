@@ -1,4 +1,4 @@
-﻿@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.Articles
 @using CnGalWebSite.Extensions
 @using CnGalWebSite.SDK.MainSite.Models.Files
@@ -11,7 +11,7 @@
     <p>设置文章主图、标题、类型与正文内容。</p>
 
     @if (Model != null)
-    {     
+    {
         <CgFormGroup Label="类型">
             <div class="article-type-selector">
                 @foreach (var type in VisibleArticleTypes)

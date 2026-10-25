@@ -3,34 +3,37 @@ using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class LotteryCommandService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
-    ILogger<LotteryCommandService> logger) : CommandServiceBase(httpClient), ILotteryCommandService
+    PublicDataCache publicCache,
+    ILogger<LotteryCommandService> logger) : CommandServiceBase(httpClient, publicCache), ILotteryCommandService
 {
+
     protected override ILogger Logger => logger;
 
     public async Task<SdkResult<IReadOnlyList<string>>> GetEntryGameItemsAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var items = await GetFromJsonAsync<List<string>>("api/entries/GetAllEntries/0", cancellationToken);
             return SdkResult<IReadOnlyList<string>>.Ok(items ?? []);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取游戏词条列表异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<IReadOnlyList<string>>.Fail("LOTTERY_ENTRY_ITEMS_EXCEPTION", "获取游戏词条列表时发生异常");
+            return SdkFailure.FromException<IReadOnlyList<string>>(ex, "LOTTERY_ENTRY_ITEMS_EXCEPTION", "获取游戏词条列表时发生异常");
         }
     }
 
     public async Task<SdkResult<EditLotteryModel>> GetLotteryEditAsync(long id, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var model = await GetFromJsonAsync<EditLotteryModel>($"api/lotteries/EditLottery/{id}", cancellationToken);
@@ -40,62 +43,63 @@ public sealed class LotteryCommandService(
             }
             return SdkResult<EditLotteryModel>.Ok(model);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取抽奖编辑数据异常。LotteryId={LotteryId}; BaseAddress={BaseAddress}", id, HttpClient.BaseAddress);
-            return SdkResult<EditLotteryModel>.Fail("LOTTERY_EDIT_QUERY_EXCEPTION", "请求抽奖编辑数据时发生异常");
+            return SdkFailure.FromException<EditLotteryModel>(ex, "LOTTERY_EDIT_QUERY_EXCEPTION", "请求抽奖编辑数据时发生异常");
         }
     }
 
     public async Task<SdkResult<long>> CreateLotteryAsync(EditLotteryModel model, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var response = await PostAsJsonRawAsync("api/lotteries/CreateLottery", model, cancellationToken);
+            using var response = await PostAsJsonRawAsync("api/lotteries/CreateLottery", model, cancellationToken);
             var result = await ReadResponseAsync<Result>(response, cancellationToken);
 
             if (result?.Successful == true && long.TryParse(result.Error, out var newId))
             {
-                memoryCache.Remove("main-site:lottery-cards");
-                memoryCache.Remove("main-site:square-summary");
                 return SdkResult<long>.Ok(newId);
             }
 
             return SdkResult<long>.Fail("LOTTERY_CREATE_FAILED", result?.Error ?? "创建抽奖失败");
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "创建抽奖异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<long>.Fail("LOTTERY_CREATE_EXCEPTION", "创建抽奖时发生异常");
+            return SdkFailure.FromException<long>(ex, "LOTTERY_CREATE_EXCEPTION", "创建抽奖时发生异常");
         }
     }
 
     public async Task<SdkResult<long>> EditLotteryAsync(EditLotteryModel model, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var response = await PostAsJsonRawAsync("api/lotteries/EditLottery", model, cancellationToken);
+            using var response = await PostAsJsonRawAsync("api/lotteries/EditLottery", model, cancellationToken);
             var result = await ReadResponseAsync<Result>(response, cancellationToken);
 
             if (result?.Successful == true)
             {
-                memoryCache.Remove($"main-site:lottery-detail:{model.Id}");
-                memoryCache.Remove("main-site:lottery-cards");
-                memoryCache.Remove("main-site:square-summary");
                 return SdkResult<long>.Ok(model.Id);
             }
 
             return SdkResult<long>.Fail("LOTTERY_EDIT_FAILED", result?.Error ?? "编辑抽奖失败");
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "编辑抽奖异常。LotteryId={LotteryId}; BaseAddress={BaseAddress}", model.Id, HttpClient.BaseAddress);
-            return SdkResult<long>.Fail("LOTTERY_EDIT_EXCEPTION", "编辑抽奖时发生异常");
+            return SdkFailure.FromException<long>(ex, "LOTTERY_EDIT_EXCEPTION", "编辑抽奖时发生异常");
         }
     }
 
     public async Task<SdkResult<UserLotteryStateModel>> GetUserLotteryStateAsync(long lotteryId, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var model = await GetFromJsonAsync<UserLotteryStateModel>($"api/lotteries/GetUserLotteryState/{lotteryId}", cancellationToken);
@@ -105,15 +109,17 @@ public sealed class LotteryCommandService(
             }
             return SdkResult<UserLotteryStateModel>.Ok(model);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取用户抽奖状态异常。LotteryId={LotteryId}; BaseAddress={BaseAddress}", lotteryId, HttpClient.BaseAddress);
-            return SdkResult<UserLotteryStateModel>.Fail("LOTTERY_STATE_EXCEPTION", "获取用户抽奖状态时发生异常");
+            return SdkFailure.FromException<UserLotteryStateModel>(ex, "LOTTERY_STATE_EXCEPTION", "获取用户抽奖状态时发生异常");
         }
     }
 
     public async Task<SdkResult<PrizeViewModel>> GetUserPrizeAsync(long lotteryId, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var model = await GetFromJsonAsync<PrizeViewModel>($"api/lotteries/GetUserPrize/{lotteryId}", cancellationToken);
@@ -123,18 +129,20 @@ public sealed class LotteryCommandService(
             }
             return SdkResult<PrizeViewModel>.Ok(model);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取用户奖品异常。LotteryId={LotteryId}; BaseAddress={BaseAddress}", lotteryId, HttpClient.BaseAddress);
-            return SdkResult<PrizeViewModel>.Fail("LOTTERY_PRIZE_EXCEPTION", "获取用户奖品时发生异常");
+            return SdkFailure.FromException<PrizeViewModel>(ex, "LOTTERY_PRIZE_EXCEPTION", "获取用户奖品时发生异常");
         }
     }
 
     public async Task<SdkResult<bool>> ParticipateInLotteryAsync(long lotteryId, CnGalWebSite.Core.Models.DeviceIdentificationModel identification, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var response = await PostAsJsonRawAsync("api/lotteries/ParticipateInLottery", new ParticipateInLotteryModel
+            using var response = await PostAsJsonRawAsync("api/lotteries/ParticipateInLottery", new ParticipateInLotteryModel
             {
                 Id = lotteryId,
                 Identification = identification,
@@ -148,15 +156,17 @@ public sealed class LotteryCommandService(
 
             return SdkResult<bool>.Fail("LOTTERY_PARTICIPATE_FAILED", result?.Error ?? "参与抽奖失败");
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "参与抽奖异常。LotteryId={LotteryId}; BaseAddress={BaseAddress}", lotteryId, HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail("LOTTERY_PARTICIPATE_EXCEPTION", "参与抽奖时发生异常");
+            return SdkFailure.FromException<bool>(ex, "LOTTERY_PARTICIPATE_EXCEPTION", "参与抽奖时发生异常");
         }
     }
 
     public async Task<SdkResult<DrawLotteryDataModel>> GetLotteryDataAsync(long id, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var model = await GetFromJsonAsync<DrawLotteryDataModel>($"api/lotteries/GetLotteryData/{id}", cancellationToken);
@@ -166,18 +176,20 @@ public sealed class LotteryCommandService(
             }
             return SdkResult<DrawLotteryDataModel>.Ok(model);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取抽奖数据异常。LotteryId={LotteryId}; BaseAddress={BaseAddress}", id, HttpClient.BaseAddress);
-            return SdkResult<DrawLotteryDataModel>.Fail("LOTTERY_DATA_EXCEPTION", "获取抽奖数据时发生异常");
+            return SdkFailure.FromException<DrawLotteryDataModel>(ex, "LOTTERY_DATA_EXCEPTION", "获取抽奖数据时发生异常");
         }
     }
 
     public async Task<SdkResult<bool>> DrawLotteryAsync(ManualLotteryModel model, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var response = await PostAsJsonRawAsync("api/lotteries/DrawLottery", model, cancellationToken);
+            using var response = await PostAsJsonRawAsync("api/lotteries/DrawLottery", model, cancellationToken);
             var result = await ReadResponseAsync<Result>(response, cancellationToken);
 
             if (result?.Successful == true)
@@ -187,18 +199,20 @@ public sealed class LotteryCommandService(
 
             return SdkResult<bool>.Fail("LOTTERY_DRAW_FAILED", result?.Error ?? "抽奖失败");
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "抽奖异常。LotteryId={LotteryId}; BaseAddress={BaseAddress}", model.LotteryId, HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail("LOTTERY_DRAW_EXCEPTION", "抽奖时发生异常");
+            return SdkFailure.FromException<bool>(ex, "LOTTERY_DRAW_EXCEPTION", "抽奖时发生异常");
         }
     }
 
     public async Task<SdkResult<bool>> EndLotteryAsync(EndLotteryModel model, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var response = await PostAsJsonRawAsync("api/lotteries/EndLottery", model, cancellationToken);
+            using var response = await PostAsJsonRawAsync("api/lotteries/EndLottery", model, cancellationToken);
             var result = await ReadResponseAsync<Result>(response, cancellationToken);
 
             if (result?.Successful == true)
@@ -208,10 +222,11 @@ public sealed class LotteryCommandService(
 
             return SdkResult<bool>.Fail("LOTTERY_END_FAILED", result?.Error ?? "结束抽奖失败");
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "结束抽奖异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail("LOTTERY_END_EXCEPTION", "结束抽奖时发生异常");
+            return SdkFailure.FromException<bool>(ex, "LOTTERY_END_EXCEPTION", "结束抽奖时发生异常");
         }
     }
 }

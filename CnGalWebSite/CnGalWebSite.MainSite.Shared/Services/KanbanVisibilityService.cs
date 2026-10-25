@@ -83,7 +83,8 @@ public class KanbanVisibilityService : IKanbanVisibilityService
 
     private async Task<bool> IsMobileViewportAsync()
     {
-        var width = await _jsRuntime.InvokeAsync<int>("eval", "document.documentElement.clientWidth || window.innerWidth");
+        await using var module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/CnGalWebSite.MainSite.Shared/scripts/site-shell.js");
+        var width = await module.InvokeAsync<int>("getViewportWidth");
         return width < 768;
     }
 }

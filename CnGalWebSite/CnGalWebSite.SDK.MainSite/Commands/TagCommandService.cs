@@ -4,18 +4,18 @@ using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.TagEdit;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class TagCommandService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<TagCommandService> logger,
     ExamineUserCache userCache,
-    ICurrentUserAccessor currentUserAccessor) : CommandServiceBase(httpClient), ITagCommandService
+    ICurrentUserAccessor currentUserAccessor) : CommandServiceBase(httpClient, publicCache), ITagCommandService
 {
+
     protected override ILogger Logger => logger;
 
     public Task<SdkResult<TagEditViewModel>> GetTagCreateTemplateAsync(CancellationToken cancellationToken = default)
@@ -30,6 +30,7 @@ public sealed class TagCommandService(
 
             return Task.FromResult(SdkResult<TagEditViewModel>.Ok(model));
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取标签创建模板异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
@@ -39,6 +40,7 @@ public sealed class TagCommandService(
 
     public async Task<SdkResult<TagEditViewModel>> GetTagEditAsync(int id, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var mainTask = GetFromJsonAsync<EditTagMainViewModel>($"api/tags/editmain/{id}", cancellationToken);
@@ -65,15 +67,17 @@ public sealed class TagCommandService(
 
             return SdkResult<TagEditViewModel>.Ok(model);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取标签编辑数据异常。TagId={TagId}; BaseAddress={BaseAddress}", id, HttpClient.BaseAddress);
-            return SdkResult<TagEditViewModel>.Fail("TAG_EDIT_QUERY_EXCEPTION", "请求标签编辑数据时发生异常");
+            return SdkFailure.FromException<TagEditViewModel>(ex, "TAG_EDIT_QUERY_EXCEPTION", "请求标签编辑数据时发生异常");
         }
     }
 
     public async Task<SdkResult<TagEditMetaOptions>> GetTagEditMetaOptionsAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var tagsTask = GetFromJsonAsync<List<string>>("api/tags/GetAllTags", cancellationToken);
@@ -89,31 +93,30 @@ public sealed class TagCommandService(
 
             return SdkResult<TagEditMetaOptions>.Ok(options);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取标签候选列表数据异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<TagEditMetaOptions>.Fail("TAG_META_OPTIONS_EXCEPTION", "请求标签候选列表数据时发生异常");
+            return SdkFailure.FromException<TagEditMetaOptions>(ex, "TAG_META_OPTIONS_EXCEPTION", "请求标签候选列表数据时发生异常");
         }
     }
 
     public async Task<SdkResult<long>> SubmitEditAsync(TagEditRequest request, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var writeAttempted = false;
         string? userId = null;
-        long? cacheEntityId = null;
         try
         {
             userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
-            cacheEntityId = request.IsCreate ? null : request.Data.Main.Id;
             writeAttempted = true;
             if (request.IsCreate)
             {
-                var response = await PostAsJsonRawAsync("api/tags/CreateTag", request.Data, cancellationToken);
+                using var response = await PostAsJsonRawAsync("api/tags/CreateTag", request.Data, cancellationToken);
                 var result = await ReadResponseAsync<Result>(response, cancellationToken);
 
                 if (result?.Successful == true && long.TryParse(result.Error, out var newId))
                 {
-                    cacheEntityId = newId;
                     return SdkResult<long>.Ok(newId);
                 }
 
@@ -145,20 +148,17 @@ public sealed class TagCommandService(
                 return SdkResult<long>.Ok(request.Data.Main.Id);
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "提交标签编辑数据异常。IsCreate={IsCreate}; BaseAddress={BaseAddress}", request.IsCreate, HttpClient.BaseAddress);
-            return SdkResult<long>.Fail("TAG_SUBMIT_EXCEPTION", "提交标签数据时发生异常");
+            return SdkFailure.FromException<long>(ex, "TAG_SUBMIT_EXCEPTION", "提交标签数据时发生异常");
         }
         finally
         {
             // 分块写入可能部分成功，异常或取消时服务端结果也可能不确定。
             if (writeAttempted)
             {
-                if (cacheEntityId.HasValue)
-                {
-                    InvalidateTagCaches(cacheEntityId.Value);
-                }
                 userCache.Invalidate(HttpClient.BaseAddress, userId);
                 userCache.InvalidateReviewQueue(HttpClient.BaseAddress);
             }
@@ -168,12 +168,5 @@ public sealed class TagCommandService(
     private Task<Result?> SubmitPartAsync<T>(string path, T model, CancellationToken cancellationToken)
     {
         return PostAsJsonAsync<T, Result>(path, model, cancellationToken);
-    }
-
-    private void InvalidateTagCaches(long tagId)
-    {
-        memoryCache.Remove($"main-site:tag-detail:{tagId}");
-        memoryCache.Remove("main-site:tag-tree");
-        memoryCache.Remove(ExamineCacheKeys.TagEditRecords(tagId));
     }
 }

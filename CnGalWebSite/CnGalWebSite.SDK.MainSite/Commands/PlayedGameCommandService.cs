@@ -2,7 +2,6 @@ using CnGalWebSite.DataModel.ViewModel.PlayedGames;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
@@ -10,14 +9,15 @@ namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class PlayedGameCommandService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
-    ICurrentUserAccessor currentUserAccessor,
-    ILogger<PlayedGameCommandService> logger) : CommandServiceBase(httpClient), IPlayedGameCommandService
+    PublicDataCache publicCache,
+    ILogger<PlayedGameCommandService> logger) : CommandServiceBase(httpClient, publicCache), IPlayedGameCommandService
 {
+
     protected override ILogger Logger => logger;
 
     public async Task<SdkResult<EditGameRecordModel>> GetEditDataAsync(int gameId, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var model = await GetFromJsonAsync<EditGameRecordModel>($"api/playedgame/EditGameRecord/{gameId}", cancellationToken);
@@ -34,18 +34,19 @@ public sealed class PlayedGameCommandService(
                 gameId, ex.StatusCode, HttpClient.BaseAddress);
             return SdkResult<EditGameRecordModel>.Fail("PLAYED_GAME_EDIT_DATA_HTTP_FAILED", "获取游玩记录编辑数据失败", (int?)ex.StatusCode);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取游玩记录编辑数据异常。GameId={GameId}; BaseAddress={BaseAddress}", gameId, HttpClient.BaseAddress);
-            return SdkResult<EditGameRecordModel>.Fail("PLAYED_GAME_EDIT_DATA_EXCEPTION", "获取游玩记录编辑数据时发生异常");
+            return SdkFailure.FromException<EditGameRecordModel>(ex, "PLAYED_GAME_EDIT_DATA_EXCEPTION", "获取游玩记录编辑数据时发生异常");
         }
     }
 
     public async Task<SdkResult<bool>> SaveAsync(EditGameRecordModel model, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var result = await PostAsJsonAsync<EditGameRecordModel, Result>("api/playedgame/EditGameRecord", model, cancellationToken);
             if (result is null)
             {
@@ -56,8 +57,6 @@ public sealed class PlayedGameCommandService(
             {
                 return SdkResult<bool>.Fail("PLAYED_GAME_SAVE_FAILED", result.Error ?? "保存游玩记录失败");
             }
-
-            InvalidatePlayedGameCaches(model.GameId, userId);
             return SdkResult<bool>.Ok(true);
         }
         catch (HttpRequestException ex)
@@ -66,18 +65,19 @@ public sealed class PlayedGameCommandService(
                 model.GameId, ex.StatusCode, HttpClient.BaseAddress);
             return SdkResult<bool>.Fail("PLAYED_GAME_SAVE_HTTP_FAILED", "保存游玩记录失败", (int?)ex.StatusCode);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "保存游玩记录异常。GameId={GameId}; BaseAddress={BaseAddress}", model.GameId, HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail("PLAYED_GAME_SAVE_EXCEPTION", "保存游玩记录时发生异常");
+            return SdkFailure.FromException<bool>(ex, "PLAYED_GAME_SAVE_EXCEPTION", "保存游玩记录时发生异常");
         }
     }
 
     public async Task<SdkResult<bool>> ToggleHiddenAsync(int gameId, bool isHidden, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
             var request = new HiddenGameRecordModel
             {
                 GameIds = [gameId],
@@ -94,8 +94,6 @@ public sealed class PlayedGameCommandService(
             {
                 return SdkResult<bool>.Fail("PLAYED_GAME_HIDDEN_FAILED", result.Error ?? "修改隐藏状态失败");
             }
-
-            InvalidatePlayedGameCaches(gameId, userId);
             return SdkResult<bool>.Ok(true);
         }
         catch (HttpRequestException ex)
@@ -104,19 +102,11 @@ public sealed class PlayedGameCommandService(
                 gameId, ex.StatusCode, HttpClient.BaseAddress);
             return SdkResult<bool>.Fail("PLAYED_GAME_HIDDEN_HTTP_FAILED", "修改隐藏状态失败", (int?)ex.StatusCode);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "修改游玩记录隐藏状态异常。GameId={GameId}; BaseAddress={BaseAddress}", gameId, HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail("PLAYED_GAME_HIDDEN_EXCEPTION", "修改隐藏状态时发生异常");
-        }
-    }
-
-    private void InvalidatePlayedGameCaches(int gameId, string? userId)
-    {
-        memoryCache.Remove($"main-site:played-game-overview:{gameId}");
-        if (!string.IsNullOrEmpty(userId))
-        {
-            memoryCache.Remove($"main-site:user-game-records:{userId}");
+            return SdkFailure.FromException<bool>(ex, "PLAYED_GAME_HIDDEN_EXCEPTION", "修改隐藏状态时发生异常");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿.toolbox-dialog {
+.toolbox-dialog {
     display: grid;
     gap: var(--cg-spacing-5);
 }
@@ -106,4 +106,9 @@
 
 .toolbox-dialog__error {
     color: var(--cg-color-error);
+}
+
+/* CgAlert 所在容器已通过 gap 提供间距，避免重复添加底部间距 */
+.toolbox-dialog > ::deep .cg-alert {
+    --cg-alert-margin-bottom: 0;
 }

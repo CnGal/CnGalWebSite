@@ -2,16 +2,17 @@ using CnGalWebSite.DataModel.ViewModel.Videos;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class VideoQueryService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<VideoQueryService> logger) : QueryServiceBase(httpClient), IVideoQueryService
 {
+    private readonly PublicDataCache memoryCache = publicCache.ForSource(httpClient.BaseAddress);
+
     private static readonly TimeSpan VideoCacheDuration = TimeSpan.FromMinutes(5);
     private const string VideoDetailPathTemplate = "api/videos/GetView/{0}";
 
@@ -19,10 +20,13 @@ public sealed class VideoQueryService(
 
     public async Task<SdkResult<VideoDetailViewModel>> GetVideoDetailAsync(long id, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"main-site:video-detail:{id}";
-        if (memoryCache.TryGetValue(cacheKey, out VideoDetailViewModel? cached) && cached is not null)
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        var cacheKey = PublicCacheKeys.Detail("video", id);
+        if (memoryCache.TryGetValue(cacheKey, out VideoDetailViewModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<VideoDetailViewModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<VideoDetailViewModel>(cached, cacheRead);
         }
 
         var path = string.Format(VideoDetailPathTemplate, id);
@@ -36,10 +40,12 @@ public sealed class VideoQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, VideoCacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, VideoCacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     private static VideoDetailViewModel MapToViewModel(VideoViewModel video)

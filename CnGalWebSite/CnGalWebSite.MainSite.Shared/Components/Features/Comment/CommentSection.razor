@@ -1,4 +1,5 @@
-﻿@* 评论区入口容器（静态 SSR）
+@implements IDisposable
+@* 评论区入口容器（静态 SSR）
    编排只读列表 + AuthorizeView 包裹的交互区域
    未登录：纯静态只读评论列表
    已登录：交互式评论列表（支持回复、删除、实时刷新） *@
@@ -25,14 +26,16 @@
         }
         else
         {
-            @* 登录用户使用交互式评论区（独立获取数据，支持回复/删除/刷新） *@
+            @* 登录交互区复用容器结果，业务动作后再刷新 *@
             <AuthorizeView>
                 <Authorized>
                     <CommentInteractive Type="Type"
                                         ObjectId="@ObjectId"
-                                        CanDelete="CanDelete" />
+                                        CanDelete="CanDelete"
+                                        InitialResult="_initialResult" />
                 </Authorized>
                 <NotAuthorized>
+                    @if (_errorMessage is not null) { <CgAlert>@_errorMessage</CgAlert> }
                     @* 未登录用户：纯静态只读评论列表 *@
                     @if (_items is not null)
                     {
@@ -83,11 +86,16 @@
 
     private IReadOnlyList<CommentItemViewModel>? _items;
     private int _totalCount;
+    private SdkResult<CommentListViewModel>? _initialResult;
+    private string? _errorMessage;
+    private CancellationTokenSource? _request;
+    private long _version;
 
     protected override async Task OnParametersSetAsync()
     {
         if (!CanComment)
         {
+            _request?.Cancel(); _items = null; _initialResult = null; _totalCount = 0;
             return;
         }
 
@@ -96,7 +104,15 @@
 
     private async Task LoadDataAsync()
     {
-        var result = await CommentQueryService.GetCommentsAsync(Type, ObjectId);
+        _errorMessage = null;
+        var version = ++_version;
+        _request?.Cancel(); _request?.Dispose();
+        var request = _request = new CancellationTokenSource();
+        try
+        {
+        var result = await CommentQueryService.GetCommentsAsync(Type, ObjectId, request.Token);
+        if (request.IsCancellationRequested || version != _version) return;
+        _initialResult = result;
         if (result.Success && result.Data is not null)
         {
             var items = result.Data.Items;
@@ -109,8 +125,12 @@
         }
         else
         {
-            _items = [];
+            _errorMessage = result.Error?.Message ?? "获取评论失败";
+            _items = null;
             _totalCount = 0;
         }
+        }
+        catch (OperationCanceledException) when (request.IsCancellationRequested) { }
     }
+    public void Dispose() { _version++; _request?.Cancel(); _request?.Dispose(); }
 }

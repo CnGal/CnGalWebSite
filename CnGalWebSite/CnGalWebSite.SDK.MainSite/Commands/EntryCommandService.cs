@@ -6,22 +6,23 @@ using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.EntryEdit;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class EntryCommandService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<EntryCommandService> logger,
     ExamineUserCache userCache,
-    ICurrentUserAccessor currentUserAccessor) : CommandServiceBase(httpClient), IEntryCommandService
+    ICurrentUserAccessor currentUserAccessor) : CommandServiceBase(httpClient, publicCache), IEntryCommandService
 {
+
     protected override ILogger Logger => logger;
 
     public async Task<SdkResult<EntryEditViewModel>> GetEntryCreateTemplateAsync(EntryType type = EntryType.Game, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var model = new EntryEditViewModel
@@ -35,7 +36,7 @@ public sealed class EntryCommandService(
                     Relevances = { Type = type }
                 }
             };
-            
+
             // 获取并初始化各个类型的基础信息模板
             var informations = await GetFromJsonAsync<List<EditInformationModel>>($"api/entries/GetEditInformationModelList?type={(int)type}", cancellationToken);
             if (informations != null)
@@ -49,15 +50,17 @@ public sealed class EntryCommandService(
 
             return SdkResult<EntryEditViewModel>.Ok(model);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取词条创建模板异常。Type={Type}; BaseAddress={BaseAddress}", type, HttpClient.BaseAddress);
-            return SdkResult<EntryEditViewModel>.Fail("ENTRY_CREATE_TEMPLATE_EXCEPTION", "请求词条创建模板时发生异常");
+            return SdkFailure.FromException<EntryEditViewModel>(ex, "ENTRY_CREATE_TEMPLATE_EXCEPTION", "请求词条创建模板时发生异常");
         }
     }
 
     public async Task<SdkResult<EntryEditViewModel>> GetEntryEditAsync(int id, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             // 并发获取所有编辑部分的当前数据
@@ -87,23 +90,25 @@ public sealed class EntryCommandService(
                     Website = websiteTask.Result ?? new()
                 }
             };
-            
+
             // 确保类型统一
             model.Data.Type = model.Data.Main.Type;
             model.Data.Id = id;
             model.Data.Name = model.Data.Main.Name;
-            
+
             return SdkResult<EntryEditViewModel>.Ok(model);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取词条编辑数据异常。EntryId={EntryId}; BaseAddress={BaseAddress}", id, HttpClient.BaseAddress);
-            return SdkResult<EntryEditViewModel>.Fail("ENTRY_EDIT_QUERY_EXCEPTION", "请求词条编辑数据时发生异常");
+            return SdkFailure.FromException<EntryEditViewModel>(ex, "ENTRY_EDIT_QUERY_EXCEPTION", "请求词条编辑数据时发生异常");
         }
     }
 
     public async Task<SdkResult<EntryEditMetaOptions>> GetEntryEditMetaOptionsAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var gamesTask = GetFromJsonAsync<List<string>>("api/entries/GetAllEntries/0", cancellationToken);
@@ -131,41 +136,40 @@ public sealed class EntryCommandService(
 
             return SdkResult<EntryEditMetaOptions>.Ok(model);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取词条候选列表数据异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<EntryEditMetaOptions>.Fail("ENTRY_META_OPTIONS_EXCEPTION", "请求词条候选列表数据时发生异常");
+            return SdkFailure.FromException<EntryEditMetaOptions>(ex, "ENTRY_META_OPTIONS_EXCEPTION", "请求词条候选列表数据时发生异常");
         }
     }
 
     public async Task<SdkResult<long>> SubmitEditAsync(EntryEditRequest request, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var writeAttempted = false;
         string? userId = null;
-        long? cacheEntityId = null;
         try
         {
             userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
-            cacheEntityId = request.IsCreate ? null : request.Data.Id;
             writeAttempted = true;
             if (request.IsCreate)
             {
-                var response = await PostAsJsonRawAsync("api/entries/EstablishEntry", request.Data, cancellationToken);
+                using var response = await PostAsJsonRawAsync("api/entries/EstablishEntry", request.Data, cancellationToken);
                 var result = await ReadResponseAsync<Result>(response, cancellationToken);
-                
+
                 if (result?.Successful == true && long.TryParse(result.Error, out var newId))
                 {
-                    cacheEntityId = newId;
                     return SdkResult<long>.Ok(newId);
                 }
-                
+
                 return SdkResult<long>.Fail("ENTRY_CREATE_FAILED", result?.Error ?? "创建词条失败");
             }
             else
             {
                 // 对于已有词条的更新，必须拆分为8个分块分别调用接口，以此复用后端的各分块审核流
                 var errors = new List<string>();
-                
+
                 var responses = await Task.WhenAll(
                     SubmitPartAsync("api/entries/EditMain", request.Data.Main, cancellationToken),
                     SubmitPartAsync("api/entries/EditAddInfor", request.Data.AddInfor, cancellationToken),
@@ -189,24 +193,21 @@ public sealed class EntryCommandService(
                 {
                     return SdkResult<long>.Fail("ENTRY_EDIT_PARTIAL_FAILED", string.Join("；", errors));
                 }
-                
+
                 return SdkResult<long>.Ok(request.Data.Id); // 此时 Data.Id 就是原词条的 Id
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "提交词条编辑数据异常。IsCreate={IsCreate}; BaseAddress={BaseAddress}", request.IsCreate, HttpClient.BaseAddress);
-            return SdkResult<long>.Fail("ENTRY_SUBMIT_EXCEPTION", "提交词条数据时发生异常");
+            return SdkFailure.FromException<long>(ex, "ENTRY_SUBMIT_EXCEPTION", "提交词条数据时发生异常");
         }
         finally
         {
             // 分块写入可能部分成功，异常或取消时服务端结果也可能不确定。
             if (writeAttempted)
             {
-                if (cacheEntityId.HasValue)
-                {
-                    InvalidateEntryCaches(cacheEntityId.Value);
-                }
                 userCache.Invalidate(HttpClient.BaseAddress, userId);
                 userCache.InvalidateReviewQueue(HttpClient.BaseAddress);
             }
@@ -215,27 +216,22 @@ public sealed class EntryCommandService(
 
     public async Task<SdkResult<IReadOnlyList<EditInformationModel>>> GetInformationFieldsAsync(EntryType type, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var informations = await GetFromJsonAsync<List<EditInformationModel>>($"api/entries/GetEditInformationModelList?type={(int)type}", cancellationToken);
             return SdkResult<IReadOnlyList<EditInformationModel>>.Ok(informations ?? []);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取词条基础信息字段列表异常。Type={Type}; BaseAddress={BaseAddress}", type, HttpClient.BaseAddress);
-            return SdkResult<IReadOnlyList<EditInformationModel>>.Fail("ENTRY_INFORMATION_FIELDS_EXCEPTION", "请求词条基础信息字段列表时发生异常");
+            return SdkFailure.FromException<IReadOnlyList<EditInformationModel>>(ex, "ENTRY_INFORMATION_FIELDS_EXCEPTION", "请求词条基础信息字段列表时发生异常");
         }
     }
 
     private Task<Result?> SubmitPartAsync<T>(string path, T model, CancellationToken cancellationToken)
     {
         return PostAsJsonAsync<T, Result>(path, model, cancellationToken);
-    }
-
-    private void InvalidateEntryCaches(long entryId)
-    {
-        memoryCache.Remove($"main-site:entry-detail:{entryId}");
-        memoryCache.Remove(ExamineCacheKeys.EntryEditRecords(entryId));
-        memoryCache.Remove("main-site:home-summary");
     }
 }

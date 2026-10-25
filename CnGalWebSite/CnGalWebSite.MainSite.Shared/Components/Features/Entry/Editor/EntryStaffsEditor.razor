@@ -1,3 +1,4 @@
+@inject ICgToastService ToastService
 @using CnGalWebSite.SDK.MainSite.Infrastructure
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
@@ -8,10 +9,7 @@
         <CgButton Variant="primary" OnClick="AddStaff">添加 Staff</CgButton>
     </HeaderActions>
     <ChildContent>
-        @if (!string.IsNullOrEmpty(_errorMessage))
-        {
-            <CgAlert Variant="error">@_errorMessage</CgAlert>
-        }
+
 
         <CgTable HasData="@Staffs.Any()" MaxHeight="400px">
             <Empty>
@@ -121,10 +119,6 @@
 @code {
     [Parameter] public List<StaffModel> Staffs { get; set; } = default!;
 
-    // ── 错误提示 ──
-    private string? _errorMessage;
-    private Timer? _errorTimer;
-
     // ── 编辑弹窗状态 ──
     private bool _editDialogOpen;
     private StaffModel? _editingItem;
@@ -135,16 +129,7 @@
     private string? _batchText;
 
     // ── 错误提示辅助 ──
-    private void ShowError(string message)
-    {
-        _errorMessage = message;
-        _errorTimer?.Dispose();
-        _errorTimer = new Timer(_ =>
-        {
-            _errorMessage = null;
-            InvokeAsync(StateHasChanged);
-        }, null, 4000, Timeout.Infinite);
-    }
+    private void ShowError(string message) => ToastService.Show(message, variant: "error");
 
     // ── 添加 ──
     private void AddStaff()

@@ -35,7 +35,7 @@
         try
         {
             await PopupService.ToastSuccessAsync("正在刷新搜索缓存", "任务执行需要一定时间，请稍安勿躁哦");
-            var obj = await _httpService.GetAsync<Result>("api/admin/RefreshSearchData");
+            var obj = await _httpService.PostAsync<object, Result>("api/admin/RefreshSearchData", new object());
             //判断结果
             if (obj.Successful == false)
             {
@@ -56,7 +56,7 @@
         try
         {
             await PopupService.ToastSuccessAsync("正在执行临时脚本", "任务执行需要一定时间，请稍安勿躁哦");
-            var obj = await _httpService.GetAsync<Result>("api/admin/TempFunction");
+            var obj = await _httpService.PostAsync<object, Result>("api/admin/TempFunction", new object());
             //判断结果
             if (obj.Successful == false)
             {

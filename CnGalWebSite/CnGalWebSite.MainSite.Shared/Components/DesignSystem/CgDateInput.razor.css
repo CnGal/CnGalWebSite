@@ -18,7 +18,7 @@
     background-color: var(--cg-color-surface);
     color: var(--cg-color-text);
     font-family: inherit;
-    font-size: var(--cg-font-size-md);
+    font-size: var(--cg-font-size-sm);
     cursor: pointer;
     text-align: left;
     transition: border-color var(--cg-transition-fast), box-shadow var(--cg-transition-fast);
@@ -35,6 +35,11 @@
     border-color: var(--cg-color-border-muted, color-mix(in oklab, var(--cg-color-border) 75%, transparent));
     cursor: not-allowed;
     opacity: 0.85;
+}
+
+.cg-date-input__trigger ::deep .cg-mdi-icon {
+    width: 1em;
+    height: 1em;
 }
 
 .cg-date-input__trigger:disabled ::deep .cg-mdi-icon {

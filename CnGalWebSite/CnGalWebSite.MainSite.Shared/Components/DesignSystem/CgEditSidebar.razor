@@ -1,0 +1,64 @@
+<cg-edit-nav class="cg-edit-sidebar @Class">
+    @BeforeContent
+    <div class="cg-edit-sidebar__card cg-edit-sidebar__card--primary">
+        <CgMdiIcon Name="@HeaderIcon" aria-hidden="true" />
+        <div>
+            <h3>@(IsCreate ? "创建模式" : "编辑模式")</h3>
+            <p>@Hint</p>
+        </div>
+    </div>
+
+    @if (HasDraftRecovered)
+    {
+        <div class="cg-edit-sidebar__card cg-edit-sidebar__card--warning">
+            <CgMdiIcon Name="mdiFileRestoreOutline" aria-hidden="true" />
+            <span>已恢复未保存的草稿</span>
+            <button class="cg-edit-sidebar__card-action" @onclick="OnDiscardDraft">丢弃</button>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(WarningText))
+    {
+        <div class="cg-edit-sidebar__card cg-edit-sidebar__card--error">
+            <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
+            <span>@WarningText</span>
+        </div>
+    }
+
+    <nav class="cg-edit-sidebar__nav">
+        @foreach (var item in Items)
+        {
+            <a class="cg-edit-nav-item" href="@($"#{item.Id}")">
+                <CgMdiIcon Name="@item.Icon" aria-hidden="true" />
+                <span>@item.Label</span>
+            </a>
+        }
+    </nav>
+
+    <div class="cg-edit-sidebar__actions">
+        <CgButton Variant="primary" Disabled="IsSubmitting" OnClick="OnSubmit">
+            @if (IsSubmitting && ShowSpinner) { <span class="cg-spinner"></span> }
+            <span>@(IsSubmitting ? BusyText : SubmitText)</span>
+        </CgButton>
+        <CgButton Variant="outline" Disabled="@(IsSubmitting && DisableCancelWhileSubmitting)" OnClick="OnCancel">取消</CgButton>
+    </div>
+</cg-edit-nav>
+
+@code {
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public bool IsCreate { get; set; }
+    [Parameter] public bool IsSubmitting { get; set; }
+    [Parameter] public bool HasDraftRecovered { get; set; }
+    [Parameter] public string HeaderIcon { get; set; } = "mdiPencilOutline";
+    [Parameter] public string Hint { get; set; } = "每 10 秒自动保存草稿";
+    [Parameter] public string SubmitText { get; set; } = "提交审核";
+    [Parameter] public string BusyText { get; set; } = "提交中...";
+    [Parameter] public bool ShowSpinner { get; set; } = true;
+    [Parameter] public bool DisableCancelWhileSubmitting { get; set; } = true;
+    [Parameter] public string? WarningText { get; set; }
+    [Parameter] public RenderFragment? BeforeContent { get; set; }
+    [Parameter] public IReadOnlyList<CgEditNavItem> Items { get; set; } = [];
+    [Parameter] public EventCallback OnSubmit { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback OnDiscardDraft { get; set; }
+}

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using System;
 using CnGalWebSite.MainSite.Shared.Services.KanbanModels;
 
@@ -8,6 +9,8 @@ namespace CnGalWebSite.MainSite.Shared.Services;
 /// </summary>
 public interface IKanbanLive2DService
 {
+    event Action<int>? MouseOverTriggered;
+    Task ConfigureHoverAsync(IReadOnlyList<KanbanHoverTarget> targets);
     event Action Live2DInitialized;
 
     event Action<string> KanbanImageGenerated;
@@ -23,7 +26,7 @@ public interface IKanbanLive2DService
     /// </summary>
     /// <param name="modelDir">模型目录名（逗号分隔）</param>
     /// <param name="modelIndex">默认模型索引</param>
-    Task InitAsync(string modelDir, int modelIndex);
+    Task InitAsync(string modelDir, int modelIndex, ElementReference root);
 
     /// <summary>
     /// 切换模型
@@ -84,5 +87,5 @@ public interface IKanbanLive2DService
     /// <summary>
     /// 释放 Live2D 资源
     /// </summary>
-    Task ReleaseLive2D();
+    Task ReleaseLive2D(ElementReference? owner = null);
 }

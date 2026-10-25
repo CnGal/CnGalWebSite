@@ -2,6 +2,7 @@ using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace CnGalWebSite.SDK.MainSite.Models;
 
@@ -37,6 +38,7 @@ public sealed class SpaceDetailViewModel
 
     public required int SignInDays { get; init; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public required DateTime? Birthday { get; init; }
 
     public required DateTime RegisteTime { get; init; }
@@ -47,6 +49,7 @@ public sealed class SpaceDetailViewModel
 
     public required IReadOnlyList<RankViewModel> Ranks { get; init; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public required EntryInforTipViewModel? UserCertification { get; init; }
 
     public required bool IsCurrentUser { get; init; }

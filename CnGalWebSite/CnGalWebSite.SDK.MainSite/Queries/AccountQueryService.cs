@@ -16,6 +16,7 @@ public sealed class AccountQueryService(
 
     public async Task<SdkResult<GeetestCodeModel>> GetGeetestCodeAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var result = await GetAsync<GeetestCodeModel>(
             GeetestCodePath,
             "ACCOUNT_GEETEST",

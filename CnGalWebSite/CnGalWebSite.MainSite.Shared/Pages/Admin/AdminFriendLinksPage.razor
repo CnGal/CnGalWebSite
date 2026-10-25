@@ -65,7 +65,7 @@
                 <CgFormGroup Label="图片" Required="true">
                     <CgImageUpload @bind-Value="_editModel.Image" />
                 </CgFormGroup>
-                
+
                 <CgFormGroup Label="名称" Required="true">
                     <CgInput @bind-Value="_editModel.Name" Placeholder="网站或项目名称" />
                 </CgFormGroup>
@@ -164,7 +164,7 @@
     private async Task SaveAsync()
     {
         if (_editModel == null) return;
-        
+
         var result = await CommandService.EditFriendLinkAsync(_editModel, _cts?.Token ?? CancellationToken.None);
         if (result.Success)
         {

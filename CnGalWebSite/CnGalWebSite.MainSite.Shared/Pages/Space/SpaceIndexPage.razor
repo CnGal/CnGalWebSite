@@ -12,6 +12,7 @@
 @using Microsoft.AspNetCore.Components.Web
 
 @inject ISpaceQueryService SpaceQueryService
+@inject PageResponseState PageResponse
 @inject IPlayedGameQueryService PlayedGameQueryService
 @inject IFavoriteFolderQueryService FavoriteFolderQueryService
 @inject IPeripheryQueryService PeripheryQueryService
@@ -297,6 +298,7 @@ else
 
     private async Task LoadDataAsync()
     {
+        PageResponse.Begin();
         _isLoginRequired = false;
         _isNotFound = false;
         _isError = false;
@@ -364,15 +366,18 @@ else
             }
 
             await Task.WhenAll(tasks);
+            PageResponse.Succeeded();
         }
         else if (result.Error?.StatusCode == 404)
         {
             _isNotFound = true;
+            PageResponse.Failed(404);
         }
         else
         {
             _isError = true;
             _errorMessage = result.Error?.Message ?? "未知错误";
+            PageResponse.Failed(result.Error);
         }
     }
 

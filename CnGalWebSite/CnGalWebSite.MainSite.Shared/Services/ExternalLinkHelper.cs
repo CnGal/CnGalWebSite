@@ -1,5 +1,6 @@
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.Extensions;
 
 namespace CnGalWebSite.MainSite.Shared.Services;
 
@@ -12,9 +13,7 @@ public static class ExternalLinkHelper
 
     public static bool IsExternalLink(string? link)
     {
-        return string.IsNullOrWhiteSpace(link) is false
-               && (link.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
-                   || link.StartsWith("https://", StringComparison.OrdinalIgnoreCase));
+        return UrlSafety.IsExternalHttpUrl(link);
     }
 
     public static string GetArticleLink(ArticleInforTipViewModel item)

@@ -5,7 +5,6 @@ using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +14,11 @@ namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class FavoriteFolderQueryService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<FavoriteFolderQueryService> logger) : QueryServiceBase(httpClient), IFavoriteFolderQueryService
 {
+    private readonly PublicDataCache memoryCache = publicCache.ForSource(httpClient.BaseAddress);
+
     private static readonly TimeSpan FolderDetailCacheDuration = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan UserFoldersCacheDuration = TimeSpan.FromMinutes(5);
 
@@ -25,10 +26,13 @@ public sealed class FavoriteFolderQueryService(
 
     public async Task<SdkResult<FavoriteFolderDetailViewModel>> GetFavoriteFolderDetailAsync(long id, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:favorite-folder-detail:{id}";
-        if (memoryCache.TryGetValue(cacheKey, out FavoriteFolderDetailViewModel? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out FavoriteFolderDetailViewModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<FavoriteFolderDetailViewModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<FavoriteFolderDetailViewModel>(cached, cacheRead);
         }
 
         var path = $"api/favorites/GetView/{id}";
@@ -42,18 +46,23 @@ public sealed class FavoriteFolderQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, FolderDetailCacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, FolderDetailCacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     public async Task<SdkResult<IReadOnlyList<FavoriteFolderSummaryItem>>> GetUserFavoriteFoldersAsync(string userId, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:user-favorite-folders:{userId}";
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FavoriteFolderSummaryItem>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FavoriteFolderSummaryItem>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<FavoriteFolderSummaryItem>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<FavoriteFolderSummaryItem>>(cached, cacheRead);
         }
 
         var path = $"api/favorites/GetUserFavoriteFolders/{userId}";
@@ -65,18 +74,23 @@ public sealed class FavoriteFolderQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, UserFoldersCacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, UserFoldersCacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     public async Task<SdkResult<IReadOnlyList<FavoriteFolderSummaryItem>>> GetAllUserFavoriteFoldersAsync(string userId, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:user-all-favorite-folders:{userId}";
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FavoriteFolderSummaryItem>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FavoriteFolderSummaryItem>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<FavoriteFolderSummaryItem>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<FavoriteFolderSummaryItem>>(cached, cacheRead);
         }
 
         var path = $"api/favorites/ListUserFavoriteFolders?userId={userId}";
@@ -88,7 +102,7 @@ public sealed class FavoriteFolderQueryService(
 
         try
         {
-            var response = await HttpClient.PostAsJsonAsync(path, queryParam, SdkJsonSerializerOptions.Default, cancellationToken);
+            using var response = await HttpClient.PostAsJsonAsync(path, queryParam, SdkJsonSerializerOptions.Default, cancellationToken);
             var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
 
             if (!response.IsSuccessStatusCode)
@@ -117,18 +131,23 @@ public sealed class FavoriteFolderQueryService(
                 IsHidden = f.IsHidden,
             }).ToList() as IReadOnlyList<FavoriteFolderSummaryItem>) ?? [];
 
-            memoryCache.Set(cacheKey, data, UserFoldersCacheDuration);
-            return SdkResult<IReadOnlyList<FavoriteFolderSummaryItem>>.Ok(data);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            memoryCache.Set(cacheKey, data, UserFoldersCacheDuration, cacheRead);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<FavoriteFolderSummaryItem>>(data, cacheRead);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "获取用户全部收藏夹列表异常。Path={Path}; BaseAddress={BaseAddress}", path, HttpClient.BaseAddress);
-            return SdkResult<IReadOnlyList<FavoriteFolderSummaryItem>>.Fail("FAVORITE_FOLDER_ALL_EXCEPTION", "请求全部收藏夹列表时发生异常");
+            return SdkFailure.FromException<IReadOnlyList<FavoriteFolderSummaryItem>>(ex, "FAVORITE_FOLDER_ALL_EXCEPTION", "请求全部收藏夹列表时发生异常");
         }
     }
 
     public async Task<SdkResult<EditFavoriteFolderViewModel>> GetFavoriteFolderForEditAsync(long id, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var path = $"api/favorites/EditFavoriteFolder/{id}";
         return await GetAsync<EditFavoriteFolderViewModel>(
             path,
@@ -139,10 +158,13 @@ public sealed class FavoriteFolderQueryService(
 
     public async Task<SdkResult<IReadOnlyList<FavoriteObjectOverviewModel>>> GetFavoriteObjectsAsync(long folderId, int page, int pageSize, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:favorite-objects:{folderId}:{page}:{pageSize}";
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FavoriteObjectOverviewModel>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FavoriteObjectOverviewModel>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<FavoriteObjectOverviewModel>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<FavoriteObjectOverviewModel>>(cached, cacheRead);
         }
 
         var path = $"api/favorites/ListUserFavoriteObjects?folderId={folderId}";
@@ -154,7 +176,7 @@ public sealed class FavoriteFolderQueryService(
 
         try
         {
-            var response = await HttpClient.PostAsJsonAsync(path, queryParam, SdkJsonSerializerOptions.Default, cancellationToken);
+            using var response = await HttpClient.PostAsJsonAsync(path, queryParam, SdkJsonSerializerOptions.Default, cancellationToken);
             var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
 
             if (!response.IsSuccessStatusCode)
@@ -171,22 +193,28 @@ public sealed class FavoriteFolderQueryService(
 
             var queryResult = Deserialize<CnGalWebSite.Core.Models.QueryResultModel<FavoriteObjectOverviewModel, FavoriteObjectSortField>>(responseBody);
             IReadOnlyList<FavoriteObjectOverviewModel> data = queryResult?.Items?.ToList() ?? [];
-            memoryCache.Set(cacheKey, data, FolderDetailCacheDuration);
-            return SdkResult<IReadOnlyList<FavoriteObjectOverviewModel>>.Ok(data);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, data, FolderDetailCacheDuration, cacheRead);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<FavoriteObjectOverviewModel>>(data, cacheRead);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "获取收藏对象列表异常。Path={Path}; BaseAddress={BaseAddress}", path, HttpClient.BaseAddress);
-            return SdkResult<IReadOnlyList<FavoriteObjectOverviewModel>>.Fail("FAVORITE_FOLDER_OBJECTS_EXCEPTION", "请求收藏对象列表时发生异常");
+            return SdkFailure.FromException<IReadOnlyList<FavoriteObjectOverviewModel>>(ex, "FAVORITE_FOLDER_OBJECTS_EXCEPTION", "请求收藏对象列表时发生异常");
         }
     }
 
     public async Task<SdkResult<IReadOnlyList<FavoriteFolderOverviewModel>>> GetUserFoldersByFolderIdAsync(long folderId, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:user-folders-by-folder:{folderId}";
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FavoriteFolderOverviewModel>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FavoriteFolderOverviewModel>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<FavoriteFolderOverviewModel>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<FavoriteFolderOverviewModel>>(cached, cacheRead);
         }
 
         var path = $"api/favorites/GetUserFavoriteInforFromFolderId/{folderId}";
@@ -198,10 +226,12 @@ public sealed class FavoriteFolderQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, FolderDetailCacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, FolderDetailCacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     private static FavoriteFolderDetailViewModel MapToDetailViewModel(FavoriteFolderViewModel dto)
@@ -234,10 +264,13 @@ public sealed class FavoriteFolderQueryService(
 
     public async Task<SdkResult<IReadOnlyList<FavoriteFolderOverviewModel>>> GetRelateFavoriteFoldersAsync(FavoriteObjectType type, long id, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:relate-favorite-folders:{(int)type}:{id}";
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FavoriteFolderOverviewModel>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<FavoriteFolderOverviewModel>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<FavoriteFolderOverviewModel>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<FavoriteFolderOverviewModel>>(cached, cacheRead);
         }
 
         var path = $"api/favorites/GetRelateFavoriteFolders?type={(int)type}&id={id}";
@@ -249,9 +282,11 @@ public sealed class FavoriteFolderQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, FolderDetailCacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, FolderDetailCacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 }

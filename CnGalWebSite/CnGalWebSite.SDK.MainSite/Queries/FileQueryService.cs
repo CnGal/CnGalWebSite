@@ -17,9 +17,10 @@ public sealed class FileQueryService(HttpClient httpClient, ILogger<FileQuerySer
     public async Task<SdkResult<QueryResultModel<UploadRecordOverviewModel, DrawingBedUploadRecordSortField>>> GetUploadRecordsAsync(
         QueryParameterModel<DrawingBedUploadRecordSortField> parameter, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var response = await HttpClient.PostAsJsonAsync(
+            using var response = await HttpClient.PostAsJsonAsync(
                 "api/files/list", parameter, SdkJsonSerializerOptions.Default, cancellationToken);
 
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -49,12 +50,13 @@ public sealed class FileQueryService(HttpClient httpClient, ILogger<FileQuerySer
                     "上传记录列表数据格式不兼容");
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex,
                 "获取上传记录列表异常。BaseAddress={BaseAddress}",
                 HttpClient.BaseAddress);
-            return SdkResult<QueryResultModel<UploadRecordOverviewModel, DrawingBedUploadRecordSortField>>.Fail(
+            return SdkFailure.FromException<QueryResultModel<UploadRecordOverviewModel, DrawingBedUploadRecordSortField>>(ex,
                 "FILES_EXCEPTION",
                 "请求上传记录列表时发生异常");
         }

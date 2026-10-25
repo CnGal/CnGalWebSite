@@ -1,4 +1,5 @@
 using CnGalWebSite.DataModel.Model;
+using System.Text.Json.Serialization;
 
 namespace CnGalWebSite.SDK.MainSite.Models;
 
@@ -45,6 +46,7 @@ public sealed class GameRecordItem
     public required int CVScore { get; init; }
     public required int TotalScore { get; init; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public required string? PlayImpressions { get; init; }
     public required bool ShowPublicly { get; init; }
     public required bool IsHidden { get; init; }

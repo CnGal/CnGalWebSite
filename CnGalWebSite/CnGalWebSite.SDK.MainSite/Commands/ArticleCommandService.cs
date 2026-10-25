@@ -4,18 +4,18 @@ using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.ArticleEdit;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class ArticleCommandService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<ArticleCommandService> logger,
     ExamineUserCache userCache,
-    ICurrentUserAccessor currentUserAccessor) : CommandServiceBase(httpClient), IArticleCommandService
+    ICurrentUserAccessor currentUserAccessor) : CommandServiceBase(httpClient, publicCache), IArticleCommandService
 {
+
     protected override ILogger Logger => logger;
 
     public Task<SdkResult<ArticleEditViewModel>> GetArticleCreateTemplateAsync(CancellationToken cancellationToken = default)
@@ -36,6 +36,7 @@ public sealed class ArticleCommandService(
 
             return Task.FromResult(SdkResult<ArticleEditViewModel>.Ok(model));
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取文章创建模板异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
@@ -45,6 +46,7 @@ public sealed class ArticleCommandService(
 
     public async Task<SdkResult<ArticleEditViewModel>> GetArticleEditAsync(long id, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var mainTask = GetFromJsonAsync<EditArticleMainViewModel>($"api/articles/EditMain/{id}", cancellationToken);
@@ -75,15 +77,17 @@ public sealed class ArticleCommandService(
 
             return SdkResult<ArticleEditViewModel>.Ok(model);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取文章编辑数据异常。ArticleId={ArticleId}; BaseAddress={BaseAddress}", id, HttpClient.BaseAddress);
-            return SdkResult<ArticleEditViewModel>.Fail("ARTICLE_EDIT_QUERY_EXCEPTION", "请求文章编辑数据时发生异常");
+            return SdkFailure.FromException<ArticleEditViewModel>(ex, "ARTICLE_EDIT_QUERY_EXCEPTION", "请求文章编辑数据时发生异常");
         }
     }
 
     public async Task<SdkResult<ArticleEditMetaOptions>> GetArticleEditMetaOptionsAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             var gamesTask = GetFromJsonAsync<List<string>>("api/entries/GetAllEntries/0", cancellationToken);
@@ -107,31 +111,30 @@ public sealed class ArticleCommandService(
 
             return SdkResult<ArticleEditMetaOptions>.Ok(model);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "获取文章候选列表数据异常。BaseAddress={BaseAddress}", HttpClient.BaseAddress);
-            return SdkResult<ArticleEditMetaOptions>.Fail("ARTICLE_META_OPTIONS_EXCEPTION", "请求文章候选列表数据时发生异常");
+            return SdkFailure.FromException<ArticleEditMetaOptions>(ex, "ARTICLE_META_OPTIONS_EXCEPTION", "请求文章候选列表数据时发生异常");
         }
     }
 
     public async Task<SdkResult<long>> SubmitEditAsync(ArticleEditRequest request, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var writeAttempted = false;
         string? userId = null;
-        long? cacheEntityId = null;
         try
         {
             userId = await currentUserAccessor.GetCurrentUserIdAsync(cancellationToken);
-            cacheEntityId = request.IsCreate ? null : request.Data.Main.Id;
             writeAttempted = true;
             if (request.IsCreate)
             {
-                var response = await PostAsJsonRawAsync("api/articles/Create", request.Data, cancellationToken);
+                using var response = await PostAsJsonRawAsync("api/articles/Create", request.Data, cancellationToken);
                 var result = await ReadResponseAsync<Result>(response, cancellationToken);
 
                 if (result?.Successful == true && long.TryParse(result.Error, out var newId))
                 {
-                    cacheEntityId = newId;
                     return SdkResult<long>.Ok(newId);
                 }
 
@@ -163,20 +166,17 @@ public sealed class ArticleCommandService(
                 return SdkResult<long>.Ok(request.Data.Main.Id);
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "提交文章编辑数据异常。IsCreate={IsCreate}; BaseAddress={BaseAddress}", request.IsCreate, HttpClient.BaseAddress);
-            return SdkResult<long>.Fail("ARTICLE_SUBMIT_EXCEPTION", "提交文章数据时发生异常");
+            return SdkFailure.FromException<long>(ex, "ARTICLE_SUBMIT_EXCEPTION", "提交文章数据时发生异常");
         }
         finally
         {
             // 分块写入可能部分成功，异常或取消时服务端结果也可能不确定。
             if (writeAttempted)
             {
-                if (cacheEntityId.HasValue)
-                {
-                    InvalidateArticleCaches(cacheEntityId.Value);
-                }
                 userCache.Invalidate(HttpClient.BaseAddress, userId);
                 userCache.InvalidateReviewQueue(HttpClient.BaseAddress);
             }
@@ -186,12 +186,5 @@ public sealed class ArticleCommandService(
     private Task<Result?> SubmitPartAsync<T>(string path, T model, CancellationToken cancellationToken)
     {
         return PostAsJsonAsync<T, Result>(path, model, cancellationToken);
-    }
-
-    private void InvalidateArticleCaches(long articleId)
-    {
-        memoryCache.Remove($"main-site:article-detail:{articleId}");
-        memoryCache.Remove(ExamineCacheKeys.ArticleEditRecords(articleId));
-        memoryCache.Remove("main-site:home-summary");
     }
 }

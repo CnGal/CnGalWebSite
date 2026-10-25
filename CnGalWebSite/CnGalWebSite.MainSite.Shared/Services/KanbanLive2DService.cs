@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components;
 using System;
 using CnGalWebSite.MainSite.Shared.Services.KanbanModels;
 using Microsoft.Extensions.Configuration;
@@ -5,12 +6,15 @@ using Microsoft.JSInterop;
 
 namespace CnGalWebSite.MainSite.Shared.Services;
 
-public class KanbanLive2DService : IKanbanLive2DService, IDisposable
+public class KanbanLive2DService : IKanbanLive2DService, IAsyncDisposable
 {
     private readonly IJSRuntime _jsRuntime;
     private readonly IConfiguration _configuration;
     private readonly IKanbanSettingService _settingService;
     private IJSObjectReference? _module;
+    private IJSObjectReference? _controller;
+    private ElementReference _owner;
+    private long _generation;
     private DotNetObjectReference<KanbanLive2DService>? _objRef;
     private string? _kanbanImage;
 
@@ -23,8 +27,17 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
     public event Action? Live2DInitialized;
     public event Action<string>? KanbanImageGenerated;
     public event Action<string>? CustomEventTriggered;
+    public event Action<int>? MouseOverTriggered;
 
-    private const string ModulePath = "/_content/CnGalWebSite.MainSite.Shared/scripts/cg-kanban-live2d.js";
+    public async Task ConfigureHoverAsync(IReadOnlyList<KanbanHoverTarget> targets)
+    {
+        if (_controller is not null && _objRef is not null)
+            await _controller.InvokeVoidAsync("initMouseOverEvent", _objRef, targets);
+    }
+
+    [JSInvokable] public void TriggerMouseOverEventAsync(int index) => MouseOverTriggered?.Invoke(index);
+
+    private const string ModulePath = "/_content/CnGalWebSite.MainSite.Shared/Components/Features/Kanban/KanbanRoot.razor.js";
 
     public KanbanLive2DService(IJSRuntime jsRuntime, IConfiguration configuration, IKanbanSettingService settingService)
     {
@@ -33,19 +46,24 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
         _settingService = settingService;
     }
 
-    public async Task InitAsync(string modelDir, int modelIndex)
+    public async Task InitAsync(string modelDir, int modelIndex, ElementReference root)
     {
-        // 如果之前已初始化过，先释放旧的资源以确保干净的状态
-        if (_module is not null)
+        await ReleaseLive2D();
+        var generation = ++_generation;
+        _owner = root;
+        var module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", ModulePath);
+        if (generation != _generation) { await module.DisposeAsync(); return; }
+        IJSObjectReference controller;
+        try { controller = await module.InvokeAsync<IJSObjectReference>("create", root); }
+        catch { await module.DisposeAsync(); throw; }
+        if (generation != _generation)
         {
-            await ReleaseLive2D();
+            await controller.InvokeVoidAsync("dispose"); await controller.DisposeAsync(); await module.DisposeAsync(); return;
         }
-
-        _module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", ModulePath);
+        _module = module; _controller = controller;
         _objRef = DotNetObjectReference.Create(this);
-
         var resourcesPath = _configuration["Live2D_ResourcesPath"] ?? string.Empty;
-        await _module.InvokeVoidAsync("initKanbanLive2D", _objRef, modelDir, modelIndex, resourcesPath);
+        await controller.InvokeVoidAsync("initKanbanLive2D", _objRef, modelDir, modelIndex, resourcesPath);
     }
 
     public async Task InitResizeAsync()
@@ -55,7 +73,7 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
             return;
         }
 
-        await _module.InvokeVoidAsync("initKanbanResizeAction", _objRef);
+        await _controller!.InvokeVoidAsync("initKanbanResizeAction", _objRef);
     }
 
     public async Task SetModelAsync(int index)
@@ -65,7 +83,7 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
             return;
         }
 
-        await _module.InvokeVoidAsync("switchLiv2DModel", index);
+        await _controller!.InvokeVoidAsync("switchLiv2DModel", index);
     }
 
     public async Task SetExpression(string name)
@@ -75,7 +93,7 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
             return;
         }
 
-        await _module.InvokeVoidAsync("switchLiv2DExpression", name);
+        await _controller!.InvokeVoidAsync("switchLiv2DExpression", name);
     }
 
     public async Task CleanExpression()
@@ -85,7 +103,7 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
             return;
         }
 
-        await _module.InvokeVoidAsync("switchLiv2DExpression");
+        await _controller!.InvokeVoidAsync("switchLiv2DExpression");
     }
 
     public async Task SetClothes(string name)
@@ -104,11 +122,11 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
 
         if (name.EndsWith('0'))
         {
-            await _module.InvokeVoidAsync("switchLiv2DClothes");
+            await _controller!.InvokeVoidAsync("switchLiv2DClothes");
         }
         else
         {
-            await _module.InvokeVoidAsync("switchLiv2DClothes", name);
+            await _controller!.InvokeVoidAsync("switchLiv2DClothes", name);
         }
     }
 
@@ -128,11 +146,11 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
 
         if (name.EndsWith('0'))
         {
-            await _module.InvokeVoidAsync("switchLiv2DStockings");
+            await _controller!.InvokeVoidAsync("switchLiv2DStockings");
         }
         else
         {
-            await _module.InvokeVoidAsync("switchLiv2DStockings", name);
+            await _controller!.InvokeVoidAsync("switchLiv2DStockings", name);
         }
     }
 
@@ -152,11 +170,11 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
 
         if (name.EndsWith('0'))
         {
-            await _module.InvokeVoidAsync("switchLiv2DShoes");
+            await _controller!.InvokeVoidAsync("switchLiv2DShoes");
         }
         else
         {
-            await _module.InvokeVoidAsync("switchLiv2DShoes", name);
+            await _controller!.InvokeVoidAsync("switchLiv2DShoes", name);
         }
     }
 
@@ -167,7 +185,7 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
             return;
         }
 
-        await _module.InvokeVoidAsync("switchLiv2DMotion", group, index);
+        await _controller!.InvokeVoidAsync("switchLiv2DMotion", group, index);
     }
 
     public async Task CleanMotion()
@@ -177,7 +195,7 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
             return;
         }
 
-        await _module.InvokeVoidAsync("switchLiv2DMotion", "Idle");
+        await _controller!.InvokeVoidAsync("switchLiv2DMotion", "Idle");
     }
 
     public async Task StartKanbanImageGeneration()
@@ -188,7 +206,7 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
         }
 
         var (x, y, width, height) = Kanban.GetCircleKanbanImageSize();
-        await _module.InvokeVoidAsync("startKanbanImageGeneration", _objRef, x, y, height, width);
+        await _controller!.InvokeVoidAsync("startKanbanImageGeneration", _objRef, x, y, height, width);
     }
 
     public async Task<string?> GetKanbanImageGeneration()
@@ -216,7 +234,7 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
             return;
         }
 
-        var position = await _module.InvokeAsync<DialogBoxPositionResult?>("getCurrentDialogBoxPosition");
+        var position = await _controller!.InvokeAsync<DialogBoxPositionResult?>("getCurrentDialogBoxPosition");
         if (position is null)
         {
             return;
@@ -225,18 +243,20 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
         await SetDialogBoxPosition(position.Left, position.Bottom, position.Top);
     }
 
-    public async Task ReleaseLive2D()
+    public async Task ReleaseLive2D(ElementReference? owner = null)
     {
-        if (_module is null)
+        if (owner.HasValue && owner.Value.Id != _owner.Id) return;
+        ++_generation;
+        var controller = _controller; var module = _module;
+        _controller = null; _module = null;
+        try
         {
-            return;
+            if (controller is not null) { await controller.InvokeVoidAsync("dispose"); await controller.DisposeAsync(); }
+            if (module is not null) await module.DisposeAsync();
         }
-
-        await _module.InvokeVoidAsync("releaseLive2D");
-        _module = null;
-
-        _objRef?.Dispose();
-        _objRef = null;
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        finally { _objRef?.Dispose(); _objRef = null; }
     }
 
     [JSInvokable]
@@ -317,11 +337,7 @@ public class KanbanLive2DService : IKanbanLive2DService, IDisposable
         CustomEventTriggered?.Invoke(eventName);
     }
 
-    public void Dispose()
-    {
-        _objRef?.Dispose();
-        GC.SuppressFinalize(this);
-    }
+    public async ValueTask DisposeAsync() => await ReleaseLive2D();
 
     private sealed class DialogBoxPositionResult
     {

@@ -14,21 +14,21 @@ using CnGalWebSite.DataModel.ViewModel.Videos;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class ExamineQueryService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<ExamineQueryService> logger,
     ExamineUserCache userCache,
     ICurrentUserAccessor currentUserAccessor)
     : QueryServiceBase(httpClient), IExamineQueryService
 {
+    private readonly PublicDataCache memoryCache = publicCache.ForSource(httpClient.BaseAddress);
+
     protected override ILogger Logger => logger;
-    protected override bool PropagateCancellation => true;
 
     private static readonly TimeSpan ListCacheDuration = TimeSpan.FromMinutes(2);
 
@@ -81,6 +81,7 @@ public sealed class ExamineQueryService(
             try
             {
                 var result = Deserialize<QueryResultModel<T, TSort>>(body);
+                cancellationToken.ThrowIfCancellationRequested();
                 return SdkResult<QueryResultModel<T, TSort>>.Ok(result!);
             }
             catch (System.Text.Json.JsonException ex)
@@ -103,7 +104,7 @@ public sealed class ExamineQueryService(
             Logger.LogError(ex,
                 "获取{DisplayName}列表异常。Path={Path}; BaseAddress={BaseAddress}",
                 displayName, apiPath, HttpClient.BaseAddress);
-            return SdkResult<QueryResultModel<T, TSort>>.Fail(
+            return SdkFailure.FromException<QueryResultModel<T, TSort>>(ex,
                 $"{errorDomain}_EXCEPTION",
                 $"请求{displayName}列表时发生异常");
         }
@@ -149,10 +150,12 @@ public sealed class ExamineQueryService(
     public async Task<SdkResult<ExaminesOverviewViewModel>> GetExaminesOverviewAsync(
         long examineId, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = ExamineCacheKeys.Overview(examineId);
-        if (memoryCache.TryGetValue(cacheKey, out ExaminesOverviewViewModel? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out ExaminesOverviewViewModel? cached, cacheRead) && cached is not null)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return SdkResult<ExaminesOverviewViewModel>.Ok(cached);
         }
 
@@ -164,7 +167,8 @@ public sealed class ExamineQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, ListCacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, ListCacheDuration, cacheRead);
         }
 
         return result;
@@ -243,6 +247,7 @@ public sealed class ExamineQueryService(
             AfterModel = currentResult.Data.AfterModel,
         };
 
+        cancellationToken.ThrowIfCancellationRequested();
         return SdkResult<ExamineViewModel>.Ok(combined);
     }
 
@@ -278,10 +283,12 @@ public sealed class ExamineQueryService(
     public async Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetEntryEditRecordsAsync(
         int entryId, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = ExamineCacheKeys.EntryEditRecords(entryId);
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached, cacheRead) && cached is not null)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(cached);
         }
 
@@ -304,7 +311,10 @@ public sealed class ExamineQueryService(
             .OrderByDescending(e => e.ApplyTime)
             .ToList();
 
-        memoryCache.Set(cacheKey, records, ListCacheDuration);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        memoryCache.Set(cacheKey, records, ListCacheDuration, cacheRead);
+        cancellationToken.ThrowIfCancellationRequested();
         return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(records);
     }
 
@@ -313,10 +323,12 @@ public sealed class ExamineQueryService(
     public async Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetArticleEditRecordsAsync(
         long articleId, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = ExamineCacheKeys.ArticleEditRecords(articleId);
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached, cacheRead) && cached is not null)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(cached);
         }
 
@@ -339,7 +351,10 @@ public sealed class ExamineQueryService(
             .OrderByDescending(e => e.ApplyTime)
             .ToList();
 
-        memoryCache.Set(cacheKey, records, ListCacheDuration);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        memoryCache.Set(cacheKey, records, ListCacheDuration, cacheRead);
+        cancellationToken.ThrowIfCancellationRequested();
         return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(records);
     }
 
@@ -348,10 +363,12 @@ public sealed class ExamineQueryService(
     public async Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetVideoEditRecordsAsync(
         long videoId, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = ExamineCacheKeys.VideoEditRecords(videoId);
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached, cacheRead) && cached is not null)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(cached);
         }
 
@@ -374,7 +391,10 @@ public sealed class ExamineQueryService(
             .OrderByDescending(e => e.ApplyTime)
             .ToList();
 
-        memoryCache.Set(cacheKey, records, ListCacheDuration);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        memoryCache.Set(cacheKey, records, ListCacheDuration, cacheRead);
+        cancellationToken.ThrowIfCancellationRequested();
         return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(records);
     }
 
@@ -383,10 +403,12 @@ public sealed class ExamineQueryService(
     public async Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetTagEditRecordsAsync(
         long tagId, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = ExamineCacheKeys.TagEditRecords(tagId);
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached, cacheRead) && cached is not null)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(cached);
         }
 
@@ -409,7 +431,10 @@ public sealed class ExamineQueryService(
             .OrderByDescending(e => e.ApplyTime)
             .ToList();
 
-        memoryCache.Set(cacheKey, records, ListCacheDuration);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        memoryCache.Set(cacheKey, records, ListCacheDuration, cacheRead);
+        cancellationToken.ThrowIfCancellationRequested();
         return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(records);
     }
 
@@ -418,10 +443,12 @@ public sealed class ExamineQueryService(
     public async Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetPeripheryEditRecordsAsync(
         long peripheryId, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = ExamineCacheKeys.PeripheryEditRecords(peripheryId);
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached, cacheRead) && cached is not null)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(cached);
         }
 
@@ -444,7 +471,10 @@ public sealed class ExamineQueryService(
             .OrderByDescending(e => e.ApplyTime)
             .ToList();
 
-        memoryCache.Set(cacheKey, records, ListCacheDuration);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        memoryCache.Set(cacheKey, records, ListCacheDuration, cacheRead);
+        cancellationToken.ThrowIfCancellationRequested();
         return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(records);
     }
 }

@@ -19,6 +19,12 @@
     background-color: transparent;
 }
 
+/* 默认按钮图标与按钮文字保持同一视觉尺寸 */
+.cg-btn ::deep .cg-mdi-icon {
+    width: 1em;
+    height: 1em;
+}
+
 .cg-btn:disabled,
 .cg-btn--disabled {
     opacity: 0.5;

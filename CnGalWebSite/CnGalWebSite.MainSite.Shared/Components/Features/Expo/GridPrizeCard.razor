@@ -3,7 +3,7 @@
 @foreach (var item in Items.Skip(Skip).Take(Take))
 {
     var active = ActiveIndex == Items.IndexOf(item);
-    <div class="prize-card @(active ? "active" : "")">
+    <div class="prize-card @(active ? "active" : "")" data-cg-prize-index="@Items.IndexOf(item)">
         <div>
             @if (string.IsNullOrWhiteSpace(item.Image) == false)
             {

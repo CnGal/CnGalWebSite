@@ -2,6 +2,7 @@
 @page "/perfections/home"
 @rendermode InteractiveServer
 @inject IPerfectionQueryService PerfectionQueryService
+@inject PageResponseState PageResponse
 @inject ICgToastService CgToastService
 @implements IDisposable
 @using CnGalWebSite.DataModel.ViewModel.Admin
@@ -111,6 +112,7 @@ else
 
     private async Task LoadAllDataAsync()
     {
+        PageResponse.Begin();
         _errorMessage = null;
 
         var afterTime = DateTime.Now.Date.AddDays(-30);
@@ -136,6 +138,12 @@ else
             if (overviewResult.Success && overviewResult.Data is not null)
             {
                 _overviewModel = overviewResult.Data;
+            }
+            else
+            {
+                _errorMessage = overviewResult.Error?.Message ?? "获取完善度数据失败";
+                PageResponse.Failed(overviewResult.Error);
+                return;
             }
 
             var editListResult = editListTask.Result;
@@ -169,6 +177,7 @@ else
             _middleChecks = middleResult.Success ? middleResult.Data : null;
 
             _isLoaded = true;
+            PageResponse.Succeeded();
         }
         catch (OperationCanceledException)
         {
@@ -178,6 +187,7 @@ else
         catch (Exception ex)
         {
             _errorMessage = ex.Message;
+            PageResponse.Failed(503);
             CgToastService.Show("完善度数据加载失败", ex.Message, "error");
         }
     }

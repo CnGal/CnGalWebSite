@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 
 @inject IStoreInfoQueryService StoreInfoQueryService
+@inject PageResponseState PageResponse
 @inject NavigationManager NavigationManager
 @implements IDisposable
 @using CnGalWebSite.DataModel.ViewModel.Stores
@@ -148,6 +149,7 @@
 
         _cts?.Cancel();
         _cts = new CancellationTokenSource();
+        PageResponse.Begin();
 
         IsLoading = true;
         ErrorMessage = null;
@@ -159,10 +161,12 @@
             {
                 Items = result.Data.Items;
                 TotalPages = result.Data.TotalPages;
+                PageResponse.Succeeded();
             }
             else
             {
                 ErrorMessage = result.Error?.Message ?? "获取游戏销量信息失败";
+                PageResponse.Failed(result.Error);
             }
         }
         catch (OperationCanceledException)

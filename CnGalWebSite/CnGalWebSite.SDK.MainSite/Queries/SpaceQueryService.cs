@@ -8,16 +8,17 @@ using CnGalWebSite.DataModel.ViewModel.Space;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class SpaceQueryService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<SpaceQueryService> logger) : QueryServiceBase(httpClient), ISpaceQueryService
 {
+    private readonly PublicDataCache memoryCache = publicCache.ForSource(httpClient.BaseAddress);
+
     private static readonly TimeSpan SpaceCacheDuration = TimeSpan.FromMinutes(5);
     private const string SpaceDetailPathTemplate = "api/space/GetUserView/{0}";
 
@@ -26,10 +27,13 @@ public sealed class SpaceQueryService(
 
     public async Task<SdkResult<SpaceDetailViewModel>> GetSpaceDetailAsync(string id, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = GetSpaceDetailCacheKey(id);
-        if (memoryCache.TryGetValue(cacheKey, out SpaceDetailViewModel? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out SpaceDetailViewModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<SpaceDetailViewModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<SpaceDetailViewModel>(cached, cacheRead);
         }
 
         var path = string.Format(SpaceDetailPathTemplate, id);
@@ -43,19 +47,23 @@ public sealed class SpaceQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, SpaceCacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, SpaceCacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     public void ClearSpaceDetailCache(string id)
     {
-        memoryCache.Remove(GetSpaceDetailCacheKey(id));
+        memoryCache.Invalidate();
     }
 
     public async Task<SdkResult<MessageListViewModel>> GetUserMessagesAsync(CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var result = await GetAsync<List<Message>>(
             "api/space/GetUserMessages",
             "MESSAGE",
@@ -98,11 +106,13 @@ public sealed class SpaceQueryService(
             HasUnreadRejected = rejected.Any(m => !m.IsReaded),
         };
 
-        return SdkResult<MessageListViewModel>.Ok(viewModel);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<MessageListViewModel>(viewModel, cacheRead);
     }
 
     public async Task<SdkResult<long>> GetUnreadMessageCountAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         return await GetAsync<long>(
             "api/space/GetUserUnReadedMessageCount",
             "MESSAGE",
@@ -176,6 +186,8 @@ public sealed class SpaceQueryService(
 
     public async Task<SdkResult<UserArticlesViewModel>> GetUserArticlesAsync(string userId, int currentPage = 1, int maxResultCount = 10, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var path = $"api/space/GetUserArticles/{userId}?currentPage={currentPage}&maxResultCount={maxResultCount}";
         var result = await GetAsync<UserArticleListModel>(path, "SPACE", "用户文章列表", cancellationToken);
 
@@ -194,11 +206,14 @@ public sealed class SpaceQueryService(
             MaxCount = result.Data.MaxCount,
             Items = result.Data.Items ?? []
         };
-        return SdkResult<UserArticlesViewModel>.Ok(vm);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<UserArticlesViewModel>(vm, cacheRead);
     }
 
     public async Task<SdkResult<UserVideosViewModel>> GetUserVideosAsync(string userId, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var path = $"api/space/GetUserVideos/{userId}";
         var result = await GetAsync<UserVideoListModel>(path, "SPACE", "用户视频列表", cancellationToken);
 
@@ -214,11 +229,14 @@ public sealed class SpaceQueryService(
         {
             Items = result.Data.Items ?? []
         };
-        return SdkResult<UserVideosViewModel>.Ok(vm);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<UserVideosViewModel>(vm, cacheRead);
     }
 
     public async Task<SdkResult<UserEditRecordsViewModel>> GetUserEditRecordsAsync(string userId, int currentPage = 1, int maxResultCount = 12, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var path = $"api/space/GetUserEditRecord?userId={userId}&sortField=ApplyTime&sortDirection=Descending&maxResultCount={maxResultCount}&currentPage={currentPage}&screeningConditions=全部";
         var result = await GetAsync<PagedResultDto<ExaminedNormalListModel>>(path, "SPACE", "用户编辑记录", cancellationToken);
 
@@ -237,11 +255,14 @@ public sealed class SpaceQueryService(
             MaxCount = maxResultCount,
             Items = result.Data.Data ?? []
         };
-        return SdkResult<UserEditRecordsViewModel>.Ok(vm);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<UserEditRecordsViewModel>(vm, cacheRead);
     }
 
     public async Task<SdkResult<UserHeatMapViewModel>> GetUserHeatMapAsync(string userId, UserHeatMapType type, DateTime? after = null, DateTime? before = null, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var now = DateTime.UtcNow;
         after ??= now.AddYears(-1);
         before ??= now;
@@ -303,11 +324,13 @@ public sealed class SpaceQueryService(
             Data = dataPoints,
             MaxCount = maxCount
         };
-        return SdkResult<UserHeatMapViewModel>.Ok(vm);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<UserHeatMapViewModel>(vm, cacheRead);
     }
 
     public async Task<SdkResult<UserTaskModel>> GetUserTasksAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         return await PostAsync<UserTaskModel>(
             "api/space/GetUserTasks",
             "SPACE",
