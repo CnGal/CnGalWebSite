@@ -36,12 +36,46 @@ public sealed class PublicDataCache(IMemoryCache storage, ICurrentUserAccessor u
 
     private object Key(object key, ReadScope scope) => (_source, scope.CacheVersion, key);
 
-    public SdkResult<T> Complete<T>(T value, ReadScope scope) => scope.IdentityVersion == user.IdentityVersion
-        ? SdkResult<T>.Ok(value)
-        : SdkResult<T>.Fail("SDK_IDENTITY_CHANGED", "会话身份已改变，请重新加载页面");
+    private bool IsGenerationCurrent(ReadScope scope) => _generation is null
+        ? scope.CacheVersion == 0
+        : scope.CacheVersion == Volatile.Read(ref _generation.Value);
 
-    public SdkResult<T> CompleteResult<T>(SdkResult<T> result, ReadScope scope) => scope.IdentityVersion == user.IdentityVersion
-        ? result : SdkResult<T>.Fail("SDK_IDENTITY_CHANGED", "会话身份已改变，请重新加载页面");
+    private bool IsCompletionValid(ReadScope scope)
+    {
+        if (scope.IdentityVersion != user.IdentityVersion)
+        {
+            return false;
+        }
+
+        // Anonymous responses can outlive a write. Refuse to surface data that
+        // was fetched before an invalidation; callers show a retryable error.
+        return !scope.Anonymous
+            || (IsGenerationCurrent(scope) && user.GetIdentityState() == CurrentIdentityState.Anonymous);
+    }
+
+    public SdkResult<T> Complete<T>(T value, ReadScope scope)
+    {
+        if (scope.IdentityVersion != user.IdentityVersion)
+        {
+            return SdkResult<T>.Fail("SDK_IDENTITY_CHANGED", "会话身份已改变，请重新加载页面");
+        }
+
+        return IsCompletionValid(scope)
+            ? SdkResult<T>.Ok(value)
+            : SdkResult<T>.Fail("SDK_DATA_CHANGED", "数据已在请求期间更新，请重新加载页面");
+    }
+
+    public SdkResult<T> CompleteResult<T>(SdkResult<T> result, ReadScope scope)
+    {
+        if (scope.IdentityVersion != user.IdentityVersion)
+        {
+            return SdkResult<T>.Fail("SDK_IDENTITY_CHANGED", "会话身份已改变，请重新加载页面");
+        }
+
+        return IsCompletionValid(scope)
+            ? result
+            : SdkResult<T>.Fail("SDK_DATA_CHANGED", "数据已在请求期间更新，请重新加载页面");
+    }
 
     public bool TryGetValue<T>(object key, out T? value, ReadScope scope)
     {

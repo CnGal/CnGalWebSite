@@ -223,6 +223,12 @@
         }
 
         var selected = args.File;
+        if (selected.Size > MaxUploadBytes)
+        {
+            _errorMessage = "上传失败：图片过大（最大 10MB）";
+            return;
+        }
+
         if (ShowCropper)
         {
             _pendingFile = selected;
@@ -234,7 +240,27 @@
 
         await UploadSingleFileAsync(selected, cropped: false);
         }
-        catch (OperationCanceledException) when (_lifetime.IsCancellationRequested) { }
+        catch (OperationCanceledException) when (_lifetime.IsCancellationRequested)
+        {
+            ResetPendingCrop();
+        }
+        catch (IOException)
+        {
+            ResetPendingCrop();
+            _errorMessage = "上传失败：图片过大（最大 10MB）";
+        }
+        catch (Exception ex)
+        {
+            ResetPendingCrop();
+            _errorMessage = $"读取图片失败：{ex.Message}";
+        }
+    }
+
+    private void ResetPendingCrop()
+    {
+        _pendingFile = null;
+        _pendingPreviewDataUrl = null;
+        _cropDialogOpen = false;
     }
 
     private async Task UploadSingleFileAsync(IBrowserFile file, bool cropped, ImageCropRect? cropRect = null)

@@ -1,4 +1,35 @@
 const cookie = name => document.cookie.split(';').map(item => item.trim()).find(item => item.startsWith(`${name}=`))?.slice(name.length + 1);
+
+function setMeta(attribute, name, content) {
+    if (typeof content !== 'string' || content.length === 0) return;
+    let element = document.head.querySelector(`meta[${attribute}="${name}"]`);
+    if (!element) {
+        element = document.createElement('meta');
+        element.setAttribute(attribute, name);
+        document.head.append(element);
+    }
+    if (element.getAttribute('content') !== content) element.setAttribute('content', content);
+}
+
+export function updatePageMeta(title, description, image, structuredData) {
+    if (typeof title === 'string' && title.length > 0) document.title = title;
+    setMeta('name', 'description', description);
+    setMeta('itemprop', 'name', title);
+    setMeta('itemprop', 'image', image);
+
+    let script = document.head.querySelector('script[data-cg-page-meta-structured-data]');
+    if (typeof structuredData === 'string' && structuredData.length > 0) {
+        if (!script) {
+            script = document.createElement('script');
+            script.type = 'application/ld+json';
+            script.dataset.cgPageMetaStructuredData = 'true';
+            document.head.append(script);
+        }
+        if (script.textContent !== structuredData) script.textContent = structuredData;
+    } else {
+        script?.remove();
+    }
+}
 const setCookie = (name, value) => { document.cookie = `${name}=${value}; path=/; max-age=31536000; samesite=lax${location.protocol === 'https:' ? '; secure' : ''}`; };
 const systemTheme = matchMedia('(prefers-color-scheme: dark)');
 

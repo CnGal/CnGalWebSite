@@ -7,9 +7,12 @@
    ──────────────────────────────────────────────────────────── *@
 
 <cg-image-gallery class="cg-image-gallery" data-cg-image-gallery style="@(GalleryAspectRatio != null ? $"aspect-ratio: {GalleryAspectRatio};" : null)">
-    @if (Items is { Count: > 0 })
+    @{
+    var items = GetSafeItems(Items);
+}
+@if (items.Count > 0)
     {
-        var total = Items.Count;
+        var total = items.Count;
         var effectiveAspect = GalleryAspectRatio ?? "16 / 9";
 
         @* ── 大图预览区 ── *@
@@ -18,7 +21,7 @@
              aria-label="点击查看全屏大图">
             @for (var i = 0; i < total; i++)
             {
-                var item = Items[i];
+                var item = items[i];
                 var activeClass = i == 0 ? " cg-image-gallery__preview-slide--active" : "";
 
                 <a class="cg-image-gallery__preview-slide@(activeClass)" data-index="@i" href="@item.Url">
@@ -49,7 +52,7 @@
             <div class="cg-image-gallery__filmstrip-track">
                 @for (var i = 0; i < total; i++)
                 {
-                    var item = Items[i];
+                    var item = items[i];
                     var activeClass = i == 0 ? " cg-image-gallery__thumbnail--active" : "";
 
                     <a class="cg-image-gallery__thumbnail@(activeClass)" href="@item.Url"
@@ -103,8 +106,8 @@
                 </button>
 
                 <div class="cg-image-gallery__fullscreen-image-wrap">
-                    <img src="@Items[0].Url"
-                         alt="@(Items[0].Alt ?? "图片 1")"
+                    <img src="@items[0].Url"
+                         alt="@(items[0].Alt ?? "图片 1")"
                          class="cg-image-gallery__fullscreen-image"
                          data-cg-image-gallery-fs-image />
                 </div>
@@ -129,7 +132,7 @@
                     <div class="cg-image-gallery__fullscreen-filmstrip-track">
                         @for (var i = 0; i < total; i++)
                         {
-                            var item = Items[i];
+                            var item = items[i];
                             var activeClass = i == 0 ? " cg-image-gallery__fullscreen-thumbnail--active" : "";
 
                             <a class="cg-image-gallery__fullscreen-thumbnail@(activeClass)" href="@item.Url"
@@ -176,4 +179,21 @@
 
     /// <summary>图片画廊数据项</summary>
     public record CgImageGalleryItem(string Url, string? Alt);
+
+    private static IReadOnlyList<SafeGalleryItem> GetSafeItems(IReadOnlyList<CgImageGalleryItem> source)
+    {
+        var items = new List<SafeGalleryItem>(source.Count);
+        foreach (var item in source)
+        {
+            var url = UrlSafety.GetSafeHref(item.Url);
+            if (url is not null)
+            {
+                items.Add(new SafeGalleryItem(url, item.Alt));
+            }
+        }
+
+        return items;
+    }
+
+    private sealed record SafeGalleryItem(string Url, string? Alt);
 }

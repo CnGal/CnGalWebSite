@@ -1,3 +1,6 @@
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
 <PageTitle>@ComputedTitle</PageTitle>
 <HeadContent>
     <meta name="description" content="@ComputedDescription">
@@ -14,6 +17,10 @@
     private const string SiteName = "CnGal 中文GalGame资料站";
     private const string DefaultDescription = "CnGal资料站的建站目的是收集，索引国产gal及中文化galgame资料、文章、攻略，为galgame同好们提供方便。";
     private const string DefaultImage = "https://app.cngal.org/_content/CnGalWebSite.Shared/images/logo.png";
+
+    private IJSObjectReference? _metaModule;
+    private string? _lastMetaSignature;
+    private bool _disposed;
 
     /// <summary>
     /// 页面标题。为空时使用默认站名。
@@ -44,4 +51,77 @@
 
     [Parameter] public string? StructuredData { get; set; }
     [Parameter] public RenderFragment? AdditionalHeadContent { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        // HeadContent is emitted during static SSR. Interactive pages with
+        // prerender:false do not have a static head, so mirror the same values
+        // into document.head once the circuit is alive. Running on every render
+        // also handles dynamic titles (for example after detail data loads).
+        var signature = string.Join('\n',
+            ComputedTitle,
+            ComputedDescription,
+            ComputedImage,
+            StructuredData ?? string.Empty);
+        if (signature == _lastMetaSignature)
+        {
+            return;
+        }
+
+        _lastMetaSignature = signature;
+        try
+        {
+            _metaModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/CnGalWebSite.MainSite.Shared/scripts/site-shell.js");
+            if (_disposed)
+            {
+                return;
+            }
+
+            await _metaModule.InvokeVoidAsync(
+                "updatePageMeta",
+                ComputedTitle,
+                ComputedDescription,
+                ComputedImage,
+                StructuredData);
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+        catch (InvalidOperationException)
+        {
+            // Static SSR has no interactive JS runtime. HeadContent above already
+            // produced the server-rendered head in that case.
+        }
+        catch (JSException ex)
+        {
+            Console.Error.WriteLine($"CgPageMeta update: {ex.Message}");
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _disposed = true;
+        if (_metaModule is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await _metaModule.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+        catch (TaskCanceledException)
+        {
+        }
+    }
 }

@@ -98,7 +98,8 @@
 
 .floating-action-toolbar__group:hover .floating-action-toolbar__panel,
 .floating-action-toolbar__group:focus-within .floating-action-toolbar__panel,
-.floating-action-toolbar__group:has(.cg-modal-mask) .floating-action-toolbar__panel {
+.floating-action-toolbar__group:has(dialog[open]) .floating-action-toolbar__panel,
+.floating-action-toolbar__group:has(.cg-modal-fallback) .floating-action-toolbar__panel {
     opacity: 1;
     pointer-events: auto;
 }

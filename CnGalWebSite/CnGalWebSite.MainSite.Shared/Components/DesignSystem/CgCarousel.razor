@@ -9,19 +9,22 @@
 <cg-carousel class="cg-carousel"
      style="aspect-ratio: @AspectRatio;"
      data-cg-carousel-duration="@SlideDurationSeconds">
-    @if (Items is not null && Items.Count > 0)
+    @{
+        var items = GetSafeItems(Items);
+    }
+    @if (items.Count > 0)
     {
-        var count = Items.Count;
+        var count = items.Count;
 
         @if (count == 1)
         {
-            var solo = Items[0];
+            var solo = items[0];
             @if (!string.IsNullOrEmpty(solo.Link))
             {
                 <a class="cg-carousel__slide cg-carousel__slide--solo"
                    href="@solo.Link"
-                   target="@(IsExternalLink(solo.Link) ? "_blank" : null)"
-                   rel="@(IsExternalLink(solo.Link) ? "noopener noreferrer" : null)"
+                   target="@(UrlSafety.IsExternalHttpUrl(solo.Link) ? "_blank" : null)"
+                   rel="@(UrlSafety.IsExternalHttpUrl(solo.Link) ? "noopener noreferrer" : null)"
                    aria-label="@solo.Alt"
                    data-cg-track-slot="@TrackSlot">
                     <img class="cg-carousel__image"
@@ -52,7 +55,7 @@
         {
             @for (var i = 0; i < count; i++)
             {
-                var item = Items[i];
+                var item = items[i];
                 var activeClass = i == 0 ? " cg-carousel__slide--active" : "";
 
                 <div class="cg-carousel__slide@(activeClass)">
@@ -60,8 +63,8 @@
                     {
                         <a class="cg-carousel__link"
                            href="@item.Link"
-                           target="@(IsExternalLink(item.Link) ? "_blank" : null)"
-                           rel="@(IsExternalLink(item.Link) ? "noopener noreferrer" : null)"
+                           target="@(UrlSafety.IsExternalHttpUrl(item.Link) ? "_blank" : null)"
+                           rel="@(UrlSafety.IsExternalHttpUrl(item.Link) ? "noopener noreferrer" : null)"
                            aria-label="@item.Alt"
                            data-cg-track-slot="@TrackSlot">
                             <img class="cg-carousel__image"
@@ -133,10 +136,20 @@
     /// <summary>轮播项数据模型</summary>
     public record CgCarouselItem(string Image, string? Link, string? Alt);
 
-    private static bool IsExternalLink(string? link)
+    private static IReadOnlyList<SafeCarouselItem> GetSafeItems(IReadOnlyList<CgCarouselItem> source)
     {
-        if (string.IsNullOrEmpty(link)) return false;
-        return link.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
-            || link.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
+        var items = new List<SafeCarouselItem>(source.Count);
+        foreach (var item in source)
+        {
+            var image = UrlSafety.GetSafeHref(item.Image);
+            if (image is not null)
+            {
+                items.Add(new SafeCarouselItem(image, UrlSafety.GetSafeHref(item.Link), item.Alt));
+            }
+        }
+
+        return items;
     }
+
+    private sealed record SafeCarouselItem(string Image, string? Link, string? Alt);
 }

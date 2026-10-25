@@ -5,6 +5,14 @@ namespace CnGalWebSite.MainSite.Services;
 
 internal static partial class PublicHtmlCachePolicy
 {
+    // Only cookies that can change the anonymous HTML variant block shared caching.
+    // Identity is checked separately through User/Authorization headers.
+    private static readonly HashSet<string> OutputVariantCookies = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ThemeConstants.CookieName,
+        MiniModeConstants.CookieName
+    };
+
     public static bool CanShare(HttpContext context)
     {
         if (context.RequestServices.GetRequiredService<PageResponseState>().Ready != true
@@ -12,7 +20,7 @@ internal static partial class PublicHtmlCachePolicy
             || context.User.Identity?.IsAuthenticated == true
             || context.Request.Headers.ContainsKey("Authorization")
             || context.Response.Headers.ContainsKey("Set-Cookie")
-            || context.Request.Cookies.Keys.Any(key => key != ThemeConstants.CookieName)
+            || context.Request.Cookies.Keys.Any(key => !OutputVariantCookies.Contains(key))
             || context.Request.Query.ContainsKey(MiniModeConstants.QueryParameterName)) return false;
 
         var path = context.Request.Path.Value ?? "";
