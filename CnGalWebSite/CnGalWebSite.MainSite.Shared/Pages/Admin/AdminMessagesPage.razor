@@ -50,7 +50,7 @@
                     @if (!string.IsNullOrWhiteSpace(item.Link))
                     {
                         <button class="admin-action-btn admin-action-btn--show" title="查看"
-                                @onclick="() => NavigationManager.NavigateTo(item.Link)">
+                                data-cg-server-action @onclick="() => NavigationManager.NavigateTo(item.Link)">
                             <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
                         </button>
                     }

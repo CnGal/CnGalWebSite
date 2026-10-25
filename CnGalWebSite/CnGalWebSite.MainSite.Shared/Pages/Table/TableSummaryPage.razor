@@ -89,11 +89,11 @@
         <span>导出当前数据</span>
     </div>
     <div class="table-summary__toolbar-actions">
-        <button class="table-summary__export-btn" @onclick="OnExportJson" disabled="@_isExporting">
+        <button class="table-summary__export-btn" data-cg-server-action @onclick="OnExportJson" disabled="@_isExporting">
             <CgMdiIcon Name="mdiCodeJson" class="table-summary__export-icon" aria-hidden="true"/>
             @(_isExporting ? "导出中..." : "JSON")
         </button>
-        <button class="table-summary__export-btn" @onclick="OnExportCsv" disabled="@_isExporting">
+        <button class="table-summary__export-btn" data-cg-server-action @onclick="OnExportCsv" disabled="@_isExporting">
             <CgMdiIcon Name="mdiFileDelimitedOutline" class="table-summary__export-icon" aria-hidden="true"/>
             @(_isExporting ? "导出中..." : "CSV")
         </button>
@@ -532,7 +532,8 @@
             var bytes = System.Text.Encoding.UTF8.GetBytes(content);
             using var stream = new MemoryStream(bytes);
             using var streamRef = new DotNetStreamReference(stream);
-            await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+            await using var module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/CnGalWebSite.MainSite.Shared/scripts/site-shell.js");
+            await module.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
         }
         finally
         {

@@ -1,10 +1,11 @@
-﻿@using Microsoft.JSInterop
+@using Microsoft.JSInterop
 @using Microsoft.Extensions.Configuration
 @implements IAsyncDisposable
 @inject IJSRuntime JSRuntime
 @inject IConfiguration Configuration
+@inject ILogger<CgMarkdownEditor> Logger
 
-<div class="cg-markdown-editor">
+<cg-owned class="cg-markdown-editor">
     @if (_loading)
     {
         <div class="cg-markdown-editor__loading">
@@ -13,18 +14,27 @@
         </div>
     }
 
+    @if (_loadError is not null)
+    {
+        <CgAlert>@_loadError</CgAlert>
+        <button type="button" data-cg-server-action @onclick="InitializeAsync">重试</button>
+    }
     <div @ref="_containerRef" style="@(_loading ? "display:none" : null)"></div>
 
-</div>
+</cg-owned>
 
 @code {
 
     private ElementReference _containerRef;
     private IJSObjectReference? _jsModule;
+    private IJSObjectReference? _controller;
+    private bool _disposed;
+    private string? _loadError;
     private DotNetObjectReference<CgMarkdownEditor>? _dotNetRef;
     private bool _initialized;
     private bool _loading;
     private string? _lastKnownValue;
+    private long _valueVersion;
 
     [Parameter]
     public string? Value { get; set; }
@@ -42,36 +52,53 @@
     {
         if (firstRender)
         {
+            await InitializeAsync();
+        }
+    }
+
+    private async Task InitializeAsync()
+    {
+        if (_loading || _disposed) return;
+        try
+        {
+            _dotNetRef?.Dispose();
             _dotNetRef = DotNetObjectReference.Create(this);
+            _loadError = null;
             _loading = true;
             StateHasChanged();
 
-            _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+            _jsModule ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
                 "import",
-                "./_content/CnGalWebSite.MainSite.Shared/scripts/cg-markdown-editor.js");
+                "./_content/CnGalWebSite.MainSite.Shared/Components/DesignSystem/CgMarkdownEditor.razor.js");
 
             var imageApiBaseUrl = Configuration["ImageApi:BaseAddress"] ?? string.Empty;
 
             _lastKnownValue = Value;
-            await _jsModule.InvokeVoidAsync("initEditor", _dotNetRef, _containerRef, Value ?? string.Empty, Placeholder ?? string.Empty, imageApiBaseUrl);
+            if (_disposed) { await _jsModule.DisposeAsync(); return; }
+            _controller = await _jsModule.InvokeAsync<IJSObjectReference>("create", _dotNetRef, _containerRef, Value ?? string.Empty, Placeholder ?? string.Empty, imageApiBaseUrl, Disabled, _valueVersion);
+            if (_disposed) { await _controller.InvokeVoidAsync("dispose"); await _controller.DisposeAsync(); return; }
+            if (!string.Equals(Value, _lastKnownValue, StringComparison.Ordinal)) await _controller.InvokeVoidAsync("setValue", Value ?? string.Empty, ++_valueVersion);
             _initialized = true;
             _loading = false;
             StateHasChanged();
         }
+        catch (JSException ex) { _loadError = "编辑器加载失败，请重试"; Logger.LogWarning(ex, "CgMarkdownEditor mount failed"); }
+        finally { _loading = false; if (!_disposed) StateHasChanged(); }
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        if (!_initialized || _jsModule is null)
+        if (!_initialized || _controller is null)
         {
             return;
         }
 
+        await _controller.InvokeVoidAsync("setDisabled", Disabled);
         // 当外部参数变更时，同步到 JS 编辑器
         if (!string.Equals(Value, _lastKnownValue, StringComparison.Ordinal))
         {
             _lastKnownValue = Value;
-            await _jsModule.InvokeVoidAsync("setValue", Value ?? string.Empty);
+            await _controller.InvokeVoidAsync("setValue", Value ?? string.Empty, ++_valueVersion);
         }
     }
 
@@ -79,20 +106,36 @@
     /// 由 JS 调用：编辑器内容变更时通知 .NET
     /// </summary>
     [JSInvokable]
-    public async Task OnEditorValueChanged(string value)
+    public async Task OnEditorValueChanged(string value, long revision)
     {
+        if (_disposed || revision != _valueVersion) return;
         _lastKnownValue = value;
         Value = value;
         await ValueChanged.InvokeAsync(value);
     }
 
+    /// <summary>Synchronize pending browser input before submitting or replacing the editor.</summary>
+    public async Task FlushAsync()
+    {
+        if (!_disposed && _controller is not null)
+            await _controller.InvokeVoidAsync("flush");
+    }
+
+    public static async Task FlushAllAsync(IJSRuntime js, ElementReference root)
+    {
+        await using var module = await js.InvokeAsync<IJSObjectReference>("import",
+            "./_content/CnGalWebSite.MainSite.Shared/Components/DesignSystem/CgMarkdownEditor.razor.js");
+        await module.InvokeVoidAsync("flushEditors", root);
+    }
+
     public async ValueTask DisposeAsync()
     {
+        _disposed = true;
         if (_jsModule is not null)
         {
             try
             {
-                await _jsModule.InvokeVoidAsync("disposeEditor");
+                if (_controller is not null) { await _controller.InvokeVoidAsync("dispose"); await _controller.DisposeAsync(); }
                 await _jsModule.DisposeAsync();
             }
             catch (JSDisconnectedException)

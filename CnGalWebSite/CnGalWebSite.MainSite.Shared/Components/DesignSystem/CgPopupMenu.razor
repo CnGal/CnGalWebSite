@@ -1,7 +1,7 @@
 <div class="cg-popup-menu">
     @if (TriggerContent != null)
     {
-        <div @onclick="Toggle">@TriggerContent</div>
+        <div data-cg-server-action @onclick="Toggle">@TriggerContent</div>
     }
     else
     {
@@ -9,7 +9,7 @@
     }
     @if (_isOpen)
     {
-        <div class="cg-popup-menu-backdrop" @onclick="Close"></div>
+        <div class="cg-popup-menu-backdrop" data-cg-server-action @onclick="Close"></div>
         <div class="cg-popup-menu-panel cg-popup-menu-panel--@Placement" role="menu" @onclick:stopPropagation>
             @if (ChildContent != null)
             {
@@ -24,7 +24,7 @@
                             <button class="cg-popup-menu-item"
                                     type="button"
                                     role="menuitem"
-                                    @onclick="() => OnItemClickAsync(item.Key)">
+                                    data-cg-server-action @onclick="() => OnItemClickAsync(item.Key)">
                                 @item.Value
                             </button>
                         </li>

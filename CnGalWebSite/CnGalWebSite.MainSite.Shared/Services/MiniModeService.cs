@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components;
@@ -37,7 +37,7 @@ public class MiniModeService : IMiniModeService
         _jsRuntime = jsRuntime;
         _localStorage = localStorageService;
         _isMiniMode = ResolveInitialMiniMode(_navigationManager.Uri);
-        PersistMiniModeCookieOnServer(_isMiniMode);
+        if (HasMiniModeRef(_navigationManager.Uri)) PersistMiniModeCookieOnServer(true);
     }
 
     public async Task SetMiniModeAsync(bool isMiniMode)
@@ -70,7 +70,8 @@ public class MiniModeService : IMiniModeService
             }
             else
             {
-                var isMiniModeInCookie = await _jsRuntime.InvokeAsync<bool>("cngalMiniMode.getCookie");
+                await using var module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/CnGalWebSite.MainSite.Shared/scripts/site-shell.js");
+                var isMiniModeInCookie = await module.InvokeAsync<bool>("getMiniMode");
                 if (isMiniModeInCookie)
                 {
                     if (!_isMiniMode)
@@ -177,7 +178,8 @@ public class MiniModeService : IMiniModeService
     private async Task PersistMiniModeOnClientAsync(bool isMiniMode)
     {
         await _localStorage.SetItemAsync("IsMiniMode", isMiniMode);
-        await _jsRuntime.InvokeVoidAsync("cngalMiniMode.setCookie", isMiniMode);
+        await using var module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/CnGalWebSite.MainSite.Shared/scripts/site-shell.js");
+        await module.InvokeVoidAsync("setMiniMode", isMiniMode);
     }
 
     private static CookieOptions CreateCookieOptions(HttpContext httpContext)

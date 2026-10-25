@@ -1,4 +1,4 @@
-﻿@using CnGalWebSite.MainSite.Shared.Services
+@using CnGalWebSite.MainSite.Shared.Services
 @inject NavigationManager NavigationManager
 @inject IMainSiteAuthRequestService AuthRequestService
 @inject IKanbanVisibilityService KanbanVisibilityService
@@ -57,7 +57,7 @@
     <button class="floating-action-toolbar__button"
             type="button"
             aria-label="回到顶部"
-            onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+            data-cg-action="scroll-top">
         <CgMdiIcon Name="mdiArrowUp" aria-hidden="true" />
         <span class="floating-action-toolbar__label">顶部</span>
     </button>
@@ -68,7 +68,7 @@
                 type="button"
                 aria-label="切换为看板娘"
                 title="切换为看板娘"
-                @onclick="HandleSwitchToKanban">
+                data-cg-server-action @onclick="HandleSwitchToKanban">
             <CgMdiIcon Name="mdiSwapHorizontal" aria-hidden="true" />
             <span class="floating-action-toolbar__label">看板</span>
         </button>
@@ -86,8 +86,8 @@
         try
         {
             // 计算看板娘位置，使按钮组底部与工具栏底部对齐（切换前后按钮位置不变）
-            var pos = await JS.InvokeAsync<KanbanAlignmentResult>("eval",
-                "(function(){var t=document.querySelector('.floating-action-toolbar');if(!t)return null;var r=t.getBoundingClientRect();var bw=48,g=12,ksW=" + KanbanSettingService.Kanban.Size.Width + ",ksH=" + KanbanSettingService.Kanban.Size.Height + ",w=window.innerWidth,h=window.innerHeight;var l=Math.round(Math.max(0,Math.min(r.right-ksW-g-bw,w-ksW)));var tp=Math.round(Math.max(0,Math.min(r.bottom-ksH,h-ksH)));return{left:l,top:tp};})()");
+            await using var module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/CnGalWebSite.MainSite.Shared/scripts/site-shell.js");
+            var pos = await module.InvokeAsync<KanbanAlignmentResult>("kanbanAlignment", KanbanSettingService.Kanban.Size.Width, KanbanSettingService.Kanban.Size.Height);
 
             if (pos is not null)
             {

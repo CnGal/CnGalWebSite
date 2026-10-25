@@ -2,6 +2,7 @@
    拥有数据所有权并处理刷新，将渲染委托给 EntryScoreOverview *@
 
 @rendermode InteractiveServer
+@implements IDisposable
 
 @inject IPlayedGameQueryService PlayedGameQueryService
 
@@ -14,18 +15,35 @@
     [Parameter]
     public int EntryId { get; set; }
 
+    [Parameter] public PlayedGameOverviewViewModel? InitialModel { get; set; }
+    [Parameter] public bool HasInitialResult { get; set; }
+    private int? _loadedId;
     private PlayedGameOverviewViewModel? _model;
+    private CancellationTokenSource? _request;
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnParametersSetAsync()
     {
-        await LoadDataAsync();
+        if (_loadedId == EntryId) return Task.CompletedTask;
+        _request?.Cancel(); _request?.Dispose();
+        _loadedId = EntryId;
+        _model = InitialModel;
+        return !HasInitialResult && _model is null ? LoadDataAsync() : Task.CompletedTask;
     }
 
     private async Task LoadDataAsync()
     {
-        var result = await PlayedGameQueryService.GetOverviewAsync(EntryId);
-        _model = result.Success ? result.Data : null;
+        _request?.Cancel(); _request?.Dispose();
+        var request = _request = new CancellationTokenSource();
+        var id = EntryId;
+        try
+        {
+            var result = await PlayedGameQueryService.GetOverviewAsync(id, request.Token);
+            if (!request.IsCancellationRequested && id == EntryId) _model = result.Success ? result.Data : null;
+        }
+        catch (OperationCanceledException) when (request.IsCancellationRequested) { }
     }
+
+    public void Dispose() { _request?.Cancel(); _request?.Dispose(); }
 
     private async Task RefreshAsync()
     {

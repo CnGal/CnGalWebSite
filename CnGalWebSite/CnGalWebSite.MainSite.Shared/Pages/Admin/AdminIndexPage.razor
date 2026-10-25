@@ -4,7 +4,7 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @layout AdminLayout
 @inject IAdminQueryService AdminQueryService
-@implements IDisposable
+@implements IAsyncDisposable
 @using CnGalWebSite.Core.Models
 @using CnGalWebSite.Core.Helpers
 @using CnGalWebSite.DataModel.ViewModel.Admin
@@ -171,18 +171,18 @@
     private string? _errorMessage;
     private DateTime? _lastRefreshTime;
     private long? _apiLatencyMs;
-    private Timer? _refreshTimer;
-    private CancellationTokenSource? _cts;
+    private Task _refreshLoop = Task.CompletedTask;
+    private readonly CancellationTokenSource _cts = new();
 
     protected override async Task OnInitializedAsync()
     {
-        _cts = new CancellationTokenSource();
+
         // 首次加载所有数据
         await LoadStaticDataAsync();
         await RefreshRealTimeDataAsync();
 
         // 启动 1 秒自动刷新定时器
-        _refreshTimer = new Timer(OnTimerCallback, null, 1000, 1000);
+        if (!_cts.IsCancellationRequested) _refreshLoop = RefreshLoopAsync();
     }
 
     /// <summary>
@@ -197,6 +197,7 @@
             var userTask = AdminQueryService.GetUserDataOverviewAsync(ct);
 
             await Task.WhenAll(apiStaticTask, userTask);
+            _cts.Token.ThrowIfCancellationRequested();
 
             if (apiStaticTask.Result.Success) _apiStaticModel = apiStaticTask.Result.Data;
             else _errorMessage = apiStaticTask.Result.Error?.Message;
@@ -205,6 +206,7 @@
 
             _blazorStaticModel = SystemEnvironmentHelper.GetServerStaticDataOverview();
         }
+        catch (OperationCanceledException) when (_cts.IsCancellationRequested) { }
         catch (Exception ex)
         {
             _errorMessage = "获取服务器概览数据失败: " + ex.Message;
@@ -221,6 +223,7 @@
             var sw = System.Diagnostics.Stopwatch.StartNew();
             var apiRtTask = AdminQueryService.GetServerRealTimeOverviewAsync(_cts?.Token ?? CancellationToken.None);
             await apiRtTask;
+            _cts.Token.ThrowIfCancellationRequested();
             sw.Stop();
             _apiLatencyMs = sw.ElapsedMilliseconds;
 
@@ -235,15 +238,20 @@
         }
     }
 
-    private async void OnTimerCallback(object? state)
+    private async Task RefreshLoopAsync()
     {
-        await InvokeAsync(async () =>
+        using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+        try
         {
-            await RefreshRealTimeDataAsync();
-            StateHasChanged();
-        });
+            while (await timer.WaitForNextTickAsync(_cts.Token))
+                await InvokeAsync(async () =>
+                {
+                    await RefreshRealTimeDataAsync();
+                    if (!_cts.IsCancellationRequested) StateHasChanged();
+                });
+        }
+        catch (OperationCanceledException) when (_cts.IsCancellationRequested) { }
     }
-
     #region 辅助方法
 
     private static string FormatUptime(TimeSpan? uptime)
@@ -305,10 +313,11 @@
 
     #endregion
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        _refreshTimer?.Dispose();
-        _cts?.Cancel();
-        _cts?.Dispose();
+
+        await _cts.CancelAsync();
+        try { await _refreshLoop; }
+        finally { _cts.Dispose(); }
     }
 }

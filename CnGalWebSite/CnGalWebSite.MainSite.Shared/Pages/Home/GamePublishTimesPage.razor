@@ -17,12 +17,12 @@
         <div class="publish-times-controls">
             <div class="publish-times-toggle-group">
                 <button class="publish-times-toggle @(Type == 0 ? "publish-times-toggle--active" : "")"
-                        @onclick="() => OnDisplayTypeChanged(0)">
+                        data-cg-server-action @onclick="() => OnDisplayTypeChanged(0)">
                     <CgMdiIcon Name="mdiViewList" aria-hidden="true" />
                     <span>卡片列表</span>
                 </button>
                 <button class="publish-times-toggle @(Type == 1 ? "publish-times-toggle--active" : "")"
-                        @onclick="() => OnDisplayTypeChanged(1)">
+                        data-cg-server-action @onclick="() => OnDisplayTypeChanged(1)">
                     <CgMdiIcon Name="mdiTimelineClockOutline" aria-hidden="true" />
                     <span>时间线</span>
                 </button>
@@ -30,12 +30,12 @@
 
             <div class="publish-times-toggle-group">
                 <button class="publish-times-toggle @(Mode == 0 ? "publish-times-toggle--active" : "")"
-                        @onclick="() => OnDataModeChanged(0)">
+                        data-cg-server-action @onclick="() => OnDataModeChanged(0)">
                     <CgMdiIcon Name="mdiGamepadSquare" aria-hidden="true" />
                     <span>正式版</span>
                 </button>
                 <button class="publish-times-toggle @(Mode == 1 ? "publish-times-toggle--active" : "")"
-                        @onclick="() => OnDataModeChanged(1)">
+                        data-cg-server-action @onclick="() => OnDataModeChanged(1)">
                     <CgMdiIcon Name="mdiFlaskOutline" aria-hidden="true" />
                     <span>试玩版</span>
                 </button>
@@ -45,12 +45,12 @@
         @if (Type == 0)
         {
             <div class="publish-times-nav">
-                <button class="publish-times-nav-btn" @onclick="OnClickLeft" aria-label="上个月">
+                <button class="publish-times-nav-btn" data-cg-server-action @onclick="OnClickLeft" aria-label="上个月">
                     <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
                     <span class="publish-times-nav-btn-text">上个月</span>
                 </button>
                 <span class="publish-times-nav-label">@CurrentDate.ToString("yyyy年M月")</span>
-                <button class="publish-times-nav-btn" @onclick="OnClickRight" aria-label="下个月">
+                <button class="publish-times-nav-btn" data-cg-server-action @onclick="OnClickRight" aria-label="下个月">
                     <span class="publish-times-nav-btn-text">下个月</span>
                     <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
                 </button>

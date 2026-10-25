@@ -2,6 +2,7 @@
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using System.Text.Json.Serialization;
 
 namespace CnGalWebSite.SDK.MainSite.Models;
 
@@ -33,6 +34,7 @@ public sealed class ArticleDetailViewModel
 
     public required string OriginalLink { get; init; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public required DateTime? PubishTime { get; init; }
 
     public required int ReaderCount { get; init; }

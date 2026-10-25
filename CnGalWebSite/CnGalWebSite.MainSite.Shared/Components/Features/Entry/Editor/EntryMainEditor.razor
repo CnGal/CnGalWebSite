@@ -1,4 +1,4 @@
-﻿@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
 @using CnGalWebSite.Extensions
 @using CnGalWebSite.SDK.MainSite.Models.Files
@@ -17,7 +17,7 @@
                     var isActive = Model.Type == type;
                     <button type="button"
                             class="entry-type-btn @(isActive ? "active" : "")"
-                            @onclick="() => OnTypeChanged(type)">
+                            data-cg-server-action @onclick="() => OnTypeChanged(type)">
                         <CgMdiIcon Name="@GetEntryTypeIcon(type)" Class="entry-type-icon" aria-hidden="true"/>
                         <span>@type.GetDisplayName()</span>
                     </button>
@@ -25,7 +25,7 @@
             </div>
         </CgFormGroup>
 
-       
+
         <CgGrid MinWidth="150px">
 
             <CgFormGroup Label="主图">
@@ -56,7 +56,7 @@
                               />
             </CgFormGroup>
         </CgGrid>
-       
+
  <CgGrid>
             <CgFormGroup Label="样式模板">
                 <CgEnumSelect TEnum="EntryStyleTemplate"

@@ -3,7 +3,7 @@
 @inject IAdminCommandService AdminCommandService
 @inject ICgToastService ToastService
 
-<button class="cg-hide-toggle-btn" @onclick="HandleToggle" disabled="@_isToggling"
+<button class="cg-hide-toggle-btn" data-cg-server-action @onclick="HandleToggle" disabled="@_isToggling"
         title="@(_isHidden ? "公开显示" : "隐藏")" type="button">
     <CgMdiIcon Name="@(_isToggling ? "mdiLoading" : (_isHidden ? "mdiEyeOutline" : "mdiEyeOffOutline"))"
                Class="@(_isToggling ? "cg-spin" : "")" aria-hidden="true" />

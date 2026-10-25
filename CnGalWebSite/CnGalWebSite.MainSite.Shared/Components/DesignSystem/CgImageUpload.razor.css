@@ -240,3 +240,5 @@
     justify-content: flex-end;
     gap: var(--cg-spacing-3);
 }
+
+.cg-image-upload__crop-stage { display:block; touch-action:none; }

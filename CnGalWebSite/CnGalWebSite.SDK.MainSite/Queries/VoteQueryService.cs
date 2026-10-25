@@ -2,16 +2,17 @@ using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class VoteQueryService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<VoteQueryService> logger) : QueryServiceBase(httpClient), IVoteQueryService
 {
+    private readonly PublicDataCache memoryCache = publicCache.ForSource(httpClient.BaseAddress);
+
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
     private const string CardsPath = "api/votes/GetVoteCards";
     private const string CardsCacheKey = "main-site:vote-cards";
@@ -20,9 +21,12 @@ public sealed class VoteQueryService(
 
     public async Task<SdkResult<IReadOnlyList<VoteCardItemModel>>> GetVoteCardsAsync(CancellationToken cancellationToken = default)
     {
-        if (memoryCache.TryGetValue(CardsCacheKey, out IReadOnlyList<VoteCardItemModel>? cached) && cached is not null)
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (memoryCache.TryGetValue(CardsCacheKey, out IReadOnlyList<VoteCardItemModel>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<VoteCardItemModel>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<VoteCardItemModel>>(cached, cacheRead);
         }
 
         var result = await GetAsync<List<VoteCardViewModel>>(CardsPath, "VOTE_CARDS", "投票列表", cancellationToken);
@@ -37,8 +41,11 @@ public sealed class VoteQueryService(
             .Select(MapToCardItem)
             .ToList() as IReadOnlyList<VoteCardItemModel>;
 
-        memoryCache.Set(CardsCacheKey, items, CacheDuration);
-        return SdkResult<IReadOnlyList<VoteCardItemModel>>.Ok(items);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        memoryCache.Set(CardsCacheKey, items, CacheDuration, cacheRead);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<IReadOnlyList<VoteCardItemModel>>(items, cacheRead);
     }
 
     private static VoteCardItemModel MapToCardItem(VoteCardViewModel dto)

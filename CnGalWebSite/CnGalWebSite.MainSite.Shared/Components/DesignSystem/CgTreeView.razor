@@ -25,7 +25,7 @@
             {
                 <button type="button"
                         class="cg-tree__toggle @(isExpanded ? "cg-tree__toggle--open" : "")"
-                        @onclick="() => ToggleExpand(node.Key)"
+                        data-cg-server-action @onclick="() => ToggleExpand(node.Key)"
                         @onclick:stopPropagation="true"
                         aria-label="@(isExpanded ? "折叠" : "展开")">
                     <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
@@ -50,7 +50,7 @@
             }
 
             @* 文本 *@
-            <span class="cg-tree__text" @onclick="() => OnTextClicked(node.Key, isLeaf, isSelected)">
+            <span class="cg-tree__text" data-cg-server-action @onclick="() => OnTextClicked(node.Key, isLeaf, isSelected)">
                 @node.Text
             </span>
         </div>

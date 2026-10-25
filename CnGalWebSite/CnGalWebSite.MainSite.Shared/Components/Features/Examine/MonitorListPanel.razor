@@ -38,10 +38,10 @@
     <CgDataTableColumn TItem="UserMonitorOverviewModel" TSort="UserMonitorSortField" Title="操作" Sortable="false" Width="100px">
         <ChildContent Context="item">
             <div class="examine-actions">
-                <button class="examine-action-btn examine-action-btn--view" title="查看" @onclick="() => LookItem(item)">
+                <button class="examine-action-btn examine-action-btn--view" title="查看" data-cg-server-action @onclick="() => LookItem(item)">
                     <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
                 </button>
-                <button class="examine-action-btn examine-action-btn--delete" title="取消关注" @onclick="() => DeleteItem(item)">
+                <button class="examine-action-btn examine-action-btn--delete" title="取消关注" data-cg-server-action @onclick="() => DeleteItem(item)">
                     <CgMdiIcon Name="mdiHeartOffOutline" aria-hidden="true" />
                 </button>
             </div>

@@ -12,16 +12,17 @@ using CnGalWebSite.Extensions;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class HomeQueryService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<HomeQueryService> logger) : QueryServiceBase(httpClient), IHomeQueryService
 {
+    private readonly PublicDataCache memoryCache = publicCache.ForSource(httpClient.BaseAddress);
+
     private static readonly TimeSpan HomeCacheDuration = TimeSpan.FromMinutes(5);
 
     protected override ILogger Logger => logger;
@@ -29,15 +30,19 @@ public sealed class HomeQueryService(
     public async Task<SdkResult<HomeSummaryViewModel>> GetHomeSummaryAsync(
         CancellationToken cancellationToken = default)
     {
-        const string cacheKey = "main-site:home-summary";
-        if (memoryCache.TryGetValue(cacheKey, out HomeSummaryViewModel? cached) && cached is not null)
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        const string cacheKey = PublicCacheKeys.HomeSummary;
+        if (memoryCache.TryGetValue(cacheKey, out HomeSummaryViewModel? cached, cacheRead) && cached is not null)
         {
             // 随机推荐数据不走缓存，每次重新请求
+            var freshWarnings = new List<SdkErrorModel>();
             var freshRecommends = await GetListSafeAsync<HotRecommendItemModel>(
                 "api/home/ListHotRecommends", "HOME_HOT_RECOMMENDS_FAILED",
-                new List<SdkErrorModel>(), cancellationToken);
-            cached.HotRecommends = NormalizeHomeItemUrls(freshRecommends);
-            return SdkResult<HomeSummaryViewModel>.Ok(cached);
+                freshWarnings, cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<HomeSummaryViewModel>(cached with
+            { HotRecommends = NormalizeHomeItemUrls(freshRecommends), Warnings = [.. cached.Warnings, .. freshWarnings] }, cacheRead);
         }
 
         var warnings = new ThreadSafeWarnings();
@@ -131,18 +136,24 @@ public sealed class HomeQueryService(
             Warnings = warnings.ToList()
         };
 
-        memoryCache.Set(cacheKey, model, HomeCacheDuration);
-        return SdkResult<HomeSummaryViewModel>.Ok(model);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        memoryCache.Set(cacheKey, model with { HotRecommends = [] }, HomeCacheDuration, cacheRead);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<HomeSummaryViewModel>(model, cacheRead);
     }
 
     public async Task<SdkResult<SearchViewModel>> SearchAsync(CnGalWebSite.DataModel.Application.Search.Dtos.SearchInputModel request,
         CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var queryString = request.ToQueryParameterString();
         var cacheKey = $"main-site:typed-sort-v1:search:{queryString}";
-        if (memoryCache.TryGetValue(cacheKey, out SearchViewModel? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out SearchViewModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<SearchViewModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<SearchViewModel>(cached, cacheRead);
         }
 
         var path = $"api/home/search{queryString}";
@@ -150,19 +161,24 @@ public sealed class HomeQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, HomeCacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, HomeCacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     public async Task<SdkResult<SquareSummaryViewModel>> GetSquareSummaryAsync(
         CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         const string cacheKey = "main-site:square-summary";
-        if (memoryCache.TryGetValue(cacheKey, out SquareSummaryViewModel? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out SquareSummaryViewModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<SquareSummaryViewModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<SquareSummaryViewModel>(cached, cacheRead);
         }
 
         var warnings = new List<SdkErrorModel>();
@@ -234,8 +250,11 @@ public sealed class HomeQueryService(
             EditOverview = editOverview,
         };
 
-        memoryCache.Set(cacheKey, model, HomeCacheDuration);
-        return SdkResult<SquareSummaryViewModel>.Ok(model);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        memoryCache.Set(cacheKey, model, HomeCacheDuration, cacheRead);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<SquareSummaryViewModel>(model, cacheRead);
     }
 
     private static IReadOnlyList<TItem> NormalizeHomeItemUrls<TItem>(IReadOnlyList<TItem> source)
@@ -352,6 +371,7 @@ public sealed class HomeQueryService(
                 }).ToList(),
             };
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogWarning(ex, "广场页编辑概览图表加载异常");

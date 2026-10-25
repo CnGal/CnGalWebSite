@@ -184,7 +184,7 @@
             </div>
             <div class="space-cert-dialog__row">
                 <label class="space-cert-dialog__label">备注</label>
-                <CgMarkdownEditor @bind-Value="_certNote"
+                <CgMarkdownEditor @ref="_certNoteEditor" @bind-Value="_certNote"
                                    Placeholder="可以上传并填写一些有助于我们确认身份的内容哦~" />
             </div>
         </div>
@@ -374,6 +374,7 @@
     private UserCertificationType _certType = UserCertificationType.Staff;
     private string _certEntryName = string.Empty;
     private string _certNote = string.Empty;
+    private CgMarkdownEditor? _certNoteEditor;
     private List<string> _certEntryList = [];
     private bool _certEntriesLoaded;
 
@@ -460,6 +461,7 @@
     /// </summary>
     private async Task OnSubmitCertAsync()
     {
+        if (_certNoteEditor is not null) await _certNoteEditor.FlushAsync();
         if (string.IsNullOrWhiteSpace(_certEntryName))
         {
             ToastService.Show("请填写需要认证的词条", null, "error");

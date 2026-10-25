@@ -48,11 +48,11 @@
             <ChildContent Context="item">
                 <div class="admin-actions">
                     <button class="admin-action-btn admin-action-btn--up" title="编辑"
-                            @onclick="@(() => NavigationManager.NavigateTo($"/almanac/edit/{item.Id}"))">
+                            data-cg-server-action @onclick="@(() => NavigationManager.NavigateTo($"/almanac/edit/{item.Id}"))">
                         <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
                     </button>
                     <button class="admin-action-btn admin-action-btn--show" title="查看"
-                            @onclick="@(() => NavigationManager.NavigateTo($"/almanac/{item.Id}"))">
+                            data-cg-server-action @onclick="@(() => NavigationManager.NavigateTo($"/almanac/{item.Id}"))">
                         <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
                     </button>
                 </div>

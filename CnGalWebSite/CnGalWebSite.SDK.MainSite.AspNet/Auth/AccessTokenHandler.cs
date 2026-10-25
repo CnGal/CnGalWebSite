@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Headers;
+using CnGalWebSite.SDK.MainSite.Infrastructure;
 
 namespace CnGalWebSite.SDK.MainSite.AspNet.Auth;
 
@@ -9,13 +10,19 @@ public sealed class AccessTokenHandler(CircuitTokenStore tokenStore) : Delegatin
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         var snapshot = await tokenStore.GetSnapshotAsync(cancellationToken);
+        var identityVersion = snapshot?.IdentityVersion ?? tokenStore.IdentityVersion;
+        if (identityVersion != tokenStore.IdentityVersion
+            || (snapshot is null && tokenStore.IdentityState == CnGalWebSite.SDK.MainSite.Abstractions.CurrentIdentityState.Authenticated))
+            throw new SdkIdentityChangedException();
         if (snapshot is not null)
         {
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", snapshot.AccessToken);
         }
 
         var response = await base.SendAsync(request, cancellationToken);
-        if (response.StatusCode != HttpStatusCode.Unauthorized || snapshot is null) return response;
+        await ValidateResponseAsync(response, identityVersion, cancellationToken);
+        if (response.StatusCode != HttpStatusCode.Unauthorized || snapshot is null
+            || !SdkRequestPolicy.CanReplay(request)) return response;
 
         AuthenticationSnapshot? refreshed;
         try { refreshed = await tokenStore.RefreshAsync(snapshot, cancellationToken); }
@@ -23,15 +30,27 @@ public sealed class AccessTokenHandler(CircuitTokenStore tokenStore) : Delegatin
         if (refreshed is null || refreshed.AccessToken == snapshot.AccessToken
             || refreshed.ExpiresAt <= DateTimeOffset.UtcNow || refreshed.CacheScope.IdentityChanged.IsCancellationRequested) return response;
 
-        // 查询绑定的旧身份会在刷新时失效，由查询层用新身份至多重试一次。
-        // 其他 SDK 调用保留现有的 401 刷新后重试行为。
+        // 只有显式可重放的查询可以刷新后重发；写操作保留 401，避免重复业务动作。
         try
         {
             using var retry = await CloneHttpRequestMessageAsync(request, cancellationToken);
             retry.Headers.Authorization = new AuthenticationHeaderValue("Bearer", refreshed.AccessToken);
-            return await base.SendAsync(retry, cancellationToken);
+            var retriedResponse = await base.SendAsync(retry, cancellationToken);
+            await ValidateResponseAsync(retriedResponse, identityVersion, cancellationToken);
+            return retriedResponse;
         }
         finally { response.Dispose(); }
+    }
+
+    private async Task ValidateResponseAsync(HttpResponseMessage response, long identityVersion, CancellationToken token)
+    {
+        try
+        {
+            // These SDK clients already use buffered JSON responses. Validate after the body, not just headers.
+            await response.Content.LoadIntoBufferAsync(token);
+            if (identityVersion != tokenStore.IdentityVersion) throw new SdkIdentityChangedException();
+        }
+        catch { response.Dispose(); throw; }
     }
 
     private static async Task<HttpRequestMessage> CloneHttpRequestMessageAsync(HttpRequestMessage request, CancellationToken cancellationToken)

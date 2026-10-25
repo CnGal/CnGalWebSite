@@ -6,7 +6,7 @@
     - 纯静态 SSR 渲染首帧，JS 接管后续交互
    ──────────────────────────────────────────────────────────── *@
 
-<div class="cg-image-gallery" data-cg-image-gallery style="@(GalleryAspectRatio != null ? $"aspect-ratio: {GalleryAspectRatio};" : null)">
+<cg-image-gallery class="cg-image-gallery" data-cg-image-gallery style="@(GalleryAspectRatio != null ? $"aspect-ratio: {GalleryAspectRatio};" : null)">
     @if (Items is { Count: > 0 })
     {
         var total = Items.Count;
@@ -15,21 +15,19 @@
         @* ── 大图预览区 ── *@
         <div class="cg-image-gallery__preview"
              style="aspect-ratio: @effectiveAspect;"
-             role="button"
-             tabindex="0"
              aria-label="点击查看全屏大图">
             @for (var i = 0; i < total; i++)
             {
                 var item = Items[i];
                 var activeClass = i == 0 ? " cg-image-gallery__preview-slide--active" : "";
 
-                <div class="cg-image-gallery__preview-slide@(activeClass)" data-index="@i">
+                <a class="cg-image-gallery__preview-slide@(activeClass)" data-index="@i" href="@item.Url">
                     <img src="@item.Url"
                          alt="@(item.Alt ?? $"图片 {i + 1}")"
                          loading="@(i == 0 ? "eager" : "lazy")"
                          fetchpriority="@(i == 0 ? "high" : "low")"
                          decoding="async" />
-                </div>
+                </a>
             }
 
             @* 全屏按钮覆盖层 *@
@@ -54,16 +52,16 @@
                     var item = Items[i];
                     var activeClass = i == 0 ? " cg-image-gallery__thumbnail--active" : "";
 
-                    <div class="cg-image-gallery__thumbnail@(activeClass)"
+                    <a class="cg-image-gallery__thumbnail@(activeClass)" href="@item.Url"
                          data-index="@i"
-                         role="button"
-                         tabindex="0"
+
+
                          aria-label="@(item.Alt ?? $"查看第 {i + 1} 张图片")">
                         <img src="@item.Url"
                              alt="@(item.Alt ?? $"缩略图 {i + 1}")"
                              loading="lazy"
                              decoding="async" />
-                    </div>
+                    </a>
                 }
             </div>
 
@@ -75,9 +73,8 @@
         </div>
 
         @* ── 全屏模态层（默认隐藏，JS 控制显示） ── *@
-        <div class="cg-image-gallery__fullscreen"
+        <dialog class="cg-image-gallery__fullscreen"
              data-cg-image-gallery-fullscreen
-             aria-hidden="true"
              role="dialog"
              aria-modal="true"
              aria-label="全屏图片查看">
@@ -135,16 +132,16 @@
                             var item = Items[i];
                             var activeClass = i == 0 ? " cg-image-gallery__fullscreen-thumbnail--active" : "";
 
-                            <div class="cg-image-gallery__fullscreen-thumbnail@(activeClass)"
+                            <a class="cg-image-gallery__fullscreen-thumbnail@(activeClass)" href="@item.Url"
                                  data-index="@i"
-                                 role="button"
-                                 tabindex="-1"
+
+
                                  aria-label="@(item.Alt ?? $"切换到第 {i + 1} 张图片")">
                                 <img src="@item.Url"
                                      alt="@(item.Alt ?? $"缩略图 {i + 1}")"
                                      loading="lazy"
                                      decoding="async" />
-                            </div>
+                            </a>
                         }
                     </div>
 
@@ -155,7 +152,7 @@
                     </button>
                 </div>
             }
-        </div>
+        </dialog>
     }
     else
     {
@@ -165,12 +162,8 @@
             <p>暂无图片</p>
         </div>
     }
-</div>
-
-@if (Items is { Count: > 0 })
-{
-    <script src="_content/CnGalWebSite.MainSite.Shared/scripts/cg-image-gallery.js"></script>
-}
+    <button type="button" data-cg-module-retry>重新加载画廊</button>
+</cg-image-gallery>
 
 @code {
     /// <summary>图片项列表</summary>

@@ -17,7 +17,7 @@ public static class FileCommandServiceExtensions
         ImageCropRect? cropRect,
         CancellationToken ct = default)
     {
-        await using var stream = file.OpenReadStream(MaxImageUploadBytes);
+        await using var stream = file.OpenReadStream(MaxImageUploadBytes, ct);
         var result = await service.UploadImageAsync(
             stream, file.Name, aspectType, gallery, cropRect, ct);
         if (!result.Success || string.IsNullOrWhiteSpace(result.Data))
@@ -33,7 +33,7 @@ public static class FileCommandServiceExtensions
         IBrowserFile file,
         CancellationToken ct = default)
     {
-        await using var stream = file.OpenReadStream(MaxAudioUploadBytes);
+        await using var stream = file.OpenReadStream(MaxAudioUploadBytes, ct);
         var result = await service.UploadAudioAsync(stream, file.Name, ct);
         if (!result.Success || result.Data is null)
         {

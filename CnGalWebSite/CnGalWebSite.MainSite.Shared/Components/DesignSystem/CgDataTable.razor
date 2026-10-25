@@ -55,7 +55,7 @@
                             {
                                 <th style="@(col.Width != null ? $"width:{col.Width}" : null)"
                                     class="@GetHeaderClass(col)"
-                                    @onclick="() => OnSortClicked(col)"
+                                    data-cg-server-action @onclick="() => OnSortClicked(col)"
                                     aria-sort="@GetAriaSortValue(col)">
                                     <span class="cg-datatable__th-content">
                                         @col.Title

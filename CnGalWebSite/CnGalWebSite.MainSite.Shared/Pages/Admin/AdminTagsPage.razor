@@ -43,9 +43,9 @@
             <ChildContent Context="item">
                 <div class="admin-actions">
                     @if (item.IsHidden)
-                    { <button class="admin-action-btn admin-action-btn--show" title="显示" @onclick="() => ToggleHidden(item, false)"><CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" /></button> }
+                    { <button class="admin-action-btn admin-action-btn--show" title="显示" data-cg-server-action @onclick="() => ToggleHidden(item, false)"><CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" /></button> }
                     else
-                    { <button class="admin-action-btn admin-action-btn--hide" title="隐藏" @onclick="() => ToggleHidden(item, true)"><CgMdiIcon Name="mdiEyeOffOutline" aria-hidden="true" /></button> }
+                    { <button class="admin-action-btn admin-action-btn--hide" title="隐藏" data-cg-server-action @onclick="() => ToggleHidden(item, true)"><CgMdiIcon Name="mdiEyeOffOutline" aria-hidden="true" /></button> }
                 </div>
             </ChildContent>
         </CgDataTableColumn>

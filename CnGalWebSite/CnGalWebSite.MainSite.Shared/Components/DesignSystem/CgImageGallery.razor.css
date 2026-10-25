@@ -1,4 +1,4 @@
-﻿/* ─────────────────────────────────────────────
+/* ─────────────────────────────────────────────
     CgImageGallery — 样式
     - 预览区 / 胶片条 / 全屏模态
    ───────────────────────────────────────────── */
@@ -41,7 +41,7 @@
     width: 100%;
     overflow: hidden;
     border-radius: var(--cg-radius-lg);
-   
+
     cursor: zoom-in;
     -webkit-user-select: none;
     user-select: none;
@@ -235,28 +235,27 @@
 .cg-image-gallery__fullscreen {
     position: fixed;
     inset: 0;
-    z-index: 2000;
     display: none;
     flex-direction: column;
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
 }
 
-.cg-image-gallery__fullscreen--open {
+.cg-image-gallery__fullscreen[open] {
     display: flex;
     animation: cg-img-gallery-fs-fade-in 0.25s ease-out;
-}
-
-.cg-image-gallery__fullscreen--closing {
-    animation: cg-img-gallery-fs-fade-out 0.2s ease-in forwards;
 }
 
 @keyframes cg-img-gallery-fs-fade-in {
     from { opacity: 0; }
     to   { opacity: 1; }
-}
-
-@keyframes cg-img-gallery-fs-fade-out {
-    from { opacity: 1; }
-    to   { opacity: 0; }
 }
 
 /* ── 全屏背景 ── */
@@ -482,10 +481,7 @@
         transition: none;
     }
 
-    .cg-image-gallery__fullscreen--open,
-    .cg-image-gallery__fullscreen--closing {
-        animation: none;
-    }
+    .cg-image-gallery__fullscreen[open] { animation: none; }
 
     .cg-image-gallery__thumbnail:hover,
     .cg-image-gallery__fullscreen-thumbnail:hover {
@@ -496,3 +492,8 @@
         opacity: 1;
     }
 }
+
+.cg-image-gallery__fullscreen::backdrop { background: rgba(0, 0, 0, .82); }
+
+[data-cg-module-retry] { display:none; }
+[data-cg-module-error] > [data-cg-module-retry] { display:block; }

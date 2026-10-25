@@ -21,4 +21,7 @@
     <ProjectReference Include="..\CnGalWebSite.SDK.MainSite.AspNet\CnGalWebSite.SDK.MainSite.AspNet.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <StaticWebAssetFingerprintPattern Include="MainSiteModules" Pattern="*.js" Expression="#[.{fingerprint}]!" />
+  </ItemGroup>
 </Project>

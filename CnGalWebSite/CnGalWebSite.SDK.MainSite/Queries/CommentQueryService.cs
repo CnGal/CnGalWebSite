@@ -1,11 +1,10 @@
-﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Coments;
 using CnGalWebSite.Helper.ViewModel.Comments;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.SDK.MainSite.Models.Comments;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
@@ -13,9 +12,11 @@ namespace CnGalWebSite.SDK.MainSite.Queries;
 /// <summary>
 /// 评论查询服务实现。
 /// </summary>
-public sealed class CommentQueryService(HttpClient httpClient, IMemoryCache memoryCache, ILogger<CommentQueryService> logger)
+public sealed class CommentQueryService(HttpClient httpClient, PublicDataCache publicCache, ILogger<CommentQueryService> logger)
     : QueryServiceBase(httpClient), ICommentQueryService
 {
+    private readonly PublicDataCache memoryCache = publicCache.ForSource(httpClient.BaseAddress);
+
     private static readonly TimeSpan CommentCacheDuration = TimeSpan.FromMinutes(2);
 
     protected override ILogger Logger { get; } = logger;
@@ -25,10 +26,13 @@ public sealed class CommentQueryService(HttpClient httpClient, IMemoryCache memo
         string objectId,
         CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:comments:{(int)type}:{objectId}";
-        if (memoryCache.TryGetValue(cacheKey, out CommentListViewModel? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out CommentListViewModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<CommentListViewModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<CommentListViewModel>(cached, cacheRead);
         }
 
         var path = $"api/comments/GetComments/{(int)type}/{objectId}";
@@ -42,16 +46,18 @@ public sealed class CommentQueryService(HttpClient httpClient, IMemoryCache memo
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, CommentCacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, CommentCacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     public void InvalidateCache(CommentType type, string objectId)
     {
         var cacheKey = $"main-site:comments:{(int)type}:{objectId}";
-        memoryCache.Remove(cacheKey);
+        memoryCache.Invalidate();
     }
 
     private static CommentListViewModel MapToViewModel(CommentCacheModel dto)

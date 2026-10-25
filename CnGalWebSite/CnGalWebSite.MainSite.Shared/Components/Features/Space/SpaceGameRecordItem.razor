@@ -2,7 +2,7 @@
 
 @if (OnClick.HasDelegate)
 {
-    <div class="space-game-record-item space-game-record-item--clickable" title="@Model.GameName" @onclick="OnClick">
+    <div class="space-game-record-item space-game-record-item--clickable" title="@Model.GameName" data-cg-server-action @onclick="OnClick">
         <div class="space-game-record-item__cover">
             <img src="@Model.GameImage" alt="@Model.GameName" loading="lazy" />
         </div>

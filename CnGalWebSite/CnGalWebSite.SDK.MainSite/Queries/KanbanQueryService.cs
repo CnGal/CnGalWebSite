@@ -18,9 +18,10 @@ public sealed class KanbanQueryService(
 
     public async Task<SdkResult<KanbanChatReply>> GetChatReplyAsync(KanbanChatRequest request, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var response = await HttpClient.PostAsJsonAsync(ChatPath, request, cancellationToken);
+            using var response = await HttpClient.PostAsJsonAsync(ChatPath, request, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -44,15 +45,17 @@ public sealed class KanbanQueryService(
 
             return SdkResult<KanbanChatReply>.Ok(reply);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "获取看板娘聊天回复异常。Path={Path}; BaseAddress={BaseAddress}", ChatPath, HttpClient.BaseAddress);
-            return SdkResult<KanbanChatReply>.Fail("KANBAN_CHAT_EXCEPTION", "请求聊天回复时发生异常");
+            return SdkFailure.FromException<KanbanChatReply>(ex, "KANBAN_CHAT_EXCEPTION", "请求聊天回复时发生异常");
         }
     }
 
     public async Task<SdkResult<KanbanPermissionsReply>> GetPermissionsAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         return await GetAsync<KanbanPermissionsReply>(
             PermissionsPath,
             "KANBAN_PERMISSIONS",

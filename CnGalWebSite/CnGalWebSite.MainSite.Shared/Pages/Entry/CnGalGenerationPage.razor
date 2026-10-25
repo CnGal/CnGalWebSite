@@ -1,4 +1,4 @@
-﻿@page "/sedai"
+@page "/sedai"
 @page "/entries/sedai"
 
 @rendermode InteractiveServer
@@ -69,7 +69,7 @@
                                 <button type="button"
                                         class="sedai-card__game @(isSelected ? "sedai-card__game--active" : "")"
                                         aria-pressed="@(isSelected ? "true" : "false")"
-                                        @onclick="() => ToggleGame(year.Year, game)">
+                                        data-cg-server-action @onclick="() => ToggleGame(year.Year, game)">
                                     <span class="sedai-card__game-text">@game.Name</span>
                                 </button>
                             }
@@ -209,7 +209,7 @@
     {
         return _jsModule ??= await JS.InvokeAsync<IJSObjectReference>(
             "import",
-            "./_content/CnGalWebSite.MainSite.Shared/scripts/cg-save-image.js");
+            "./_content/CnGalWebSite.MainSite.Shared/Pages/Entry/CnGalGenerationPage.razor.js");
     }
 
     private async Task DownloadAsImage()

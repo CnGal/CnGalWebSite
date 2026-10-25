@@ -19,14 +19,14 @@ using CnGalWebSite.DataModel.ViewModel.Votes;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
-public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memoryCache, ILogger<AdminCommandService> logger)
-    : CommandServiceBase(httpClient), IAdminCommandService
+public sealed class AdminCommandService(HttpClient httpClient, PublicDataCache publicCache, ILogger<AdminCommandService> logger)
+    : CommandServiceBase(httpClient, publicCache), IAdminCommandService
 {
+
     protected override ILogger Logger => logger;
 
     // ─── 通用 POST 命令辅助方法 ───
@@ -44,10 +44,11 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
             }
             return SdkResult<bool>.Ok(true);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "{DisplayName}异常。BaseAddress={BaseAddress}", displayName, HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail($"ADMIN_{errorCode}_EXCEPTION", $"{displayName}时发生异常");
+            return SdkFailure.FromException<bool>(ex, $"ADMIN_{errorCode}_EXCEPTION", $"{displayName}时发生异常");
         }
     }
 
@@ -64,11 +65,13 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
             }
             return SdkResult<bool>.Ok(true);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "{DisplayName}异常。BaseAddress={BaseAddress}", displayName, HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail($"ADMIN_{errorCode}_EXCEPTION", $"{displayName}时发生异常");
+            return SdkFailure.FromException<bool>(ex, $"ADMIN_{errorCode}_EXCEPTION", $"{displayName}时发生异常");
         }
+        finally { PublicCache.Invalidate(); }
     }
 
     // ─── 系统 ───
@@ -100,17 +103,10 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
 
     public async Task<SdkResult<bool>> HideEntryAsync(int[] ids, bool isHidden, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var result = await PostCommandAsync("api/entries/HiddenEntry",
             new HiddenEntryModel { Ids = ids, IsHidden = isHidden },
             "HIDE_ENTRY", "操作词条显隐", cancellationToken);
-        if (result.Success)
-        {
-            foreach (var id in ids)
-            {
-                memoryCache.Remove($"main-site:entry-detail:{id}");
-                memoryCache.Remove(ExamineCacheKeys.EntryEditRecords(id));
-            }
-        }
         return result;
     }
 
@@ -145,18 +141,10 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
 
     public async Task<SdkResult<bool>> HideArticleAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var result = await PostCommandAsync("api/articles/Hide",
             new HiddenArticleModel { Ids = ids, IsHidden = isHidden },
             "HIDE_ARTICLE", "操作文章显隐", cancellationToken);
-        if (result.Success)
-        {
-            foreach (var id in ids)
-            {
-                memoryCache.Remove($"main-site:article-detail:{id}");
-                memoryCache.Remove(ExamineCacheKeys.ArticleEditRecords(id));
-            }
-            memoryCache.Remove("main-site:home-summary");
-        }
         return result;
     }
 
@@ -174,18 +162,10 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
 
     public async Task<SdkResult<bool>> HideVideoAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var result = await PostCommandAsync("api/videos/Hide",
             new HiddenArticleModel { Ids = ids, IsHidden = isHidden },
             "HIDE_VIDEO", "操作视频显隐", cancellationToken);
-        if (result.Success)
-        {
-            foreach (var id in ids)
-            {
-                memoryCache.Remove($"main-site:video-detail:{id}");
-                memoryCache.Remove(ExamineCacheKeys.VideoEditRecords(id));
-            }
-            memoryCache.Remove("main-site:home-summary");
-        }
         return result;
     }
 
@@ -198,18 +178,10 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
 
     public async Task<SdkResult<bool>> HideTagAsync(int[] ids, bool isHidden, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var result = await PostCommandAsync("api/Tags/HiddenTag",
             new HiddenTagModel { Ids = ids, IsHidden = isHidden },
             "HIDE_TAG", "操作标签显隐", cancellationToken);
-        if (result.Success)
-        {
-            foreach (var id in ids)
-            {
-                memoryCache.Remove($"main-site:tag-detail:{id}");
-                memoryCache.Remove(ExamineCacheKeys.TagEditRecords(id));
-            }
-            memoryCache.Remove("main-site:tag-tree");
-        }
         return result;
     }
 
@@ -222,16 +194,10 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
 
     public async Task<SdkResult<bool>> HideLotteryAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var result = await PostCommandAsync("api/Lotteries/HiddenLottery",
             new HiddenLotteryModel { Ids = ids, IsHidden = isHidden },
             "HIDE_LOTTERY", "操作抽奖显隐", cancellationToken);
-        if (result.Success)
-        {
-            foreach (var id in ids)
-            {
-                memoryCache.Remove($"main-site:lottery-detail:{id}");
-            }
-        }
         return result;
     }
 
@@ -259,17 +225,10 @@ public sealed class AdminCommandService(HttpClient httpClient, IMemoryCache memo
 
     public async Task<SdkResult<bool>> HidePeripheryAsync(long[] ids, bool isHidden, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var result = await PostCommandAsync("api/peripheries/HiddenPeriphery",
             new HiddenPeripheryModel { Ids = ids, IsHidden = isHidden },
             "HIDE_PERIPHERY", "操作周边显隐", cancellationToken);
-        if (result.Success)
-        {
-            foreach (var id in ids)
-            {
-                memoryCache.Remove($"main-site:periphery-detail:{id}");
-                memoryCache.Remove(ExamineCacheKeys.PeripheryEditRecords(id));
-            }
-        }
         return result;
     }
 

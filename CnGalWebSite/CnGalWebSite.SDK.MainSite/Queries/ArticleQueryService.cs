@@ -2,16 +2,17 @@ using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class ArticleQueryService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<ArticleQueryService> logger) : QueryServiceBase(httpClient), IArticleQueryService
 {
+    private readonly PublicDataCache memoryCache = publicCache.ForSource(httpClient.BaseAddress);
+
     private static readonly TimeSpan ArticleCacheDuration = TimeSpan.FromMinutes(5);
     private const string ArticleDetailPathTemplate = "api/articles/GetArticleView/{0}";
 
@@ -19,10 +20,13 @@ public sealed class ArticleQueryService(
 
     public async Task<SdkResult<ArticleDetailViewModel>> GetArticleDetailAsync(long id, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"main-site:article-detail:{id}";
-        if (memoryCache.TryGetValue(cacheKey, out ArticleDetailViewModel? cached) && cached is not null)
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        var cacheKey = PublicCacheKeys.Detail("article", id);
+        if (memoryCache.TryGetValue(cacheKey, out ArticleDetailViewModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<ArticleDetailViewModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<ArticleDetailViewModel>(cached, cacheRead);
         }
 
         var path = string.Format(ArticleDetailPathTemplate, id);
@@ -36,10 +40,12 @@ public sealed class ArticleQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, ArticleCacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, ArticleCacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     private static ArticleDetailViewModel MapToViewModel(ArticleViewModel article)

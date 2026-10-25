@@ -10,6 +10,8 @@ public interface ICgToastService
     /// </summary>
     event Action<string, string?, string>? OnShow;
 
+    IReadOnlyList<CgToastMessage> DrainPending() => [];
+
     /// <summary>
     /// 显示一条 Toast 消息
     /// </summary>
@@ -18,3 +20,5 @@ public interface ICgToastService
     /// <param name="variant">类型：info / success / warning / error</param>
     void Show(string title, string? detail = null, string variant = "info");
 }
+
+public sealed record CgToastMessage(string Title, string? Detail, string Variant);

@@ -1,11 +1,11 @@
-﻿@namespace CnGalWebSite.MainSite.Shared.Components.Features.Home
+@namespace CnGalWebSite.MainSite.Shared.Components.Features.Home
 
 <CgMiniModeContainer>
     <div class="home-mobile-button-group-card">
         <div class="home-mobile-button-group">
             @foreach (var item in _items)
             {
-                <a href="@item.Url" class="home-mobile-button-item" aria-label="@item.Name" data-cg-track-slot="button" @onclick="@(()=>OnClick(item))" @onclick:preventDefault="@(item.Url == null)">
+                <a href="@item.Url" class="home-mobile-button-item" aria-label="@item.Name" data-cg-track-slot="button" data-cg-server-action @onclick="@(()=>OnClick(item))" @onclick:preventDefault="@(item.Url == null)">
                     <div class="home-mobile-button-icon" style="background-color: @item.BgColor; color: @item.Color;">
                         <CgMdiIcon Name="@item.Icon" aria-hidden="true" />
                     </div>

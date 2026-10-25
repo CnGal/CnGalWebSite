@@ -1,6 +1,6 @@
+@inject IArticlePageQueryService PageQuery
+@inject PageResponseState PageResponse
 @page "/articles/index/{Id:long}"
-@inject IArticleQueryService ArticleQueryService
-@inject IExamineQueryService ExamineQueryService
 
 
 @using CnGalWebSite.DataModel.Model
@@ -14,11 +14,11 @@
 @using CnGalWebSite.MainSite.Shared.Components.DesignSystem
 @using System.Text.Json.Nodes
 
-<CgPageMeta Title="@(_model is null ? null : GetDisplayTitle())" Description="@(_model?.BriefIntroduction)" Image="@(_model?.MainPicture)" />
+<CgPageMeta Title="@(_model is null ? null : GetDisplayTitle())" Description="@(_model?.BriefIntroduction)" Image="@(_model?.MainPicture)" StructuredData="@GenerateStructuredDataJson()" />
 
 @if (_model is not null)
 {
-    <CgStructuredData Data="@GenerateStructuredDataJson()" />
+
     <TrackingMeta Type="article" Id="@_model.Id.ToString()" Name="@_model.Name" />
 }
 
@@ -123,6 +123,7 @@ else if (_model is not null)
             </EntrySection>
 
             <CgMiniModeContainer>
+                @if (_recordsError is not null) { <CgAlert>@_recordsError</CgAlert> }
                 <EditRecordListCard Records="_editRecords" />
             </CgMiniModeContainer>
 
@@ -152,47 +153,42 @@ else
     private IReadOnlyList<ExaminedNormalListModel>? _editRecords;
     private string? _errorMessage;
     private CancellationTokenSource? _cts;
+    private long _requestVersion;
+    private string? _recordsError;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (_model?.Id == Id)
-        {
-            return;
-        }
-
-        _cts?.Cancel();
-        _cts = new CancellationTokenSource();
-        var ct = _cts.Token;
-
-        _model = null;
-        _editRecords = null;
-        _errorMessage = null;
-
+        if (_model?.Id == Id) return;
+        PageResponse.Begin();
+        var version = ++_requestVersion;
+        _cts?.Cancel(); _cts?.Dispose();
+        using var request = new CancellationTokenSource();
+        _cts = request;
+        _model = null; _editRecords = null; _errorMessage = null; _recordsError = null;
         try
         {
-            var articleTask = ArticleQueryService.GetArticleDetailAsync(Id, ct);
-            var editRecordsTask = ExamineQueryService.GetArticleEditRecordsAsync(Id, ct);
-
-            var result = await articleTask;
-            if (result.Success && result.Data is not null)
+            var result = await PageQuery.GetAsync(Id, request.Token);
+            if (request.IsCancellationRequested || version != _requestVersion) return;
+            if (result.Success && result.Data is { } page)
             {
-                _errorMessage = null;
-                _model = result.Data;
-
-                var editRecordsResult = await editRecordsTask;
-                _editRecords = editRecordsResult.Success ? editRecordsResult.Data : null;
-                return;
+                PageResponse.Succeeded();
+                _model = page.Article;
+                _editRecords = page.EditRecords.Data;
+                _recordsError = page.EditRecords.Error?.Message;
             }
-
-            _model = null;
-            _editRecords = null;
-            _errorMessage = result.Error?.Message ?? "请稍后重试";
+            else
+            {
+                PageResponse.Failed(result.Error);
+                _errorMessage = result.Error?.Message ?? "请稍后重试";
+            }
         }
-        catch (OperationCanceledException) { }
+        catch (OperationCanceledException) when (request.IsCancellationRequested) { }
+        finally { if (ReferenceEquals(_cts, request)) _cts = null; }
     }
 
     public void Dispose()
     {
+        _requestVersion++;
         _cts?.Cancel();
         _cts?.Dispose();
     }

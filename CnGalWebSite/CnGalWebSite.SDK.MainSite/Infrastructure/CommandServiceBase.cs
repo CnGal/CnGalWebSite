@@ -7,9 +7,10 @@ namespace CnGalWebSite.SDK.MainSite.Infrastructure;
 /// <summary>
 /// Command 服务基类，封装通用的 POST/GET + JSON 序列化辅助方法。
 /// </summary>
-public abstract class CommandServiceBase(HttpClient httpClient)
+public abstract class CommandServiceBase(HttpClient httpClient, PublicDataCache publicCache)
 {
     protected HttpClient HttpClient { get; } = httpClient;
+    protected PublicDataCache PublicCache { get; } = publicCache.ForSource(httpClient.BaseAddress);
 
     /// <summary>
     /// 子类必须暴露自身的 Logger，供辅助方法使用。
@@ -32,19 +33,30 @@ public abstract class CommandServiceBase(HttpClient httpClient)
         TRequest request,
         CancellationToken cancellationToken)
     {
-        var response = await HttpClient.PostAsJsonAsync(requestUri, request, SdkJsonSerializerOptions.Default, cancellationToken);
+        using var response = await PostAsJsonRawAsync(requestUri, request, cancellationToken);
+        response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<TResponse>(SdkJsonSerializerOptions.Default, cancellationToken);
     }
 
     /// <summary>
     /// POST JSON 请求并返回原始 HttpResponseMessage（用于需要检查状态码的场景）。
     /// </summary>
-    protected Task<HttpResponseMessage> PostAsJsonRawAsync<TRequest>(
+    protected async Task<HttpResponseMessage> PostAsJsonRawAsync<TRequest>(
         string requestUri,
         TRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        bool readOnly = false)
     {
-        return HttpClient.PostAsJsonAsync(requestUri, request, SdkJsonSerializerOptions.Default, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        try
+        {
+            return await HttpClient.PostAsJsonAsync(requestUri, request, SdkJsonSerializerOptions.Default, cancellationToken);
+        }
+        finally
+        {
+            // A lost response can still mean the write committed. Expire both cached and in-flight reads.
+            if (!readOnly) PublicCache.Invalidate();
+        }
     }
 
     /// <summary>

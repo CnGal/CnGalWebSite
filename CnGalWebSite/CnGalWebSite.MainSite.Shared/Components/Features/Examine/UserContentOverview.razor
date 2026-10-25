@@ -49,10 +49,10 @@ else if (_model != null)
                         <span class="user-content-card__time">@item.ApplyTime.ToString("yyyy-MM-dd HH:mm")</span>
                     </div>
                     <div class="user-content-card__actions">
-                        <button class="examine-action-btn examine-action-btn--approve" title="已读" @onclick="() => OnReviewItem(item, EditRecordReviewState.Reviewed)">
+                        <button class="examine-action-btn examine-action-btn--approve" title="已读" data-cg-server-action @onclick="() => OnReviewItem(item, EditRecordReviewState.Reviewed)">
                             <CgMdiIcon Name="mdiEmailOpenOutline" aria-hidden="true" />
                         </button>
-                        <button class="examine-action-btn examine-action-btn--ignore" title="忽略" @onclick="() => OnReviewItem(item, EditRecordReviewState.Ignored)">
+                        <button class="examine-action-btn examine-action-btn--ignore" title="忽略" data-cg-server-action @onclick="() => OnReviewItem(item, EditRecordReviewState.Ignored)">
                             <CgMdiIcon Name="mdiBellOffOutline" aria-hidden="true" />
                         </button>
                     </div>

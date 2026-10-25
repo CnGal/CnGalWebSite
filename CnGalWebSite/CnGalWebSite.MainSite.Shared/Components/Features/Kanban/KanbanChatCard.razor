@@ -98,8 +98,8 @@
     {
         try
         {
-            await JS.InvokeVoidAsync("eval",
-                "arguments[0].scrollTop = arguments[0].scrollHeight", _messagesContainer);
+            await using var module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/CnGalWebSite.MainSite.Shared/scripts/site-shell.js");
+            await module.InvokeVoidAsync("scrollToBottom", _messagesContainer);
         }
         catch
         {

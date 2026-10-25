@@ -8,8 +8,8 @@ using Microsoft.Extensions.Logging;
 namespace CnGalWebSite.SDK.MainSite.Commands;
 
 public sealed class FileCommandService(
-    HttpClient httpClient,
-    ILogger<FileCommandService> logger) : CommandServiceBase(httpClient), IFileCommandService
+    HttpClient httpClient, PublicDataCache publicCache,
+    ILogger<FileCommandService> logger) : CommandServiceBase(httpClient, publicCache), IFileCommandService
 {
     protected override ILogger Logger => logger;
 
@@ -21,6 +21,7 @@ public sealed class FileCommandService(
         ImageCropRect? cropRect = null,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             using var streamContent = new StreamContent(fileStream);
@@ -33,7 +34,7 @@ public sealed class FileCommandService(
             {
                 requestUri += $"&cropX={cropRect.X}&cropY={cropRect.Y}&cropW={cropRect.Width}&cropH={cropRect.Height}";
             }
-            var response = await HttpClient.PostAsync(requestUri, form, cancellationToken);
+            using var response = await HttpClient.PostAsync(requestUri, form, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 logger.LogWarning("图片上传失败。Status={StatusCode}; Path={Path}; BaseAddress={BaseAddress}",
@@ -55,10 +56,11 @@ public sealed class FileCommandService(
 
             return SdkResult<string>.Ok(first.Url);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "图片上传异常。FileName={FileName}; BaseAddress={BaseAddress}", fileName, HttpClient.BaseAddress);
-            return SdkResult<string>.Fail("FILE_UPLOAD_EXCEPTION", "上传图片时发生异常");
+            return SdkFailure.FromException<string>(ex, "FILE_UPLOAD_EXCEPTION", "上传图片时发生异常");
         }
     }
 
@@ -79,6 +81,7 @@ public sealed class FileCommandService(
         string fileName,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             using var streamContent = new StreamContent(fileStream);
@@ -87,7 +90,7 @@ public sealed class FileCommandService(
 
             // type=1 corresponds to UploadFileType.Audio
             var requestUri = "api/files/Upload?type=1";
-            var response = await HttpClient.PostAsync(requestUri, form, cancellationToken);
+            using var response = await HttpClient.PostAsync(requestUri, form, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 logger.LogWarning("音频上传失败。Status={StatusCode}; Path={Path}; BaseAddress={BaseAddress}",
@@ -114,10 +117,11 @@ public sealed class FileCommandService(
                 Duration = first.Duration ?? TimeSpan.Zero
             });
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "音频上传异常。FileName={FileName}; BaseAddress={BaseAddress}", fileName, HttpClient.BaseAddress);
-            return SdkResult<AudioUploadResult>.Fail("AUDIO_UPLOAD_EXCEPTION", "上传音频时发生异常");
+            return SdkFailure.FromException<AudioUploadResult>(ex, "AUDIO_UPLOAD_EXCEPTION", "上传音频时发生异常");
         }
     }
 
@@ -127,6 +131,7 @@ public sealed class FileCommandService(
         double y = 0,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         try
         {
             if (string.IsNullOrWhiteSpace(url))
@@ -135,7 +140,7 @@ public sealed class FileCommandService(
             }
 
             var requestUri = $"api/files/linkToImgUrl?url={Uri.EscapeDataString(url)}&x={x}&y={y}&type=0";
-            var response = await HttpClient.PostAsJsonAsync(requestUri, new { }, SdkJsonSerializerOptions.Default, cancellationToken);
+            using var response = await HttpClient.PostAsJsonAsync(requestUri, new { }, SdkJsonSerializerOptions.Default, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 logger.LogWarning("图片转存失败。Status={StatusCode}; Path={Path}; BaseAddress={BaseAddress}",
@@ -156,10 +161,11 @@ public sealed class FileCommandService(
 
             return SdkResult<string>.Ok(result.Url);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             logger.LogError(ex, "图片转存异常。Url={Url}; BaseAddress={BaseAddress}", url, HttpClient.BaseAddress);
-            return SdkResult<string>.Fail("FILE_TRANSFORM_EXCEPTION", "转存图片时发生异常");
+            return SdkFailure.FromException<string>(ex, "FILE_TRANSFORM_EXCEPTION", "转存图片时发生异常");
         }
     }
 

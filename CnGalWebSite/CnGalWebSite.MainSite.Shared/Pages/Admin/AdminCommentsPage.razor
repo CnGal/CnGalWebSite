@@ -73,19 +73,19 @@
                 <div class="admin-actions">
                     <button class="admin-action-btn admin-action-btn--up"
                             title="增加权重"
-                            @onclick="() => EditPriority(item, true)">
+                            data-cg-server-action @onclick="() => EditPriority(item, true)">
                         <CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" />
                     </button>
                     <button class="admin-action-btn admin-action-btn--down"
                             title="降低权重"
-                            @onclick="() => EditPriority(item, false)">
+                            data-cg-server-action @onclick="() => EditPriority(item, false)">
                         <CgMdiIcon Name="mdiArrowDownBold" aria-hidden="true" />
                     </button>
                     @if (item.IsHidden)
                     {
                         <button class="admin-action-btn admin-action-btn--show"
                                 title="显示评论"
-                                @onclick="() => ToggleHidden(item, false)">
+                                data-cg-server-action @onclick="() => ToggleHidden(item, false)">
                             <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
                         </button>
                     }
@@ -93,7 +93,7 @@
                     {
                         <button class="admin-action-btn admin-action-btn--hide"
                                 title="隐藏评论"
-                                @onclick="() => ToggleHidden(item, true)">
+                                data-cg-server-action @onclick="() => ToggleHidden(item, true)">
                             <CgMdiIcon Name="mdiEyeOffOutline" aria-hidden="true" />
                         </button>
                     }

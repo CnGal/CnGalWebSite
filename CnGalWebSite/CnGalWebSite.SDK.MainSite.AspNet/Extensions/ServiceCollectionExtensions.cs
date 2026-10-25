@@ -138,97 +138,14 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection AddMainSiteSdk(this IServiceCollection services, string apiBaseAddress, string imageApiBaseAddress, string taskApiBaseAddress)
     {
-        services.AddMainSiteSdkCore(apiBaseAddress, imageApiBaseAddress, taskApiBaseAddress);
         services.AddScoped<ICurrentUserAccessor, HttpContextCurrentUserAccessor>();
         services.AddScoped<CircuitTokenStore>();
-        services.AddTransient<AccessTokenHandler>();
         services.TryAddEnumerable(ServiceDescriptor.Scoped<CircuitHandler, AuthenticationCircuitHandler>());
         services.AddScoped(typeof(IToolboxLocalRepository<>), typeof(ToolboxLocalRepository<>));
-
-        var apiBase = new Uri(EnsureTrailingSlash(apiBaseAddress));
-        var imageApiBase = new Uri(EnsureTrailingSlash(imageApiBaseAddress));
-        var taskApiBase = new Uri(EnsureTrailingSlash(taskApiBaseAddress));
-
-        RegisterSdkHttpClient<IHomeQueryService, HomeQueryService>(services, apiBase);
-        RegisterSdkHttpClient<IEntryQueryService, EntryQueryService>(services, apiBase);
-        RegisterSdkHttpClient<ISpaceQueryService, SpaceQueryService>(services, apiBase);
-        RegisterSdkHttpClient<ITagQueryService, TagQueryService>(services, apiBase);
-        RegisterSdkHttpClient<IArticleQueryService, ArticleQueryService>(services, apiBase);
-        RegisterSdkHttpClient<IVideoQueryService, VideoQueryService>(services, apiBase);
-        RegisterSdkHttpClient<IPeripheryQueryService, PeripheryQueryService>(services, apiBase);
-        RegisterSdkHttpClient<ILotteryQueryService, LotteryQueryService>(services, apiBase);
-        RegisterSdkHttpClient<IPlayedGameQueryService, PlayedGameQueryService>(services, apiBase);
-        RegisterSdkHttpClient<ICommentQueryService, CommentQueryService>(services, apiBase);
-        RegisterSdkHttpClient<IFavoriteFolderQueryService, FavoriteFolderQueryService>(services, apiBase);
-        RegisterSdkHttpClient<ICommodityQueryService, CommodityQueryService>(services, apiBase);
-
-        RegisterSdkHttpClient<IEntryCommandService, EntryCommandService>(services, apiBase);
-        RegisterSdkHttpClient<IArticleCommandService, ArticleCommandService>(services, apiBase);
-        RegisterSdkHttpClient<ITagCommandService, TagCommandService>(services, apiBase);
-        RegisterSdkHttpClient<IVideoCommandService, VideoCommandService>(services, apiBase);
-        RegisterSdkHttpClient<ISpaceCommandService, SpaceCommandService>(services, apiBase);
-        RegisterSdkHttpClient<ILotteryCommandService, LotteryCommandService>(services, apiBase);
-        RegisterSdkHttpClient<IPeripheryCommandService, PeripheryCommandService>(services, apiBase);
-        RegisterSdkHttpClient<IPlayedGameCommandService, PlayedGameCommandService>(services, apiBase);
-        RegisterSdkHttpClient<ICommentCommandService, CommentCommandService>(services, apiBase);
-        RegisterSdkHttpClient<IFavoriteFolderCommandService, FavoriteFolderCommandService>(services, apiBase);
-        RegisterSdkHttpClient<IToolboxCommandService, ToolboxCommandService>(services, apiBase);
-
-        RegisterSdkHttpClient<IAdminQueryService, AdminQueryService>(services, apiBase);
-        RegisterSdkHttpClient<IAdminCommandService, AdminCommandService>(services, apiBase);
-
-        RegisterSdkHttpClient<IExamineQueryService, ExamineQueryService>(services, apiBase);
-        RegisterSdkHttpClient<IExamineCommandService, ExamineCommandService>(services, apiBase);
-
-        RegisterSdkHttpClient<IFileQueryService, FileQueryService>(services, imageApiBase);
-        RegisterSdkHttpClient<ITimedTaskService, TimedTaskService>(services, taskApiBase);
-
-        RegisterSdkHttpClient<IExpoQueryService, ExpoQueryService>(services, apiBase);
-        RegisterSdkHttpClient<IExpoCommandService, ExpoCommandService>(services, apiBase);
-
+        services.AddScoped<AuthenticatedSdkClients>();
+        services.AddMainSiteSdkCore(apiBaseAddress, imageApiBaseAddress, taskApiBaseAddress,
+            static (provider, name) => provider.GetRequiredService<AuthenticatedSdkClients>().Create(name));
         return services;
     }
 
-    private static void RegisterSdkHttpClient<TInterface, TImpl>(
-        IServiceCollection services,
-        Uri baseAddress)
-        where TInterface : class
-        where TImpl : class, TInterface
-    {
-        var clientName = typeof(TInterface).FullName!;
-        var builder = services.AddHttpClient(clientName, client =>
-        {
-            client.BaseAddress = baseAddress;
-            client.Timeout = TimeSpan.FromSeconds(30);
-        })
-        .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
-        {
-            PooledConnectionLifetime = TimeSpan.FromMinutes(5),
-            PooledConnectionIdleTimeout = TimeSpan.FromMinutes(2),
-            MaxConnectionsPerServer = 20,
-            EnableMultipleHttp2Connections = true,
-        });
-
-        builder.AddStandardResilienceHandler(options =>
-        {
-            options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(12);
-            options.CircuitBreaker.MinimumThroughput = 4;
-        });
-
-        services.AddTransient<TInterface>(provider =>
-        {
-            // 工厂的处理器作用域与 circuit 不同；只让传输/重试管线由工厂池化。
-            var handler = provider.GetRequiredService<AccessTokenHandler>();
-            handler.InnerHandler = provider.GetRequiredService<IHttpMessageHandlerFactory>().CreateHandler(clientName);
-            var client = new HttpClient(handler, disposeHandler: false);
-            var clientOptions = provider.GetRequiredService<IOptionsMonitor<HttpClientFactoryOptions>>().Get(clientName);
-            foreach (var configure in clientOptions.HttpClientActions) configure(client);
-            return ActivatorUtilities.CreateInstance<TImpl>(provider, client);
-        });
-    }
-
-    private static string EnsureTrailingSlash(string address)
-    {
-        return address.EndsWith('/') ? address : $"{address}/";
-    }
 }

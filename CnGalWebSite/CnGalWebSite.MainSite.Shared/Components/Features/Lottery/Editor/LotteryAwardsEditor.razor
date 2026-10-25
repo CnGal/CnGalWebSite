@@ -59,10 +59,10 @@
                             }
                         </div>
                         <div class="lottery-award-card__actions">
-                            <button type="button" class="lottery-award-btn lottery-award-btn--edit" @onclick="() => EditAward(award)" aria-label="编辑">
+                            <button type="button" class="lottery-award-btn lottery-award-btn--edit" data-cg-server-action @onclick="() => EditAward(award)" aria-label="编辑">
                                 <CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" />
                             </button>
-                            <button type="button" class="lottery-award-btn lottery-award-btn--delete" @onclick="() => DeleteAward(award)" aria-label="删除">
+                            <button type="button" class="lottery-award-btn lottery-award-btn--delete" data-cg-server-action @onclick="() => DeleteAward(award)" aria-label="删除">
                                 <CgMdiIcon Name="mdiTrashCanOutline" aria-hidden="true" />
                             </button>
                         </div>
@@ -134,7 +134,7 @@
                             {
                                 <div class="lottery-prize-item">
                                     <span class="lottery-prize-item__text">@prize.Context</span>
-                                    <button type="button" class="lottery-award-btn lottery-award-btn--delete" @onclick="() => DeletePrize(prize)" aria-label="删除">
+                                    <button type="button" class="lottery-award-btn lottery-award-btn--delete" data-cg-server-action @onclick="() => DeletePrize(prize)" aria-label="删除">
                                         <CgMdiIcon Name="mdiCloseCircleOutline" aria-hidden="true" />
                                     </button>
                                 </div>

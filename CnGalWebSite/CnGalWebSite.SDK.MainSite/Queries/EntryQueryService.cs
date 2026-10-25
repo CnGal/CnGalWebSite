@@ -4,16 +4,17 @@ using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class EntryQueryService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<EntryQueryService> logger) : QueryServiceBase(httpClient), IEntryQueryService
 {
+    private readonly PublicDataCache memoryCache = publicCache.ForSource(httpClient.BaseAddress);
+
     private static readonly TimeSpan EntryCacheDuration = TimeSpan.FromMinutes(5);
     private const string EntryDetailPathTemplate = "api/entries/GetEntryView/{0}";
 
@@ -21,10 +22,13 @@ public sealed class EntryQueryService(
 
     public async Task<SdkResult<EntryDetailViewModel>> GetEntryDetailAsync(int id, CancellationToken cancellationToken = default)
     {
-        var cacheKey = $"main-site:entry-detail:{id}";
-        if (memoryCache.TryGetValue(cacheKey, out EntryDetailViewModel? cached) && cached is not null)
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        var cacheKey = PublicCacheKeys.Detail("entry", id);
+        if (memoryCache.TryGetValue(cacheKey, out EntryDetailViewModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<EntryDetailViewModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<EntryDetailViewModel>(cached, cacheRead);
         }
 
         var path = string.Format(EntryDetailPathTemplate, id);
@@ -38,19 +42,24 @@ public sealed class EntryQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, EntryCacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, EntryCacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     public async Task<SdkResult<IReadOnlyList<GamePublishTimesCardItem>>> GetPublishGamesByTimeAsync(
         int year, int month, int mode = 0, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:publish-games-by-time:{year}:{month}:{mode}";
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<GamePublishTimesCardItem>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<GamePublishTimesCardItem>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<GamePublishTimesCardItem>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<GamePublishTimesCardItem>>(cached, cacheRead);
         }
 
         var path = $"api/entries/GetPublishGamesByTime?year={year}&month={month}&mode={mode}";
@@ -71,17 +80,23 @@ public sealed class EntryQueryService(
             .OrderBy(x => x.PublishTime)
             .ToList();
 
-        memoryCache.Set(cacheKey, items, EntryCacheDuration);
-        return SdkResult<IReadOnlyList<GamePublishTimesCardItem>>.Ok(items);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        memoryCache.Set(cacheKey, items, EntryCacheDuration, cacheRead);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<IReadOnlyList<GamePublishTimesCardItem>>(items, cacheRead);
     }
 
     public async Task<SdkResult<IReadOnlyList<GamePublishTimesTimelineItem>>> GetPublishGamesTimelineAsync(
         long afterTime, long beforeTime, int mode = 0, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:publish-games-timeline:{afterTime}:{beforeTime}:{mode}";
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<GamePublishTimesTimelineItem>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<GamePublishTimesTimelineItem>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<GamePublishTimesTimelineItem>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<GamePublishTimesTimelineItem>>(cached, cacheRead);
         }
 
         var path = $"api/entries/GetPublishGamesTimeline?afterTime={afterTime}&beforeTime={beforeTime}&mode={mode}";
@@ -102,17 +117,23 @@ public sealed class EntryQueryService(
             .OrderByDescending(x => x.PublishTime)
             .ToList();
 
-        memoryCache.Set(cacheKey, items, EntryCacheDuration);
-        return SdkResult<IReadOnlyList<GamePublishTimesTimelineItem>>.Ok(items);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        memoryCache.Set(cacheKey, items, EntryCacheDuration, cacheRead);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<IReadOnlyList<GamePublishTimesTimelineItem>>(items, cacheRead);
     }
 
     public async Task<SdkResult<IReadOnlyList<BirthdayCalendarItem>>> GetRoleBirthdaysByMonthAsync(
         int month, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:role-birthdays-month:{month}";
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<BirthdayCalendarItem>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<BirthdayCalendarItem>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<BirthdayCalendarItem>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<BirthdayCalendarItem>>(cached, cacheRead);
         }
 
         var path = $"api/entries/GetRoleBirthdaysByTime?month={month}";
@@ -131,8 +152,11 @@ public sealed class EntryQueryService(
             .Select(MapToBirthdayItem)
             .ToList();
 
-        memoryCache.Set(cacheKey, items, EntryCacheDuration);
-        return SdkResult<IReadOnlyList<BirthdayCalendarItem>>.Ok(items);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        memoryCache.Set(cacheKey, items, EntryCacheDuration, cacheRead);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<IReadOnlyList<BirthdayCalendarItem>>(items, cacheRead);
     }
 
     private static GamePublishTimesCardItem MapToCardItem(EntryInforTipViewModel dto) => new()

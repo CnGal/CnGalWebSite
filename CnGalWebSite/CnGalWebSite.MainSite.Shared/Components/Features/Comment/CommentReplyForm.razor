@@ -8,7 +8,7 @@
 <div class="comment-reply-form @(IsChild ? "comment-reply-form--child" : "")">
     @if (UseMarkdown)
     {
-        <CgMarkdownEditor Value="@_text" ValueChanged="OnTextChanged" Placeholder="请在留言板中友善发言，理性讨论" />
+        <CgMarkdownEditor @ref="_markdownEditor" Value="@_text" ValueChanged="OnTextChanged" Placeholder="请在留言板中友善发言，理性讨论" />
     }
     else
     {
@@ -71,6 +71,7 @@
 
     private string _text = "";
     private bool _isSubmitting;
+    private CgMarkdownEditor? _markdownEditor;
     private bool UseMarkdown { get; set; }
 
     private void OnTextChanged(string? value)
@@ -80,6 +81,7 @@
 
     private async Task OnSubmitAsync(MouseEventArgs _)
     {
+        if (UseMarkdown && _markdownEditor is not null) await _markdownEditor.FlushAsync();
         if (string.IsNullOrWhiteSpace(_text))
         {
             ToastService.Show("你还什么都没说呢，不能发表空的评论哦", null, "error");
@@ -111,14 +113,16 @@
         }
     }
 
-    private void OnToggleEditor()
+    private async Task OnToggleEditor()
     {
+        if (UseMarkdown && _markdownEditor is not null) await _markdownEditor.FlushAsync();
         UseMarkdown = !UseMarkdown;
         StateHasChanged();
     }
 
-    private void OnImageUploaded(string path)
+    private async Task OnImageUploaded(string path)
     {
+        if (UseMarkdown && _markdownEditor is not null) await _markdownEditor.FlushAsync();
         _text += $"![]({path})";
         StateHasChanged();
     }

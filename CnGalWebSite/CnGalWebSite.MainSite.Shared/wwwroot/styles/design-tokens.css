@@ -1,4 +1,4 @@
-﻿:root {
+:root {
     /* ── 基础色彩 ── */
     --cg-color-bg: #f6f6f8;
     --cg-color-surface: #ffffff;
@@ -223,3 +223,6 @@ h2:focus,
 h3:focus {
     outline: none;
 }
+
+/* Light DOM hosts retain normal block layout before their modules load. */
+cg-owned, cg-carousel, cg-edit-nav { display: block; }

@@ -4,7 +4,7 @@
 @inject ICgToastService ToastService
 
 <button class="entry-favorite-btn @(_isFavorited ? "entry-favorite-btn--active" : "")"
-        @onclick="ToggleFavoriteAsync"
+        data-cg-server-action @onclick="ToggleFavoriteAsync"
         disabled="@_isLoading"
         title="@(_isFavorited ? "取消收藏" : "收藏")"
         aria-label="@(_isFavorited ? "取消收藏" : "收藏")">

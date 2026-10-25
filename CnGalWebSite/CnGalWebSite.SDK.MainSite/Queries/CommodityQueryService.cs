@@ -23,6 +23,7 @@ public sealed class CommodityQueryService(
 
     public async Task<SdkResult<List<CommodityUserModel>>> GetAllCommoditiesAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         return await GetAsync<List<CommodityUserModel>>(
             GetAllPath,
             "COMMODITY",
@@ -32,12 +33,13 @@ public sealed class CommodityQueryService(
 
     public async Task<SdkResult<bool>> BuyCommodityAsync(long commodityId, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         const string operationName = "购买商品";
 
         try
         {
             var model = new BuyCommodityModel { Id = commodityId };
-            var response = await HttpClient.PostAsJsonAsync(BuyPath, model, SdkJsonSerializerOptions.Default, cancellationToken);
+            using var response = await HttpClient.PostAsJsonAsync(BuyPath, model, SdkJsonSerializerOptions.Default, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -67,20 +69,22 @@ public sealed class CommodityQueryService(
 
             return SdkResult<bool>.Ok(true);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "{Operation}异常。Path={Path}; BaseAddress={BaseAddress}", operationName, BuyPath, HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail("COMMODITY_BUY_EXCEPTION", $"请求{operationName}时发生异常");
+            return SdkFailure.FromException<bool>(ex, "COMMODITY_BUY_EXCEPTION", $"请求{operationName}时发生异常");
         }
     }
 
     public async Task<SdkResult<bool>> RedeemedCommodityCodeAsync(RedeemedCommodityCodeModel model, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         const string operationName = "兑换G币";
 
         try
         {
-            var response = await HttpClient.PostAsJsonAsync(RedeemPath, model, SdkJsonSerializerOptions.Default, cancellationToken);
+            using var response = await HttpClient.PostAsJsonAsync(RedeemPath, model, SdkJsonSerializerOptions.Default, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -110,20 +114,22 @@ public sealed class CommodityQueryService(
 
             return SdkResult<bool>.Ok(true);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex, "{Operation}异常。Path={Path}; BaseAddress={BaseAddress}", operationName, RedeemPath, HttpClient.BaseAddress);
-            return SdkResult<bool>.Fail("COMMODITY_REDEEM_EXCEPTION", $"请求{operationName}时发生异常");
+            return SdkFailure.FromException<bool>(ex, "COMMODITY_REDEEM_EXCEPTION", $"请求{operationName}时发生异常");
         }
     }
 
     public async Task<SdkResult<QueryResultModel<GCoinsRecordOverviewModel, GCoinsRecordSortField>>> ListGCoinsRecordAsync(QueryParameterModel<GCoinsRecordSortField> model, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         const string entityDescription = "G币变动记录";
 
         try
         {
-            var response = await HttpClient.PostAsJsonAsync(ListRecordPath, model, SdkJsonSerializerOptions.Default, cancellationToken);
+            using var response = await HttpClient.PostAsJsonAsync(ListRecordPath, model, SdkJsonSerializerOptions.Default, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -154,6 +160,7 @@ public sealed class CommodityQueryService(
 
             return SdkResult<QueryResultModel<GCoinsRecordOverviewModel, GCoinsRecordSortField>>.Ok(result);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex,
@@ -162,7 +169,7 @@ public sealed class CommodityQueryService(
                 ListRecordPath,
                 HttpClient.BaseAddress);
 
-            return SdkResult<QueryResultModel<GCoinsRecordOverviewModel, GCoinsRecordSortField>>.Fail(
+            return SdkFailure.FromException<QueryResultModel<GCoinsRecordOverviewModel, GCoinsRecordSortField>>(ex,
                 "COMMODITY_RECORD_EXCEPTION",
                 $"请求{entityDescription}时发生异常");
         }

@@ -1,4 +1,4 @@
-﻿@* 游玩记录编辑/添加弹窗 *@
+@* 游玩记录编辑/添加弹窗 *@
 
 @using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel.PlayedGames
@@ -26,7 +26,7 @@
                 {
                     <button type="button"
                             class="space-game-record-edit__type-btn @(_model.Type == type.Value ? "space-game-record-edit__type-btn--active" : "")"
-                            @onclick="() => _model.Type = type.Value">
+                            data-cg-server-action @onclick="() => _model.Type = type.Value">
                         @type.Label
                     </button>
                 }

@@ -57,7 +57,7 @@
             @* ─── Interactive mode ─── *@
             <button class="cg-pagination__btn cg-pagination__nav"
                     disabled="@(CurrentPage <= 1)"
-                    @onclick="GoPreviousAsync"
+                    data-cg-server-action @onclick="GoPreviousAsync"
                     aria-label="上一页">
                 <CgMdiIcon Name="mdiChevronLeft" aria-hidden="true" />
             </button>
@@ -71,7 +71,7 @@
                 else
                 {
                     <button class="cg-pagination__btn @(item.Page == CurrentPage ? "cg-pagination__btn--active" : "") @item.CssClass"
-                            @onclick="() => GoToPageAsync(item.Page)"
+                            data-cg-server-action @onclick="() => GoToPageAsync(item.Page)"
                             aria-label="@($"第 {item.Page} 页")"
                             aria-current="@(item.Page == CurrentPage ? "page" : null)">
                         @item.Page
@@ -81,7 +81,7 @@
 
             <button class="cg-pagination__btn cg-pagination__nav"
                     disabled="@(CurrentPage >= TotalPages)"
-                    @onclick="GoNextAsync"
+                    data-cg-server-action @onclick="GoNextAsync"
                     aria-label="下一页">
                 <CgMdiIcon Name="mdiChevronRight" aria-hidden="true" />
             </button>

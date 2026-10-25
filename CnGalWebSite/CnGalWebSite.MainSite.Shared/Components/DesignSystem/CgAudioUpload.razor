@@ -1,3 +1,4 @@
+@implements IDisposable
 @using CnGalWebSite.SDK.MainSite.Models.Files
 @using Microsoft.AspNetCore.Components.Forms
 <div class="cg-audio-upload @Class">
@@ -30,6 +31,9 @@
 </div>
 
 @code {
+    private readonly CancellationTokenSource _lifetime = new();
+    private bool _disposed;
+    public void Dispose() { _disposed = true; _lifetime.Cancel(); }
     private const long MaxUploadBytes = 50 * 1024 * 1024; // 50MB for audio files
     private readonly string _inputId = $"cg-audio-upload-{Guid.NewGuid():N}";
     private bool _isUploading;
@@ -66,7 +70,7 @@
         finally
         {
             _isUploading = false;
-            StateHasChanged();
+            if (!_disposed) StateHasChanged();
         }
     }
 
@@ -80,8 +84,7 @@
 
         try
         {
-            using var cts = new CancellationTokenSource();
-            var result = await OnUploadAudioAsync.Invoke(file, cts.Token);
+            var result = await OnUploadAudioAsync.Invoke(file, _lifetime.Token);
             if (result is null)
             {
                 _errorMessage = "上传失败";
@@ -89,8 +92,9 @@
             }
 
             _errorMessage = null;
-            await OnAudioUploaded.InvokeAsync(result);
+            if (!_disposed) await OnAudioUploaded.InvokeAsync(result);
         }
+        catch (OperationCanceledException) when (_lifetime.IsCancellationRequested) { }
         catch (IOException)
         {
             _errorMessage = "上传失败：音频过大（最大 50MB）";

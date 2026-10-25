@@ -3,7 +3,7 @@
 @inject ICgToastService ToastService
 
 <button class="periphery-collect-btn @(_isCollected ? "periphery-collect-btn--active" : "")"
-        @onclick="ToggleCollectionAsync"
+        data-cg-server-action @onclick="ToggleCollectionAsync"
         disabled="@_isLoading"
         title="@(_isCollected ? "取消收集" : "收集周边")"
         aria-label="@(_isCollected ? "取消收集" : "收集周边")">

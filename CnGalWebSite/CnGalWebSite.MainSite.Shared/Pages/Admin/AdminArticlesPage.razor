@@ -69,38 +69,38 @@
             <ChildContent Context="item">
                 <div class="admin-actions">
                     <button class="admin-action-btn admin-action-btn--up" title="增加权重"
-                            @onclick="() => EditPriority(item, true)">
+                            data-cg-server-action @onclick="() => EditPriority(item, true)">
                         <CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" />
                     </button>
                     <button class="admin-action-btn admin-action-btn--down" title="降低权重"
-                            @onclick="() => EditPriority(item, false)">
+                            data-cg-server-action @onclick="() => EditPriority(item, false)">
                         <CgMdiIcon Name="mdiArrowDownBold" aria-hidden="true" />
                     </button>
                     @if (item.CanComment)
                     {
                         <button class="admin-action-btn admin-action-btn--nocomment" title="关闭留言板"
-                                @onclick="() => ToggleCanComment(item, false)">
+                                data-cg-server-action @onclick="() => ToggleCanComment(item, false)">
                             <CgMdiIcon Name="mdiCommentRemoveOutline" aria-hidden="true" />
                         </button>
                     }
                     else
                     {
                         <button class="admin-action-btn admin-action-btn--comment" title="开启留言板"
-                                @onclick="() => ToggleCanComment(item, true)">
+                                data-cg-server-action @onclick="() => ToggleCanComment(item, true)">
                             <CgMdiIcon Name="mdiCommentCheckOutline" aria-hidden="true" />
                         </button>
                     }
                     @if (item.IsHidden)
                     {
                         <button class="admin-action-btn admin-action-btn--show" title="显示"
-                                @onclick="() => ToggleHidden(item, false)">
+                                data-cg-server-action @onclick="() => ToggleHidden(item, false)">
                             <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
                         </button>
                     }
                     else
                     {
                         <button class="admin-action-btn admin-action-btn--hide" title="隐藏"
-                                @onclick="() => ToggleHidden(item, true)">
+                                data-cg-server-action @onclick="() => ToggleHidden(item, true)">
                             <CgMdiIcon Name="mdiEyeOffOutline" aria-hidden="true" />
                         </button>
                     }

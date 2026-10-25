@@ -1,3 +1,5 @@
+import { registerElement, install as installLifecycle } from '/_content/CnGalWebSite.MainSite.Shared/scripts/component-lifecycle.js';
+import { install as installShell } from '/_content/CnGalWebSite.MainSite.Shared/scripts/site-shell.js';
 const installationKey = Symbol.for('CnGalWebSite.MainSite.Shared.imeInputInstalled');
 const inputStates = new WeakMap();
 
@@ -109,10 +111,16 @@ export function afterWebStarted(blazor) {
     installImeInputListeners();
     document[installationKey] = true;
 
-    import('./scripts/umami-track.js')
+    registerElement('cg-image-gallery', () => import('/_content/CnGalWebSite.MainSite.Shared/Components/DesignSystem/CgImageGallery.razor.js'));
+    registerElement('cg-carousel', () => import('/_content/CnGalWebSite.MainSite.Shared/Components/DesignSystem/CgCarousel.razor.js'));
+    registerElement('cg-edit-nav', () => import('/_content/CnGalWebSite.MainSite.Shared/scripts/edit-nav.js'));
+    installLifecycle(blazor);
+    installShell(blazor);
+
+    import('/_content/CnGalWebSite.MainSite.Shared/scripts/umami-track.js')
         .then(function (m) {
             m.install();
             blazor.addEventListener('enhancedload', function () { m.refresh(); });
         })
-        .catch(function () { /* 埋点加载失败不影响页面 */ });
+        .catch(error => console.warn('[umami-track] import', error));
 }

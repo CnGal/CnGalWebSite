@@ -8,7 +8,6 @@ using CnGalWebSite.DataModel.ViewModel.Tables;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
@@ -16,9 +15,11 @@ namespace CnGalWebSite.SDK.MainSite.Queries;
 /// <summary>
 /// 数据汇总查询服务实现。
 /// </summary>
-public class TableQueryService(HttpClient httpClient, IMemoryCache memoryCache, ILogger<TableQueryService> logger)
+public class TableQueryService(HttpClient httpClient, PublicDataCache publicCache, ILogger<TableQueryService> logger)
     : QueryServiceBase(httpClient), ITableQueryService
 {
+    private readonly PublicDataCache memoryCache = publicCache.ForSource(httpClient.BaseAddress);
+
     private static readonly TimeSpan SummaryCacheDuration = TimeSpan.FromMinutes(10);
     private static readonly TimeSpan QueryCacheDuration = TimeSpan.FromMinutes(3);
 
@@ -26,10 +27,13 @@ public class TableQueryService(HttpClient httpClient, IMemoryCache memoryCache, 
 
     public async Task<SdkResult<TableViewModel>> GetTableSummaryAsync(CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         const string cacheKey = "main-site:typed-sort-v1:table-summary";
-        if (memoryCache.TryGetValue(cacheKey, out TableViewModel? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out TableViewModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<TableViewModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<TableViewModel>(cached, cacheRead);
         }
 
         var result = await GetAsync<TableViewModel>(
@@ -40,10 +44,12 @@ public class TableQueryService(HttpClient httpClient, IMemoryCache memoryCache, 
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, SummaryCacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, SummaryCacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     public Task<SdkResult<QueryResultModel<BasicInforTableModel, BasicInforSortField>>> QueryGamesAsync(
@@ -103,20 +109,24 @@ public class TableQueryService(HttpClient httpClient, IMemoryCache memoryCache, 
         string entityDescription,
         CancellationToken cancellationToken) where T : class where TSort : struct, Enum
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
         var cacheKey = BuildCacheKey(path, request);
-        if (memoryCache.TryGetValue(cacheKey, out QueryResultModel<T, TSort>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out QueryResultModel<T, TSort>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<QueryResultModel<T, TSort>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<QueryResultModel<T, TSort>>(cached, cacheRead);
         }
 
         var result = await PostQueryAsync<T, TSort>(path, request, entityDescription, cancellationToken);
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, QueryCacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, QueryCacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     // ── 通用 POST 分页查询 ──
@@ -127,9 +137,10 @@ public class TableQueryService(HttpClient httpClient, IMemoryCache memoryCache, 
         string entityDescription,
         CancellationToken cancellationToken) where T : class where TSort : struct, Enum
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
         try
         {
-            var response = await HttpClient.PostAsJsonAsync(path, request, SdkJsonSerializerOptions.Default, cancellationToken);
+            using var response = await HttpClient.PostAsJsonAsync(path, request, SdkJsonSerializerOptions.Default, cancellationToken);
             var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
 
             if (!response.IsSuccessStatusCode)
@@ -151,7 +162,8 @@ public class TableQueryService(HttpClient httpClient, IMemoryCache memoryCache, 
                 {
                     return SdkResult<QueryResultModel<T, TSort>>.Fail("TABLE_EMPTY_RESPONSE", $"{entityDescription}数据为空");
                 }
-                return SdkResult<QueryResultModel<T, TSort>>.Ok(data);
+                cancellationToken.ThrowIfCancellationRequested();
+                return memoryCache.Complete<QueryResultModel<T, TSort>>(data, cacheRead);
             }
             catch (JsonException ex)
             {
@@ -165,6 +177,7 @@ public class TableQueryService(HttpClient httpClient, IMemoryCache memoryCache, 
                 return SdkResult<QueryResultModel<T, TSort>>.Fail("TABLE_DESERIALIZE_FAILED", $"{entityDescription}数据格式不兼容");
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(
@@ -173,7 +186,7 @@ public class TableQueryService(HttpClient httpClient, IMemoryCache memoryCache, 
                 entityDescription,
                 path,
                 HttpClient.BaseAddress);
-            return SdkResult<QueryResultModel<T, TSort>>.Fail("TABLE_QUERY_EXCEPTION", $"请求{entityDescription}时发生异常");
+            return SdkFailure.FromException<QueryResultModel<T, TSort>>(ex, "TABLE_QUERY_EXCEPTION", $"请求{entityDescription}时发生异常");
         }
     }
 }

@@ -1,6 +1,8 @@
 @using CnGalWebSite.MainSite.Shared.Components.DesignSystem
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Http
+@implements IDisposable
 @using CnGalWebSite.SDK.MainSite.Abstractions
 @using CnGalWebSite.DataModel.ViewModel.Ranks
 
@@ -115,6 +117,7 @@
     [Parameter] public string? UserName { get; set; }
     [Parameter] public string? UserId { get; set; }
     [Parameter] public string CurrentReturnUrl { get; set; } = string.Empty;
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
 
     private string? _lastLoadedUserId;
     private string _avatarUrl = string.Empty;
@@ -122,9 +125,19 @@
     private IReadOnlyList<RankViewModel>? _ranks;
     private long _unreadCount;
     private bool _avatarReady => string.IsNullOrWhiteSpace(_avatarUrl) == false;
+    private CancellationTokenSource? _request;
+    private long _requestVersion;
+    private bool _disposed;
 
     protected override async Task OnParametersSetAsync()
     {
+        if (_disposed || _lastLoadedUserId == UserId) return;
+        var version = ++_requestVersion;
+        _request?.Cancel();
+        _avatarUrl = string.Empty;
+        _personalSignature = string.Empty;
+        _ranks = null;
+        _unreadCount = 0;
         if (string.IsNullOrWhiteSpace(UserId))
         {
             _avatarUrl = string.Empty;
@@ -133,35 +146,34 @@
             return;
         }
 
-        if (_lastLoadedUserId == UserId)
-        {
-            return;
-        }
-
         _lastLoadedUserId = UserId;
-        _avatarUrl = string.Empty;
-
-        var spaceTask = SpaceQueryService.GetSpaceDetailAsync(UserId);
-        var unreadTask = SpaceQueryService.GetUnreadMessageCountAsync();
-
-        await Task.WhenAll(spaceTask, unreadTask);
-
-        var result = spaceTask.Result;
-        if (result.Success && result.Data != null)
+        // HttpContext is available only during SSR; an interactive instance owns its own request.
+        using var request = CancellationTokenSource.CreateLinkedTokenSource(HttpContext?.RequestAborted ?? CancellationToken.None);
+        _request = request;
+        try
         {
-            _avatarUrl = string.IsNullOrWhiteSpace(result.Data.PhotoPath) ? string.Empty : result.Data.PhotoPath;
-            _personalSignature = result.Data.PersonalSignature ?? string.Empty;
-            _ranks = result.Data.Ranks;
+            var spaceTask = SpaceQueryService.GetSpaceDetailAsync(UserId, request.Token);
+            var unreadTask = SpaceQueryService.GetUnreadMessageCountAsync(request.Token);
+            await Task.WhenAll(spaceTask, unreadTask);
+            if (request.IsCancellationRequested || version != _requestVersion) return;
+            var result = spaceTask.Result;
+            if (result.Success && result.Data is not null)
+            {
+                _avatarUrl = result.Data.PhotoPath ?? string.Empty;
+                _personalSignature = result.Data.PersonalSignature ?? string.Empty;
+                _ranks = result.Data.Ranks;
+            }
+            var unreadResult = unreadTask.Result;
+            _unreadCount = unreadResult.Success ? unreadResult.Data : 0;
         }
-        else
+        catch (OperationCanceledException) when (request.IsCancellationRequested)
         {
-            _avatarUrl = string.Empty;
-            _personalSignature = string.Empty;
+            if (version == _requestVersion) _lastLoadedUserId = null;
         }
-
-        var unreadResult = unreadTask.Result;
-        _unreadCount = unreadResult.Success ? unreadResult.Data : 0;
+        finally { if (ReferenceEquals(_request, request)) _request = null; }
     }
+
+    public void Dispose() { _disposed = true; ++_requestVersion; _request?.Cancel(); }
 
     private static string FormatBadge(long count) => count > 99 ? "99+" : count.ToString();
 }

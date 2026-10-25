@@ -9,16 +9,17 @@ using CnGalWebSite.DataModel.ViewModel.Perfections;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class PerfectionQueryService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<PerfectionQueryService> logger) : QueryServiceBase(httpClient), IPerfectionQueryService
 {
+    private readonly PublicDataCache memoryCache = publicCache.ForSource(httpClient.BaseAddress);
+
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(2);
 
     protected override ILogger Logger => logger;
@@ -26,10 +27,13 @@ public sealed class PerfectionQueryService(
     public async Task<SdkResult<PerfectionLevelOverviewModel>> GetPerfectionLevelOverviewAsync(
         CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         const string cacheKey = "main-site:typed-sort-v1:perfection-level-overview";
-        if (memoryCache.TryGetValue(cacheKey, out PerfectionLevelOverviewModel? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out PerfectionLevelOverviewModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<PerfectionLevelOverviewModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<PerfectionLevelOverviewModel>(cached, cacheRead);
         }
 
         var result = await GetAsync<PerfectionLevelOverviewModel>(
@@ -40,19 +44,24 @@ public sealed class PerfectionQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, CacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, CacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     public async Task<SdkResult<IReadOnlyList<PerfectionInforTipViewModel>>> GetPerfectionLevelRadomListAsync(
         PerfectionLevel level, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:typed-sort-v1:perfection-level-random:{level}";
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<PerfectionInforTipViewModel>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<PerfectionInforTipViewModel>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<PerfectionInforTipViewModel>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<PerfectionInforTipViewModel>>(cached, cacheRead);
         }
 
         var result = await GetAsync<IReadOnlyList<PerfectionInforTipViewModel>>(
@@ -63,19 +72,24 @@ public sealed class PerfectionQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, CacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, CacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     public async Task<SdkResult<IReadOnlyList<PerfectionCheckViewModel>>> GetPerfectionCheckLevelRadomListAsync(
         PerfectionCheckLevel level, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:typed-sort-v1:perfection-check-level-random:{level}";
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<PerfectionCheckViewModel>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<PerfectionCheckViewModel>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<PerfectionCheckViewModel>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<PerfectionCheckViewModel>>(cached, cacheRead);
         }
 
         var result = await GetAsync<IReadOnlyList<PerfectionCheckViewModel>>(
@@ -86,15 +100,18 @@ public sealed class PerfectionQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, CacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, CacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     public async Task<SdkResult<LineChartModel>> GetPerfectionLineChartAsync(
         LineChartType type, DateTime afterTime, DateTime beforeTime, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var path = $"api/perfections/GetPerfectionLineChart?type={type}&afterTime={new DateTimeOffset(afterTime).ToUnixTimeMilliseconds()}&beforeTime={new DateTimeOffset(beforeTime).ToUnixTimeMilliseconds()}";
 
         return await GetAsync<LineChartModel>(
@@ -107,10 +124,13 @@ public sealed class PerfectionQueryService(
     public async Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetRecentlyEditListAsync(
         CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         const string cacheKey = "main-site:typed-sort-v1:perfection-recently-edit";
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<ExaminedNormalListModel>>(cached, cacheRead);
         }
 
         var result = await GetAsync<IReadOnlyList<ExaminedNormalListModel>>(
@@ -121,24 +141,29 @@ public sealed class PerfectionQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, CacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, CacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     public async Task<SdkResult<QueryResultModel<PerfectionOverviewModel, PerfectionSortField>>> ListPerfectionsAsync(
         QueryParameterModel<PerfectionSortField> parameter, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:typed-sort-v1:perfections-list:p{parameter.Page}:s{parameter.ItemsPerPage}:sorts{SortCacheKey.Create(parameter.Sorts)}:q{parameter.SearchText}";
-        if (memoryCache.TryGetValue(cacheKey, out QueryResultModel<PerfectionOverviewModel, PerfectionSortField>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out QueryResultModel<PerfectionOverviewModel, PerfectionSortField>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<QueryResultModel<PerfectionOverviewModel, PerfectionSortField>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<QueryResultModel<PerfectionOverviewModel, PerfectionSortField>>(cached, cacheRead);
         }
 
         try
         {
-            var response = await HttpClient.PostAsJsonAsync(
+            using var response = await HttpClient.PostAsJsonAsync(
                 "api/perfections/ListPerfections", parameter, SdkJsonSerializerOptions.Default, cancellationToken);
 
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -156,8 +181,10 @@ public sealed class PerfectionQueryService(
             try
             {
                 var result = Deserialize<QueryResultModel<PerfectionOverviewModel, PerfectionSortField>>(body);
-                memoryCache.Set(cacheKey, result!, CacheDuration);
-                return SdkResult<QueryResultModel<PerfectionOverviewModel, PerfectionSortField>>.Ok(result!);
+                cancellationToken.ThrowIfCancellationRequested();
+                memoryCache.Set(cacheKey, result!, CacheDuration, cacheRead);
+                cancellationToken.ThrowIfCancellationRequested();
+                return memoryCache.Complete<QueryResultModel<PerfectionOverviewModel, PerfectionSortField>>(result!, cacheRead);
             }
             catch (System.Text.Json.JsonException ex)
             {
@@ -169,12 +196,13 @@ public sealed class PerfectionQueryService(
                     "完善度列表数据格式不兼容");
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex,
                 "获取完善度列表异常。Path=api/perfections/ListPerfections; BaseAddress={BaseAddress}",
                 HttpClient.BaseAddress);
-            return SdkResult<QueryResultModel<PerfectionOverviewModel, PerfectionSortField>>.Fail(
+            return SdkFailure.FromException<QueryResultModel<PerfectionOverviewModel, PerfectionSortField>>(ex,
                 "PERFECTION_LIST_EXCEPTION",
                 "请求完善度列表时发生异常");
         }
@@ -183,15 +211,18 @@ public sealed class PerfectionQueryService(
     public async Task<SdkResult<QueryResultModel<PerfectionCheckOverviewModel, PerfectionCheckSortField>>> ListPerfectionChecksAsync(
         QueryParameterModel<PerfectionCheckSortField> parameter, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:typed-sort-v1:perfection-checks-list:p{parameter.Page}:s{parameter.ItemsPerPage}:sorts{SortCacheKey.Create(parameter.Sorts)}:q{parameter.SearchText}";
-        if (memoryCache.TryGetValue(cacheKey, out QueryResultModel<PerfectionCheckOverviewModel, PerfectionCheckSortField>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out QueryResultModel<PerfectionCheckOverviewModel, PerfectionCheckSortField>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<QueryResultModel<PerfectionCheckOverviewModel, PerfectionCheckSortField>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<QueryResultModel<PerfectionCheckOverviewModel, PerfectionCheckSortField>>(cached, cacheRead);
         }
 
         try
         {
-            var response = await HttpClient.PostAsJsonAsync(
+            using var response = await HttpClient.PostAsJsonAsync(
                 "api/perfections/ListPerfectionChecks", parameter, SdkJsonSerializerOptions.Default, cancellationToken);
 
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -209,8 +240,10 @@ public sealed class PerfectionQueryService(
             try
             {
                 var result = Deserialize<QueryResultModel<PerfectionCheckOverviewModel, PerfectionCheckSortField>>(body);
-                memoryCache.Set(cacheKey, result!, CacheDuration);
-                return SdkResult<QueryResultModel<PerfectionCheckOverviewModel, PerfectionCheckSortField>>.Ok(result!);
+                cancellationToken.ThrowIfCancellationRequested();
+                memoryCache.Set(cacheKey, result!, CacheDuration, cacheRead);
+                cancellationToken.ThrowIfCancellationRequested();
+                return memoryCache.Complete<QueryResultModel<PerfectionCheckOverviewModel, PerfectionCheckSortField>>(result!, cacheRead);
             }
             catch (System.Text.Json.JsonException ex)
             {
@@ -222,12 +255,13 @@ public sealed class PerfectionQueryService(
                     "完善度检查列表数据格式不兼容");
             }
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
         {
             Logger.LogError(ex,
                 "获取完善度检查列表异常。Path=api/perfections/ListPerfectionChecks; BaseAddress={BaseAddress}",
                 HttpClient.BaseAddress);
-            return SdkResult<QueryResultModel<PerfectionCheckOverviewModel, PerfectionCheckSortField>>.Fail(
+            return SdkFailure.FromException<QueryResultModel<PerfectionCheckOverviewModel, PerfectionCheckSortField>>(ex,
                 "PERFECTION_CHECK_LIST_EXCEPTION",
                 "请求完善度检查列表时发生异常");
         }

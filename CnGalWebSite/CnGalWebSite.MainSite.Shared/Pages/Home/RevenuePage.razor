@@ -40,12 +40,12 @@
             <!-- Order switch buttons -->
             <div class="revenue-page__toggle-group">
                 <button class="revenue-page__toggle @(Order == 0 ? "revenue-page__toggle--active" : "")"
-                        @onclick="() => OnOrderChanged(0)">
+                        data-cg-server-action @onclick="() => OnOrderChanged(0)">
                     <CgMdiIcon Name="mdiCurrencyCny" aria-hidden="true" />
                     <span>预估销售额</span>
                 </button>
                 <button class="revenue-page__toggle @(Order == 1 ? "revenue-page__toggle--active" : "")"
-                        @onclick="() => OnOrderChanged(1)">
+                        data-cg-server-action @onclick="() => OnOrderChanged(1)">
                     <CgMdiIcon Name="mdiAccountGroupOutline" aria-hidden="true" />
                     <span>预估销量</span>
                 </button>

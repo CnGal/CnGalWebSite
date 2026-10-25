@@ -1,4 +1,5 @@
-﻿@page "/"
+@inject PageResponseState PageResponse
+@page "/"
 @inject IHomeQueryService HomeQueryService
 @using CnGalWebSite.DataModel.ViewModel.Home
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
@@ -447,15 +448,19 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        PageResponse.Begin();
         _cts = new CancellationTokenSource();
         try
         {
             var result = await HomeQueryService.GetHomeSummaryAsync(cancellationToken: _cts.Token);
             if (result.Success && result.Data is not null)
             {
+                PageResponse.Succeeded();
                 Model = result.Data;
                 return;
             }
+
+            PageResponse.Failed(result.Error);
 
             ErrorMessage = result.Error?.Message ?? "请稍后重试";
         }

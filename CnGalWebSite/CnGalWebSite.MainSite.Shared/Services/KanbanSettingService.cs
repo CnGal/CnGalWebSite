@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Blazored.LocalStorage;
 using CnGalWebSite.MainSite.Shared.Services.KanbanModels;
@@ -152,7 +152,8 @@ public class KanbanSettingService : IKanbanSettingService
 
     private async Task<WindowSize> GetWindowSizeAsync()
     {
-        return await _jsRuntime.InvokeAsync<WindowSize>("eval", "({ height: window.innerHeight, width: document.documentElement.clientWidth || window.innerWidth })");
+        await using var module = await _jsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/CnGalWebSite.MainSite.Shared/scripts/site-shell.js");
+        return await module.InvokeAsync<WindowSize>("getWindowSize");
     }
 
     private sealed class SettingStorageModel

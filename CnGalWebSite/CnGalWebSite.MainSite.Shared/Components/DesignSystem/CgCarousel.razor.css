@@ -123,3 +123,6 @@
         opacity: 1;
     }
 }
+
+[data-cg-module-retry] { display:none; }
+[data-cg-module-error] > [data-cg-module-retry] { display:block; }

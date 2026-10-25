@@ -6,7 +6,7 @@
     ‑ 尊重 prefers-reduced-motion
    ──────────────────────────────────────────────────────────── *@
 
-<div class="cg-carousel"
+<cg-carousel class="cg-carousel"
      style="aspect-ratio: @AspectRatio;"
      data-cg-carousel-duration="@SlideDurationSeconds">
     @if (Items is not null && Items.Count > 0)
@@ -102,12 +102,8 @@
             </button>
         }
     }
-</div>
-
-@if (Items is not null && Items.Count > 1)
-{
-    <script src="_content/CnGalWebSite.MainSite.Shared/scripts/cg-carousel.js"></script>
-}
+    <button type="button" data-cg-module-retry>重新加载轮播</button>
+</cg-carousel>
 
 @code {
     /// <summary>轮播项列表</summary>

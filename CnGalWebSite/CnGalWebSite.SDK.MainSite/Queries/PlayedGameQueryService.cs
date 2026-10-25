@@ -4,16 +4,17 @@ using CnGalWebSite.DataModel.ViewModel.Steam;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class PlayedGameQueryService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<PlayedGameQueryService> logger) : QueryServiceBase(httpClient), IPlayedGameQueryService
 {
+    private readonly PublicDataCache memoryCache = publicCache.ForSource(httpClient.BaseAddress);
+
     private static readonly TimeSpan OverviewCacheDuration = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan SteamInfoCacheDuration = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan GamesOverviewCacheDuration = TimeSpan.FromMinutes(10);
@@ -27,10 +28,13 @@ public sealed class PlayedGameQueryService(
 
     public async Task<SdkResult<PlayedGameOverviewViewModel>> GetOverviewAsync(int entryId, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:played-game-overview:{entryId}";
-        if (memoryCache.TryGetValue(cacheKey, out PlayedGameOverviewViewModel? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out PlayedGameOverviewViewModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<PlayedGameOverviewViewModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<PlayedGameOverviewViewModel>(cached, cacheRead);
         }
 
         var path = string.Format(OverviewPathTemplate, entryId);
@@ -44,14 +48,18 @@ public sealed class PlayedGameQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, OverviewCacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, OverviewCacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     public async Task<SdkResult<UserGameRecordsViewModel>> GetUserGameRecordsAsync(string userId, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var path = string.Format(UserRecordsPathTemplate, userId);
         var result = await GetAsync<List<GameRecordViewModel>>(
             path,
@@ -68,15 +76,19 @@ public sealed class PlayedGameQueryService(
         }
 
         var viewModel = MapRecordsToViewModel(result.Data);
-        return SdkResult<UserGameRecordsViewModel>.Ok(viewModel);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<UserGameRecordsViewModel>(viewModel, cacheRead);
     }
 
     public async Task<SdkResult<IReadOnlyList<SteamUserInfoItem>>> GetUserSteamInfoAsync(string userId, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:user-steam-info:{userId}";
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<SteamUserInfoItem>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<SteamUserInfoItem>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<SteamUserInfoItem>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<SteamUserInfoItem>>(cached, cacheRead);
         }
 
         var path = string.Format(UserSteamInfoPathTemplate, userId);
@@ -89,7 +101,8 @@ public sealed class PlayedGameQueryService(
         if (!result.Success || result.Data is null)
         {
             // Steam 信息获取失败时返回空列表而非错误，保证页面可渲染
-            return SdkResult<IReadOnlyList<SteamUserInfoItem>>.Ok(Array.Empty<SteamUserInfoItem>());
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<SteamUserInfoItem>>(Array.Empty<SteamUserInfoItem>(), cacheRead);
         }
 
         IReadOnlyList<SteamUserInfoItem> items = result.Data
@@ -102,8 +115,11 @@ public sealed class PlayedGameQueryService(
             })
             .ToList();
 
-        memoryCache.Set(cacheKey, items, SteamInfoCacheDuration);
-        return SdkResult<IReadOnlyList<SteamUserInfoItem>>.Ok(items);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        memoryCache.Set(cacheKey, items, SteamInfoCacheDuration, cacheRead);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<IReadOnlyList<SteamUserInfoItem>>(items, cacheRead);
     }
 
     private static PlayedGameOverviewViewModel MapOverviewToViewModel(PlayedGameOverviewModel model)
@@ -195,10 +211,13 @@ public sealed class PlayedGameQueryService(
 
     public async Task<SdkResult<SteamGamesOverviewViewModel>> GetSteamGamesOverviewAsync(CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         const string cacheKey = "main-site:steam-games-overview";
-        if (memoryCache.TryGetValue(cacheKey, out SteamGamesOverviewViewModel? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out SteamGamesOverviewViewModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<SteamGamesOverviewViewModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<SteamGamesOverviewViewModel>(cached, cacheRead);
         }
 
         var result = await GetAsync<SteamGamesOverviewModel>(
@@ -216,28 +235,33 @@ public sealed class PlayedGameQueryService(
         }
 
         var viewModel = MapGamesOverviewToViewModel(result.Data);
-        memoryCache.Set(cacheKey, viewModel, GamesOverviewCacheDuration);
-        return SdkResult<SteamGamesOverviewViewModel>.Ok(viewModel);
+        cancellationToken.ThrowIfCancellationRequested();
+        memoryCache.Set(cacheKey, viewModel, GamesOverviewCacheDuration, cacheRead);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<SteamGamesOverviewViewModel>(viewModel, cacheRead);
     }
 
     public void InvalidateUserRecordsCache(string userId)
     {
         var cacheKey = $"main-site:user-game-records:{userId}";
-        memoryCache.Remove(cacheKey);
+        memoryCache.Invalidate();
     }
 
     public void InvalidateOverviewCache(int entryId)
     {
         var cacheKey = $"main-site:played-game-overview:{entryId}";
-        memoryCache.Remove(cacheKey);
+        memoryCache.Invalidate();
     }
 
     public async Task<SdkResult<IReadOnlyList<RandomReviewItem>>> GetRandomReviewsAsync(CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         const string cacheKey = "main-site:random-reviews";
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<RandomReviewItem>? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<RandomReviewItem>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<RandomReviewItem>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<RandomReviewItem>>(cached, cacheRead);
         }
 
         var result = await GetAsync<List<PlayedGameUserScoreRandomModel>>(
@@ -248,15 +272,19 @@ public sealed class PlayedGameQueryService(
 
         if (!result.Success || result.Data is null)
         {
-            return SdkResult<IReadOnlyList<RandomReviewItem>>.Ok(Array.Empty<RandomReviewItem>());
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<RandomReviewItem>>(Array.Empty<RandomReviewItem>(), cacheRead);
         }
 
         IReadOnlyList<RandomReviewItem> items = result.Data
             .Select(MapRandomReview)
             .ToList();
 
-        memoryCache.Set(cacheKey, items, TimeSpan.FromMinutes(2));
-        return SdkResult<IReadOnlyList<RandomReviewItem>>.Ok(items);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        memoryCache.Set(cacheKey, items, TimeSpan.FromMinutes(2), cacheRead);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<IReadOnlyList<RandomReviewItem>>(items, cacheRead);
     }
 
     private static SteamGamesOverviewViewModel MapGamesOverviewToViewModel(SteamGamesOverviewModel model)

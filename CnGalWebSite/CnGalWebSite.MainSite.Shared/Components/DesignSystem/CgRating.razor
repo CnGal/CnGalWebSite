@@ -14,7 +14,7 @@
                     class="cg-rating__star @(isFilled ? "cg-rating__star--filled" : "")"
                     disabled="@Disabled"
                     aria-label="@starIndex 分"
-                    @onclick="() => OnStarClick(starIndex)">
+                    data-cg-server-action @onclick="() => OnStarClick(starIndex)">
             </button>
         }
     </div>

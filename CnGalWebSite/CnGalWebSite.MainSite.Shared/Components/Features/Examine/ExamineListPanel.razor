@@ -56,15 +56,15 @@
     <CgDataTableColumn TItem="ExamineOverviewModel" TSort="ExamineSortField" Title="操作" Sortable="false" Width="140px">
         <ChildContent Context="item">
             <div class="examine-actions">
-                <button class="examine-action-btn examine-action-btn--view" title="查看" @onclick="() => LookItem(item)">
+                <button class="examine-action-btn examine-action-btn--view" title="查看" data-cg-server-action @onclick="() => LookItem(item)">
                     <CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" />
                 </button>
                 @if (item.IsPassed == null)
                 {
-                    <button class="examine-action-btn examine-action-btn--approve" title="通过" @onclick="() => ProcItem(item, true)">
+                    <button class="examine-action-btn examine-action-btn--approve" title="通过" data-cg-server-action @onclick="() => ProcItem(item, true)">
                         <CgMdiIcon Name="mdiCheck" aria-hidden="true" />
                     </button>
-                    <button class="examine-action-btn examine-action-btn--reject" title="驳回" @onclick="() => ProcItem(item, false)">
+                    <button class="examine-action-btn examine-action-btn--reject" title="驳回" data-cg-server-action @onclick="() => ProcItem(item, false)">
                         <CgMdiIcon Name="mdiClose" aria-hidden="true" />
                     </button>
                 }

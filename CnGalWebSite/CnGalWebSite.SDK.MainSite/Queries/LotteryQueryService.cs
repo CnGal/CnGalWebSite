@@ -2,16 +2,17 @@ using CnGalWebSite.DataModel.ViewModel.Lotteries;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace CnGalWebSite.SDK.MainSite.Queries;
 
 public sealed class LotteryQueryService(
     HttpClient httpClient,
-    IMemoryCache memoryCache,
+    PublicDataCache publicCache,
     ILogger<LotteryQueryService> logger) : QueryServiceBase(httpClient), ILotteryQueryService
 {
+    private readonly PublicDataCache memoryCache = publicCache.ForSource(httpClient.BaseAddress);
+
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
     private const string DetailPathTemplate = "api/lotteries/GetLotteryView/{0}";
     private const string CardsPath = "api/lotteries/GetLotteryCards";
@@ -21,10 +22,13 @@ public sealed class LotteryQueryService(
 
     public async Task<SdkResult<LotteryDetailViewModel>> GetLotteryDetailAsync(long id, CancellationToken cancellationToken = default)
     {
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = $"main-site:lottery-detail:{id}";
-        if (memoryCache.TryGetValue(cacheKey, out LotteryDetailViewModel? cached) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out LotteryDetailViewModel? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<LotteryDetailViewModel>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<LotteryDetailViewModel>(cached, cacheRead);
         }
 
         var path = string.Format(DetailPathTemplate, id);
@@ -38,17 +42,22 @@ public sealed class LotteryQueryService(
 
         if (result.Success && result.Data is not null)
         {
-            memoryCache.Set(cacheKey, result.Data, CacheDuration);
+            cancellationToken.ThrowIfCancellationRequested();
+            memoryCache.Set(cacheKey, result.Data, CacheDuration, cacheRead);
         }
 
-        return result;
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     public async Task<SdkResult<IReadOnlyList<LotteryCardItemModel>>> GetLotteryCardsAsync(CancellationToken cancellationToken = default)
     {
-        if (memoryCache.TryGetValue(CardsCacheKey, out IReadOnlyList<LotteryCardItemModel>? cached) && cached is not null)
+        var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (memoryCache.TryGetValue(CardsCacheKey, out IReadOnlyList<LotteryCardItemModel>? cached, cacheRead) && cached is not null)
         {
-            return SdkResult<IReadOnlyList<LotteryCardItemModel>>.Ok(cached);
+            cancellationToken.ThrowIfCancellationRequested();
+            return memoryCache.Complete<IReadOnlyList<LotteryCardItemModel>>(cached, cacheRead);
         }
 
         var result = await GetAsync<List<LotteryCardViewModel>>(CardsPath, "LOTTERY_CARDS", "抽奖列表", cancellationToken);
@@ -63,8 +72,11 @@ public sealed class LotteryQueryService(
             .Select(MapToCardItem)
             .ToList() as IReadOnlyList<LotteryCardItemModel>;
 
-        memoryCache.Set(CardsCacheKey, items, CacheDuration);
-        return SdkResult<IReadOnlyList<LotteryCardItemModel>>.Ok(items);
+        cancellationToken.ThrowIfCancellationRequested();
+
+        memoryCache.Set(CardsCacheKey, items, CacheDuration, cacheRead);
+        cancellationToken.ThrowIfCancellationRequested();
+        return memoryCache.Complete<IReadOnlyList<LotteryCardItemModel>>(items, cacheRead);
     }
 
     private static LotteryCardItemModel MapToCardItem(LotteryCardViewModel dto)

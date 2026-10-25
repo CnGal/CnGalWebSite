@@ -14,35 +14,15 @@
                 <h3 class="cg-audio-title-text">@firstAudio.Name</h3>
             </div>
         </div>
-        
+
         <div class="cg-audio-tracks">
             @for (var i = 0; i < Audio.Count; i++)
             {
                 var item = Audio[i];
                 var index = i + 1;
-                <div class="cg-audio-item @(i == 0 ? "active" : "")" 
+                <div class="cg-audio-item @(i == 0 ? "active" : "")"
                      data-url="@item.Url" data-name="@item.Name" data-thumbnail="@(item.Thumbnail ?? "")"
-                     onclick="var p = this.closest('.cg-audio-playlist');
-                              var a = p.querySelector('.cg-audio-player');
-                              if(a.src.endsWith(this.dataset.url)) {
-                                  a.paused ? a.play() : a.pause();
-                                  return;
-                              }
-                              a.src = this.dataset.url;
-                              a.play();
-                              var t = p.querySelector('.cg-audio-title-text');
-                              if(t) t.textContent = this.dataset.name;
-                              var i = p.querySelector('.cg-audio-thumbnail');
-                              if(i) {
-                                  if(this.dataset.thumbnail) {
-                                      i.src = this.dataset.thumbnail;
-                                      i.style.display = 'block';
-                                  } else {
-                                      i.style.display = 'none';
-                                  }
-                              }
-                              p.querySelectorAll('.cg-audio-item').forEach(function(e){ e.classList.remove('active'); });
-                              this.classList.add('active');">
+                     data-cg-action="audio-select" role="button" tabindex="0">
                     <div class="cg-audio-item-icon">
                         <CgMdiIcon Icon="mdiPlayBox" />
                     </div>
@@ -55,7 +35,7 @@
                 </div>
             }
         </div>
-        
+
         <div class="cg-audio-player-wrapper">
             <audio controls preload="none" src="@firstAudio.Url" class="cg-audio-player"></audio>
         </div>

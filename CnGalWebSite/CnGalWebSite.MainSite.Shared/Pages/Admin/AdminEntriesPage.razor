@@ -65,20 +65,20 @@
                     <CgDataTableColumn TItem="EntryOverviewModel" TSort="EntrySortField" Title="操作" Sortable="false" Width="180px">
                         <ChildContent Context="item">
                             <div class="admin-actions">
-                                <button class="admin-action-btn admin-action-btn--up" title="增加权重" @onclick="() => EditPriority(item, true)"><CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" /></button>
-                                <button class="admin-action-btn admin-action-btn--down" title="降低权重" @onclick="() => EditPriority(item, false)"><CgMdiIcon Name="mdiArrowDownBold" aria-hidden="true" /></button>
+                                <button class="admin-action-btn admin-action-btn--up" title="增加权重" data-cg-server-action @onclick="() => EditPriority(item, true)"><CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" /></button>
+                                <button class="admin-action-btn admin-action-btn--down" title="降低权重" data-cg-server-action @onclick="() => EditPriority(item, false)"><CgMdiIcon Name="mdiArrowDownBold" aria-hidden="true" /></button>
                                 @if (item.IsHideOutlink)
-                                { <button class="admin-action-btn admin-action-btn--link" title="显示外链" @onclick="() => ToggleOutlink(item, false)"><CgMdiIcon Name="mdiLinkVariant" aria-hidden="true" /></button> }
+                                { <button class="admin-action-btn admin-action-btn--link" title="显示外链" data-cg-server-action @onclick="() => ToggleOutlink(item, false)"><CgMdiIcon Name="mdiLinkVariant" aria-hidden="true" /></button> }
                                 else
-                                { <button class="admin-action-btn admin-action-btn--hide" title="隐藏外链" @onclick="() => ToggleOutlink(item, true)"><CgMdiIcon Name="mdiLinkVariantOff" aria-hidden="true" /></button> }
+                                { <button class="admin-action-btn admin-action-btn--hide" title="隐藏外链" data-cg-server-action @onclick="() => ToggleOutlink(item, true)"><CgMdiIcon Name="mdiLinkVariantOff" aria-hidden="true" /></button> }
                                 @if (item.CanComment)
-                                { <button class="admin-action-btn admin-action-btn--nocomment" title="关闭留言板" @onclick="() => ToggleCanComment(item, false)"><CgMdiIcon Name="mdiCommentRemoveOutline" aria-hidden="true" /></button> }
+                                { <button class="admin-action-btn admin-action-btn--nocomment" title="关闭留言板" data-cg-server-action @onclick="() => ToggleCanComment(item, false)"><CgMdiIcon Name="mdiCommentRemoveOutline" aria-hidden="true" /></button> }
                                 else
-                                { <button class="admin-action-btn admin-action-btn--comment" title="开启留言板" @onclick="() => ToggleCanComment(item, true)"><CgMdiIcon Name="mdiCommentCheckOutline" aria-hidden="true" /></button> }
+                                { <button class="admin-action-btn admin-action-btn--comment" title="开启留言板" data-cg-server-action @onclick="() => ToggleCanComment(item, true)"><CgMdiIcon Name="mdiCommentCheckOutline" aria-hidden="true" /></button> }
                                 @if (item.IsHidden)
-                                { <button class="admin-action-btn admin-action-btn--show" title="显示词条" @onclick="() => ToggleHidden(item, false)"><CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" /></button> }
+                                { <button class="admin-action-btn admin-action-btn--show" title="显示词条" data-cg-server-action @onclick="() => ToggleHidden(item, false)"><CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" /></button> }
                                 else
-                                { <button class="admin-action-btn admin-action-btn--hide" title="隐藏词条" @onclick="() => ToggleHidden(item, true)"><CgMdiIcon Name="mdiEyeOffOutline" aria-hidden="true" /></button> }
+                                { <button class="admin-action-btn admin-action-btn--hide" title="隐藏词条" data-cg-server-action @onclick="() => ToggleHidden(item, true)"><CgMdiIcon Name="mdiEyeOffOutline" aria-hidden="true" /></button> }
                             </div>
                         </ChildContent>
                     </CgDataTableColumn>
@@ -133,13 +133,13 @@
                         <ChildContent Context="item">
                             <div class="admin-actions">
                                 @if (item.ShowPublicly)
-                                { <button class="admin-action-btn admin-action-btn--hide" title="设为私密" @onclick="() => ToggleShowPublicly(item, false)"><CgMdiIcon Name="mdiLinkVariantOff" aria-hidden="true" /></button> }
+                                { <button class="admin-action-btn admin-action-btn--hide" title="设为私密" data-cg-server-action @onclick="() => ToggleShowPublicly(item, false)"><CgMdiIcon Name="mdiLinkVariantOff" aria-hidden="true" /></button> }
                                 else
-                                { <button class="admin-action-btn admin-action-btn--link" title="设为公开" @onclick="() => ToggleShowPublicly(item, true)"><CgMdiIcon Name="mdiLinkVariant" aria-hidden="true" /></button> }
+                                { <button class="admin-action-btn admin-action-btn--link" title="设为公开" data-cg-server-action @onclick="() => ToggleShowPublicly(item, true)"><CgMdiIcon Name="mdiLinkVariant" aria-hidden="true" /></button> }
                                 @if (item.IsHidden)
-                                { <button class="admin-action-btn admin-action-btn--show" title="显示记录" @onclick="() => TogglePlayedGameHidden(item, false)"><CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" /></button> }
+                                { <button class="admin-action-btn admin-action-btn--show" title="显示记录" data-cg-server-action @onclick="() => TogglePlayedGameHidden(item, false)"><CgMdiIcon Name="mdiEyeOutline" aria-hidden="true" /></button> }
                                 else
-                                { <button class="admin-action-btn admin-action-btn--hide" title="隐藏记录" @onclick="() => TogglePlayedGameHidden(item, true)"><CgMdiIcon Name="mdiEyeOffOutline" aria-hidden="true" /></button> }
+                                { <button class="admin-action-btn admin-action-btn--hide" title="隐藏记录" data-cg-server-action @onclick="() => TogglePlayedGameHidden(item, true)"><CgMdiIcon Name="mdiEyeOffOutline" aria-hidden="true" /></button> }
                             </div>
                         </ChildContent>
                     </CgDataTableColumn>
@@ -188,7 +188,7 @@
                     <CgDataTableColumn TItem="EntryInformationTypeOverviewModel" TSort="EntryInformationTypeSortField" Title="操作" Sortable="false" Width="60px">
                         <ChildContent Context="item">
                             <div class="admin-actions">
-                                <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditInfoTypeAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                                <button class="admin-action-btn admin-action-btn--edit" title="编辑" data-cg-server-action @onclick="() => OnEditInfoTypeAsync(item)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
                             </div>
                         </ChildContent>
                     </CgDataTableColumn>

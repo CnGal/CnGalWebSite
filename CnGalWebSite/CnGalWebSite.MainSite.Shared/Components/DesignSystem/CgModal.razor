@@ -1,88 +1,80 @@
-@if (_isOpenInternal)
-{
-    <div class="cg-modal-mask @(_isClosing ? "cg-modal-closing" : "")" @onclick="OnMaskClick">
-        <section class="cg-modal-panel @(_isClosing ? "cg-modal-panel-closing" : "")" style="@(Width != null ? $"width: {Width}; max-width: 92vw;": "")" @onclick:stopPropagation="true" role="dialog" aria-modal="true">
-            <CgRenderFreeze Freeze="_isClosing">
-                @if (!string.IsNullOrWhiteSpace(Title))
-                {
-                    <header class="cg-modal-header">
-                        <h3>@Title</h3>
-                    </header>
-                }
-                <div class="cg-modal-content">
-                    @ChildContent
-                </div>
-                @if (Footer != null)
-                {
-                    <footer class="cg-modal-footer">
-                        @Footer
-                    </footer>
-                }
-            </CgRenderFreeze>
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<cg-owned @ref="_root" style="display:contents">
+    <dialog class="cg-modal-panel" style="@(Width is not null ? $"width:{Width};max-width:92vw" : null)" aria-label="@Title">
+        @if (_renderContent && _loadError is null)
+        {
+            @if (!string.IsNullOrWhiteSpace(Title))
+            {
+                <header class="cg-modal-header"><h3>@Title</h3></header>
+            }
+            <div class="cg-modal-content">@ChildContent</div>
+            @if (Footer is not null)
+            {
+                <footer class="cg-modal-footer">@Footer</footer>
+            }
+        }
+    </dialog>
+    @if (_loadError is not null && IsOpen)
+    {
+        <section class="cg-modal-fallback" aria-label="@Title">
+            <CgAlert>@_loadError</CgAlert>
+            <button type="button" data-cg-server-action @onclick="RetryAsync">重试弹层</button>
+            <button type="button" data-cg-server-action @onclick="RequestClose">关闭</button>
+            @ChildContent
+            @Footer
         </section>
-    </div>
-}
+    }
+</cg-owned>
 
 @code {
-    [Parameter]
-    public bool IsOpen { get; set; }
+    [Parameter] public bool IsOpen { get; set; }
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string? Width { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? Footer { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    private ElementReference _root;
+    private IJSObjectReference? _module, _controller;
+    private DotNetObjectReference<CgModal>? _callback;
+    private bool _renderContent, _disposed;
+    private string? _loadError;
 
-    [Parameter]
-    public string Title { get; set; } = string.Empty;
+    protected override void OnParametersSet() { if (IsOpen) _renderContent = true; }
 
-    [Parameter]
-    public string? Width { get; set; }
-
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
-
-    /// <summary>
-    /// 弹窗底部操作栏（如取消/保存按钮），若不提供则不渲染
-    /// </summary>
-    [Parameter]
-    public RenderFragment? Footer { get; set; }
-
-    [Parameter]
-    public EventCallback OnClose { get; set; }
-
-    private bool _isOpenInternal;
-    private bool _isClosing;
-
-    protected override void OnParametersSet()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (IsOpen)
+        if (_disposed || _loadError is not null || (!_renderContent && _controller is null)) return;
+        try
         {
-            _isOpenInternal = true;
-            _isClosing = false;
+            _module ??= await JS.InvokeAsync<IJSObjectReference>("import", "./_content/CnGalWebSite.MainSite.Shared/Components/DesignSystem/CgModal.razor.js");
+            if (_disposed) { await _module.DisposeAsync(); return; }
+            _callback ??= DotNetObjectReference.Create(this);
+            _controller ??= await _module.InvokeAsync<IJSObjectReference>("create", _root, _callback);
+            if (_disposed) { await _controller.InvokeVoidAsync("dispose"); await _controller.DisposeAsync(); return; }
+            await _controller.InvokeVoidAsync("setOpen", IsOpen);
+            if (!IsOpen && _renderContent) { _renderContent = false; StateHasChanged(); }
         }
-        else if (!IsOpen && _isOpenInternal && !_isClosing)
-        {
-            _ = PlayCloseAnimationAsync();
-        }
+        catch (JSDisconnectedException) { }
+        catch (JSException ex) { _loadError = "弹层加载失败，内容已在页面中显示"; Console.Error.WriteLine($"CgModal mount: {ex.Message}"); if (!_disposed) StateHasChanged(); }
     }
 
-    private async Task PlayCloseAnimationAsync()
+    private Task RetryAsync() { _loadError = null; StateHasChanged(); return Task.CompletedTask; }
+
+    [JSInvokable] public Task RequestClose() => _disposed ? Task.CompletedTask : OnClose.InvokeAsync();
+
+    public async ValueTask DisposeAsync()
     {
-        _isClosing = true;
-        await InvokeAsync(StateHasChanged);
-        
-        await Task.Delay(250);
-        
-        if (_isClosing)
+        _disposed = true;
+        try
         {
-            _isOpenInternal = false;
-            _isClosing = false;
-            await InvokeAsync(StateHasChanged);
+            if (_controller is not null) { await _controller.InvokeVoidAsync("dispose"); await _controller.DisposeAsync(); }
+            if (_module is not null) await _module.DisposeAsync();
         }
-    }
-
-    private Task OnMaskClick()
-    {
-        return CloseAsync();
-    }
-
-    private Task CloseAsync()
-    {
-        return OnClose.InvokeAsync();
+        catch (JSDisconnectedException) { }
+        catch (TaskCanceledException) { }
+        finally { _callback?.Dispose(); }
     }
 }

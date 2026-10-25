@@ -1,3 +1,5 @@
+@using CnGalWebSite.MainSite.Shared.Services.Editing
+@inject IJSRuntime JS
 @page "/space/edit"
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
@@ -13,40 +15,40 @@
 @inject NavigationManager NavigationManager
 @inject ILocalStorageService LocalStorage
 @inject ICgToastService ToastService
-@implements IDisposable
+@implements IAsyncDisposable
 
 <CgPageMeta Title="编辑个人空间" />
 
-@if (IsLoading)
+@if (Session.IsLoading)
 {
     <section class="space-edit-loading" aria-label="加载中">
         <div class="space-edit-loading-spinner"></div>
         <p>正在获取数据...</p>
     </section>
 }
-else if (LoadErrorMessage != null)
+else if (Session.LoadErrorMessage != null)
 {
     <section class="space-edit-error">
         <h1>加载失败</h1>
-        <p>@LoadErrorMessage</p>
-        <CgButton Variant="primary" OnClick="LoadDataAsync">重试</CgButton>
+        <p>@Session.LoadErrorMessage</p>
+        <CgButton Variant="primary" OnClick="Session.LoadDataAsync">重试</CgButton>
     </section>
 }
-else if (Model != null)
+else if (Session.Model != null)
 {
-    <article class="space-edit-page">
+    <article class="space-edit-page" @ref="_editRoot" data-cg-edit-root>
         <div class="space-edit-layout">
-            <SpaceEditorSidebar IsSubmitting="IsSubmitting"
-                                HasDraftRecovered="HasDraftRecovered"
-                                OnDiscardDraft="DiscardDraft"
-                                OnSubmit="SubmitAsync"
-                                OnCancel="Cancel" />
+            <SpaceEditorSidebar IsSubmitting="Session.IsSubmitting"
+                                HasDraftRecovered="Session.HasDraftRecovered"
+                                OnDiscardDraft="Session.DiscardDraft"
+                                OnSubmit="Session.SubmitAsync"
+                                OnCancel="Session.Cancel" />
 
             <main class="space-edit-main">
-                <SpaceProfileEditor Model="Model.UserData" />
-                <SpaceAccountEditor Model="Model.UserData" />
-                <SpacePrivacyEditor Model="Model.UserData" />
-                <SpaceMainPageEditor Model="Model.MainPage" />
+                <SpaceProfileEditor Model="Session.Model.UserData" />
+                <SpaceAccountEditor Model="Session.Model.UserData" />
+                <SpacePrivacyEditor Model="Session.Model.UserData" />
+                <SpaceMainPageEditor Model="Session.Model.MainPage" />
             </main>
         </div>
 
@@ -54,164 +56,22 @@ else if (Model != null)
 }
 
 @code {
-    private bool IsLoading = true;
-    private string? LoadErrorMessage;
-    private bool IsSubmitting = false;
 
-    private SpaceEditViewModel? Model;
-
-    private System.Threading.Timer? _autoSaveTimer;
-    private CancellationTokenSource? _cts;
-    private const string DraftKey = "SpaceDraft_Edit";
-
-    private bool HasDraftRecovered = false;
-    private SpaceEditViewModel? OriginalData;
-
-    protected override async Task OnInitializedAsync()
+    private EditSessionHost<SpaceEditSession>? _sessions;
+    private SpaceEditSession Session => _sessions!.Current;
+    private ElementReference _editRoot;
+    protected override Task OnParametersSetAsync()
     {
-        _cts = new CancellationTokenSource();
-        await LoadDataAsync();
-        _autoSaveTimer = new System.Threading.Timer(AutoSaveCallback, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
-    }
-
-    private void AutoSaveCallback(object? state)
-    {
-        _ = InvokeAsync(async () =>
+        _sessions ??= new(() => InvokeAsync(StateHasChanged));
+        return _sessions.SetAsync("space", () =>
         {
-            if (Model != null && !IsSubmitting && !IsLoading)
-            {
-                try
-                {
-                    await LocalStorage.SetItemAsync(DraftKey, Model);
-                }
-                catch { /* Ignore local storage errors */ }
-            }
+            var session = new SpaceEditSession(SpaceCommandService, NavigationManager, LocalStorage, ToastService);
+            session.Draft.Dispatch = work => InvokeAsync(work);
+            session.Draft.FlushInputs = () => CgMarkdownEditor.FlushAllAsync(JS, _editRoot);
+            return session;
         });
     }
 
-    public void Dispose()
-    {
-        _autoSaveTimer?.Dispose();
-        _cts?.Cancel();
-        _cts?.Dispose();
-    }
+    public ValueTask DisposeAsync() => _sessions?.DisposeAsync() ?? ValueTask.CompletedTask;
 
-    private async Task LoadDataAsync()
-    {
-        IsLoading = true;
-        LoadErrorMessage = null;
-        StateHasChanged();
-
-        try
-        {
-            var result = await SpaceCommandService.GetSpaceEditAsync(_cts?.Token ?? CancellationToken.None);
-
-            if (result.Success && result.Data != null)
-            {
-                Model = result.Data;
-                OriginalData = JsonSerializer.Deserialize<SpaceEditViewModel>(JsonSerializer.Serialize(result.Data));
-
-                // 尝试恢复草稿
-                try
-                {
-                    var draft = await LocalStorage.GetItemAsync<SpaceEditViewModel>(DraftKey);
-                    if (draft != null)
-                    {
-                        Model = draft;
-                        HasDraftRecovered = true;
-                    }
-                }
-                catch { }
-            }
-            else
-            {
-                LoadErrorMessage = result.Error?.Message ?? "获取编辑数据失败";
-            }
-        }
-        catch (Exception ex)
-        {
-            LoadErrorMessage = "发生未知错误：" + ex.Message;
-        }
-        finally
-        {
-            IsLoading = false;
-            StateHasChanged();
-        }
-    }
-
-    private async Task DiscardDraft()
-    {
-        if (OriginalData != null)
-        {
-            Model = JsonSerializer.Deserialize<SpaceEditViewModel>(JsonSerializer.Serialize(OriginalData))!;
-            HasDraftRecovered = false;
-            await LocalStorage.RemoveItemAsync(DraftKey);
-            StateHasChanged();
-        }
-    }
-
-    private async Task SubmitAsync()
-    {
-        if (Model == null || IsSubmitting) return;
-
-        // 若原始值与当前值都是 null 或空字符串，保持原始值不变，避免产生空的审核记录
-        if (string.IsNullOrEmpty(Model.MainPage.MainPage) && string.IsNullOrEmpty(OriginalData?.MainPage.MainPage))
-        {
-            Model.MainPage.MainPage = OriginalData.MainPage.MainPage;
-        }
-
-        // 客户端校验
-        var userDataValidation = Model.UserData.Validate();
-        if (!userDataValidation.Successful)
-        {
-            ToastService.Show("校验失败", userDataValidation.Error ?? "请检查个人资料是否填写正确", "error");
-            return;
-        }
-
-        var mainPageValidation = Model.MainPage.Validate();
-        if (!mainPageValidation.Successful)
-        {
-            ToastService.Show("校验失败", mainPageValidation.Error ?? "请检查个人主页内容", "error");
-            return;
-        }
-
-        IsSubmitting = true;
-        StateHasChanged();
-
-        try
-        {
-            var result = await SpaceCommandService.SubmitEditAsync(Model, _cts?.Token ?? CancellationToken.None);
-            if (result.Success)
-            {
-                await LocalStorage.RemoveItemAsync(DraftKey);
-                ToastService.Show("保存成功", "修改已提交，部分内容需要审核通过后才会对其他用户可见", "success");
-                NavigationManager.NavigateTo($"/space/index/{result.Data}");
-            }
-            else
-            {
-                ToastService.Show("提交失败", result.Error?.Message ?? "提交时出现问题", "error");
-            }
-        }
-        catch (Exception ex)
-        {
-            ToastService.Show("发生错误", ex.Message, "error");
-        }
-        finally
-        {
-            IsSubmitting = false;
-            StateHasChanged();
-        }
-    }
-
-    private void Cancel()
-    {
-        if (Model?.UserData?.Id != null)
-        {
-            NavigationManager.NavigateTo($"/space/index/{Model.UserData.Id}");
-        }
-        else
-        {
-            NavigationManager.NavigateTo("/");
-        }
-    }
 }

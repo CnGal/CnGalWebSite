@@ -2,6 +2,7 @@ using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using System.Text.Json.Serialization;
 
 namespace CnGalWebSite.SDK.MainSite.Models;
 
@@ -39,6 +40,7 @@ public sealed class EntryDetailViewModel
 
     public required string MainPage { get; init; }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
     public required BookingViewModel? Booking { get; init; }
 
     public required IReadOnlyList<EntryInformationModel> Information { get; init; }
