@@ -7,7 +7,7 @@
 <cg-owned @ref="_root" class="cg-line-chart @(IsExpanded ? "cg-line-chart--expanded" : "") @CssClass" style="@Style">
     @if (Chart.ErrorMessage is not null)
     {
-        <CgAlert>@Chart.ErrorMessage</CgAlert><button type="button" data-cg-server-action @onclick="RetryAsync">重试</button>
+        <CgAlert>@Chart.ErrorMessage</CgAlert><button type="button" @onclick="RetryAsync">重试</button>
     }
 
     <div class="cg-line-chart__header">
@@ -20,7 +20,7 @@
                           Options="@_timeRangeOptions"
                           ClassName="cg-line-chart__select" />
             }
-            <button type="button" class="cg-line-chart__action-btn" data-cg-server-action @onclick="ToggleExpand" title="@(IsExpanded ? "还原宽度" : "横跨多列")">
+            <button type="button" class="cg-line-chart__action-btn" @onclick="ToggleExpand" title="@(IsExpanded ? "还原宽度" : "横跨多列")">
                 <CgMdiIcon Name="@(IsExpanded ? "mdiFullscreenExit" : "mdiFullscreen")" aria-hidden="true" />
             </button>
         </div>

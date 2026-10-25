@@ -107,30 +107,8 @@ export function install(blazor) {
     }, true);
     systemTheme.addEventListener('change', applyTheme);
     document.addEventListener('cg-navigation-start', () => drawer(false));
-    let observers = [];
-    const observeConnection = () => {
-        observers.forEach(observer => observer.disconnect()); observers = [];
-        const reconnect = document.getElementById('components-reconnect-modal');
-        const error = document.getElementById('blazor-error-ui');
-        const update = () => {
-            const offline = reconnect?.matches('.components-reconnect-show, .components-reconnect-failed, .components-reconnect-rejected')
-                || (error?.style.display && error.style.display !== 'none');
-            document.documentElement.toggleAttribute('data-cg-server-offline', !!offline);
-        };
-        for (const element of [reconnect, error]) {
-            if (!element) continue;
-            const observer = new MutationObserver(update);
-            observer.observe(element, { attributes: true, attributeFilter: ['class', 'style'] });
-            observers.push(observer);
-        }
-        update(); applyTheme();
-    };
-    document.addEventListener('click', event => {
-        if (document.documentElement.hasAttribute('data-cg-server-offline')
-            && event.target.closest?.('[data-cg-server-action]')) { event.preventDefault(); event.stopImmediatePropagation(); }
-    }, true);
-    blazor.addEventListener('enhancedload', observeConnection);
-    observeConnection();
+    blazor.addEventListener('enhancedload', applyTheme);
+    applyTheme();
     const clarity = document.createElement('script');
     window.clarity ??= function () { (window.clarity.q ??= []).push(arguments); };
     clarity.async = true; clarity.src = 'https://www.clarity.ms/tag/buu31hy6os'; document.head.append(clarity);

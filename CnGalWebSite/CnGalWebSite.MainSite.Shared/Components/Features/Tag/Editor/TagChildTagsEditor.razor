@@ -16,7 +16,7 @@
             <div class="relevance-editor__header">
                 <h4 class="relevance-editor__title">标签</h4>
                 <span class="relevance-editor__count">@Model.Tags.Count 项</span>
-                <button type="button" class="relevance-editor__add" data-cg-server-action @onclick="AddItem" title="添加标签">
+                <button type="button" class="relevance-editor__add" @onclick="AddItem" title="添加标签">
                     <CgMdiIcon Name="mdiPlus" aria-hidden="true" />
                 </button>
             </div>
@@ -35,7 +35,7 @@
                             <button type="button"
                                     class="relevance-editor__remove"
                                     title="移除"
-                                    data-cg-server-action @onclick="() => RemoveItem(current)">
+                                    @onclick="() => RemoveItem(current)">
                                 <CgMdiIcon Name="mdiCloseCircleOutline" aria-hidden="true" />
                             </button>
                         </div>

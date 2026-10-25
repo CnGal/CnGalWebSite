@@ -17,7 +17,7 @@
                     var isActive = Model.Type == type;
                     <button type="button"
                             class="entry-type-btn @(isActive ? "active" : "")"
-                            data-cg-server-action @onclick="() => OnTypeChanged(type)">
+                            @onclick="() => OnTypeChanged(type)">
                         <CgMdiIcon Name="@GetEntryTypeIcon(type)" Class="entry-type-icon" aria-hidden="true"/>
                         <span>@type.GetDisplayName()</span>
                     </button>

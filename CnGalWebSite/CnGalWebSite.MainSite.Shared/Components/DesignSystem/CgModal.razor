@@ -21,8 +21,8 @@
     {
         <section class="cg-modal-fallback" aria-label="@Title">
             <CgAlert>@_loadError</CgAlert>
-            <button type="button" data-cg-server-action @onclick="RetryAsync">重试弹层</button>
-            <button type="button" data-cg-server-action @onclick="RequestClose">关闭</button>
+            <button type="button" @onclick="RetryAsync">重试弹层</button>
+            <button type="button" @onclick="RequestClose">关闭</button>
             @ChildContent
             @Footer
         </section>

@@ -26,7 +26,7 @@
                 <GridPrizeCard Items="_items" Skip="3" Take="1" ActiveIndex="_activeIndex" />
             </div>
 
-            <div class="action-card @(HasAvailablePrizes ? "" : "disabled")" data-cg-server-action @onclick="OnClickStartAsync">
+            <div class="action-card @(HasAvailablePrizes ? "" : "disabled")" @onclick="OnClickStartAsync">
                 <div>
                     @if (HasAvailablePrizes)
                     {
@@ -52,10 +52,10 @@
     </div>
 </cg-owned>
 <div class="lottery-action-card">
-    <div class="button-card" data-cg-server-action @onclick="OpenRules">
+    <div class="button-card" @onclick="OpenRules">
         抽奖规则
     </div>
-    <div class="button-card" data-cg-server-action @onclick="OpenPrizesAsync">
+    <div class="button-card" @onclick="OpenPrizesAsync">
         我的奖品
     </div>
 </div>

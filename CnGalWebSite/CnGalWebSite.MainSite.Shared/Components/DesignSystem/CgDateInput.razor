@@ -5,7 +5,7 @@
             disabled="@Disabled"
             aria-haspopup="dialog"
             aria-expanded="@_isOpen"
-            data-cg-server-action @onclick="TogglePanel">
+            @onclick="TogglePanel">
         <span class="@(_hasValue ? "cg-date-input__value" : "cg-date-input__value cg-date-input__value--placeholder")">@DisplayText</span>
         <CgMdiIcon Name="@TriggerIcon" Size="18" />
     </button>
@@ -15,7 +15,7 @@
         <button type="button"
                 class="cg-date-input__backdrop"
                 aria-label="关闭"
-                data-cg-server-action @onclick="ClosePanel"></button>
+                @onclick="ClosePanel"></button>
 
         <div class="cg-date-input__panel" role="dialog" aria-modal="false">
             @* ── 日历部分（Date / DateTime / MonthDay） ── *@
@@ -26,11 +26,11 @@
                     <div class="cg-date-input__nav">
                         @if (_showYearPicker)
                         {
-                            <button type="button" class="cg-date-input__nav-btn" data-cg-server-action @onclick="PrevYearRange" aria-label="上一组">
+                            <button type="button" class="cg-date-input__nav-btn" @onclick="PrevYearRange" aria-label="上一组">
                                 <CgMdiIcon Name="mdiChevronLeft" Size="20" />
                             </button>
                             <span class="cg-date-input__nav-title">@_viewYearRangeStart – @(_viewYearRangeStart + 11)</span>
-                            <button type="button" class="cg-date-input__nav-btn" data-cg-server-action @onclick="NextYearRange" aria-label="下一组">
+                            <button type="button" class="cg-date-input__nav-btn" @onclick="NextYearRange" aria-label="下一组">
                                 <CgMdiIcon Name="mdiChevronRight" Size="20" />
                             </button>
                         }
@@ -42,35 +42,35 @@
                             }
                             else
                             {
-                                <button type="button" class="cg-date-input__nav-btn" data-cg-server-action @onclick="PrevYear" aria-label="上一年">
+                                <button type="button" class="cg-date-input__nav-btn" @onclick="PrevYear" aria-label="上一年">
                                     <CgMdiIcon Name="mdiChevronLeft" Size="20" />
                                 </button>
-                                <button type="button" class="cg-date-input__nav-title cg-date-input__nav-title--clickable" data-cg-server-action @onclick="OpenYearPicker">
+                                <button type="button" class="cg-date-input__nav-title cg-date-input__nav-title--clickable" @onclick="OpenYearPicker">
                                     @_viewYear 年
                                 </button>
-                                <button type="button" class="cg-date-input__nav-btn" data-cg-server-action @onclick="NextYear" aria-label="下一年">
+                                <button type="button" class="cg-date-input__nav-btn" @onclick="NextYear" aria-label="下一年">
                                     <CgMdiIcon Name="mdiChevronRight" Size="20" />
                                 </button>
                             }
                         }
                         else
                         {
-                            <button type="button" class="cg-date-input__nav-btn" data-cg-server-action @onclick="PrevMonth" aria-label="上一月">
+                            <button type="button" class="cg-date-input__nav-btn" @onclick="PrevMonth" aria-label="上一月">
                                 <CgMdiIcon Name="mdiChevronLeft" Size="20" />
                             </button>
                             @if (Mode == CgDateInputMode.MonthDay)
                             {
-                                <button type="button" class="cg-date-input__nav-title cg-date-input__nav-title--clickable" data-cg-server-action @onclick="OpenMonthPicker">
+                                <button type="button" class="cg-date-input__nav-title cg-date-input__nav-title--clickable" @onclick="OpenMonthPicker">
                                     @_viewMonth 月
                                 </button>
                             }
                             else
                             {
-                                <button type="button" class="cg-date-input__nav-title cg-date-input__nav-title--clickable" data-cg-server-action @onclick="OpenMonthPicker">
+                                <button type="button" class="cg-date-input__nav-title cg-date-input__nav-title--clickable" @onclick="OpenMonthPicker">
                                     @_viewYear 年 @_viewMonth 月
                                 </button>
                             }
-                            <button type="button" class="cg-date-input__nav-btn" data-cg-server-action @onclick="NextMonth" aria-label="下一月">
+                            <button type="button" class="cg-date-input__nav-btn" @onclick="NextMonth" aria-label="下一月">
                                 <CgMdiIcon Name="mdiChevronRight" Size="20" />
                             </button>
                         }
@@ -85,7 +85,7 @@
                                 var year = y;
                                 <button type="button"
                                         class="cg-date-input__year-cell @(year == _viewYear ? "is-selected" : "")"
-                                        data-cg-server-action @onclick="() => SelectYear(year)">
+                                        @onclick="() => SelectYear(year)">
                                     @year
                                 </button>
                             }
@@ -100,7 +100,7 @@
                                 var month = m;
                                 <button type="button"
                                         class="cg-date-input__month-cell @(month == _viewMonth ? "is-selected" : "")"
-                                        data-cg-server-action @onclick="() => SelectMonth(month)">
+                                        @onclick="() => SelectMonth(month)">
                                     @month 月
                                 </button>
                             }
@@ -131,7 +131,7 @@
                                     var isToday = IsDayToday(c.Day);
                                     <button type="button"
                                             class="cg-date-input__cell @(isSelected ? "is-selected" : "") @(isToday ? "is-today" : "")"
-                                            data-cg-server-action @onclick="() => SelectDay(c.Day)">
+                                            @onclick="() => SelectDay(c.Day)">
                                         @c.Day
                                     </button>
                                 }
@@ -158,7 +158,7 @@
                                 var hour = h;
                                 <button type="button"
                                         class="cg-date-input__time-cell @(hour == _selectedHour ? "is-selected" : "")"
-                                        data-cg-server-action @onclick="() => SelectHour(hour)">
+                                        @onclick="() => SelectHour(hour)">
                                     @hour.ToString("D2")
                                 </button>
                             }
@@ -172,7 +172,7 @@
                                 var minute = m;
                                 <button type="button"
                                         class="cg-date-input__time-cell @(minute == _selectedMinute ? "is-selected" : "")"
-                                        data-cg-server-action @onclick="() => SelectMinute(minute)">
+                                        @onclick="() => SelectMinute(minute)">
                                     @minute.ToString("D2")
                                 </button>
                             }
@@ -185,11 +185,11 @@
             <div class="cg-date-input__footer">
                 @if (Mode is CgDateInputMode.Date or CgDateInputMode.DateTime)
                 {
-                    <button type="button" class="cg-date-input__today-btn" data-cg-server-action @onclick="GoToday">今天</button>
+                    <button type="button" class="cg-date-input__today-btn" @onclick="GoToday">今天</button>
                 }
                 @if (_hasValue)
                 {
-                    <button type="button" class="cg-date-input__clear-btn" data-cg-server-action @onclick="ClearValue">清除</button>
+                    <button type="button" class="cg-date-input__clear-btn" @onclick="ClearValue">清除</button>
                 }
             </div>
         </div>

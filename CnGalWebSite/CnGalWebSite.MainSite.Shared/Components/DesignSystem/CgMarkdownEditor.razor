@@ -17,7 +17,7 @@
     @if (_loadError is not null)
     {
         <CgAlert>@_loadError</CgAlert>
-        <button type="button" data-cg-server-action @onclick="InitializeAsync">重试</button>
+        <button type="button" @onclick="InitializeAsync">重试</button>
     }
     <div @ref="_containerRef" style="@(_loading ? "display:none" : null)"></div>
 

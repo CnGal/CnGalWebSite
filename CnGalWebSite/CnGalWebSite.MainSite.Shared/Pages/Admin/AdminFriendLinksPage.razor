@@ -47,9 +47,9 @@
         <CgDataTableColumn TItem="FriendLinkOverviewModel" TSort="FriendLinkSortField" Title="操作" Width="140px">
             <ChildContent Context="context">
                 <div class="admin-actions">
-                    <button class="admin-action-btn admin-action-btn--up" title="增加权重" data-cg-server-action @onclick="() => OnEditPriorityAsync(context, 1)"><CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" /></button>
-                    <button class="admin-action-btn admin-action-btn--down" title="降低权重" data-cg-server-action @onclick="() => OnEditPriorityAsync(context, -1)"><CgMdiIcon Name="mdiArrowDownBold" aria-hidden="true" /></button>
-                    <button class="admin-action-btn admin-action-btn--edit" title="编辑" data-cg-server-action @onclick="() => OnEditAsync(context)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
+                    <button class="admin-action-btn admin-action-btn--up" title="增加权重" @onclick="() => OnEditPriorityAsync(context, 1)"><CgMdiIcon Name="mdiArrowUpBold" aria-hidden="true" /></button>
+                    <button class="admin-action-btn admin-action-btn--down" title="降低权重" @onclick="() => OnEditPriorityAsync(context, -1)"><CgMdiIcon Name="mdiArrowDownBold" aria-hidden="true" /></button>
+                    <button class="admin-action-btn admin-action-btn--edit" title="编辑" @onclick="() => OnEditAsync(context)"><CgMdiIcon Name="mdiPencilOutline" aria-hidden="true" /></button>
                 </div>
             </ChildContent>
         </CgDataTableColumn>

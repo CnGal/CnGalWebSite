@@ -53,7 +53,7 @@
         <CgDataTableColumn TItem="BackUpArchiveOverviewModel" TSort="BackUpArchiveSortField" Title="操作" Sortable="false" Width="50px">
             <ChildContent Context="item">
                 <div class="admin-actions">
-                    <button class="admin-action-btn admin-action-btn--run" title="执行备份" data-cg-server-action @onclick="() => RunBackUp(item)">
+                    <button class="admin-action-btn admin-action-btn--run" title="执行备份" @onclick="() => RunBackUp(item)">
                         <CgMdiIcon Name="mdiPlayCircleOutline" aria-hidden="true" />
                     </button>
                 </div>

@@ -15,7 +15,7 @@
                     var isActive = Model.Type == type;
                     <button type="button"
                             class="periphery-type-btn @(isActive ? "active" : "")"
-                            data-cg-server-action @onclick="() => Model.Type = type">
+                            @onclick="() => Model.Type = type">
                         <CgMdiIcon Name="@GetPeripheryTypeIcon(type)" Class="periphery-type-icon" aria-hidden="true"/>
                         <span>@type.GetDisplayName()</span>
                     </button>

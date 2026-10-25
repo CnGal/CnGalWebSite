@@ -13,7 +13,7 @@
                 <CgMdiIcon Name="mdiTagMultipleOutline" Class="tag-editor__icon" aria-hidden="true"/>
                 <h3 class="tag-editor__title">标签列表</h3>
                 <span class="tag-editor__count">@Model.Tags.Count 项</span>
-                <button type="button" class="tag-editor__add" data-cg-server-action @onclick="AddTag" title="添加标签">
+                <button type="button" class="tag-editor__add" @onclick="AddTag" title="添加标签">
                     <CgMdiIcon Name="mdiPlus" aria-hidden="true"/>
                 </button>
             </div>
@@ -31,7 +31,7 @@
                             <button type="button"
                                     class="tag-editor__remove"
                                     title="移除"
-                                    data-cg-server-action @onclick="() => RemoveTag(item)">
+                                    @onclick="() => RemoveTag(item)">
                                 <CgMdiIcon Name="mdiCloseCircleOutline" aria-hidden="true"/>
                             </button>
                         </div>

@@ -35,10 +35,10 @@
                         <span class="cg-ff-obj-manager-item-type @GetTypeClass(obj.Type)">@GetTypeName(obj.Type)</span>
                         <a href="@GetObjectUrl(obj)" class="cg-ff-obj-manager-item-name">@obj.ObjectName</a>
                         <span class="cg-ff-obj-manager-item-date">@obj.CreateTime.ToString("yyyy-MM-dd")</span>
-                        <button class="cg-ff-obj-manager-item-move" data-cg-server-action @onclick="() => MoveObject(obj)" title="移动" type="button">
+                        <button class="cg-ff-obj-manager-item-move" @onclick="() => MoveObject(obj)" title="移动" type="button">
                             <CgMdiIcon Name="mdiFileMove" aria-hidden="true" />
                         </button>
-                        <button class="cg-ff-obj-manager-item-delete" data-cg-server-action @onclick="() => DeleteObject(obj)" title="删除" type="button">
+                        <button class="cg-ff-obj-manager-item-delete" @onclick="() => DeleteObject(obj)" title="删除" type="button">
                             <CgMdiIcon Name="mdiDeleteOutline" aria-hidden="true" />
                         </button>
                     </div>

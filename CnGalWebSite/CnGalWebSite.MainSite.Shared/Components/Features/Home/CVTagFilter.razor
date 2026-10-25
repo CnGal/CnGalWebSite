@@ -14,7 +14,7 @@
 
             <button type="button"
                     class="cv-tag-filter__chip @(!hasSelectedInGroup ? "cv-tag-filter__chip--active" : "")"
-                    data-cg-server-action @onclick="() => OnClearGroup(group)">
+                    @onclick="() => OnClearGroup(group)">
                 @groupLabel
             </button>
 
@@ -23,7 +23,7 @@
                 var isSelected = SelectedTags.Contains(child.Title);
                 <button type="button"
                         class="cv-tag-filter__chip @(isSelected ? "cv-tag-filter__chip--active" : "")"
-                        data-cg-server-action @onclick="() => OnClickTag(child)">
+                        @onclick="() => OnClickTag(child)">
                     @($"{child.Title.Replace("STAFF", "")} ({child.EntryCount})")
                 </button>
             }
@@ -34,7 +34,7 @@
             }
             <button type="button"
                     class="cv-tag-filter__chip @(isUnlabeled ? "cv-tag-filter__chip--active" : "")"
-                    data-cg-server-action @onclick="() => OnClickUnlabeled(group)">
+                    @onclick="() => OnClickUnlabeled(group)">
                 @($"未标注 ({unlabeledCount})")
             </button>
         </div>

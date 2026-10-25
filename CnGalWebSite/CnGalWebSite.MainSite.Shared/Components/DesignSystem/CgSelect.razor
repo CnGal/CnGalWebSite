@@ -4,7 +4,7 @@
             disabled="@Disabled"
             aria-haspopup="listbox"
             aria-expanded="@_isOpen"
-            data-cg-server-action @onclick="ToggleDropdown">
+            @onclick="ToggleDropdown">
         <span class="@(HasSelectedOption ? "cg-select__value" : "cg-select__value cg-select__value--placeholder")">@CurrentText</span>
         <span class="cg-select__arrow" aria-hidden="true"></span>
     </button>
@@ -14,7 +14,7 @@
         <button type="button"
                 class="cg-select__backdrop"
                 aria-label="关闭下拉框"
-                data-cg-server-action @onclick="CloseDropdown"></button>
+                @onclick="CloseDropdown"></button>
 
         <ul class="cg-select__menu" role="listbox">
             @if (!string.IsNullOrWhiteSpace(Placeholder))
@@ -22,7 +22,7 @@
                 <li role="option" aria-selected="@string.IsNullOrEmpty(Value)">
                     <button type="button"
                             class="cg-select__option @(string.IsNullOrEmpty(Value) ? "is-selected" : string.Empty)"
-                            data-cg-server-action @onclick='() => SelectOption(string.Empty)'>
+                            @onclick='() => SelectOption(string.Empty)'>
                         @Placeholder
                     </button>
                 </li>
@@ -33,7 +33,7 @@
                 <li role="option" aria-selected="@(string.Equals(option.Key, Value, StringComparison.Ordinal))">
                     <button type="button"
                             class="cg-select__option @(string.Equals(option.Key, Value, StringComparison.Ordinal) ? "is-selected" : string.Empty)"
-                            data-cg-server-action @onclick='() => SelectOption(option.Key)'>
+                            @onclick='() => SelectOption(option.Key)'>
                         @option.Value
                     </button>
                 </li>

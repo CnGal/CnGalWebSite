@@ -6,7 +6,7 @@
 }
 else
 {
-    <button class="@CssClass" type="@Type" disabled="@IsDisabled" aria-disabled="@(IsDisabled ? "true" : null)" data-cg-server-action @onclick="HandleClickAsync" @attributes="AdditionalAttributes">
+    <button class="@CssClass" type="@Type" disabled="@IsDisabled" aria-disabled="@(IsDisabled ? "true" : null)" @onclick="HandleClickAsync" @attributes="AdditionalAttributes">
         @if (_isLoading)
         {
             <CgProgressRing Size="sm" />

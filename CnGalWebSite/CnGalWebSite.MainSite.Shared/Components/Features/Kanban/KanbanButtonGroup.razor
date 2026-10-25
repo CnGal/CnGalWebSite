@@ -57,11 +57,11 @@
         </ChildContent>
     </CgPopupMenu>
 
-    <button class="kanban-action-btn" type="button" title="回到顶部" aria-label="回到顶部" data-cg-server-action @onclick="() => OnBackToTop.InvokeAsync()">
+    <button class="kanban-action-btn" type="button" title="回到顶部" aria-label="回到顶部" @onclick="() => OnBackToTop.InvokeAsync()">
         <CgMdiIcon Name="mdiArrowUp" aria-hidden="true" />
     </button>
 
-    <button class="kanban-action-btn" type="button" title="切换为浮动按钮" aria-label="切换为浮动按钮" data-cg-server-action @onclick="HandleSwitchToToolbar">
+    <button class="kanban-action-btn" type="button" title="切换为浮动按钮" aria-label="切换为浮动按钮" @onclick="HandleSwitchToToolbar">
         <CgMdiIcon Name="mdiSwapHorizontal" aria-hidden="true" />
     </button>
 </div>

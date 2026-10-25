@@ -6,7 +6,7 @@
 <cg-owned @ref="_root" class="cg-pie-chart @CssClass" style="@Style">
     @if (Chart.ErrorMessage is not null)
     {
-        <CgAlert>@Chart.ErrorMessage</CgAlert><button type="button" data-cg-server-action @onclick="RetryAsync">重试</button>
+        <CgAlert>@Chart.ErrorMessage</CgAlert><button type="button" @onclick="RetryAsync">重试</button>
     }
 
     @if (!string.IsNullOrWhiteSpace(Title))
