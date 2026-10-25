@@ -1,6 +1,7 @@
 ﻿@page "/entries/birthdaycalendar"
 @page "/birthday"
 @inject IEntryQueryService EntryQueryService
+@inject PageResponseState PageResponse
 @implements IDisposable
 @using CnGalWebSite.MainSite.Shared.Components.Features.Entry.Detail
 
@@ -185,6 +186,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         _cts = new CancellationTokenSource();
+        PageResponse.Begin();
         try
         {
         _today = DateTime.Now.Date;
@@ -231,11 +233,13 @@ else
         if (!hasAnySuccess)
         {
             _errorMessage = results[0].Error?.Message ?? "获取角色生日列表失败，请稍后重试";
+            PageResponse.Failed(results[0].Error);
             return;
         }
 
         _items = allItems;
         _loaded = true;
+        PageResponse.Succeeded();
         }
         catch (OperationCanceledException)
         {

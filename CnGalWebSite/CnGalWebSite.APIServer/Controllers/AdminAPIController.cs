@@ -300,7 +300,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// 刷新ES缓存
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         public async Task<ActionResult<Result>> RefreshSearchData()
         {
             try
@@ -322,7 +322,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// 临时脚本
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         public async Task<ActionResult<Result>> TempFunction()
         {
             try

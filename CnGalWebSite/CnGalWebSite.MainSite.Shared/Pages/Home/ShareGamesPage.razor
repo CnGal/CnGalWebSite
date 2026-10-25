@@ -3,6 +3,7 @@
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
 
 @inject IPlayedGameQueryService PlayedGameQueryService
+@inject PageResponseState PageResponse
 @implements IDisposable
 
 <CgPageMeta Title="分享游戏库" Description="展示你的游戏收藏和游玩时长" />
@@ -109,6 +110,7 @@ else
     {
         _cts?.Cancel();
         _cts = new CancellationTokenSource();
+        PageResponse.Begin();
 
         var overviewTask = PlayedGameQueryService.GetSteamGamesOverviewAsync(_cts!.Token);
         var reviewsTask = PlayedGameQueryService.GetRandomReviewsAsync(_cts!.Token);
@@ -126,10 +128,12 @@ else
         if (overviewResult.Success && overviewResult.Data is not null)
         {
             _overview = overviewResult.Data;
+            PageResponse.Succeeded();
         }
         else
         {
             _errorMessage = overviewResult.Error?.Message ?? "请稍后重试";
+            PageResponse.Failed(overviewResult.Error);
             return;
         }
 

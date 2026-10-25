@@ -1,5 +1,6 @@
 @page "/lotteries/index/{Id:long}"
 @inject ILotteryQueryService LotteryQueryService
+@inject PageResponseState PageResponse
 
 
 @implements IDisposable
@@ -145,6 +146,7 @@ else
     {
         _cts?.Cancel();
         _cts = new CancellationTokenSource();
+        PageResponse.Begin();
         try
         {
             var result = await LotteryQueryService.GetLotteryDetailAsync(Id, cancellationToken: _cts.Token);
@@ -152,11 +154,13 @@ else
             {
                 _errorMessage = null;
                 _model = result.Data;
+                PageResponse.Succeeded();
                 return;
             }
 
             _model = null;
             _errorMessage = result.Error?.Message ?? "请稍后重试";
+            PageResponse.Failed(result.Error);
         }
         catch (OperationCanceledException)
         {

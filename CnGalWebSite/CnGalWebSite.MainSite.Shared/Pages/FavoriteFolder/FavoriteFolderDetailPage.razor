@@ -6,6 +6,7 @@
 @using CnGalWebSite.MainSite.Shared.Components.DesignSystem
 
 @inject IFavoriteFolderQueryService FavoriteFolderQueryService
+@inject PageResponseState PageResponse
 @inject NavigationManager NavigationManager
 @implements IDisposable
 
@@ -81,6 +82,7 @@ else
     {
         _cts?.Cancel();
         _cts = new CancellationTokenSource();
+        PageResponse.Begin();
         try
         {
             _isNotFound = false;
@@ -92,15 +94,18 @@ else
             if (result.Success && result.Data != null)
             {
                 _model = result.Data;
+                PageResponse.Succeeded();
             }
             else if (result.Error?.StatusCode == 404)
             {
                 _isNotFound = true;
+                PageResponse.Failed(404);
             }
             else
             {
                 _isError = true;
                 _errorMessage = result.Error?.Message ?? "未知错误";
+                PageResponse.Failed(result.Error);
             }
         }
         catch (OperationCanceledException)

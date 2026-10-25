@@ -14,6 +14,7 @@
 @using CnGalWebSite.SDK.MainSite.Infrastructure
 
 @inject ITableQueryService TableService
+@inject PageResponseState PageResponse
 @inject IJSRuntime JS
 @implements IDisposable
 
@@ -392,16 +393,19 @@
     protected override async Task OnInitializedAsync()
     {
         _cts = new CancellationTokenSource();
+        PageResponse.Begin();
         try
         {
         var result = await TableService.GetTableSummaryAsync(_cts!.Token);
-        if (result.Success)
+        if (result.Success && result.Data is not null)
         {
             _summary = result.Data;
+            PageResponse.Succeeded();
         }
         else
         {
             _loadingError = result.Error?.Message ?? "加载失败";
+            PageResponse.Failed(result.Error);
         }
         }
         catch (OperationCanceledException)

@@ -1,5 +1,6 @@
 @page "/square"
 @inject IHomeQueryService HomeQueryService
+@inject PageResponseState PageResponse
 @implements IDisposable
 @using CnGalWebSite.MainSite.Shared.Components.Features.Home
 
@@ -121,6 +122,7 @@ else
     {
         _cts?.Cancel();
         _cts = new CancellationTokenSource();
+        PageResponse.Begin();
 
         try
         {
@@ -128,10 +130,12 @@ else
             if (result.Success && result.Data is not null)
             {
                 Model = result.Data;
+                PageResponse.Succeeded();
                 return;
             }
 
             ErrorMessage = result.Error?.Message ?? "请稍后重试";
+            PageResponse.Failed(result.Error);
         }
         catch (OperationCanceledException)
         {

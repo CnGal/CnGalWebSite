@@ -1,6 +1,7 @@
 @page "/lotteries/home"
 @page "/lotteries"
 @inject ILotteryQueryService LotteryQueryService
+@inject PageResponseState PageResponse
 @implements IDisposable
 @using CnGalWebSite.MainSite.Shared.Components.Features.Lottery.Home
 
@@ -68,6 +69,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         _cts = new CancellationTokenSource();
+        PageResponse.Begin();
         try
         {
             var result = await LotteryQueryService.GetLotteryCardsAsync(_cts.Token);
@@ -75,11 +77,13 @@ else
             {
                 _errorMessage = null;
                 _cards = result.Data;
+                PageResponse.Succeeded();
                 return;
             }
 
             _cards = null;
             _errorMessage = result.Error?.Message ?? "请稍后重试";
+            PageResponse.Failed(result.Error);
         }
         catch (OperationCanceledException)
         {

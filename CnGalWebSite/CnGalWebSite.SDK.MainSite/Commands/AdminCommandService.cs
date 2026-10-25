@@ -52,35 +52,13 @@ public sealed class AdminCommandService(HttpClient httpClient, PublicDataCache p
         }
     }
 
-    private async Task<SdkResult<bool>> GetCommandAsync(
-        string apiPath, string errorCode, string displayName,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            var result = await GetFromJsonAsync<Result>(apiPath, cancellationToken);
-            if (result is null || !result.Successful)
-            {
-                return SdkResult<bool>.Fail($"ADMIN_{errorCode}_FAILED", result?.Error ?? $"{displayName}失败");
-            }
-            return SdkResult<bool>.Ok(true);
-        }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
-        catch (Exception ex)
-        {
-            Logger.LogError(ex, "{DisplayName}异常。BaseAddress={BaseAddress}", displayName, HttpClient.BaseAddress);
-            return SdkFailure.FromException<bool>(ex, $"ADMIN_{errorCode}_EXCEPTION", $"{displayName}时发生异常");
-        }
-        finally { PublicCache.Invalidate(); }
-    }
-
     // ─── 系统 ───
 
     public Task<SdkResult<bool>> RefreshSearchDataAsync(CancellationToken cancellationToken = default)
-        => GetCommandAsync("api/admin/RefreshSearchData", "REFRESH_SEARCH", "刷新搜索缓存", cancellationToken);
+        => PostCommandAsync("api/admin/RefreshSearchData", new object(), "REFRESH_SEARCH", "刷新搜索缓存", cancellationToken);
 
     public Task<SdkResult<bool>> RunTempFunctionAsync(CancellationToken cancellationToken = default)
-        => GetCommandAsync("api/admin/TempFunction", "TEMP_FUNCTION", "执行临时脚本", cancellationToken);
+        => PostCommandAsync("api/admin/TempFunction", new object(), "TEMP_FUNCTION", "执行临时脚本", cancellationToken);
 
     // ─── 评论 ───
 

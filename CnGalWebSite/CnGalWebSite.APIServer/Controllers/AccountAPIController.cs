@@ -168,7 +168,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// 建议每十分钟调用一次
         /// </remarks>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [AllowAnonymous]
         public async Task<ActionResult<Result>> MakeUserOnlineAsync()
         {

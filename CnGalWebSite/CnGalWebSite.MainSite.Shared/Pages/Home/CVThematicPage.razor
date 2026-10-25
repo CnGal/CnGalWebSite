@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 
 @inject ITagQueryService TagQueryService
+@inject PageResponseState PageResponse
 @inject NavigationManager NavigationManager
 @implements IDisposable
 @using CnGalWebSite.DataModel.ViewModel.ThematicPages
@@ -163,6 +164,7 @@
 
         _cts?.Cancel();
         _cts = new CancellationTokenSource();
+        PageResponse.Begin();
 
         IsLoading = true;
         ErrorMessage = null;
@@ -178,10 +180,12 @@
                 TagGroups = result.Data.Tags;
                 PrepareCarousels();
                 ApplyFilterAndSort();
+                PageResponse.Succeeded();
             }
             else
             {
                 ErrorMessage = result.Error?.Message ?? "获取CV专题页数据失败";
+                PageResponse.Failed(result.Error);
             }
         }
         catch (OperationCanceledException)

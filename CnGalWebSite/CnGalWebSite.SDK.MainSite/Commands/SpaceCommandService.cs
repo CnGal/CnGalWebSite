@@ -153,7 +153,11 @@ public sealed class SpaceCommandService(
         cancellationToken.ThrowIfCancellationRequested();
         try
         {
-            var result = await GetFromJsonAsync<Result>("api/account/MakeUserOnline", cancellationToken);
+            // Heartbeat only changes the current user's online state; it does not invalidate public data.
+            using var response = await PostAsJsonRawAsync(
+                "api/account/MakeUserOnline", new object(), cancellationToken, readOnly: true);
+            response.EnsureSuccessStatusCode();
+            var result = await ReadResponseAsync<Result>(response, cancellationToken);
 
             if (result is { Successful: true })
             {

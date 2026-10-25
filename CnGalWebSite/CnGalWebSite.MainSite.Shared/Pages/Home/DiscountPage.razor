@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 
 @inject IStoreInfoQueryService StoreInfoQueryService
+@inject PageResponseState PageResponse
 @inject NavigationManager NavigationManager
 @implements IDisposable
 @using CnGalWebSite.DataModel.ViewModel.Steam
@@ -139,6 +140,7 @@
 
         _cts?.Cancel();
         _cts = new CancellationTokenSource();
+        PageResponse.Begin();
 
         IsLoading = true;
         ErrorMessage = null;
@@ -150,10 +152,12 @@
             {
                 AllItems = result.Data;
                 ApplyFilterAndSort();
+                PageResponse.Succeeded();
             }
             else
             {
                 ErrorMessage = result.Error?.Message ?? "获取 Steam 折扣游戏列表失败";
+                PageResponse.Failed(result.Error);
             }
         }
         catch (OperationCanceledException)
