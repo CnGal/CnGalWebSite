@@ -59,6 +59,31 @@ export async function downloadFileFromStream(name, stream) {
     } finally { URL.revokeObjectURL(url); }
 }
 
+function installStatusTopLayer(blazor) {
+    const ids = ['blazor-error-ui', 'components-reconnect-modal'];
+    const sync = () => {
+        for (const id of ids) {
+            const element = document.getElementById(id);
+            if (!element || typeof element.showPopover !== 'function') continue;
+            if (!element.hasAttribute('popover')) element.setAttribute('popover', 'manual');
+            const visible = getComputedStyle(element).display !== 'none';
+            let open = false;
+            try { open = element.matches(':popover-open'); } catch { }
+            if (visible === open) continue;
+            try {
+                if (visible) element.showPopover();
+                else element.hidePopover();
+            } catch (error) {
+                console.warn(`[status-ui] ${id} top layer`, error);
+            }
+        }
+    };
+    const observer = new MutationObserver(sync);
+    observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['class', 'style'] });
+    blazor.addEventListener('enhancedload', sync);
+    sync();
+}
+
 export function install(blazor) {
     let drawerOpener;
     function drawer(open, trigger) {
@@ -105,6 +130,7 @@ export function install(blazor) {
         const target = event.target;
         if (target.matches?.('[data-cg-image-fallback]')) { target.hidden = true; target.parentElement.classList.add('commodity-item-card__image-wrapper--broken'); }
     }, true);
+    installStatusTopLayer(blazor);
     systemTheme.addEventListener('change', applyTheme);
     document.addEventListener('cg-navigation-start', () => drawer(false));
     blazor.addEventListener('enhancedload', applyTheme);

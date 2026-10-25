@@ -706,6 +706,17 @@
     }
 }
 
+/* Keep framework status UI above native dialog top layers. */
+#blazor-error-ui,
+#components-reconnect-modal {
+    inset: auto var(--cg-spacing-6) var(--cg-spacing-6) auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    overflow: visible;
+}
+
 #blazor-error-ui {
     display: none;
     position: fixed;

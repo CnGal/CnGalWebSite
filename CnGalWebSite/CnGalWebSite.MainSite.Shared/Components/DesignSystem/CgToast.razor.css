@@ -1,11 +1,20 @@
 /* ── Toast container (stacks from bottom-right) ── */
 .cg-toast-container {
     position: fixed;
-    bottom: var(--cg-spacing-6);
+    top: auto;
     right: var(--cg-spacing-6);
-    z-index: 9999;
-    max-width: 400px;
+    bottom: var(--cg-spacing-6);
+    left: auto;
+    z-index: 2147483647;
     width: calc(100% - var(--cg-spacing-8));
+    max-width: 400px;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: visible;
+    background: transparent;
+    color: inherit;
 
     display: flex;
     flex-direction: column-reverse;

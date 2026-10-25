@@ -280,7 +280,7 @@
 </AuthorizeView>
 
 @* 以下错误/重连 UI 豁免 CgMdiIcon 规范：circuit 断开时 Blazor 组件无法渲染，必须使用原生 SVG *@
-<div id="blazor-error-ui" data-nosnippet>
+<div id="blazor-error-ui" data-nosnippet popover="manual">
     <div class="blazor-error-card">
         <div class="blazor-error-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z" /></svg>
@@ -296,7 +296,7 @@
     </div>
 </div>
 
-<div id="components-reconnect-modal">
+<div id="components-reconnect-modal" popover="manual">
     @* 重连中 *@
     <div class="reconnect-card reconnect-show">
         <div class="reconnect-spinner" aria-hidden="true"></div>

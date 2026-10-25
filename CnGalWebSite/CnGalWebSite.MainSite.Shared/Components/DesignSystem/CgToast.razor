@@ -2,15 +2,16 @@
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 
-<cg-owned @ref="_root" class="cg-toast-container" aria-live="polite">
+<div @ref="_root" popover="manual" class="cg-toast-container" aria-live="polite" role="region" aria-label="Notifications">
+    @* Keep DOM prototypes hidden instead of using <template>: its content can be empty under Interactive Server. *@
     @foreach (var variant in new[] { "info", "success", "warning", "error" })
     {
-        <template data-variant="@variant">
+        <div data-toast-template data-variant="@variant" hidden>
             <div class="cg-toast cg-toast--@variant" role="status">
                 <CgMdiIcon Name="@GetVariantIcon(variant)" Class="cg-toast__icon" aria-hidden="true" />
                 <div class="cg-toast__content"><div class="cg-toast__title"></div><div class="cg-toast__detail"></div></div>
             </div>
-        </template>
+        </div>
     }
     @if (_loadError)
     {
@@ -20,7 +21,7 @@
         }
         <button type="button" @onclick="RetryAsync">重试通知组件</button>
     }
-</cg-owned>
+</div>
 
 @code {
     [Parameter] public int Duration { get; set; } = 3000;
