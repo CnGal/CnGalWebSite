@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CnGalWebSite.SDK.MainSite\CnGalWebSite.SDK.MainSite.csproj" />
+    <ProjectReference Include="..\CnGalWebSite.MainSite.Shared\CnGalWebSite.MainSite.Shared.csproj" />
     <Compile Include="../CnGalWebSite.APIServer/Application/Helper/HtmlSanitizerHelper.cs" Link="HtmlSanitizerHelper.cs" />
     <PackageReference Include="HtmlSanitizer" Version="9.2.995" />
     <PackageReference Include="Markdig" Version="0.43.0" />

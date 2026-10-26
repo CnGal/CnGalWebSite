@@ -560,38 +560,6 @@ namespace CnGalWebSite.DataModel.Helper
 
         
 
-        public static int GetLevelIntegral(int level)
-        {
-            return level switch
-            {
-                0 => 5,
-                1 => 50,
-                2 => 200,
-                3 => 500,
-                4 => 1000,
-                5 => 2000,
-                6 => 3500,
-                7 => 6000,
-                8 => 10000,
-                9 => 99999999,
-                10 => 99999999,
-                _ => -1,
-            };
-        }
-
-        public static int GetUserLevel(int integral)
-        {
-            for (var i = 0; i <= 10; i++)
-            {
-                if (integral < GetLevelIntegral(i))
-                {
-                    return i;
-                }
-            }
-
-            return -1;
-        }
-
         /// <summary>
         /// 是否在同一个星期
         /// </summary>

@@ -1,6 +1,5 @@
 
 using CnGalWebSite.APIServer.DataReositories;
-using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Space;
@@ -33,7 +32,7 @@ namespace CnGalWebSite.APIServer.Application.Ranks
         {
             var nowTime = DateTime.Now.ToCstTime();
             //用户等级头衔
-            var level = ToolHelper.GetUserLevel(user.DisplayIntegral);
+            var level = UserLevelHelper.GetUserLevel(user.DisplayIntegral);
             //获取用户目前的等级头衔
             var levelRank = await _rankUserRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Rank.Name.Contains("Lv ")).Select(s => s.Rank.Name).FirstOrDefaultAsync();
             //比较是否过时

@@ -1,5 +1,11 @@
 @using CnGalWebSite.SDK.MainSite.Models
 @using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+@using System.Globalization
+
+@{
+    var level = UserLevelHelper.GetUserLevel(Model.Integral);
+    var progress = UserLevelHelper.GetLevelProgress(Model.Integral).ToString("0.##", CultureInfo.InvariantCulture);
+}
 
 <div class="cg-space-card">
     <div class="cg-space-card-body">
@@ -18,14 +24,14 @@
             <div class="cg-space-data-level-header">
                 <span>
                     <CgMdiIcon Name="mdiMagicStaff" Class="cg-space-data-level-icon" />
-                    Lv：@(GetUserLevel(Model.Integral))
+                    Lv：@level
                 </span>
                 <span class="cg-space-data-level-text">
-                    @(GetUserLevel(Model.Integral) == 10 ? Model.Integral.ToString() : $"{Model.Integral} / {GetLevelIntegral(GetUserLevel(Model.Integral))}")
+                    @(level == UserLevelHelper.MaxLevel ? Model.Integral.ToString() : $"{Model.Integral} / {UserLevelHelper.GetNextLevelIntegral(level)}")
                 </span>
             </div>
             <div class="cg-space-progress-bar">
-                <div class="cg-space-progress-bar-fill" style="width: @(GetLevelProgress(Model.Integral))%"></div>
+                <div class="cg-space-progress-bar-fill" style="width: @progress%"></div>
             </div>
         </div>
     </div>
@@ -34,29 +40,4 @@
 @code {
     [Parameter, EditorRequired]
     public required SpaceDetailViewModel Model { get; set; }
-
-    private int GetUserLevel(int integral)
-    {
-        int[] levelThresholds = { 0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500 };
-        for (int i = levelThresholds.Length - 1; i >= 0; i--)
-        {
-            if (integral >= levelThresholds[i]) return i + 1;
-        }
-        return 1;
-    }
-
-    private int GetLevelIntegral(int level)
-    {
-        int[] levelThresholds = { 0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500 };
-        if (level >= 10) return levelThresholds[9];
-        return levelThresholds[level];
-    }
-    
-    private double GetLevelProgress(int integral)
-    {
-        int level = GetUserLevel(integral);
-        if (level >= 10) return 100.0;
-        int max = GetLevelIntegral(level);
-        return max == 0 ? 0 : Math.Clamp(100.0 * integral / max, 0, 100);
-    }
 }
