@@ -33,6 +33,7 @@ public static class ServiceCollectionExtensions
 
         RegisterSdkHttpClient<IAccountQueryService, AccountQueryService>(services, apiBase, createClient);
         RegisterSdkHttpClient<IHomeQueryService, HomeQueryService>(services, apiBase, createClient);
+        RegisterSdkHttpClient<IRobotQueryService, RobotQueryService>(services, apiBase, createClient);
         RegisterSdkHttpClient<IEntryQueryService, EntryQueryService>(services, apiBase, createClient);
         RegisterSdkHttpClient<ISpaceQueryService, SpaceQueryService>(services, apiBase, createClient);
         RegisterSdkHttpClient<ITagQueryService, TagQueryService>(services, apiBase, createClient);
