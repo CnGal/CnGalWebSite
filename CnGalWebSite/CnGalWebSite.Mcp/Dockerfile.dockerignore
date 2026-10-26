@@ -1,0 +1,13 @@
+**
+!CnGalWebSite/
+!CnGalWebSite/CnGalWebSite.Mcp/**
+!CnGalWebSite/CnGalWebSite.SDK.MainSite/**
+!CnGalWebSite/CnGalWebSite.DataModel/**
+!CnGalWebSite/CnGalWebSite.Core/**
+!CnGalWebSite/CnGalWebSite.Extensions/**
+!CnGalWebSite/CnGalWebSite.DrawingBed.Models/**
+!CnGalWebSite/CnGalWebSite.TimedTask.Models/**
+**/bin/**
+**/obj/**
+**/*.user
+**/.env*
