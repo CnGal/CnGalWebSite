@@ -19,15 +19,15 @@
     </div>
     <div class="mb-4 mt-3">
         <div style=" display: flex; justify-content: space-between;">
-            @{ int level = ToolHelper.GetUserLevel(Model.BasicInfor.Integral);}
+            @{ int level = UserLevelHelper.GetUserLevel(Model.BasicInfor.Integral);}
             <span>
                 <i class="primary-textfa fa-magic fa-fw"></i>@("Lv："+level)
             </span>
             <span style=" color: gray;">
-                @(level==10?Model.BasicInfor.Integral:(Model.BasicInfor.Integral+" / "+ToolHelper.GetLevelIntegral(level)))
+                @(level == UserLevelHelper.MaxLevel ? Model.BasicInfor.Integral.ToString() : $"{Model.BasicInfor.Integral} / {UserLevelHelper.GetNextLevelIntegral(level)}")
             </span>
         </div>
-        <MProgressLinear Value="@(level==10?100:(100.0*Model.BasicInfor.Integral/ToolHelper.GetLevelIntegral(level)))" ></MProgressLinear>
+        <MProgressLinear Value="@UserLevelHelper.GetLevelProgress(Model.BasicInfor.Integral)" ></MProgressLinear>
     </div>
     @if (Model.IsCurrentUser)
     {
