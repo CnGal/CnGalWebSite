@@ -1,0 +1,112 @@
+name: Publish AstrBot plugin
+
+on:
+  workflow_dispatch: # 手动发布已验证的默认分支提交
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-astrbot-plugin
+
+env:
+  PLUGIN_PATH: integrations/astrbot/plugins/astrbot_plugin_cngal_interaction
+  RELEASE_BRANCH: astrbot-plugin
+
+jobs:
+  publish:
+    if: ${{ github.ref_name == github.event.repository.default_branch }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出触发提交
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+
+      - name: 设置 uv 和 Python
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.15.1"
+          enable-cache: false
+
+      - name: 打包并检查公开内容
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv --version
+          # 全新 runner 可能尚未安装指定解释器，首次运行允许 uv 下载。
+          uv run --no-project python --version
+          uv run --no-project --no-python-downloads python integrations/astrbot/tools/package.py --output "$RUNNER_TEMP/astrbot-dist"
+          uv run --no-project --no-python-downloads python - <<'PY'
+          import ast
+          import hashlib
+          import json
+          import os
+          import re
+          import subprocess
+          from pathlib import Path
+          from zipfile import ZipFile
+
+          source = os.environ["GITHUB_SHA"]
+          plugin_path = os.environ["PLUGIN_PATH"]
+          subtree = f"{source}:{plugin_path}"
+          names = subprocess.check_output(["git", "ls-tree", "-r", "--name-only", "-z", subtree]).decode().split("\0")
+          files = {name: subprocess.check_output(["git", "show", f"{subtree}/{name}"]) for name in names if name}
+          assert {"main.py", "metadata.yaml", "_conf_schema.json", "README.md", "LICENSE", "core/assets.json"} <= files.keys()
+          assert all(name.split("/")[0] in {"main.py", "metadata.yaml", "_conf_schema.json", "README.md", "LICENSE", "core"} for name in files)
+          assert not any(part in {"private", "tests", "__pycache__"} for name in files for part in name.split("/"))
+          metadata = files["metadata.yaml"].decode()
+          version = re.search(r"^version:\s*v(\d+\.\d+\.\d+)\s*$", metadata, re.MULTILINE).group(1)
+          assert "repo: https://github.com/CnGal/CnGalWebSite/tree/astrbot-plugin" in metadata.splitlines()
+          assert "astrbot_version: '>=4.28.2,<5'" in metadata.splitlines()
+          assert "support_platforms: [aiocqhttp]" in metadata.splitlines()
+          main = ast.parse(files["main.py"])
+          registration = next(node for node in ast.walk(main) if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "register")
+          assert ast.literal_eval(registration.args[0]) == "astrbot_plugin_cngal_interaction"
+          assert ast.literal_eval(registration.args[3]) == version
+          for name, content in files.items():
+              if name.endswith(".py"):
+                  ast.parse(content, filename=name)
+              elif name.endswith(".json"):
+                  json.loads(content)
+          assert json.loads(files["core/assets.json"]) == {}
+          assert files["README.md"].strip()
+          assert files["LICENSE"] == subprocess.check_output(["git", "show", f"{source}:LICENSE"])
+          output = Path(os.environ["RUNNER_TEMP"]) / "astrbot-dist"
+          artifact = output / f"astrbot_plugin_cngal_interaction-{version}.zip"
+          with ZipFile(artifact) as archive:
+              assert archive.testzip() is None
+              assert len(archive.namelist()) == len(files)
+              assert {name: archive.read(name) for name in archive.namelist()} == files
+          assert json.loads((output / "sha256.json").read_text()) == {artifact.name: hashlib.sha256(artifact.read_bytes()).hexdigest()}
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as stream:
+              stream.write(f"version={version}\n")
+          print(f"公开内容校验通过：v{version}，{len(files)} 个文件，来源 {source}")
+          PY
+
+      - name: 更新发布分支
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ steps.package.outputs.version }}
+        run: |
+          set -euo pipefail
+          release_ref="refs/heads/$RELEASE_BRANCH"
+          tree=$(git rev-parse "$GITHUB_SHA:$PLUGIN_PATH")
+          remote=$(git ls-remote --heads origin "$release_ref")
+          parents=()
+          if [[ -n "$remote" ]]; then
+            git fetch --no-tags origin "$release_ref"
+            parent=$(git rev-parse FETCH_HEAD)
+            if [[ "$(git rev-parse "$parent^{tree}")" == "$tree" ]]; then
+              printf '公开插件内容未变化，跳过发布。来源提交：%s\n' "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            parents=(-p "$parent")
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          # 发布提交只引用插件子树，父提交也仅来自发布分支。
+          commit=$(git -c commit.gpgsign=false commit-tree "$tree" "${parents[@]}" -m "发布 CnGal 插件 v$RELEASE_VERSION" -m "来源提交：$GITHUB_SHA")
+          git push origin "$commit:$release_ref"
+          printf '已发布 v%s 到 %s。来源提交：%s；发布提交：%s\n' "$RELEASE_VERSION" "$RELEASE_BRANCH" "$GITHUB_SHA" "$commit" >> "$GITHUB_STEP_SUMMARY"

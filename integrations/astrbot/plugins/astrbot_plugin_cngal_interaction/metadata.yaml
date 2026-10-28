@@ -1,0 +1,8 @@
+name: astrbot_plugin_cngal_interaction
+display_name: CnGal 交互
+desc: CnGal 群聊与私聊 AI、固定素材及独立绑定。
+version: v1.0.0
+author: CnGal
+repo: https://github.com/CnGal/CnGalWebSite/tree/astrbot-plugin
+support_platforms: [aiocqhttp]
+astrbot_version: '>=4.28.2,<5'

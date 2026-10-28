@@ -1,0 +1,4 @@
+{
+  "plugin_set": ["astrbot_plugin_cngal_interaction"],
+  "provider_settings": {"enable": true}
+}

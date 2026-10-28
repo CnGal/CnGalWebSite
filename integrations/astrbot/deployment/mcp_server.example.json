@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "cngal": {
+      "enable": true,
+      "transport": "streamable_http",
+      "url": "http://cngal-mcp:8080/mcp",
+      "headers": {"Authorization": "Bearer REPLACE_WITH_DEDICATED_MCP_TOKEN"}
+    }
+  }
+}
