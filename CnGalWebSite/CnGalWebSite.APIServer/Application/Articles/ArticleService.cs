@@ -57,6 +57,13 @@ namespace CnGalWebSite.APIServer.Application.Articles
             _userService = userService;
         }
 
+        public async Task<ArticleInforTipViewModel> GetPublicSummaryAsync(long id, CancellationToken cancellationToken = default)
+        {
+            var article = await _articleRepository.GetAll().AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Id == id && !s.IsHidden && !string.IsNullOrWhiteSpace(s.Name), cancellationToken);
+            return article == null ? null : _appHelper.GetArticleInforTipViewModel(article);
+        }
+
         public async Task<PagedResultDto<Article>> GetPaginatedResult(GetArticleInput input)
         {
             var query = _articleRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false);
