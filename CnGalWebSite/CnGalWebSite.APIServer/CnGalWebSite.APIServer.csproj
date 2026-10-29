@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <PackageReference Include="htmldiff.net" Version="1.5.0" />
+    <PackageReference Include="ModelContextProtocol.AspNetCore" Version="2.3.0" />
     <PackageReference Include="HtmlSanitizer" Version="9.2.995" />
     <PackageReference Include="IdentityModel" Version="7.0.0" />
     <PackageReference Include="Markdig" Version="0.43.0" />

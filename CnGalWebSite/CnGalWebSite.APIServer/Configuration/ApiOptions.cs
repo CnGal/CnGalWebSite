@@ -2,6 +2,19 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace CnGalWebSite.APIServer.Configuration;
 
+public sealed class SiteOptions
+{
+    public const string SectionName = "Site";
+    public string PublicBaseUrl { get; set; }
+
+    public string GetUrl(string value)
+    {
+        var baseUri = new Uri(PublicBaseUrl.TrimEnd('/') + "/");
+        return Uri.TryCreate(baseUri, value ?? "", out var uri) && uri.Scheme is "http" or "https"
+            ? uri.AbsoluteUri : baseUri.AbsoluteUri;
+    }
+}
+
 public sealed class DatabaseOptions
 {
     public const string SectionName = "ConnectionStrings";

@@ -9,6 +9,10 @@ public static class ApiOptionsRegistration
 {
     public static IServiceCollection AddApiConfiguration(this IServiceCollection services)
     {
+        services.AddOptions<SiteOptions>()
+            .BindConfiguration(SiteOptions.SectionName)
+            .Validate(options => IsHttpAddress(options.PublicBaseUrl), "站点地址 Site:PublicBaseUrl 未配置或格式不正确。");
+
         services.AddOptions<DatabaseOptions>()
             .BindConfiguration(DatabaseOptions.SectionName)
             .Validate(IsValidDatabase, "ConnectionStrings is missing or invalid.")
