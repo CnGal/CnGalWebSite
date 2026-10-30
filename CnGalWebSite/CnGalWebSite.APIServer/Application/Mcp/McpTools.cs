@@ -23,7 +23,7 @@ public sealed class McpTools(McpService queries)
     public Task<McpQueryResult> News(CancellationToken cancellationToken = default) => queries.GetNewsAsync(cancellationToken);
     [McpServerTool(Name = "get_random_game", ReadOnly = true), Description("随机推荐一款公开游戏并提供来源；每次调用结果可能不同，空结果表示当前未找到可推荐的公开内容。")]
     public Task<McpQueryResult> Random(CancellationToken cancellationToken = default) => queries.GetRandomGameAsync(cancellationToken);
-    [McpServerTool(Name = "get_role_birthdays", ReadOnly = true), Description("查询公开角色生日及来源。month 和 day 必须同时填写，day=0 表示查询整月；都不填写时查询上海时区当天的生日。空结果表示未找到符合日期条件的公开角色。")]
+    [McpServerTool(Name = "get_role_birthdays", ReadOnly = true), Description("查询公开角色生日及来源，最多返回 6 条。month 和 day 必须同时填写，day=0 表示查询整月；都不填写时查询上海时区当天的生日。空结果表示未找到符合日期条件的公开角色。")]
     public Task<McpQueryResult> Birthdays(int? month = null, int? day = null, CancellationToken cancellationToken = default) => queries.GetRoleBirthdaysAsync(month, day, cancellationToken);
     [McpServerTool(Name = "get_recently_updated_games", ReadOnly = true), Description("查询最近编辑更新的游戏词条及来源；更新时间不是发售日期，不把编辑更新当成新作发布。")]
     public Task<McpQueryResult> Updated(CancellationToken cancellationToken = default) => queries.GetRecentlyUpdatedGamesAsync(cancellationToken);

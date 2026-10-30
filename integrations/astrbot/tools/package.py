@@ -18,8 +18,9 @@ def source_files(source):
         relative = path.relative_to(source)
         if not path.is_file() or set(relative.parts) & {".venv", ".pytest_cache", "__pycache__"} or path.suffix == ".pyc":
             continue
-        if set(relative.parts) & {"private", "tests"} or relative.parts[0] not in {
-                "main.py", "metadata.yaml", "_conf_schema.json", "README.md", "LICENSE", "core"}:
+        if (set(relative.parts) & {"private", "tests"} or relative.parts[0] not in {
+                "main.py", "metadata.yaml", "_conf_schema.json", "README.md", "LICENSE", "core"}
+                or (relative.parts[0] == "core" and path.suffix != ".py")):
             raise ValueError(f"插件目录包含非公开源码文件：{relative.as_posix()}")
         files.append(path)
     return files

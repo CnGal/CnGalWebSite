@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "cngal": {
-      "enable": true,
+      "active": true,
       "transport": "streamable_http",
       "url": "https://api.cngal.org/mcp"
     }

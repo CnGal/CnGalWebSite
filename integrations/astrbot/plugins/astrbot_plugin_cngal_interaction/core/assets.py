@@ -23,6 +23,8 @@ def catalog(path):
                 raise ValueError("素材的 kind 与 usage 必须匹配")
             if not isinstance(asset.get("url"), str) or not asset["url"].strip():
                 raise ValueError("素材的 url 必须是非空字符串")
+            if asset["kind"] == "image" and not asset["url"].startswith(("http://", "https://")):
+                raise ValueError("图片素材的 url 必须使用 HTTP 或 HTTPS 地址")
         return MappingProxyType({name: MappingProxyType(asset) for name, asset in assets.items()})
     except FileNotFoundError:
         return MappingProxyType({})
