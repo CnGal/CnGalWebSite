@@ -69,6 +69,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                 {
                     model.Add(new RecentlyDemoGameItemModel
                     {
+                        Id = item.Id,
                         Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
                         Name = item.DisplayName,
                         Url = "entries/index/" + item.Id,
@@ -99,6 +100,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                 {
                     model.Add(new PublishedGameItemModel
                     {
+                        Id = item.Id,
                         Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
                         Name = item.DisplayName,
                         Url = "entries/index/" + item.Id,
@@ -132,6 +134,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                 {
                     model.Add(new RecentlyEditedGameItemModel
                     {
+                        Id = item.Id,
                         Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
                         Name = item.DisplayName,
                         Url = "entries/index/" + item.Id,
@@ -157,6 +160,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                 {
                     var temp = new UpcomingGameItemModel
                     {
+                        Id = item.Id,
                         Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
                         Name = item.DisplayName,
                         Url = "entries/index/" + item.Id,

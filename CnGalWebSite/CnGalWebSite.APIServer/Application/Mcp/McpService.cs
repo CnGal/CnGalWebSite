@@ -20,11 +20,13 @@ public sealed class McpService(
     IHomeService home, ISearchHelper search, IEntryService entries, IArticleService articles,
     IStoreInfoService stores)
 {
+    private const int MaxItems = 6;
+
     private static string Text(string? value) => WebUtility.HtmlDecode(
         Regex.Replace(value ?? "", "<[^>]*>", " ", RegexOptions.None, TimeSpan.FromSeconds(1))).Trim();
 
     private static McpQueryResult Result(IEnumerable<McpItem> items, string source = "/", int? total = null, int page = 1)
-        => new() { Items = items.Take(6).ToList(), SourceUrl = source, Total = total, Page = page };
+        => new() { Items = items.Take(MaxItems).ToList(), SourceUrl = source, Total = total, Page = page };
 
     private static McpItem Item(EntryInforTipViewModel entry) => new()
     {
@@ -43,11 +45,15 @@ public sealed class McpService(
         ArgumentException.ThrowIfNullOrWhiteSpace(text);
         if (text.Length > 200) throw new ArgumentOutOfRangeException(nameof(text));
         if (currentPage < 1 || currentPage > 1000) throw new ArgumentOutOfRangeException(nameof(currentPage));
-        var input = SearchInputModel.Parse(["Entry", "Article"], [], text, SearchSortField.Default, SortDirection.Descending, currentPage);
+        var input = SearchInputModel.Parse(["Entry", "Article"], [], text, SearchSortField.Default, SortDirection.Descending, 1);
+        // 网页与 MCP 每页数量不同，来源链接保留搜索条件并指向第一页。
+        var sourceUrl = $"search{input.ToPageQueryString()}";
+        input.CurrentPage = currentPage;
+        input.MaxResultCount = MaxItems;
         var data = await search.QueryAsync(input).WaitAsync(cancellationToken);
         var items = data.Data.SelectMany(x => x.entry is not null ? new[] { Item(x.entry) } :
             x.article is not null ? new[] { Item(x.article) } : Array.Empty<McpItem>());
-        return Result(items, $"search{input.ToQueryParameterString()}", data.TotalCount, currentPage);
+        return Result(items, sourceUrl, data.TotalCount, currentPage);
     }
 
     public async Task<McpQueryResult> GetEntryAsync(int id, CancellationToken cancellationToken = default)
@@ -67,7 +73,7 @@ public sealed class McpService(
     private static async Task<McpQueryResult> HomeAsync<T>(Func<Task<List<T>>> query, Func<T, string?> summary, CancellationToken cancellationToken) where T : HomeItemModel
     {
         var items = await query().WaitAsync(cancellationToken);
-        return Result(items.Select(x => new McpItem { Title = Text(x.Name), Summary = Text(summary(x)), Url = x.Url }));
+        return Result(items.Select(x => new McpItem { Id = x.Id, Title = Text(x.Name), Summary = Text(summary(x)), Url = x.Url }));
     }
 
     public Task<McpQueryResult> GetLatestGamesAsync(CancellationToken cancellationToken = default)

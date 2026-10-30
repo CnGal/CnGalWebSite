@@ -18,7 +18,7 @@ https://github.com/CnGal/CnGalWebSite/tree/astrbot-plugin
 
 部署包含本次修改的 `CnGalWebSite.APIServer`，`/mcp` 与现有 API 共用进程、容器和监听端口。该入口只公开 11 个只读查询工具，沿用站内公开资料的可见范围；无需单独 MCP 容器、RabbitMQ 接入或新增令牌。
 
-MCP 在 API 进程内通过依赖注入直接调用已有业务服务，无需通过 HTTP 回调 API 获取数据。查询结果中的站内链接使用相对路径，已有服务返回的链接保持原样；无需额外配置站点域名。
+MCP 在 API 进程内通过依赖注入直接调用已有业务服务，无需通过 HTTP 回调 API 获取数据。查询结果中的站内链接使用相对路径，已有服务返回的链接保持原样；无需额外配置站点域名。MCP 搜索每页最多 6 条，来源链接保留搜索条件并指向网页搜索第一页；网页页码与 MCP 页码分别计算。
 
 在 AstrBot 原生 MCP 管理中按 [mcp_server.example.json](mcp_server.example.json) 添加服务，传输方式为 `streamable_http`，URL 指向 API 的 `/mcp`。示例为 `https://api.cngal.org/mcp`；内部容器地址可使用实际 API 服务名与端口。确保 AstrBot 进程能访问该地址，反向代理将 `/mcp` 转发至现有 API，并允许流式响应。连接成功后应发现 11 个 CnGal 查询工具。
 
@@ -37,13 +37,17 @@ flowchart LR
 
 ## 模型、会话与人设
 
+若其他会话仍使用默认配置，先复制该配置并将这些会话路由到副本，确认原有模型、插件和回复设置正常，再应用以下补丁。
+
 1. 在 AstrBot 中配置模型提供商和支持工具调用的聊天模型，在获准聊天配置的本地 Agent 中选择该模型。模型凭据由原生配置管理。
 2. 默认配置：在已有配置上应用[基础补丁](astrbot-profile.patch.json)，关闭默认 AI。新聊天配置：每次从原生默认值新建非默认配置档后，都先应用基础补丁，再应用[聊天补丁](astrbot-chat-profile.patch.json)，开启该配置的 AI。不能只应用聊天补丁，否则会遗漏人设和中间消息缓冲等设置。字典递归合并，列表及普通值替换，不能用补丁覆盖完整配置；保留原有模型和平台连接参数。
-3. 在默认配置及受管理的 QQ 配置中，保留原有插件选择，并在原生插件选择界面明确加入 `astrbot_plugin_cngal_interaction`；仅选择通配项 `*` 不满足本插件的准入条件。两份补丁均不修改插件选择，也不关闭原有的 ID 白名单；保留各配置已有的白名单设置。按 [路由示例](astrbot-routes.example.json)，在原生配置档绑定界面将允许聊天的群或私聊精确绑定到聊天配置档。
+3. 在默认配置及受管理的 QQ 配置中，明确选中 `astrbot_plugin_cngal_interaction`。原插件选择为 `["*"]` 时，先将 `*` 替换为需要保留的已安装插件名称，再加入 CnGal 插件；已有显式名单则保留并追加。仅有 `["*"]` 不满足本插件的准入条件，`["*", "astrbot_plugin_cngal_interaction"]` 也不表示启用全部插件。两份补丁均不修改插件选择，也不关闭原有的 ID 白名单；保留各配置已有的白名单设置。按 [路由示例](astrbot-routes.example.json)，在原生配置档绑定界面将允许聊天的群或私聊精确绑定到聊天配置档。
 4. 将 `REPLACE_PLATFORM_ID` 替换为 AstrBot 中的机器人平台实例 ID，将 `REPLACE_CHAT_PROFILE_ID` 替换为聊天配置档 ID，并替换示例群号或 QQ 号。群格式为 `平台ID:GroupMessage:群号`，私聊格式为 `平台ID:FriendMessage:QQ号`。通配路由不能开放聊天，较早匹配的通配路由也不能遮住精确路由。
 5. 在原生人设管理中新建或选择 ID 为 `cngal` 的人设，导入管理员准备的完整内容，再按 [人设选择示例](cngal-persona-selection.example.json) 选择 11 个 MCP 查询工具和 `cngal_asset`，Skills 设为空列表。如使用其他人设 ID，须同步修改配置补丁中的引用。
 
 群聊通过“看板娘”或 @机器人唤醒；获准私聊可直接交流。会话总开关、会话插件开关和 AI 开关仍由 AstrBot 原生管理。仅开启模型或添加通配路由不等于授权聊天。
+
+群聊上下文保持开启（`group_icl_enable=true`），使用 AstrBot 原生内存缓存，最多保留最近 30 条群消息。获准群内未唤醒机器人的普通消息也可能随提问发送给所选模型，部署方应向群成员说明。关闭群消息历史持久化（`group_message_history_enable=false`）不代表消息不会进入模型上下文；主动回复仍关闭（`active_reply.enable=false`）。
 
 仓库不提供人设正文，由管理员自行编写、维护并通过 AstrBot 原生人设管理导入；插件不会自动覆盖已有的人设。生日是公开固定信息，代码按上海日期计算并注入当前年龄。
 

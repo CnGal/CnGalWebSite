@@ -35,7 +35,7 @@ namespace CnGalWebSite.APIServer.Application.Stores
 
         public Task<int> CountDiscountedGamesAsync(CancellationToken cancellationToken = default)
             => _storeInfoRepository.GetAll().AsNoTracking()
-                .Where(s => s.PlatformType == PublishPlatformType.Steam && s.CutNow > 0
+                .Where(s => s.PlatformType == PublishPlatformType.Steam && s.CutNow > 0 && s.State != StoreState.Takedown
                     && s.Entry != null && s.Entry.Type == EntryType.Game && !s.Entry.IsHidden
                     && !string.IsNullOrWhiteSpace(s.Entry.Name))
                 .Select(s => s.Entry.Id).Distinct().CountAsync(cancellationToken);
