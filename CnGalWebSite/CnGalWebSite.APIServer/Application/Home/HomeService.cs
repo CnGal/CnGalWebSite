@@ -54,6 +54,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                 {
                     s.MainPicture,
                     s.DisplayName,
+                    s.Name,
                     s.Id,
                     s.BriefIntroduction,
                     s.Tags,
@@ -71,7 +72,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                     {
                         Id = item.Id,
                         Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
-                        Name = item.DisplayName,
+                        Name = string.IsNullOrWhiteSpace(item.DisplayName) ? item.Name : item.DisplayName,
                         Url = "entries/index/" + item.Id,
                         BriefIntroduction = item.BriefIntroduction,
                         Tags = item.Tags.Where(s => s.Name.Contains("字幕") == false && s.Name.Contains("语音") == false && s.Name.Contains("界面") == false).Select(s => s.Name).ToList()
@@ -102,7 +103,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                     {
                         Id = item.Id,
                         Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
-                        Name = item.DisplayName,
+                        Name = string.IsNullOrWhiteSpace(item.DisplayName) ? item.Name : item.DisplayName,
                         Url = "entries/index/" + item.Id,
                         BriefIntroduction = item.BriefIntroduction,
                         Tags = item.Tags.Where(s => s.Name.Contains("字幕") == false && s.Name.Contains("语音") == false && s.Name.Contains("界面") == false).Select(s => s.Name).ToList()
@@ -136,7 +137,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                     {
                         Id = item.Id,
                         Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
-                        Name = item.DisplayName,
+                        Name = string.IsNullOrWhiteSpace(item.DisplayName) ? item.Name : item.DisplayName,
                         Url = "entries/index/" + item.Id,
                         PublishTime = item.LastEditTime.ToTimeFromNowString()
                     });
@@ -162,7 +163,7 @@ namespace CnGalWebSite.APIServer.Application.Home
                     {
                         Id = item.Id,
                         Image = _appHelper.GetImagePath(item.MainPicture, "app.png"),
-                        Name = item.DisplayName,
+                        Name = string.IsNullOrWhiteSpace(item.DisplayName) ? item.Name : item.DisplayName,
                         Url = "entries/index/" + item.Id,
                         BriefIntroduction = item.BriefIntroduction,
                     };

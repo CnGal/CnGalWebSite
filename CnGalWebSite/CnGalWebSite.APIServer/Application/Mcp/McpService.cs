@@ -108,7 +108,7 @@ public sealed class McpService(
         // day 为 0 时查询整月；使用闰年校验日期，以支持 2 月 29 日。
         var date = new DateOnly(2000, month ?? today.Month, selectedDay == 0 ? 1 : selectedDay);
         var roles = await entries.GetBirthdayRoles(date.Month, selectedDay).WaitAsync(cancellationToken);
-        return Result(roles.DistinctBy(x => x.Id).OrderBy(x => x.Id).Select(Item));
+        return Result(roles.DistinctBy(x => x.Id).OrderBy(x => x.Brithday.Day).ThenBy(x => x.Id).Select(Item));
     }
 
     public async Task<McpDiscountSummary> GetDiscountSummaryAsync(CancellationToken cancellationToken = default)

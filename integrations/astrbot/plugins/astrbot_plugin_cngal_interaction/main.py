@@ -42,6 +42,8 @@ class EarlyQQPolicy(filter.CustomFilter):
         event.set_extra("cngal_binding", binding)
         scope = (self.policy.binding_scope(event) if binding is not None else self.policy.interaction_scope(event)) if self.policy else False
         if not scope:
+            if binding is None:
+                return False
             event.stop_event()
             # 阻止原生命令过滤器在同一阶段继续回复。
             event.is_at_or_wake_command = False
@@ -126,8 +128,13 @@ class CnGalInteraction(Star):
     async def before_ai(self, event: AstrMessageEvent, req: ProviderRequest):
         if event.get_platform_name() != "aiocqhttp":
             return
+        if event.get_extra("cngal_binding") is not None or event.get_extra("cngal_binding_handled"):
+            event.stop_event()
+            return
+        if not event.get_extra("cngal_admitted") and not self.policy.interaction_scope(event):
+            return
         event.set_extra("cngal_asset_agent_done", None)
-        if event.get_extra("cngal_binding") is not None or event.get_extra("cngal_binding_handled") or not self.ai_trigger(event) or not await self.ai_allowed(event):
+        if not self.ai_trigger(event) or not await self.ai_allowed(event):
             event.stop_event()
             return
         if not await self.admit(event):
