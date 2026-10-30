@@ -513,7 +513,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
         {
             var model = new NewsModel
             {
-                Title = article.DisplayName ?? article.Name,
+                Title = string.IsNullOrWhiteSpace(article.DisplayName) ? article.Name : article.DisplayName,
                 BriefIntroduction = article.BriefIntroduction,
                 Link = article.OriginalLink ?? ("/articles/index/" + article.Id),
                 HappenedTime = article.RealNewsTime ?? article.PubishTime,
