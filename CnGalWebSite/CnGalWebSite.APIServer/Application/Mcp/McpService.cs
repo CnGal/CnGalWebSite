@@ -12,6 +12,7 @@ using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Mcp;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using ModelContextProtocol;
 
 namespace CnGalWebSite.APIServer.Application.Mcp;
 
@@ -42,9 +43,9 @@ public sealed class McpService(
 
     public async Task<McpQueryResult> SearchAsync(string text, int currentPage = 1, CancellationToken cancellationToken = default)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(text);
-        if (text.Length > 200) throw new ArgumentOutOfRangeException(nameof(text));
-        if (currentPage < 1 || currentPage > 1000) throw new ArgumentOutOfRangeException(nameof(currentPage));
+        if (string.IsNullOrWhiteSpace(text)) throw new McpException("搜索关键词 text 不能为空。");
+        if (text.Length > 200) throw new McpException("搜索关键词 text 不能超过 200 个字符。");
+        if (currentPage < 1 || currentPage > 1000) throw new McpException("页码 current_page 必须在 1 到 1000 之间。");
         var input = SearchInputModel.Parse(["Entry", "Article"], [], text, SearchSortField.Default, SortDirection.Descending, 1);
         // 网页与 MCP 每页数量不同，来源链接保留搜索条件并指向第一页。
         var sourceUrl = $"search{input.ToPageQueryString()}";
@@ -58,14 +59,14 @@ public sealed class McpService(
 
     public async Task<McpQueryResult> GetEntryAsync(int id, CancellationToken cancellationToken = default)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
+        if (id <= 0) throw new McpException("词条 ID id 必须大于 0。");
         var entry = await entries.GetPublicSummaryAsync(id, cancellationToken);
         return Result(entry is null ? [] : [Item(entry)], $"entries/{id}");
     }
 
     public async Task<McpQueryResult> GetArticleAsync(long id, CancellationToken cancellationToken = default)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(id);
+        if (id <= 0) throw new McpException("文章 ID id 必须大于 0。");
         var article = await articles.GetPublicSummaryAsync(id, cancellationToken);
         return Result(article is null ? [] : [Item(article)], $"articles/{id}");
     }
@@ -102,11 +103,19 @@ public sealed class McpService(
 
     public async Task<McpQueryResult> GetRoleBirthdaysAsync(int? month = null, int? day = null, CancellationToken cancellationToken = default)
     {
-        if (month.HasValue != day.HasValue) throw new ArgumentException("月份和日期必须同时填写，或同时留空。");
+        if (month.HasValue != day.HasValue) throw new McpException("月份 month 和日期 day 必须同时填写，或同时留空。");
         var today = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTimeOffset.UtcNow, "Asia/Shanghai");
         var selectedDay = day ?? today.Day;
         // day 为 0 时查询整月；使用闰年校验日期，以支持 2 月 29 日。
-        var date = new DateOnly(2000, month ?? today.Month, selectedDay == 0 ? 1 : selectedDay);
+        DateOnly date;
+        try
+        {
+            date = new DateOnly(2000, month ?? today.Month, selectedDay == 0 ? 1 : selectedDay);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            throw new McpException("月份 month 必须在 1 到 12 之间，日期 day 必须是当月有效日期；day=0 表示查询整月。");
+        }
         var roles = await entries.GetBirthdayRoles(date.Month, selectedDay).WaitAsync(cancellationToken);
         return Result(roles.DistinctBy(x => x.Id).OrderBy(x => x.Brithday.Day).ThenBy(x => x.Id).Select(Item));
     }
