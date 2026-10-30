@@ -47,6 +47,10 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         Task<EntryIndexViewModel> GetEntryIndexViewModelAsync(Entry entry, bool renderMarkdown = true);
 
+        Task<EntryInforTipViewModel> GetPublicSummaryAsync(int id, System.Threading.CancellationToken cancellationToken = default);
+
+        Task<int?> GetRandomPublicGameIdAsync(System.Threading.CancellationToken cancellationToken = default);
+
         List<KeyValuePair<object, Operation>> ExaminesCompletion(Entry currentEntry, Entry newEntry);
 
         Task<List<EntryIndexViewModel>> ConcompareAndGenerateModel(Entry currentEntry, Entry newEntry);

@@ -1,6 +1,7 @@
 using CnGalWebSite.APIServer.Application.BackgroundTasks;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.News;
+using CnGalWebSite.APIServer.Application.Mcp;
 using CnGalWebSite.APIServer.Application.Search;
 using CnGalWebSite.APIServer.Application.Search.Meilisearch;
 using CnGalWebSite.APIServer.CustomMiddlewares;
@@ -56,6 +57,8 @@ namespace CnGalWebSite.APIServer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddApiConfiguration();
+            services.AddScoped<McpService>();
+            services.AddMcpServer().WithHttpTransport(options => options.Stateless = true).WithTools<McpTools>();
             services.AddProblemDetails();
             services.AddExceptionHandler<ConfigurationExceptionHandler>();
             services.AddConfiguredMeilisearch();
@@ -246,6 +249,7 @@ namespace CnGalWebSite.APIServer
             //添加终结点
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapMcp("/mcp").AllowAnonymous();
                 endpoints.MapControllers()
                     .RequireAuthorization("ApiScope");
             });

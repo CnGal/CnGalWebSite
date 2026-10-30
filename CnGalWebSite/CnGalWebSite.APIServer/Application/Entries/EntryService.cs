@@ -88,6 +88,32 @@ namespace CnGalWebSite.APIServer.Application.Entries
             _entryInformationTypeRepository = entryInformationTypeRepository;
         }
 
+        public async Task<EntryInforTipViewModel> GetPublicSummaryAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var entry = await _entryRepository.GetAll().AsNoTracking()
+                .Where(s => s.Id == id && !s.IsHidden && !string.IsNullOrWhiteSpace(s.Name))
+                .Select(s => new Entry
+                {
+                    Id = s.Id, Name = s.Name, DisplayName = s.DisplayName, Type = s.Type,
+                    BriefIntroduction = s.BriefIntroduction, LastEditTime = s.LastEditTime,
+                    ReaderCount = s.ReaderCount, CommentCount = s.CommentCount, PubulishTime = s.PubulishTime,
+                    Thumbnail = s.Thumbnail, MainPicture = s.MainPicture
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+            return entry == null ? null : _appHelper.GetEntryInforTipViewModel(entry);
+        }
+
+        public async Task<int?> GetRandomPublicGameIdAsync(CancellationToken cancellationToken = default)
+        {
+            var query = _entryRepository.GetAll().AsNoTracking()
+                .Where(s => s.Type == EntryType.Game && !s.IsHidden && !string.IsNullOrWhiteSpace(s.Name));
+            var count = await query.CountAsync(cancellationToken);
+            if (count == 0) return null;
+
+            return await query.OrderBy(s => s.Id).Skip(Random.Shared.Next(count))
+                .Select(s => (int?)s.Id).FirstOrDefaultAsync(cancellationToken);
+        }
+
         public async Task<PagedResultDto<Entry>> GetPaginatedResult(GetEntryInput input)
         {
             var query = _entryRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false);
@@ -3053,12 +3079,29 @@ namespace CnGalWebSite.APIServer.Application.Entries
         public async Task<List<RoleBrithdayViewModel>> GetBirthdayRoles(int month, int day = 0)
         {
             List<RoleBrithdayViewModel> model = new List<RoleBrithdayViewModel>();
-            var date = DateTime.UtcNow;
-
             var roles = await _roleBirthdayRepository.GetAll().AsNoTracking()
-                .Include(s => s.Role).ThenInclude(s => s.EntryRelationFromEntryNavigation).ThenInclude(s => s.ToEntryNavigation)
-                .Where(s => s.Birthday.Date.Month == month && (day == 0 || s.Birthday.Date.Day == day))
-                .ToListAsync();
+                .Where(s => s.Birthday.Date.Month == month && (day == 0 || s.Birthday.Date.Day == day)
+                    && s.Role != null && s.Role.Type == EntryType.Role && !s.Role.IsHidden
+                    && !string.IsNullOrWhiteSpace(s.Role.Name))
+                .Select(s => new
+                {
+                    s.Birthday,
+                    Role = new Entry
+                    {
+                        Id = s.Role.Id, Name = s.Role.Name, DisplayName = s.Role.DisplayName, Type = s.Role.Type,
+                        BriefIntroduction = s.Role.BriefIntroduction, LastEditTime = s.Role.LastEditTime,
+                        ReaderCount = s.Role.ReaderCount, CommentCount = s.Role.CommentCount,
+                        PubulishTime = s.Role.PubulishTime, Thumbnail = s.Role.Thumbnail,
+                        EntryRelationFromEntryNavigation = s.Role.EntryRelationFromEntryNavigation.Select(r => new EntryRelation
+                        {
+                            ToEntryNavigation = new Entry
+                            {
+                                Id = r.ToEntryNavigation.Id, DisplayName = r.ToEntryNavigation.DisplayName,
+                                Type = r.ToEntryNavigation.Type, IsHidden = r.ToEntryNavigation.IsHidden
+                            }
+                        }).ToList()
+                    }
+                }).ToListAsync();
 
             foreach (var role in roles)
             {

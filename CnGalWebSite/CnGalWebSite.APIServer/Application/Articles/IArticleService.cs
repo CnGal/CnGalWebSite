@@ -36,6 +36,8 @@ namespace CnGalWebSite.APIServer.Application.Articles
 
         ArticleViewModel GetArticleViewModelAsync(Article article, bool renderMarkdown = true);
 
+        Task<ArticleInforTipViewModel> GetPublicSummaryAsync(long id, System.Threading.CancellationToken cancellationToken = default);
+
         List<KeyValuePair<object, Operation>> ExaminesCompletion(Article currentArticle, Article newArticle);
 
         List<ArticleViewModel> ConcompareAndGenerateModel(Article currentArticle, Article newArticle);

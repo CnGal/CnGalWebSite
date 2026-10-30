@@ -1,0 +1,67 @@
+name: Publish AstrBot plugin
+
+on:
+  workflow_dispatch: # 手动发布已验证的默认分支提交
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-astrbot-plugin
+
+env:
+  PLUGIN_PATH: integrations/astrbot/plugins/astrbot_plugin_cngal_interaction
+  RELEASE_BRANCH: astrbot-plugin
+
+jobs:
+  publish:
+    if: ${{ github.ref_name == github.event.repository.default_branch }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出触发提交
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+
+      - name: 设置 uv 和 Python
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.15.1"
+          enable-cache: false
+
+      - name: 打包并检查公开内容
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv --version
+          # 全新 runner 可能尚未安装指定解释器，首次运行允许 uv 下载。
+          uv run --no-project python --version
+          uv run --no-project --no-python-downloads python integrations/astrbot/tools/package.py --output "$RUNNER_TEMP/astrbot-dist"
+          uv run --no-project --no-python-downloads python integrations/astrbot/tools/check_package.py --output "$RUNNER_TEMP/astrbot-dist" --repository "$GITHUB_REPOSITORY" --github-output "$GITHUB_OUTPUT"
+
+      - name: 更新发布分支
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ steps.package.outputs.version }}
+        run: |
+          set -euo pipefail
+          release_ref="refs/heads/$RELEASE_BRANCH"
+          tree=$(git rev-parse "$GITHUB_SHA:$PLUGIN_PATH")
+          remote=$(git ls-remote --heads origin "$release_ref")
+          parents=()
+          if [[ -n "$remote" ]]; then
+            git fetch --no-tags origin "$release_ref"
+            parent=$(git rev-parse FETCH_HEAD)
+            if [[ "$(git rev-parse "$parent^{tree}")" == "$tree" ]]; then
+              printf '公开插件内容未变化，跳过发布。来源提交：%s\n' "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            parents=(-p "$parent")
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          # 发布提交只引用插件子树，父提交也仅来自发布分支。
+          commit=$(git -c commit.gpgsign=false commit-tree "$tree" "${parents[@]}" -m "发布 CnGal 插件 v$RELEASE_VERSION" -m "来源提交：$GITHUB_SHA")
+          git push origin "$commit:$release_ref"
+          printf '已发布 v%s 到 %s。来源提交：%s；发布提交：%s\n' "$RELEASE_VERSION" "$RELEASE_BRANCH" "$GITHUB_SHA" "$commit" >> "$GITHUB_STEP_SUMMARY"

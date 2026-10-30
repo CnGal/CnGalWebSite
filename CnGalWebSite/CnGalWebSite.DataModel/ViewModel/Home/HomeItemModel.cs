@@ -3,12 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.DataModel.ViewModel.Home
 {
     public class HomeItemModel
     {
+        /// <summary>
+        /// 内容 ID，未提供时不输出。
+        /// </summary>
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+        public long Id { get; set; }
+
         /// <summary>
         /// 名称
         /// </summary>
