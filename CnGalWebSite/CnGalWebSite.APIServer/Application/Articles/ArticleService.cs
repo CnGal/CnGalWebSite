@@ -60,7 +60,15 @@ namespace CnGalWebSite.APIServer.Application.Articles
         public async Task<ArticleInforTipViewModel> GetPublicSummaryAsync(long id, CancellationToken cancellationToken = default)
         {
             var article = await _articleRepository.GetAll().AsNoTracking()
-                .FirstOrDefaultAsync(s => s.Id == id && !s.IsHidden && !string.IsNullOrWhiteSpace(s.Name), cancellationToken);
+                .Where(s => s.Id == id && !s.IsHidden && !string.IsNullOrWhiteSpace(s.Name))
+                .Select(s => new Article
+                {
+                    Id = s.Id, Name = s.Name, DisplayName = s.DisplayName, Type = s.Type,
+                    CreateUserId = s.CreateUserId, MainPicture = s.MainPicture, BriefIntroduction = s.BriefIntroduction,
+                    LastEditTime = s.LastEditTime, ReaderCount = s.ReaderCount, ThumbsUpCount = s.ThumbsUpCount,
+                    CommentCount = s.CommentCount, OriginalLink = s.OriginalLink
+                })
+                .FirstOrDefaultAsync(cancellationToken);
             return article == null ? null : _appHelper.GetArticleInforTipViewModel(article);
         }
 
