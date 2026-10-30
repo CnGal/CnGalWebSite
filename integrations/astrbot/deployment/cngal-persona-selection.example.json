@@ -1,0 +1,18 @@
+{
+  "persona_id": "cngal",
+  "tools": [
+    "search_cngal",
+    "get_entry",
+    "get_article",
+    "get_latest_games",
+    "get_latest_demo_games",
+    "get_upcoming_games",
+    "get_news",
+    "get_random_game",
+    "get_role_birthdays",
+    "get_recently_updated_games",
+    "get_discount_summary",
+    "cngal_asset"
+  ],
+  "skills": []
+}
