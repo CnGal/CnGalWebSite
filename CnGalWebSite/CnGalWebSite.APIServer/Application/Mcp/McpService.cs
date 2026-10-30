@@ -15,29 +15,27 @@ using CnGalWebSite.DataModel.ViewModel.Search;
 
 namespace CnGalWebSite.APIServer.Application.Mcp;
 
-/// <summary>复用现有查询，整理为 MCP 工具使用的简要结果。</summary>
+/// <summary>直接调用 API 内部服务，整理为 MCP 工具使用的简要结果。</summary>
 public sealed class McpService(
     IHomeService home, ISearchHelper search, IEntryService entries, IArticleService articles,
-    IStoreInfoService stores, IOptions<SiteOptions> site)
+    IStoreInfoService stores)
 {
     private static string Text(string? value) => WebUtility.HtmlDecode(
         Regex.Replace(value ?? "", "<[^>]*>", " ", RegexOptions.None, TimeSpan.FromSeconds(1))).Trim();
 
-    private string Url(string? value) => site.Value.GetUrl(value);
+    private static McpQueryResult Result(IEnumerable<McpItem> items, string source = "/", int? total = null, int page = 1)
+        => new() { Items = items.Take(6).ToList(), SourceUrl = source, Total = total, Page = page };
 
-    private McpQueryResult Result(IEnumerable<McpItem> items, string source = "", int? total = null, int page = 1)
-        => new() { Items = items.Take(6).ToList(), SourceUrl = Url(source), Total = total, Page = page };
-
-    private McpItem Item(EntryInforTipViewModel entry) => new()
+    private static McpItem Item(EntryInforTipViewModel entry) => new()
     {
         Id = entry.Id, Title = Text(entry.Name), Summary = Text(entry.BriefIntroduction),
-        Url = Url($"entries/{entry.Id}")
+        Url = $"entries/{entry.Id}"
     };
 
-    private McpItem Item(ArticleInforTipViewModel article) => new()
+    private static McpItem Item(ArticleInforTipViewModel article) => new()
     {
         Id = article.Id, Kind = "article", Title = Text(string.IsNullOrWhiteSpace(article.DisplayName) ? article.Name : article.DisplayName),
-        Summary = Text(article.BriefIntroduction), Url = Url($"articles/{article.Id}")
+        Summary = Text(article.BriefIntroduction), Url = $"articles/{article.Id}"
     };
 
     public async Task<McpQueryResult> SearchAsync(string text, int currentPage = 1, CancellationToken cancellationToken = default)
@@ -66,10 +64,10 @@ public sealed class McpService(
         return Result(article is null ? [] : [Item(article)], $"articles/{id}");
     }
 
-    private async Task<McpQueryResult> HomeAsync<T>(Func<Task<List<T>>> query, Func<T, string?> summary, CancellationToken cancellationToken) where T : HomeItemModel
+    private static async Task<McpQueryResult> HomeAsync<T>(Func<Task<List<T>>> query, Func<T, string?> summary, CancellationToken cancellationToken) where T : HomeItemModel
     {
         var items = await query().WaitAsync(cancellationToken);
-        return Result(items.Select(x => new McpItem { Title = Text(x.Name), Summary = Text(summary(x)), Url = Url(x.Url) }));
+        return Result(items.Select(x => new McpItem { Title = Text(x.Name), Summary = Text(summary(x)), Url = x.Url }));
     }
 
     public Task<McpQueryResult> GetLatestGamesAsync(CancellationToken cancellationToken = default)
@@ -86,7 +84,7 @@ public sealed class McpService(
         var items = await home.GetHomeNewsViewAsync().WaitAsync(cancellationToken);
         return Result(items.Select(x => new McpItem
         {
-            Id = x.ArticleId, Kind = "article", Title = Text(x.Title), Summary = Text(x.Text), Url = Url(x.Link)
+            Id = x.ArticleId, Kind = "article", Title = Text(x.Title), Summary = Text(x.Text), Url = x.Link
         }));
     }
 
@@ -108,5 +106,5 @@ public sealed class McpService(
     }
 
     public async Task<McpDiscountSummary> GetDiscountSummaryAsync(CancellationToken cancellationToken = default)
-        => new() { Count = await stores.CountDiscountedGamesAsync(cancellationToken), Url = Url("discount") };
+        => new() { Count = await stores.CountDiscountedGamesAsync(cancellationToken), Url = "discount" };
 }

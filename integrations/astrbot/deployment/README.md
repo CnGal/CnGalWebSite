@@ -18,15 +18,7 @@ https://github.com/CnGal/CnGalWebSite/tree/astrbot-plugin
 
 部署包含本次修改的 `CnGalWebSite.APIServer`，`/mcp` 与现有 API 共用进程、容器和监听端口。该入口只公开 11 个只读查询工具，沿用站内公开资料的可见范围；无需单独 MCP 容器、RabbitMQ 接入或新增令牌。
 
-在 API 配置中设置公开站点地址，AstrBot 的 MCP 查询结果通过此配置生成站内链接：
-
-```json
-{
-  "Site": { "PublicBaseUrl": "https://www.cngal.org/" }
-}
-```
-
-容器环境变量对应 `Site__PublicBaseUrl`。这里填写用户访问的站点地址，API 地址则用于连接和绑定。有效的外部新闻来源链接会保留。
+MCP 在 API 进程内通过依赖注入直接调用已有业务服务，无需通过 HTTP 回调 API 获取数据。查询结果中的站内链接使用相对路径，已有服务返回的链接保持原样；无需额外配置站点域名。
 
 在 AstrBot 原生 MCP 管理中按 [mcp_server.example.json](mcp_server.example.json) 添加服务，传输方式为 `streamable_http`，URL 指向 API 的 `/mcp`。示例为 `https://api.cngal.org/mcp`；内部容器地址可使用实际 API 服务名与端口。确保 AstrBot 进程能访问该地址，反向代理将 `/mcp` 转发至现有 API，并允许流式响应。连接成功后应发现 11 个 CnGal 查询工具。
 
