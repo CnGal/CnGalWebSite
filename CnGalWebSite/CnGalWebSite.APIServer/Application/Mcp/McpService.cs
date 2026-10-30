@@ -90,7 +90,7 @@ public sealed class McpService(
         var items = await home.GetHomeNewsViewAsync().WaitAsync(cancellationToken);
         return Result(items.Select(x => new McpItem
         {
-            Id = x.ArticleId, Kind = "article", Title = Text(x.Title), Summary = Text(x.Text), Url = x.Link
+            Id = x.ArticleId, Kind = "article", Title = Text(x.Text), Summary = Text(x.Title), Url = x.Link
         }));
     }
 
