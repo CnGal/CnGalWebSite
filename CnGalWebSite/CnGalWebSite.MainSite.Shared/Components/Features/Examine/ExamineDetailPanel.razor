@@ -21,7 +21,7 @@
         <div class="examine-detail-panel__alert" role="status"><strong>请先处理前置审核</strong><a href="/examine?Id=@_record.PrepositionExamineId">查看前置审核 #@_record.PrepositionExamineId →</a></div>
     }
     <ReviewContent Model="_record" />
-    <RecordNotes Overview="@_record.EditOverview" Comments="@_record.Comments" Note="@_record.Note" ShowEmpty="true" />
+    <RecordNotes Comments="@_record.Comments" Note="@_record.Note" ShowEmpty="true" />
     @if (_record.ContributionValue > 0)
     { <p class="examine-detail-panel__contribution">附加贡献值 <strong>@_record.ContributionValue</strong></p> }
     @if (_record.SensitiveWords is { Count: > 0 })

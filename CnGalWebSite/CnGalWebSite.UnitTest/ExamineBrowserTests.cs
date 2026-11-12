@@ -152,8 +152,8 @@ public class ExamineBrowserTests
         await Expect(_page.Locator(".record-notes__empty")).ToHaveCountAsync(1);
         await Expect(_page.Locator(".record-comparison__empty")).ToBeVisibleAsync();
         await _page.GotoAsync(Site + "/examine?Id=102");
-        await Expect(_page.Locator(".record-notes")).ToContainTextAsync("原始数据");
         await Expect(_page.Locator(".record-notes")).ToContainTextAsync("资料已核对。");
+        await Expect(_page.Locator(".record-notes")).Not.ToContainTextAsync("原始数据");
         await Expect(_page.GetByRole(AriaRole.Button, new() { Name = "通过", Exact = true })).ToHaveCountAsync(0);
     }
 
