@@ -215,13 +215,16 @@
                     <CgInput @bind-Value="_editingGameNews.WeiboId" Placeholder="请输入微博Id" />
                 </CgFormGroup>
                 <CgFormGroup Label="关联词条名称">
-                    <CgAutoComplete RestrictToItems="true" @bind-Value="_editingGameNews.AuthorEntryName" Items="_allEntryNames" Placeholder="请输入关联词条名称" />
+                    <CgAutoComplete RestrictToItems="true" @bind-Value="_editingGameNews.AuthorEntryName" Items="_allEntryNames"
+                                    Placeholder="请输入关联词条名称" Disabled="_isLoadingEntryOptions || _entryOptionsLoadFailed" />
                 </CgFormGroup>
             </CgGrid>
         </CgFormSection>
 
         <CgFormSection Title="关联词条" Icon="mdiLinkVariant" Flat>
-            <CnGalWebSite.MainSite.Shared.Components.Features.Entry.Editor.EntryRelevanceListEditor Title="词条" Items="_editingGameNews.Entries" AutoCompleteItems="_allEntryNames" />
+            <CnGalWebSite.MainSite.Shared.Components.Features.Entry.Editor.EntryRelevanceListEditor Title="词条"
+                    Items="_editingGameNews.Entries" AutoCompleteItems="_allEntryNames"
+                    Disabled="_isLoadingEntryOptions || _entryOptionsLoadFailed" />
         </CgFormSection>
 
         <CgFormSection Title="正文" Icon="mdiTextBoxOutline" Flat>

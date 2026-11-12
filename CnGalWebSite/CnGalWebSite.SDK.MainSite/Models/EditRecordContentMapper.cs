@@ -61,7 +61,8 @@ public static class EditRecordContentMapper
     public static ExaminePreDataModel Map(ArticleViewModel value)
     {
         var result = Create(value.MainPage, ("名称", value.Name), ("显示名称", value.DisplayName),
-            ("简介", value.BriefIntroduction), ("类型", value.Type), ("原作者", value.OriginalAuthor), ("发布时间", value.PubishTime));
+            ("简介", value.BriefIntroduction), ("类型", value.Type), ("原作者", value.OriginalAuthor), ("发布时间", value.PubishTime),
+            ("真实动态时间", value.RealNewsTime), ("动态类型", value.NewsType), ("用户创作", value.IsCreatedByCurrentUser));
         Images(result, ("主图", value.MainPicture), ("背景图", value.BackgroundPicture), ("小背景图", value.SmallBackgroundPicture));
         Link(result, "原文链接", value.OriginalLink);
         result.Outlinks.AddRange(value.RelatedOutlinks ?? []);

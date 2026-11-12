@@ -12,49 +12,52 @@ STATE = {}
 COUNTS = {}
 
 
-def item(key, group, kind, label, value, display=None, url=None, properties=None):
-    return {
-        "key": key,
-        "group": group,
-        "kind": kind,
-        "label": label,
-        "value": value,
-        "displayValue": display if display is not None else value,
-        "url": url,
-        "html": value if kind == 0 else None,
-        "properties": properties or [],
-        "isKnown": True,
-    }
-
-
-def content(new=False):
+def legacy_content(new=False):
     body = ("<h2>故事与角色</h2><p>"
             + ("补充后的故事介绍。" if new else "原有的故事介绍。") * 8
             + "</p><table><tr><th>项目</th><th>说明</th></tr><tr><td>世界观</td><td>一段新的旅程</td></tr></table>")
     name = "夏日回响 · 特别篇" if new else "夏日回响"
     intro = (("修改后的文本内容。\n" if new else "这是一条多行的简介。\n") * 12)
     return {
-        "items": [
-            item("body", "正文", 0, "正文", body),
-            item("main/Name", "主要信息", 1, "名称", name),
-            item("main/BriefIntroduction", "主要信息", 1, "简介", intro),
-            item("main/AnotherName", "主要信息", 1, "别称", "Echoes"),
-            item("picture/main", "图片", 2, "主视觉 · 2026", MEDIA, url=MEDIA,
-                 properties=[{"key": "Priority", "label": "优先级", "value": "1", "displayValue": "1"}]),
-            item("relation/entry/42", "关联词条", 3, "关联作品", "entry:42", display="关联作品", url="/entries/index/42"),
-            item("relation/tag/3", "关联标签", 3, "视觉小说", "tag:3", display="视觉小说", url="/tags/index/3"),
-            item("outlink/官网", "外链", 4, "官方网站", "https://example.com/" + "long-path/" * 14,
-                 display="https://example.com/" + "long-path/" * 14, url="https://example.com/" + "long-path/" * 14,
-                 properties=[{"key": "description", "label": "说明", "value": "官方网站", "displayValue": "官方网站"}]),
-            item("audio/theme", "音频", 5, "主题曲试听", f"http://127.0.0.1:{PORT}/fixture-audio.mp3",
-                 url=f"http://127.0.0.1:{PORT}/fixture-audio.mp3"),
+        "mainPage": body,
+        "texts": [{
+            "modifier": "主要信息",
+            "informations": [
+                {"displayName": "名称", "displayValue": name},
+                {"displayName": "简介", "displayValue": intro},
+                {"displayName": "别称", "displayValue": "Echoes"},
+            ],
+        }],
+        "pictures": [{"note": "主视觉 · 2026", "url": MEDIA, "priority": 1}],
+        "relevances": [
+            {"entry": {"id": 42, "name": "关联作品"}},
+            {"tag": {"id": 3, "name": "视觉小说"}},
         ],
-        "isComplete": True,
+        "outlinks": [{
+            "displayName": "官方网站",
+            "displayValue": "https://example.com/" + "long-path/" * 14,
+            "link": "https://example.com/" + "long-path/" * 14,
+        }],
+        "audio": [{
+            "name": "主题曲试听",
+            "url": f"http://127.0.0.1:{PORT}/fixture-audio.mp3",
+            "briefIntroduction": "主题曲试听片段",
+            "thumbnail": MEDIA,
+            "priority": 1,
+            "duration": "00:03:00",
+        }],
     }
 
 
-def empty_model(complete=False):
-    return {"items": [], "isComplete": complete}
+def empty_model():
+    return {
+        "mainPage": "",
+        "texts": [],
+        "pictures": [],
+        "relevances": [],
+        "outlinks": [],
+        "audio": [],
+    }
 
 
 def record(record_id):
@@ -71,8 +74,8 @@ def record(record_id):
         "applyTime": "2026-11-12T09:30:00",
         "isAdmin": True,
         "isPassed": None if record_id >= 100 else True,
-        "beforeModel": content(),
-        "afterModel": content(True),
+        "beforeModel": legacy_content(),
+        "afterModel": legacy_content(True),
         "editOverview": "<p>补充游戏简介与关联资料，更新主视觉。</p><p><del>原有介绍</del> <ins>补充后的介绍</ins></p>",
         "comments": "",
         "note": "资料来源：官方发布信息。\n补充内容已核对。",
@@ -105,8 +108,12 @@ def record(record_id):
             submissionOnly=True,
             beforeModel=empty_model(),
             afterModel={
-                "items": [item("body", "正文", 0, "正文", "<p>这是一条单份评论内容。</p>")],
-                "isComplete": True,
+                "mainPage": "<p>这是一条单份评论内容。</p>",
+                "texts": [],
+                "pictures": [],
+                "relevances": [],
+                "outlinks": [],
+                "audio": [],
             },
         )
     if record_id == 110:
@@ -114,10 +121,12 @@ def record(record_id):
             image=f"http://127.0.0.1:{PORT}/missing.png",
             beforeModel=empty_model(),
             afterModel={
-                "items": [item("picture/missing", "图片", 2, "失效图片",
-                               f"http://127.0.0.1:{PORT}/missing.png",
-                               url=f"http://127.0.0.1:{PORT}/missing.png")],
-                "isComplete": True,
+                "mainPage": "",
+                "texts": [],
+                "pictures": [{"note": "失效图片", "url": f"http://127.0.0.1:{PORT}/missing.png", "priority": 1}],
+                "relevances": [],
+                "outlinks": [],
+                "audio": [],
             },
         )
     if record_id == 111:
@@ -152,16 +161,13 @@ def overview(record_id):
     }
 
 
-def snapshot(version):
+def entry_model(version):
     return {
-        "items": [
-            item("main/Name", "主要信息", 1, "名称", "夏日回响"),
-            item("main/BriefIntroduction", "主要信息", 1, "简介", f"截至记录 #{version} 的简介。"),
-            item("main/MainPicture", "主要信息", 2, "主图", MEDIA, url=MEDIA),
-            item("body", "正文", 0, "正文", f"<h2>版本 #{version}</h2><p>历史还原内容，与当前审核详情独立。</p>"),
-            item("relation/entry/42", "关联词条", 3, "关联作品", "entry:42", display="关联作品", url="/entries/index/42"),
-        ],
-        "isComplete": True,
+        "mainPage": f"<h2>版本 #{version}</h2><p>历史还原内容，与当前审核详情独立。</p>",
+        "name": "夏日回响",
+        "briefIntroduction": f"截至记录 #{version} 的简介。",
+        "mainPicture": MEDIA,
+        "information": [{"name": "别称", "value": "Echoes"}],
     }
 
 
@@ -210,8 +216,8 @@ class Handler(BaseHTTPRequestHandler):
             return self.send({
                 "contrastId": before,
                 "currentId": after,
-                "before": snapshot(before),
-                "after": snapshot(after),
+                "contrastModel": entry_model(before),
+                "currentModel": entry_model(after),
             })
         return self.send([])
 

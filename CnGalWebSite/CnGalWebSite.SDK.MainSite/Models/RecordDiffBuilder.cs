@@ -94,9 +94,20 @@ public static class RecordDiffBuilder
     }
 
     private static bool Equal(RecordPreviewItem left, RecordPreviewItem right) => left.Kind == right.Kind
+        && Normalize(left.Group) == Normalize(right.Group)
+        && Normalize(left.Label) == Normalize(right.Label)
         && Normalize(left.Value) == Normalize(right.Value)
-        && left.Properties.OrderBy(p => p.Key, StringComparer.Ordinal).Select(p => (p.Key, Normalize(p.Value)))
-            .SequenceEqual(right.Properties.OrderBy(p => p.Key, StringComparer.Ordinal).Select(p => (p.Key, Normalize(p.Value))));
+        && Normalize(left.DisplayValue) == Normalize(right.DisplayValue)
+        && Normalize(left.Url) == Normalize(right.Url)
+        && Normalize(left.Html) == Normalize(right.Html)
+        && PropertiesEqual(left.Properties, right.Properties);
+
+    private static bool PropertiesEqual(
+        IEnumerable<RecordPreviewProperty> left, IEnumerable<RecordPreviewProperty> right) =>
+        left.OrderBy(p => p.Key, StringComparer.Ordinal)
+            .Select(p => (p.Key, p.Label, Normalize(p.Value), Normalize(p.DisplayValue)))
+            .SequenceEqual(right.OrderBy(p => p.Key, StringComparer.Ordinal)
+                .Select(p => (p.Key, p.Label, Normalize(p.Value), Normalize(p.DisplayValue))));
 
     private static bool Meaningful(RecordPreviewItem item) => !string.IsNullOrEmpty(item.Value)
         || item.Properties.Any(p => !string.IsNullOrEmpty(p.Value));

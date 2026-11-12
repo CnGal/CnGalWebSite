@@ -1423,11 +1423,6 @@ namespace CnGalWebSite.APIServer.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<EntryContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
         {
-            if (contrastId > currentId)
-            {
-                return BadRequest("对比的编辑必须先于当前的编辑");
-            }
-
             var contrastExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId);
             var currentExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == currentId);
 
@@ -1435,19 +1430,36 @@ namespace CnGalWebSite.APIServer.Controllers
             {
                 return NotFound("编辑记录Id不正确");
             }
+            if (contrastExamine.IsPassed != true || currentExamine.IsPassed != true)
+            {
+                return BadRequest("请选择已通过的编辑记录");
+            }
 
             var currentEntry = new Entry();
             var newEntry = new Entry();
 
-            //获取审核记录
-            var examines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.IsPassed == true && s.EntryId == currentExamine.EntryId).ToListAsync();
+            //按审核通过时间还原历史版本
+            var examines = RecordVersionOrder.Approved(
+                await _examineRepository.GetAll().AsNoTracking()
+                    .Where(s => s.IsPassed == true && s.EntryId == currentExamine.EntryId)
+                    .ToListAsync()).ToList();
+            var contrastIndex = examines.FindIndex(s => s.Id == contrastId);
+            var currentIndex = examines.FindIndex(s => s.Id == currentId);
+            if (contrastIndex < 0 || currentIndex < 0)
+            {
+                return BadRequest("编辑记录未通过审核");
+            }
+            if (contrastIndex > currentIndex)
+            {
+                return BadRequest("对比的编辑必须先于当前的编辑");
+            }
 
-            foreach (var item in examines.Where(s => s.Id <= contrastId).OrderBy(s => s.Id))
+            foreach (var item in examines.Take(contrastIndex + 1))
             {
                 await _entryService.UpdateEntryDataAsync(currentEntry, item);
             }
 
-            foreach (var item in examines.Where(s => s.Id <= currentId).OrderBy(s => s.Id))
+            foreach (var item in examines.Take(currentIndex + 1))
             {
                 await _entryService.UpdateEntryDataAsync(newEntry, item);
             }

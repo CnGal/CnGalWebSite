@@ -62,6 +62,21 @@ namespace CnGalWebSite.DataModel.ViewModel.Articles
         public string OriginalLink { get; set; }
         public DateTime? PubishTime { get; set; }
 
+        /// <summary>
+        /// 动态类别 仅对动态有效
+        /// </summary>
+        public string NewsType { get; set; }
+
+        /// <summary>
+        /// 真实发生动态的时间 当类型是文章时 有效
+        /// </summary>
+        public DateTime? RealNewsTime { get; set; }
+
+        /// <summary>
+        /// 是否为用户本人创作
+        /// </summary>
+        public bool IsCreatedByCurrentUser { get; set; }
+
 
         public EditState MainState { get; set; }
         public EditState MainPageState { get; set; }

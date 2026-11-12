@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.SDK.MainSite.Abstractions;
@@ -160,6 +161,54 @@ public class ExamineComparisonSdkTests
             Assert.That(diff.Items[0].Change, Is.EqualTo(RecordChangeKind.Modified));
             Assert.That(diff.Items[0].After, Is.Not.Null);
             Assert.That(diff.Items[0].After?.Value, Is.Empty);
+        });
+    }
+
+    [Test]
+    public void DisplayOnlyChangeIsReportedAsModified()
+    {
+        var before = new RecordPreviewModel { Items = [
+            new() { Key = "link/官网", Group = "外链", Kind = RecordPreviewKind.Link, Label = "官网",
+                Value = "https://example.com", DisplayValue = "旧链接文字", Url = "https://example.com" }
+        ] };
+        var after = new RecordPreviewModel { Items = [
+            new() { Key = "link/官网", Group = "外链", Kind = RecordPreviewKind.Link, Label = "官网",
+                Value = "https://example.com", DisplayValue = "新链接文字", Url = "https://example.com" }
+        ] };
+
+        var diff = RecordDiffBuilder.Build(before, after);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(diff.Items, Has.Count.EqualTo(1));
+            Assert.That(diff.Items[0].Change, Is.EqualTo(RecordChangeKind.Modified));
+            Assert.That(diff.Items[0].Before?.DisplayValue, Is.EqualTo("旧链接文字"));
+            Assert.That(diff.Items[0].After?.DisplayValue, Is.EqualTo("新链接文字"));
+        });
+    }
+
+    [Test]
+    public void ApprovedVersionsAreOrderedByPassedTimeThenId()
+    {
+        var laterApprovalWithLowerId = new Examine
+        {
+            Id = 10,
+            IsPassed = true,
+            PassedTime = new DateTime(2026, 11, 12, 11, 0, 0)
+        };
+        var earlierApprovalWithHigherId = new Examine
+        {
+            Id = 20,
+            IsPassed = true,
+            PassedTime = new DateTime(2026, 11, 12, 9, 0, 0)
+        };
+
+        var ordered = RecordVersionOrder.Approved([laterApprovalWithLowerId, earlierApprovalWithHigherId]).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(ordered.Select(r => r.Id), Is.EqualTo(new[] { 20L, 10L }));
+            Assert.That(RecordVersionOrder.Compare(earlierApprovalWithHigherId, laterApprovalWithLowerId), Is.LessThan(0));
         });
     }
 

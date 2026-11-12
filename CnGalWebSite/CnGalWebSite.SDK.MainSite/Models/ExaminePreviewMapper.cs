@@ -102,6 +102,8 @@ public static class ExaminePreviewMapper
                 [
                     new() { Key = "Name", Label = "名称", Value = audio.Name ?? string.Empty, DisplayValue = audio.Name ?? string.Empty },
                     new() { Key = "BriefIntroduction", Label = "简介", Value = audio.BriefIntroduction ?? string.Empty, DisplayValue = audio.BriefIntroduction ?? string.Empty },
+                    new() { Key = "Duration", Label = "时长", Value = audio.Duration.ToString(), DisplayValue = audio.Duration.ToString() },
+                    new() { Key = "Priority", Label = "优先级", Value = audio.Priority.ToString(), DisplayValue = audio.Priority.ToString() },
                     new() { Key = "Thumbnail", Label = "缩略图", Value = audio.Thumbnail ?? string.Empty, DisplayValue = audio.Thumbnail ?? string.Empty }
                 ]
             });

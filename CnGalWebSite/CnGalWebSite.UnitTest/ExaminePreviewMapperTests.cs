@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.SDK.MainSite.Models;
@@ -36,7 +37,8 @@ public class ExaminePreviewMapperTests
                 new() { entry = new EntryInforTipViewModel { Id = 42, Name = "关联词条" } }
             ],
             Outlinks = [new() { DisplayName = "官网", DisplayValue = "官网说明", Link = "https://example.com" }],
-            Audio = [new() { Name = "主题曲", Url = "https://example.com/theme.mp3", BriefIntroduction = "音频说明" }]
+            Audio = [new() { Name = "主题曲", Url = "https://example.com/theme.mp3", BriefIntroduction = "音频说明",
+                Duration = TimeSpan.FromMinutes(3), Priority = 2 }]
         };
 
         var result = ExaminePreviewMapper.FromPreData(legacy);
@@ -51,6 +53,33 @@ public class ExaminePreviewMapperTests
             Assert.That(result.Items.Single(i => i.Kind == RecordPreviewKind.Relation).Value, Is.EqualTo("entry:42"));
             Assert.That(result.Items.Single(i => i.Kind == RecordPreviewKind.Link).Url, Is.EqualTo("https://example.com"));
             Assert.That(result.Items.Single(i => i.Kind == RecordPreviewKind.Audio).Url, Is.EqualTo("https://example.com/theme.mp3"));
+            var audioProperties = result.Items.Single(i => i.Kind == RecordPreviewKind.Audio).Properties
+                .ToDictionary(p => p.Key, p => p.Value, StringComparer.Ordinal);
+            Assert.That(audioProperties["Duration"], Is.EqualTo(TimeSpan.FromMinutes(3).ToString()));
+            Assert.That(audioProperties["Priority"], Is.EqualTo("2"));
+        });
+    }
+
+    [Test]
+    public void ArticleNewsFieldsParticipateInTheSnapshot()
+    {
+        var legacy = EditRecordContentMapper.Map(new ArticleViewModel
+        {
+            Name = "动态标题",
+            MainPage = "<p>正文</p>",
+            NewsType = "公告",
+            RealNewsTime = new DateTime(2026, 11, 12, 9, 30, 0),
+            PubishTime = new DateTime(2026, 11, 11, 8, 0, 0),
+            IsCreatedByCurrentUser = true
+        });
+
+        var values = legacy.Texts.SelectMany(t => t.Informations)
+            .ToDictionary(i => i.DisplayName, i => i.DisplayValue, StringComparer.Ordinal);
+        Assert.Multiple(() =>
+        {
+            Assert.That(values["动态类型"], Is.EqualTo("公告"));
+            Assert.That(values["真实动态时间"], Is.EqualTo("2026-11-12 09:30"));
+            Assert.That(values["用户创作"], Is.EqualTo("是"));
         });
     }
 
