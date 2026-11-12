@@ -1,0 +1,31 @@
+<span class="record-image @(Contain ? "record-image--contain" : "")">
+    @{
+        var renderedUrl = Url;
+    }
+    @if (!_failed)
+    { <img src="@renderedUrl" alt="@Alt" loading="lazy" @onerror="() => OnImageError(renderedUrl)" /> }
+    else
+    { <span class="record-image__fallback"><CgMdiIcon Name="mdiImageOutline" aria-hidden="true" />图片无法加载</span> }
+</span>
+
+@code {
+    [Parameter] public string? Url { get; set; }
+    [Parameter] public string Alt { get; set; } = "";
+    [Parameter] public bool Contain { get; set; }
+    private string? _loadedUrl;
+    private bool _failed;
+    protected override void OnParametersSet()
+    {
+        if (_loadedUrl == Url) return;
+        _loadedUrl = Url;
+        _failed = false;
+    }
+
+    private void OnImageError(string? failedUrl)
+    {
+        if (string.Equals(failedUrl, Url, StringComparison.Ordinal))
+        {
+            _failed = true;
+        }
+    }
+}

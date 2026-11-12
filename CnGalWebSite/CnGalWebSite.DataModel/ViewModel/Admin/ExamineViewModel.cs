@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using System;
 using System.Collections.Generic;
@@ -68,6 +69,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
         public List<RelevancesKeyValueModel> Outlinks { get; set; } = new List<RelevancesKeyValueModel>();
 
         public List<EditAudioAloneModel> Audio { get; set; } = new List<EditAudioAloneModel>();
+
+        public List<NewsModel> News { get; set; } = new List<NewsModel>();
 
         public string MainPage { get; set; }
     }

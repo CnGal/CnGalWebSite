@@ -1,34 +1,23 @@
-/* ═══════════════════════════════════════════════════
-   EditRecordTimeline — 编辑记录时间线
-   ═══════════════════════════════════════════════════ */
-
 .edit-record-timeline {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    max-height: 600px;
+    list-style: none;
+    margin: 0;
+    display: grid;
+    gap: var(--cg-spacing-1);
+    max-height: min(640px, calc(100dvh - var(--cg-header-height) - 180px));
     overflow-y: auto;
     padding: var(--cg-spacing-2);
+    border-top: 1px solid var(--cg-color-border);
 }
 
-/* ── Timeline Item ── */
 .edit-record-timeline__item {
     display: flex;
-    align-items: flex-start;
     gap: var(--cg-spacing-3);
-    padding: var(--cg-spacing-3) var(--cg-spacing-4);
+    padding: var(--cg-spacing-3);
     border: 1px solid transparent;
-    border-radius: var(--cg-radius-lg);
-    background: transparent;
-    cursor: pointer;
-    transition: all var(--cg-transition-fast);
-    text-align: left;
-    width: 100%;
-    font-family: inherit;
-    font-size: inherit;
-    position: relative;
+    border-radius: var(--cg-radius-md);
+    color: var(--cg-color-text);
     text-decoration: none;
-    color: inherit;
+    min-width: 0;
 }
 
 .edit-record-timeline__item:hover {
@@ -36,87 +25,65 @@
 }
 
 .edit-record-timeline__item--active {
-    background: color-mix(in srgb, var(--cg-color-primary) 8%, transparent);
-    border-color: color-mix(in srgb, var(--cg-color-primary) 25%, transparent);
+    border-color: color-mix(in srgb, var(--cg-color-primary) 30%, var(--cg-color-border));
+    background: color-mix(in srgb, var(--cg-color-primary) 7%, var(--cg-color-surface));
 }
 
-/* ── Timeline Marker ── */
 .edit-record-timeline__marker {
-    flex-shrink: 0;
-    width: 10px;
-    height: 10px;
+    flex: 0 0 6px;
+    height: 6px;
+    margin-top: 7px;
     border-radius: var(--cg-radius-full);
     background: var(--cg-color-border);
-    margin-top: 6px;
-    transition: all var(--cg-transition-fast);
-}
-
-.edit-record-timeline__item:hover .edit-record-timeline__marker {
-    background: color-mix(in srgb, var(--cg-color-primary) 50%, var(--cg-color-border));
 }
 
 .edit-record-timeline__item--active .edit-record-timeline__marker {
     background: var(--cg-color-primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--cg-color-primary) 20%, transparent);
-    animation: ert-pulse 2s infinite;
 }
 
-@keyframes ert-pulse {
-    0%   { box-shadow: 0 0 0 3px color-mix(in srgb, var(--cg-color-primary) 20%, transparent); }
-    50%  { box-shadow: 0 0 0 6px color-mix(in srgb, var(--cg-color-primary) 8%, transparent); }
-    100% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--cg-color-primary) 20%, transparent); }
-}
-
-/* ── Content ── */
 .edit-record-timeline__content {
-    flex: 1;
     min-width: 0;
+    flex: 1;
 }
 
 .edit-record-timeline__header {
     display: flex;
-    align-items: center;
+    flex-wrap: wrap;
     gap: var(--cg-spacing-2);
-    margin-bottom: 2px;
+    font-size: var(--cg-font-size-xs);
 }
 
 .edit-record-timeline__id {
-    font-size: var(--cg-font-size-sm);
-    font-weight: var(--cg-font-weight-semibold);
-    color: var(--cg-color-text);
+    color: var(--cg-color-primary);
     font-variant-numeric: tabular-nums;
 }
 
 .edit-record-timeline__op {
-    font-size: var(--cg-font-size-xs);
-    color: var(--cg-color-text-muted);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    padding: 1px var(--cg-spacing-2);
-    background: color-mix(in srgb, var(--cg-color-primary) 6%, transparent);
-    border-radius: var(--cg-radius-full);
+    overflow-wrap: anywhere;
 }
 
 .edit-record-timeline__meta {
-    display: flex;
-    align-items: center;
-    gap: var(--cg-spacing-3);
-    font-size: var(--cg-font-size-xs);
+    display: grid;
+    gap: var(--cg-spacing-1);
+    margin-top: var(--cg-spacing-2);
     color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-xs);
 }
 
 .edit-record-timeline__user {
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
+    display: flex;
+    gap: var(--cg-spacing-1);
+    overflow-wrap: anywhere;
 }
 
-::deep .edit-record-timeline__user .cg-mdi-icon {
+.edit-record-timeline__user ::deep svg {
     width: 14px;
     height: 14px;
+    flex-shrink: 0;
 }
 
-.edit-record-timeline__time {
-    font-variant-numeric: tabular-nums;
+@media (max-width: 1023px) {
+    .edit-record-timeline {
+        max-height: 320px;
+    }
 }

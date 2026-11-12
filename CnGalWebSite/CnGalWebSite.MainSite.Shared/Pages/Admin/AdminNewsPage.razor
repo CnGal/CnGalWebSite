@@ -203,18 +203,28 @@
         </CgFormSection>
 
         <CgFormSection Title="作者关联" Icon="mdiAccountOutline" Flat>
+            @if (_entryOptionsLoadFailed)
+            {
+                <CgAlert Variant="warning">
+                    关联词条列表加载失败，作者关联和关联词条输入将无法选择。
+                    <CgButton Variant="secondary" Size="sm" Async OnClick="LoadEntryOptionsAsync" Disabled="_isLoadingEntryOptions">重新加载</CgButton>
+                </CgAlert>
+            }
             <CgGrid>
                 <CgFormGroup Label="微博Id">
                     <CgInput @bind-Value="_editingGameNews.WeiboId" Placeholder="请输入微博Id" />
                 </CgFormGroup>
                 <CgFormGroup Label="关联词条名称">
-                    <CgAutoComplete @bind-Value="_editingGameNews.AuthorEntryName" Items="_allEntryNames" Placeholder="请输入关联词条名称" />
+                    <CgAutoComplete RestrictToItems="true" @bind-Value="_editingGameNews.AuthorEntryName" Items="_allEntryNames"
+                                    Placeholder="请输入关联词条名称" Disabled="_isLoadingEntryOptions || _entryOptionsLoadFailed" />
                 </CgFormGroup>
             </CgGrid>
         </CgFormSection>
 
         <CgFormSection Title="关联词条" Icon="mdiLinkVariant" Flat>
-            <CnGalWebSite.MainSite.Shared.Components.Features.Entry.Editor.EntryRelevanceListEditor Title="词条" Items="_editingGameNews.Entries" AutoCompleteItems="_allEntryNames" />
+            <CnGalWebSite.MainSite.Shared.Components.Features.Entry.Editor.EntryRelevanceListEditor Title="词条"
+                    Items="_editingGameNews.Entries" AutoCompleteItems="_allEntryNames"
+                    Disabled="_isLoadingEntryOptions || _entryOptionsLoadFailed" />
         </CgFormSection>
 
         <CgFormSection Title="正文" Icon="mdiTextBoxOutline" Flat>
@@ -382,13 +392,27 @@
     private ArticleViewModel? _previewContent;
 
     private List<string> _allEntryNames = [];
+    private bool _isLoadingEntryOptions;
+    private bool _entryOptionsLoadFailed;
 
     protected override async Task OnInitializedAsync()
     {
         _cts = new CancellationTokenSource();
+        await LoadEntryOptionsAsync();
+    }
+
+    private async Task LoadEntryOptionsAsync()
+    {
+        if (_isLoadingEntryOptions)
+        {
+            return;
+        }
+
+        _isLoadingEntryOptions = true;
+        _entryOptionsLoadFailed = false;
         try
         {
-            var metaResult = await ArticleCommandService.GetArticleEditMetaOptionsAsync(_cts.Token);
+            var metaResult = await ArticleCommandService.GetArticleEditMetaOptionsAsync(_cts?.Token ?? CancellationToken.None);
             if (metaResult.Success && metaResult.Data != null)
             {
                 _allEntryNames = metaResult.Data.EntryGameItems
@@ -398,10 +422,26 @@
                     .Distinct()
                     .ToList();
             }
+            else
+            {
+                _allEntryNames = [];
+                _entryOptionsLoadFailed = true;
+                ToastService.Show("加载关联词条失败", metaResult.Error?.Message, "error");
+            }
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (_cts?.IsCancellationRequested == true)
         {
             // Component disposed, ignore
+        }
+        catch (Exception ex)
+        {
+            _allEntryNames = [];
+            _entryOptionsLoadFailed = true;
+            ToastService.Show("加载关联词条失败", ex.Message, "error");
+        }
+        finally
+        {
+            _isLoadingEntryOptions = false;
         }
     }
 

@@ -1,0 +1,44 @@
+﻿.record-notes {
+    display: grid;
+    gap: var(--cg-spacing-4);
+    min-width: 0;
+}
+
+section {
+    padding: var(--cg-spacing-5);
+    background: var(--cg-color-surface);
+    border: 1px solid var(--cg-color-border);
+    border-radius: var(--cg-radius-lg);
+    min-width: 0;
+}
+
+h3 {
+    margin: 0 0 var(--cg-spacing-3);
+    color: var(--cg-color-text);
+    font-size: var(--cg-font-size-md);
+}
+
+p {
+    margin: 0;
+    color: var(--cg-color-text);
+    font-size: var(--cg-font-size-sm);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.7;
+}
+
+.record-notes__overview {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.record-notes__overview ::deep ins {
+    color: var(--cg-color-success);
+    background: color-mix(in srgb, var(--cg-color-success) 10%, transparent);
+    text-decoration: none;
+}
+
+.record-notes__overview ::deep del {
+    color: var(--cg-color-error);
+    background: color-mix(in srgb, var(--cg-color-error) 8%, transparent);
+}

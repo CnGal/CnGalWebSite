@@ -28,7 +28,7 @@
 
     @if (Id <= 0 && _model is null)
     {
-        <div class="examine-detail-page__error">
+        <div class="examine-detail-page__error" role="alert">
             <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
             <p>请提供有效的审核记录 ID</p>
             <a href="/usercenter" class="cg-btn cg-btn--primary">返回内容中心</a>
@@ -36,14 +36,14 @@
     }
     else if (_isLoading)
     {
-        <div class="examine-detail-page__loading">
+        <div class="examine-detail-page__loading" role="status">
             <CgProgressRing />
             <span>加载审核记录中...</span>
         </div>
     }
     else if (_isError)
     {
-        <div class="examine-detail-page__error">
+        <div class="examine-detail-page__error" role="alert">
             <CgMdiIcon Name="mdiAlertCircleOutline" aria-hidden="true" />
             <p>@_errorMessage</p>
             <CgButton Variant="primary" OnClick="LoadDataAsync">重试</CgButton>
@@ -52,14 +52,16 @@
     }
     else if (_model is not null)
     {
-        <ExamineDetailPanel Model="@_model" OnProcCompleted="OnProcCompleted" />
+        <ExamineDetailPanel @key="_model.Id" Model="@_model" OnProcCompleted="OnProcCompleted" />
     }
 </div>
 
 @code {
-    [SupplyParameterFromQuery]
+    [SupplyParameterFromQuery(Name = "Id")]
     [Parameter]
-    public long Id { get; set; }
+    public string? IdQuery { get; set; }
+
+    private long Id => long.TryParse(IdQuery, out var id) ? id : 0;
 
     private ExamineViewModel? _model;
     private bool _isLoading = true;

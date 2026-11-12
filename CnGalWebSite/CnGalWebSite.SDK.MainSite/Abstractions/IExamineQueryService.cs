@@ -55,13 +55,27 @@ public interface IExamineQueryService
         long examineId,
         CancellationToken cancellationToken = default);
 
+    /// <summary>绕过详情缓存重新获取审核记录，用于前置审核处理后的状态刷新。</summary>
+    Task<SdkResult<ExamineViewModel>> RefreshExamineDetailAsync(
+        long examineId,
+        CancellationToken cancellationToken = default);
+
     /// <summary>
-    /// 获取两个版本之间的对比审核详情。
-    /// 通过加载 contrastId 对应的审核记录，获取 BeforeModel（对比版本截止状态）和 AfterModel（当前版本截止状态）。
+    /// 按对象类型调用历史重建接口，返回截至两次已通过编辑的完整内容。
+    /// 两个编号必须属于同一对象，基准版本的通过顺序不得晚于目标版本。
     /// </summary>
-    Task<SdkResult<ExamineViewModel>> GetContrastExamineAsync(
+    Task<SdkResult<EditRecordComparison>> GetEditRecordComparisonAsync(
+        ExaminedNormalListModelType type,
         long contrastId,
         long currentId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// 获取一条已通过审核记录相对上一通过版本的历史对比。
+    /// 审核详情接口返回的前后快照对已通过记录不包含历史状态，展示变更摘要时应使用此方法。
+    /// </summary>
+    Task<SdkResult<EditRecordComparison>> GetApprovedExamineComparisonAsync(
+        long examineId,
         CancellationToken cancellationToken = default);
 
     /// <summary>

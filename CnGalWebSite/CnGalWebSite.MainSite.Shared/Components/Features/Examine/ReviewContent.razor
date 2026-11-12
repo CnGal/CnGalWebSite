@@ -1,0 +1,66 @@
+﻿@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Admin
+@using CnGalWebSite.SDK.MainSite.Models
+<div class="review-content">
+    <div class="review-content__tabs" role="tablist" aria-label="审核内容">
+        <button type="button" role="tab" id="review-tab-summary" aria-controls="review-panel-summary"
+            aria-selected="@(_activeTab == ReviewTab.Summary ? "true" : "false")"
+            class="@(_activeTab == ReviewTab.Summary ? "is-active" : "")"
+            @onclick="() => _activeTab = ReviewTab.Summary">变更摘要</button>
+        <button type="button" role="tab" id="review-tab-description" aria-controls="review-panel-description"
+            aria-selected="@(_activeTab == ReviewTab.Description ? "true" : "false")"
+            class="@(_activeTab == ReviewTab.Description ? "is-active" : "")"
+            @onclick="() => _activeTab = ReviewTab.Description">原始数据</button>
+    </div>
+
+    @if (_activeTab == ReviewTab.Summary)
+    {
+        <div id="review-panel-summary" role="tabpanel" aria-labelledby="review-tab-summary">
+            @if (Model.IsPassed == true && Comparison is null && !IsSubmissionOnly)
+            {
+                <p class="review-content__notice" role="status">未能加载历史对比，变更摘要可能不完整，请查看原始数据。</p>
+            }
+            <RecordContentComparison Before="_before" After="_after"
+                BeforeTitle="@(Model.IsPassed is null ? "当前内容" : "修改前")"
+                AfterTitle="@(Model.IsPassed == false ? "拟提交内容" : Model.IsPassed is null ? "提交内容" : "修改后")"
+                SubmissionOnly="IsSubmissionOnly" />
+        </div>
+    }
+    else
+    {
+        <section id="review-panel-description" class="review-content__description" role="tabpanel" aria-labelledby="review-tab-description">
+            <CgHtmlContent Content="@Model.EditOverview" />
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public ExamineViewModel Model { get; set; } = default!;
+
+    /// <summary>已通过记录由历史重建接口提供准确的修改前/后快照。</summary>
+    [Parameter] public EditRecordComparison? Comparison { get; set; }
+
+    private ExamineViewModel? _source;
+    private EditRecordComparison? _sourceComparison;
+    private RecordPreviewModel? _before;
+    private RecordPreviewModel? _after;
+    private ReviewTab _activeTab = ReviewTab.Summary;
+    private bool IsSubmissionOnly => Model.Operation is Operation.PubulishComment or Operation.RequestUserCertification;
+
+    protected override void OnParametersSet()
+    {
+        if (ReferenceEquals(_source, Model) && ReferenceEquals(_sourceComparison, Comparison)) return;
+        _source = Model;
+        _sourceComparison = Comparison;
+        var useComparison = Comparison is not null && Comparison.CurrentId == Model.Id;
+        _before = useComparison
+            ? Comparison!.Before
+            : ExaminePreviewMapper.FromPreData(Model.BeforeModel);
+        _after = useComparison
+            ? Comparison!.After
+            : ExaminePreviewMapper.FromPreData(Model.AfterModel);
+        _activeTab = ReviewTab.Summary;
+    }
+
+    private enum ReviewTab { Summary, Description }
+}

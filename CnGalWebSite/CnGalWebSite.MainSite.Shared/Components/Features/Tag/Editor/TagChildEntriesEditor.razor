@@ -27,7 +27,7 @@
                     {
                         var current = item;
                         <div class="relevance-editor__item">
-                            <CgAutoComplete Value="@current.DisplayName"
+                            <CgAutoComplete RestrictToItems="true" Value="@current.DisplayName"
                                             ValueChanged="(text) => current.DisplayName = text ?? string.Empty"
                                             Items="@EntryItems"
                                             Placeholder="输入词条唯一名称" />

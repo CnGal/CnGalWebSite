@@ -1423,31 +1423,49 @@ namespace CnGalWebSite.APIServer.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<EntryContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
         {
-            if (contrastId > currentId)
-            {
-                return BadRequest("对比的编辑必须先于当前的编辑");
-            }
-
-            var contrastExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId);
+            var contrastExamine = contrastId > 0
+                ? await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId)
+                : null;
             var currentExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == currentId);
 
-            if (contrastExamine == null || currentExamine == null || contrastExamine.EntryId == null || currentExamine.EntryId == null || contrastExamine.EntryId != currentExamine.EntryId)
+            if (currentExamine == null || currentExamine.EntryId == null
+                || (contrastId > 0 && (contrastExamine == null || contrastExamine.EntryId != currentExamine.EntryId)))
             {
                 return NotFound("编辑记录Id不正确");
+            }
+            if (currentExamine.IsPassed != true || (contrastId > 0 && contrastExamine.IsPassed != true))
+            {
+                return BadRequest("请选择已通过的编辑记录");
             }
 
             var currentEntry = new Entry();
             var newEntry = new Entry();
 
-            //获取审核记录
-            var examines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.IsPassed == true && s.EntryId == currentExamine.EntryId).ToListAsync();
-
-            foreach (var item in examines.Where(s => s.Id <= contrastId))
+            //按审核通过时间还原历史版本；contrastId=0 表示空基准，用于首个版本
+            var examines = RecordVersionOrder.Approved(
+                await _examineRepository.GetAll().AsNoTracking()
+                    .Where(s => s.IsPassed == true && s.EntryId == currentExamine.EntryId)
+                    .ToListAsync()).ToList();
+            var contrastIndex = contrastId > 0 ? examines.FindIndex(s => s.Id == contrastId) : -1;
+            var currentIndex = examines.FindIndex(s => s.Id == currentId);
+            if (currentIndex < 0 || (contrastId > 0 && contrastIndex < 0))
             {
-                await _entryService.UpdateEntryDataAsync(currentEntry, item);
+                return BadRequest("编辑记录未通过审核");
+            }
+            if (contrastIndex > currentIndex)
+            {
+                return BadRequest("对比的编辑必须先于当前的编辑");
             }
 
-            foreach (var item in examines.Where(s => s.Id <= currentId))
+            if (contrastIndex >= 0)
+            {
+                foreach (var item in examines.Take(contrastIndex + 1))
+                {
+                    await _entryService.UpdateEntryDataAsync(currentEntry, item);
+                }
+            }
+
+            foreach (var item in examines.Take(currentIndex + 1))
             {
                 await _entryService.UpdateEntryDataAsync(newEntry, item);
             }

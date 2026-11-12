@@ -42,7 +42,7 @@
                 <CgInput @bind-Value="Model.Name"/>
             </CgFormGroup>
             <CgFormGroup Label="父标签">
-                <CgAutoComplete Value="@Model.ParentTagName"
+                <CgAutoComplete RestrictToItems="true" Value="@Model.ParentTagName"
                                 ValueChanged="(text) => Model.ParentTagName = text ?? string.Empty"
                                 Items="@TagItems"
                                 Placeholder="输入父标签名称"/>

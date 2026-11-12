@@ -1,76 +1,39 @@
-
 @inject NavigationManager NavigationManager
-@rendermode InteractiveServer
 
-@* 编辑记录对比选择器 — 交互岛，仅在登录后可用 *@
-
-<div class="ecp-contrast-bar">
-    <div class="ecp-contrast-selector">
-        <label class="ecp-contrast-label">
-            <CgMdiIcon Name="mdiFileRestoreOutline" aria-hidden="true"/>
-            对比版本
-        </label>
-        <CgSelect Value="@_contrastIdStr" ValueChanged="OnContrastChanged" Options="@ExamineOptions" />
+<section class="record-selector" aria-label="选择历史版本">
+    <div class="record-selector__fields">
+        <div class="record-selector__field"><span>基准版本</span><CgSelect AriaLabel="基准版本" Value="@_contrastId" ValueChanged="v => _contrastId = v" Options="ExamineOptions" /></div>
+        <div class="record-selector__field"><span>目标版本</span><CgSelect AriaLabel="目标版本" Value="@_currentId" ValueChanged="v => _currentId = v" Options="ExamineOptions" /></div>
+        <CgButton OnClick="NavigateToContrast" Disabled="@(SelectionError is not null)">对比版本</CgButton>
     </div>
-    <div class="ecp-contrast-selector">
-        <label class="ecp-contrast-label">
-            <CgMdiIcon Name="mdiFileDocumentCheckOutline" aria-hidden="true"/>
-            当前版本
-        </label>
-        <CgSelect Value="@_currentIdStr" ValueChanged="OnCurrentChanged" Options="@ExamineOptions" />
-    </div>
-    <CgButton Variant="primary" OnClick="NavigateToContrast">
-        <CgMdiIcon Name="mdiMagnify" aria-hidden="true"/>
-        对比
-    </CgButton>
-</div>
+    @if (SelectionError is { } error) { <p role="status">@error</p> }
+</section>
 
 @code {
-    [Parameter]
-    public IEnumerable<KeyValuePair<string, string>> ExamineOptions { get; set; } = [];
+    [Parameter] public IEnumerable<KeyValuePair<string, string>> ExamineOptions { get; set; } = [];
+    [Parameter] public long ContrastId { get; set; }
+    [Parameter] public long CurrentId { get; set; }
+    [Parameter] public long SelectedId { get; set; }
+    private string? _contrastId;
+    private string? _currentId;
+    private (long, long)? _loaded;
 
-    [Parameter]
-    public long ContrastId { get; set; }
-
-    [Parameter]
-    public long CurrentId { get; set; }
-
-    private string _contrastIdStr = "";
-    private string _currentIdStr = "";
-    private long _contrastId;
-    private long _currentId;
-
-    protected override void OnInitialized()
+    protected override void OnParametersSet()
     {
-        _contrastId = ContrastId;
-        _currentId = CurrentId;
-        _contrastIdStr = _contrastId.ToString();
-        _currentIdStr = _currentId.ToString();
+        if (_loaded == (ContrastId, CurrentId)) return;
+        _loaded = (ContrastId, CurrentId);
+        _contrastId = ContrastId.ToString();
+        _currentId = CurrentId.ToString();
     }
 
-    private Task OnContrastChanged(string? value)
-    {
-        if (long.TryParse(value, out var id))
-        {
-            _contrastId = id;
-            _contrastIdStr = value!;
-        }
-        return Task.CompletedTask;
-    }
-
-    private Task OnCurrentChanged(string? value)
-    {
-        if (long.TryParse(value, out var id))
-        {
-            _currentId = id;
-            _currentIdStr = value!;
-        }
-        return Task.CompletedTask;
-    }
+    private string? SelectionError => !long.TryParse(_contrastId, out var before) || !long.TryParse(_currentId, out var after)
+        || !ExamineOptions.Any(o => o.Key == _contrastId) || !ExamineOptions.Any(o => o.Key == _currentId)
+        ? "请选择此对象的有效历史版本。"
+        : ExamineOptions.Select(o => o.Key).ToList().IndexOf(_contrastId!) < ExamineOptions.Select(o => o.Key).ToList().IndexOf(_currentId!) ? "基准版本不能晚于目标版本，请调整选择。" : null;
 
     private void NavigateToContrast()
     {
-        NavigationManager.NavigateTo(
-            $"/home/editrecord?ContrastId={_contrastId}&CurrentId={_currentId}");
+        if (SelectionError is not null) return;
+        NavigationManager.NavigateTo($"/home/editrecord?ContrastId={_contrastId}&CurrentId={_currentId}&SelectedId={SelectedId}&Mode=compare");
     }
 }

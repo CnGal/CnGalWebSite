@@ -1,0 +1,21 @@
+﻿.record-diff-text {
+    white-space: pre-wrap;
+}
+
+.record-diff-text__change {
+    border-radius: 0.15em;
+    padding: 0 0.08em;
+}
+
+.record-diff-text__change--removed {
+    color: var(--cg-color-error, #c23845);
+    background: color-mix(in srgb, var(--cg-color-error, #c23845) 16%, transparent);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+}
+
+.record-diff-text__change--added {
+    color: var(--cg-color-success, #16834a);
+    background: color-mix(in srgb, var(--cg-color-success, #16834a) 16%, transparent);
+    text-decoration: none;
+}

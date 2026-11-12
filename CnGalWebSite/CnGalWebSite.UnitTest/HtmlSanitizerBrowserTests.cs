@@ -1,9 +1,9 @@
-using System.Text;
+﻿using System.Text;
 using System.Net;
 using System.Net.Sockets;
-using CnGalWebSite.APIServer.Application.Helper;
 using Microsoft.Playwright;
 using NUnit.Framework;
+using CnGalWebSite.APIServer.Application.Helper;
 
 namespace CnGalWebSite.UnitTest;
 

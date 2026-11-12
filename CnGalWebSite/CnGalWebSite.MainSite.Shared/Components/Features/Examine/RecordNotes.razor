@@ -1,0 +1,14 @@
+﻿<div class="record-notes">
+    @if (!string.IsNullOrWhiteSpace(Comments))
+    { <section><h3>审核批注</h3><p>@Comments</p></section> }
+    @if (!string.IsNullOrWhiteSpace(Note))
+    { <section><h3>提交备注</h3><p>@Note</p></section> }
+    @if (ShowEmpty && string.IsNullOrWhiteSpace(Comments) && string.IsNullOrWhiteSpace(Note))
+    { <p class="record-notes__empty">此记录未附加批注或备注。</p> }
+</div>
+
+@code {
+    [Parameter] public string? Comments { get; set; }
+    [Parameter] public string? Note { get; set; }
+    [Parameter] public bool ShowEmpty { get; set; }
+}

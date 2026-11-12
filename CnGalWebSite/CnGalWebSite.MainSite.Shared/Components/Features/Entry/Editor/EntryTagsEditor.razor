@@ -24,7 +24,7 @@
                     @foreach (var item in Model.Tags)
                     {
                         <div class="tag-editor__item">
-                            <CgAutoComplete Value="@item.DisplayName"
+                            <CgAutoComplete RestrictToItems="true" Value="@item.DisplayName"
                                             ValueChanged="(text) => OnTagChanged(item, text)"
                                             Items="@MetaOptions.TagItems"
                                             Placeholder="输入标签名称"/>

@@ -1,9 +1,11 @@
-<div class="cg-select @(DropUp ? "cg-select--dropup" : string.Empty) @ClassName">
+<div class="cg-select @(DropUp ? "cg-select--dropup" : string.Empty) @ClassName" @onkeydown="OnKeyDown">
     <button type="button"
+            @ref="_trigger"
             class="cg-select__trigger"
             disabled="@Disabled"
+            aria-label="@AriaLabel"
             aria-haspopup="listbox"
-            aria-expanded="@_isOpen"
+            aria-expanded="@(_isOpen ? "true" : "false")"
             @onclick="ToggleDropdown">
         <span class="@(HasSelectedOption ? "cg-select__value" : "cg-select__value cg-select__value--placeholder")">@CurrentText</span>
         <span class="cg-select__arrow" aria-hidden="true"></span>
@@ -19,7 +21,7 @@
         <ul class="cg-select__menu" role="listbox">
             @if (!string.IsNullOrWhiteSpace(Placeholder))
             {
-                <li role="option" aria-selected="@string.IsNullOrEmpty(Value)">
+                <li role="option" aria-selected="@(string.IsNullOrEmpty(Value) ? "true" : "false")">
                     <button type="button"
                             class="cg-select__option @(string.IsNullOrEmpty(Value) ? "is-selected" : string.Empty)"
                             @onclick='() => SelectOption(string.Empty)'>
@@ -30,7 +32,7 @@
 
             @foreach (var option in Options)
             {
-                <li role="option" aria-selected="@(string.Equals(option.Key, Value, StringComparison.Ordinal))">
+                <li role="option" aria-selected="@(string.Equals(option.Key, Value, StringComparison.Ordinal) ? "true" : "false")">
                     <button type="button"
                             class="cg-select__option @(string.Equals(option.Key, Value, StringComparison.Ordinal) ? "is-selected" : string.Empty)"
                             @onclick='() => SelectOption(option.Key)'>
@@ -44,6 +46,21 @@
 
 @code {
     private bool _isOpen;
+    private ElementReference _trigger;
+
+    [Parameter]
+    public string? AriaLabel { get; set; }
+
+    private async Task OnKeyDown(KeyboardEventArgs args)
+    {
+        if (args.Key != "Escape" || !_isOpen)
+        {
+            return;
+        }
+
+        CloseDropdown();
+        await _trigger.FocusAsync();
+    }
 
     [Parameter]
     public string? Value { get; set; }

@@ -1,0 +1,26 @@
+@using CnGalWebSite.DataModel.ViewModel.Admin
+
+<header class="record-meta">
+    <div class="record-meta__heading">
+        <div><span class="record-meta__id">记录 #@Model.Id</span><h3>@Model.Operation.GetDisplayName()</h3></div>
+        <ExamineStatusBadge IsPassed="Model.IsPassed" />
+    </div>
+    <dl>
+        <div><dt>提交者</dt><dd>
+            @if (!string.IsNullOrWhiteSpace(Model.UserId))
+            { <a href="@($"/space/index/{Uri.EscapeDataString(Model.UserId)}")">@(Model.UserName ?? "未知用户")</a> }
+            else { <span>@(Model.UserName ?? "未知用户")</span> }
+        </dd></div>
+        <div><dt>提交时间</dt><dd><time datetime="@Model.ApplyTime.ToString("O")">@Model.ApplyTime.ToString("yyyy-MM-dd HH:mm")</time></dd></div>
+        @if (Model.PassedTime.HasValue)
+        { <div><dt>处理时间</dt><dd><time datetime="@Model.PassedTime.Value.ToString("O")">@Model.PassedTime.Value.ToString("yyyy-MM-dd HH:mm")</time></dd></div> }
+        @if (!string.IsNullOrWhiteSpace(Model.PassedAdminName))
+        { <div><dt>处理人</dt><dd>@Model.PassedAdminName</dd></div> }
+    </dl>
+    @ChildContent
+</header>
+
+@code {
+    [Parameter, EditorRequired] public ExamineViewModel Model { get; set; } = default!;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

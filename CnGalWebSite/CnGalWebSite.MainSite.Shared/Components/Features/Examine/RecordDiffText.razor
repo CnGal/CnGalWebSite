@@ -1,0 +1,9 @@
+﻿<span class="record-diff-text">@foreach (var segment in Segments) { if (segment.Change == RecordTextChangeKind.Unchanged) { @segment.Text } else { <span class="record-diff-text__change record-diff-text__change--@(segment.Change == RecordTextChangeKind.Removed ? "removed" : "added")">@segment.Text</span> } }</span>
+
+@code {
+    [Parameter] public string? Before { get; set; }
+    [Parameter] public string? After { get; set; }
+    [Parameter] public bool IsBefore { get; set; }
+
+    private IReadOnlyList<RecordTextSegment> Segments => RecordTextDiff.BuildSide(Before, After, IsBefore);
+}

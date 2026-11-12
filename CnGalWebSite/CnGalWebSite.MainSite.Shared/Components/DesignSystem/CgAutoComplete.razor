@@ -1,11 +1,12 @@
 @* CgAutoComplete — 自定义下拉自动补全（类 CgSelect 风格） *@
 <div class="cg-autocomplete @ClassName"
-     @onfocusout="OnFocusOut"
+     data-cg-autocomplete="true"
+     @oncgfocusleave="OnFocusLeave"
      tabindex="-1">
     <input @key="_inputKey"
            class="cg-autocomplete__input"
            type="text"
-           value="@Value"
+           value="@_draft"
            placeholder="@Placeholder"
            disabled="@Disabled"
            data-cg-ime-input="true"
@@ -21,6 +22,7 @@
                 <li role="option">
                     <button type="button"
                             class="cg-autocomplete__option"
+                            @onpointerdown:preventDefault="true"
                             @onclick="() => SelectOption(item)">
                         @item
                     </button>
@@ -35,13 +37,19 @@
     private bool _isOpen;
     private List<string> _filtered = [];
     private int _inputKey;
-    private string? _lastUserInput;
+    private string? _draft;
+    private string? _boundValue;
+    private bool _initialized;
+    private bool _editing;
 
     [Parameter] public string? Value { get; set; }
 
     [Parameter] public EventCallback<string?> ValueChanged { get; set; }
 
     [Parameter] public IEnumerable<string> Items { get; set; } = [];
+
+    /// <summary>仅接受 Items 中的完整名称；搜索草稿在离开组件时确认或清空。</summary>
+    [Parameter] public bool RestrictToItems { get; set; }
 
     [Parameter] public string? Placeholder { get; set; }
 
@@ -51,10 +59,15 @@
 
     protected override void OnParametersSet()
     {
-        if (_lastUserInput != null && Value != _lastUserInput)
+        // 父组件回传有效值（或空值）时保留尚未完成的搜索草稿。
+        // 外部主动更改 Value 时才替换输入，不在候选项异步加载时校验已有值。
+        if (!_initialized || !string.Equals(Value ?? string.Empty, _boundValue ?? string.Empty, StringComparison.Ordinal))
         {
             _inputKey++;
-            _lastUserInput = null;
+            _draft = Value;
+            _boundValue = Value;
+            _editing = false;
+            _initialized = true;
         }
     }
 
@@ -76,8 +89,9 @@
     private async Task OnInput(ChangeEventArgs args)
     {
         var text = args.Value?.ToString();
-        _lastUserInput = text;
-        await ValueChanged.InvokeAsync(text);
+        _draft = text;
+        _editing = true;
+        await SetValueAsync(RestrictToItems ? FindItem(text) : text);
         UpdateFiltered(text);
         _isOpen = _filtered.Any();
     }
@@ -89,28 +103,40 @@
             return;
         }
 
-        UpdateFiltered(Value);
+        UpdateFiltered(_draft);
         _isOpen = _filtered.Any();
     }
 
-    private void OnFocusOut(FocusEventArgs args)
+    private string? FindItem(string? text) => string.IsNullOrEmpty(text)
+        ? null
+        : Items.FirstOrDefault(item => string.Equals(item, text, StringComparison.OrdinalIgnoreCase));
+
+    private async Task SetValueAsync(string? value)
     {
-        // focusout 冒泡触发；如果新焦点仍在组件内部（输入框或选项按钮），不关闭
-        // Blazor 的 FocusEventArgs 没有 relatedTarget，所以用延迟让 onfocus/onclick 先处理
-        _ = CloseAfterDelay();
+        _boundValue = value;
+        await ValueChanged.InvokeAsync(value);
     }
 
-    private async Task CloseAfterDelay()
+    private async Task OnFocusLeave(CgFocusLeaveEventArgs args)
     {
-        await Task.Delay(150);
+        if (args.IsInternal) return;
         _isOpen = false;
-        StateHasChanged();
+        if (RestrictToItems && _editing)
+        {
+            _draft = FindItem(_draft);
+            _editing = false;
+            _inputKey++;
+            await SetValueAsync(_draft);
+        }
     }
 
     private async Task SelectOption(string item)
     {
         _isOpen = false;
-        await ValueChanged.InvokeAsync(item);
+        _draft = item;
+        _editing = false;
+        _inputKey++;
+        await SetValueAsync(item);
     }
 
 }

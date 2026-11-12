@@ -1,0 +1,57 @@
+﻿.record-value {
+    min-width: 0;
+    display: grid;
+    gap: var(--cg-spacing-2);
+    color: var(--cg-color-text);
+    font-size: var(--cg-font-size-sm);
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.record-value a { color: var(--cg-color-link); }
+.record-value__text { white-space: pre-wrap; }
+.record-value__empty { color: var(--cg-color-text-muted); }
+.record-value__url,
+.record-value__audio-name {
+    display: block;
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-xs);
+    overflow-wrap: anywhere;
+}
+.record-value audio { width: 100%; min-width: 0; }
+
+.record-value dl {
+    margin: var(--cg-spacing-2) 0 0;
+}
+
+.record-value dl > div {
+    display: grid;
+    grid-template-columns: minmax(72px, 30%) minmax(0, 1fr);
+    gap: var(--cg-spacing-2);
+    padding: var(--cg-spacing-2) 0;
+    border-top: 1px solid var(--cg-color-border);
+}
+
+.record-value dt { color: var(--cg-color-text-muted); }
+.record-value dd { margin: 0; white-space: pre-wrap; }
+.record-value ::deep img { max-height: 240px; object-fit: contain; }
+
+.record-value__body-diff ::deep .record-diff-inserted {
+    color: var(--cg-color-success, #16834a);
+    background: color-mix(in srgb, var(--cg-color-success, #16834a) 16%, transparent);
+    text-decoration: none;
+}
+
+.record-value__body-diff ::deep .record-diff-deleted {
+    color: var(--cg-color-error, #c23845);
+    background: color-mix(in srgb, var(--cg-color-error, #c23845) 16%, transparent);
+    text-decoration: line-through;
+}
+
+.record-value__body-diff--before ::deep .record-diff-inserted {
+    display: none;
+}
+
+.record-value__body-diff--after ::deep .record-diff-deleted {
+    display: none;
+}

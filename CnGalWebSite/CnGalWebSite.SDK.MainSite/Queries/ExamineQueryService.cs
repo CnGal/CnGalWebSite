@@ -1,4 +1,5 @@
-using CnGalWebSite.DataModel.Sorting;
+﻿using CnGalWebSite.DataModel.Sorting;
+using CnGalWebSite.DataModel.ViewModel;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -174,11 +175,50 @@ public sealed class ExamineQueryService(
         return result;
     }
 
+    // ─── 已通过记录的历史对比 ───
+
+    public async Task<SdkResult<EditRecordComparison>> GetApprovedExamineComparisonAsync(
+        long examineId, CancellationToken cancellationToken = default)
+    {
+        var overviewResult = await GetExaminesOverviewAsync(examineId, cancellationToken);
+        if (!overviewResult.Success || overviewResult.Data is null)
+        {
+            return SdkResult<EditRecordComparison>.Fail(
+                overviewResult.Error?.Code ?? "EXAMINE_COMPARISON_OVERVIEW",
+                overviewResult.Error?.Message ?? "无法加载编辑记录概览。",
+                overviewResult.Error?.StatusCode);
+        }
+
+        var records = overviewResult.Data.Examines
+            .Where(record => record.Id > 0)
+            .OrderBy(record => record.PassedTime)
+            .ThenBy(record => record.Id)
+            .ToList();
+        var index = records.FindIndex(record => record.Id == examineId);
+        if (index < 0)
+        {
+            return SdkResult<EditRecordComparison>.Fail(
+                "EXAMINE_COMPARISON_NOT_FOUND", "无法找到该审核记录所属的已通过历史。");
+        }
+        // 首个版本以空内容作为基准，完整展示该版本新增的内容。
+        var contrastId = index == 0 ? 0 : records[index - 1].Id;
+        return await GetEditRecordComparisonAsync(
+            overviewResult.Data.Type, contrastId, examineId, cancellationToken);
+    }
+
     // ─── 单条审核详情 ───
 
     public Task<SdkResult<ExamineViewModel>> GetExamineDetailAsync(
         long examineId, CancellationToken cancellationToken = default)
         => WithIdentityAsync((scope, token) => GetExamineDetailAsync(examineId, scope, token), cancellationToken);
+
+    public async Task<SdkResult<ExamineViewModel>> RefreshExamineDetailAsync(
+        long examineId, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        userCache.InvalidateExamine(HttpClient.BaseAddress, examineId);
+        return await GetExamineDetailAsync(examineId, cancellationToken);
+    }
 
     private Task<SdkResult<ExamineViewModel>> GetExamineDetailAsync(
         long examineId, CurrentUserCacheScope? scope, CancellationToken cancellationToken)
@@ -195,61 +235,57 @@ public sealed class ExamineQueryService(
             cancellationToken, userCache.GetExamineGeneration(HttpClient.BaseAddress, examineId));
     }
 
-    // ─── 对比审核（两个版本的 Before/After） ───
-
-    public Task<SdkResult<ExamineViewModel>> GetContrastExamineAsync(
-        long contrastId, long currentId, CancellationToken cancellationToken = default)
-        => WithIdentityAsync((scope, token) => GetContrastExamineAsync(contrastId, currentId, scope, token), cancellationToken);
-
-    private async Task<SdkResult<ExamineViewModel>> GetContrastExamineAsync(
-        long contrastId, long currentId, CurrentUserCacheScope? scope, CancellationToken cancellationToken)
+    public async Task<SdkResult<EditRecordComparison>> GetEditRecordComparisonAsync(
+        ExaminedNormalListModelType type, long contrastId, long currentId, CancellationToken cancellationToken = default)
     {
-        // 分别加载两条审核记录的详情
-        // BeforeModel 取自 contrastId 的 AfterModel（对比版本的终态）
-        // AfterModel 取自 currentId 的 AfterModel（当前版本的终态）
-        var contrastResult = await GetExamineDetailAsync(contrastId, scope, cancellationToken);
-        if (!contrastResult.Success || contrastResult.Data is null)
-        {
-            return contrastResult;
-        }
-
-        var currentResult = await GetExamineDetailAsync(currentId, scope, cancellationToken);
-        if (!currentResult.Success || currentResult.Data is null)
-        {
-            return currentResult;
-        }
-
-        // 组合成对比模型：Before = contrast 的 AfterModel, After = current 的 AfterModel
-        var combined = new ExamineViewModel
-        {
-            Id = contrastResult.Data.Id,
-            ObjectId = contrastResult.Data.ObjectId,
-            ObjectName = contrastResult.Data.ObjectName,
-            ObjectBriefIntroduction = contrastResult.Data.ObjectBriefIntroduction,
-            Image = contrastResult.Data.Image,
-            IsThumbnail = contrastResult.Data.IsThumbnail,
-            Type = contrastResult.Data.Type,
-            Operation = contrastResult.Data.Operation,
-            EditOverview = contrastResult.Data.EditOverview,
-            IsPassed = contrastResult.Data.IsPassed,
-            PassedAdminName = contrastResult.Data.PassedAdminName,
-            IsAdmin = contrastResult.Data.IsAdmin,
-            Comments = contrastResult.Data.Comments,
-            Note = contrastResult.Data.Note,
-            UserId = contrastResult.Data.UserId,
-            UserName = contrastResult.Data.UserName,
-            ApplyTime = contrastResult.Data.ApplyTime,
-            PassedTime = contrastResult.Data.PassedTime,
-            PrepositionExamineId = contrastResult.Data.PrepositionExamineId,
-            ContributionValue = contrastResult.Data.ContributionValue,
-            SensitiveWords = contrastResult.Data.SensitiveWords,
-            BeforeModel = contrastResult.Data.AfterModel,
-            AfterModel = currentResult.Data.AfterModel,
-        };
-
         cancellationToken.ThrowIfCancellationRequested();
-        return SdkResult<ExamineViewModel>.Ok(combined);
+        if (contrastId < 0 || currentId <= 0)
+            return SdkResult<EditRecordComparison>.Fail("EXAMINE_COMPARISON_RANGE", "请选择有效的版本");
+
+        var suffix = $"GetContrastEditRecordViews/{contrastId}/{currentId}";
+        var result = await (type switch
+        {
+            ExaminedNormalListModelType.Entry => GetSingleAsync<EntryContrastEditRecordViewModel, EditRecordComparison>(
+                $"api/entries/{suffix}",
+                m => Compare(m.ContrastId, m.CurrentId,
+                    EditRecordContentMapper.Map(m.ContrastModel), EditRecordContentMapper.Map(m.CurrentModel)),
+                "EXAMINE_COMPARISON", "历史版本对比", contrastId, cancellationToken),
+            ExaminedNormalListModelType.Article => GetSingleAsync<ArticleContrastEditRecordViewModel, EditRecordComparison>(
+                $"api/articles/{suffix}",
+                m => Compare(m.ContrastId, m.CurrentId,
+                    EditRecordContentMapper.Map(m.ContrastModel), EditRecordContentMapper.Map(m.CurrentModel)),
+                "EXAMINE_COMPARISON", "历史版本对比", contrastId, cancellationToken),
+            ExaminedNormalListModelType.Tag => GetSingleAsync<TagContrastEditRecordViewModel, EditRecordComparison>(
+                $"api/tags/{suffix}",
+                m => Compare(m.ContrastId, m.CurrentId,
+                    EditRecordContentMapper.Map(m.ContrastModel), EditRecordContentMapper.Map(m.CurrentModel)),
+                "EXAMINE_COMPARISON", "历史版本对比", contrastId, cancellationToken),
+            ExaminedNormalListModelType.Periphery => GetSingleAsync<PeripheryContrastEditRecordViewModel, EditRecordComparison>(
+                $"api/peripheries/{suffix}",
+                m => Compare(m.ContrastId, m.CurrentId,
+                    EditRecordContentMapper.Map(m.ContrastModel), EditRecordContentMapper.Map(m.CurrentModel)),
+                "EXAMINE_COMPARISON", "历史版本对比", contrastId, cancellationToken),
+            ExaminedNormalListModelType.Video => GetSingleAsync<VideoContrastEditRecordViewModel, EditRecordComparison>(
+                $"api/videos/{suffix}",
+                m => Compare(m.ContrastId, m.CurrentId,
+                    EditRecordContentMapper.Map(m.ContrastModel), EditRecordContentMapper.Map(m.CurrentModel)),
+                "EXAMINE_COMPARISON", "历史版本对比", contrastId, cancellationToken),
+            _ => Task.FromResult(SdkResult<EditRecordComparison>.Fail(
+                "EXAMINE_COMPARISON_TYPE", "该类型不支持历史版本对比"))
+        });
+        cancellationToken.ThrowIfCancellationRequested();
+        return result;
     }
+
+    private static EditRecordComparison Compare(long contrastId, long currentId,
+        CnGalWebSite.DataModel.ViewModel.Admin.ExaminePreDataModel before,
+        CnGalWebSite.DataModel.ViewModel.Admin.ExaminePreDataModel after) => new()
+    {
+        ContrastId = contrastId,
+        CurrentId = currentId,
+        Before = ExaminePreviewMapper.FromPreData(before),
+        After = ExaminePreviewMapper.FromPreData(after)
+    };
 
     private async Task<SdkResult<T>> WithIdentityAsync<T>(
         Func<CurrentUserCacheScope?, CancellationToken, Task<SdkResult<T>>> query,

@@ -2,6 +2,7 @@
 @typeparam TItem
 @typeparam TSort where TSort : struct, Enum
 @inject ILogger<CgDataTable<TItem, TSort>> Logger
+@implements IDisposable
 
 <div class="cg-datatable">
     @* ── 工具栏 ── *@
@@ -137,6 +138,14 @@
     private bool _sortDesc;
     private string? _search;
     private bool _loading;
+    private bool _rendered;
+    private bool _clientModeRefreshPending;
+    private bool _disposed;
+    private long _queryVersion;
+    private CgDataTableRequest<TSort>? _lastParameterState;
+
+    private CgDataTableRequest<TSort> CurrentState => new(
+        _currentPage, _pageSize, _sortField, _sortDesc, _search);
 
     // ── 计算值 ──
     private List<TItem> _displayItems = new();
@@ -159,6 +168,18 @@
     /// </summary>
     [Parameter]
     public Func<CgDataTableRequest<TSort>, Task<CgDataTableResult<TItem>>>? OnServerQuery { get; set; }
+
+    /// <summary>可选的外部查询状态，用于 URL 恢复等场景。</summary>
+    [Parameter]
+    public CgDataTableRequest<TSort>? State { get; set; }
+
+    /// <summary>交互或数据变化导致页码修正时通知调用方。</summary>
+    [Parameter]
+    public EventCallback<CgDataTableRequest<TSort>> StateChanged { get; set; }
+
+    /// <summary>页码因数据范围变化而被自动修正时通知调用方；调用方应替换当前历史项。</summary>
+    [Parameter]
+    public EventCallback<CgDataTableRequest<TSort>> StateCorrected { get; set; }
 
     /// <summary>
     /// 工具栏标题。
@@ -194,13 +215,13 @@
     /// 默认每页条数。
     /// </summary>
     [Parameter]
-    public int DefaultPageSize { get; set; } = 10;
+    public int DefaultPageSize { get; set; } = CgDataTableDefaults.PageSize;
 
     /// <summary>
     /// 每页条数可选项。
     /// </summary>
     [Parameter]
-    public int[] PageSizeOptions { get; set; } = [5, 10, 20, 50];
+    public int[] PageSizeOptions { get; set; } = CgDataTableDefaults.CreatePageSizeOptions();
 
     // ── 列注册 ──
 
@@ -209,13 +230,21 @@
         if (!_columns.Contains(column))
         {
             _columns.Add(column);
+            if (_rendered && OnServerQuery == null && Items != null)
+            {
+                _clientModeRefreshPending = true;
+            }
             StateHasChanged();
         }
     }
 
     public void RemoveColumn(CgDataTableColumn<TItem, TSort> column)
     {
-        _columns.Remove(column);
+        if (_columns.Remove(column) && _rendered && OnServerQuery == null && Items != null)
+        {
+            _clientModeRefreshPending = true;
+            StateHasChanged();
+        }
     }
 
     // ── 生命周期 ──
@@ -233,10 +262,32 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        if (State != null && State != _lastParameterState)
+        {
+            _lastParameterState = State;
+            if (State != CurrentState)
+            {
+                _currentPage = Math.Max(1, State.Page);
+                _pageSize = PageSizeOptions.Contains(State.PageSize) ? State.PageSize : DefaultPageSize;
+                _sortField = State.SortField;
+                _sortDesc = State.SortDesc;
+                _search = State.SearchText;
+                if (_rendered)
+                {
+                    await RefreshDataAsync();
+                    return;
+                }
+            }
+        }
+
         // 客户端模式下，Items 变化时重新计算
         if (OnServerQuery == null && Items != null)
         {
-            ApplyClientMode();
+            _clientModeRefreshPending = true;
+            if (_rendered)
+            {
+                await ApplyClientModeAndNotifyAsync();
+            }
         }
     }
 
@@ -244,8 +295,16 @@
     {
         if (firstRender && OnServerQuery != null)
         {
+            _rendered = true;
             await LoadServerDataAsync();
         }
+        else if (OnServerQuery == null && Items != null && _clientModeRefreshPending)
+        {
+            _rendered = true;
+            await ApplyClientModeAndNotifyAsync();
+            StateHasChanged();
+        }
+        _rendered = true;
     }
 
     // ── 客户端模式逻辑 ──
@@ -307,44 +366,48 @@
 
     private async Task LoadServerDataAsync()
     {
-        if (OnServerQuery == null) return;
+        if (OnServerQuery == null || _disposed) return;
 
+        var version = ++_queryVersion;
+        var request = CurrentState;
         _loading = true;
         StateHasChanged();
 
         try
         {
-            var request = new CgDataTableRequest<TSort>(
-                Page: _currentPage,
-                PageSize: _pageSize,
-                SortField: _sortField,
-                SortDesc: _sortDesc,
-                SearchText: _search);
-
             var result = await OnServerQuery(request);
+            if (_disposed || version != _queryVersion) return;
             _displayItems = result.Items.ToList();
             _totalCount = result.TotalCount;
 
-            // 确保当前页在有效范围内
-            if (_currentPage > _totalPages)
+            // 确保当前页在有效范围内；查询失败时不能把失败结果当成空数据来修正页码。
+            if (result.Success && _currentPage > _totalPages)
             {
                 _currentPage = _totalPages;
+                request = request with { Page = _currentPage };
+                await NotifyStateCorrectionAsync(request);
+                if (_disposed || version != _queryVersion) return;
                 // 页码修正后重新查询
-                result = await OnServerQuery(request with { Page = _currentPage });
+                result = await OnServerQuery(request);
+                if (_disposed || version != _queryVersion) return;
                 _displayItems = result.Items.ToList();
                 _totalCount = result.TotalCount;
             }
         }
         catch (Exception ex)
         {
+            if (_disposed || version != _queryVersion) return;
             Logger.LogError(ex, "CgDataTable 加载服务端数据失败");
             _displayItems = new List<TItem>();
             _totalCount = 0;
         }
         finally
         {
-            _loading = false;
-            StateHasChanged();
+            if (!_disposed && version == _queryVersion)
+            {
+                _loading = false;
+                StateHasChanged();
+            }
         }
     }
 
@@ -365,29 +428,53 @@
         }
 
         _currentPage = 1;
-        await RefreshDataAsync();
+        await QueryChangedAsync();
     }
 
     private async Task OnSearchInput(ChangeEventArgs args)
     {
-        _search = args.Value?.ToString();
+        var text = args.Value?.ToString();
+        _search = string.IsNullOrWhiteSpace(text) ? null : text;
         _currentPage = 1;
-        await RefreshDataAsync();
+        await QueryChangedAsync();
     }
 
     private async Task OnPageChanged(int page)
     {
-        _currentPage = page;
-        await RefreshDataAsync();
+        _currentPage = Math.Max(1, page);
+        await QueryChangedAsync();
     }
 
     private async Task OnPageSizeChanged(string? value)
     {
-        if (int.TryParse(value, out var size))
+        if (int.TryParse(value, out var size) && PageSizeOptions.Contains(size))
         {
             _pageSize = size;
             _currentPage = 1;
+            await QueryChangedAsync();
+        }
+    }
+
+    private async Task QueryChangedAsync()
+    {
+        // 在通知父组件之前使旧请求失效；父组件回传相同状态不会再次加载。
+        var version = ++_queryVersion;
+        await StateChanged.InvokeAsync(CurrentState);
+        if (!_disposed && version == _queryVersion)
             await RefreshDataAsync();
+    }
+
+    private Task NotifyStateCorrectionAsync(CgDataTableRequest<TSort> state)
+        => StateCorrected.HasDelegate ? StateCorrected.InvokeAsync(state) : StateChanged.InvokeAsync(state);
+
+    private async Task ApplyClientModeAndNotifyAsync()
+    {
+        _clientModeRefreshPending = false;
+        var previousPage = _currentPage;
+        ApplyClientMode();
+        if (previousPage != _currentPage)
+        {
+            await NotifyStateCorrectionAsync(CurrentState);
         }
     }
 
@@ -399,7 +486,11 @@
         }
         else
         {
+            _clientModeRefreshPending = false;
+            var previousPage = _currentPage;
             ApplyClientMode();
+            if (previousPage != _currentPage)
+                await NotifyStateCorrectionAsync(CurrentState);
         }
     }
 
@@ -425,4 +516,10 @@
     /// 允许外部调用方强制刷新数据（如操作完成后需重新加载）。
     /// </summary>
     public Task RefreshAsync() => RefreshDataAsync();
+
+    public void Dispose()
+    {
+        _disposed = true;
+        _queryVersion++;
+    }
 }

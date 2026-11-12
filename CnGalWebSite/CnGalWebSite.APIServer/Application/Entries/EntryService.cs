@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.Sorting;
+﻿using CnGalWebSite.DataModel.Sorting;
 
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
@@ -1196,6 +1196,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 model.IsDubbing = true;
             }
 
+            model.AllInformation = entry.Information?.ToList() ?? [];
             //初始化图片链接
             model.MainPicture = _appHelper.GetImagePath(entry.MainPicture, (entry.Type == EntryType.Staff || entry.Type == EntryType.Role) ? "" : "app.png");
             model.BackgroundPicture = _appHelper.GetImagePath(entry.BackgroundPicture, "");
@@ -2409,8 +2410,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 await GetEntryIndexViewModelAsync(currentEntry),
                 await GetEntryIndexViewModelAsync(newEntry)
             };
-
-
 
             return model;
         }

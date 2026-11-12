@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.Sorting;
+﻿using CnGalWebSite.DataModel.Sorting;
 
 using CnGalWebSite.APIServer.Application.Articles.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -571,6 +571,9 @@ namespace CnGalWebSite.APIServer.Application.Articles
                 Type = article.Type,
                 MainPage = article.MainPage,
                 PubishTime = article.RealNewsTime ?? article.PubishTime,
+                RealNewsTime = article.RealNewsTime,
+                NewsType = article.NewsType,
+                IsCreatedByCurrentUser = article.IsCreatedByCurrentUser,
                 OriginalLink = article.OriginalLink,
                 OriginalAuthor = article.OriginalAuthor,
                 CreateTime = article.CreateTime,
@@ -824,8 +827,6 @@ namespace CnGalWebSite.APIServer.Application.Articles
                 GetArticleViewModelAsync(currentArticle),
                 GetArticleViewModelAsync(newArticle)
             };
-
-
 
             return model;
         }

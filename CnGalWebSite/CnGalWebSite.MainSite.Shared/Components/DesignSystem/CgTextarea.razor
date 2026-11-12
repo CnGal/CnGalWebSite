@@ -1,4 +1,5 @@
 <textarea @key="_textareaKey"
+          id="@Id"
           class="cg-textarea @(Monospace ? "cg-textarea--mono" : string.Empty)"
           rows="@Rows"
           disabled="@Disabled"
@@ -8,6 +9,9 @@
           @oncginputcommit="OnInputAsync"></textarea>
 
 @code {
+    [Parameter]
+    public string? Id { get; set; }
+
     [Parameter]
     public string? Value { get; set; }
 

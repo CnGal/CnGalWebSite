@@ -1,0 +1,37 @@
+﻿@using CnGalWebSite.DataModel.ViewModel.Admin
+
+<section class="record-object" aria-label="记录所属对象">
+    <div class="record-object__image @(IsThumbnail ? "record-object__image--thumbnail" : "")">
+        @if (!string.IsNullOrWhiteSpace(Image))
+        {
+            <RecordImage Url="@Image" />
+        }
+        else
+        {
+            <CgMdiIcon Name="mdiFileDocumentOutline" aria-hidden="true" />
+        }
+    </div>
+    <div class="record-object__body">
+        <span class="record-object__type">@Type.GetDisplayName()</span>
+        <h2>@(string.IsNullOrWhiteSpace(Name) ? "记录所属对象" : Name)</h2>
+        @if (!string.IsNullOrWhiteSpace(Description)) { <p>@Description</p> }
+        <div class="record-object__actions">
+            @if (RecordPresentation.ObjectUrl(Type, ObjectId, UserId) is { } url)
+            {
+                <a class="record-object__action" href="@url">查看对象详情 <span aria-hidden="true">→</span></a>
+            }
+            @ChildContent
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter] public ExaminedNormalListModelType Type { get; set; }
+    [Parameter] public long ObjectId { get; set; }
+    [Parameter] public string? UserId { get; set; }
+    [Parameter] public string? Name { get; set; }
+    [Parameter] public string? Description { get; set; }
+    [Parameter] public string? Image { get; set; }
+    [Parameter] public bool IsThumbnail { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.Sorting;
+﻿using CnGalWebSite.DataModel.Sorting;
 
 
 using CnGalWebSite.APIServer.Application.Articles.Dtos;

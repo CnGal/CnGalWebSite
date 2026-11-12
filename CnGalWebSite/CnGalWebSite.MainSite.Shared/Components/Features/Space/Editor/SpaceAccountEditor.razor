@@ -178,8 +178,9 @@
             </div>
             <div class="space-cert-dialog__row">
                 <label class="space-cert-dialog__label">认证的词条</label>
-                <CgAutoComplete @bind-Value="_certEntryName"
+                <CgAutoComplete RestrictToItems="true" @bind-Value="_certEntryName"
                                 Items="_certEntryList"
+                                Disabled="@(_isLoadingCertEntries || _certEntriesType != _certType)"
                                 Placeholder="输入词条名称搜索..." />
             </div>
             <div class="space-cert-dialog__row">
@@ -376,24 +377,26 @@
     private string _certNote = string.Empty;
     private CgMarkdownEditor? _certNoteEditor;
     private List<string> _certEntryList = [];
-    private bool _certEntriesLoaded;
+    private UserCertificationType? _certEntriesType;
+    private bool _isLoadingCertEntries;
+    private int _certEntriesRequestVersion;
 
     /// <summary>
     /// 打开用户认证弹窗。
     /// </summary>
     private async Task OnOpenCertDialogAsync()
     {
-        if (!_certEntriesLoaded)
-        {
-            await LoadCertEntriesAsync();
-        }
-
-        // 回填已有数据
+        // 先回填已有数据，再按恢复后的认证类别加载可选词条。
         if (Model.UserCertificationModel != null)
         {
             _certType = Model.UserCertificationModel.Type;
             _certEntryName = Model.UserCertificationModel.EntryName ?? string.Empty;
             _certNote = Model.UserCertificationModel.Note ?? string.Empty;
+        }
+
+        if (_certEntriesType != _certType)
+        {
+            await LoadCertEntriesAsync();
         }
 
         _showCertDialog = true;
@@ -421,25 +424,54 @@
     /// </summary>
     private async Task LoadCertEntriesAsync()
     {
+        var requestedType = _certType;
+        var requestVersion = ++_certEntriesRequestVersion;
+        _isLoadingCertEntries = true;
         try
         {
-            var entryType = _certType == UserCertificationType.Group ? EntryType.ProductionGroup : EntryType.Staff;
+            var entryType = requestedType == UserCertificationType.Group ? EntryType.ProductionGroup : EntryType.Staff;
             var result = await SpaceCommandService.GetAllNotCertificatedEntriesAsync(entryType);
+            if (!IsCurrentCertEntriesRequest(requestedType, requestVersion))
+            {
+                return;
+            }
+
             if (result.Success && result.Data != null)
             {
                 _certEntryList = result.Data;
+                _certEntriesType = requestedType;
             }
             else
             {
                 _certEntryList = [];
+                _certEntriesType = null;
+                ToastService.Show("加载认证词条失败", result.Error?.Message, "error");
             }
-            _certEntriesLoaded = true;
         }
-        catch
+        catch (Exception ex)
         {
+            if (!IsCurrentCertEntriesRequest(requestedType, requestVersion))
+            {
+                return;
+            }
+
             _certEntryList = [];
+            _certEntriesType = null;
+            ToastService.Show("加载认证词条失败", ex.Message, "error");
+        }
+        finally
+        {
+            // Loading belongs to the request lifecycle, not the currently restored category.
+            // A dialog can be closed and reopened with cached options while this request is in flight.
+            if (requestVersion == _certEntriesRequestVersion)
+            {
+                _isLoadingCertEntries = false;
+            }
         }
     }
+
+    private bool IsCurrentCertEntriesRequest(UserCertificationType requestedType, int requestVersion) =>
+        requestVersion == _certEntriesRequestVersion && _certType == requestedType;
 
     /// <summary>
     /// 取消认证。
