@@ -163,6 +163,82 @@ public class ExaminePreviewMapperTests
     }
 
     [Test]
+    public void DuplicateTextGroupModifiersProduceDistinctKeys()
+    {
+        var legacy = new ExaminePreDataModel
+        {
+            Texts =
+            [
+                new()
+                {
+                    Modifier = "发行信息 · 同一名称",
+                    Informations = [new() { DisplayName = "发行平台", DisplayValue = "Steam" }]
+                },
+                new()
+                {
+                    Modifier = "发行信息 · 同一名称",
+                    Informations = [new() { DisplayName = "发行平台", DisplayValue = "百度贴吧" }]
+                }
+            ]
+        };
+
+        var result = ExaminePreviewMapper.FromPreData(legacy);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Items, Has.Count.EqualTo(2));
+            Assert.That(result.Items.Select(item => item.Key).Distinct().Count(), Is.EqualTo(2));
+        });
+    }
+
+    [Test]
+    public void ReleasesWithSameNameAreSeparatedByPlatform()
+    {
+        var legacy = EditRecordContentMapper.Map(new EntryIndexViewModel
+        {
+            Name = "关于我被小学女生绑架这件事",
+            Releases =
+            [
+                new()
+                {
+                    Name = "关于我被小学女生绑架这件事",
+                    PublishPlatformType = PublishPlatformType.Steam,
+                    Type = GameReleaseType.Official,
+                    GamePlatformTypes = [GamePlatformType.Windows],
+                    Time = new DateTime(2018, 5, 31),
+                    Engine = "Ren'Py",
+                    Link = "862690"
+                },
+                new()
+                {
+                    Name = "关于我被小学女生绑架这件事",
+                    PublishPlatformType = PublishPlatformType.Other,
+                    PublishPlatformName = "百度贴吧",
+                    Type = GameReleaseType.Official,
+                    GamePlatformTypes = [GamePlatformType.Windows],
+                    Time = new DateTime(2017, 5, 31),
+                    Engine = "Unity(Utage)",
+                    Link = "https://tieba.baidu.com/p/5142940840"
+                }
+            ]
+        });
+
+        var result = ExaminePreviewMapper.FromPreData(legacy);
+        var groups = result.Items
+            .Where(item => item.Group.StartsWith("发行信息", StringComparison.Ordinal))
+            .Select(item => item.Group)
+            .Distinct()
+            .ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(groups, Has.Count.EqualTo(2));
+            Assert.That(groups.Any(group => group.Contains("Steam", StringComparison.Ordinal)), Is.True);
+            Assert.That(groups.Any(group => group.Contains("百度贴吧", StringComparison.Ordinal)), Is.True);
+        });
+    }
+
+    [Test]
     public void NullLegacySnapshotIsMarkedIncomplete()
     {
         Assert.That(ExaminePreviewMapper.FromPreData(null).IsComplete, Is.False);

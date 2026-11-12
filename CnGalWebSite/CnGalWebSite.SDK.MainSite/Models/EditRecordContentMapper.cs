@@ -38,7 +38,12 @@ public static class EditRecordContentMapper
         }
         foreach (var release in value.Releases ?? [])
         {
-            Group(result, $"发行信息 · {release.Name}", [("发行平台", release.PublishPlatformType),
+            var platform = string.IsNullOrWhiteSpace(release.PublishPlatformName)
+                ? release.PublishPlatformType.GetDisplayName()
+                : release.PublishPlatformName;
+            var releaseGroup = string.Join(" · ", new[] { "发行信息", release.Name, platform }
+                .Where(part => !string.IsNullOrWhiteSpace(part)));
+            Group(result, releaseGroup, [("发行平台", release.PublishPlatformType),
                 ("平台名称", release.PublishPlatformName), ("类别", release.Type), ("发行时间", release.Time),
                 ("时间备注", release.TimeNote), ("引擎", release.Engine),
                 ("游戏平台", string.Join("、", (release.GamePlatformTypes ?? []).Select(p => p.GetDisplayName())))]);
