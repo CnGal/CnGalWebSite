@@ -51,6 +51,24 @@ public sealed class RecordPreviewProjector
     private static readonly HashSet<string> Images = new()
     { "MainPicture", "Thumbnail", "BackgroundPicture", "SmallBackgroundPicture", "PhotoPath", "BackgroundImage", "MBgImage", "SBgImage", "MainImage", "Logo" };
 
+    private static readonly IReadOnlyDictionary<string, Type> StaffEnumTypes = new Dictionary<string, Type>
+    {
+        ["PositionGeneral"] = typeof(PositionGeneralType)
+    };
+
+    private static readonly IReadOnlyDictionary<string, Type> ReleaseEnumTypes = new Dictionary<string, Type>
+    {
+        ["PublishPlatformType"] = typeof(PublishPlatformType),
+        ["Type"] = typeof(GameReleaseType),
+        ["GamePlatformTypes"] = typeof(GamePlatformType[])
+    };
+
+    private static readonly IReadOnlyDictionary<string, Type> WebsiteImageEnumTypes = new Dictionary<string, Type>
+    {
+        ["Type"] = typeof(EntryWebsiteImageType),
+        ["Size"] = typeof(EntryWebsiteImageSize)
+    };
+
     public RecordPreviewProjector(Type objectType, Func<string, string> imageUrlResolver = null)
     {
         this.objectType = objectType;
@@ -207,7 +225,8 @@ public sealed class RecordPreviewProjector
                 if (!string.IsNullOrWhiteSpace(Text(data["ParentTag"]))) Relation("tag-name", Text(data["ParentTag"]), "父标签", false, "parent");
                 break;
             case Operation.PubulishComment:
-                Scalars(new JObject { ["Time"] = data["CommentTime"], ["Type"] = data["Type"], ["ObjectId"] = data["ObjectId"] }, null, "comment", "评论");
+                Scalars(new JObject { ["Time"] = data["CommentTime"], ["Type"] = data["Type"], ["ObjectId"] = data["ObjectId"] }, null, "comment", "评论",
+                    new Dictionary<string, Type> { ["Type"] = typeof(CommentType) });
                 Body(Text(data["Text"]));
                 break;
             case Operation.RequestUserCertification:
@@ -220,14 +239,17 @@ public sealed class RecordPreviewProjector
 
     private void Body(string value) => Put(new() { Key = "body", Group = "正文", Kind = RecordPreviewKind.Body, Label = "正文", Value = value ?? "", DisplayValue = value ?? "" });
 
-    private void Scalars(JObject data, Type type, string prefix, string group)
+    private void Scalars(JObject data, Type type, string prefix, string group, IReadOnlyDictionary<string, Type> propertyTypes = null)
     {
         foreach (var property in data.Properties())
         {
             if (!Labels.ContainsKey(property.Name) && !(prefix == "comment" && property.Name == "ObjectId")) continue;
             var info = type?.GetProperty(property.Name);
-            if (type != null && info == null) continue;
-            var (raw, display) = Format(property.Value, info?.PropertyType);
+            var propertyType = propertyTypes != null && propertyTypes.TryGetValue(property.Name, out var overrideType)
+                ? overrideType
+                : info?.PropertyType;
+            if (type != null && info == null && (propertyTypes == null || !propertyTypes.ContainsKey(property.Name))) continue;
+            var (raw, display) = Format(property.Value, propertyType);
             var kind = Images.Contains(property.Name) ? RecordPreviewKind.Image
                 : property.Name is "OriginalLink" or "SaleLink" ? RecordPreviewKind.Link : RecordPreviewKind.Text;
             var url = kind == RecordPreviewKind.Image ? ResolveImage(raw) : raw;
@@ -270,7 +292,7 @@ public sealed class RecordPreviewProjector
         Key = Key("staff", Text(data["StaffId"]), Text(data["Name"]), Text(data["PositionOfficial"]), Text(data["Modifier"])),
         Group = "Staff" + GroupSuffix(data), Kind = RecordPreviewKind.Text, Label = Text(data["PositionOfficial"]),
         Value = Text(data["StaffId"]) + ":" + Text(data["Name"]), DisplayValue = Text(data["CustomName"]) is { Length: > 0 } name ? name : Text(data["Name"]),
-        Properties = Properties(data, "CustomName", "PositionGeneral", "SubordinateOrganization"),
+        Properties = Properties(data, StaffEnumTypes, "CustomName", "PositionGeneral", "SubordinateOrganization"),
         Url = (int?)data["StaffId"] > 0 ? "/entries/index/" + Text(data["StaffId"]) : null
     }, Deleted(data));
 
@@ -278,7 +300,7 @@ public sealed class RecordPreviewProjector
     {
         Key = Key("release", Text(data["PublishPlatformType"]), Text(data["PublishPlatformName"]), Text(data["Link"]), Text(data["Name"])),
         Group = "发行信息", Kind = RecordPreviewKind.Text, Label = Text(data["Name"]), Value = Text(data["Name"]), DisplayValue = Text(data["Name"]),
-        Properties = Properties(data, "PublishPlatformType", "PublishPlatformName", "Type", "GamePlatformTypes", "Time", "TimeNote", "Engine", "Link")
+        Properties = Properties(data, ReleaseEnumTypes, "PublishPlatformType", "PublishPlatformName", "Type", "GamePlatformTypes", "Time", "TimeNote", "Engine", "Link")
     }, Deleted(data));
 
     private void Goal(JObject data) => Put(new()
@@ -291,7 +313,7 @@ public sealed class RecordPreviewProjector
     {
         Key = Key("website-image", Text(data["Url"])), Group = "官网图片", Kind = RecordPreviewKind.Image,
         Label = Text(data["Note"]), Value = Text(data["Url"]), DisplayValue = Text(data["Url"]), Url = ResolveImage(Text(data["Url"])),
-        Properties = Properties(data, "Type", "Size", "Note", "Priority")
+        Properties = Properties(data, WebsiteImageEnumTypes, "Type", "Size", "Note", "Priority")
     }, Deleted(data));
 
     private void Outlink(JObject data, bool patch)
@@ -355,9 +377,13 @@ public sealed class RecordPreviewProjector
         else items.Add(item);
     }
 
-    private List<RecordPreviewProperty> Properties(JObject data, params string[] names) => names.Select(name =>
+    private List<RecordPreviewProperty> Properties(JObject data, params string[] names) =>
+        Properties(data, null, names);
+
+    private List<RecordPreviewProperty> Properties(JObject data, IReadOnlyDictionary<string, Type> propertyTypes, params string[] names) => names.Select(name =>
     {
-        var (raw, display) = Format(data[name], null);
+        var propertyType = propertyTypes != null && propertyTypes.TryGetValue(name, out var overrideType) ? overrideType : null;
+        var (raw, display) = Format(data[name], propertyType);
         return new RecordPreviewProperty { Key = name, Label = Labels.GetValueOrDefault(name, name), Value = raw,
             DisplayValue = name == "Thumbnail" ? ResolveImage(display) : display };
     }).ToList();
@@ -370,6 +396,12 @@ public sealed class RecordPreviewProjector
             type = Nullable.GetUnderlyingType(type ?? typeof(string)) ?? type;
             var converted = type != null ? value.ToObject(type) : (value as JValue)?.Value;
             if (converted is Enum enumeration) return (Convert.ToInt64(enumeration).ToString(CultureInfo.InvariantCulture), enumeration.GetDisplayName());
+            if (converted is IEnumerable enumerable && converted is not string)
+            {
+                var values = enumerable.Cast<object>().ToList();
+                if (values.Count > 0 && values.All(value => value is Enum))
+                    return (Text(value), string.Join("、", values.Cast<Enum>().Select(value => value.GetDisplayName())));
+            }
             if (converted is bool boolean) return (boolean ? "true" : "false", boolean ? "是" : "否");
             if (converted is DateTime date) return (date.ToUniversalTime().ToString("O"), date.ToString("yyyy-MM-dd HH:mm:ss"));
             if (converted is TimeSpan duration) return (duration.ToString("c"), duration.ToString("c"));

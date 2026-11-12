@@ -8,6 +8,88 @@ namespace CnGalWebSite.UnitTest;
 [TestFixture]
 public class RecordPreviewProjectorTests
 {
+
+    [Test]
+    public void CommentTypeUsesTheEnumDisplayName()
+    {
+        var projector = new RecordPreviewProjector(typeof(Comment));
+        projector.Apply(new Examine
+        {
+            Operation = Operation.PubulishComment,
+            Context = "{\"CommentTime\":\"2026-11-12T10:00:00\",\"Type\":2,\"ObjectId\":\"1\",\"Text\":\"hello\"}"
+        });
+
+        var type = projector.Snapshot(value => value).Items.Single(item => item.Key == "comment/Type");
+        Assert.That(type.Value, Is.EqualTo("2"));
+        Assert.That(type.DisplayValue, Is.EqualTo(CommentType.ReplyComment.GetDisplayName()));
+    }
+
+    [Test]
+    public void NestedStaffReleaseAndWebsiteEnumsUseDisplayNames()
+    {
+        var projector = new RecordPreviewProjector(typeof(Entry));
+        projector.Load(new Entry
+        {
+            Id = 1,
+            Name = "Entry",
+            EntryStaffFromEntryNavigation = new List<EntryStaff>
+            {
+                new()
+                {
+                    ToEntry = 2,
+                    Name = "Staff",
+                    PositionOfficial = "配音",
+                    PositionGeneral = PositionGeneralType.CV
+                }
+            },
+            Releases = new List<GameRelease>
+            {
+                new()
+                {
+                    Name = "正式版",
+                    PublishPlatformType = PublishPlatformType.Steam,
+                    PublishPlatformName = "Steam",
+                    Type = GameReleaseType.Official,
+                    GamePlatformTypes = new[] { GamePlatformType.Windows, GamePlatformType.Linux },
+                    Link = "https://example.com"
+                }
+            },
+            WebsiteAddInfor = new EntryWebsite
+            {
+                Images = new List<EntryWebsiteImage>
+                {
+                    new()
+                    {
+                        Url = "https://example.com/website.png",
+                        Type = EntryWebsiteImageType.Carousel,
+                        Size = EntryWebsiteImageSize.Large
+                    }
+                }
+            }
+        });
+
+        var snapshot = projector.Snapshot(value => value);
+        var staff = snapshot.Items.Single(item => item.Group.StartsWith("Staff", StringComparison.Ordinal));
+        var release = snapshot.Items.Single(item => item.Group == "发行信息");
+        var websiteImage = snapshot.Items.Single(item => item.Group == "官网图片");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(staff.Properties.Single(property => property.Key == "PositionGeneral").DisplayValue,
+                Is.EqualTo(PositionGeneralType.CV.GetDisplayName()));
+            Assert.That(release.Properties.Single(property => property.Key == "PublishPlatformType").DisplayValue,
+                Is.EqualTo(PublishPlatformType.Steam.GetDisplayName()));
+            Assert.That(release.Properties.Single(property => property.Key == "Type").DisplayValue,
+                Is.EqualTo(GameReleaseType.Official.GetDisplayName()));
+            Assert.That(release.Properties.Single(property => property.Key == "GamePlatformTypes").DisplayValue,
+                Is.EqualTo($"{GamePlatformType.Windows.GetDisplayName()}、{GamePlatformType.Linux.GetDisplayName()}"));
+            Assert.That(websiteImage.Properties.Single(property => property.Key == "Type").DisplayValue,
+                Is.EqualTo(EntryWebsiteImageType.Carousel.GetDisplayName()));
+            Assert.That(websiteImage.Properties.Single(property => property.Key == "Size").DisplayValue,
+                Is.EqualTo(EntryWebsiteImageSize.Large.GetDisplayName()));
+        });
+    }
+
     [Test]
     public void ImageAndAudioThumbnailUrlsUseTheInjectedResolverWithoutChangingCanonicalValues()
     {
