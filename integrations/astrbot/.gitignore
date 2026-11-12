@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+# 构建产物；插件 core/ 目录保存运行源码。
+/dist/
+
+# 人设和素材只在本机保存，不提交或打包。
+/private/
+/persona.md

@@ -1,0 +1,33 @@
+{
+  "api_base_url": {
+    "description": "主站绑定 API 地址（资料查询由 MCP 提供）",
+    "type": "string",
+    "default": "https://api.cngal.org/"
+  },
+  "rate_limit": {
+    "description": "限流（保存后重载插件生效）",
+    "type": "object",
+    "items": {
+      "window_seconds": {
+        "description": "统计窗口（秒）",
+        "type": "int",
+        "default": 60
+      },
+      "user_limit": {
+        "description": "每用户额度",
+        "type": "int",
+        "default": 5
+      },
+      "session_limit": {
+        "description": "每会话额度",
+        "type": "int",
+        "default": 10
+      },
+      "global_limit": {
+        "description": "插件全局额度",
+        "type": "int",
+        "default": 60
+      }
+    }
+  }
+}
