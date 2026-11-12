@@ -56,9 +56,16 @@ public interface IExamineQueryService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// 获取两个版本之间的对比审核详情。
-    /// 通过加载 contrastId 对应的审核记录，获取 BeforeModel（对比版本截止状态）和 AfterModel（当前版本截止状态）。
+    /// 按对象类型调用历史重建接口，返回截至两次已通过编辑的完整内容。
+    /// 两个编号必须属于同一对象，且 contrastId 不得晚于 currentId。
     /// </summary>
+    Task<SdkResult<EditRecordComparison>> GetEditRecordComparisonAsync(
+        ExaminedNormalListModelType type,
+        long contrastId,
+        long currentId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>兼容旧调用方式；同样使用历史重建接口。</summary>
     Task<SdkResult<ExamineViewModel>> GetContrastExamineAsync(
         long contrastId,
         long currentId,

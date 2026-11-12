@@ -1,0 +1,20 @@
+@using CnGalWebSite.DataModel.ViewModel.Admin
+
+@if (RecordPresentation.IsSingleSubmission(Model.Operation))
+{
+    <RecordContentComparison After="Model.AfterModel" AfterTitle="记录提交内容" Single="true" />
+}
+else
+{
+    @if (Model.IsPassed.HasValue)
+    {
+        <p class="review-content__hint">此处展示记录保存的内容与查询时的内容，不代表完整历史快照。</p>
+    }
+    <RecordContentComparison Before="Model.BeforeModel" After="Model.AfterModel"
+        BeforeTitle="@(Model.IsPassed is null ? "当前内容" : "记录保存内容")"
+        AfterTitle="@(Model.IsPassed is null ? "提交内容" : "查询时内容")" />
+}
+
+@code {
+    [Parameter, EditorRequired] public ExamineViewModel Model { get; set; } = default!;
+}

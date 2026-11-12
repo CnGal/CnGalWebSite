@@ -837,12 +837,12 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取审核记录
             var examines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.IsPassed == true && s.VideoId == currentExamine.VideoId).ToListAsync();
 
-            foreach (var item in examines.Where(s => s.Id <= contrastId))
+            foreach (var item in examines.Where(s => s.Id <= contrastId).OrderBy(s => s.Id))
             {
                 await _videoService.UpdateData(currentVideo, item);
             }
 
-            foreach (var item in examines.Where(s => s.Id <= currentId))
+            foreach (var item in examines.Where(s => s.Id <= currentId).OrderBy(s => s.Id))
             {
                 await _videoService.UpdateData(newVideo, item);
             }

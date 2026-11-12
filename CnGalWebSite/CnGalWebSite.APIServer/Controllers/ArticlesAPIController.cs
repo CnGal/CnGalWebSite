@@ -1169,12 +1169,12 @@ namespace CnGalWebSite.APIServer.Controllers
             //获取审核记录
             var examines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.IsPassed == true && s.ArticleId == currentExamine.ArticleId).ToListAsync();
 
-            foreach (var item in examines.Where(s => s.Id <= contrastId))
+            foreach (var item in examines.Where(s => s.Id <= contrastId).OrderBy(s => s.Id))
             {
                 await _articleService.UpdateArticleData(currentArticle, item);
             }
 
-            foreach (var item in examines.Where(s => s.Id <= currentId))
+            foreach (var item in examines.Where(s => s.Id <= currentId).OrderBy(s => s.Id))
             {
                 await _articleService.UpdateArticleData(newArticle, item);
             }

@@ -1,0 +1,43 @@
+.record-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.record-image--contain {
+    height: auto;
+}
+
+.record-image--contain img {
+    height: auto;
+    max-height: 320px;
+    object-fit: contain;
+    border-radius: var(--cg-radius-md);
+    background: var(--cg-color-section-bg);
+}
+
+.record-image__fallback {
+    min-height: 72px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--cg-spacing-2);
+    align-items: center;
+    justify-content: center;
+    padding: var(--cg-spacing-2);
+    background: var(--cg-color-section-bg);
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-xs);
+}
+
+.record-image__fallback ::deep svg {
+    width: 24px;
+    height: 24px;
+}

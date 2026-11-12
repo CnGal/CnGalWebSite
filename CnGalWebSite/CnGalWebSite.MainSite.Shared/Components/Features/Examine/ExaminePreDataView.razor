@@ -1,231 +1,98 @@
-﻿@using CnGalWebSite.DataModel.ViewModel.Admin
+@using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.ViewModel.Search
 
-@* 展示 ExaminePreDataModel 的结构化内容 — 正文、图片、文本信息、关联、外链、音频 *@
-
-@if (Model is not null)
-{
-    <div class="examine-pre-data-view">
-        @* ── 正文 ── *@
-        @if (!string.IsNullOrWhiteSpace(Model.MainPage))
-        {
-            <section class="examine-pre-data-view__section">
-                <h5 class="examine-pre-data-view__section-title">
-                    <CgMdiIcon Name="mdiTextBoxOutline" aria-hidden="true" />
-                    正文
-                </h5>
-                <div class="examine-pre-data-view__section-body">
-                    <CgHtmlContent Content="@Model.MainPage" />
-                </div>
-            </section>
-        }
-
-        @* ── 文本信息 ── *@
-        @if (Model.Texts.Count > 0)
-        {
-            <section class="examine-pre-data-view__section">
-                <h5 class="examine-pre-data-view__section-title">
-                    <CgMdiIcon Name="mdiFormatListBulleted" aria-hidden="true" />
-                    文本信息 (@Model.Texts.Count)
-                </h5>
-                <div class="examine-pre-data-view__section-body">
-                    @foreach (var group in Model.Texts)
+<div class="record-content">
+    @foreach (var kind in VisibleKinds)
+    {
+        <section class="record-content__section" aria-label="@RecordPresentation.Title(kind)">
+            @if (Kind is null) { <h4>@RecordPresentation.Title(kind)</h4> }
+            @switch (kind)
+            {
+                case RecordContentKind.MainPage:
+                    <CgHtmlContent Content="@Model!.MainPage" />
+                    break;
+                case RecordContentKind.Texts:
+                    @foreach (var group in Model!.Texts ?? [])
                     {
-                        @if (!string.IsNullOrWhiteSpace(group.Modifier))
-                        {
-                            <div class="examine-pre-data-view__group-title">@group.Modifier</div>
-                        }
-                        <table class="examine-pre-data-view__table">
-                            <thead>
-                                <tr>
-                                    <th>名称</th>
-                                    <th>值</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var kv in group.Informations)
-                                {
-                                    <tr>
-                                        <td>@kv.DisplayName</td>
-                                        <td>@kv.DisplayValue</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                        @if (!string.IsNullOrWhiteSpace(group.Modifier)) { <h5>@group.Modifier</h5> }
+                        <dl class="record-content__fields">
+                            @foreach (var field in group.Informations ?? [])
+                            { <div><dt>@field.DisplayName</dt><dd>@(string.IsNullOrWhiteSpace(field.DisplayValue) ? "—" : field.DisplayValue)</dd></div> }
+                        </dl>
                     }
-                </div>
-            </section>
-        }
-
-        @* ── 图片 ── *@
-        @if (Model.Pictures.Count > 0)
-        {
-            <section class="examine-pre-data-view__section">
-                <h5 class="examine-pre-data-view__section-title">
-                    <CgMdiIcon Name="mdiImageMultipleOutline" aria-hidden="true" />
-                    图片 (@Model.Pictures.Count)
-                </h5>
-                <div class="examine-pre-data-view__section-body">
-                    <div class="examine-pre-data-view__image-grid">
-                        @foreach (var pic in Model.Pictures)
+                    break;
+                case RecordContentKind.Pictures:
+                    <div class="record-content__pictures">
+                        @foreach (var image in Model!.Pictures ?? [])
                         {
-                            <div class="examine-pre-data-view__image-item">
-                                <img src="@pic.Url" alt="@(pic.Note ?? "")" loading="lazy" />
-                                @if (!string.IsNullOrWhiteSpace(pic.Note))
+                            <figure>
+                                @if (RecordPresentation.HttpUrl(image.Url) is { } imageUrl)
                                 {
-                                    <span class="examine-pre-data-view__image-note">@pic.Note</span>
+                                    <a href="@imageUrl" target="_blank" rel="noopener noreferrer" aria-label="@($"查看原图：{image.Note ?? "图片"}")">
+                                        <RecordImage Url="@imageUrl" Alt="@(image.Note ?? "记录图片")" Contain="true" />
+                                    </a>
                                 }
-                            </div>
+                                else { <span class="record-content__empty">图片地址不可用</span> }
+                                @if (!string.IsNullOrWhiteSpace(image.Note)) { <figcaption>@image.Note</figcaption> }
+                            </figure>
                         }
                     </div>
-                </div>
-            </section>
-        }
-
-        @* ── 关联 ── *@
-        @if (Model.Relevances.Count > 0)
-        {
-            <section class="examine-pre-data-view__section">
-                <h5 class="examine-pre-data-view__section-title">
-                    <CgMdiIcon Name="mdiLinkVariant" aria-hidden="true" />
-                    关联 (@Model.Relevances.Count)
-                </h5>
-                <div class="examine-pre-data-view__section-body">
-                    <div class="examine-pre-data-view__tag-list">
-                        @foreach (var rel in Model.Relevances)
+                    break;
+                case RecordContentKind.Relevances:
+                    <ul class="record-content__links">
+                        @foreach (var relevance in Model!.Relevances ?? [])
                         {
-                            var name = GetRelevanceName(rel);
-                            var url = GetRelevanceUrl(rel);
-                            if (!string.IsNullOrWhiteSpace(name))
-                            {
-                                @if (!string.IsNullOrWhiteSpace(url))
-                                {
-                                    <a class="examine-pre-data-view__tag" href="@url" target="_blank" rel="noopener noreferrer">@name</a>
-                                }
-                                else
-                                {
-                                    <span class="examine-pre-data-view__tag">@name</span>
-                                }
-                            }
+                            var (name, url) = Relevance(relevance);
+                            <li>@if (url is not null) { <a href="@url" target="_blank" rel="noopener noreferrer">@name</a> }
+                                else { <span>@name</span> }</li>
                         }
-                    </div>
-                </div>
-            </section>
-        }
-
-        @* ── 外链 ── *@
-        @if (Model.Outlinks.Count > 0)
-        {
-            <section class="examine-pre-data-view__section">
-                <h5 class="examine-pre-data-view__section-title">
-                    <CgMdiIcon Name="mdiOpenInNew" aria-hidden="true" />
-                    外链 (@Model.Outlinks.Count)
-                </h5>
-                <div class="examine-pre-data-view__section-body">
-                    <table class="examine-pre-data-view__table">
-                        <thead>
-                            <tr>
-                                <th>名称</th>
-                                <th>链接</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var link in Model.Outlinks)
-                            {
-                                <tr>
-                                    <td>@link.DisplayName</td>
-                                    <td>
-                                        @{
-                                            var url = !string.IsNullOrWhiteSpace(link.Link) ? link.Link : null;
-                                            var display = link.DisplayValue;
-
-                                            if (string.IsNullOrWhiteSpace(url) && !string.IsNullOrWhiteSpace(display) && 
-                                                (display.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || display.StartsWith("https://", StringComparison.OrdinalIgnoreCase)))
-                                            {
-                                                url = display;
-                                            }
-                                            
-                                            if (string.IsNullOrWhiteSpace(display))
-                                            {
-                                                display = url;
-                                            }
-                                        }
-                                        @if (!string.IsNullOrWhiteSpace(url) && (url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || url.StartsWith("https://", StringComparison.OrdinalIgnoreCase)))
-                                        {
-                                            <a href="@url" target="_blank" rel="noopener noreferrer">@display</a>
-                                        }
-                                        else
-                                        {
-                                            @(string.IsNullOrWhiteSpace(display) ? "—" : display)
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        }
-
-        @* ── 音频 ── *@
-        @if (Model.Audio.Count > 0)
-        {
-            <section class="examine-pre-data-view__section">
-                <h5 class="examine-pre-data-view__section-title">
-                    <CgMdiIcon Name="mdiMusicNoteOutline" aria-hidden="true" />
-                    音频 (@Model.Audio.Count)
-                </h5>
-                <div class="examine-pre-data-view__section-body">
-                    @foreach (var audio in Model.Audio)
+                    </ul>
+                    break;
+                case RecordContentKind.Outlinks:
+                    <dl class="record-content__fields">
+                        @foreach (var link in Model!.Outlinks ?? [])
+                        {
+                            var url = RecordPresentation.HttpUrl(link.Link) ?? RecordPresentation.HttpUrl(link.DisplayValue);
+                            var text = string.IsNullOrWhiteSpace(link.DisplayValue) ? url ?? "—" : link.DisplayValue;
+                            <div><dt>@(link.DisplayName ?? "链接")</dt><dd>
+                                @if (url is not null) { <a href="@url" target="_blank" rel="noopener noreferrer">@text</a> }
+                                else { <span>@text</span> }
+                            </dd></div>
+                        }
+                    </dl>
+                    break;
+                case RecordContentKind.Audio:
+                    @foreach (var audio in Model!.Audio ?? [])
                     {
-                        <div class="examine-pre-data-view__audio-item">
-                            <span>@audio.Name</span>
-                            @if (!string.IsNullOrWhiteSpace(audio.Url))
-                            {
-                                <a href="@audio.Url" target="_blank" rel="noopener noreferrer">播放</a>
-                            }
+                        <div class="record-content__audio">
+                            <span>@(audio.Name ?? "音频")</span>
+                            @if (RecordPresentation.HttpUrl(audio.Url) is { } audioUrl)
+                            { <audio controls preload="none" src="@audioUrl" aria-label="@(audio.Name ?? "记录音频")"></audio><a href="@audioUrl" target="_blank" rel="noopener noreferrer">打开音频</a> }
+                            else { <span class="record-content__empty">音频地址不可用</span> }
                         </div>
                     }
-                </div>
-            </section>
-        }
-
-        @* ── 空状态 ── *@
-        @if (string.IsNullOrWhiteSpace(Model.MainPage) && Model.Texts.Count == 0 && Model.Pictures.Count == 0
-             && Model.Relevances.Count == 0 && Model.Outlinks.Count == 0 && Model.Audio.Count == 0)
-        {
-            <div class="examine-pre-data-view__empty">
-                <CgMdiIcon Name="mdiInformationOutline" aria-hidden="true" />
-                <span>暂无数据</span>
-            </div>
-        }
-    </div>
-}
+                    break;
+            }
+        </section>
+    }
+    @if (!VisibleKinds.Any()) { <p class="record-content__empty">@EmptyText</p> }
+</div>
 
 @code {
-    [Parameter]
-    public ExaminePreDataModel? Model { get; set; }
+    [Parameter] public ExaminePreDataModel? Model { get; set; }
+    [Parameter] public RecordContentKind? Kind { get; set; }
+    [Parameter] public string EmptyText { get; set; } = "此侧无内容";
+    private IEnumerable<RecordContentKind> VisibleKinds => RecordPresentation.ContentKinds
+        .Where(k => (Kind is null || Kind == k) && RecordPresentation.HasContent(Model, k));
 
-    private static string? GetRelevanceName(SearchAloneModel model)
+    private static (string Name, string? Url) Relevance(SearchAloneModel model)
     {
-        if (model.entry is not null) return model.entry.Name;
-        if (model.article is not null) return model.article.DisplayName ?? model.article.Name;
-        if (model.tag is not null) return model.tag.Name;
-        if (model.video is not null) return model.video.DisplayName ?? model.video.Name;
-        if (model.periphery is not null) return model.periphery.Name;
-        if (model.user is not null) return model.user.UserName ?? "用户";
-        return null;
-    }
-
-    private static string? GetRelevanceUrl(SearchAloneModel model)
-    {
-        if (model.entry is not null) return $"/entries/index/{model.entry.Id}";
-        if (model.article is not null) return $"/articles/index/{model.article.Id}";
-        if (model.tag is not null) return $"/tags/index/{model.tag.Id}";
-        if (model.video is not null) return $"/videos/index/{model.video.Id}";
-        if (model.periphery is not null) return $"/peripheries/index/{model.periphery.Id}";
-        if (model.user is not null) return $"/space/index/{model.user.Id}";
-        return null;
+        if (model.entry is { } e) return (e.Name ?? "未命名词条", RecordPresentation.ObjectUrl(ExaminedNormalListModelType.Entry, e.Id));
+        if (model.article is { } a) return (a.DisplayName ?? a.Name ?? "未命名文章", RecordPresentation.ObjectUrl(ExaminedNormalListModelType.Article, a.Id));
+        if (model.tag is { } t) return (t.Name ?? "未命名标签", RecordPresentation.ObjectUrl(ExaminedNormalListModelType.Tag, t.Id));
+        if (model.video is { } v) return (v.DisplayName ?? v.Name ?? "未命名视频", RecordPresentation.ObjectUrl(ExaminedNormalListModelType.Video, v.Id));
+        if (model.periphery is { } p) return (p.Name ?? "未命名周边", RecordPresentation.ObjectUrl(ExaminedNormalListModelType.Periphery, p.Id));
+        if (model.user is { } u) return (u.UserName ?? "未知用户", RecordPresentation.ObjectUrl(ExaminedNormalListModelType.User, 0, u.Id));
+        return ("关联对象信息不可用", null);
     }
 }
-

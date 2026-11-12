@@ -1,0 +1,37 @@
+@using CnGalWebSite.DataModel.ViewModel.Admin
+
+<div class="record-comparison @(Single ? "record-comparison--single" : "")">
+    @if (!RecordPresentation.HasContent(Before) && !RecordPresentation.HasContent(After))
+    {
+        <p class="record-comparison__empty">此记录没有可展示的内容，请参阅修改说明。</p>
+    }
+    @foreach (var kind in RecordPresentation.ContentKinds.Where(k =>
+        RecordPresentation.HasContent(AfterContent, k) || (!Single && RecordPresentation.HasContent(Before, k))))
+    {
+        <section class="record-comparison__section" aria-label="@RecordPresentation.Title(kind)">
+            <h3>@RecordPresentation.Title(kind)</h3>
+            <div class="record-comparison__columns">
+                @if (!Single)
+                {
+                    <div class="record-comparison__side">
+                        <h4>@BeforeTitle</h4>
+                        <ExaminePreDataView Model="Before" Kind="kind" />
+                    </div>
+                }
+                <div class="record-comparison__side">
+                    <h4>@AfterTitle</h4>
+                    <ExaminePreDataView Model="AfterContent" Kind="kind" />
+                </div>
+            </div>
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter] public ExaminePreDataModel? Before { get; set; }
+    [Parameter] public ExaminePreDataModel? After { get; set; }
+    [Parameter] public string BeforeTitle { get; set; } = "当前内容";
+    [Parameter] public string AfterTitle { get; set; } = "提交内容";
+    [Parameter] public bool Single { get; set; }
+    private ExaminePreDataModel? AfterContent => Single && !RecordPresentation.HasContent(After) ? Before : After;
+}
