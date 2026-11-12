@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CnGalWebSite.DataModel.ExamineModel.Comments;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -19,20 +20,20 @@ public partial class ExamineService
         if (live == null) return false;
         model.Type = PreviewType(examine);
         model.ObjectId = ObjectId(examine);
-        model.ObjectName = Property(live, "DisplayName") ?? Property(live, "Name") ?? Property(live, "UserName");
-        model.ObjectBriefIntroduction = Property(live, "BriefIntroduction") ?? Property(live, "PersonalSignature");
-        model.Image = _appHelper.GetImagePath(Property(live, "MainPicture") ?? Property(live, "MainImage") ?? Property(live, "PhotoPath"), "app.png");
+        ApplyObjectSummary(model, live);
         model.EditOverview = HtmlSanitizerHelper.Sanitize(_appHelper.GetJsonStringView(examine.Context));
         model.ContributionValue = examine.ContributionValue;
         model.SubmissionOnly = examine.Operation is Operation.PubulishComment or Operation.RequestUserCertification;
         var records = await PreviewHistory(examine).AsNoTracking().ToListAsync();
-        var state = new RecordPreviewProjector(live.GetType());
+        var state = CreatePreviewProjector(live.GetType());
 
         if (model.SubmissionOnly)
         {
             state.Apply(examine);
             model.BeforeModel = new() { IsComplete = false };
             model.AfterModel = state.Snapshot(RenderPreview);
+            if (live is Comment comment)
+                await EnrichCommentPreview(examine, model, model.AfterModel);
         }
         else if (examine.IsPassed == null)
         {
@@ -63,6 +64,8 @@ public partial class ExamineService
             ReplayPreview(state, examine);
             model.AfterModel = state.Snapshot(RenderPreview);
         }
+        if (live is PlayedGame playedGame && playedGame.Entry is not null)
+            EnrichPlayedGamePreview(playedGame, model.BeforeModel, model.AfterModel);
         await ResolvePreviewReferences(model.BeforeModel, model.AfterModel);
         return true;
     }
@@ -79,7 +82,7 @@ public partial class ExamineService
         if (RecordVersionOrder.Compare(before, after) > 0)
             throw new ArgumentException("基准版本的通过时间不能晚于目标版本。");
         var records = await PreviewHistory(before).AsNoTracking().Where(r => r.IsPassed == true).ToListAsync();
-        var state = new RecordPreviewProjector(DomainType(type));
+        var state = CreatePreviewProjector(DomainType(type));
         var result = new EditRecordComparison { ContrastId = contrastId, CurrentId = currentId };
         foreach (var record in RecordVersionOrder.Approved(records))
         {
@@ -90,6 +93,199 @@ public partial class ExamineService
         }
         await ResolvePreviewReferences(result.Before, result.After);
         return result;
+    }
+
+    private RecordPreviewProjector CreatePreviewProjector(Type objectType) =>
+        new(objectType, value => _appHelper.GetImagePath(value, ""));
+
+    private void ApplyObjectSummary(ExamineViewModel model, object live)
+    {
+        model.ObjectName = FirstNonEmpty(Property(live, "DisplayName"), Property(live, "Name"), Property(live, "UserName"));
+        model.ObjectBriefIntroduction = FirstNonEmpty(Property(live, "BriefIntroduction"), Property(live, "PersonalSignature"));
+        model.Image = _appHelper.GetImagePath(FirstNonEmpty(Property(live, "MainPicture"), Property(live, "MainImage"), Property(live, "PhotoPath")), "app.png");
+
+        switch (live)
+        {
+            case Entry entry:
+                model.ObjectName = FirstNonEmpty(entry.DisplayName, entry.Name);
+                if (entry.Type is EntryType.Game or EntryType.ProductionGroup)
+                    model.Image = _appHelper.GetImagePath(entry.MainPicture, "app.png");
+                else
+                {
+                    model.Image = _appHelper.GetImagePath(entry.Thumbnail, "user.png");
+                    model.IsThumbnail = true;
+                }
+                break;
+            case ApplicationUser user:
+                model.ObjectName = FirstNonEmpty(user.UserName);
+                model.ObjectBriefIntroduction = user.PersonalSignature;
+                model.Image = _appHelper.GetImagePath(user.PhotoPath, "user.png");
+                model.IsThumbnail = true;
+                break;
+            case PlayedGame playedGame when playedGame.Entry is not null:
+                model.ObjectName = FirstNonEmpty(playedGame.Entry.DisplayName, playedGame.Entry.Name);
+                model.ObjectBriefIntroduction = playedGame.Entry.BriefIntroduction;
+                model.Image = _appHelper.GetImagePath(playedGame.Entry.MainPicture, "app.png");
+                break;
+        }
+    }
+
+    private async Task EnrichCommentPreview(Examine examine, ExamineViewModel model, ExaminePreDataModel snapshot)
+    {
+        CommentText text;
+        try
+        {
+            text = JsonConvert.DeserializeObject<CommentText>(examine.Context);
+        }
+        catch (JsonException)
+        {
+            return;
+        }
+        if (text is null) return;
+
+        var target = await ResolveCommentTarget(text);
+        if (target is null) return;
+        var (type, id) = target.Value;
+        switch (type)
+        {
+            case CommentType.CommentArticle when long.TryParse(id, out var articleId):
+            {
+                var article = await _articleRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == articleId);
+                if (article is null) return;
+                var name = FirstNonEmpty(article.DisplayName, article.Name);
+                AddCommentTarget(snapshot, "article", id, name, "/articles/index/" + id);
+                model.ObjectName = name;
+                model.ObjectBriefIntroduction = article.BriefIntroduction;
+                model.Image = _appHelper.GetImagePath(article.MainPicture, "app.png");
+                break;
+            }
+            case CommentType.CommentEntries when int.TryParse(id, out var entryId):
+            {
+                var entry = await _entryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == entryId);
+                if (entry is null) return;
+                var name = FirstNonEmpty(entry.DisplayName, entry.Name);
+                AddCommentTarget(snapshot, "entry", id, name, "/entries/index/" + id);
+                model.ObjectName = name;
+                model.ObjectBriefIntroduction = entry.BriefIntroduction;
+                model.Image = _appHelper.GetImagePath(entry.Type is EntryType.Game or EntryType.ProductionGroup ? entry.MainPicture : entry.Thumbnail,
+                    entry.Type is EntryType.Game or EntryType.ProductionGroup ? "app.png" : "user.png");
+                model.IsThumbnail = entry.Type is not (EntryType.Game or EntryType.ProductionGroup);
+                break;
+            }
+            case CommentType.CommentPeriphery when long.TryParse(id, out var peripheryId):
+            {
+                var periphery = await _peripheryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == peripheryId);
+                if (periphery is null) return;
+                var name = FirstNonEmpty(periphery.DisplayName, periphery.Name);
+                AddCommentTarget(snapshot, "periphery", id, name, "/peripheries/index/" + id);
+                model.ObjectName = name;
+                model.ObjectBriefIntroduction = periphery.BriefIntroduction;
+                model.Image = _appHelper.GetImagePath(periphery.MainPicture, "app.png");
+                break;
+            }
+            case CommentType.CommentVideo when long.TryParse(id, out var videoId):
+            {
+                var video = await _videoRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == videoId);
+                if (video is null) return;
+                var name = FirstNonEmpty(video.DisplayName, video.Name);
+                AddCommentTarget(snapshot, "video", id, name, "/videos/index/" + id);
+                model.ObjectName = name;
+                model.ObjectBriefIntroduction = video.BriefIntroduction;
+                model.Image = _appHelper.GetImagePath(video.MainPicture, "app.png");
+                break;
+            }
+            case CommentType.CommentVote when long.TryParse(id, out var voteId):
+            {
+                var vote = await _voteRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == voteId);
+                if (vote is null) return;
+                var name = FirstNonEmpty(vote.DisplayName, vote.Name);
+                AddCommentTarget(snapshot, "vote", id, name, "/votes/index/" + id);
+                model.ObjectName = name;
+                model.ObjectBriefIntroduction = vote.BriefIntroduction;
+                model.Image = _appHelper.GetImagePath(vote.MainPicture, "app.png");
+                break;
+            }
+            case CommentType.CommentLottery when long.TryParse(id, out var lotteryId):
+            {
+                var lottery = await _lotteryRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == lotteryId);
+                if (lottery is null) return;
+                var name = FirstNonEmpty(lottery.DisplayName, lottery.Name);
+                AddCommentTarget(snapshot, "lottery", id, name, "/lotteries/index/" + id);
+                model.ObjectName = name;
+                model.ObjectBriefIntroduction = lottery.BriefIntroduction;
+                model.Image = _appHelper.GetImagePath(lottery.MainPicture, "app.png");
+                break;
+            }
+            case CommentType.CommentUser:
+            {
+                var user = await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(s => s.Id == id);
+                if (user is null) return;
+                AddCommentTarget(snapshot, "user", id, FirstNonEmpty(user.UserName), "/space/index/" + Uri.EscapeDataString(id));
+                model.ObjectName = FirstNonEmpty(user.UserName);
+                model.ObjectBriefIntroduction = user.PersonalSignature;
+                model.Image = _appHelper.GetImagePath(user.PhotoPath, "user.png");
+                model.IsThumbnail = true;
+                break;
+            }
+        }
+    }
+
+    private async Task<(CommentType Type, string Id)?> ResolveCommentTarget(CommentText text)
+    {
+        if (text.Type != CommentType.ReplyComment)
+            return string.IsNullOrWhiteSpace(text.ObjectId) ? null : (text.Type, text.ObjectId);
+
+        var objectId = text.ObjectId;
+        var visited = new HashSet<long>();
+        while (long.TryParse(objectId, out var parentId) && visited.Add(parentId))
+        {
+            var parent = await _commentRepository.GetAll().AsNoTracking()
+                .Include(s => s.ParentCodeNavigation)
+                .FirstOrDefaultAsync(s => s.Id == parentId);
+            if (parent is null) return null;
+
+            var direct = CommentTarget(parent);
+            if (direct is not null) return direct;
+            if (parent.Type != CommentType.ReplyComment) return null;
+            objectId = parent.ParentCodeNavigation?.Id.ToString();
+        }
+        return null;
+    }
+
+    private static (CommentType Type, string Id)? CommentTarget(Comment comment)
+    {
+        if (comment.EntryId.HasValue) return (CommentType.CommentEntries, comment.EntryId.Value.ToString());
+        if (comment.ArticleId.HasValue) return (CommentType.CommentArticle, comment.ArticleId.Value.ToString());
+        if (comment.PeripheryId.HasValue) return (CommentType.CommentPeriphery, comment.PeripheryId.Value.ToString());
+        if (comment.VideoId.HasValue) return (CommentType.CommentVideo, comment.VideoId.Value.ToString());
+        if (comment.VoteId.HasValue) return (CommentType.CommentVote, comment.VoteId.Value.ToString());
+        if (comment.LotteryId.HasValue) return (CommentType.CommentLottery, comment.LotteryId.Value.ToString());
+        return null;
+    }
+
+    private static void EnrichPlayedGamePreview(PlayedGame playedGame, params ExaminePreDataModel[] snapshots)
+    {
+        var entry = playedGame.Entry;
+        var name = FirstNonEmpty(entry.DisplayName, entry.Name);
+        foreach (var snapshot in snapshots)
+        {
+            if (snapshot.Items.Any(item => item.Kind == RecordPreviewKind.Relation && item.Value == "entry:" + entry.Id)) continue;
+            snapshot.Items.Add(new RecordPreviewItem
+            {
+                Key = "relation/关联词条/entry/" + entry.Id, Group = "关联词条", Kind = RecordPreviewKind.Relation,
+                Label = name, Value = "entry:" + entry.Id, DisplayValue = name, Url = "/entries/index/" + entry.Id
+            });
+        }
+    }
+
+    private static void AddCommentTarget(ExaminePreDataModel snapshot, string type, string id, string name, string url)
+    {
+        snapshot.Items.RemoveAll(i => i.Key == "comment/target");
+        snapshot.Items.Add(new RecordPreviewItem
+        {
+            Key = "comment/target", Group = "评论目标", Kind = RecordPreviewKind.Relation,
+            Label = name, Value = type + ":" + id, DisplayValue = name, Url = url
+        });
     }
 
     private void ReplayPreview(RecordPreviewProjector state, Examine record)
@@ -158,7 +354,8 @@ public partial class ExamineService
             case ExaminedNormalListModelType.UserCertification:
                 return await _userRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(e => e.Id == record.ApplicationUserId);
             case ExaminedNormalListModelType.PlayedGame:
-                return await _playedGameRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(e => e.Id == record.PlayedGameId);
+                return await _playedGameRepository.GetAll().AsNoTracking().Include(e => e.Entry)
+                    .FirstOrDefaultAsync(e => e.Id == record.PlayedGameId);
             case ExaminedNormalListModelType.FavoriteFolder:
                 return await _favoriteFolderRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(e => e.Id == record.FavoriteFolderId);
             case ExaminedNormalListModelType.Disambig:
@@ -192,6 +389,7 @@ public partial class ExamineService
     }
 
     private static string Property(object value, string name) => value.GetType().GetProperty(name)?.GetValue(value) as string;
+    private static string FirstNonEmpty(params string[] values) => values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value)) ?? string.Empty;
     private static long ObjectId(Examine e) => PreviewType(e) switch
     {
         ExaminedNormalListModelType.Entry => e.EntryId ?? 0, ExaminedNormalListModelType.Article => e.ArticleId ?? 0,

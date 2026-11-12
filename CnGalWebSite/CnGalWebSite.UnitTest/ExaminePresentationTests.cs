@@ -230,6 +230,29 @@ public class ExaminePresentationTests
     }
 
     [Test]
+    public async Task SameVersionComparisonShowsNoticeWithoutCallingComparisonApi()
+    {
+        var query = Proxy<IExamineQueryService>((method, _) => method.Name switch
+        {
+            "GetExaminesOverviewAsync" => Task.FromResult(SdkResult<ExaminesOverviewViewModel>.Ok(new()
+                { ObjectId = 1, ObjectName = "测试对象", Examines = [History(1), History(2)] })),
+            "GetEditRecordComparisonAsync" => throw new AssertionException("Same-version comparison should not call the API"),
+            _ => throw new InvalidOperationException(method.Name)
+        });
+        using var services = Services(query);
+        await using var renderer = new TestRenderer(services);
+        var root = await renderer.Attach<EditRecordPage>();
+        await renderer.Render(root, new()
+        {
+            ["ContrastIdQuery"] = "1",
+            ["CurrentIdQuery"] = "1",
+            ["Mode"] = "compare"
+        });
+
+        Assert.That(renderer.AllText(root), Does.Contain("两个版本相同。"));
+    }
+
+    [Test]
     public async Task RecordPageReactsToParametersAndRejectsStaleResults()
     {
         var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);

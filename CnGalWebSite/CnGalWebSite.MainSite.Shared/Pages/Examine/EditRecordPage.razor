@@ -51,6 +51,8 @@
 
                     @if (_contentLoading)
                     { <div class="edit-record-page__state" role="status"><CgProgressRing /><span>@(IsCompare ? "正在重建历史版本…" : "正在加载记录内容…")</span></div> }
+                    else if (_contentNotice is not null)
+                    { <p class="edit-record-page__notice" role="status">@_contentNotice</p> }
                     else if (_contentError is not null)
                     { <div class="edit-record-page__notice" role="alert"><p>@_contentError</p><CgButton Variant="secondary" OnClick="LoadDataAsync">重试</CgButton></div> }
                     else if (IsCompare && _comparison is not null)
@@ -61,7 +63,7 @@
                             />
                     }
                     else if (!IsCompare && _record is not null)
-                    { <ReviewContent Model="_record" /><RecordNotes Comments="@_record.Comments" /> }
+                    { <ReviewContent Model="_record" /><RecordNotes Overview="@_record.EditOverview" Comments="@_record.Comments" Note="@_record.Note" ShowEmpty="true" /> }
                 </div>
             </div>
         }
@@ -89,6 +91,7 @@
     private bool _contentLoading;
     private string? _pageError;
     private string? _contentError;
+    private string? _contentNotice;
     private CancellationTokenSource? _cts;
     private bool _disposed;
     private bool IsCompare => RecordPresentation.IsCompareMode(Mode, CurrentId);
@@ -108,7 +111,7 @@
         var selectedId = SelectedId;
         var currentId = CurrentId;
         var compare = IsCompare;
-        _pageError = _contentError = null;
+        _pageError = _contentError = _contentNotice = null;
         _recordsOpen = false;
         _record = null;
         _comparison = null;
@@ -145,6 +148,11 @@
                 _contentError = "选中的记录不属于此对象或已不可用，请重新选择左侧记录。";
                 return;
             }
+            if (compare && contrastId == _currentId)
+            {
+                _contentNotice = "两个版本相同。";
+                return;
+            }
             if (compare && (IsReversed(_overview.Examines, contrastId, _currentId) || !_overview.Examines.Any(e => e.Id == contrastId)
                 || !_overview.Examines.Any(e => e.Id == _currentId)))
             {
@@ -165,7 +173,7 @@
                 var result = await ExamineQueryService.GetExamineDetailAsync(_selectedId, token);
                 if (_disposed || token.IsCancellationRequested) return;
                 if (result.Success && result.Data is not null) _record = result.Data;
-                else _contentError = result.Error?.Message ?? "记录内容加载失败，仍可阅读上方原始数据。";
+                else _contentError = result.Error?.Message ?? "记录内容加载失败，请重试。";
             }
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested) { }

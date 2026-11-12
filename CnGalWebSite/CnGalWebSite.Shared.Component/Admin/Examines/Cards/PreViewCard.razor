@@ -57,7 +57,7 @@
     private List<RecordPreviewItem> BodyItems => Items.Where(i => i.Kind == RecordPreviewKind.Body).ToList();
 
     private List<PicturesAloneViewModel> Pictures => Items
-        .Where(i => i.Kind == RecordPreviewKind.Image)
+        .Where(i => i.Kind == RecordPreviewKind.Image && !string.IsNullOrWhiteSpace(i.Url ?? i.Value))
         .Select(i => new PicturesAloneViewModel
         {
             Note = i.Label,
@@ -72,11 +72,14 @@
         .Select(group => new InformationsModel
         {
             Modifier = group.Key,
-            Informations = group.Select(i => new KeyValueModel
+            Informations = group.SelectMany(i => new[] { new KeyValueModel
             {
                 DisplayName = i.Label,
                 DisplayValue = ItemText(i)
-            }).ToList()
+            } }.Concat(i.Properties
+                .Where(p => !string.IsNullOrWhiteSpace(p.DisplayValue))
+                .Where(p => p.DisplayValue != i.Label && p.DisplayValue != ItemText(i))
+                .Select(p => new KeyValueModel { DisplayName = p.Label ?? p.Key, DisplayValue = p.DisplayValue }))).ToList()
         })
         .ToList();
 

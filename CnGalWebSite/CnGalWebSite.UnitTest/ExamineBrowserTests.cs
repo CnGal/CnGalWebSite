@@ -80,8 +80,8 @@ public class ExamineBrowserTests
                 await NoOverflow();
                 await _page.ScreenshotAsync(new() { Path = Path.Combine(output, $"review-{theme}-{width}.png"), FullPage = true });
                 await _page.GotoAsync(Site + "/examine?Id=102");
-                var history = _page.GetByRole(AriaRole.Button, new() { Name = "查看编辑记录", Exact = true });
-                await Expect(_page.Locator(".record-object").GetByRole(AriaRole.Button, new() { Name = "查看编辑记录", Exact = true })).ToBeVisibleAsync();
+                var history = _page.GetByRole(AriaRole.Link, new() { Name = "查看编辑记录", Exact = true });
+                await Expect(_page.Locator(".record-object").GetByRole(AriaRole.Link, new() { Name = "查看编辑记录", Exact = true })).ToBeVisibleAsync();
                 await Expect(history).ToHaveCountAsync(1);
                 await Expect(history).ToHaveAttributeAsync("href", "/home/editrecord?ContrastId=102&Mode=record");
                 await NoOverflow();
@@ -152,7 +152,8 @@ public class ExamineBrowserTests
         await Expect(_page.Locator(".record-notes__empty")).ToHaveCountAsync(1);
         await Expect(_page.Locator(".record-comparison__empty")).ToBeVisibleAsync();
         await _page.GotoAsync(Site + "/examine?Id=102");
-        await Expect(_page.Locator(".record-notes")).ToContainTextAsync(["原始数据", "资料已核对。"]);
+        await Expect(_page.Locator(".record-notes")).ToContainTextAsync("原始数据");
+        await Expect(_page.Locator(".record-notes")).ToContainTextAsync("资料已核对。");
         await Expect(_page.GetByRole(AriaRole.Button, new() { Name = "通过", Exact = true })).ToHaveCountAsync(0);
     }
 

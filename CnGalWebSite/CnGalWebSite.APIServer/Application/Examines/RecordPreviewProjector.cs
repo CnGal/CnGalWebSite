@@ -20,6 +20,7 @@ namespace CnGalWebSite.APIServer.Application.Examines;
 public sealed class RecordPreviewProjector
 {
     private readonly Type objectType;
+    private readonly Func<string, string> imageUrlResolver;
     private readonly List<RecordPreviewItem> items = new();
     public bool IsComplete { get; set; }
 
@@ -50,7 +51,11 @@ public sealed class RecordPreviewProjector
     private static readonly HashSet<string> Images = new()
     { "MainPicture", "Thumbnail", "BackgroundPicture", "SmallBackgroundPicture", "PhotoPath", "BackgroundImage", "MBgImage", "SBgImage", "MainImage", "Logo" };
 
-    public RecordPreviewProjector(Type objectType) => this.objectType = objectType;
+    public RecordPreviewProjector(Type objectType, Func<string, string> imageUrlResolver = null)
+    {
+        this.objectType = objectType;
+        this.imageUrlResolver = imageUrlResolver;
+    }
 
     public ExaminePreDataModel Snapshot(Func<string, string> render)
     {
@@ -100,6 +105,10 @@ public sealed class RecordPreviewProjector
         {
             Scalars(Shallow(website), website.GetType(), "website", "官网模板");
             foreach (var image in List(website, "Images")) WebsiteImage(Shallow(image));
+        }
+        if (objectType == typeof(PlayedGame) && Get(value, "Entry") is { } playedEntry)
+        {
+            Relation("entry", Convert.ToString(Get(playedEntry, "Id"), CultureInfo.InvariantCulture), "关联词条", false, displayName: RelatedDisplayName(playedEntry));
         }
     }
 
@@ -174,12 +183,27 @@ public sealed class RecordPreviewProjector
                 foreach (var entry in Array(data, "Relevances")) Relation("periphery", Text(entry["PeripheryId"]), "关联周边", Deleted(entry));
                 break;
             case Operation.DisambigRelevances:
-                foreach (var entry in Array(data, "Relevances")) Relation((int?)entry["Type"] == 1 ? "article" : "entry", Text(entry["EntryId"]), "关联对象", Deleted(entry));
+                foreach (var entry in Array(data, "Relevances"))
+                {
+                    var type = (int?)entry["Type"] == 1 ? "article" : "entry";
+                    Relation(type, Text(entry["EntryId"]), type == "article" ? "关联文章" : "关联词条", Deleted(entry));
+                }
                 break;
             case Operation.EditTag:
                 Scalars(data, typeof(Tag), "main", "主要信息");
-                foreach (var tag in Array(data, "ChildrenTags")) Relation("tag-name", Text(tag["Name"]), "子标签", Deleted(tag));
-                foreach (var entry in Array(data, "ChildrenEntries")) Relation("entry-name", Text(entry["Name"]), "子词条", Deleted(entry));
+                foreach (var tag in Array(data, "ChildrenTags"))
+                {
+                    var name = Text(tag["Name"]);
+                    if (Deleted(tag)) RemoveRelationByName("子标签", name);
+                    else if (FindRelationByName("子标签", name) is null) Relation("tag-name", name, "子标签", false);
+                }
+                foreach (var entry in Array(data, "ChildrenEntries"))
+                {
+                    var name = Text(entry["Name"]);
+                    if (Deleted(entry)) RemoveRelationByName("子词条", name);
+                    else if (FindRelationByName("子词条", name) is null) Relation("entry-name", name, "子词条", false);
+                }
+                items.RemoveAll(i => i.Group == "父标签" && !string.Equals(i.DisplayValue, Text(data["ParentTag"]), StringComparison.Ordinal));
                 if (!string.IsNullOrWhiteSpace(Text(data["ParentTag"]))) Relation("tag-name", Text(data["ParentTag"]), "父标签", false, "parent");
                 break;
             case Operation.PubulishComment:
@@ -206,9 +230,11 @@ public sealed class RecordPreviewProjector
             var (raw, display) = Format(property.Value, info?.PropertyType);
             var kind = Images.Contains(property.Name) ? RecordPreviewKind.Image
                 : property.Name is "OriginalLink" or "SaleLink" ? RecordPreviewKind.Link : RecordPreviewKind.Text;
+            var url = kind == RecordPreviewKind.Image ? ResolveImage(raw) : raw;
             Put(new() { Key = $"{prefix}/{property.Name}", Group = group, Kind = kind,
-                Label = Labels.GetValueOrDefault(property.Name, "目标 ID"), Value = raw, DisplayValue = display,
-                Url = kind is RecordPreviewKind.Image or RecordPreviewKind.Link ? raw : null });
+                Label = Labels.GetValueOrDefault(property.Name, "目标 ID"), Value = raw,
+                DisplayValue = kind == RecordPreviewKind.Image && !string.IsNullOrWhiteSpace(url) ? url : display,
+                Url = kind is RecordPreviewKind.Image or RecordPreviewKind.Link ? url : null });
         }
     }
 
@@ -219,7 +245,7 @@ public sealed class RecordPreviewProjector
         // Periphery pictures use (group, note, URL) in their persisted write contract.
         if (!audio && objectType == typeof(Periphery)) key = Key("picture", Text(data["Modifier"]), Text(data["Note"]), url);
         var item = new RecordPreviewItem { Key = key, Group = audio ? "音频" : "图片", Kind = audio ? RecordPreviewKind.Audio : RecordPreviewKind.Image,
-            Label = Text(data[audio ? "Name" : "Note"]), Value = url, DisplayValue = url, Url = url,
+            Label = Text(data[audio ? "Name" : "Note"]), Value = url, DisplayValue = url, Url = ResolveImage(url),
             Properties = Properties(data, audio ? new[] { "Name", "BriefIntroduction", "Priority", "Duration", "Thumbnail" } : new[] { "Modifier", "Note", "Priority" }) };
         Put(item, Deleted(data));
     }
@@ -264,7 +290,7 @@ public sealed class RecordPreviewProjector
     private void WebsiteImage(JObject data) => Put(new()
     {
         Key = Key("website-image", Text(data["Url"])), Group = "官网图片", Kind = RecordPreviewKind.Image,
-        Label = Text(data["Note"]), Value = Text(data["Url"]), DisplayValue = Text(data["Url"]), Url = Text(data["Url"]),
+        Label = Text(data["Note"]), Value = Text(data["Url"]), DisplayValue = Text(data["Url"]), Url = ResolveImage(Text(data["Url"])),
         Properties = Properties(data, "Type", "Size", "Note", "Priority")
     }, Deleted(data));
 
@@ -279,16 +305,43 @@ public sealed class RecordPreviewProjector
 
     private void Relations(object value, string property, string type, string group)
     {
-        foreach (var related in List(value, property)) Relation(type, Convert.ToString(Get(related, "Id"), CultureInfo.InvariantCulture), group, false);
+        foreach (var related in List(value, property))
+        {
+            Relation(type, Convert.ToString(Get(related, "Id"), CultureInfo.InvariantCulture), group, false, displayName: RelatedDisplayName(related));
+        }
     }
 
-    private void Relation(string type, string id, string group, bool deleted, string slot = null)
+    private void Relation(string type, string id, string group, bool deleted, string slot = null, string displayName = null)
     {
         if (string.IsNullOrWhiteSpace(id)) return;
+        var fallbackLabel = RelationLabel(type) + " #" + id;
+        var label = string.IsNullOrWhiteSpace(displayName) ? fallbackLabel : displayName;
         Put(new() { Key = Key("relation", slot ?? group, type, id), Group = group, Kind = RecordPreviewKind.Relation,
-            Label = RelationLabel(type) + " #" + id, Value = type + ":" + id, DisplayValue = RelationLabel(type) + " #" + id,
+            Label = label, Value = type + ":" + id, DisplayValue = label,
             Url = type switch { "entry" => "/entries/index/" + id, "article" => "/articles/index/" + id,
                 "video" => "/videos/index/" + id, "tag" => "/tags/index/" + id, "periphery" => "/peripheries/index/" + id, _ => null } }, deleted);
+    }
+
+    private RecordPreviewItem FindRelationByName(string group, string name)
+    {
+        return string.IsNullOrWhiteSpace(name) ? null : items.FirstOrDefault(i => i.Kind == RecordPreviewKind.Relation
+            && i.Group == group && (string.Equals(i.DisplayValue, name, StringComparison.Ordinal) || string.Equals(i.Label, name, StringComparison.Ordinal)));
+    }
+
+    private void RemoveRelationByName(string group, string name)
+    {
+        var item = FindRelationByName(group, name);
+        if (item is not null) items.Remove(item);
+    }
+
+    private string ResolveImage(string value) => string.IsNullOrWhiteSpace(value) ? string.Empty : imageUrlResolver?.Invoke(value) ?? value;
+
+    private static string RelatedDisplayName(object related)
+    {
+        var displayName = Convert.ToString(Get(related, "DisplayName"), CultureInfo.InvariantCulture);
+        return string.IsNullOrWhiteSpace(displayName)
+            ? Convert.ToString(Get(related, "Name"), CultureInfo.InvariantCulture)
+            : displayName;
     }
 
     private void Put(RecordPreviewItem item, bool deleted = false)
@@ -302,10 +355,11 @@ public sealed class RecordPreviewProjector
         else items.Add(item);
     }
 
-    private static List<RecordPreviewProperty> Properties(JObject data, params string[] names) => names.Select(name =>
+    private List<RecordPreviewProperty> Properties(JObject data, params string[] names) => names.Select(name =>
     {
         var (raw, display) = Format(data[name], null);
-        return new RecordPreviewProperty { Key = name, Label = Labels.GetValueOrDefault(name, name), Value = raw, DisplayValue = display };
+        return new RecordPreviewProperty { Key = name, Label = Labels.GetValueOrDefault(name, name), Value = raw,
+            DisplayValue = name == "Thumbnail" ? ResolveImage(display) : display };
     }).ToList();
 
     private static (string Raw, string Display) Format(JToken value, Type type)
