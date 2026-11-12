@@ -40,3 +40,17 @@
     border-radius: var(--cg-radius-lg);
     overflow-wrap: anywhere;
 }
+
+.review-content__description ::deep pre {
+    max-width: 100%;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    overflow-x: hidden;
+}
+
+.review-content__description ::deep pre code {
+    white-space: inherit;
+    overflow-wrap: inherit;
+    word-break: inherit;
+}

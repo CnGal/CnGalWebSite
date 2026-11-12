@@ -248,6 +248,25 @@ public class RecordPreviewProjectorTests
     }
 
     [Test]
+    public void EstablishRelevanceOutlinkIsProjected()
+    {
+        var projector = new RecordPreviewProjector(typeof(Entry));
+        projector.Apply(new Examine
+        {
+            Operation = Operation.EstablishRelevances,
+            Context = "{\"Relevances\":[{\"IsDelete\":false,\"Type\":2,\"DisplayName\":\"Bangumi\",\"DisplayValue\":null,\"Link\":\"https://bangumi.tv/subject/316369\"}]}"
+        });
+
+        var snapshot = projector.Snapshot(value => value);
+        var outlink = snapshot.Items.Single(item => item.Kind == RecordPreviewKind.Link);
+        Assert.Multiple(() =>
+        {
+            Assert.That(outlink.Label, Is.EqualTo("Bangumi"));
+            Assert.That(outlink.Value, Is.EqualTo("https://bangumi.tv/subject/316369"));
+        });
+    }
+
+    [Test]
     public void LegacyTagChildDeletionMatchesLoadedChildrenByName()
     {
         var projector = new RecordPreviewProjector(typeof(Tag));
