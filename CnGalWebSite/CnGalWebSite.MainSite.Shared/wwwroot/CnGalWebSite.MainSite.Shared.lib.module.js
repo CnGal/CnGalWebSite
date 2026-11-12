@@ -108,6 +108,13 @@ export function afterWebStarted(blazor) {
             };
         }
     });
+    blazor.registerCustomEventType('cgfocusleave', {
+        browserEventName: 'focusout',
+        createEventArgs: function (event) {
+            const container = event.target.closest('[data-cg-autocomplete]');
+            return { isInternal: !!(container && event.relatedTarget && container.contains(event.relatedTarget)) };
+        }
+    });
     installImeInputListeners();
     document[installationKey] = true;
 

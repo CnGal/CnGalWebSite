@@ -1,8 +1,9 @@
 @page "/usercenter"
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
-@implements IDisposable
 
 @using CnGalWebSite.MainSite.Shared.Components.Features.Examine
+@using CnGalWebSite.DataModel.Sorting
+@inject NavigationManager NavigationManager
 
 <CgPageMeta Title="内容中心" />
 
@@ -18,7 +19,8 @@
 
             <CgTabs Items="@_tabs"
                     Variant="underline"
-                    DefaultActiveKey="overview"
+                    DefaultActiveKey="@ActiveTab"
+                    HrefTemplate="@GetTabHref()"
                     AriaLabel="内容中心标签页"
                     Id="user-center-tabs">
                 <PanelTemplate Context="key">
@@ -26,22 +28,31 @@
                     {
                         case "overview":
                             <div class="user-center-page__panel">
-                                <UserContentOverview />
+                                <UserContentOverview UnReviewPage="@UserCenterQueryState.GetPage(UnReviewPage)"
+                                                     PendingPage="@UserCenterQueryState.GetPage(PendingPage)"
+                                                     EntryPage="@UserCenterQueryState.GetPage(EntryPage)"
+                                                     PagesCorrected="CorrectOverviewPages"
+                                                     UnReviewPageChanged="@(p => SetOverviewPage("unReviewPage", p))"
+                                                     PendingPageChanged="@(p => SetOverviewPage("pendingPage", p))"
+                                                     EntryPageChanged="@(p => SetOverviewPage("entryPage", p))" />
                             </div>
                             break;
                         case "examines":
                             <div class="user-center-page__panel">
-                                <ExamineListPanel />
+                                <ExamineListPanel State="@GetTableState(ExamineSortField.PassedTime, ExamineSortField.Id, ExamineSortField.PassedTime, ExamineSortField.ApplyTime)"
+                                                  StateChanged="@(state => SetTableState(state))" />
                             </div>
                             break;
                         case "reviews":
                             <div class="user-center-page__panel">
-                                <ReviewRecordListPanel />
+                                <ReviewRecordListPanel State="@GetTableState(UserReviewEditRecordSortField.ReviewedTime, UserReviewEditRecordSortField.ReviewedTime)"
+                                                       StateChanged="@(state => SetTableState(state))" />
                             </div>
                             break;
                         case "monitors":
                             <div class="user-center-page__panel">
-                                <MonitorListPanel />
+                                <MonitorListPanel State="@GetTableState(UserMonitorSortField.CreateTime, UserMonitorSortField.CreateTime)"
+                                                  StateChanged="@(state => SetTableState(state))" />
                             </div>
                             break;
                     }
@@ -60,7 +71,17 @@
 </AuthorizeView>
 
 @code {
-    private CancellationTokenSource? _cts;
+    [SupplyParameterFromQuery(Name = "tab")] public string? Tab { get; set; }
+    [SupplyParameterFromQuery(Name = "page")] public string? Page { get; set; }
+    [SupplyParameterFromQuery(Name = "pageSize")] public string? PageSize { get; set; }
+    [SupplyParameterFromQuery(Name = "search")] public string? Search { get; set; }
+    [SupplyParameterFromQuery(Name = "sort")] public string? Sort { get; set; }
+    [SupplyParameterFromQuery(Name = "desc")] public string? Desc { get; set; }
+    [SupplyParameterFromQuery(Name = "unReviewPage")] public string? UnReviewPage { get; set; }
+    [SupplyParameterFromQuery(Name = "pendingPage")] public string? PendingPage { get; set; }
+    [SupplyParameterFromQuery(Name = "entryPage")] public string? EntryPage { get; set; }
+
+    private string ActiveTab => UserCenterQueryState.GetTab(Tab);
     private static readonly IReadOnlyList<CgTabItem> _tabs = new CgTabItem[]
     {
         new("overview", "概览", "mdiViewDashboardOutline"),
@@ -69,9 +90,53 @@
         new("monitors", "关注的词条", "mdiHeartOutline"),
     };
 
-    public void Dispose()
+    private CgDataTableRequest<TSort> GetTableState<TSort>(TSort defaultSort, params TSort[] sortableFields)
+        where TSort : struct, Enum => UserCenterQueryState.GetTableState(
+            Page, PageSize, Search, Sort, Desc, defaultSort, sortableFields);
+
+    private void SetTableState<TSort>(CgDataTableRequest<TSort> state) where TSort : struct, Enum
     {
-        _cts?.Cancel();
-        _cts?.Dispose();
+        Navigate(new()
+        {
+            ["tab"] = ActiveTab,
+            ["page"] = state.Page,
+            ["pageSize"] = state.PageSize,
+            ["search"] = state.SearchText,
+            ["sort"] = state.SortField?.ToString(),
+            ["desc"] = state.SortDesc,
+        });
+    }
+
+    private void SetOverviewPage(string parameter, int page) => Navigate(new()
+    {
+        ["tab"] = "overview",
+        [parameter] = page,
+    });
+
+    private void CorrectOverviewPages((int UnReviewPage, int PendingPage, int EntryPage) pages) => Navigate(new()
+    {
+        ["tab"] = "overview",
+        ["unReviewPage"] = pages.UnReviewPage,
+        ["pendingPage"] = pages.PendingPage,
+        ["entryPage"] = pages.EntryPage,
+    });
+
+    private void Navigate(Dictionary<string, object?> parameters)
+    {
+        var uri = NavigationManager.GetUriWithQueryParameters(parameters);
+        if (uri != NavigationManager.Uri)
+            NavigationManager.NavigateTo(uri);
+    }
+
+    private string GetTabHref()
+    {
+        var uri = NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["tab"] = "__cg_tab__",
+            ["page"] = null, ["pageSize"] = null, ["search"] = null,
+            ["sort"] = null, ["desc"] = null,
+            ["unReviewPage"] = null, ["pendingPage"] = null, ["entryPage"] = null,
+        });
+        return uri.Replace("{", "{{").Replace("}", "}}").Replace("__cg_tab__", "{0}");
     }
 }

@@ -178,7 +178,7 @@
             </div>
             <div class="space-cert-dialog__row">
                 <label class="space-cert-dialog__label">认证的词条</label>
-                <CgAutoComplete @bind-Value="_certEntryName"
+                <CgAutoComplete RestrictToItems="true" @bind-Value="_certEntryName"
                                 Items="_certEntryList"
                                 Placeholder="输入词条名称搜索..." />
             </div>

@@ -208,7 +208,7 @@
                     <CgInput @bind-Value="_editingGameNews.WeiboId" Placeholder="请输入微博Id" />
                 </CgFormGroup>
                 <CgFormGroup Label="关联词条名称">
-                    <CgAutoComplete @bind-Value="_editingGameNews.AuthorEntryName" Items="_allEntryNames" Placeholder="请输入关联词条名称" />
+                    <CgAutoComplete RestrictToItems="true" @bind-Value="_editingGameNews.AuthorEntryName" Items="_allEntryNames" Placeholder="请输入关联词条名称" />
                 </CgFormGroup>
             </CgGrid>
         </CgFormSection>

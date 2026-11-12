@@ -12,6 +12,8 @@
 
 <CgDataTable TItem="UserMonitorOverviewModel" TSort="UserMonitorSortField"
              Title="关注的词条"
+             State="State"
+             StateChanged="StateChanged"
              OnServerQuery="LoadMonitorsAsync"
              DefaultSortField="UserMonitorSortField.CreateTime"
              DefaultSortDesc="true"
@@ -51,6 +53,9 @@
 </CgDataTable>
 
 @code {
+    [Parameter] public CgDataTableRequest<UserMonitorSortField>? State { get; set; }
+    [Parameter] public EventCallback<CgDataTableRequest<UserMonitorSortField>> StateChanged { get; set; }
+
     private CgDataTable<UserMonitorOverviewModel, UserMonitorSortField>? _dataTable;
 
     private async Task<CgDataTableResult<UserMonitorOverviewModel>> LoadMonitorsAsync(CgDataTableRequest<UserMonitorSortField> request)

@@ -61,7 +61,7 @@ else if (_model != null)
 
             @if (UnReviewTotalPages > 1)
             {
-                <CgPagination CurrentPage="@_unReviewPage" TotalPages="@UnReviewTotalPages" CurrentPageChanged="p => { _unReviewPage = p; }" />
+                <CgPagination CurrentPage="@_unReviewPage" TotalPages="@UnReviewTotalPages" CurrentPageChanged="UnReviewPageChanged" />
             }
         </section>
     }
@@ -98,7 +98,7 @@ else if (_model != null)
 
             @if (PendingTotalPages > 1)
             {
-                <CgPagination CurrentPage="@_pendingPage" TotalPages="@PendingTotalPages" CurrentPageChanged="p => { _pendingPage = p; }" />
+                <CgPagination CurrentPage="@_pendingPage" TotalPages="@PendingTotalPages" CurrentPageChanged="PendingPageChanged" />
             }
         </section>
     }
@@ -135,7 +135,7 @@ else if (_model != null)
 
             @if (EntryTotalPages > 1)
             {
-                <CgPagination CurrentPage="@_entryPage" TotalPages="@EntryTotalPages" CurrentPageChanged="p => { _entryPage = p; }" />
+                <CgPagination CurrentPage="@_entryPage" TotalPages="@EntryTotalPages" CurrentPageChanged="EntryPageChanged" />
             }
         </section>
     }
@@ -156,9 +156,17 @@ else if (_model != null)
     private bool _loading = true;
     private string? _error;
 
-    private int _unReviewPage = 1;
-    private int _pendingPage = 1;
-    private int _entryPage = 1;
+    [Parameter] public int UnReviewPage { get; set; } = 1;
+    [Parameter] public int PendingPage { get; set; } = 1;
+    [Parameter] public int EntryPage { get; set; } = 1;
+    [Parameter] public EventCallback<int> UnReviewPageChanged { get; set; }
+    [Parameter] public EventCallback<int> PendingPageChanged { get; set; }
+    [Parameter] public EventCallback<int> EntryPageChanged { get; set; }
+    [Parameter] public EventCallback<(int UnReviewPage, int PendingPage, int EntryPage)> PagesCorrected { get; set; }
+
+    private int _unReviewPage => Math.Clamp(UnReviewPage, 1, UnReviewTotalPages);
+    private int _pendingPage => Math.Clamp(PendingPage, 1, PendingTotalPages);
+    private int _entryPage => Math.Clamp(EntryPage, 1, EntryTotalPages);
 
     private int UnReviewTotalPages => _model?.UnReviewExamines.Count > 0 ? ((_model.UnReviewExamines.Count - 1) / PageSize) + 1 : 1;
     private int PendingTotalPages => _model?.PendingExamines.Count > 0 ? ((_model.PendingExamines.Count - 1) / PageSize) + 1 : 1;
@@ -167,6 +175,16 @@ else if (_model != null)
     protected override async Task OnInitializedAsync()
     {
         await LoadDataAsync();
+    }
+
+    protected override Task OnParametersSetAsync() => CorrectPagesAsync();
+
+    private async Task CorrectPagesAsync()
+    {
+        if (_model == null) return;
+        // 一次导航修正所有页码，避免交互式导航尚未完成时各回调相互覆盖查询参数。
+        if (UnReviewPage != _unReviewPage || PendingPage != _pendingPage || EntryPage != _entryPage)
+            await PagesCorrected.InvokeAsync((_unReviewPage, _pendingPage, _entryPage));
     }
 
     private async Task LoadDataAsync()
@@ -197,6 +215,7 @@ else if (_model != null)
         if (result.Success)
         {
             _model.UnReviewExamines.Clear();
+            await CorrectPagesAsync();
             ToastService.Show("全部已读成功", variant: "success");
         }
         else
@@ -211,6 +230,7 @@ else if (_model != null)
         if (result.Success)
         {
             _model?.UnReviewExamines.Remove(item);
+            await CorrectPagesAsync();
         }
         else
         {

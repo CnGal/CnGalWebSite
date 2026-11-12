@@ -17,7 +17,7 @@
         @if (Booking.Open)
         {
             <CgFormGroup Label="关联抽奖">
-                <CgAutoComplete @bind-Value="Booking.LotteryName"
+                <CgAutoComplete RestrictToItems="true" @bind-Value="Booking.LotteryName"
                                 Items="@LotteryItems"
                                 Placeholder="输入或选择抽奖名称" />
             </CgFormGroup>

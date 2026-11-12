@@ -51,7 +51,7 @@
             @if (Model.ConditionType == LotteryConditionType.BookingGame)
             {
                 <CgFormGroup Label="关联游戏">
-                    <CgAutoComplete @bind-Value="Model.GameName" Items="EntryGameItems" Placeholder="搜索游戏..." />
+                    <CgAutoComplete RestrictToItems="true" @bind-Value="Model.GameName" Items="EntryGameItems" Placeholder="搜索游戏..." />
                 </CgFormGroup>
             }
 

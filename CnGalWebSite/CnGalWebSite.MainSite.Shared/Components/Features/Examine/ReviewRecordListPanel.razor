@@ -12,6 +12,8 @@
 
 <CgDataTable TItem="UserReviewEditRecordOverviewModel" TSort="UserReviewEditRecordSortField"
              Title="审阅记录列表"
+             State="State"
+             StateChanged="StateChanged"
              OnServerQuery="LoadReviewRecordsAsync"
              DefaultSortField="UserReviewEditRecordSortField.ReviewedTime"
              DefaultSortDesc="true"
@@ -69,6 +71,9 @@
 </CgDataTable>
 
 @code {
+    [Parameter] public CgDataTableRequest<UserReviewEditRecordSortField>? State { get; set; }
+    [Parameter] public EventCallback<CgDataTableRequest<UserReviewEditRecordSortField>> StateChanged { get; set; }
+
     private CgDataTable<UserReviewEditRecordOverviewModel, UserReviewEditRecordSortField>? _dataTable;
 
     private async Task<CgDataTableResult<UserReviewEditRecordOverviewModel>> LoadReviewRecordsAsync(CgDataTableRequest<UserReviewEditRecordSortField> request)
