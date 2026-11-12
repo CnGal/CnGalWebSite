@@ -1,4 +1,4 @@
-using CnGalWebSite.Helper.Examines;
+﻿using CnGalWebSite.Helper.Examines;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using NUnit.Framework;
@@ -104,6 +104,31 @@ public class RecordPreviewProjectorTests
             Assert.That(websiteImage.Properties.Single(property => property.Key == "Size").DisplayValue,
                 Is.EqualTo(EntryWebsiteImageSize.Large.GetDisplayName()));
         });
+    }
+
+    [Test]
+    public void DefaultStaffPositionGeneralIsNotExposedAsAProperty()
+    {
+        var projector = new RecordPreviewProjector(typeof(Entry));
+        projector.Load(new Entry
+        {
+            Id = 1,
+            Name = "Entry",
+            EntryStaffFromEntryNavigation = new List<EntryStaff>
+            {
+                new()
+                {
+                    ToEntry = 2,
+                    Name = "Staff",
+                    PositionOfficial = "配音"
+                }
+            }
+        });
+
+        var staff = projector.Snapshot(value => value).Items
+            .Single(item => item.Group.StartsWith("Staff", StringComparison.Ordinal));
+
+        Assert.That(staff.Properties.Any(property => property.Key == "PositionGeneral"), Is.False);
     }
 
     [Test]

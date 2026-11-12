@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -343,7 +343,7 @@ public sealed class RecordPreviewProjector
         Key = Key("staff", Text(data["StaffId"]), Text(data["Name"]), Text(data["PositionOfficial"]), Text(data["Modifier"])),
         Group = "Staff" + GroupSuffix(data), Kind = RecordPreviewKind.Text, Label = Text(data["PositionOfficial"]),
         Value = Text(data["StaffId"]) + ":" + Text(data["Name"]), DisplayValue = Text(data["CustomName"]) is { Length: > 0 } name ? name : Text(data["Name"]),
-        Properties = Properties(data, StaffEnumTypes, "CustomName", "PositionGeneral", "SubordinateOrganization"),
+        Properties = StaffProperties(data),
         Url = (int?)data["StaffId"] > 0 ? "/entries/index/" + Text(data["StaffId"]) : null
     }, Deleted(data));
 
@@ -431,13 +431,24 @@ public sealed class RecordPreviewProjector
     private List<RecordPreviewProperty> Properties(JsonObject data, params string[] names) =>
         Properties(data, null, names);
 
+    private List<RecordPreviewProperty> StaffProperties(JsonObject data)
+    {
+        var properties = Properties(data, StaffEnumTypes, "CustomName", "PositionGeneral", "SubordinateOrganization");
+        // 通用职位是非空枚举，默认值 Other(0) 在旧编辑数据中没有实际含义。
+        if (Text(data["PositionGeneral"]) is "" or "0")
+        {
+            properties.RemoveAll(property => property.Key == "PositionGeneral");
+        }
+        return properties;
+    }
+
     private List<RecordPreviewProperty> Properties(JsonObject data, IReadOnlyDictionary<string, Type> propertyTypes, params string[] names) => names.Select(name =>
     {
         var propertyType = propertyTypes != null && propertyTypes.TryGetValue(name, out var overrideType) ? overrideType : null;
         var (raw, display) = Format(data[name], propertyType);
         return new RecordPreviewProperty { Key = name, Label = Labels.GetValueOrDefault(name, name), Value = raw,
             DisplayValue = name == "Thumbnail" ? ResolveImage(display) : display };
-    }).ToList();
+    }).Where(property => !string.IsNullOrWhiteSpace(property.Value) || !string.IsNullOrWhiteSpace(property.DisplayValue)).ToList();
 
     private static (string Raw, string Display) Format(JsonNode value, Type type)
     {
