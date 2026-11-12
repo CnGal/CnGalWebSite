@@ -818,14 +818,8 @@ namespace CnGalWebSite.APIServer.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<EditRecordComparison>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
         {
-            try
-            {
-                return await _examineService.GetEditRecordComparison(contrastId, currentId, ExaminedNormalListModelType.Video);
-            }
-            catch (ArgumentException error)
-            {
-                return BadRequest(error.Message);
-            }
+            return await ExamineComparisonResult.ExecuteAsync(
+                _examineService, contrastId, currentId, ExaminedNormalListModelType.Video);
         }
 
         /// <summary>

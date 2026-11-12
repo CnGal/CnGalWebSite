@@ -38,8 +38,6 @@ namespace CnGalWebSite.APIServer.Application.Articles
 
         List<KeyValuePair<object, Operation>> ExaminesCompletion(Article currentArticle, Article newArticle);
 
-        List<ArticleViewModel> ConcompareAndGenerateModel(Article currentArticle, Article newArticle);
-
         Task<ArticleEditState> GetArticleEditState(ApplicationUser user, long id);
 
         void SetDataFromEditArticleMainViewModel(Article newArticle, EditArticleMainViewModel model);

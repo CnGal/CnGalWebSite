@@ -32,6 +32,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Result = CnGalWebSite.DataModel.Model.Result;
+using CnGalWebSite.Helper.Security;
 
 namespace CnGalWebSite.APIServer.Controllers
 {
@@ -1150,14 +1151,8 @@ namespace CnGalWebSite.APIServer.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<EditRecordComparison>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
         {
-            try
-            {
-                return await _examineService.GetEditRecordComparison(contrastId, currentId, ExaminedNormalListModelType.Article);
-            }
-            catch (ArgumentException error)
-            {
-                return BadRequest(error.Message);
-            }
+            return await ExamineComparisonResult.ExecuteAsync(
+                _examineService, contrastId, currentId, ExaminedNormalListModelType.Article);
         }
 
         [HttpGet("{id}")]

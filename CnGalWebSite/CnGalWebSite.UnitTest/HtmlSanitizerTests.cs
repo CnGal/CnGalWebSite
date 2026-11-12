@@ -1,8 +1,8 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
-using CnGalWebSite.APIServer.Application.Helper;
 using Markdig;
 using NUnit.Framework;
+using CnGalWebSite.Helper.Security;
 
 namespace CnGalWebSite.UnitTest;
 

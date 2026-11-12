@@ -106,25 +106,9 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public IPageModelCatche<ExaminesOverviewViewModel> ExaminesOverviewCatche { get; set; }
         /// <summary>
-        /// 编辑对比页面数据缓存 词条
+        /// 编辑对比页面数据缓存。所有对象类型共用同一缓存实例，按完整 URL 区分。
         /// </summary>
-        public IPageModelCatche<EditRecordComparison> EntryContrastEditRecordViewCatche { get; set; }
-        /// <summary>
-        /// 编辑对比页面数据缓存 文章
-        /// </summary>
-        public IPageModelCatche<EditRecordComparison> ArticleContrastEditRecordViewCatche { get; set; }
-        /// <summary>
-        /// 编辑对比页面数据缓存 周边
-        /// </summary>
-        public IPageModelCatche<EditRecordComparison> PeripheryContrastEditRecordViewCatche { get; set; }
-        /// <summary>
-        /// 编辑对比页面数据缓存 标签
-        /// </summary>
-        public IPageModelCatche<EditRecordComparison> TagContrastEditRecordViewCatche { get; set; }
-        /// <summary>
-        /// 编辑对比页面数据缓存 视频
-        /// </summary>
-        public IPageModelCatche<EditRecordComparison> VideoContrastEditRecordViewCatche { get; set; }
+        private readonly IPageModelCatche<EditRecordComparison> _editRecordComparisonCatche;
         /// <summary>
         /// 图表缓存
         /// </summary>
@@ -258,15 +242,26 @@ namespace CnGalWebSite.Shared.Service
         /// </summary>
         public IPageModelCatche<SearchViewModel> SearchViewCatche { get; set; }
 
+        public Task<EditRecordComparison> GetEditRecordComparisonAsync(
+            ExaminedNormalListModelType type, long contrastId, long currentId)
+        {
+            var segment = ExamineRecordTypeMetadata.ApiSegment(type);
+            if (segment is null)
+            {
+                return Task.FromResult<EditRecordComparison>(null);
+            }
+
+            var url = ToolHelper.WebApiPath + $"api/{segment}/GetContrastEditRecordViews/{contrastId}/{currentId}";
+            return _editRecordComparisonCatche.GetCache(url);
+        }
+
+        public void CleanEditRecordComparisonCache() => _editRecordComparisonCatche.Clean();
+
         public DataCatcheService(IPageModelCatche<EntryIndexViewModel> entryIndexPageCatche, IPageModelCatche<ArticleViewModel> articleIndexPageCatche, IPageModelCatche<VoteViewModel> voteIndexPageCatche,
         IPageModelCatche<PeripheryViewModel> peripheryIndexPageCatche, IPageModelCatche<TagIndexViewModel> tagIndexPageCatche, IPageModelCatche<List<HomeNewsAloneViewModel>> homePageNewsCatche,
         IPageModelCatche<List<CarouselViewModel>> homePageCarouselsCatche, IPageModelCatche<ExaminesOverviewViewModel> examinesOverviewCatche,
         IPageModelCatche<LotteryViewModel> lotteryIndexPageCatche,
-        IPageModelCatche<EditRecordComparison> articleContrastEditRecordViewCatche,
-        IPageModelCatche<EditRecordComparison> peripheryContrastEditRecordViewCatche,
-        IPageModelCatche<EditRecordComparison> tagContrastEditRecordViewCatche,
-         IPageModelCatche<EditRecordComparison> videoContrastEditRecordViewCatche,
-        IPageModelCatche<EditRecordComparison> entryContrastEditRecordViewCatche,
+        IPageModelCatche<EditRecordComparison> editRecordComparisonCatche,
         IPageModelCatche<SearchViewModel> searchViewCatche,
         IPageModelCatche<LineChartModel> lineChartDataCatche,
         IPageModelCatche<CommentCacheModel> commentDataCatche,
@@ -293,11 +288,7 @@ namespace CnGalWebSite.Shared.Service
             (FavoriteFolderIndexPageCatche = favoriteFolderIndexPageCatche).Init(nameof(FavoriteFolderIndexPageCatche), ToolHelper.WebApiPath + "api/Favorites/GetView/");
             (TagIndexPageCatche = tagIndexPageCatche).Init(nameof(TagIndexPageCatche), ToolHelper.WebApiPath + "api/tags/gettag/");
             (ExaminesOverviewCatche = examinesOverviewCatche).Init(nameof(ExaminesOverviewCatche), ToolHelper.WebApiPath + "api/examines/GetExaminesOverview/");
-            (EntryContrastEditRecordViewCatche = entryContrastEditRecordViewCatche).Init(nameof(EntryContrastEditRecordViewCatche), ToolHelper.WebApiPath + "api/entries/GetContrastEditRecordViews/");
-            (ArticleContrastEditRecordViewCatche = articleContrastEditRecordViewCatche).Init(nameof(ArticleContrastEditRecordViewCatche), ToolHelper.WebApiPath + "api/articles/GetContrastEditRecordViews/");
-            (PeripheryContrastEditRecordViewCatche = peripheryContrastEditRecordViewCatche).Init(nameof(PeripheryContrastEditRecordViewCatche), ToolHelper.WebApiPath + "api/peripheries/GetContrastEditRecordViews/");
-            (TagContrastEditRecordViewCatche = tagContrastEditRecordViewCatche).Init(nameof(TagContrastEditRecordViewCatche), ToolHelper.WebApiPath + "api/tags/GetContrastEditRecordViews/");
-            (VideoContrastEditRecordViewCatche = videoContrastEditRecordViewCatche).Init(nameof(VideoContrastEditRecordViewCatche), ToolHelper.WebApiPath + "api/videos/GetContrastEditRecordViews/");
+            _editRecordComparisonCatche = editRecordComparisonCatche;
             (PlayedGameOverviewDataCatche = playedGameOverviewDataCatche).Init(nameof(PlayedGameOverviewDataCatche), ToolHelper.WebApiPath + "api/playedgame/GetPlayedGameOverview/");
             (CommentDataCatche = commentDataCatche).Init(nameof(CommentDataCatche), ToolHelper.WebApiPath + "api/comments/GetComments/");
             (PersonalSpaceDataCatche = personalSpaceDataCatche).Init(nameof(PersonalSpaceDataCatche), ToolHelper.WebApiPath + "api/space/getuserview/");

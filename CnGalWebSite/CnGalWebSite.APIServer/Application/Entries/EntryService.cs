@@ -34,6 +34,7 @@ using System.Threading.Tasks;
 using System.Web;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Tag = CnGalWebSite.DataModel.Model.Tag;
+using CnGalWebSite.Helper.Security;
 
 namespace CnGalWebSite.APIServer.Application.Entries
 {
@@ -2374,19 +2375,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
             }
 
             return examines;
-        }
-
-        public async Task<List<EntryIndexViewModel>> ConcompareAndGenerateModel(Entry currentEntry, Entry newEntry)
-        {
-            var model = new List<EntryIndexViewModel>
-            {
-                await GetEntryIndexViewModelAsync(currentEntry),
-                await GetEntryIndexViewModelAsync(newEntry)
-            };
-
-
-
-            return model;
         }
 
         public EditMainViewModel GetEditMainViewModel(Entry entry)

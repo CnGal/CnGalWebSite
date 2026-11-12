@@ -214,13 +214,13 @@
     /// 默认每页条数。
     /// </summary>
     [Parameter]
-    public int DefaultPageSize { get; set; } = 10;
+    public int DefaultPageSize { get; set; } = CgDataTableDefaults.PageSize;
 
     /// <summary>
     /// 每页条数可选项。
     /// </summary>
     [Parameter]
-    public int[] PageSizeOptions { get; set; } = [5, 10, 20, 50];
+    public int[] PageSizeOptions { get; set; } = CgDataTableDefaults.CreatePageSizeOptions();
 
     // ── 列注册 ──
 

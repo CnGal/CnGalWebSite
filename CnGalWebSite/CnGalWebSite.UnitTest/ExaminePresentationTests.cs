@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using CnGalWebSite.Core.Models;
@@ -66,7 +66,11 @@ public class ExaminePresentationTests
         using var services = Services();
         await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
         var html = await renderer.Dispatcher.InvokeAsync(async () =>
-            (await renderer.RenderComponentAsync<ExaminePreDataView>(ParameterView.FromDictionary(new Dictionary<string, object?> { ["Model"] = data }))).ToHtmlString());
+            (await renderer.RenderComponentAsync<RecordContentComparison>(ParameterView.FromDictionary(new Dictionary<string, object?>
+            {
+                ["Before"] = null,
+                ["After"] = data,
+            }))).ToHtmlString());
         Assert.That(html, Does.Contain("&lt;script&gt;").And.Not.Contain("href=\"javascript:"));
         Assert.That(html, Does.Contain("preload=\"none\"").And.Not.Contain("autoplay"));
         Assert.That(html, Does.Contain("https://media.example/picture.png").And.Contain("target=\"_blank\""));

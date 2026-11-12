@@ -1,4 +1,4 @@
-﻿
+
 using CnGalWebSite.DataModel.ExamineModel.Peripheries;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Model;
@@ -33,8 +33,6 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
        PeripheryViewModel GetPeripheryViewModel(Periphery periphery);
 
         List<KeyValuePair<object, Operation>> ExaminesCompletion(Periphery currentPeriphery, Periphery newPeriphery);
-
-       List<PeripheryViewModel> ConcompareAndGenerateModel(Periphery currentPeriphery, Periphery newPeriphery);
 
         void SetDataFromEditPeripheryMainViewModel(Periphery newPeriphery, EditPeripheryMainViewModel model);
 

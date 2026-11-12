@@ -774,23 +774,6 @@ namespace CnGalWebSite.APIServer.Application.Videos
         }
 
         /// <summary>
-        /// 生成对比视图
-        /// </summary>
-        /// <param name="currentVideo"></param>
-        /// <param name="newVideo"></param>
-        /// <returns></returns>
-        public List<VideoViewModel> ConcompareAndGenerateModel(Video currentVideo, Video newVideo)
-        {
-            var model = new List<VideoViewModel>
-            {
-                GetViewModel(currentVideo),
-                GetViewModel(newVideo)
-            };
-
-            return model;
-        }
-
-        /// <summary>
         /// 获取编辑状态
         /// </summary>
         /// <param name="user"></param>
@@ -1175,10 +1158,5 @@ namespace CnGalWebSite.APIServer.Application.Videos
 
         }
 
-        /// <summary>
-        /// 获取 审核预览视图 主要信息
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
     }
 }

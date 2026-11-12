@@ -1,4 +1,4 @@
-﻿@inject IJSRuntime JS
+@inject IJSRuntime JS
 @inject NavigationManager NavigationManager
 
 <MDCard Outline>
@@ -6,9 +6,6 @@
         <ButtonContent>
             <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="mdi-share" Text="查看详情" OnClick="@(()=>NavigationManager.NavigateTo("/examine?Id="+Model.Id))" StopPropagation />
          </ButtonContent>
-         <ChildContent>
-             <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.EditOverview" Class="overflow-y-auto" Style="max-height: 420px;" />
-         </ChildContent>
      </CnGalWebSite.Components.Containers.MasaTitleContainer>
      @if (string.IsNullOrWhiteSpace(Model.Comments) == false)
     {

@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.DataModel.ExamineModel.Shared;
+using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.ExamineModel.Tags;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Tags;
@@ -30,8 +30,6 @@ namespace CnGalWebSite.APIServer.Application.Tags
         List<KeyValuePair<object, Operation>> ExaminesCompletion(Tag currentTag, Tag newTag);
 
         Task<List<int>> GetTagIdsFromNames(List<string> names);
-
-        Task<List<TagIndexViewModel>> ConcompareAndGenerateModel(Tag currentTag, Tag newTag);
 
         void SetDataFromEditTagMainViewModel(Tag newTag, EditTagMainViewModel model, Tag parentTag);
 

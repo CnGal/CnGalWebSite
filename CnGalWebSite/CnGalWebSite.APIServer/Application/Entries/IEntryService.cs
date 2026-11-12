@@ -49,8 +49,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         List<KeyValuePair<object, Operation>> ExaminesCompletion(Entry currentEntry, Entry newEntry);
 
-        Task<List<EntryIndexViewModel>> ConcompareAndGenerateModel(Entry currentEntry, Entry newEntry);
-
         EditMainViewModel GetEditMainViewModel(Entry entry);
 
         Task< EditAddInforViewModel> GetEditAddInforViewModel(Entry entry);

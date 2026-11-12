@@ -1,4 +1,4 @@
-﻿@inject IHttpService _httpService
+@inject IHttpService _httpService
 
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
@@ -259,7 +259,7 @@ else
                         break;
 
                 }
-                _dataCatcheService.VideoContrastEditRecordViewCatche.Clean(Id);
+                _dataCatcheService.CleanEditRecordComparisonCache();
                 await Refresh();
             }
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -7,11 +7,11 @@ using System.Reflection;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ExamineModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Admin;
-using CnGalWebSite.Helper.Extensions;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using CnGalWebSite.Extensions;
 
-namespace CnGalWebSite.APIServer.Application.Examines;
+namespace CnGalWebSite.Helper.Examines;
 
 /// <summary>
 /// A read-only interpreter of the persisted edit instructions. It never attaches entities or
@@ -69,6 +69,45 @@ public sealed class RecordPreviewProjector
         ["Size"] = typeof(EntryWebsiteImageSize)
     };
 
+    /// <summary>
+    /// 明确声明可被预览的审核操作。新增 Operation 时该集合必须同步更新，
+    /// 并由单元测试保证不会静默遗漏。
+    /// </summary>
+    public static IReadOnlySet<Operation> SupportedOperations { get; } = new HashSet<Operation>
+    {
+        Operation.UserMainPage,
+        Operation.EstablishMain,
+        Operation.EstablishAddInfor,
+        Operation.EstablishMainPage,
+        Operation.EstablishImages,
+        Operation.EstablishRelevances,
+        Operation.EstablishTags,
+        Operation.EditArticleMain,
+        Operation.EditArticleRelevanes,
+        Operation.EditArticleMainPage,
+        Operation.EditTag,
+        Operation.PubulishComment,
+        Operation.DisambigMain,
+        Operation.DisambigRelevances,
+        Operation.EditUserMain,
+        Operation.EditPeripheryMain,
+        Operation.EditPeripheryImages,
+        Operation.EditPeripheryRelatedEntries,
+        Operation.EditTagMain,
+        Operation.EditTagChildTags,
+        Operation.EditTagChildEntries,
+        Operation.EditPeripheryRelatedPeripheries,
+        Operation.EditPlayedGameMain,
+        Operation.EstablishAudio,
+        Operation.RequestUserCertification,
+        Operation.EditVideoMain,
+        Operation.EditVideoImages,
+        Operation.EditVideoMainPage,
+        Operation.EditVideoRelevanes,
+        Operation.EditFavoriteFolderMain,
+        Operation.EstablishWebsite,
+    };
+
     public RecordPreviewProjector(Type objectType, Func<string, string> imageUrlResolver = null)
     {
         this.objectType = objectType;
@@ -78,7 +117,7 @@ public sealed class RecordPreviewProjector
     public ExaminePreDataModel Snapshot(Func<string, string> render)
     {
         // Every snapshot owns its values; later replay cannot change an earlier version.
-        var copy = JsonConvert.DeserializeObject<List<RecordPreviewItem>>(JsonConvert.SerializeObject(items));
+        var copy = JsonSerializer.Deserialize<List<RecordPreviewItem>>(JsonSerializer.Serialize(items));
         foreach (var item in copy.Where(i => i.Kind == RecordPreviewKind.Body)) item.Html = render(item.Value ?? "");
         return new() { Items = copy, IsComplete = IsComplete };
     }
@@ -95,7 +134,7 @@ public sealed class RecordPreviewProjector
         foreach (var staff in List(value, "EntryStaffFromEntryNavigation"))
         {
             var data = Shallow(staff);
-            data["StaffId"] = data["ToEntry"];
+            data["StaffId"] = Clone(data["ToEntry"]);
             Staff(data);
         }
         foreach (var release in List(value, "Releases")) Release(Shallow(release));
@@ -132,9 +171,14 @@ public sealed class RecordPreviewProjector
 
     public void Apply(Examine record)
     {
+        if (!SupportedOperations.Contains(record.Operation))
+        {
+            throw new InvalidOperationException($"不支持的审核操作：{record.Operation}");
+        }
+
         if (record.Operation is Operation.EstablishMainPage or Operation.EditArticleMainPage or Operation.EditVideoMainPage or Operation.UserMainPage)
         { Body(record.Context); return; }
-        var data = JObject.Parse(record.Context ?? "{}");
+        var data = JsonNode.Parse(record.Context ?? "{}") as JsonObject ?? new JsonObject();
         switch (record.Operation)
         {
             case Operation.EstablishMain:
@@ -165,7 +209,7 @@ public sealed class RecordPreviewProjector
                 foreach (var info in Array(data, "Information")) Information(info, Array(info, "Additional"));
                 foreach (var staff in Array(data, "Staffs")) Staff(staff);
                 foreach (var release in Array(data, "Releases")) Release(release);
-                if (data["Booking"] is JObject booking)
+                if (data["Booking"] is JsonObject booking)
                 {
                     Scalars(PatchFields(booking, "MainInfor"), typeof(Booking), "booking", "预约");
                     foreach (var goal in Array(booking, "Goals")) Goal(goal);
@@ -225,7 +269,7 @@ public sealed class RecordPreviewProjector
                 if (!string.IsNullOrWhiteSpace(Text(data["ParentTag"]))) Relation("tag-name", Text(data["ParentTag"]), "父标签", false, "parent");
                 break;
             case Operation.PubulishComment:
-                Scalars(new JObject { ["Time"] = data["CommentTime"], ["Type"] = data["Type"], ["ObjectId"] = data["ObjectId"] }, null, "comment", "评论",
+                Scalars(new JsonObject { ["Time"] = Clone(data["CommentTime"]), ["Type"] = Clone(data["Type"]), ["ObjectId"] = Clone(data["ObjectId"]) }, null, "comment", "评论",
                     new Dictionary<string, Type> { ["Type"] = typeof(CommentType) });
                 Body(Text(data["Text"]));
                 break;
@@ -239,28 +283,29 @@ public sealed class RecordPreviewProjector
 
     private void Body(string value) => Put(new() { Key = "body", Group = "正文", Kind = RecordPreviewKind.Body, Label = "正文", Value = value ?? "", DisplayValue = value ?? "" });
 
-    private void Scalars(JObject data, Type type, string prefix, string group, IReadOnlyDictionary<string, Type> propertyTypes = null)
+    private void Scalars(JsonObject data, Type type, string prefix, string group, IReadOnlyDictionary<string, Type> propertyTypes = null)
     {
-        foreach (var property in data.Properties())
+        foreach (var property in data)
         {
-            if (!Labels.ContainsKey(property.Name) && !(prefix == "comment" && property.Name == "ObjectId")) continue;
-            var info = type?.GetProperty(property.Name);
-            var propertyType = propertyTypes != null && propertyTypes.TryGetValue(property.Name, out var overrideType)
+            var propertyName = property.Key;
+            if (!Labels.ContainsKey(propertyName) && !(prefix == "comment" && propertyName == "ObjectId")) continue;
+            var info = type?.GetProperty(propertyName);
+            var propertyType = propertyTypes != null && propertyTypes.TryGetValue(propertyName, out var overrideType)
                 ? overrideType
                 : info?.PropertyType;
-            if (type != null && info == null && (propertyTypes == null || !propertyTypes.ContainsKey(property.Name))) continue;
+            if (type != null && info == null && (propertyTypes == null || !propertyTypes.ContainsKey(propertyName))) continue;
             var (raw, display) = Format(property.Value, propertyType);
-            var kind = Images.Contains(property.Name) ? RecordPreviewKind.Image
-                : property.Name is "OriginalLink" or "SaleLink" ? RecordPreviewKind.Link : RecordPreviewKind.Text;
+            var kind = Images.Contains(propertyName) ? RecordPreviewKind.Image
+                : propertyName is "OriginalLink" or "SaleLink" ? RecordPreviewKind.Link : RecordPreviewKind.Text;
             var url = kind == RecordPreviewKind.Image ? ResolveImage(raw) : raw;
-            Put(new() { Key = $"{prefix}/{property.Name}", Group = group, Kind = kind,
-                Label = Labels.GetValueOrDefault(property.Name, "目标 ID"), Value = raw,
+            Put(new() { Key = $"{prefix}/{propertyName}", Group = group, Kind = kind,
+                Label = Labels.GetValueOrDefault(propertyName, "目标 ID"), Value = raw,
                 DisplayValue = kind == RecordPreviewKind.Image && !string.IsNullOrWhiteSpace(url) ? url : display,
                 Url = kind is RecordPreviewKind.Image or RecordPreviewKind.Link ? url : null });
         }
     }
 
-    private void Media(JObject data, bool audio)
+    private void Media(JsonObject data, bool audio)
     {
         var url = Text(data["Url"]);
         var key = Key(audio ? "audio" : "picture", url);
@@ -272,7 +317,7 @@ public sealed class RecordPreviewProjector
         Put(item, Deleted(data));
     }
 
-    private void Information(JObject data, IEnumerable<JObject> additional)
+    private void Information(JsonObject data, IEnumerable<JsonObject> additional)
     {
         var key = Key("information", Text(data["Modifier"]), Text(data["DisplayName"]), Text(data["DisplayValue"]));
         var existing = items.FirstOrDefault(i => i.Key == key);
@@ -287,7 +332,7 @@ public sealed class RecordPreviewProjector
             Value = Text(data["DisplayValue"]), DisplayValue = Text(data["DisplayValue"]), Properties = properties }, Deleted(data));
     }
 
-    private void Staff(JObject data) => Put(new()
+    private void Staff(JsonObject data) => Put(new()
     {
         Key = Key("staff", Text(data["StaffId"]), Text(data["Name"]), Text(data["PositionOfficial"]), Text(data["Modifier"])),
         Group = "Staff" + GroupSuffix(data), Kind = RecordPreviewKind.Text, Label = Text(data["PositionOfficial"]),
@@ -296,27 +341,27 @@ public sealed class RecordPreviewProjector
         Url = (int?)data["StaffId"] > 0 ? "/entries/index/" + Text(data["StaffId"]) : null
     }, Deleted(data));
 
-    private void Release(JObject data) => Put(new()
+    private void Release(JsonObject data) => Put(new()
     {
         Key = Key("release", Text(data["PublishPlatformType"]), Text(data["PublishPlatformName"]), Text(data["Link"]), Text(data["Name"])),
         Group = "发行信息", Kind = RecordPreviewKind.Text, Label = Text(data["Name"]), Value = Text(data["Name"]), DisplayValue = Text(data["Name"]),
         Properties = Properties(data, ReleaseEnumTypes, "PublishPlatformType", "PublishPlatformName", "Type", "GamePlatformTypes", "Time", "TimeNote", "Engine", "Link")
     }, Deleted(data));
 
-    private void Goal(JObject data) => Put(new()
+    private void Goal(JsonObject data) => Put(new()
     {
         Key = Key("goal", Text(data["Name"])), Group = "预约目标", Kind = RecordPreviewKind.Text,
         Label = Text(data["Name"]), Value = Text(data["Target"]), DisplayValue = Text(data["Target"])
     }, Deleted(data));
 
-    private void WebsiteImage(JObject data) => Put(new()
+    private void WebsiteImage(JsonObject data) => Put(new()
     {
         Key = Key("website-image", Text(data["Url"])), Group = "官网图片", Kind = RecordPreviewKind.Image,
         Label = Text(data["Note"]), Value = Text(data["Url"]), DisplayValue = Text(data["Url"]), Url = ResolveImage(Text(data["Url"])),
         Properties = Properties(data, WebsiteImageEnumTypes, "Type", "Size", "Note", "Priority")
     }, Deleted(data));
 
-    private void Outlink(JObject data, bool patch)
+    private void Outlink(JsonObject data, bool patch)
     {
         var name = Text(data[patch ? "DisplayName" : "Name"]);
         var value = Text(data[patch ? "DisplayValue" : "BriefIntroduction"]);
@@ -377,10 +422,10 @@ public sealed class RecordPreviewProjector
         else items.Add(item);
     }
 
-    private List<RecordPreviewProperty> Properties(JObject data, params string[] names) =>
+    private List<RecordPreviewProperty> Properties(JsonObject data, params string[] names) =>
         Properties(data, null, names);
 
-    private List<RecordPreviewProperty> Properties(JObject data, IReadOnlyDictionary<string, Type> propertyTypes, params string[] names) => names.Select(name =>
+    private List<RecordPreviewProperty> Properties(JsonObject data, IReadOnlyDictionary<string, Type> propertyTypes, params string[] names) => names.Select(name =>
     {
         var propertyType = propertyTypes != null && propertyTypes.TryGetValue(name, out var overrideType) ? overrideType : null;
         var (raw, display) = Format(data[name], propertyType);
@@ -388,42 +433,62 @@ public sealed class RecordPreviewProjector
             DisplayValue = name == "Thumbnail" ? ResolveImage(display) : display };
     }).ToList();
 
-    private static (string Raw, string Display) Format(JToken value, Type type)
+    private static (string Raw, string Display) Format(JsonNode value, Type type)
     {
-        if (value == null || value.Type == JTokenType.Null) return ("", "");
+        if (value is null) return ("", "");
         try
         {
             type = Nullable.GetUnderlyingType(type ?? typeof(string)) ?? type;
-            var converted = type != null ? value.ToObject(type) : (value as JValue)?.Value;
+            object converted = type != null
+                ? JsonSerializer.Deserialize(value.ToJsonString(), type)
+                : value is JsonValue scalar && scalar.TryGetValue<object>(out var scalarValue) ? scalarValue : null;
             if (converted is Enum enumeration) return (Convert.ToInt64(enumeration).ToString(CultureInfo.InvariantCulture), enumeration.GetDisplayName());
             if (converted is IEnumerable enumerable && converted is not string)
             {
                 var values = enumerable.Cast<object>().ToList();
-                if (values.Count > 0 && values.All(value => value is Enum))
-                    return (Text(value), string.Join("、", values.Cast<Enum>().Select(value => value.GetDisplayName())));
+                if (values.Count > 0 && values.All(item => item is Enum))
+                    return (Text(value), string.Join("、", values.Cast<Enum>().Select(item => item.GetDisplayName())));
             }
             if (converted is bool boolean) return (boolean ? "true" : "false", boolean ? "是" : "否");
             if (converted is DateTime date) return (date.ToUniversalTime().ToString("O"), date.ToString("yyyy-MM-dd HH:mm:ss"));
             if (converted is TimeSpan duration) return (duration.ToString("c"), duration.ToString("c"));
         }
-        catch (Exception e) when (e is FormatException or ArgumentException or JsonException or InvalidCastException or OverflowException) { }
+        catch (Exception e) when (e is FormatException or ArgumentException or JsonException or InvalidCastException or OverflowException or NotSupportedException) { }
         var text = Text(value);
         return (text, text);
     }
 
-    private static JObject PatchFields(JObject data, string property = "Items") => data[property] is JArray fields
-        ? new JObject(fields.OfType<JObject>().Where(f => !string.IsNullOrEmpty(Text(f["Key"])))
-            .GroupBy(f => Text(f["Key"])).Select(g => new JProperty(g.Key, g.Last()["Value"]?.DeepClone()))) : data;
-    private static string Text(JToken value) => value == null || value.Type == JTokenType.Null ? "" : value.Type == JTokenType.String ? (string)value : value.ToString(Formatting.None);
-    private static bool Deleted(JObject value) => (bool?)value["IsDelete"] == true;
-    private static IEnumerable<JObject> Array(JObject value, string property) => (value[property] as JArray)?.OfType<JObject>() ?? Enumerable.Empty<JObject>();
-    private static string Key(string prefix, params string[] values) => prefix + "/" + JsonConvert.SerializeObject(values);
-    private static string GroupSuffix(JObject data) => string.IsNullOrWhiteSpace(Text(data["Modifier"])) ? "" : " · " + Text(data["Modifier"]);
+    private static JsonObject PatchFields(JsonObject data, string property = "Items") => data[property] is JsonArray fields
+        ? new JsonObject(fields.OfType<JsonObject>().Where(f => !string.IsNullOrEmpty(Text(f["Key"])))
+            .GroupBy(f => Text(f["Key"])).Select(g => new KeyValuePair<string, JsonNode>(g.Key, Clone(g.Last()["Value"])))) : data;
+    private static string Text(JsonNode value)
+    {
+        if (value is null) return "";
+        if (value is JsonValue scalar)
+        {
+            return scalar.TryGetValue<string>(out var text) ? text : scalar.ToJsonString();
+        }
+        return value.ToJsonString();
+    }
+    private static bool Deleted(JsonObject value) => value?["IsDelete"] is JsonValue deleted
+        && deleted.TryGetValue<bool>(out var isDeleted) && isDeleted;
+    private static IEnumerable<JsonObject> Array(JsonObject value, string property) =>
+        (value[property] as JsonArray)?.OfType<JsonObject>() ?? Enumerable.Empty<JsonObject>();
+    private static string Key(string prefix, params string[] values) => prefix + "/" + JsonSerializer.Serialize(values);
+    private static string GroupSuffix(JsonObject data) => string.IsNullOrWhiteSpace(Text(data["Modifier"])) ? "" : " · " + Text(data["Modifier"]);
     private static object Get(object value, string property) => value?.GetType().GetProperty(property)?.GetValue(value);
     private static IEnumerable<object> List(object value, string property) => (Get(value, property) as IEnumerable)?.Cast<object>() ?? Enumerable.Empty<object>();
-    private static JObject Shallow(object value) => new(value.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)
-        .Where(p => p.CanRead && (p.PropertyType.IsValueType || p.PropertyType == typeof(string) || p.PropertyType.IsArray))
-        .Select(p => new JProperty(p.Name, p.GetValue(value))));
+    private static JsonNode Clone(JsonNode value) => value is null ? null : JsonNode.Parse(value.ToJsonString());
+    private static JsonObject Shallow(object value)
+    {
+        var result = new JsonObject();
+        foreach (var property in value.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            .Where(p => p.CanRead && (p.PropertyType.IsValueType || p.PropertyType == typeof(string) || p.PropertyType.IsArray)))
+        {
+            result[property.Name] = JsonSerializer.SerializeToNode(property.GetValue(value));
+        }
+        return result;
+    }
     private static string RelationLabel(string type) => type switch
     { "entry" or "entry-name" => "词条", "article" => "文章", "video" => "视频", "tag" or "tag-name" => "标签", "periphery" => "周边", _ => "对象" };
 }

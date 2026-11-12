@@ -802,19 +802,6 @@ namespace CnGalWebSite.APIServer.Application.Articles
             return examines;
         }
 
-        public List<ArticleViewModel> ConcompareAndGenerateModel(Article currentArticle, Article newArticle)
-        {
-            var model = new List<ArticleViewModel>
-            {
-                GetArticleViewModelAsync(currentArticle),
-                GetArticleViewModelAsync(newArticle)
-            };
-
-
-
-            return model;
-        }
-
         public async Task<ArticleEditState> GetArticleEditState(ApplicationUser user, long id)
         {
             var model = new ArticleEditState();

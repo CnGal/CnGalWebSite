@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.Examines;
+using CnGalWebSite.Helper.Examines;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using NUnit.Framework;
@@ -8,6 +8,22 @@ namespace CnGalWebSite.UnitTest;
 [TestFixture]
 public class RecordPreviewProjectorTests
 {
+    public static IEnumerable<Operation> PreviewOperations =>
+        Enum.GetValues<Operation>().Where(operation => operation != Operation.None);
+
+    [TestCaseSource(nameof(PreviewOperations))]
+    public void EveryOperationHasAnExplicitPreviewContract(Operation operation)
+    {
+        Assert.That(RecordPreviewProjector.SupportedOperations, Does.Contain(operation),
+            "新增 Operation 时必须显式声明预览支持或降级策略。");
+        var projector = new RecordPreviewProjector(typeof(Entry));
+        Assert.DoesNotThrow(() =>
+        {
+            projector.Apply(new Examine { Operation = operation, Context = "{}" });
+            _ = projector.Snapshot(value => value);
+        });
+    }
+
 
     [Test]
     public void CommentTypeUsesTheEnumDisplayName()

@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using System;
 using System.Collections.Generic;
@@ -27,8 +27,6 @@ namespace CnGalWebSite.DataModel.ViewModel.Home
         public long Id { get; set; }
 
         public bool IsSelected { get; set; }
-
-        public string EditOverview { get; set; }
 
         public Operation Operation { get; set; }
 

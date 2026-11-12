@@ -17,9 +17,6 @@
     <ProjectReference Include="..\CnGalWebSite.SDK.MainSite\CnGalWebSite.SDK.MainSite.csproj" />
     <ProjectReference Include="..\CnGalWebSite.MainSite.Shared\CnGalWebSite.MainSite.Shared.csproj" />
     <ProjectReference Include="..\CnGalWebSite.Helper\CnGalWebSite.Helper.csproj" />
-    <Compile Include="../CnGalWebSite.APIServer/Application/Helper/HtmlSanitizerHelper.cs" Link="HtmlSanitizerHelper.cs" />
-    <Compile Include="../CnGalWebSite.APIServer/Application/Examines/RecordPreviewProjector.cs" Link="RecordPreviewProjector.cs" />
-    <PackageReference Include="HtmlSanitizer" Version="9.2.995" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Markdig" Version="0.43.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />

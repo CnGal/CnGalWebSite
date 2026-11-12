@@ -1,14 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CnGalWebSite.DataModel.ExamineModel.Comments;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.Helper.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Tag = CnGalWebSite.DataModel.Model.Tag;
+using CnGalWebSite.Helper.Security;
 
 namespace CnGalWebSite.APIServer.Application.Examines;
 
@@ -18,12 +20,12 @@ public partial class ExamineService
     {
         var live = await LoadPreviewObject(examine);
         if (live == null) return false;
-        model.Type = PreviewType(examine);
-        model.ObjectId = ObjectId(examine);
+        model.Type = ExamineRecordTypeMetadata.ResolveType(examine);
+        model.ObjectId = ExamineRecordTypeMetadata.ResolveObjectId(examine);
         ApplyObjectSummary(model, live);
         model.EditOverview = BuildEditOverview(examine);
         model.ContributionValue = examine.ContributionValue;
-        model.SubmissionOnly = examine.Operation is Operation.PubulishComment or Operation.RequestUserCertification;
+        model.SubmissionOnly = ExamineOperationMetadata.IsSubmissionOnly(examine.Operation);
         var records = await PreviewHistory(examine).AsNoTracking().ToListAsync();
         var state = CreatePreviewProjector(live.GetType());
 
@@ -77,12 +79,15 @@ public partial class ExamineService
         var before = selected.FirstOrDefault(r => r.Id == contrastId);
         var after = selected.FirstOrDefault(r => r.Id == currentId);
         if (before == null || after == null || before.IsPassed != true || after.IsPassed != true
-            || PreviewType(before) != type || PreviewType(after) != type || ObjectId(before) != ObjectId(after))
+            || ExamineRecordTypeMetadata.ResolveType(before) != type || ExamineRecordTypeMetadata.ResolveType(after) != type
+            || ExamineRecordTypeMetadata.ResolveObjectId(before) != ExamineRecordTypeMetadata.ResolveObjectId(after))
             throw new ArgumentException("请选择同一对象的已通过版本。");
         if (RecordVersionOrder.Compare(before, after) > 0)
             throw new ArgumentException("基准版本的通过时间不能晚于目标版本。");
         var records = await PreviewHistory(before).AsNoTracking().Where(r => r.IsPassed == true).ToListAsync();
-        var state = CreatePreviewProjector(DomainType(type));
+        var domainType = ExamineRecordTypeMetadata.DomainType(type)
+            ?? throw new ArgumentException("该类型不支持历史版本对比。");
+        var state = CreatePreviewProjector(domainType);
         var result = new EditRecordComparison { ContrastId = contrastId, CurrentId = currentId };
         foreach (var record in RecordVersionOrder.Approved(records))
         {
@@ -102,7 +107,7 @@ public partial class ExamineService
     {
         var context = examine.Context ?? string.Empty;
         if (string.IsNullOrWhiteSpace(context)) return string.Empty;
-        if (IsPlainTextContext(examine.Operation))
+        if (ExamineOperationMetadata.IsPlainTextContext(examine.Operation))
             return HtmlSanitizerHelper.Sanitize($"<pre>{System.Net.WebUtility.HtmlEncode(context)}</pre>");
         try
         {
@@ -114,9 +119,6 @@ public partial class ExamineService
             return HtmlSanitizerHelper.Sanitize($"<pre>{System.Net.WebUtility.HtmlEncode(context)}</pre>");
         }
     }
-
-    private static bool IsPlainTextContext(Operation operation) => operation is
-        Operation.EstablishMainPage or Operation.EditArticleMainPage or Operation.EditVideoMainPage or Operation.UserMainPage;
 
     private void ApplyObjectSummary(ExamineViewModel model, object live)
     {
@@ -330,26 +332,14 @@ public partial class ExamineService
 
     private IQueryable<Examine> PreviewHistory(Examine record)
     {
-        var query = _examineRepository.GetAll();
-        return PreviewType(record) switch
-        {
-            ExaminedNormalListModelType.Entry => query.Where(r => r.EntryId == record.EntryId),
-            ExaminedNormalListModelType.Article => query.Where(r => r.ArticleId == record.ArticleId),
-            ExaminedNormalListModelType.Tag => query.Where(r => r.TagId == record.TagId),
-            ExaminedNormalListModelType.Periphery => query.Where(r => r.PeripheryId == record.PeripheryId),
-            ExaminedNormalListModelType.Video => query.Where(r => r.VideoId == record.VideoId),
-            ExaminedNormalListModelType.User => query.Where(r => r.ApplicationUserId == record.ApplicationUserId && (r.Operation == Operation.UserMainPage || r.Operation == Operation.EditUserMain)),
-            ExaminedNormalListModelType.PlayedGame => query.Where(r => r.PlayedGameId == record.PlayedGameId),
-            ExaminedNormalListModelType.FavoriteFolder => query.Where(r => r.FavoriteFolderId == record.FavoriteFolderId),
-            ExaminedNormalListModelType.Disambig => query.Where(r => r.DisambigId == record.DisambigId),
-            _ => query.Where(r => r.Id == record.Id)
-        };
+        var type = ExamineRecordTypeMetadata.ResolveType(record);
+        return ExamineRecordTypeMetadata.ScopeHistory(_examineRepository.GetAll(), type, record);
     }
 
     private async Task<object> LoadPreviewObject(Examine record)
     {
         // Only the editable object is loaded, never tracked navigation graphs.
-        switch (PreviewType(record))
+        switch (ExamineRecordTypeMetadata.ResolveType(record))
         {
             case ExaminedNormalListModelType.Entry:
                 return await _entryRepository.GetAll().AsNoTracking().AsSplitQuery()
@@ -410,32 +400,4 @@ public partial class ExamineService
 
     private static string Property(object value, string name) => value.GetType().GetProperty(name)?.GetValue(value) as string;
     private static string FirstNonEmpty(params string[] values) => values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value)) ?? string.Empty;
-    private static long ObjectId(Examine e) => PreviewType(e) switch
-    {
-        ExaminedNormalListModelType.Entry => e.EntryId ?? 0, ExaminedNormalListModelType.Article => e.ArticleId ?? 0,
-        ExaminedNormalListModelType.Tag => e.TagId ?? 0, ExaminedNormalListModelType.Periphery => e.PeripheryId ?? 0,
-        ExaminedNormalListModelType.Video => e.VideoId ?? 0, ExaminedNormalListModelType.PlayedGame => e.PlayedGameId ?? 0,
-        ExaminedNormalListModelType.FavoriteFolder => e.FavoriteFolderId ?? 0, ExaminedNormalListModelType.Disambig => e.DisambigId ?? 0,
-        _ => e.CommentId ?? 0
-    };
-    private static ExaminedNormalListModelType PreviewType(Examine e) => e.Operation switch
-    {
-        Operation.UserMainPage or Operation.EditUserMain => ExaminedNormalListModelType.User,
-        Operation.RequestUserCertification => ExaminedNormalListModelType.UserCertification,
-        Operation.PubulishComment => ExaminedNormalListModelType.Comment,
-        _ when e.EntryId.HasValue => ExaminedNormalListModelType.Entry,
-        _ when e.ArticleId.HasValue => ExaminedNormalListModelType.Article,
-        _ when e.TagId.HasValue => ExaminedNormalListModelType.Tag,
-        _ when e.PeripheryId.HasValue => ExaminedNormalListModelType.Periphery,
-        _ when e.VideoId.HasValue => ExaminedNormalListModelType.Video,
-        _ when e.PlayedGameId.HasValue => ExaminedNormalListModelType.PlayedGame,
-        _ when e.FavoriteFolderId.HasValue => ExaminedNormalListModelType.FavoriteFolder,
-        _ => ExaminedNormalListModelType.Disambig
-    };
-    private static Type DomainType(ExaminedNormalListModelType type) => type switch
-    {
-        ExaminedNormalListModelType.Entry => typeof(Entry), ExaminedNormalListModelType.Article => typeof(Article),
-        ExaminedNormalListModelType.Tag => typeof(Tag), ExaminedNormalListModelType.Periphery => typeof(Periphery),
-        ExaminedNormalListModelType.Video => typeof(Video), _ => throw new ArgumentException("该类型不支持历史版本对比。")
-    };
 }

@@ -26,6 +26,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 using Result = CnGalWebSite.DataModel.Model.Result;
+using CnGalWebSite.Helper.Security;
 
 
 namespace CnGalWebSite.APIServer.Controllers

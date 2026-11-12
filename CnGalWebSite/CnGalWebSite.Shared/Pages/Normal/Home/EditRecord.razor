@@ -1,7 +1,11 @@
 @page "/home/editrecord"
 @inject IDataCacheService DataCache
 @using CnGalWebSite.DataModel.ViewModel.Admin
-@if (_comparison is not null)
+@if (!string.IsNullOrWhiteSpace(_comparisonError))
+{
+    <p>@_comparisonError</p>
+}
+else if (_comparison is not null)
 {
     <h2>版本 #@_comparison.ContrastId → #@_comparison.CurrentId</h2>
     <h3>基准版本</h3>
@@ -13,19 +17,52 @@
     [SupplyParameterFromQuery, Parameter] public long ContrastId { get; set; }
     [SupplyParameterFromQuery, Parameter] public long CurrentId { get; set; }
     private EditRecordComparison _comparison;
+    private string _comparisonError;
     protected override async Task OnParametersSetAsync()
     {
+        _comparison = null;
+        _comparisonError = null;
         var overview = await DataCache.ExaminesOverviewCatche.GetCache(ContrastId.ToString());
-        var current = CurrentId > 0 ? CurrentId : overview.Examines.OrderBy(r => r.PassedTime).ThenBy(r => r.Id).Last().Id;
-        var key = ContrastId + "/" + current;
-        _comparison = overview.Type switch
+        var ordered = overview?.Examines?
+            .OrderBy(record => record.PassedTime)
+            .ThenBy(record => record.Id)
+            .ToList();
+        if (ordered is null || ordered.Count == 0) return;
+
+        var contrastIndex = ordered.FindIndex(record => record.Id == ContrastId);
+        if (contrastIndex < 0) return;
+
+        var currentIndex = CurrentId > 0 ? ordered.FindIndex(record => record.Id == CurrentId) : ordered.Count - 1;
+        if (currentIndex < contrastIndex) currentIndex = ordered.Count - 1;
+
+        var candidates = new List<int> { currentIndex };
+        for (var index = ordered.Count - 1; index >= contrastIndex; index--)
         {
-            ExaminedNormalListModelType.Entry => await DataCache.EntryContrastEditRecordViewCatche.GetCache(key),
-            ExaminedNormalListModelType.Article => await DataCache.ArticleContrastEditRecordViewCatche.GetCache(key),
-            ExaminedNormalListModelType.Tag => await DataCache.TagContrastEditRecordViewCatche.GetCache(key),
-            ExaminedNormalListModelType.Periphery => await DataCache.PeripheryContrastEditRecordViewCatche.GetCache(key),
-            ExaminedNormalListModelType.Video => await DataCache.VideoContrastEditRecordViewCatche.GetCache(key),
-            _ => null
-        };
+            if (index != currentIndex) candidates.Add(index);
+        }
+
+        foreach (var index in candidates)
+        {
+            try
+            {
+                _comparison = await GetComparisonAsync(overview.Type, ContrastId, ordered[index].Id);
+                if (_comparison is not null) return;
+            }
+            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                // 新对比接口会拒绝跨对象、未通过或反向版本组合，旧链接可能携带过期 CurrentId。
+                // 依次尝试同一对象下其它已通过版本。
+            }
+            catch (HttpRequestException)
+            {
+                break;
+            }
+        }
+
+        _comparison = null;
+        _comparisonError = "无法加载版本对比，该记录可能已失效或不属于同一对象。";
     }
+
+    private Task<EditRecordComparison> GetComparisonAsync(ExaminedNormalListModelType type, long contrastId, long currentId)
+        => DataCache.GetEditRecordComparisonAsync(type, contrastId, currentId);
 }

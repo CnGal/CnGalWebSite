@@ -74,15 +74,15 @@
 </AuthorizeView>
 
 @code {
-    [SupplyParameterFromQuery(Name = "tab")] public string? Tab { get; set; }
-    [SupplyParameterFromQuery(Name = "page")] public string? Page { get; set; }
-    [SupplyParameterFromQuery(Name = "pageSize")] public string? PageSize { get; set; }
-    [SupplyParameterFromQuery(Name = "search")] public string? Search { get; set; }
-    [SupplyParameterFromQuery(Name = "sort")] public string? Sort { get; set; }
-    [SupplyParameterFromQuery(Name = "desc")] public string? Desc { get; set; }
-    [SupplyParameterFromQuery(Name = "unReviewPage")] public string? UnReviewPage { get; set; }
-    [SupplyParameterFromQuery(Name = "pendingPage")] public string? PendingPage { get; set; }
-    [SupplyParameterFromQuery(Name = "entryPage")] public string? EntryPage { get; set; }
+    [SupplyParameterFromQuery(Name = UserCenterQueryState.TabParameter)] public string? Tab { get; set; }
+    [SupplyParameterFromQuery(Name = UserCenterQueryState.PageParameter)] public string? Page { get; set; }
+    [SupplyParameterFromQuery(Name = UserCenterQueryState.PageSizeParameter)] public string? PageSize { get; set; }
+    [SupplyParameterFromQuery(Name = UserCenterQueryState.SearchParameter)] public string? Search { get; set; }
+    [SupplyParameterFromQuery(Name = UserCenterQueryState.SortParameter)] public string? Sort { get; set; }
+    [SupplyParameterFromQuery(Name = UserCenterQueryState.DescParameter)] public string? Desc { get; set; }
+    [SupplyParameterFromQuery(Name = UserCenterQueryState.UnReviewPageParameter)] public string? UnReviewPage { get; set; }
+    [SupplyParameterFromQuery(Name = UserCenterQueryState.PendingPageParameter)] public string? PendingPage { get; set; }
+    [SupplyParameterFromQuery(Name = UserCenterQueryState.EntryPageParameter)] public string? EntryPage { get; set; }
 
     private string ActiveTab => UserCenterQueryState.GetTab(Tab);
     private static readonly IReadOnlyList<CgTabItem> _tabs = new CgTabItem[]
@@ -106,26 +106,26 @@
     private void NavigateTableState<TSort>(CgDataTableRequest<TSort> state, bool replaceHistory) where TSort : struct, Enum
         => Navigate(new()
         {
-            ["tab"] = ActiveTab,
-            ["page"] = state.Page,
-            ["pageSize"] = state.PageSize,
-            ["search"] = state.SearchText,
-            ["sort"] = state.SortField?.ToString(),
-            ["desc"] = state.SortDesc,
+            [UserCenterQueryState.TabParameter] = ActiveTab,
+            [UserCenterQueryState.PageParameter] = state.Page,
+            [UserCenterQueryState.PageSizeParameter] = state.PageSize,
+            [UserCenterQueryState.SearchParameter] = state.SearchText,
+            [UserCenterQueryState.SortParameter] = state.SortField?.ToString(),
+            [UserCenterQueryState.DescParameter] = state.SortDesc,
         }, replaceHistory);
 
     private void SetOverviewPage(string parameter, int page) => Navigate(new()
     {
-        ["tab"] = "overview",
+        [UserCenterQueryState.TabParameter] = "overview",
         [parameter] = page,
     });
 
     private void CorrectOverviewPages((int UnReviewPage, int PendingPage, int EntryPage) pages) => Navigate(new()
     {
-        ["tab"] = "overview",
-        ["unReviewPage"] = pages.UnReviewPage,
-        ["pendingPage"] = pages.PendingPage,
-        ["entryPage"] = pages.EntryPage,
+        [UserCenterQueryState.TabParameter] = "overview",
+        [UserCenterQueryState.UnReviewPageParameter] = pages.UnReviewPage,
+        [UserCenterQueryState.PendingPageParameter] = pages.PendingPage,
+        [UserCenterQueryState.EntryPageParameter] = pages.EntryPage,
     }, replaceHistory: true);
 
     private void Navigate(Dictionary<string, object?> parameters, bool replaceHistory = false)
@@ -137,13 +137,16 @@
 
     private string GetTabHref()
     {
-        var uri = NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+        var parameters = new Dictionary<string, object?>
         {
-            ["tab"] = "__cg_tab__",
-            ["page"] = null, ["pageSize"] = null, ["search"] = null,
-            ["sort"] = null, ["desc"] = null,
-            ["unReviewPage"] = null, ["pendingPage"] = null, ["entryPage"] = null,
-        });
+            [UserCenterQueryState.TabParameter] = "__cg_tab__",
+        };
+        foreach (var name in UserCenterQueryState.TableParameterNames.Concat(UserCenterQueryState.OverviewParameterNames))
+        {
+            parameters[name] = null;
+        }
+
+        var uri = NavigationManager.GetUriWithQueryParameters(parameters);
         return uri.Replace("{", "{{").Replace("}", "}}").Replace("__cg_tab__", "{0}");
     }
 }

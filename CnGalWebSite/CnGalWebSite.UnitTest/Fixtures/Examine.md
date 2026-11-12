@@ -39,6 +39,8 @@ dotnet test CnGalWebSite/CnGalWebSite.UnitTest --filter "FullyQualifiedName~Exam
 
 ## 数据语义
 
-`GetExamineDetailAsync` 返回记录相关内容和查询时内容，不能用来组合完整的历史版本。新 SDK 方法 `GetEditRecordComparisonAsync` 分别调用五类对象已有的 `GetContrastEditRecordViews` 接口，后端按 ID 顺序回放已通过记录。旧 SDK 方法保留并转接到正确的数据来源。
+`GetExamineDetailAsync` 返回记录相关内容和查询时内容，不能用来组合完整的历史版本。新 SDK 方法 `GetEditRecordComparisonAsync` 调用五类对象已有的 `GetContrastEditRecordViews` 接口；能力映射统一由 `ExamineRecordTypeMetadata` 提供，后端按通过时间与 ID 的稳定顺序回放已通过记录，使用前应校验版本方向和对象一致性。
 
 历史页面保留 `ContrastId`、`CurrentId`、`SelectedId`，新增可选 `Mode=record|compare`；显式模式优先，否则携带 `CurrentId` 的旧链接进入对比模式。`CurrentId=0` 解析为最新已通过记录。页面对非数字、越界、反向和跨对象选择显示局部错误，不将缺失内容推断为删除。
+
+新增 `Operation` 时，必须同步更新 `RecordPreviewProjector.SupportedOperations`，`RecordPreviewProjectorTests` 会逐一校验所有非 `None` 操作都有显式预览契约。新增审核对象类型时，只需更新 `ExamineRecordTypeMetadata` 的描述表；API 路由、SDK 路由、历史能力和对象链接均由该表派生。
