@@ -36,13 +36,27 @@
     }
     @if (_record.IsAdmin && _record.IsPassed is null)
     {
-        <section class="examine-detail-panel__actions" aria-label="审核操作" aria-busy="@(_processing ? "true" : "false")">
-            <h3>审核操作</h3>
-            <label><span>审核批注 <small>（可选）</small></span><CgTextarea @bind-Value="_comments" Placeholder="向提交者说明审核结果…" Disabled="_processing" Rows="4" /></label>
-            @if (_error is not null) { <p class="examine-detail-panel__error" role="alert">@_error</p> }
-            <div class="examine-detail-panel__buttons">
-                <CgButton OnClick="() => HandleProc(true)" Disabled="@(!CanProcess || _processing)">@(_processing ? "正在提交…" : "通过审核")</CgButton>
-                <CgButton Variant="danger" OnClick="() => HandleProc(false)" Disabled="@(!CanProcess || _processing)">驳回</CgButton>
+        <section class="examine-detail-panel__admin-actions" aria-label="审核操作" aria-busy="@(_processing ? "true" : "false")">
+            <h4 class="examine-detail-panel__section-title">
+                <CgMdiIcon Name="mdiShieldCheckOutline" aria-hidden="true" />
+                审核操作
+            </h4>
+            <div class="examine-detail-panel__action-body">
+                <div class="examine-detail-panel__action-input">
+                    <label for="examine-comments">批注</label>
+                    <CgTextarea Id="examine-comments" @bind-Value="_comments" Placeholder="可选，输入审核批注..." Disabled="_processing" />
+                </div>
+                @if (_error is not null) { <p class="examine-detail-panel__error" role="alert">@_error</p> }
+                <div class="examine-detail-panel__action-buttons">
+                    <CgButton Variant="primary" OnClick="() => HandleProc(true)" Disabled="@(!CanProcess || _processing)">
+                        <CgMdiIcon Name="mdiCheck" aria-hidden="true" />
+                        通过
+                    </CgButton>
+                    <CgButton Variant="danger" OnClick="() => HandleProc(false)" Disabled="@(!CanProcess || _processing)">
+                        <CgMdiIcon Name="mdiClose" aria-hidden="true" />
+                        驳回
+                    </CgButton>
+                </div>
             </div>
         </section>
     }

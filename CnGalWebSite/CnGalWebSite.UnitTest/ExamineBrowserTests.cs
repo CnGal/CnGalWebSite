@@ -76,12 +76,12 @@ public class ExamineBrowserTests
                 await NoOverflow();
                 await _page.ScreenshotAsync(new() { Path = Path.Combine(output, $"compare-{theme}-{width}.png"), FullPage = true });
                 await _page.GotoAsync(Site + "/examine?Id=101");
-                await Expect(_page.GetByRole(AriaRole.Button, new() { Name = "通过审核", Exact = true })).ToBeEnabledAsync();
+                await Expect(_page.GetByRole(AriaRole.Button, new() { Name = "通过", Exact = true })).ToBeEnabledAsync();
                 await NoOverflow();
                 await _page.ScreenshotAsync(new() { Path = Path.Combine(output, $"review-{theme}-{width}.png"), FullPage = true });
                 await _page.GotoAsync(Site + "/examine?Id=102");
-                var history = _page.GetByRole(AriaRole.Link, new() { Name = "查看编辑记录", Exact = true });
-                await Expect(_page.Locator(".record-object").GetByRole(AriaRole.Link, new() { Name = "查看编辑记录", Exact = true })).ToBeVisibleAsync();
+                var history = _page.GetByRole(AriaRole.Button, new() { Name = "查看编辑记录", Exact = true });
+                await Expect(_page.Locator(".record-object").GetByRole(AriaRole.Button, new() { Name = "查看编辑记录", Exact = true })).ToBeVisibleAsync();
                 await Expect(history).ToHaveCountAsync(1);
                 await Expect(history).ToHaveAttributeAsync("href", "/home/editrecord?ContrastId=102&Mode=record");
                 await NoOverflow();
@@ -137,11 +137,11 @@ public class ExamineBrowserTests
     public async Task PendingDependencyPermissionsAndFailedImages()
     {
         await _page.GotoAsync(Site + "/examine?Id=104");
-        await Expect(_page.GetByRole(AriaRole.Button, new() { Name = "通过审核", Exact = true })).ToBeDisabledAsync();
+        await Expect(_page.GetByRole(AriaRole.Button, new() { Name = "通过", Exact = true })).ToBeDisabledAsync();
         await Expect(_page.GetByRole(AriaRole.Link, new() { Name = "查看前置审核 #101 →" })).ToBeVisibleAsync();
         await _page.GotoAsync(Site + "/examine?Id=105");
         await Expect(_page.Locator(".examine-detail-panel")).ToBeVisibleAsync();
-        await Expect(_page.GetByRole(AriaRole.Button, new() { Name = "通过审核", Exact = true })).ToHaveCountAsync(0);
+        await Expect(_page.GetByRole(AriaRole.Button, new() { Name = "通过", Exact = true })).ToHaveCountAsync(0);
         await _page.GotoAsync(Site + "/examine?Id=106");
         await Expect(_page.GetByText("这是一条单份评论内容。", new() { Exact = true })).ToHaveCountAsync(1);
         await _page.GotoAsync(Site + "/examine?Id=110");
@@ -153,25 +153,25 @@ public class ExamineBrowserTests
         await Expect(_page.Locator(".record-comparison__empty")).ToBeVisibleAsync();
         await _page.GotoAsync(Site + "/examine?Id=102");
         await Expect(_page.Locator(".record-notes")).ToContainTextAsync(["修改说明", "资料已核对。"]);
-        await Expect(_page.GetByRole(AriaRole.Button, new() { Name = "通过审核", Exact = true })).ToHaveCountAsync(0);
+        await Expect(_page.GetByRole(AriaRole.Button, new() { Name = "通过", Exact = true })).ToHaveCountAsync(0);
     }
 
     [Test]
     public async Task SubmissionFailureRetainsCommentsAndSuccessReturnsToContentCenter()
     {
         await _page.GotoAsync(Site + "/examine?Id=107");
-        var comments = _page.GetByLabel("审核批注 （可选）");
+        var comments = _page.GetByLabel("批注", new() { Exact = true });
         await comments.FillAsync("审核说明：已核对来源");
         await comments.BlurAsync();
-        await _page.GetByRole(AriaRole.Button, new() { Name = "通过审核", Exact = true }).ClickAsync();
+        await _page.GetByRole(AriaRole.Button, new() { Name = "通过", Exact = true }).ClickAsync();
         await Expect(_page.Locator(".examine-detail-panel__error")).ToContainTextAsync("模拟网络失败");
         await Expect(comments).ToHaveValueAsync("审核说明：已核对来源");
-        await _page.GetByRole(AriaRole.Button, new() { Name = "通过审核", Exact = true }).ClickAsync();
+        await _page.GetByRole(AriaRole.Button, new() { Name = "通过", Exact = true }).ClickAsync();
         await Expect(_page).ToHaveURLAsync(Site + "/usercenter");
         await _page.GotoAsync(Site + "/examine?Id=108");
         await _page.GetByRole(AriaRole.Button, new() { Name = "驳回", Exact = true }).ClickAsync();
         await Expect(_page.Locator(".examine-detail-panel__error")).ToContainTextAsync("此记录已被处理");
-        await Expect(_page.GetByRole(AriaRole.Button, new() { Name = "通过审核", Exact = true })).ToHaveCountAsync(0);
+        await Expect(_page.GetByRole(AriaRole.Button, new() { Name = "通过", Exact = true })).ToHaveCountAsync(0);
     }
 
     private async Task NoOverflow()

@@ -169,7 +169,7 @@ public class ExaminePresentationTests
         await renderer.Click(renderer.Children<CgButton>(root)[0]);
         Assert.That(renderer.AllText(root), Does.Contain("此记录已被处理").And.Contain("其他审核员的批注"));
         Assert.That(writes, Is.EqualTo(1));
-        Assert.That(renderer.AllText(root), Does.Not.Contain("通过审核"));
+        Assert.That(renderer.AllText(root), Does.Not.Contain("审核操作"));
     }
 
     [Test]
