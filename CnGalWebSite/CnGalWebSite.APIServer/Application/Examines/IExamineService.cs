@@ -1,4 +1,4 @@
-
+﻿
 
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Model;

@@ -5,6 +5,10 @@
 @using CnGalWebSite.DataModel.ViewModel.Search
 
 <div class="@Class">
+    @if (Model?.IsComplete == false)
+    {
+        <div class="mb-4 pa-3" role="status">历史快照不完整，部分数据可能无法显示。</div>
+    }
     @foreach (var body in BodyItems)
     {
         <MDCard Class="mb-4 pa-3 ">
@@ -22,6 +26,15 @@
     @if (Relevances.Count > 0)
     {
         <CnGalWebSite.Shared.Component.Admin.Examines.Parts.RelevanceListCard Model="Relevances" />
+    }
+    @if (UnresolvedRelations.Count > 0)
+    {
+        <MDCard Class="mb-4 pa-3">
+            @foreach (var relation in UnresolvedRelations)
+            {
+                <div>@relation.Label：@ItemText(relation)</div>
+            }
+        </MDCard>
     }
     @if (Outlinks.Count > 0)
     {
@@ -77,6 +90,10 @@
         .Select(i => i!)
         .ToList();
 
+    private List<RecordPreviewItem> UnresolvedRelations => Items
+        .Where(i => i.Kind == RecordPreviewKind.Relation && ToSearchModel(i) is null)
+        .ToList();
+
     private List<RelevancesKeyValueModel> Outlinks => Items
         .Where(i => i.Kind == RecordPreviewKind.Link)
         .Select(i => new RelevancesKeyValueModel
@@ -107,13 +124,14 @@
         var type = value[..separator];
         var reference = value[(separator + 1)..];
         var name = ItemText(item);
+        var hasId = long.TryParse(reference, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) && id > 0;
         return type switch
         {
-            "entry" or "entry-name" => new SearchAloneModel { entry = new EntryInforTipViewModel { Id = ParseInt(reference), Name = name } },
-            "article" => new SearchAloneModel { article = new ArticleInforTipViewModel { Id = ParseLong(reference), Name = name, DisplayName = name } },
-            "video" => new SearchAloneModel { video = new VideoInforTipViewModel { Id = ParseLong(reference), Name = name, DisplayName = name } },
-            "tag" or "tag-name" => new SearchAloneModel { tag = new TagInforTipViewModel { Id = ParseInt(reference), Name = name } },
-            "periphery" => new SearchAloneModel { periphery = new PeripheryInforTipViewModel { Id = ParseLong(reference), Name = name } },
+            "entry" when hasId => new SearchAloneModel { entry = new EntryInforTipViewModel { Id = (int)id, Name = name } },
+            "article" when hasId => new SearchAloneModel { article = new ArticleInforTipViewModel { Id = id, Name = name, DisplayName = name } },
+            "video" when hasId => new SearchAloneModel { video = new VideoInforTipViewModel { Id = id, Name = name, DisplayName = name } },
+            "tag" when hasId => new SearchAloneModel { tag = new TagInforTipViewModel { Id = (int)id, Name = name } },
+            "periphery" when hasId => new SearchAloneModel { periphery = new PeripheryInforTipViewModel { Id = id, Name = name } },
             _ => null
         };
     }

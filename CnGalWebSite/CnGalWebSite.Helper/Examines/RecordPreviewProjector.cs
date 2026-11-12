@@ -23,6 +23,7 @@ public sealed class RecordPreviewProjector
     private readonly Func<string, string> imageUrlResolver;
     private readonly List<RecordPreviewItem> items = new();
     public bool IsComplete { get; set; }
+    public bool HasFailed { get; set; }
 
     private static readonly Dictionary<string, string> Labels = new()
     {
@@ -125,6 +126,7 @@ public sealed class RecordPreviewProjector
     public void Load(object value)
     {
         IsComplete = true;
+        HasFailed = false;
         Scalars(Shallow(value), objectType, "main", "主要信息");
         var source = Get(value, "MainPage") ?? Get(value, "MainPageContext");
         if (source is string body) Body(body);

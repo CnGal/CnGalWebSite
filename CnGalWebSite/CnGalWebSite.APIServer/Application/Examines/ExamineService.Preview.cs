@@ -45,11 +45,11 @@ public partial class ExamineService
             var dependency = examine.PrepositionExamineId;
             while (dependency is > 0)
             {
-                if (!visited.Add(dependency.Value)) { state.IsComplete = false; break; }
+                if (!visited.Add(dependency.Value)) { MarkIncomplete(state); break; }
                 var parent = records.FirstOrDefault(r => r.Id == dependency.Value);
-                if (parent == null) { state.IsComplete = false; break; }
+                if (parent == null) { MarkIncomplete(state); break; }
                 if (parent.IsPassed == true) break;
-                if (parent.IsPassed == false) { state.IsComplete = false; break; }
+                if (parent.IsPassed == false) { MarkIncomplete(state); break; }
                 dependencies.Add(parent);
                 dependency = parent.PrepositionExamineId;
             }
@@ -317,15 +317,22 @@ public partial class ExamineService
             state.Apply(record);
             // The main creation/edit record supplies the initial scalar state. Until then,
             // absent values must not be presented as known empty values.
-            if (record.Operation is Operation.EstablishMain or Operation.EditArticleMain or Operation.EditVideoMain
+            if (!state.HasFailed && (record.Operation is Operation.EstablishMain or Operation.EditArticleMain or Operation.EditVideoMain
                 or Operation.EditPeripheryMain or Operation.EditTagMain or Operation.EditTag or Operation.EditUserMain
-                or Operation.EditPlayedGameMain or Operation.EditFavoriteFolderMain or Operation.DisambigMain)
+                or Operation.EditPlayedGameMain or Operation.EditFavoriteFolderMain or Operation.DisambigMain))
                 state.IsComplete = true;
         }
-        catch (Exception error) when (error is JsonException or InvalidOperationException or FormatException)
+        catch (Exception error) when (error is JsonException or InvalidOperationException or FormatException
+            or ArgumentException or InvalidCastException or OverflowException)
         {
-            state.IsComplete = false;
+            MarkIncomplete(state);
         }
+    }
+
+    private static void MarkIncomplete(RecordPreviewProjector state)
+    {
+        state.HasFailed = true;
+        state.IsComplete = false;
     }
 
     private string RenderPreview(string source) => HtmlSanitizerHelper.Sanitize(_appHelper.MarkdownToHtml(source));
