@@ -1052,14 +1052,17 @@ namespace CnGalWebSite.APIServer.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<PeripheryContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
         {
-            var contrastExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId);
+            var contrastExamine = contrastId > 0
+                ? await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId)
+                : null;
             var currentExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == currentId);
 
-            if (contrastExamine == null || currentExamine == null || contrastExamine.PeripheryId == null || currentExamine.PeripheryId == null || contrastExamine.PeripheryId != currentExamine.PeripheryId)
+            if (currentExamine == null || currentExamine.PeripheryId == null
+                || (contrastId > 0 && (contrastExamine == null || contrastExamine.PeripheryId != currentExamine.PeripheryId)))
             {
                 return NotFound("编辑记录Id不正确");
             }
-            if (contrastExamine.IsPassed != true || currentExamine.IsPassed != true)
+            if (currentExamine.IsPassed != true || (contrastId > 0 && contrastExamine.IsPassed != true))
             {
                 return BadRequest("请选择已通过的编辑记录");
             }
@@ -1067,14 +1070,14 @@ namespace CnGalWebSite.APIServer.Controllers
             var currentPeriphery = new Periphery();
             var newPeriphery = new Periphery();
 
-            //按审核通过时间还原历史版本
+            //按审核通过时间还原历史版本；contrastId=0 表示空基准，用于首个版本
             var examines = RecordVersionOrder.Approved(
                 await _examineRepository.GetAll().AsNoTracking()
                     .Where(s => s.IsPassed == true && s.PeripheryId == currentExamine.PeripheryId)
                     .ToListAsync()).ToList();
-            var contrastIndex = examines.FindIndex(s => s.Id == contrastId);
+            var contrastIndex = contrastId > 0 ? examines.FindIndex(s => s.Id == contrastId) : -1;
             var currentIndex = examines.FindIndex(s => s.Id == currentId);
-            if (contrastIndex < 0 || currentIndex < 0)
+            if (currentIndex < 0 || (contrastId > 0 && contrastIndex < 0))
             {
                 return BadRequest("编辑记录未通过审核");
             }
@@ -1083,9 +1086,12 @@ namespace CnGalWebSite.APIServer.Controllers
                 return BadRequest("对比的编辑必须先于当前的编辑");
             }
 
-            foreach (var item in examines.Take(contrastIndex + 1))
+            if (contrastIndex >= 0)
             {
-                await _peripheryService.UpdatePeripheryDataAsync(currentPeriphery, item);
+                foreach (var item in examines.Take(contrastIndex + 1))
+                {
+                    await _peripheryService.UpdatePeripheryDataAsync(currentPeriphery, item);
+                }
             }
 
             foreach (var item in examines.Take(currentIndex + 1))

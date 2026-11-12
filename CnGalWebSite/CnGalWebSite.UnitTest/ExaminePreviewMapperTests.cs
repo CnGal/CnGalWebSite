@@ -1,4 +1,5 @@
 ﻿using CnGalWebSite.Core.Models;
+using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
@@ -102,6 +103,63 @@ public class ExaminePreviewMapperTests
             Assert.That(result.Items.Any(i => i.Kind == RecordPreviewKind.Image && i.Value == "main.png"), Is.True);
             Assert.That(result.Items.Any(i => i.Kind == RecordPreviewKind.Relation && i.Value == "tag:3"), Is.True);
         });
+    }
+
+    [Test]
+    public void EntryNewsAndFullInformationParticipateInComparison()
+    {
+        var before = EditRecordContentMapper.Map(new EntryIndexViewModel
+        {
+            Name = "高考恋爱一百天",
+            NewsOfEntry =
+            [
+                new() { ArticleId = 1155, Title = "要上考场的同学们", Link = "https://weibo.com/old", HappenedTime = new(2022, 6, 6) }
+            ],
+            AllInformation =
+            [
+                new() { Modifier = "基本信息", DisplayName = "发行时间", DisplayValue = "2014年7月20日" }
+            ]
+        });
+        var after = EditRecordContentMapper.Map(new EntryIndexViewModel
+        {
+            Name = "高考恋爱一百天",
+            NewsOfEntry =
+            [
+                new() { ArticleId = 2613, Title = "这游戏做了8年", Link = "https://www.bilibili.com/video/new", HappenedTime = new(2023, 5, 25) },
+                new() { ArticleId = 1155, Title = "要上考场的同学们", Link = "https://weibo.com/old", HappenedTime = new(2022, 6, 6) }
+            ]
+        });
+
+        var diff = RecordDiffBuilder.Build(ExaminePreviewMapper.FromPreData(before), ExaminePreviewMapper.FromPreData(after));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(diff.Items.Any(item => item.Item.Group == "关联动态" && item.Item.Label == "这游戏做了8年"), Is.True);
+            Assert.That(diff.Items.Any(item => item.Item.Group == "基本信息" && item.Item.Label == "发行时间" && item.Change == RecordChangeKind.Removed), Is.True);
+        });
+    }
+
+    [Test]
+    public void EmptyStaffModifierDoesNotLeaveTrailingSeparator()
+    {
+        var legacy = EditRecordContentMapper.Map(new EntryIndexViewModel
+        {
+            Name = "测试词条",
+            Staffs =
+            [
+                new()
+                {
+                    Modifier = "",
+                    StaffList =
+                    [
+                        new() { Modifier = "剧本", Names = [new() { DisplayName = "测试 Staff" }] }
+                    ]
+                }
+            ]
+        });
+
+        Assert.That(legacy.Texts.Any(text => text.Modifier == "Staff"), Is.True);
+        Assert.That(legacy.Texts.Any(text => text.Modifier.StartsWith("Staff ·", StringComparison.Ordinal)), Is.False);
     }
 
     [Test]

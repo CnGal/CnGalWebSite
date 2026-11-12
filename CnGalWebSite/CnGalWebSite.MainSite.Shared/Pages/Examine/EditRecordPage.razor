@@ -64,7 +64,7 @@
                             />
                     }
                     else if (!IsCompare && _record is not null)
-                    { <ReviewContent Model="_record" Comparison="_recordComparison" /><RecordNotes Comments="@_record.Comments" Note="@_record.Note" ShowEmpty="true" /> }
+                    { <RecordNotes Comments="@_record.Comments" Note="@_record.Note" ShowEmpty="true" /><ReviewContent Model="_record" Comparison="_recordComparison" /> }
                 </div>
             </div>
         }

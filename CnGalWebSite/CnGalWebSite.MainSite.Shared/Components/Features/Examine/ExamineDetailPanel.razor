@@ -27,8 +27,8 @@
     {
         <p class="examine-detail-panel__error" role="status">@_comparisonError</p>
     }
-    <ReviewContent Model="_record" Comparison="_comparison" />
     <RecordNotes Comments="@_record.Comments" Note="@_record.Note" ShowEmpty="true" />
+    <ReviewContent Model="_record" Comparison="_comparison" />
     @if (_record.ContributionValue > 0)
     { <p class="examine-detail-panel__contribution">附加贡献值 <strong>@_record.ContributionValue</strong></p> }
     @if (_record.SensitiveWords is { Count: > 0 })

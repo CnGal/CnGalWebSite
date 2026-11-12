@@ -126,9 +126,8 @@
     private string? DiffBeforeLabel => IsBefore ? RawLabel : OtherRawLabel;
     private string? DiffAfterLabel => IsBefore ? OtherRawLabel : RawLabel;
     private bool ShowLinkDestination => Item?.Kind == RecordPreviewKind.Link
-        && !string.IsNullOrWhiteSpace(DiffBeforeUrl ?? DiffAfterUrl)
-        && (!string.Equals(DiffBeforeText, DiffBeforeUrl, StringComparison.Ordinal)
-            || !string.Equals(DiffAfterText, DiffAfterUrl, StringComparison.Ordinal));
+        && !string.IsNullOrWhiteSpace(RawUrl)
+        && !string.Equals(RawText, RawUrl, StringComparison.Ordinal);
     private bool ShowAudioNameDiff => Item?.Kind == RecordPreviewKind.Audio
         && !string.Equals(RawLabel ?? string.Empty, OtherRawLabel ?? string.Empty, StringComparison.Ordinal)
         && (!string.IsNullOrWhiteSpace(RawLabel) || !string.IsNullOrWhiteSpace(OtherRawLabel));

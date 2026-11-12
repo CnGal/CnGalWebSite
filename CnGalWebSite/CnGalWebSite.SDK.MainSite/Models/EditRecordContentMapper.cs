@@ -22,11 +22,20 @@ public static class EditRecordContentMapper
             ("背景图", value.BackgroundPicture), ("小背景图", value.SmallBackgroundPicture));
         Pictures(result, value.Pictures);
         Group(result, "附加信息", (value.Information ?? []).Select(i => (i.Name, (object?)i.Value)));
+        foreach (var group in (value.AllInformation ?? [])
+                     .GroupBy(i => string.IsNullOrWhiteSpace(i.Modifier) ? "附加信息" : i.Modifier))
+        {
+            Group(result, group.Key, group.SelectMany(i => new[] { (i.DisplayName, (object?)i.DisplayValue) }
+                .Concat((i.Additional ?? []).Select(a => ($"{i.DisplayName} · {a.DisplayName}", (object?)a.DisplayValue)))));
+        }
         Group(result, "制作组", (value.ProductionGroups ?? []).Select(i => ("名称", (object?)i.DisplayName)));
         Group(result, "发行商", (value.Publishers ?? []).Select(i => ("名称", (object?)i.DisplayName)));
         foreach (var staff in value.Staffs ?? [])
-            Group(result, $"Staff · {staff.Modifier}", (staff.StaffList ?? []).SelectMany(position =>
+        {
+            var staffGroup = string.IsNullOrWhiteSpace(staff.Modifier) ? "Staff" : $"Staff · {staff.Modifier.Trim()}";
+            Group(result, staffGroup, (staff.StaffList ?? []).SelectMany(position =>
                 (position.Names ?? []).Select(name => (position.Modifier, (object?)name.DisplayName))));
+        }
         foreach (var release in value.Releases ?? [])
         {
             Group(result, $"发行信息 · {release.Name}", [("发行平台", release.PublishPlatformType),
@@ -48,6 +57,7 @@ public static class EditRecordContentMapper
         }
         result.Audio = value.Audio ?? [];
         result.Outlinks.AddRange(value.OtherRelevances ?? []);
+        result.News.AddRange(value.NewsOfEntry ?? []);
         result.Relevances.AddRange((value.EntryRelevances ?? []).Select(i => new SearchAloneModel { entry = i }));
         result.Relevances.AddRange((value.ArticleRelevances ?? []).Select(i => new SearchAloneModel { article = i }));
         result.Relevances.AddRange((value.VideoRelevances ?? []).Select(i => new SearchAloneModel { video = i }));

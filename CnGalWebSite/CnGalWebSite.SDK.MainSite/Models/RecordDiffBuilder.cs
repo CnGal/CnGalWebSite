@@ -87,11 +87,24 @@ public static class RecordDiffBuilder
                 && string.Equals(items[index].After!.Group, removed.Group, StringComparison.Ordinal))
             .ToList();
         if (candidates.Count == 0) return -1;
-        var sameLabel = candidates.Where(index => string.Equals(Normalize(items[index].After!.Label), Normalize(removed.Label), StringComparison.Ordinal)).ToList();
-        if (sameLabel.Count == 1) return sameLabel[0];
-        if (sameLabel.Count > 1) return -1;
-        return candidates.Count == 1 ? candidates[0] : -1;
+        var sameLabel = candidates.Cast<int?>().FirstOrDefault(index =>
+            string.Equals(Normalize(items[index!.Value].After!.Label), Normalize(removed.Label), StringComparison.Ordinal));
+        if (sameLabel is int labelIndex) return labelIndex;
+
+        var removedPriority = PropertyValue(removed, "Priority");
+        if (!string.IsNullOrEmpty(removedPriority))
+        {
+            var samePriority = candidates.Cast<int?>().FirstOrDefault(index =>
+                string.Equals(PropertyValue(items[index!.Value].After!, "Priority"), removedPriority, StringComparison.Ordinal));
+            if (samePriority is int priorityIndex) return priorityIndex;
+        }
+
+        // 图片顺序或说明文字发生变化时，同组剩余图片按顺序视为替换，避免整组显示为删除再新增。
+        return candidates.Count > 0 ? candidates[0] : -1;
     }
+
+    private static string? PropertyValue(RecordPreviewItem item, string key) =>
+        item.Properties.FirstOrDefault(property => string.Equals(property.Key, key, StringComparison.Ordinal))?.Value;
 
     private static bool Equal(RecordPreviewItem left, RecordPreviewItem right) => left.Kind == right.Kind
         && Normalize(left.Group) == Normalize(right.Group)

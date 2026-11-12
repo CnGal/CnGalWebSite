@@ -1,6 +1,6 @@
-﻿.record-object {
+.record-object {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     gap: var(--cg-spacing-5);
     padding: var(--cg-spacing-6);
     background: var(--cg-color-surface);
@@ -9,8 +9,8 @@
 }
 
 .record-object__image {
-    flex: 0 0 144px;
-    aspect-ratio: 460 / 215;
+    flex: 0 0 clamp(180px, 22vw, 280px);
+    min-height: 120px;
     overflow: hidden;
     border-radius: var(--cg-radius-md);
     background: var(--cg-color-section-bg);
@@ -20,12 +20,23 @@
 
 .record-object__image--thumbnail {
     flex-basis: 72px;
+    min-height: 0;
     aspect-ratio: 1;
+    align-self: center;
 }
 
-.record-object__image img {
+.record-object__image ::deep .record-image {
     width: 100%;
     height: 100%;
+}
+
+.record-object__image ::deep img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.record-object__image--thumbnail ::deep img {
     object-fit: cover;
 }
 
@@ -81,16 +92,46 @@ p {
     text-decoration: underline;
 }
 
+@media (max-width: 900px) and (min-width: 641px) {
+    .record-object__image {
+        flex-basis: 180px;
+    }
+}
+
 @media (max-width: 640px) {
     .record-object {
         padding: var(--cg-spacing-4);
         gap: var(--cg-spacing-3);
-        flex-wrap: wrap;
+        flex-direction: column;
     }
+
     .record-object__image {
-        flex-basis: 88px;
+        flex: none;
+        width: 100%;
+        min-height: 0;
     }
+
+    .record-object__image ::deep .record-image {
+        height: auto;
+    }
+
+    .record-object__image ::deep img {
+        height: auto;
+        object-fit: contain;
+    }
+
     .record-object__image--thumbnail {
-        flex-basis: 56px;
+        width: 88px;
+        aspect-ratio: 1;
+        align-self: flex-start;
+    }
+
+    .record-object__image--thumbnail ::deep .record-image,
+    .record-object__image--thumbnail ::deep img {
+        height: 100%;
+    }
+
+    .record-object__image--thumbnail ::deep img {
+        object-fit: cover;
     }
 }

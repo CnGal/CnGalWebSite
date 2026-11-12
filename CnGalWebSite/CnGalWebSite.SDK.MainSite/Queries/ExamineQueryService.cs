@@ -200,14 +200,10 @@ public sealed class ExamineQueryService(
             return SdkResult<EditRecordComparison>.Fail(
                 "EXAMINE_COMPARISON_NOT_FOUND", "无法找到该审核记录所属的已通过历史。");
         }
-        if (index == 0)
-        {
-            return SdkResult<EditRecordComparison>.Fail(
-                "EXAMINE_COMPARISON_BASELINE", "该记录是首个已通过版本，没有可对比的基准版本。");
-        }
-
+        // 首个版本以空内容作为基准，完整展示该版本新增的内容。
+        var contrastId = index == 0 ? 0 : records[index - 1].Id;
         return await GetEditRecordComparisonAsync(
-            overviewResult.Data.Type, records[index - 1].Id, examineId, cancellationToken);
+            overviewResult.Data.Type, contrastId, examineId, cancellationToken);
     }
 
     // ─── 单条审核详情 ───
@@ -243,7 +239,7 @@ public sealed class ExamineQueryService(
         ExaminedNormalListModelType type, long contrastId, long currentId, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (contrastId <= 0 || currentId <= 0)
+        if (contrastId < 0 || currentId <= 0)
             return SdkResult<EditRecordComparison>.Fail("EXAMINE_COMPARISON_RANGE", "请选择有效的版本");
 
         var suffix = $"GetContrastEditRecordViews/{contrastId}/{currentId}";

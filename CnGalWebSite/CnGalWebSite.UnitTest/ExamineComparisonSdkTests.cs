@@ -145,6 +145,40 @@ public class ExamineComparisonSdkTests
     }
 
     [Test]
+    public async Task FirstApprovedVersionUsesAnEmptyComparisonBaseline()
+    {
+        var calls = new List<string>();
+        using var storage = new MemoryCache(new MemoryCacheOptions());
+        using var userCache = new ExamineUserCache(NullLogger<ExamineUserCache>.Instance);
+        using var http = Client((request, _) =>
+        {
+            var path = request.RequestUri!.AbsolutePath;
+            calls.Add(path);
+            return Task.FromResult(path.EndsWith("/GetExaminesOverview/20", StringComparison.Ordinal)
+                ? Json(HttpStatusCode.OK, """
+                    {"objectId":1,"objectName":"测试对象","type":0,"examines":[
+                      {"id":20,"passedTime":"2026-11-12T10:00:00Z"}]}
+                    """)
+                : Json(HttpStatusCode.OK, """
+                    {"contrastId":0,"currentId":20,"contrastModel":{},"currentModel":{"name":"First version"}}
+                    """));
+        });
+        var result = await Query(http, storage, userCache).GetApprovedExamineComparisonAsync(20);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Success, Is.True, result.Error?.Message);
+            Assert.That(calls, Is.EqualTo(new[]
+            {
+                "/api/examines/GetExaminesOverview/20",
+                "/api/entries/GetContrastEditRecordViews/0/20"
+            }));
+            Assert.That(result.Data?.ContrastId, Is.Zero);
+            Assert.That(result.Data?.After.Items.Any(item => item.DisplayValue == "First version"), Is.True);
+        });
+    }
+
+    [Test]
     public void CancellationIsPropagated()
     {
         using var storage = new MemoryCache(new MemoryCacheOptions());
@@ -175,6 +209,35 @@ public class ExamineComparisonSdkTests
             Assert.That(diff.Items[0].Change, Is.EqualTo(RecordChangeKind.Modified));
             Assert.That(diff.Items[0].Before?.Value, Is.EqualTo("https://media.example/old.png"));
             Assert.That(diff.Items[0].After?.Value, Is.EqualTo("https://media.example/new.png"));
+        });
+    }
+
+    [Test]
+    public void MultipleImageReplacementsArePairedAsModifiedRows()
+    {
+        var before = new RecordPreviewModel { Items = [
+            new() { Key = "picture/old-1", Group = "图片", Kind = RecordPreviewKind.Image, Label = "旧图一",
+                Value = "https://media.example/old-1.png", DisplayValue = "https://media.example/old-1.png", Url = "https://media.example/old-1.png",
+                Properties = [new() { Key = "Priority", Label = "优先级", Value = "1", DisplayValue = "1" }] },
+            new() { Key = "picture/old-2", Group = "图片", Kind = RecordPreviewKind.Image, Label = "旧图二",
+                Value = "https://media.example/old-2.png", DisplayValue = "https://media.example/old-2.png", Url = "https://media.example/old-2.png",
+                Properties = [new() { Key = "Priority", Label = "优先级", Value = "2", DisplayValue = "2" }] }
+        ] };
+        var after = new RecordPreviewModel { Items = [
+            new() { Key = "picture/new-1", Group = "图片", Kind = RecordPreviewKind.Image, Label = "新图一",
+                Value = "https://media.example/new-1.png", DisplayValue = "https://media.example/new-1.png", Url = "https://media.example/new-1.png",
+                Properties = [new() { Key = "Priority", Label = "优先级", Value = "1", DisplayValue = "1" }] },
+            new() { Key = "picture/new-2", Group = "图片", Kind = RecordPreviewKind.Image, Label = "新图二",
+                Value = "https://media.example/new-2.png", DisplayValue = "https://media.example/new-2.png", Url = "https://media.example/new-2.png",
+                Properties = [new() { Key = "Priority", Label = "优先级", Value = "2", DisplayValue = "2" }] }
+        ] };
+
+        var diff = RecordDiffBuilder.Build(before, after);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(diff.Items, Has.Count.EqualTo(2));
+            Assert.That(diff.Items.All(item => item.Change == RecordChangeKind.Modified), Is.True);
         });
     }
 

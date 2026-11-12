@@ -89,6 +89,29 @@ public static class ExaminePreviewMapper
             });
         }
 
+        for (var index = 0; index < value.News.Count; index++)
+        {
+            var news = value.News[index];
+            var newsUrl = !string.IsNullOrWhiteSpace(news.Link)
+                ? news.Link
+                : news.ArticleId > 0 ? "/articles/index/" + news.ArticleId : null;
+            if (string.IsNullOrWhiteSpace(news.Title) && string.IsNullOrWhiteSpace(newsUrl)) continue;
+            result.Items.Add(new RecordPreviewItem
+            {
+                Key = news.ArticleId > 0 ? $"news/{news.ArticleId}" : $"news/{news.Link}",
+                Group = "关联动态", Kind = RecordPreviewKind.Link,
+                Label = news.Title ?? string.Empty,
+                Value = newsUrl ?? news.Title ?? string.Empty,
+                DisplayValue = news.Title ?? newsUrl ?? string.Empty,
+                Url = newsUrl,
+                Properties =
+                [
+                    new() { Key = "HappenedTime", Label = "时间", Value = news.HappenedTime.ToString("yyyy-MM-dd HH:mm"), DisplayValue = news.HappenedTime.ToString("yyyy-MM-dd HH:mm") },
+                    new() { Key = "NewsType", Label = "动态类型", Value = news.NewsType ?? string.Empty, DisplayValue = news.NewsType ?? string.Empty }
+                ]
+            });
+        }
+
         for (var index = 0; index < value.Audio.Count; index++)
         {
             var audio = value.Audio[index];

@@ -112,6 +112,11 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// 附加信息列表
         /// </summary>
         public List<EntryInformationModel> Information { get; set; } = new List<EntryInformationModel>();
+
+        /// <summary>
+        /// 历史对比使用的完整附加信息，包含当前页面已隐藏或不再配置展示的类型。
+        /// </summary>
+        public List<BasicEntryInformation> AllInformation { get; set; } = new List<BasicEntryInformation>();
         /// <summary>
         /// Staff信息 
         /// </summary>

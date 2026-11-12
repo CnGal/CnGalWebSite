@@ -155,7 +155,7 @@ public class ExaminePresentationTests
     }
 
     [Test]
-    public void AmbiguousImageReplacementsRemainAdditionsAndRemovals()
+    public void AmbiguousImageReplacementsArePairedByOrder()
     {
         var before = new RecordPreviewModel
         {
@@ -178,9 +178,8 @@ public class ExaminePresentationTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(changes.Count(item => item.Change == RecordChangeKind.Removed), Is.EqualTo(2));
-            Assert.That(changes.Count(item => item.Change == RecordChangeKind.Added), Is.EqualTo(2));
-            Assert.That(changes.Any(item => item.Change == RecordChangeKind.Modified), Is.False);
+            Assert.That(changes, Has.Count.EqualTo(2));
+            Assert.That(changes.All(item => item.Change == RecordChangeKind.Modified), Is.True);
         });
     }
 
@@ -352,6 +351,32 @@ public class ExaminePresentationTests
             Assert.That(text, Does.Contain("rebuilt-").And.Contain("before").And.Contain("after"));
             Assert.That(text, Does.Not.Contain("live-current-content"));
         });
+    }
+
+    [Test]
+    public async Task LinkWhoseTextIsTheUrlRendersTheUrlOnce()
+    {
+        var url = "https://weibo.com/u/3786888223";
+        var before = new RecordPreviewModel();
+        var after = new RecordPreviewModel
+        {
+            Items =
+            [
+                new() { Key = "link/微博", Group = "外链", Kind = RecordPreviewKind.Link, Label = "微博",
+                    Value = url, DisplayValue = url, Url = url }
+            ]
+        };
+        using var services = Services();
+        await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
+        var html = await renderer.Dispatcher.InvokeAsync(async () =>
+            (await renderer.RenderComponentAsync<RecordContentComparison>(ParameterView.FromDictionary(new Dictionary<string, object?>
+            {
+                ["Before"] = before,
+                ["After"] = after
+            }))).ToHtmlString());
+        var text = Regex.Replace(WebUtility.HtmlDecode(html), "<[^>]+>", string.Empty);
+
+        Assert.That(Regex.Matches(text, Regex.Escape(url)).Count, Is.EqualTo(1));
     }
 
     [Test]
