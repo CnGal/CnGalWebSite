@@ -326,6 +326,35 @@ public class ExaminePresentationTests
     }
 
     [Test]
+    public async Task ReviewContentUsesRebuiltApprovedRecordComparison()
+    {
+        using var services = Services();
+        await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
+        var model = Review(7, true);
+        model.BeforeModel = model.AfterModel = LegacyBody("<p>live-current-content</p>");
+        var comparison = new EditRecordComparison
+        {
+            ContrastId = 6,
+            CurrentId = 7,
+            Before = ExaminePreviewMapper.FromPreData(LegacyBody("<p>rebuilt-before</p>")),
+            After = ExaminePreviewMapper.FromPreData(LegacyBody("<p>rebuilt-after</p>"))
+        };
+        var html = await renderer.Dispatcher.InvokeAsync(async () =>
+            (await renderer.RenderComponentAsync<ReviewContent>(ParameterView.FromDictionary(new Dictionary<string, object?>
+            {
+                ["Model"] = model,
+                ["Comparison"] = comparison
+            }))).ToHtmlString());
+        var text = WebUtility.HtmlDecode(html);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(text, Does.Contain("rebuilt-").And.Contain("before").And.Contain("after"));
+            Assert.That(text, Does.Not.Contain("live-current-content"));
+        });
+    }
+
+    [Test]
     public async Task EmptyRecordNotesDoNotRenderPlaceholder()
     {
         using var services = Services();

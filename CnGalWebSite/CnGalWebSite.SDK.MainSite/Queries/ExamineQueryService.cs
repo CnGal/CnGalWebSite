@@ -175,6 +175,41 @@ public sealed class ExamineQueryService(
         return result;
     }
 
+    // ─── 已通过记录的历史对比 ───
+
+    public async Task<SdkResult<EditRecordComparison>> GetApprovedExamineComparisonAsync(
+        long examineId, CancellationToken cancellationToken = default)
+    {
+        var overviewResult = await GetExaminesOverviewAsync(examineId, cancellationToken);
+        if (!overviewResult.Success || overviewResult.Data is null)
+        {
+            return SdkResult<EditRecordComparison>.Fail(
+                overviewResult.Error?.Code ?? "EXAMINE_COMPARISON_OVERVIEW",
+                overviewResult.Error?.Message ?? "无法加载编辑记录概览。",
+                overviewResult.Error?.StatusCode);
+        }
+
+        var records = overviewResult.Data.Examines
+            .Where(record => record.Id > 0)
+            .OrderBy(record => record.PassedTime)
+            .ThenBy(record => record.Id)
+            .ToList();
+        var index = records.FindIndex(record => record.Id == examineId);
+        if (index < 0)
+        {
+            return SdkResult<EditRecordComparison>.Fail(
+                "EXAMINE_COMPARISON_NOT_FOUND", "无法找到该审核记录所属的已通过历史。");
+        }
+        if (index == 0)
+        {
+            return SdkResult<EditRecordComparison>.Fail(
+                "EXAMINE_COMPARISON_BASELINE", "该记录是首个已通过版本，没有可对比的基准版本。");
+        }
+
+        return await GetEditRecordComparisonAsync(
+            overviewResult.Data.Type, records[index - 1].Id, examineId, cancellationToken);
+    }
+
     // ─── 单条审核详情 ───
 
     public Task<SdkResult<ExamineViewModel>> GetExamineDetailAsync(

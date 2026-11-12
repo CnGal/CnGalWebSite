@@ -23,7 +23,11 @@
             <CgButton Variant="secondary" Size="sm" Async OnClick="RefreshRecordAsync" Disabled="_processing || _refreshing">刷新状态</CgButton>
         </div>
     }
-    <ReviewContent Model="_record" />
+    @if (_comparisonError is not null)
+    {
+        <p class="examine-detail-panel__error" role="status">@_comparisonError</p>
+    }
+    <ReviewContent Model="_record" Comparison="_comparison" />
     <RecordNotes Comments="@_record.Comments" Note="@_record.Note" ShowEmpty="true" />
     @if (_record.ContributionValue > 0)
     { <p class="examine-detail-panel__contribution">附加贡献值 <strong>@_record.ContributionValue</strong></p> }
@@ -68,6 +72,8 @@
     [Parameter] public EventCallback OnProcCompleted { get; set; }
     private ExamineViewModel _record = default!;
     private ExamineViewModel? _source;
+    private EditRecordComparison? _comparison;
+    private string? _comparisonError;
     private string? _comments = "";
     private string? _error;
     private bool _processing;
@@ -77,19 +83,46 @@
     private CancellationTokenSource? _cts;
     private bool CanProcess => !_submitted && RecordPresentation.CanProcess(_record);
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         if (ReferenceEquals(_source, Model)) return;
         _cts?.Cancel();
         _cts?.Dispose();
         _cts = new();
+        var token = _cts.Token;
         _source = Model;
         _record = Model;
+        _comparison = null;
+        _comparisonError = null;
         _comments = "";
         _processing = false;
         _refreshing = false;
         _submitted = false;
         _error = null;
+
+        if (_record.IsPassed == true && RecordPresentation.SupportsHistory(_record.Type)
+            && _record.Operation is not Operation.PubulishComment and not Operation.RequestUserCertification)
+        {
+            try
+            {
+                var result = await ExamineQueryService.GetApprovedExamineComparisonAsync(_record.Id, token);
+                if (_disposed || token.IsCancellationRequested) return;
+                if (result.Success && result.Data is { } comparison)
+                {
+                    _comparison = comparison;
+                }
+                else
+                {
+                    _comparisonError = result.Error?.Message ?? "历史变更加载失败，请查看原始数据。";
+                }
+            }
+            catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+            catch
+            {
+                if (!_disposed && !token.IsCancellationRequested)
+                    _comparisonError = "历史变更加载失败，请查看原始数据。";
+            }
+        }
     }
 
     private async Task RefreshRecordAsync()

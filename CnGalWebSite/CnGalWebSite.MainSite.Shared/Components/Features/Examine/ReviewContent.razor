@@ -16,6 +16,10 @@
     @if (_activeTab == ReviewTab.Summary)
     {
         <div id="review-panel-summary" role="tabpanel" aria-labelledby="review-tab-summary">
+            @if (Model.IsPassed == true && Comparison is null && !IsSubmissionOnly)
+            {
+                <p class="review-content__notice" role="status">未能加载历史对比，变更摘要可能不完整，请查看原始数据。</p>
+            }
             <RecordContentComparison Before="_before" After="_after"
                 BeforeTitle="@(Model.IsPassed is null ? "当前内容" : "修改前")"
                 AfterTitle="@(Model.IsPassed == false ? "拟提交内容" : Model.IsPassed is null ? "提交内容" : "修改后")"
@@ -32,7 +36,12 @@
 
 @code {
     [Parameter, EditorRequired] public ExamineViewModel Model { get; set; } = default!;
+
+    /// <summary>已通过记录由历史重建接口提供准确的修改前/后快照。</summary>
+    [Parameter] public EditRecordComparison? Comparison { get; set; }
+
     private ExamineViewModel? _source;
+    private EditRecordComparison? _sourceComparison;
     private RecordPreviewModel? _before;
     private RecordPreviewModel? _after;
     private ReviewTab _activeTab = ReviewTab.Summary;
@@ -40,10 +49,16 @@
 
     protected override void OnParametersSet()
     {
-        if (ReferenceEquals(_source, Model)) return;
+        if (ReferenceEquals(_source, Model) && ReferenceEquals(_sourceComparison, Comparison)) return;
         _source = Model;
-        _before = ExaminePreviewMapper.FromPreData(Model.BeforeModel);
-        _after = ExaminePreviewMapper.FromPreData(Model.AfterModel);
+        _sourceComparison = Comparison;
+        var useComparison = Comparison is not null && Comparison.CurrentId == Model.Id;
+        _before = useComparison
+            ? Comparison!.Before
+            : ExaminePreviewMapper.FromPreData(Model.BeforeModel);
+        _after = useComparison
+            ? Comparison!.After
+            : ExaminePreviewMapper.FromPreData(Model.AfterModel);
         _activeTab = ReviewTab.Summary;
     }
 

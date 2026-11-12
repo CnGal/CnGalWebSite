@@ -71,6 +71,14 @@ public interface IExamineQueryService
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// 获取一条已通过审核记录相对上一通过版本的历史对比。
+    /// 审核详情接口返回的前后快照对已通过记录不包含历史状态，展示变更摘要时应使用此方法。
+    /// </summary>
+    Task<SdkResult<EditRecordComparison>> GetApprovedExamineComparisonAsync(
+        long examineId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// 获取指定词条的编辑记录列表（已通过的审核记录）。
     /// </summary>
     Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetEntryEditRecordsAsync(

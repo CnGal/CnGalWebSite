@@ -64,7 +64,7 @@
                             />
                     }
                     else if (!IsCompare && _record is not null)
-                    { <ReviewContent Model="_record" /><RecordNotes Comments="@_record.Comments" Note="@_record.Note" ShowEmpty="true" /> }
+                    { <ReviewContent Model="_record" Comparison="_recordComparison" /><RecordNotes Comments="@_record.Comments" Note="@_record.Note" ShowEmpty="true" /> }
                 </div>
             </div>
         }
@@ -84,6 +84,7 @@
     private EditRecordAloneViewModel? _selectedRecord;
     private ExamineViewModel? _record;
     private EditRecordComparison? _comparison;
+    private EditRecordComparison? _recordComparison;
     private long _selectedId;
     private long _currentId;
     private bool _isLoading = true;
@@ -116,6 +117,7 @@
         _recordsOpen = false;
         _record = null;
         _comparison = null;
+        _recordComparison = null;
         _selectedRecord = null;
         _contentLoading = false;
         _isLoading = _overview is null || !_overview.Examines.Any(e => e.Id == contrastId);
@@ -173,7 +175,17 @@
             {
                 var result = await ExamineQueryService.GetExamineDetailAsync(_selectedId, token);
                 if (_disposed || token.IsCancellationRequested) return;
-                if (result.Success && result.Data is not null) _record = result.Data;
+                if (result.Success && result.Data is not null)
+                {
+                    _record = result.Data;
+                    if (_record.IsPassed == true && RecordPresentation.SupportsHistory(_record.Type))
+                    {
+                        var comparison = await ExamineQueryService.GetApprovedExamineComparisonAsync(_record.Id, token);
+                        if (_disposed || token.IsCancellationRequested) return;
+                        if (comparison.Success && comparison.Data is not null)
+                            _recordComparison = comparison.Data;
+                    }
+                }
                 else _contentError = result.Error?.Message ?? "记录内容加载失败，请重试。";
             }
         }

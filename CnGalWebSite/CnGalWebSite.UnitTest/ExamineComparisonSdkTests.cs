@@ -110,6 +110,41 @@ public class ExamineComparisonSdkTests
     }
 
     [Test]
+    public async Task ApprovedRecordComparisonUsesThePreviousApprovedVersion()
+    {
+        var calls = new List<string>();
+        using var storage = new MemoryCache(new MemoryCacheOptions());
+        using var userCache = new ExamineUserCache(NullLogger<ExamineUserCache>.Instance);
+        using var http = Client((request, _) =>
+        {
+            var path = request.RequestUri!.AbsolutePath;
+            calls.Add(path);
+            return Task.FromResult(path.EndsWith("/GetExaminesOverview/20", StringComparison.Ordinal)
+                ? Json(HttpStatusCode.OK, """
+                    {"objectId":1,"objectName":"测试对象","type":0,"examines":[
+                      {"id":10,"passedTime":"2026-11-12T09:00:00Z"},
+                      {"id":20,"passedTime":"2026-11-12T10:00:00Z"}]}
+                    """)
+                : Json(HttpStatusCode.OK, """
+                    {"contrastId":10,"currentId":20,"contrastModel":{"name":"Historical baseline"},"currentModel":{"name":"Historical target"}}
+                    """));
+        });
+        var result = await Query(http, storage, userCache).GetApprovedExamineComparisonAsync(20);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Success, Is.True, result.Error?.Message);
+            Assert.That(calls, Is.EqualTo(new[]
+            {
+                "/api/examines/GetExaminesOverview/20",
+                "/api/entries/GetContrastEditRecordViews/10/20"
+            }));
+            Assert.That(result.Data?.Before.Items.Any(item => item.DisplayValue == "Historical baseline"), Is.True);
+            Assert.That(result.Data?.After.Items.Any(item => item.DisplayValue == "Historical target"), Is.True);
+        });
+    }
+
+    [Test]
     public void CancellationIsPropagated()
     {
         using var storage = new MemoryCache(new MemoryCacheOptions());
