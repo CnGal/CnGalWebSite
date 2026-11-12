@@ -86,6 +86,9 @@ public class ExamineBrowserTests
                 await Expect(history).ToHaveAttributeAsync("href", "/home/editrecord?ContrastId=102&Mode=record");
                 await NoOverflow();
                 await _page.ScreenshotAsync(new() { Path = Path.Combine(output, $"review-approved-{theme}-{width}.png"), FullPage = true });
+                await history.ClickAsync();
+                await Expect(_page.Locator(".edit-record-page__notice")).ToHaveCountAsync(0);
+                await Expect(_page.Locator(".record-meta__id")).ToHaveTextAsync("记录 #102");
             }
         }
         await _page.GotoAsync(Site + "/home/editrecord?ContrastId=20");
@@ -111,6 +114,7 @@ public class ExamineBrowserTests
         await Expect(baseline).ToHaveAttributeAsync("aria-expanded", "true");
         await baseline.PressAsync("Escape");
         await Expect(baseline).ToHaveAttributeAsync("aria-expanded", "false");
+        await Expect(baseline).ToBeFocusedAsync();
         var selectors = _page.Locator(".record-selector .cg-select__trigger");
         await selectors.Nth(1).ClickAsync();
         await _page.Locator(".cg-select__option").Filter(new() { HasText = "#20 ·" }).ClickAsync();
@@ -181,7 +185,9 @@ public class ExamineBrowserTests
     private static string OutputDirectory()
     {
         var root = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
-        while (root.Parent is not null && !Directory.Exists(Path.Combine(root.FullName, ".git"))) root = root.Parent;
+        while (root.Parent is not null
+               && !Directory.Exists(Path.Combine(root.FullName, ".git"))
+               && !File.Exists(Path.Combine(root.FullName, ".git"))) root = root.Parent;
         var path = Path.Combine(root.FullName, ".cache", "examine-screenshots");
         Directory.CreateDirectory(path);
         return path;

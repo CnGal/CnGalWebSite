@@ -87,6 +87,13 @@ def record(record_id):
             passedAdminName="审核员",
             passedTime="2026-11-12T10:15:00",
         )
+    if record_id == 901:
+        result.update(
+            isPassed=True,
+            comments="资料已核对。",
+            passedAdminName="审核员",
+            passedTime="2026-11-12T10:15:00",
+        )
     if record_id == 104:
         result["prepositionExamineId"] = 101
     if record_id == 105:
@@ -121,7 +128,7 @@ def record(record_id):
 
 
 def overview(record_id):
-    ids = [] if record_id == 900 else [record_id] if record_id == 901 else list(range(10, 31))
+    ids = [] if record_id == 900 else [record_id] if record_id == 901 else list(range(10, 31)) + ([102] if record_id == 102 else [])
     return {
         "objectId": 42,
         "objectName": "夏日回响 · 特别篇",

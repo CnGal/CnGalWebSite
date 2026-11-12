@@ -55,6 +55,11 @@ public interface IExamineQueryService
         long examineId,
         CancellationToken cancellationToken = default);
 
+    /// <summary>绕过详情缓存重新获取审核记录，用于前置审核处理后的状态刷新。</summary>
+    Task<SdkResult<ExamineViewModel>> RefreshExamineDetailAsync(
+        long examineId,
+        CancellationToken cancellationToken = default);
+
     /// <summary>
     /// 按对象类型调用历史重建接口，返回截至两次已通过编辑的完整内容。
     /// 两个编号必须属于同一对象，基准版本的通过顺序不得晚于目标版本。

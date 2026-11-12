@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
@@ -120,9 +121,46 @@ public class ExaminePresentationTests
             (await renderer.RenderComponentAsync<ExamineDetailPanel>(ParameterView.FromDictionary(new Dictionary<string, object?> { ["Model"] = model }))).ToHtmlString()));
         Assert.That(html.Contains("aria-label=\"审核操作\""), Is.EqualTo(admin && passed is null));
         Assert.That(RecordPresentation.CanProcess(model), Is.EqualTo(admin && passed is null && dependency <= 0));
-        if (admin && passed is null && dependency > 0) Assert.That(html, Does.Contain("disabled").And.Contain("查看前置审核 #42"));
+        if (admin && passed is null && dependency > 0)
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(ButtonIsDisabled(html, "通过"), Is.True);
+                Assert.That(ButtonIsDisabled(html, "驳回"), Is.True);
+                Assert.That(html, Does.Contain("查看前置审核 #42"));
+            });
+        }
         if (passed is null) Assert.That(html, Does.Contain("提交内容").And.Contain("当前内容"));
         else Assert.That(html, Does.Contain(passed == false ? "拟提交内容" : "修改后").And.Not.Contain("编辑后"));
+    }
+
+    [Test]
+    public async Task RefreshDependencyReloadsUncachedRecord()
+    {
+        var refreshCalls = 0;
+        var refreshed = Review(7, admin: true, dependency: 0);
+        var query = Proxy<IExamineQueryService>((method, _) => method.Name switch
+        {
+            "RefreshExamineDetailAsync" => Refresh(),
+            _ => throw new InvalidOperationException(method.Name)
+        });
+        Task<SdkResult<ExamineViewModel>> Refresh()
+        {
+            refreshCalls++;
+            return Task.FromResult(SdkResult<ExamineViewModel>.Ok(refreshed));
+        }
+
+        using var services = Services(query);
+        await using var renderer = new TestRenderer(services);
+        var root = await renderer.Mount<ExamineDetailPanel>(new() { ["Model"] = Review(7, admin: true, dependency: 42) });
+        var refresh = renderer.Children<CgButton>(root).Single(button => renderer.AllText(button).Contains("刷新状态"));
+        await renderer.Click(refresh);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(refreshCalls, Is.EqualTo(1));
+            Assert.That(renderer.AllText(root), Does.Not.Contain("请先处理前置审核").And.Contain("审核操作"));
+        });
     }
 
     [TestCase(Operation.PubulishComment)]
@@ -308,6 +346,11 @@ public class ExaminePresentationTests
         if ((mask & 32) != 0) count++;
         return count;
     }
+
+    private static bool ButtonIsDisabled(string html, string label) =>
+        Regex.IsMatch(html,
+            $@"<button\b(?=[^>]*\bdisabled=)[^>]*>.*?{Regex.Escape(label)}.*?</button>",
+            RegexOptions.Singleline);
 
     private static ExaminePreDataModel Body(string text) => new()
     {

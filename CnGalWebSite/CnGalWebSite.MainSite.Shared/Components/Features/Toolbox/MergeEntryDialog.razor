@@ -8,6 +8,11 @@
             @if (_step == 1)
             {
                 <CgAlert Variant="warning">合并时会自动迁移关联信息，并提交多条审核记录。当前不支持合并游戏词条。</CgAlert>
+                @if (_entryItemsLoadFailed)
+                {
+                    <CgAlert Variant="warning">词条列表加载失败，请重新加载。</CgAlert>
+                    <CgButton Variant="secondary" Size="sm" Async OnClick="LoadEntryItemsAsync" Disabled="_isLoadingEntryItems">重新加载</CgButton>
+                }
                 <p class="toolbox-dialog__hint">
                     被合并的词条
                     <span class="toolbox-dialog__hint-arrow" aria-hidden="true">→</span>
@@ -98,6 +103,7 @@
     private string _message = "准备中";
     private List<string> _entryItems = [];
     private bool _isLoadingEntryItems;
+    private bool _entryItemsLoadFailed;
 
     protected override async Task OnInitializedAsync()
     {
@@ -108,6 +114,7 @@
     private async Task LoadEntryItemsAsync()
     {
         _isLoadingEntryItems = true;
+        _entryItemsLoadFailed = false;
         try
         {
             var result = await EntryCommandService.GetEntryEditMetaOptionsAsync();
@@ -120,6 +127,14 @@
                     .OrderBy(s => s, StringComparer.Ordinal)
                     .ToList();
             }
+            else
+            {
+                _entryItemsLoadFailed = true;
+            }
+        }
+        catch
+        {
+            _entryItemsLoadFailed = true;
         }
         finally
         {

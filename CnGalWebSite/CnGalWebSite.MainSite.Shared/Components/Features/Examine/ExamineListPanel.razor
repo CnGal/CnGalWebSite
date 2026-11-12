@@ -14,6 +14,7 @@
              Title="审核列表"
              State="State"
              StateChanged="StateChanged"
+             StateCorrected="StateCorrected"
              OnServerQuery="LoadExaminesAsync"
              DefaultSortField="ExamineSortField.PassedTime"
              DefaultSortDesc="true"
@@ -79,6 +80,7 @@
 @code {
     [Parameter] public CgDataTableRequest<ExamineSortField>? State { get; set; }
     [Parameter] public EventCallback<CgDataTableRequest<ExamineSortField>> StateChanged { get; set; }
+    [Parameter] public EventCallback<CgDataTableRequest<ExamineSortField>> StateCorrected { get; set; }
 
     private CgDataTable<ExamineOverviewModel, ExamineSortField>? _dataTable;
 
@@ -94,7 +96,7 @@
                 result.Data.Total);
         }
 
-        return new CgDataTableResult<ExamineOverviewModel>([], 0);
+        return new CgDataTableResult<ExamineOverviewModel>([], 0, Success: false);
     }
 
     private void LookItem(ExamineOverviewModel model)

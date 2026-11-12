@@ -14,6 +14,7 @@
              Title="关注的词条"
              State="State"
              StateChanged="StateChanged"
+             StateCorrected="StateCorrected"
              OnServerQuery="LoadMonitorsAsync"
              DefaultSortField="UserMonitorSortField.CreateTime"
              DefaultSortDesc="true"
@@ -55,6 +56,7 @@
 @code {
     [Parameter] public CgDataTableRequest<UserMonitorSortField>? State { get; set; }
     [Parameter] public EventCallback<CgDataTableRequest<UserMonitorSortField>> StateChanged { get; set; }
+    [Parameter] public EventCallback<CgDataTableRequest<UserMonitorSortField>> StateCorrected { get; set; }
 
     private CgDataTable<UserMonitorOverviewModel, UserMonitorSortField>? _dataTable;
 
@@ -70,7 +72,7 @@
                 result.Data.Total);
         }
 
-        return new CgDataTableResult<UserMonitorOverviewModel>([], 0);
+        return new CgDataTableResult<UserMonitorOverviewModel>([], 0, Success: false);
     }
 
     private void LookItem(UserMonitorOverviewModel model)

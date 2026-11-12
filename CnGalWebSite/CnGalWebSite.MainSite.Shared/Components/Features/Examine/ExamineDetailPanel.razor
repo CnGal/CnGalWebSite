@@ -18,7 +18,10 @@
 
     @if (_record.PrepositionExamineId > 0 && _record.IsPassed is null)
     {
-        <div class="examine-detail-panel__alert" role="status"><strong>请先处理前置审核</strong><a href="/examine?Id=@_record.PrepositionExamineId">查看前置审核 #@_record.PrepositionExamineId →</a></div>
+        <div class="examine-detail-panel__alert" role="status">
+            <span><strong>请先处理前置审核</strong><a href="/examine?Id=@_record.PrepositionExamineId">查看前置审核 #@_record.PrepositionExamineId →</a></span>
+            <CgButton Variant="secondary" Size="sm" Async OnClick="RefreshRecordAsync" Disabled="_processing || _refreshing">刷新状态</CgButton>
+        </div>
     }
     <ReviewContent Model="_record" />
     <RecordNotes Comments="@_record.Comments" Note="@_record.Note" ShowEmpty="true" />
@@ -68,6 +71,7 @@
     private string? _comments = "";
     private string? _error;
     private bool _processing;
+    private bool _refreshing;
     private bool _submitted;
     private bool _disposed;
     private CancellationTokenSource? _cts;
@@ -85,6 +89,36 @@
         _processing = false;
         _submitted = false;
         _error = null;
+    }
+
+    private async Task RefreshRecordAsync()
+    {
+        if (_disposed || _refreshing) return;
+        var token = _cts!.Token;
+        _refreshing = true;
+        _error = null;
+        try
+        {
+            var latest = await ExamineQueryService.RefreshExamineDetailAsync(_record.Id, token);
+            if (_disposed || token.IsCancellationRequested) return;
+            if (latest.Success && latest.Data is { } record)
+            {
+                _record = record;
+            }
+            else
+            {
+                _error = latest.Error?.Message ?? "刷新审核状态失败，请重试。";
+            }
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            if (!_disposed && !token.IsCancellationRequested) _refreshing = false;
+        }
     }
 
     private async Task HandleProc(bool isPassed)

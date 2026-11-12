@@ -73,6 +73,15 @@ public class MainSiteEditorStateTests
             Assert.That(query["page"].ToString(), Is.EqualTo("2"));
             Assert.That(navigation.LastReplace, Is.False);
         });
+
+        var correctedState = state with { Page = 1 };
+        typeof(UserCenterPage).GetMethod("SetCorrectedTableState", BindingFlags.Instance | BindingFlags.NonPublic)!
+            .MakeGenericMethod(typeof(ExamineSortField)).Invoke(page, new object[] { correctedState });
+        Assert.Multiple(() =>
+        {
+            Assert.That(QueryHelpers.ParseQuery(new Uri(navigation.Uri).Query)["page"].ToString(), Is.EqualTo("1"));
+            Assert.That(navigation.LastReplace, Is.True);
+        });
     }
 
     [TestCase(2)]
@@ -207,6 +216,43 @@ public class MainSiteEditorStateTests
         await renderer.Dispatcher.InvokeAsync(() => host.Table!.RefreshAsync());
         Assert.That(host.State.Page, Is.EqualTo(1));
         Assert.That(host.Requests.TakeLast(2).Select(r => r.Page), Is.EqualTo(new[] { 3, 1 }));
+        Assert.That(host.Corrections.Select(c => c.Page), Is.EqualTo(new[] { 1 }));
+    }
+
+    [Test]
+    public async Task FailedQueryDoesNotRewriteTheSavedPage()
+    {
+        using var services = new ServiceCollection().AddLogging().BuildServiceProvider();
+        await using var renderer = new ComponentRenderer(services);
+        var (host, _) = await renderer.MountAsync<TableHost>();
+        var requestsBeforeFailure = host.Requests.Count;
+
+        host.Query = _ => Task.FromResult(new CgDataTableResult<string>([], 0, Success: false));
+        await renderer.Dispatcher.InvokeAsync(() => host.Table!.RefreshAsync());
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(host.State.Page, Is.EqualTo(3));
+            Assert.That(host.Corrections, Is.Empty);
+            Assert.That(host.Requests.Count, Is.EqualTo(requestsBeforeFailure + 1));
+        });
+    }
+
+    [Test]
+    public async Task ClientModeInitialPageCorrectionNotifiesStateOwner()
+    {
+        using var services = new ServiceCollection().AddLogging().BuildServiceProvider();
+        await using var renderer = new ComponentRenderer(services);
+        var (host, _) = await renderer.MountAsync<TableHost>(new Dictionary<string, object?>
+        {
+            ["ClientMode"] = true,
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(host.State.Page, Is.EqualTo(1));
+            Assert.That(host.Corrections.Select(c => c.Page), Is.EqualTo(new[] { 1 }));
+        });
     }
 
     [Test]
@@ -269,6 +315,7 @@ public class MainSiteEditorStateTests
         [Parameter] public bool ClientMode { get; set; }
         public CgDataTableRequest<ExamineSortField> State = new(3, 10, ExamineSortField.Id, true, "原搜索");
         public readonly List<CgDataTableRequest<ExamineSortField>> Requests = [];
+        public readonly List<CgDataTableRequest<ExamineSortField>> Corrections = [];
         public Func<CgDataTableRequest<ExamineSortField>, Task<CgDataTableResult<string>>> Query =
             _ => Task.FromResult(new CgDataTableResult<string>(["row"], 100));
         public CgDataTable<string, ExamineSortField>? Table;
@@ -280,23 +327,32 @@ public class MainSiteEditorStateTests
             {
                 builder.AddAttribute(1, "State", State);
                 builder.AddAttribute(2, "StateChanged", EventCallback.Factory.Create<CgDataTableRequest<ExamineSortField>>(this, state => State = state));
+                builder.AddAttribute(3, "StateCorrected", EventCallback.Factory.Create<CgDataTableRequest<ExamineSortField>>(this, state =>
+                {
+                    State = state;
+                    Corrections.Add(state);
+                }));
             }
             if (ClientMode)
-                builder.AddAttribute(3, "Items", new[] { "row", "other" });
+            {
+                builder.AddAttribute(4, "Items", new[] { "row", "other" });
+            }
             else
-                builder.AddAttribute(3, "OnServerQuery", (Func<CgDataTableRequest<ExamineSortField>, Task<CgDataTableResult<string>>>)(request =>
+            {
+                builder.AddAttribute(4, "OnServerQuery", (Func<CgDataTableRequest<ExamineSortField>, Task<CgDataTableResult<string>>>)(request =>
                 {
                     Requests.Add(request);
                     return Query(request);
                 }));
-            builder.AddAttribute(4, "ChildContent", (RenderFragment)(columns =>
+            }
+            builder.AddAttribute(5, "ChildContent", (RenderFragment)(columns =>
             {
                 columns.OpenComponent<CgDataTableColumn<string, ExamineSortField>>(0);
                 columns.AddAttribute(1, "SortField", ExamineSortField.Id);
                 columns.AddAttribute(2, "Value", (Func<string, object?>)(item => item));
                 columns.CloseComponent();
             }));
-            builder.AddComponentReferenceCapture(5, instance => Table = (CgDataTable<string, ExamineSortField>)instance);
+            builder.AddComponentReferenceCapture(6, instance => Table = (CgDataTable<string, ExamineSortField>)instance);
             builder.CloseComponent();
         }
     }

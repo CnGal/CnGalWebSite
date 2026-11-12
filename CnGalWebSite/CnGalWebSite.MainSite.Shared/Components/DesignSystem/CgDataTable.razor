@@ -176,6 +176,10 @@
     [Parameter]
     public EventCallback<CgDataTableRequest<TSort>> StateChanged { get; set; }
 
+    /// <summary>页码因数据范围变化而被自动修正时通知调用方；调用方应替换当前历史项。</summary>
+    [Parameter]
+    public EventCallback<CgDataTableRequest<TSort>> StateCorrected { get; set; }
+
     /// <summary>
     /// 工具栏标题。
     /// </summary>
@@ -270,7 +274,12 @@
         // 客户端模式下，Items 变化时重新计算
         if (OnServerQuery == null && Items != null)
         {
+            var previousPage = _currentPage;
             ApplyClientMode();
+            if (previousPage != _currentPage)
+            {
+                await NotifyStateCorrectionAsync(CurrentState);
+            }
         }
     }
 
@@ -357,12 +366,12 @@
             _displayItems = result.Items.ToList();
             _totalCount = result.TotalCount;
 
-            // 确保当前页在有效范围内
-            if (_currentPage > _totalPages)
+            // 确保当前页在有效范围内；查询失败时不能把失败结果当成空数据来修正页码。
+            if (result.Success && _currentPage > _totalPages)
             {
                 _currentPage = _totalPages;
                 request = request with { Page = _currentPage };
-                await StateChanged.InvokeAsync(request);
+                await NotifyStateCorrectionAsync(request);
                 if (_disposed || version != _queryVersion) return;
                 // 页码修正后重新查询
                 result = await OnServerQuery(request);
@@ -441,6 +450,9 @@
             await RefreshDataAsync();
     }
 
+    private Task NotifyStateCorrectionAsync(CgDataTableRequest<TSort> state)
+        => StateCorrected.HasDelegate ? StateCorrected.InvokeAsync(state) : StateChanged.InvokeAsync(state);
+
     private async Task RefreshDataAsync()
     {
         if (OnServerQuery != null)
@@ -452,7 +464,7 @@
             var previousPage = _currentPage;
             ApplyClientMode();
             if (previousPage != _currentPage)
-                await StateChanged.InvokeAsync(CurrentState);
+                await NotifyStateCorrectionAsync(CurrentState);
         }
     }
 

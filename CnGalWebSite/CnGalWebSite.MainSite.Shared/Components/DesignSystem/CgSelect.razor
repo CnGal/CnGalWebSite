@@ -1,5 +1,6 @@
 <div class="cg-select @(DropUp ? "cg-select--dropup" : string.Empty) @ClassName" @onkeydown="OnKeyDown">
     <button type="button"
+            @ref="_trigger"
             class="cg-select__trigger"
             disabled="@Disabled"
             aria-label="@AriaLabel"
@@ -45,13 +46,20 @@
 
 @code {
     private bool _isOpen;
+    private ElementReference _trigger;
 
     [Parameter]
     public string? AriaLabel { get; set; }
 
-    private void OnKeyDown(KeyboardEventArgs args)
+    private async Task OnKeyDown(KeyboardEventArgs args)
     {
-        if (args.Key == "Escape") CloseDropdown();
+        if (args.Key != "Escape" || !_isOpen)
+        {
+            return;
+        }
+
+        CloseDropdown();
+        await _trigger.FocusAsync();
     }
 
     [Parameter]

@@ -49,11 +49,21 @@ public class ExamineComparisonSdkTests
     [TestCase(20, 10)]
     public async Task InvalidRangesDoNotSendRequests(long before, long after)
     {
+        var requestCount = 0;
         using var storage = new MemoryCache(new MemoryCacheOptions());
         using var userCache = new ExamineUserCache(NullLogger<ExamineUserCache>.Instance);
-        using var http = Client((_, _) => throw new AssertionException("Invalid selection should not reach HTTP"));
+        using var http = Client((_, _) =>
+        {
+            requestCount++;
+            return Task.FromResult(Json(HttpStatusCode.OK, "{}"));
+        });
         var result = await Query(http, storage, userCache).GetEditRecordComparisonAsync(ExaminedNormalListModelType.Entry, before, after);
-        Assert.That(result.Success, Is.False);
+        Assert.Multiple(() =>
+        {
+            Assert.That(requestCount, Is.Zero);
+            Assert.That(result.Success, Is.False);
+            Assert.That(result.Error?.Code, Is.EqualTo("EXAMINE_COMPARISON_RANGE"));
+        });
     }
 
     [TestCase(ExaminedNormalListModelType.User)]

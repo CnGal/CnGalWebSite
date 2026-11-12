@@ -181,6 +181,14 @@ public sealed class ExamineQueryService(
         long examineId, CancellationToken cancellationToken = default)
         => WithIdentityAsync((scope, token) => GetExamineDetailAsync(examineId, scope, token), cancellationToken);
 
+    public async Task<SdkResult<ExamineViewModel>> RefreshExamineDetailAsync(
+        long examineId, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        userCache.InvalidateExamine(HttpClient.BaseAddress, examineId);
+        return await GetExamineDetailAsync(examineId, cancellationToken);
+    }
+
     private Task<SdkResult<ExamineViewModel>> GetExamineDetailAsync(
         long examineId, CurrentUserCacheScope? scope, CancellationToken cancellationToken)
     {
@@ -201,8 +209,8 @@ public sealed class ExamineQueryService(
         ExaminedNormalListModelType type, long contrastId, long currentId, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (contrastId <= 0 || currentId <= 0)
-            return SdkResult<EditRecordComparison>.Fail("EXAMINE_COMPARISON_RANGE", "请选择有效的历史版本");
+        if (contrastId <= 0 || currentId <= 0 || contrastId > currentId)
+            return SdkResult<EditRecordComparison>.Fail("EXAMINE_COMPARISON_RANGE", "请选择有效的版本，基准版本不能晚于目标版本");
         var path = type switch
         {
             ExaminedNormalListModelType.Entry => "entries", ExaminedNormalListModelType.Article => "articles",

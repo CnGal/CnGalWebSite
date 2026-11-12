@@ -40,19 +40,22 @@
                         case "examines":
                             <div class="user-center-page__panel">
                                 <ExamineListPanel State="@GetTableState(ExamineSortField.PassedTime, ExamineSortField.Id, ExamineSortField.PassedTime, ExamineSortField.ApplyTime)"
-                                                  StateChanged="@(state => SetTableState(state))" />
+                                                  StateChanged="@(state => SetTableState(state))"
+                                                  StateCorrected="@(state => SetCorrectedTableState(state))" />
                             </div>
                             break;
                         case "reviews":
                             <div class="user-center-page__panel">
                                 <ReviewRecordListPanel State="@GetTableState(UserReviewEditRecordSortField.ReviewedTime, UserReviewEditRecordSortField.ReviewedTime)"
-                                                       StateChanged="@(state => SetTableState(state))" />
+                                                       StateChanged="@(state => SetTableState(state))"
+                                                       StateCorrected="@(state => SetCorrectedTableState(state))" />
                             </div>
                             break;
                         case "monitors":
                             <div class="user-center-page__panel">
                                 <MonitorListPanel State="@GetTableState(UserMonitorSortField.CreateTime, UserMonitorSortField.CreateTime)"
-                                                  StateChanged="@(state => SetTableState(state))" />
+                                                  StateChanged="@(state => SetTableState(state))"
+                                                  StateCorrected="@(state => SetCorrectedTableState(state))" />
                             </div>
                             break;
                     }
@@ -95,8 +98,13 @@
             Page, PageSize, Search, Sort, Desc, defaultSort, sortableFields);
 
     private void SetTableState<TSort>(CgDataTableRequest<TSort> state) where TSort : struct, Enum
-    {
-        Navigate(new()
+        => NavigateTableState(state, replaceHistory: false);
+
+    private void SetCorrectedTableState<TSort>(CgDataTableRequest<TSort> state) where TSort : struct, Enum
+        => NavigateTableState(state, replaceHistory: true);
+
+    private void NavigateTableState<TSort>(CgDataTableRequest<TSort> state, bool replaceHistory) where TSort : struct, Enum
+        => Navigate(new()
         {
             ["tab"] = ActiveTab,
             ["page"] = state.Page,
@@ -104,8 +112,7 @@
             ["search"] = state.SearchText,
             ["sort"] = state.SortField?.ToString(),
             ["desc"] = state.SortDesc,
-        });
-    }
+        }, replaceHistory);
 
     private void SetOverviewPage(string parameter, int page) => Navigate(new()
     {
@@ -119,13 +126,13 @@
         ["unReviewPage"] = pages.UnReviewPage,
         ["pendingPage"] = pages.PendingPage,
         ["entryPage"] = pages.EntryPage,
-    });
+    }, replaceHistory: true);
 
-    private void Navigate(Dictionary<string, object?> parameters)
+    private void Navigate(Dictionary<string, object?> parameters, bool replaceHistory = false)
     {
         var uri = NavigationManager.GetUriWithQueryParameters(parameters);
         if (uri != NavigationManager.Uri)
-            NavigationManager.NavigateTo(uri);
+            NavigationManager.NavigateTo(uri, new NavigationOptions { ReplaceHistoryEntry = replaceHistory });
     }
 
     private string GetTabHref()

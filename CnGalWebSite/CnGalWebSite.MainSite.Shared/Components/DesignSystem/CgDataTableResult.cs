@@ -7,4 +7,5 @@ namespace CnGalWebSite.MainSite.Shared.Components.DesignSystem;
 /// </summary>
 public sealed record CgDataTableResult<TItem>(
     IReadOnlyList<TItem> Items,
-    int TotalCount);
+    int TotalCount,
+    bool Success = true);

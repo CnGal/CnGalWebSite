@@ -14,6 +14,7 @@
              Title="审阅记录列表"
              State="State"
              StateChanged="StateChanged"
+             StateCorrected="StateCorrected"
              OnServerQuery="LoadReviewRecordsAsync"
              DefaultSortField="UserReviewEditRecordSortField.ReviewedTime"
              DefaultSortDesc="true"
@@ -73,6 +74,7 @@
 @code {
     [Parameter] public CgDataTableRequest<UserReviewEditRecordSortField>? State { get; set; }
     [Parameter] public EventCallback<CgDataTableRequest<UserReviewEditRecordSortField>> StateChanged { get; set; }
+    [Parameter] public EventCallback<CgDataTableRequest<UserReviewEditRecordSortField>> StateCorrected { get; set; }
 
     private CgDataTable<UserReviewEditRecordOverviewModel, UserReviewEditRecordSortField>? _dataTable;
 
@@ -88,7 +90,7 @@
                 result.Data.Total);
         }
 
-        return new CgDataTableResult<UserReviewEditRecordOverviewModel>([], 0);
+        return new CgDataTableResult<UserReviewEditRecordOverviewModel>([], 0, Success: false);
     }
 
     private void LookItem(UserReviewEditRecordOverviewModel model)
