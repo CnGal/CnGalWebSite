@@ -31,6 +31,12 @@
                 else { <span class="record-value__empty">—</span> }
                 break;
             case RecordPreviewKind.Audio:
+                @if (ShowAudioNameDiff)
+                {
+                    <span class="record-value__audio-name">
+                        <RecordDiffText Before="@DiffBeforeLabel" After="@DiffAfterLabel" IsBefore="IsBefore" />
+                    </span>
+                }
                 @if (RecordPresentation.HttpUrl(Item.Url ?? Item.Value) is { } audioUrl)
                 {
                     <audio controls preload="none" src="@audioUrl" aria-label="@(Item.Label ?? "记录音频")"></audio>
@@ -61,6 +67,12 @@
                 else
                 {
                     <span class="record-value__text">@Text</span>
+                }
+                @if (ShowLinkDestination)
+                {
+                    <span class="record-value__url">
+                        <RecordDiffText Before="@DiffBeforeUrl" After="@DiffAfterUrl" IsBefore="IsBefore" />
+                    </span>
                 }
                 break;
         }
@@ -105,6 +117,21 @@
     private string? DiffBeforeHtml => IsBefore ? ThisHtml : OtherHtml;
     private string? DiffAfterHtml => IsBefore ? OtherHtml : ThisHtml;
     private string? SafeUrl => RecordPresentation.ContentUrl(Item?.Url);
+    private string? RawUrl => Item?.Url ?? Item?.Value;
+    private string? OtherRawUrl => Other?.Url ?? Other?.Value;
+    private string? DiffBeforeUrl => IsBefore ? RawUrl : OtherRawUrl;
+    private string? DiffAfterUrl => IsBefore ? OtherRawUrl : RawUrl;
+    private string? RawLabel => Item?.Label;
+    private string? OtherRawLabel => Other?.Label;
+    private string? DiffBeforeLabel => IsBefore ? RawLabel : OtherRawLabel;
+    private string? DiffAfterLabel => IsBefore ? OtherRawLabel : RawLabel;
+    private bool ShowLinkDestination => Item?.Kind == RecordPreviewKind.Link
+        && !string.IsNullOrWhiteSpace(DiffBeforeUrl ?? DiffAfterUrl)
+        && (!string.Equals(DiffBeforeText, DiffBeforeUrl, StringComparison.Ordinal)
+            || !string.Equals(DiffAfterText, DiffAfterUrl, StringComparison.Ordinal));
+    private bool ShowAudioNameDiff => Item?.Kind == RecordPreviewKind.Audio
+        && !string.Equals(RawLabel ?? string.Empty, OtherRawLabel ?? string.Empty, StringComparison.Ordinal)
+        && (!string.IsNullOrWhiteSpace(RawLabel) || !string.IsNullOrWhiteSpace(OtherRawLabel));
     private string? OtherPropertyValue(RecordPreviewProperty property) =>
         Other?.Properties.FirstOrDefault(other => other.Key == property.Key)?.DisplayValue ?? string.Empty;
     private IEnumerable<RecordPreviewProperty> VisibleProperties => (Item?.Properties ?? [])

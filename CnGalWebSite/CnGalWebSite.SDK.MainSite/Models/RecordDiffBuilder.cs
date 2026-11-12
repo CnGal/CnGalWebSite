@@ -20,9 +20,9 @@ public static class RecordDiffBuilder
 {
     public static RecordDiff Build(ExaminePreDataModel? before, ExaminePreDataModel? after, bool submissionOnly = false)
     {
-        var left = (before?.Items ?? []).Where(Meaningful).ToList();
-        var right = (after?.Items ?? []).Where(Meaningful).ToList();
-        if (submissionOnly) return new(right.Select(i => new RecordDiffItem(null, i, RecordChangeKind.Submission, false)).ToList());
+        var left = (before?.Items ?? []).ToList();
+        var right = (after?.Items ?? []).ToList();
+        if (submissionOnly) return new(right.Where(Meaningful).Select(i => new RecordDiffItem(null, i, RecordChangeKind.Submission, false)).ToList());
 
         var result = new List<RecordDiffItem>();
         foreach (var key in left.Select(i => i.Key).Concat(right.Select(i => i.Key)).Distinct(StringComparer.Ordinal))
@@ -42,9 +42,9 @@ public static class RecordDiffBuilder
                 result.Add(new(oldItems[0], newItems[0], RecordChangeKind.Modified, oldItems[0].IsKnown));
                 continue;
             }
-            result.AddRange(oldItems.Select(i => new RecordDiffItem(i, null,
+            result.AddRange(oldItems.Where(Meaningful).Select(i => new RecordDiffItem(i, null,
                 after?.IsComplete == false ? RecordChangeKind.Unknown : RecordChangeKind.Removed, i.IsKnown)));
-            result.AddRange(newItems.Select(i => new RecordDiffItem(null, i,
+            result.AddRange(newItems.Where(Meaningful).Select(i => new RecordDiffItem(null, i,
                 before?.IsComplete == true ? RecordChangeKind.Added : RecordChangeKind.Unknown, before?.IsComplete == true)));
         }
         return new(PairImageReplacements(result));

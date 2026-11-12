@@ -46,8 +46,7 @@ public class ExamineComparisonSdkTests
 
     [TestCase(-1, 20)]
     [TestCase(10, 0)]
-    [TestCase(20, 10)]
-    public async Task InvalidRangesDoNotSendRequests(long before, long after)
+    public async Task NonPositiveIdsDoNotSendRequests(long before, long after)
     {
         var requestCount = 0;
         using var storage = new MemoryCache(new MemoryCacheOptions());
@@ -89,6 +88,27 @@ public class ExamineComparisonSdkTests
     }
 
     [Test]
+    public async Task VersionOrderIsValidatedByTheServer()
+    {
+        var calls = new List<string>();
+        using var storage = new MemoryCache(new MemoryCacheOptions());
+        using var userCache = new ExamineUserCache(NullLogger<ExamineUserCache>.Instance);
+        using var http = Client((request, _) =>
+        {
+            calls.Add(request.RequestUri!.AbsolutePath);
+            return Task.FromResult(Json(HttpStatusCode.OK, """
+                {"contrastId":20,"currentId":10,"before":{"items":[]},"after":{"items":[]}}
+                """));
+        });
+        var result = await Query(http, storage, userCache).GetEditRecordComparisonAsync(ExaminedNormalListModelType.Entry, 20, 10);
+        Assert.Multiple(() =>
+        {
+            Assert.That(calls, Is.EqualTo(new[] { "/api/entries/GetContrastEditRecordViews/20/10" }));
+            Assert.That(result.Success, Is.True, result.Error?.Message);
+        });
+    }
+
+    [Test]
     public void CancellationIsPropagated()
     {
         using var storage = new MemoryCache(new MemoryCacheOptions());
@@ -119,6 +139,27 @@ public class ExamineComparisonSdkTests
             Assert.That(diff.Items[0].Change, Is.EqualTo(RecordChangeKind.Modified));
             Assert.That(diff.Items[0].Before?.Value, Is.EqualTo("https://media.example/old.png"));
             Assert.That(diff.Items[0].After?.Value, Is.EqualTo("https://media.example/new.png"));
+        });
+    }
+
+    [Test]
+    public void ExplicitlyClearedFieldIsModifiedInsteadOfRemoved()
+    {
+        var before = new ExaminePreDataModel { Items = [
+            new() { Key = "main/Name", Group = "主要信息", Kind = RecordPreviewKind.Text, Label = "名称", Value = "A", DisplayValue = "A" }
+        ] };
+        var after = new ExaminePreDataModel { Items = [
+            new() { Key = "main/Name", Group = "主要信息", Kind = RecordPreviewKind.Text, Label = "名称", Value = "", DisplayValue = "" }
+        ] };
+
+        var diff = RecordDiffBuilder.Build(before, after);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(diff.Items, Has.Count.EqualTo(1));
+            Assert.That(diff.Items[0].Change, Is.EqualTo(RecordChangeKind.Modified));
+            Assert.That(diff.Items[0].After, Is.Not.Null);
+            Assert.That(diff.Items[0].After?.Value, Is.Empty);
         });
     }
 

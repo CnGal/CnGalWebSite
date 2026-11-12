@@ -72,6 +72,10 @@ h3 {
     border-left: 1px solid var(--cg-color-border);
 }
 
+.record-comparison__side-heading {
+    display: none;
+}
+
 .record-comparison__empty {
     padding: var(--cg-spacing-6);
     margin: 0;
@@ -82,15 +86,20 @@ h3 {
 }
 
 @media (max-width: 767px) {
-    .record-comparison__headings,
+    .record-comparison__headings {
+        display: none;
+    }
+
     .record-comparison__columns {
         grid-template-columns: minmax(0, 1fr);
     }
 
-    .record-comparison__headings span + span {
-        border-top: 1px solid var(--cg-color-border);
-        margin-top: var(--cg-spacing-1);
-        padding-top: var(--cg-spacing-1);
+    .record-comparison__side-heading {
+        display: block;
+        margin-bottom: var(--cg-spacing-2);
+        color: var(--cg-color-text-muted);
+        font-size: var(--cg-font-size-xs);
+        font-weight: var(--cg-font-weight-medium);
     }
 
     .record-comparison__side + .record-comparison__side {

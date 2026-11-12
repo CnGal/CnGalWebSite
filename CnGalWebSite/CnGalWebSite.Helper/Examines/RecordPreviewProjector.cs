@@ -152,7 +152,7 @@ public sealed class RecordPreviewProjector
             ("PeripheryRelationFromPeripheryNavigation", "ToPeriphery", "periphery") })
             foreach (var relation in List(value, property)) Relation(type, Convert.ToString(Get(relation, target), CultureInfo.InvariantCulture), "关联" + RelationLabel(type), false);
         if (Get(value, "ParentCodeNavigation") is { } parent)
-            Relation("tag", Convert.ToString(Get(parent, "Id"), CultureInfo.InvariantCulture), "父标签", false, "parent");
+            Relation("tag", Convert.ToString(Get(parent, "Id"), CultureInfo.InvariantCulture), "父标签", false, "parent", RelatedDisplayName(parent));
         if (Get(value, "Booking") is { } booking)
         {
             Scalars(Shallow(booking), booking.GetType(), "booking", "预约");
@@ -265,8 +265,14 @@ public sealed class RecordPreviewProjector
                     if (Deleted(entry)) RemoveRelationByName("子词条", name);
                     else if (FindRelationByName("子词条", name) is null) Relation("entry-name", name, "子词条", false);
                 }
-                items.RemoveAll(i => i.Group == "父标签" && !string.Equals(i.DisplayValue, Text(data["ParentTag"]), StringComparison.Ordinal));
-                if (!string.IsNullOrWhiteSpace(Text(data["ParentTag"]))) Relation("tag-name", Text(data["ParentTag"]), "父标签", false, "parent");
+                if (data.ContainsKey("ParentTag"))
+                {
+                    var parentName = Text(data["ParentTag"]);
+                    var existingParent = FindRelationByName("父标签", parentName);
+                    items.RemoveAll(i => i.Group == "父标签" && !ReferenceEquals(i, existingParent));
+                    if (!string.IsNullOrWhiteSpace(parentName) && existingParent is null)
+                        Relation("tag-name", parentName, "父标签", false, "parent");
+                }
                 break;
             case Operation.PubulishComment:
                 Scalars(new JsonObject { ["Time"] = Clone(data["CommentTime"]), ["Type"] = Clone(data["Type"]), ["ObjectId"] = Clone(data["ObjectId"]) }, null, "comment", "评论",

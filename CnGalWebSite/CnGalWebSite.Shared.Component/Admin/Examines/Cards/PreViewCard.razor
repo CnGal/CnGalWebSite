@@ -23,22 +23,6 @@
     {
         <CnGalWebSite.Shared.Component.Admin.Examines.Parts.RelevanceListCard Model="Relevances" />
     }
-    @if (UnresolvedRelations.Count > 0)
-    {
-        <MDCard Class="mb-4 pa-3">
-            <div class="title-large mb-2">关联对象</div>
-            <ul>
-                @foreach (var item in UnresolvedRelations)
-                {
-                    <li>
-                        @if (RecordPresentationLink(item) is { } link)
-                        { <a href="@link" target="_blank" rel="noopener noreferrer">@ItemText(item)</a> }
-                        else { <span>@ItemText(item)</span> }
-                    </li>
-                }
-            </ul>
-        </MDCard>
-    }
     @if (Outlinks.Count > 0)
     {
         <CnGalWebSite.Shared.Component.Admin.Examines.Parts.OutlinkListCard Model="Outlinks" />
@@ -49,9 +33,12 @@
     }
 </div>
 
+
 @code {
-    [Parameter] public ExaminePreDataModel Model { get; set; }
-    [Parameter] public string Class { get; set; }
+    [Parameter]
+    public ExaminePreDataModel Model { get; set; }
+    [Parameter]
+    public string Class { get; set; }
 
     private List<RecordPreviewItem> Items => Model?.Items ?? new();
     private List<RecordPreviewItem> BodyItems => Items.Where(i => i.Kind == RecordPreviewKind.Body).ToList();
@@ -88,10 +75,6 @@
         .Select(ToSearchModel)
         .Where(i => i is not null)
         .Select(i => i!)
-        .ToList();
-
-    private List<RecordPreviewItem> UnresolvedRelations => Items
-        .Where(i => i.Kind == RecordPreviewKind.Relation && ToSearchModel(i) is null)
         .ToList();
 
     private List<RelevancesKeyValueModel> Outlinks => Items
@@ -136,10 +119,8 @@
     }
 
     private static string ItemText(RecordPreviewItem item) => string.IsNullOrWhiteSpace(item.DisplayValue) ? item.Value : item.DisplayValue;
-    private static string? RecordPresentationLink(RecordPreviewItem item) =>
-        item.Url is { Length: > 0 } url && (url.StartsWith("http", StringComparison.OrdinalIgnoreCase) || url.StartsWith('/')) ? url : null;
 
-    private static string? Property(RecordPreviewItem item, string key) =>
+    private static string Property(RecordPreviewItem item, string key) =>
         item.Properties.FirstOrDefault(p => p.Key == key)?.DisplayValue;
 
     private static int ParseInt(string value) => int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result) ? result : 0;

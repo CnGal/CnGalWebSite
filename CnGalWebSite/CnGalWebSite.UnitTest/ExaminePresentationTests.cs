@@ -150,6 +150,37 @@ public class ExaminePresentationTests
     }
 
     [Test]
+    public async Task LinkDestinationsAndAudioNamesAreVisibleInComparison()
+    {
+        var before = new ExaminePreDataModel
+        {
+            Items =
+            [
+                new() { Key = "link", Group = "外链", Kind = RecordPreviewKind.Link, Label = "官网", Value = "https://old.example/path", DisplayValue = "官网", Url = "https://old.example/path" },
+                new() { Key = "audio", Group = "音频", Kind = RecordPreviewKind.Audio, Label = "旧名称", Value = "https://media.example/audio.mp3", DisplayValue = "https://media.example/audio.mp3", Url = "https://media.example/audio.mp3", Properties = [new() { Key = "Name", Label = "名称", Value = "旧名称", DisplayValue = "旧名称" }] }
+            ]
+        };
+        var after = new ExaminePreDataModel
+        {
+            Items =
+            [
+                new() { Key = "link", Group = "外链", Kind = RecordPreviewKind.Link, Label = "官网", Value = "https://new.example/path", DisplayValue = "官网", Url = "https://new.example/path" },
+                new() { Key = "audio", Group = "音频", Kind = RecordPreviewKind.Audio, Label = "新名称", Value = "https://media.example/audio.mp3", DisplayValue = "https://media.example/audio.mp3", Url = "https://media.example/audio.mp3", Properties = [new() { Key = "Name", Label = "名称", Value = "新名称", DisplayValue = "新名称" }] }
+            ]
+        };
+        using var services = Services();
+        await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
+        var html = await renderer.Dispatcher.InvokeAsync(async () =>
+            (await renderer.RenderComponentAsync<RecordContentComparison>(ParameterView.FromDictionary(new Dictionary<string, object?>
+            {
+                ["Before"] = before,
+                ["After"] = after
+            }))).ToHtmlString());
+        var text = Regex.Replace(WebUtility.HtmlDecode(html), "<[^>]+>", string.Empty);
+
+        Assert.That(text, Does.Contain("old.example").And.Contain("new.example").And.Contain("旧名称").And.Contain("新名称"));
+    }
+    [Test]
     public async Task ReviewContentDefaultsToChangeSummaryTab()
     {
         using var services = Services();
@@ -426,9 +457,10 @@ public class ExaminePresentationTests
     }
 
     private static bool ButtonIsDisabled(string html, string label) =>
-        Regex.IsMatch(html,
-            $@"<button\b(?=[^>]*\bdisabled=)[^>]*>.*?{Regex.Escape(label)}.*?</button>",
-            RegexOptions.Singleline);
+        Regex.Matches(html, @"<button\b[^>]*>.*?</button>", RegexOptions.Singleline)
+            .Cast<Match>()
+            .Any(button => Regex.IsMatch(button.Value, @"<button\b[^>]*\bdisabled=", RegexOptions.Singleline)
+                && button.Value.Contains(label, StringComparison.Ordinal));
 
     private static ExaminePreDataModel Body(string text) => new()
     {

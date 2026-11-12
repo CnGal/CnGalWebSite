@@ -1,68 +1,216 @@
-@page "/home/editrecord"
-@inject IDataCacheService DataCache
-@using CnGalWebSite.DataModel.ViewModel.Admin
-@if (!string.IsNullOrWhiteSpace(_comparisonError))
+﻿@page "/home/editrecord"
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JS
+@inject IDataCacheService _dataCatcheService
+@implements IDisposable
+
+@if (isReady && !_loadFailed)
 {
-    <p>@_comparisonError</p>
+    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip NoIndex Title="@("『"+ExaminesOverview.ObjectName+"』第" +(ExaminesOverview.Examines.FindIndex(s=>s.Id==ContrastId)+1)+"次编辑记录")" Description="@ExaminesOverview.ObjectBriefIntroduction" Image="@ExaminesOverview.Image"/>
 }
-else if (_comparison is not null)
+
+@if (_loadFailed)
 {
-    <h2>版本 #@_comparison.ContrastId → #@_comparison.CurrentId</h2>
-    <h3>基准版本</h3>
-    <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="_comparison.Before" />
-    <h3>目标版本</h3>
-    <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="_comparison.After" />
+    <p role="alert">@_comparisonError</p>
 }
+else if (isReady)
+{
+    <OverviewCard Model="ExaminesOverview" @ref="overviewCard" />
+    <ContrastOverview Model="ExaminesOverview" ContrastItem="@ContrastId.ToString()" CurrentItem="@CurrentId.ToString()"
+                                                                                   ContrastChanged="ContrastChanged" CurrentChanged="CurrentChanged">
+        <ContrastView>
+            @if (isRefreshing)
+            {
+                <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
+            }
+            else if (_comparison is null)
+            {
+                <p>@_comparisonError</p>
+            }
+            else
+            {
+                <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="_comparison.Before" />
+            }
+        </ContrastView>
+        <CurrentView>
+            @if (isRefreshing)
+            {
+                <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
+            }
+            else if (_comparison is null)
+            {
+                <p>@_comparisonError</p>
+            }
+            else
+            {
+                <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="_comparison.After" />
+            }
+        </CurrentView>
+    </ContrastOverview>
+}
+else
+{
+    <CnGalWebSite.Components.Progressings.ProgressingCard Page />
+}
+
+
 @code {
-    [SupplyParameterFromQuery, Parameter] public long ContrastId { get; set; }
-    [SupplyParameterFromQuery, Parameter] public long CurrentId { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public long ContrastId { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public long CurrentId { get; set; }
+
+    bool isReady = false;
+    bool isRefreshing = true;
+    bool _loadFailed;
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    public ExaminesOverviewViewModel ExaminesOverview { get; set; } = new ExaminesOverviewViewModel();
+
     private EditRecordComparison _comparison;
     private string _comparisonError;
-    protected override async Task OnParametersSetAsync()
+
+    OverviewCard overviewCard;
+
+    async Task OnReLoad()
     {
-        _comparison = null;
+        _loadFailed = false;
         _comparisonError = null;
-        var overview = await DataCache.ExaminesOverviewCatche.GetCache(ContrastId.ToString());
-        var ordered = overview?.Examines?
-            .OrderBy(record => record.PassedTime)
-            .ThenBy(record => record.Id)
-            .ToList();
-        if (ordered is null || ordered.Count == 0) return;
-
-        var contrastIndex = ordered.FindIndex(record => record.Id == ContrastId);
-        if (contrastIndex < 0) return;
-
-        var currentIndex = CurrentId > 0 ? ordered.FindIndex(record => record.Id == CurrentId) : ordered.Count - 1;
-        if (currentIndex < contrastIndex) currentIndex = ordered.Count - 1;
-
-        var candidates = new List<int> { currentIndex };
-        for (var index = ordered.Count - 1; index >= contrastIndex; index--)
+        try
         {
-            if (index != currentIndex) candidates.Add(index);
+            var overview = await _dataCatcheService.ExaminesOverviewCatche.GetCache(ContrastId.ToString());
+            if (overview is null)
+            {
+                _loadFailed = true;
+                _comparisonError = "未找到可用的编辑记录。";
+                return;
+            }
+
+            ExaminesOverview = overview;
+            await OnRefreshContrastView(ContrastId.ToString(), CurrentId.ToString());
+
+            isReady = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            _loadFailed = true;
+            _comparisonError = "加载编辑记录失败。";
+            await ErrorHandler.ProcessError(ex, "获取编辑记录概览失败");
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+           await  OnReLoad();
+
+            NavigationManager.LocationChanged -= LocationChanged;
+            NavigationManager.LocationChanged += LocationChanged;
         }
 
-        foreach (var index in candidates)
+    }
+    public async void LocationChanged(object sender, LocationChangedEventArgs args)
+    {
+        if(NavigationManager.Uri.Contains("/home/editrecord"))
         {
             try
             {
-                _comparison = await GetComparisonAsync(overview.Type, ContrastId, ordered[index].Id);
-                if (_comparison is not null) return;
+                await OnRefreshContrastView(ContrastId.ToString(), CurrentId.ToString());
             }
-            catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            catch
             {
-                // 新对比接口会拒绝跨对象、未通过或反向版本组合，旧链接可能携带过期 CurrentId。
-                // 依次尝试同一对象下其它已通过版本。
-            }
-            catch (HttpRequestException)
-            {
-                break;
+
             }
         }
 
-        _comparison = null;
-        _comparisonError = "无法加载版本对比，该记录可能已失效或不属于同一对象。";
     }
 
-    private Task<EditRecordComparison> GetComparisonAsync(ExaminedNormalListModelType type, long contrastId, long currentId)
-        => DataCache.GetEditRecordComparisonAsync(type, contrastId, currentId);
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+    public void ContrastChanged(string conId)
+    {
+        if (overviewCard != null)
+        {
+            int index = ExaminesOverview.Examines.FindIndex(s => s.IsSelected);
+            if (index == ExaminesOverview.Examines.Count - 1)
+            {
+                overviewCard.SelecteChanged(ExaminesOverview.Examines[index]);
+            }
+            else
+            {
+                overviewCard.SelecteChanged(ExaminesOverview.Examines[index + 1]);
+            }
+        }
+
+        NavigationManager.NavigateTo("/home/editrecord?ContrastId=" + conId + "&CurrentId=" + CurrentId);
+
+
+    }
+    public void CurrentChanged(string curId)
+    {
+        NavigationManager.NavigateTo("/home/editrecord?ContrastId=" + ContrastId + "&CurrentId=" + curId);
+    }
+
+    public async Task OnRefreshContrastView(string conId, string curId)
+    {
+        try
+        {
+            isRefreshing = true;
+            _comparisonError = null;
+            StateHasChanged();
+
+            var contrastId = long.Parse(conId);
+            var latest = ExaminesOverview.Examines.LastOrDefault();
+            if (latest is null)
+            {
+                _comparison = null;
+                _comparisonError = "未找到可用的编辑记录。";
+                return;
+            }
+
+            var currentId = curId == "0" ? latest.Id : long.Parse(curId);
+            _comparison = await _dataCatcheService.GetEditRecordComparisonAsync(ExaminesOverview.Type, contrastId, currentId);
+            if (_comparison is not null)
+            {
+                ContrastId = _comparison.ContrastId;
+                CurrentId = _comparison.CurrentId;
+            }
+            else
+            {
+                _comparisonError = "无法加载版本对比，该记录可能已失效或不属于同一对象。";
+            }
+        }
+        catch (Exception ex)
+        {
+            _comparison = null;
+            _comparisonError = "无法加载版本对比，该记录可能已失效或不属于同一对象。";
+            await ErrorHandler.ProcessError(ex, "获取详细编辑对比视图失败");
+        }
+        finally
+        {
+            isRefreshing = false;
+            StateHasChanged();
+        }
+    }
+    #region 释放实例
+
+    public void  Dispose()
+    {
+
+        NavigationManager.LocationChanged -= LocationChanged;
+
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

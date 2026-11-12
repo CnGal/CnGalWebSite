@@ -209,8 +209,8 @@ public sealed class ExamineQueryService(
         ExaminedNormalListModelType type, long contrastId, long currentId, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (contrastId <= 0 || currentId <= 0 || contrastId > currentId)
-            return SdkResult<EditRecordComparison>.Fail("EXAMINE_COMPARISON_RANGE", "请选择有效的版本，基准版本不能晚于目标版本");
+        if (contrastId <= 0 || currentId <= 0)
+            return SdkResult<EditRecordComparison>.Fail("EXAMINE_COMPARISON_RANGE", "请选择有效的版本");
         var path = ExamineRecordTypeMetadata.ApiSegment(type);
         if (path is null) return SdkResult<EditRecordComparison>.Fail("EXAMINE_COMPARISON_TYPE", "该类型不支持历史版本对比");
         return await GetAsync<EditRecordComparison>($"api/{path}/GetContrastEditRecordViews/{contrastId}/{currentId}",

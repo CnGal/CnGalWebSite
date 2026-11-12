@@ -139,6 +139,7 @@
     private string? _search;
     private bool _loading;
     private bool _rendered;
+    private bool _clientModeRefreshPending;
     private bool _disposed;
     private long _queryVersion;
     private CgDataTableRequest<TSort>? _lastParameterState;
@@ -229,13 +230,21 @@
         if (!_columns.Contains(column))
         {
             _columns.Add(column);
+            if (_rendered && OnServerQuery == null && Items != null)
+            {
+                _clientModeRefreshPending = true;
+            }
             StateHasChanged();
         }
     }
 
     public void RemoveColumn(CgDataTableColumn<TItem, TSort> column)
     {
-        _columns.Remove(column);
+        if (_columns.Remove(column) && _rendered && OnServerQuery == null && Items != null)
+        {
+            _clientModeRefreshPending = true;
+            StateHasChanged();
+        }
     }
 
     // ── 生命周期 ──
@@ -274,11 +283,10 @@
         // 客户端模式下，Items 变化时重新计算
         if (OnServerQuery == null && Items != null)
         {
-            var previousPage = _currentPage;
-            ApplyClientMode();
-            if (previousPage != _currentPage)
+            _clientModeRefreshPending = true;
+            if (_rendered)
             {
-                await NotifyStateCorrectionAsync(CurrentState);
+                await ApplyClientModeAndNotifyAsync();
             }
         }
     }
@@ -289,6 +297,12 @@
         {
             _rendered = true;
             await LoadServerDataAsync();
+        }
+        else if (OnServerQuery == null && Items != null && _clientModeRefreshPending)
+        {
+            _rendered = true;
+            await ApplyClientModeAndNotifyAsync();
+            StateHasChanged();
         }
         _rendered = true;
     }
@@ -453,6 +467,17 @@
     private Task NotifyStateCorrectionAsync(CgDataTableRequest<TSort> state)
         => StateCorrected.HasDelegate ? StateCorrected.InvokeAsync(state) : StateChanged.InvokeAsync(state);
 
+    private async Task ApplyClientModeAndNotifyAsync()
+    {
+        _clientModeRefreshPending = false;
+        var previousPage = _currentPage;
+        ApplyClientMode();
+        if (previousPage != _currentPage)
+        {
+            await NotifyStateCorrectionAsync(CurrentState);
+        }
+    }
+
     private async Task RefreshDataAsync()
     {
         if (OnServerQuery != null)
@@ -461,6 +486,7 @@
         }
         else
         {
+            _clientModeRefreshPending = false;
             var previousPage = _currentPage;
             ApplyClientMode();
             if (previousPage != _currentPage)

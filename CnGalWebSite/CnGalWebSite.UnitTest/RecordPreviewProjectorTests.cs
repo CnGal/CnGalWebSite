@@ -172,6 +172,57 @@ public class RecordPreviewProjectorTests
     }
 
     [Test]
+    public void EditTagWithoutParentFieldKeepsLoadedParent()
+    {
+        var projector = new RecordPreviewProjector(typeof(Tag));
+        projector.Load(new Tag
+        {
+            Id = 1,
+            Name = "Tag",
+            ParentCodeNavigation = new Tag { Id = 7, Name = "Parent display" }
+        });
+
+        projector.Apply(new Examine
+        {
+            Operation = Operation.EditTag,
+            Context = "{\"Name\":\"Tag\",\"ChildrenEntries\":[]}"
+        });
+
+        var parent = projector.Snapshot(value => value).Items.Single(item => item.Group == "父标签");
+        Assert.Multiple(() =>
+        {
+            Assert.That(parent.Value, Is.EqualTo("tag:7"));
+            Assert.That(parent.Url, Is.EqualTo("/tags/index/7"));
+        });
+    }
+
+    [Test]
+    public void EditTagWithUnchangedParentKeepsRelationId()
+    {
+        var projector = new RecordPreviewProjector(typeof(Tag));
+        projector.Load(new Tag
+        {
+            Id = 1,
+            Name = "Tag",
+            ParentCodeNavigation = new Tag { Id = 7, Name = "Parent display" }
+        });
+
+        projector.Apply(new Examine
+        {
+            Operation = Operation.EditTag,
+            Context = "{\"Name\":\"Tag\",\"ParentTag\":\"Parent display\"}"
+        });
+
+        var parents = projector.Snapshot(value => value).Items.Where(item => item.Group == "父标签").ToList();
+        Assert.Multiple(() =>
+        {
+            Assert.That(parents, Has.Count.EqualTo(1));
+            Assert.That(parents[0].Value, Is.EqualTo("tag:7"));
+            Assert.That(parents[0].Url, Is.EqualTo("/tags/index/7"));
+        });
+    }
+
+    [Test]
     public void LegacyTagChildDeletionMatchesLoadedChildrenByName()
     {
         var projector = new RecordPreviewProjector(typeof(Tag));

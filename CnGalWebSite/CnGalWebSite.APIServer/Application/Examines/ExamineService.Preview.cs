@@ -31,8 +31,8 @@ public partial class ExamineService
 
         if (model.SubmissionOnly)
         {
-            state.Apply(examine);
             model.BeforeModel = new() { IsComplete = false };
+            ReplayPreview(state, examine);
             model.AfterModel = state.Snapshot(RenderPreview);
             if (live is Comment comment)
                 await EnrichCommentPreview(examine, model, model.AfterModel);

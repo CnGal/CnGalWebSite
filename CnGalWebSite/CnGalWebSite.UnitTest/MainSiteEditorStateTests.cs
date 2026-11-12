@@ -256,6 +256,25 @@ public class MainSiteEditorStateTests
     }
 
     [Test]
+    public async Task ClientModeWaitsForColumnsBeforeCorrectingPage()
+    {
+        using var services = new ServiceCollection().AddLogging().BuildServiceProvider();
+        await using var renderer = new ComponentRenderer(services);
+        var (host, _) = await renderer.MountAsync<TableHost>(new Dictionary<string, object?>
+        {
+            ["ClientMode"] = true,
+            ["InitialState"] = new CgDataTableRequest<ExamineSortField>(2, 10, ExamineSortField.Id, true, "match"),
+            ["ClientItems"] = Enumerable.Range(0, 20).Select(i => $"match-{i}").ToArray(),
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(host.State.Page, Is.EqualTo(2));
+            Assert.That(host.Corrections, Is.Empty);
+        });
+    }
+
+    [Test]
     public async Task OlderSearchResultsCannotOverwriteNewerSearch()
     {
         using var services = new ServiceCollection().AddLogging().BuildServiceProvider();
@@ -313,12 +332,21 @@ public class MainSiteEditorStateTests
     {
         [Parameter] public bool BindState { get; set; } = true;
         [Parameter] public bool ClientMode { get; set; }
+        [Parameter] public IReadOnlyList<string>? ClientItems { get; set; }
+        [Parameter] public CgDataTableRequest<ExamineSortField>? InitialState { get; set; }
         public CgDataTableRequest<ExamineSortField> State = new(3, 10, ExamineSortField.Id, true, "原搜索");
         public readonly List<CgDataTableRequest<ExamineSortField>> Requests = [];
         public readonly List<CgDataTableRequest<ExamineSortField>> Corrections = [];
         public Func<CgDataTableRequest<ExamineSortField>, Task<CgDataTableResult<string>>> Query =
             _ => Task.FromResult(new CgDataTableResult<string>(["row"], 100));
         public CgDataTable<string, ExamineSortField>? Table;
+        protected override void OnInitialized()
+        {
+            if (InitialState is not null)
+            {
+                State = InitialState;
+            }
+        }
         public void Redraw() => StateHasChanged();
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
@@ -335,7 +363,7 @@ public class MainSiteEditorStateTests
             }
             if (ClientMode)
             {
-                builder.AddAttribute(4, "Items", new[] { "row", "other" });
+                builder.AddAttribute(4, "Items", ClientItems ?? new[] { "row", "other" });
             }
             else
             {

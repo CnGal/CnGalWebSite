@@ -11,6 +11,13 @@
 .record-value a { color: var(--cg-color-link); }
 .record-value__text { white-space: pre-wrap; }
 .record-value__empty { color: var(--cg-color-text-muted); }
+.record-value__url,
+.record-value__audio-name {
+    display: block;
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-xs);
+    overflow-wrap: anywhere;
+}
 .record-value audio { width: 100%; min-width: 0; }
 
 .record-value dl {

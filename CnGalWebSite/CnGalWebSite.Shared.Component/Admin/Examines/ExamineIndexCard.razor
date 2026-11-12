@@ -20,33 +20,20 @@
             <CnGalWebSite.Shared.Component.Admin.Examines.Cards.TitleCard Model="Model" Class="mb-4"/>
             <CnGalWebSite.Shared.Component.Admin.Examines.Cards.StepCard Model="Model"  Class="mb-4"/>
             <CnGalWebSite.Shared.Component.Admin.Examines.Cards.OverviewCard Model="Model" Class="mb-4" />
-            @if (Model.SubmissionOnly)
-            {
-                <div class="row">
-                    <div class="col-12">
-                        <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Lock.ToIconString()" Title="提交内容" Class="mb-4" Collapable Outline>
-                            <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="Model.AfterModel" />
-                        </CnGalWebSite.Components.Containers.MasaTitleContainer>
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="row">
-                    <div class="col-12 col-lg-6">
-                        <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Key.ToIconString()" Title="修改前" Class="mb-4" Collapable Outline>
-                            <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="Model.BeforeModel"/>
-                        </CnGalWebSite.Components.Containers.MasaTitleContainer>
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Key.ToIconString()" Title="@(Model.IsPassed==null? "修改前" : "编辑后")" Class="mb-4" Collapable Outline>
+                        <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="Model.BeforeModel"/>
+                    </CnGalWebSite.Components.Containers.MasaTitleContainer>
 
-                    </div>
-                    <div class="col-12 col-lg-6">
-                     <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Lock.ToIconString()" Title="修改后" Class="mb-4" Collapable Outline>
-                            <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="Model.AfterModel" />
-                        </CnGalWebSite.Components.Containers.MasaTitleContainer>
-
-                    </div>
                 </div>
-            }
+                <div class="col-12 col-lg-6">
+                 <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.Lock.ToIconString()" Title="@(Model.IsPassed==null? "修改后" : "当前状态")" Class="mb-4" Collapable Outline>
+                        <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="Model.AfterModel" />
+                    </CnGalWebSite.Components.Containers.MasaTitleContainer>
+
+                </div>
+            </div>
           
                 @if (Model.IsPassed == null && Model.PrepositionExamineId <= 0&&Model.IsAdmin)
                 {

@@ -1,11 +1,15 @@
-@inject IJSRuntime JS
+﻿@inject IJSRuntime JS
 @inject NavigationManager NavigationManager
+@inject IHttpService _httpService
 
 <MDCard Outline>
     <CnGalWebSite.Components.Containers.MasaTitleContainer Icon="@IconType.MainPage.ToIconString()" Title="概览" Outline Class="mb-4">
         <ButtonContent>
             <CnGalWebSite.Components.Buttons.MasaButton Rounded Icon="mdi-share" Text="查看详情" OnClick="@(()=>NavigationManager.NavigateTo("/examine?Id="+Model.Id))" StopPropagation />
          </ButtonContent>
+         <ChildContent>
+             <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@_editOverview" Class="overflow-y-auto" Style="max-height: 420px;" />
+         </ChildContent>
      </CnGalWebSite.Components.Containers.MasaTitleContainer>
      @if (string.IsNullOrWhiteSpace(Model.Comments) == false)
     {
@@ -28,6 +32,32 @@
 @code {
     [Parameter]
     public EditRecordAloneViewModel Model { get; set; }
+
+    private string _editOverview;
+    private long _loadedId = -1;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Model?.Id == _loadedId)
+        {
+            return;
+        }
+
+        _loadedId = Model?.Id ?? -1;
+        _editOverview = null;
+        if (Model?.Id > 0)
+        {
+            try
+            {
+                var detail = await _httpService.GetAsync<ExamineViewModel>($"api/examines/GetExamineView/{Model.Id}");
+                _editOverview = detail?.EditOverview;
+            }
+            catch
+            {
+                // 概览只是附加信息，接口不可用时保留卡片其它内容。
+            }
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
