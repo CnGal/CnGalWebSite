@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.Helper.Examines;
+﻿using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using NUnit.Framework;
@@ -8,36 +8,57 @@ namespace CnGalWebSite.UnitTest;
 [TestFixture]
 public class RecordPreviewProjectorTests
 {
-    public static IEnumerable<Operation> PreviewOperations =>
-        Enum.GetValues<Operation>().Where(operation => operation != Operation.None);
-
-    [TestCaseSource(nameof(PreviewOperations))]
-    public void EveryOperationHasAnExplicitPreviewContract(Operation operation)
+    [TestCase(ExaminedNormalListModelType.Entry, typeof(Entry))]
+    [TestCase(ExaminedNormalListModelType.Article, typeof(Article))]
+    [TestCase(ExaminedNormalListModelType.Tag, typeof(Tag))]
+    [TestCase(ExaminedNormalListModelType.Periphery, typeof(Periphery))]
+    [TestCase(ExaminedNormalListModelType.Video, typeof(Video))]
+    [TestCase(ExaminedNormalListModelType.User, typeof(ApplicationUser))]
+    [TestCase(ExaminedNormalListModelType.PlayedGame, typeof(PlayedGame))]
+    [TestCase(ExaminedNormalListModelType.FavoriteFolder, typeof(FavoriteFolder))]
+    [TestCase(ExaminedNormalListModelType.Disambig, typeof(Disambig))]
+    public void CreateTargetReturnsExpectedAggregate(ExaminedNormalListModelType type, Type expected)
     {
-        Assert.That(RecordPreviewProjector.SupportedOperations, Does.Contain(operation),
-            "新增 Operation 时必须显式声明预览支持或降级策略。");
-        var projector = new RecordPreviewProjector(typeof(Entry));
-        Assert.DoesNotThrow(() =>
-        {
-            projector.Apply(new Examine { Operation = operation, Context = "{}" });
-            _ = projector.Snapshot(value => value);
-        });
+        // This exercises the same factory used by history replay without constructing any
+        // repository or application service.
+        Assert.That(ExaminePatchApplicationService.CreateEmptyTarget(type), Is.InstanceOf(expected));
     }
 
-
     [Test]
-    public void CommentTypeUsesTheEnumDisplayName()
+    public void CommentSubmissionUsesTheEnumDisplayName()
     {
         var projector = new RecordPreviewProjector(typeof(Comment));
-        projector.Apply(new Examine
+        projector.LoadSubmission(new Examine
         {
             Operation = Operation.PubulishComment,
             Context = "{\"CommentTime\":\"2026-11-12T10:00:00\",\"Type\":2,\"ObjectId\":\"1\",\"Text\":\"hello\"}"
         });
 
         var type = projector.Snapshot(value => value).Items.Single(item => item.Key == "comment/Type");
-        Assert.That(type.Value, Is.EqualTo("2"));
-        Assert.That(type.DisplayValue, Is.EqualTo(CommentType.ReplyComment.GetDisplayName()));
+        Assert.Multiple(() =>
+        {
+            Assert.That(type.Value, Is.EqualTo("2"));
+            Assert.That(type.DisplayValue, Is.EqualTo(CommentType.ReplyComment.GetDisplayName()));
+        });
+    }
+
+    [Test]
+    public void CertificationSubmissionExposesRelationAndNote()
+    {
+        var projector = new RecordPreviewProjector(typeof(ApplicationUser));
+        projector.LoadSubmission(new Examine
+        {
+            Operation = Operation.RequestUserCertification,
+            Context = "{\"EntryId\":42}",
+            Note = "认证说明"
+        });
+
+        var snapshot = projector.Snapshot(value => value);
+        Assert.Multiple(() =>
+        {
+            Assert.That(snapshot.Items.Any(item => item.Value == "entry:42"), Is.True);
+            Assert.That(snapshot.Items.Any(item => item.Kind == RecordPreviewKind.Body && item.Value == "认证说明"), Is.True);
+        });
     }
 
     [Test]
@@ -161,21 +182,10 @@ public class RecordPreviewProjectorTests
     }
 
     [Test]
-    public void DisambigRelevanceDeletionRemovesTheLoadedRelation()
+    public void DisambigDeletedRelationIsAbsentFromProjectedState()
     {
         var projector = new RecordPreviewProjector(typeof(Disambig));
-        projector.Load(new Disambig
-        {
-            Id = 1,
-            Name = "Disambig",
-            Entries = new List<Entry> { new() { Id = 7, Name = "Related entry" } }
-        });
-
-        projector.Apply(new Examine
-        {
-            Operation = Operation.DisambigRelevances,
-            Context = "{\"Relevances\":[{\"IsDelete\":true,\"EntryId\":7,\"Type\":0}]}"
-        });
+        projector.Load(new Disambig { Id = 1, Name = "Disambig", Entries = new List<Entry>() });
 
         var snapshot = projector.Snapshot(value => value);
         Assert.That(snapshot.Items.Any(item => item.Kind == RecordPreviewKind.Relation && item.Value == "entry:7"), Is.False);
@@ -197,7 +207,7 @@ public class RecordPreviewProjectorTests
     }
 
     [Test]
-    public void EditTagWithoutParentFieldKeepsLoadedParent()
+    public void LoadedTagParentIsProjectedWithItsId()
     {
         var projector = new RecordPreviewProjector(typeof(Tag));
         projector.Load(new Tag
@@ -205,37 +215,6 @@ public class RecordPreviewProjectorTests
             Id = 1,
             Name = "Tag",
             ParentCodeNavigation = new Tag { Id = 7, Name = "Parent display" }
-        });
-
-        projector.Apply(new Examine
-        {
-            Operation = Operation.EditTag,
-            Context = "{\"Name\":\"Tag\",\"ChildrenEntries\":[]}"
-        });
-
-        var parent = projector.Snapshot(value => value).Items.Single(item => item.Group == "父标签");
-        Assert.Multiple(() =>
-        {
-            Assert.That(parent.Value, Is.EqualTo("tag:7"));
-            Assert.That(parent.Url, Is.EqualTo("/tags/index/7"));
-        });
-    }
-
-    [Test]
-    public void EditTagWithUnchangedParentKeepsRelationId()
-    {
-        var projector = new RecordPreviewProjector(typeof(Tag));
-        projector.Load(new Tag
-        {
-            Id = 1,
-            Name = "Tag",
-            ParentCodeNavigation = new Tag { Id = 7, Name = "Parent display" }
-        });
-
-        projector.Apply(new Examine
-        {
-            Operation = Operation.EditTag,
-            Context = "{\"Name\":\"Tag\",\"ParentTag\":\"Parent display\"}"
         });
 
         var parents = projector.Snapshot(value => value).Items.Where(item => item.Group == "父标签").ToList();
@@ -248,13 +227,17 @@ public class RecordPreviewProjectorTests
     }
 
     [Test]
-    public void EstablishRelevanceOutlinkIsProjected()
+    public void LoadedEntryOutlinkIsProjected()
     {
         var projector = new RecordPreviewProjector(typeof(Entry));
-        projector.Apply(new Examine
+        projector.Load(new Entry
         {
-            Operation = Operation.EstablishRelevances,
-            Context = "{\"Relevances\":[{\"IsDelete\":false,\"Type\":2,\"DisplayName\":\"Bangumi\",\"DisplayValue\":null,\"Link\":\"https://bangumi.tv/subject/316369\"}]}"
+            Id = 1,
+            Name = "Entry",
+            Outlinks = new List<Outlink>
+            {
+                new() { Name = "Bangumi", BriefIntroduction = "说明", Link = "https://bangumi.tv/subject/316369" }
+            }
         });
 
         var snapshot = projector.Snapshot(value => value);
@@ -264,27 +247,6 @@ public class RecordPreviewProjectorTests
             Assert.That(outlink.Label, Is.EqualTo("Bangumi"));
             Assert.That(outlink.Value, Is.EqualTo("https://bangumi.tv/subject/316369"));
         });
-    }
-
-    [Test]
-    public void LegacyTagChildDeletionMatchesLoadedChildrenByName()
-    {
-        var projector = new RecordPreviewProjector(typeof(Tag));
-        projector.Load(new Tag
-        {
-            Id = 1,
-            Name = "Tag",
-            Entries = new List<Entry> { new() { Id = 9, Name = "Child entry" } }
-        });
-
-        projector.Apply(new Examine
-        {
-            Operation = Operation.EditTag,
-            Context = "{\"Name\":\"Tag\",\"ChildrenEntries\":[{\"Name\":\"Child entry\",\"IsDelete\":true}]}"
-        });
-
-        var snapshot = projector.Snapshot(value => value);
-        Assert.That(snapshot.Items.Any(item => item.Kind == RecordPreviewKind.Relation && item.Value == "entry:9"), Is.False);
     }
 
     [Test]

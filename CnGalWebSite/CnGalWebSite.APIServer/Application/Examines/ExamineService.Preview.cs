@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using CnGalWebSite.DataModel.ExamineModel.Comments;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
-using CnGalWebSite.Helper.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -26,47 +25,69 @@ public partial class ExamineService
         model.EditOverview = BuildEditOverview(examine);
         model.ContributionValue = examine.ContributionValue;
         model.SubmissionOnly = ExamineOperationMetadata.IsSubmissionOnly(examine.Operation);
-        var state = CreatePreviewProjector(live.GetType());
 
         if (model.SubmissionOnly)
         {
             model.BeforeModel = new() { IsComplete = false };
-            ReplayPreview(state, examine);
-            model.AfterModel = state.Snapshot(RenderPreview);
+            var submissionState = CreatePreviewProjector(live.GetType());
+            try
+            {
+                submissionState.LoadSubmission(examine);
+                model.AfterModel = submissionState.Snapshot(RenderPreview);
+            }
+            catch (Exception error) when (IsPreviewReplayError(error))
+            {
+                model.AfterModel = new() { IsComplete = false };
+            }
             if (live is Comment comment)
                 await EnrichCommentPreview(examine, model, model.AfterModel);
         }
         else if (examine.IsPassed == null)
         {
             var records = await PreviewHistory(examine).AsNoTracking().ToListAsync();
-            state.Load(live);
+            model.BeforeModel = ProjectSnapshot(live);
+
+            // Loading the same no-tracking aggregate a second time gives the replay an isolated
+            // working copy; applying pending records never mutates the displayed "before" state.
+            var replayTarget = await LoadPreviewObject(examine);
+            if (replayTarget == null) return false;
+            var incomplete = false;
             var dependencies = new List<Examine>();
             var visited = new HashSet<long> { examine.Id };
             var dependency = examine.PrepositionExamineId;
             while (dependency is > 0)
             {
-                if (!visited.Add(dependency.Value)) { MarkIncomplete(state); break; }
+                if (!visited.Add(dependency.Value)) { incomplete = true; break; }
                 var parent = records.FirstOrDefault(r => r.Id == dependency.Value);
-                if (parent == null) { MarkIncomplete(state); break; }
+                if (parent == null) { incomplete = true; break; }
                 if (parent.IsPassed == true) break;
-                if (parent.IsPassed == false) { MarkIncomplete(state); break; }
+                if (parent.IsPassed == false) { incomplete = true; break; }
                 dependencies.Add(parent);
                 dependency = parent.PrepositionExamineId;
             }
-            foreach (var parent in dependencies.AsEnumerable().Reverse()) ReplayPreview(state, parent);
-            model.BeforeModel = state.Snapshot(RenderPreview);
-            ReplayPreview(state, examine);
-            model.AfterModel = state.Snapshot(RenderPreview);
+            foreach (var parent in dependencies.AsEnumerable().Reverse())
+            {
+                if (!await ReplayPreview(replayTarget, parent))
+                {
+                    incomplete = true;
+                    break;
+                }
+            }
+            if (!await ReplayPreview(replayTarget, examine)) incomplete = true;
+            model.AfterModel = ProjectSnapshot(replayTarget, incomplete);
         }
         else
         {
             var records = await PreviewHistory(examine).AsNoTracking().ToListAsync();
+            var replayTarget = _examinePatchApplicationService.CreateTarget(model.Type);
+            var incomplete = false;
             foreach (var record in RecordVersionOrder.Approved(records).Where(r => RecordVersionOrder.Compare(r, examine) < 0))
-                ReplayPreview(state, record);
-            model.BeforeModel = state.Snapshot(RenderPreview);
-            ReplayPreview(state, examine);
-            model.AfterModel = state.Snapshot(RenderPreview);
+                incomplete |= !await ReplayPreview(replayTarget, record);
+            model.BeforeModel = ProjectSnapshot(replayTarget, incomplete);
+            if (!await ReplayPreview(replayTarget, examine)) incomplete = true;
+            model.AfterModel = ProjectSnapshot(replayTarget, incomplete);
         }
+
         if (live is PlayedGame playedGame && playedGame.Entry is not null)
             EnrichPlayedGamePreview(playedGame, model.BeforeModel, model.AfterModel);
         await ResolvePreviewReferences(model.BeforeModel, model.AfterModel);
@@ -86,19 +107,27 @@ public partial class ExamineService
         if (RecordVersionOrder.Compare(before, after) > 0)
             throw new ArgumentException("基准版本的通过时间不能晚于目标版本。");
         var records = await PreviewHistory(before).AsNoTracking().Where(r => r.IsPassed == true).ToListAsync();
-        var domainType = ExamineRecordTypeMetadata.DomainType(type)
-            ?? throw new ArgumentException("该类型不支持历史版本对比。");
-        var state = CreatePreviewProjector(domainType);
+        var replayTarget = _examinePatchApplicationService.CreateTarget(type);
         var result = new EditRecordComparison { ContrastId = contrastId, CurrentId = currentId };
+        var incomplete = false;
         foreach (var record in RecordVersionOrder.Approved(records))
         {
             if (RecordVersionOrder.Compare(record, after) > 0) break;
-            ReplayPreview(state, record);
-            if (record.Id == contrastId) result.Before = state.Snapshot(RenderPreview);
-            if (record.Id == currentId) result.After = state.Snapshot(RenderPreview);
+            if (!await ReplayPreview(replayTarget, record)) incomplete = true;
+            if (record.Id == contrastId) result.Before = ProjectSnapshot(replayTarget, incomplete);
+            if (record.Id == currentId) result.After = ProjectSnapshot(replayTarget, incomplete);
         }
         await ResolvePreviewReferences(result.Before, result.After);
         return result;
+    }
+
+    private ExaminePreDataModel ProjectSnapshot(object target, bool incomplete = false)
+    {
+        var projector = CreatePreviewProjector(target.GetType());
+        projector.Load(target);
+        var snapshot = projector.Snapshot(RenderPreview);
+        if (incomplete) snapshot.IsComplete = false;
+        return snapshot;
     }
 
     private RecordPreviewProjector CreatePreviewProjector(Type objectType) =>
@@ -314,30 +343,27 @@ public partial class ExamineService
         });
     }
 
-    private void ReplayPreview(RecordPreviewProjector state, Examine record)
+    /// <summary>
+    /// Applies the exact same application-service mutation used by the approved-write path,
+    /// but to a detached aggregate. No repository save is performed here.
+    /// </summary>
+    private async Task<bool> ReplayPreview(object target, Examine record)
     {
         try
         {
-            state.Apply(record);
-            // The main creation/edit record supplies the initial scalar state. Until then,
-            // absent values must not be presented as known empty values.
-            if (!state.HasFailed && (record.Operation is Operation.EstablishMain or Operation.EditArticleMain or Operation.EditVideoMain
-                or Operation.EditPeripheryMain or Operation.EditTagMain or Operation.EditTag or Operation.EditUserMain
-                or Operation.EditPlayedGameMain or Operation.EditFavoriteFolderMain or Operation.DisambigMain))
-                state.IsComplete = true;
+            await _examinePatchApplicationService.ApplyAsync(target, record);
+            return true;
         }
-        catch (Exception error) when (error is Newtonsoft.Json.JsonException or System.Text.Json.JsonException
-            or InvalidOperationException or FormatException or ArgumentException or InvalidCastException or OverflowException)
+        catch (Exception error) when (IsPreviewReplayError(error))
         {
-            MarkIncomplete(state);
+            return false;
         }
     }
 
-    private static void MarkIncomplete(RecordPreviewProjector state)
-    {
-        state.HasFailed = true;
-        state.IsComplete = false;
-    }
+    private static bool IsPreviewReplayError(Exception error) => error is
+        Newtonsoft.Json.JsonException or System.Text.Json.JsonException or
+        InvalidOperationException or FormatException or ArgumentException or
+        InvalidCastException or OverflowException;
 
     private string RenderPreview(string source) => HtmlSanitizerHelper.Sanitize(_appHelper.MarkdownToHtml(source));
 

@@ -99,6 +99,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IRepository<UserCertification, long> _userCertificationRepository;
         private readonly IRepository<UserMonitor, long> _userMonitorRepository;
         private readonly IRepository<UserReviewEditRecord, long> _userReviewEditRecordRepository;
+        private readonly IExaminePatchApplicationService _examinePatchApplicationService;
 
 
         public ExamineService(IRepository<Examine, int> examineRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRankService rankService, IPerfectionService perfectionService, IRepository<FavoriteFolder, long> favoriteFolderRepository,
@@ -106,7 +107,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository, IRepository<Message, long> messageRepository,
         IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService, IPlayedGameService playedGameService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository, ILogger<ExamineService> logger, IRepository<Lottery, long> lotteryRepository,
-        IOptions<AutomationUsersOptions> automationUsersOptions,  IRepository<PlayedGame, long> playedGameRepository, ICommentService commentService, IRepository<Vote, long> voteRepository)
+        IOptions<AutomationUsersOptions> automationUsersOptions,  IRepository<PlayedGame, long> playedGameRepository, ICommentService commentService, IRepository<Vote, long> voteRepository, IExaminePatchApplicationService examinePatchApplicationService)
         {
             _examineRepository = examineRepository;
             _appHelper = appHelper;
@@ -141,6 +142,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _videoRepository = videoRepository;
             _favoriteFolderRepository = favoriteFolderRepository;
             _favoriteFolderService = favoriteFolderService;
+            _examinePatchApplicationService = examinePatchApplicationService;
         }
 
         public async Task<PagedResultDto<ExaminedNormalListModel>> GetPaginatedResult(GetExamineInput input, int entryId = 0, string userId = "")

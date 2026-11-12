@@ -5,17 +5,17 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using CnGalWebSite.DataModel.Model;
-using CnGalWebSite.DataModel.ExamineModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using CnGalWebSite.Extensions;
 
-namespace CnGalWebSite.Helper.Examines;
+namespace CnGalWebSite.APIServer.Application.Examines;
 
 /// <summary>
-/// A read-only interpreter of the persisted edit instructions. It never attaches entities or
-/// invokes the write services. Keys mirror the matching rules used by those services.
+/// Projects a replayed domain aggregate or a submission-only payload into transport-safe
+/// preview items. It performs no persistence and no edit-instruction interpretation; normal
+/// aggregate replay is owned by the shared application services.
 /// </summary>
 public sealed class RecordPreviewProjector
 {
@@ -23,7 +23,6 @@ public sealed class RecordPreviewProjector
     private readonly Func<string, string> imageUrlResolver;
     private readonly List<RecordPreviewItem> items = new();
     public bool IsComplete { get; set; }
-    public bool HasFailed { get; set; }
 
     private static readonly Dictionary<string, string> Labels = new()
     {
@@ -70,44 +69,6 @@ public sealed class RecordPreviewProjector
         ["Size"] = typeof(EntryWebsiteImageSize)
     };
 
-    /// <summary>
-    /// 明确声明可被预览的审核操作。新增 Operation 时该集合必须同步更新，
-    /// 并由单元测试保证不会静默遗漏。
-    /// </summary>
-    public static IReadOnlySet<Operation> SupportedOperations { get; } = new HashSet<Operation>
-    {
-        Operation.UserMainPage,
-        Operation.EstablishMain,
-        Operation.EstablishAddInfor,
-        Operation.EstablishMainPage,
-        Operation.EstablishImages,
-        Operation.EstablishRelevances,
-        Operation.EstablishTags,
-        Operation.EditArticleMain,
-        Operation.EditArticleRelevanes,
-        Operation.EditArticleMainPage,
-        Operation.EditTag,
-        Operation.PubulishComment,
-        Operation.DisambigMain,
-        Operation.DisambigRelevances,
-        Operation.EditUserMain,
-        Operation.EditPeripheryMain,
-        Operation.EditPeripheryImages,
-        Operation.EditPeripheryRelatedEntries,
-        Operation.EditTagMain,
-        Operation.EditTagChildTags,
-        Operation.EditTagChildEntries,
-        Operation.EditPeripheryRelatedPeripheries,
-        Operation.EditPlayedGameMain,
-        Operation.EstablishAudio,
-        Operation.RequestUserCertification,
-        Operation.EditVideoMain,
-        Operation.EditVideoImages,
-        Operation.EditVideoMainPage,
-        Operation.EditVideoRelevanes,
-        Operation.EditFavoriteFolderMain,
-        Operation.EstablishWebsite,
-    };
 
     public RecordPreviewProjector(Type objectType, Func<string, string> imageUrlResolver = null)
     {
@@ -125,8 +86,8 @@ public sealed class RecordPreviewProjector
 
     public void Load(object value)
     {
+        items.Clear();
         IsComplete = true;
-        HasFailed = false;
         Scalars(Shallow(value), objectType, "main", "主要信息");
         var source = Get(value, "MainPage") ?? Get(value, "MainPageContext");
         if (source is string body) Body(body);
@@ -171,121 +132,33 @@ public sealed class RecordPreviewProjector
         }
     }
 
-    public void Apply(Examine record)
+    /// <summary>
+    /// Submission-only records (comments and certifications) are the submitted payload itself;
+    /// they do not patch a persistent aggregate. Their display projection lives here so callers
+    /// do not need a second operation interpreter.
+    /// </summary>
+    public void LoadSubmission(Examine record)
     {
-        if (!SupportedOperations.Contains(record.Operation))
-        {
-            throw new InvalidOperationException($"不支持的审核操作：{record.Operation}");
-        }
-
-        if (record.Operation is Operation.EstablishMainPage or Operation.EditArticleMainPage or Operation.EditVideoMainPage or Operation.UserMainPage)
-        { Body(record.Context); return; }
+        items.Clear();
+        IsComplete = true;
         var data = JsonNode.Parse(record.Context ?? "{}") as JsonObject ?? new JsonObject();
         switch (record.Operation)
         {
-            case Operation.EstablishMain:
-            case Operation.EditArticleMain:
-            case Operation.EditVideoMain:
-            case Operation.EditPeripheryMain:
-            case Operation.EditTagMain:
-            case Operation.EditUserMain:
-            case Operation.EditFavoriteFolderMain:
-            case Operation.EditPlayedGameMain:
-            case Operation.DisambigMain:
-                Scalars(PatchFields(data), objectType, "main", "主要信息");
-                if (PatchFields(data)["ParentTagId"] is { } parent)
-                {
-                    items.RemoveAll(i => i.Group == "父标签");
-                    if ((int?)parent > 0) Relation("tag", Text(parent), "父标签", false, "parent");
-                }
-                break;
-            case Operation.EstablishImages:
-            case Operation.EditVideoImages:
-            case Operation.EditPeripheryImages:
-                foreach (var image in Array(data, "Images")) Media(image, false);
-                break;
-            case Operation.EstablishAudio:
-                foreach (var audio in Array(data, "Audio")) Media(audio, true);
-                break;
-            case Operation.EstablishAddInfor:
-                foreach (var info in Array(data, "Information")) Information(info, Array(info, "Additional"));
-                foreach (var staff in Array(data, "Staffs")) Staff(staff);
-                foreach (var release in Array(data, "Releases")) Release(release);
-                if (data["Booking"] is JsonObject booking)
-                {
-                    Scalars(PatchFields(booking, "MainInfor"), typeof(Booking), "booking", "预约");
-                    foreach (var goal in Array(booking, "Goals")) Goal(goal);
-                }
-                break;
-            case Operation.EstablishWebsite:
-                Scalars(PatchFields(data, "MainInfor"), typeof(EntryWebsite), "website", "官网模板");
-                foreach (var image in Array(data, "Images")) WebsiteImage(image);
-                break;
-            case Operation.EstablishRelevances:
-            case Operation.EditArticleRelevanes:
-            case Operation.EditVideoRelevanes:
-                foreach (var relation in Array(data, "Relevances"))
-                {
-                    var type = ((RelevancesType)((int?)relation["Type"] ?? 0)).ToString().ToLowerInvariant();
-                    if (type == "outlink") Outlink(relation, true);
-                    else Relation(type, Text(relation["DisplayName"]), "关联" + RelationLabel(type), Deleted(relation));
-                }
-                break;
-            case Operation.EstablishTags:
-                foreach (var tag in Array(data, "Tags")) Relation("tag", Text(tag["TagId"]), "标签", Deleted(tag));
-                break;
-            case Operation.EditTagChildTags:
-                foreach (var tag in Array(data, "ChildTags")) Relation("tag", Text(tag["TagId"]), "子标签", Deleted(tag));
-                break;
-            case Operation.EditTagChildEntries:
-                foreach (var entry in Array(data, "ChildEntries")) Relation("entry", Text(entry["EntryId"]), "子词条", Deleted(entry));
-                break;
-            case Operation.EditPeripheryRelatedEntries:
-                foreach (var entry in Array(data, "Relevances")) Relation("entry", Text(entry["EntryId"]), "关联词条", Deleted(entry));
-                break;
-            case Operation.EditPeripheryRelatedPeripheries:
-                foreach (var entry in Array(data, "Relevances")) Relation("periphery", Text(entry["PeripheryId"]), "关联周边", Deleted(entry));
-                break;
-            case Operation.DisambigRelevances:
-                foreach (var entry in Array(data, "Relevances"))
-                {
-                    var type = (int?)entry["Type"] == 1 ? "article" : "entry";
-                    Relation(type, Text(entry["EntryId"]), type == "article" ? "关联文章" : "关联词条", Deleted(entry));
-                }
-                break;
-            case Operation.EditTag:
-                Scalars(data, typeof(Tag), "main", "主要信息");
-                foreach (var tag in Array(data, "ChildrenTags"))
-                {
-                    var name = Text(tag["Name"]);
-                    if (Deleted(tag)) RemoveRelationByName("子标签", name);
-                    else if (FindRelationByName("子标签", name) is null) Relation("tag-name", name, "子标签", false);
-                }
-                foreach (var entry in Array(data, "ChildrenEntries"))
-                {
-                    var name = Text(entry["Name"]);
-                    if (Deleted(entry)) RemoveRelationByName("子词条", name);
-                    else if (FindRelationByName("子词条", name) is null) Relation("entry-name", name, "子词条", false);
-                }
-                if (data.ContainsKey("ParentTag"))
-                {
-                    var parentName = Text(data["ParentTag"]);
-                    var existingParent = FindRelationByName("父标签", parentName);
-                    items.RemoveAll(i => i.Group == "父标签" && !ReferenceEquals(i, existingParent));
-                    if (!string.IsNullOrWhiteSpace(parentName) && existingParent is null)
-                        Relation("tag-name", parentName, "父标签", false, "parent");
-                }
-                break;
             case Operation.PubulishComment:
-                Scalars(new JsonObject { ["Time"] = Clone(data["CommentTime"]), ["Type"] = Clone(data["Type"]), ["ObjectId"] = Clone(data["ObjectId"]) }, null, "comment", "评论",
-                    new Dictionary<string, Type> { ["Type"] = typeof(CommentType) });
+                Scalars(new JsonObject
+                {
+                    ["Time"] = Clone(data["CommentTime"]),
+                    ["Type"] = Clone(data["Type"]),
+                    ["ObjectId"] = Clone(data["ObjectId"])
+                }, null, "comment", "评论", new Dictionary<string, Type> { ["Type"] = typeof(CommentType) });
                 Body(Text(data["Text"]));
                 break;
             case Operation.RequestUserCertification:
                 Relation("entry", Text(data["EntryId"]), "认证词条", false);
                 Body(record.Note);
                 break;
-            default: throw new InvalidOperationException($"不支持的审核操作：{record.Operation}");
+            default:
+                throw new InvalidOperationException($"该操作不是提交型审核：{record.Operation}");
         }
     }
 
@@ -397,18 +270,6 @@ public sealed class RecordPreviewProjector
                 "video" => "/videos/index/" + id, "tag" => "/tags/index/" + id, "periphery" => "/peripheries/index/" + id, _ => null } }, deleted);
     }
 
-    private RecordPreviewItem FindRelationByName(string group, string name)
-    {
-        return string.IsNullOrWhiteSpace(name) ? null : items.FirstOrDefault(i => i.Kind == RecordPreviewKind.Relation
-            && i.Group == group && (string.Equals(i.DisplayValue, name, StringComparison.Ordinal) || string.Equals(i.Label, name, StringComparison.Ordinal)));
-    }
-
-    private void RemoveRelationByName(string group, string name)
-    {
-        var item = FindRelationByName(group, name);
-        if (item is not null) items.Remove(item);
-    }
-
     private string ResolveImage(string value) => string.IsNullOrWhiteSpace(value) ? string.Empty : imageUrlResolver?.Invoke(value) ?? value;
 
     private static string RelatedDisplayName(object related)
@@ -477,9 +338,6 @@ public sealed class RecordPreviewProjector
         return (text, text);
     }
 
-    private static JsonObject PatchFields(JsonObject data, string property = "Items") => data[property] is JsonArray fields
-        ? new JsonObject(fields.OfType<JsonObject>().Where(f => !string.IsNullOrEmpty(Text(f["Key"])))
-            .GroupBy(f => Text(f["Key"])).Select(g => new KeyValuePair<string, JsonNode>(g.Key, Clone(g.Last()["Value"])))) : data;
     private static string Text(JsonNode value)
     {
         if (value is null) return "";
@@ -491,8 +349,6 @@ public sealed class RecordPreviewProjector
     }
     private static bool Deleted(JsonObject value) => value?["IsDelete"] is JsonValue deleted
         && deleted.TryGetValue<bool>(out var isDeleted) && isDeleted;
-    private static IEnumerable<JsonObject> Array(JsonObject value, string property) =>
-        (value[property] as JsonArray)?.OfType<JsonObject>() ?? Enumerable.Empty<JsonObject>();
     private static string Key(string prefix, params string[] values) => prefix + "/" + JsonSerializer.Serialize(values);
     private static string GroupSuffix(JsonObject data) => string.IsNullOrWhiteSpace(Text(data["Modifier"])) ? "" : " · " + Text(data["Modifier"]);
     private static object Get(object value, string property) => value?.GetType().GetProperty(property)?.GetValue(value);
