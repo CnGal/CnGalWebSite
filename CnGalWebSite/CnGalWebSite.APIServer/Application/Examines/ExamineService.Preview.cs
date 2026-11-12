@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -263,6 +263,7 @@ public partial class ExamineService
         {
             var parent = await _commentRepository.GetAll().AsNoTracking()
                 .Include(s => s.ParentCodeNavigation)
+                .Include(s => s.UserSpaceCommentManager)
                 .FirstOrDefaultAsync(s => s.Id == parentId);
             if (parent is null) return null;
 
@@ -282,6 +283,8 @@ public partial class ExamineService
         if (comment.VideoId.HasValue) return (CommentType.CommentVideo, comment.VideoId.Value.ToString());
         if (comment.VoteId.HasValue) return (CommentType.CommentVote, comment.VoteId.Value.ToString());
         if (comment.LotteryId.HasValue) return (CommentType.CommentLottery, comment.LotteryId.Value.ToString());
+        if (comment.UserSpaceCommentManager?.ApplicationUserId is { Length: > 0 } userId)
+            return (CommentType.CommentUser, userId);
         return null;
     }
 
@@ -322,8 +325,8 @@ public partial class ExamineService
                 or Operation.EditPlayedGameMain or Operation.EditFavoriteFolderMain or Operation.DisambigMain))
                 state.IsComplete = true;
         }
-        catch (Exception error) when (error is JsonException or InvalidOperationException or FormatException
-            or ArgumentException or InvalidCastException or OverflowException)
+        catch (Exception error) when (error is Newtonsoft.Json.JsonException or System.Text.Json.JsonException
+            or InvalidOperationException or FormatException or ArgumentException or InvalidCastException or OverflowException)
         {
             MarkIncomplete(state);
         }

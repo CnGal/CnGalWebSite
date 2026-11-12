@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.ViewModel.Admin;
+﻿using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;

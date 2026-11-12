@@ -43,7 +43,7 @@ public static class RecordDiffBuilder
                 continue;
             }
             result.AddRange(oldItems.Where(Meaningful).Select(i => new RecordDiffItem(i, null,
-                after?.IsComplete == false ? RecordChangeKind.Unknown : RecordChangeKind.Removed, i.IsKnown)));
+                after?.IsComplete == true ? RecordChangeKind.Removed : RecordChangeKind.Unknown, i.IsKnown)));
             result.AddRange(newItems.Where(Meaningful).Select(i => new RecordDiffItem(null, i,
                 before?.IsComplete == true ? RecordChangeKind.Added : RecordChangeKind.Unknown, before?.IsComplete == true)));
         }

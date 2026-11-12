@@ -1,4 +1,4 @@
-
+﻿
 using CnGalWebSite.DataModel.ExamineModel.Peripheries;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Model;

@@ -1,4 +1,4 @@
-# 编辑记录与审核详情验收
+﻿# 编辑记录与审核详情验收
 
 自动测试使用本地模拟 API，不读取生产数据，也不向真实审核接口提交操作。浏览器测试标记为 Explicit，不会随常规单元测试启动。
 
@@ -43,4 +43,4 @@ dotnet test CnGalWebSite/CnGalWebSite.UnitTest --filter "FullyQualifiedName~Exam
 
 历史页面保留 `ContrastId`、`CurrentId`、`SelectedId`，新增可选 `Mode=record|compare`；显式模式优先，否则携带 `CurrentId` 的旧链接进入对比模式。`CurrentId=0` 解析为最新已通过记录。页面对非数字、越界、反向和跨对象选择显示局部错误，不将缺失内容推断为删除。
 
-新增 `Operation` 时，必须同步更新 `RecordPreviewProjector.SupportedOperations`，`RecordPreviewProjectorTests` 会逐一校验所有非 `None` 操作都有显式预览契约。新增审核对象类型时，只需更新 `ExamineRecordTypeMetadata` 的描述表；API 路由、SDK 路由、历史能力和对象链接均由该表派生。
+新增 `Operation` 时，必须同步更新 `RecordPreviewProjector.SupportedOperations`，`RecordPreviewProjectorTests` 会逐一校验所有非 `None` 操作都有显式预览契约。新增审核对象类型时，除补充 `ExamineRecordTypeMetadata` 的描述表外，还必须同步维护该类型的 `ResolveType`、`ResolveObjectId`、`ScopeHistory` 显式分支，以及对应的控制器历史对比路由和 SDK 路由；描述表中的 `ApiSegment`、`ObjectPathPrefix` 仅负责能力查询和对象链接，不能替代这些映射。

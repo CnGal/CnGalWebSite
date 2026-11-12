@@ -100,7 +100,7 @@
         {
             DisplayName = i.Label,
             DisplayValue = i.DisplayValue,
-            Link = i.Url ?? i.Value
+            Link = SafeOutlink(i.Url ?? i.Value)
         })
         .ToList();
 
@@ -137,6 +137,8 @@
     }
 
     private static string ItemText(RecordPreviewItem item) => string.IsNullOrWhiteSpace(item.DisplayValue) ? item.Value : item.DisplayValue;
+    private static string SafeOutlink(string? value) =>
+        CnGalWebSite.Extensions.UrlSafety.IsExternalHttpUrl(value) ? value! : string.Empty;
 
     private static string Property(RecordPreviewItem item, string key) =>
         item.Properties.FirstOrDefault(p => p.Key == key)?.DisplayValue;

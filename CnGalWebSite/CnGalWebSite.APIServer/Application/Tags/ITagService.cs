@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.ExamineModel.Shared;
+﻿using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.ExamineModel.Tags;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Tags;

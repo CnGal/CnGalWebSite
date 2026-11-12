@@ -9,6 +9,17 @@
          </ButtonContent>
          <ChildContent>
              <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@_editOverview" Class="overflow-y-auto" Style="max-height: 420px;" />
+             @if (_isLoading)
+             {
+                 <div class="pa-3" role="status">正在加载概览…</div>
+             }
+             else if (_loadFailed)
+             {
+                 <div class="pa-3 d-flex align-center ga-3" role="alert">
+                     <span>概览加载失败。</span>
+                     <CnGalWebSite.Components.Buttons.MasaButton Text="重新加载" Small Outlined IsAsync="true" OnClick="LoadOverviewAsync" />
+                 </div>
+             }
          </ChildContent>
      </CnGalWebSite.Components.Containers.MasaTitleContainer>
      @if (string.IsNullOrWhiteSpace(Model.Comments) == false)
@@ -33,31 +44,59 @@
     [Parameter]
     public EditRecordAloneViewModel Model { get; set; }
 
-    private string _editOverview;
+    private string? _editOverview;
     private long _loadedId = -1;
+    private long _lastAttemptedId = long.MinValue;
+    private long _requestVersion;
+    private bool _isLoading;
+    private bool _loadFailed;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (Model?.Id == _loadedId)
+        var requestedId = Model?.Id ?? -1;
+        if (requestedId == _lastAttemptedId)
         {
             return;
         }
 
-        _loadedId = Model?.Id ?? -1;
+        _lastAttemptedId = requestedId;
+        await LoadOverviewAsync();
+    }
+
+    private async Task LoadOverviewAsync()
+    {
+        var requestedId = Model?.Id ?? -1;
+        var requestVersion = ++_requestVersion;
         _editOverview = null;
-        if (Model?.Id > 0)
+        _loadedId = -1;
+        _loadFailed = false;
+        _isLoading = requestedId > 0;
+        if (requestedId <= 0) return;
+
+        try
         {
-            try
+            var detail = await _httpService.GetAsync<ExamineViewModel>($"api/examines/GetExamineView/{requestedId}");
+            if (!IsCurrentOverviewRequest(requestedId, requestVersion)) return;
+            _editOverview = detail?.EditOverview;
+            _loadedId = requestedId;
+        }
+        catch
+        {
+            if (!IsCurrentOverviewRequest(requestedId, requestVersion)) return;
+            _loadFailed = true;
+        }
+        finally
+        {
+            if (IsCurrentOverviewRequest(requestedId, requestVersion))
             {
-                var detail = await _httpService.GetAsync<ExamineViewModel>($"api/examines/GetExamineView/{Model.Id}");
-                _editOverview = detail?.EditOverview;
-            }
-            catch
-            {
-                // 概览只是附加信息，接口不可用时保留卡片其它内容。
+                _isLoading = false;
+                _lastAttemptedId = requestedId;
             }
         }
     }
+
+    private bool IsCurrentOverviewRequest(long requestedId, long requestVersion) =>
+        requestVersion == _requestVersion && (Model?.Id ?? -1) == requestedId;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using System;
 using System.Collections.Generic;

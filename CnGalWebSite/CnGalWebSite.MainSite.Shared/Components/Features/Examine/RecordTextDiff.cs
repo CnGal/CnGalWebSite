@@ -1,4 +1,6 @@
-﻿namespace CnGalWebSite.MainSite.Shared.Components.Features.Examine;
+﻿using System.Text;
+
+namespace CnGalWebSite.MainSite.Shared.Components.Features.Examine;
 
 public enum RecordTextChangeKind { Unchanged, Removed, Added }
 
@@ -43,10 +45,30 @@ public static class RecordTextDiff
     }
 
     private static IReadOnlyList<RecordTextSegment> SplitSide(IEnumerable<RecordTextSegment> segments, bool beforeSide) =>
-        segments.Where(segment => beforeSide
-                ? segment.Change != RecordTextChangeKind.Added
-                : segment.Change != RecordTextChangeKind.Removed)
-            .ToList();
+        Coalesce(segments.Where(segment => beforeSide
+            ? segment.Change != RecordTextChangeKind.Added
+            : segment.Change != RecordTextChangeKind.Removed));
+
+    private static IReadOnlyList<RecordTextSegment> Coalesce(IEnumerable<RecordTextSegment> segments)
+    {
+        var result = new List<RecordTextSegment>();
+        var text = new StringBuilder();
+        RecordTextChangeKind? change = null;
+        foreach (var segment in segments)
+        {
+            if (string.IsNullOrEmpty(segment.Text)) continue;
+            if (change is not null && change != segment.Change && text.Length > 0)
+            {
+                result.Add(new(text.ToString(), change.Value));
+                text.Clear();
+            }
+            change = segment.Change;
+            text.Append(segment.Text);
+        }
+        if (text.Length > 0 && change is not null)
+            result.Add(new(text.ToString(), change.Value));
+        return result;
+    }
 
     private static void AppendLcsDiff(List<RecordTextSegment> result, List<string> before, List<string> after)
     {
@@ -92,11 +114,7 @@ public static class RecordTextDiff
 
     private static void Append(List<RecordTextSegment> result, string text, RecordTextChangeKind change)
     {
-        if (string.IsNullOrEmpty(text)) return;
-        if (result.Count > 0 && result[^1].Change == change)
-            result[^1] = result[^1] with { Text = result[^1].Text + text };
-        else
-            result.Add(new(text, change));
+        if (!string.IsNullOrEmpty(text)) result.Add(new(text, change));
     }
 
     private static string Normalize(string value) => value.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');

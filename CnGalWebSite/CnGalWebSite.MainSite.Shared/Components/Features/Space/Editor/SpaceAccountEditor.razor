@@ -379,6 +379,7 @@
     private List<string> _certEntryList = [];
     private UserCertificationType? _certEntriesType;
     private bool _isLoadingCertEntries;
+    private int _certEntriesRequestVersion;
 
     /// <summary>
     /// 打开用户认证弹窗。
@@ -424,12 +425,13 @@
     private async Task LoadCertEntriesAsync()
     {
         var requestedType = _certType;
+        var requestVersion = ++_certEntriesRequestVersion;
         _isLoadingCertEntries = true;
         try
         {
             var entryType = requestedType == UserCertificationType.Group ? EntryType.ProductionGroup : EntryType.Staff;
             var result = await SpaceCommandService.GetAllNotCertificatedEntriesAsync(entryType);
-            if (_certType != requestedType)
+            if (!IsCurrentCertEntriesRequest(requestedType, requestVersion))
             {
                 return;
             }
@@ -448,7 +450,7 @@
         }
         catch (Exception ex)
         {
-            if (_certType != requestedType)
+            if (!IsCurrentCertEntriesRequest(requestedType, requestVersion))
             {
                 return;
             }
@@ -459,12 +461,15 @@
         }
         finally
         {
-            if (_certType == requestedType)
+            if (IsCurrentCertEntriesRequest(requestedType, requestVersion))
             {
                 _isLoadingCertEntries = false;
             }
         }
     }
+
+    private bool IsCurrentCertEntriesRequest(UserCertificationType requestedType, int requestVersion) =>
+        requestVersion == _certEntriesRequestVersion && _certType == requestedType;
 
     /// <summary>
     /// 取消认证。

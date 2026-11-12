@@ -4,7 +4,14 @@
 <div class="record-comparison @(SubmissionOnly ? "record-comparison--single" : "")">
     @if (!_diff.HasChanges)
     {
-        <p class="record-comparison__empty" role="status">无变化</p>
+        @if (!SubmissionOnly && (Before is null || After is null || !Before.IsComplete || !After.IsComplete))
+        {
+            <p class="record-comparison__empty" role="status">版本快照不完整，无法确认是否存在变化。</p>
+        }
+        else
+        {
+            <p class="record-comparison__empty" role="status">无变化</p>
+        }
     }
     else
     {

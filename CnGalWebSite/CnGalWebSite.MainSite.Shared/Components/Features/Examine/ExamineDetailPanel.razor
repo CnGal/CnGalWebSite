@@ -114,7 +114,7 @@
         catch (OperationCanceledException) when (token.IsCancellationRequested) { }
         catch (Exception ex)
         {
-            _error = ex.Message;
+            if (!_disposed && !token.IsCancellationRequested) _error = ex.Message;
         }
         finally
         {

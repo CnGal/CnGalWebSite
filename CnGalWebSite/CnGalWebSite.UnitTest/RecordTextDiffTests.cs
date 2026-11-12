@@ -42,6 +42,25 @@ public class RecordTextDiffTests
     }
 
     [Test]
+    public void LongSharedPrefixDoesNotDegradeIntoQuadraticStringCopying()
+    {
+        var prefix = new string('中', 100_000);
+        var before = prefix + "旧";
+        var after = prefix + "新";
+
+        var beforeSegments = RecordTextDiff.BuildSide(before, after, beforeSide: true);
+        var afterSegments = RecordTextDiff.BuildSide(before, after, beforeSide: false);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(string.Concat(beforeSegments.Select(segment => segment.Text)), Is.EqualTo(before));
+            Assert.That(string.Concat(afterSegments.Select(segment => segment.Text)), Is.EqualTo(after));
+            Assert.That(beforeSegments.Count, Is.LessThanOrEqualTo(2));
+            Assert.That(afterSegments.Count, Is.LessThanOrEqualTo(2));
+        });
+    }
+
+    [Test]
     public void HtmlDiffMarksInsertedAndDeletedContent()
     {
         var diff = RecordHtmlDiff.Build("<p>旧内容</p>", "<p>新内容</p>");

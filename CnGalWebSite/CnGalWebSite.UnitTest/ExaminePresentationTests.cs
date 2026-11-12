@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using CnGalWebSite.Core.Models;
@@ -46,14 +46,56 @@ public class ExaminePresentationTests
                 return WebUtility.HtmlDecode(root.ToHtmlString());
             });
             Assert.That(html, Does.Not.Contain("已删除"));
-            if (mask == 0) Assert.That(html, Does.Contain("无变化"));
+            if (mask == 0)
+            {
+                Assert.That(html, Does.Contain("版本快照不完整，无法确认是否存在变化。"));
+            }
             else
             {
                 Assert.That(html.Split("record-comparison__row--").Length - 1, Is.EqualTo(ItemCount(mask)));
+                Assert.That(html, Does.Contain("record-comparison__row--unknown"));
                 if ((mask & 2) != 0) Assert.That(html, Does.Contain("重复字段").And.Contain("第一行").And.Contain("第二行"));
             }
         }
     }
+
+    [Test]
+    public void MissingOrIncompleteSnapshotsAreUnknownInsteadOfRemovedOrAdded()
+    {
+        var data = Content(1);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(RecordDiffBuilder.Build(data, null).Items.Select(item => item.Change),
+                Is.All.EqualTo(RecordChangeKind.Unknown));
+            Assert.That(RecordDiffBuilder.Build(null, data).Items.Select(item => item.Change),
+                Is.All.EqualTo(RecordChangeKind.Unknown));
+            Assert.That(RecordDiffBuilder.Build(data, new ExaminePreDataModel { IsComplete = false }).Items.Select(item => item.Change),
+                Is.All.EqualTo(RecordChangeKind.Unknown));
+        });
+    }
+
+    [Test]
+    public async Task CompleteEqualSnapshotsReportNoChangesWhileIncompleteOnesDoNot()
+    {
+        using var services = Services();
+        await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
+
+        async Task<string> Render(ExaminePreDataModel before, ExaminePreDataModel after) =>
+            WebUtility.HtmlDecode((await renderer.RenderComponentAsync<RecordContentComparison>(
+                ParameterView.FromDictionary(new Dictionary<string, object?> { ["Before"] = before, ["After"] = after }))).ToHtmlString());
+
+        var complete = await renderer.Dispatcher.InvokeAsync(() => Render(new(), new()));
+        var incomplete = await renderer.Dispatcher.InvokeAsync(() => Render(
+            new() { IsComplete = false }, new() { IsComplete = false }));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(complete, Does.Contain("无变化").And.Not.Contain("版本快照不完整"));
+            Assert.That(incomplete, Does.Contain("版本快照不完整").And.Not.Contain(">无变化<"));
+        });
+    }
+
     [Test]
     public async Task MediaLinksAndStringsAreRenderedWithoutExecutableHtml()
     {
