@@ -100,6 +100,29 @@ public class ExamineComparisonSdkTests
     }
 
     [Test]
+    public void ImageReplacementIsReportedAsModifiedInsteadOfRemovedAndAdded()
+    {
+        var before = new ExaminePreDataModel { Items = [
+            new() { Key = "picture/old", Group = "图片", Kind = RecordPreviewKind.Image, Label = "主视觉",
+                Value = "https://media.example/old.png", DisplayValue = "https://media.example/old.png", Url = "https://media.example/old.png" }
+        ] };
+        var after = new ExaminePreDataModel { Items = [
+            new() { Key = "picture/new", Group = "图片", Kind = RecordPreviewKind.Image, Label = "主视觉",
+                Value = "https://media.example/new.png", DisplayValue = "https://media.example/new.png", Url = "https://media.example/new.png" }
+        ] };
+
+        var diff = RecordDiffBuilder.Build(before, after);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(diff.Items, Has.Count.EqualTo(1));
+            Assert.That(diff.Items[0].Change, Is.EqualTo(RecordChangeKind.Modified));
+            Assert.That(diff.Items[0].Before?.Value, Is.EqualTo("https://media.example/old.png"));
+            Assert.That(diff.Items[0].After?.Value, Is.EqualTo("https://media.example/new.png"));
+        });
+    }
+
+    [Test]
     public void DiffKeepsDuplicateRowsAndOnlyReportsChangedValues()
     {
         var before = new ExaminePreDataModel { Items = [

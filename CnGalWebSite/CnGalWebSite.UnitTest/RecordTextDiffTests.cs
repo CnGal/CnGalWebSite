@@ -1,0 +1,52 @@
+﻿using CnGalWebSite.MainSite.Shared.Components.Features.Examine;
+using NUnit.Framework;
+
+namespace CnGalWebSite.UnitTest;
+
+[TestFixture]
+public class RecordTextDiffTests
+{
+    [Test]
+    public void ChangedTextIsSplitIntoRemovedAndAddedSegmentsForEachSide()
+    {
+        const string beforeText = "这是旧的内容。";
+        const string afterText = "这是新的内容。";
+
+        var before = RecordTextDiff.BuildSide(beforeText, afterText, beforeSide: true);
+        var after = RecordTextDiff.BuildSide(beforeText, afterText, beforeSide: false);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(string.Concat(before.Select(segment => segment.Text)), Is.EqualTo(beforeText));
+            Assert.That(string.Concat(after.Select(segment => segment.Text)), Is.EqualTo(afterText));
+            Assert.That(before.Any(segment => segment.Change == RecordTextChangeKind.Removed && segment.Text.Contains('旧')), Is.True);
+            Assert.That(after.Any(segment => segment.Change == RecordTextChangeKind.Added && segment.Text.Contains('新')), Is.True);
+            Assert.That(before.Any(segment => segment.Change == RecordTextChangeKind.Added), Is.False);
+            Assert.That(after.Any(segment => segment.Change == RecordTextChangeKind.Removed), Is.False);
+        });
+    }
+
+    [Test]
+    public void AddedTextIsOnlyRenderedOnTheAfterSide()
+    {
+        var before = RecordTextDiff.BuildSide("abc def", "abc xyz def", beforeSide: true);
+        var after = RecordTextDiff.BuildSide("abc def", "abc xyz def", beforeSide: false);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(string.Concat(before.Select(segment => segment.Text)), Is.EqualTo("abc def"));
+            Assert.That(string.Concat(after.Select(segment => segment.Text)), Is.EqualTo("abc xyz def"));
+            Assert.That(before.All(segment => segment.Change == RecordTextChangeKind.Unchanged), Is.True);
+            Assert.That(after.Any(segment => segment.Change == RecordTextChangeKind.Added && segment.Text.Contains("xyz")), Is.True);
+        });
+    }
+
+    [Test]
+    public void HtmlDiffMarksInsertedAndDeletedContent()
+    {
+        var diff = RecordHtmlDiff.Build("<p>旧内容</p>", "<p>新内容</p>");
+        Assert.That(diff, Does.Contain("<del").And.Contain("<ins"));
+        Assert.That(RecordHtmlDiff.Build(string.Empty, "<p>新内容</p>"), Does.StartWith("<ins>").And.EndWith("</ins>"));
+        Assert.That(RecordHtmlDiff.Build("<p>旧内容</p>", string.Empty), Does.StartWith("<del>").And.EndWith("</del>"));
+    }
+}

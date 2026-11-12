@@ -28,3 +28,23 @@
 .record-value dt { color: var(--cg-color-text-muted); }
 .record-value dd { margin: 0; white-space: pre-wrap; }
 .record-value ::deep img { max-height: 240px; object-fit: contain; }
+
+.record-value__body-diff ::deep ins {
+    color: var(--cg-color-success, #16834a);
+    background: color-mix(in srgb, var(--cg-color-success, #16834a) 16%, transparent);
+    text-decoration: none;
+}
+
+.record-value__body-diff ::deep del {
+    color: var(--cg-color-error, #c23845);
+    background: color-mix(in srgb, var(--cg-color-error, #c23845) 16%, transparent);
+    text-decoration: line-through;
+}
+
+.record-value__body-diff--before ::deep ins {
+    display: none;
+}
+
+.record-value__body-diff--after ::deep del {
+    display: none;
+}

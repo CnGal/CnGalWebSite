@@ -1,4 +1,4 @@
-"""Local-only fixture API for ExamineBrowserTests. No production data or credentials.
+﻿"""Local-only fixture API for ExamineBrowserTests. No production data or credentials.
 Run: python CnGalWebSite/CnGalWebSite.UnitTest/Fixtures/examine_api.py
 """
 import json
@@ -32,7 +32,7 @@ def content(new=False):
             + ("补充后的故事介绍。" if new else "原有的故事介绍。") * 8
             + "</p><table><tr><th>项目</th><th>说明</th></tr><tr><td>世界观</td><td>一段新的旅程</td></tr></table>")
     name = "夏日回响 · 特别篇" if new else "夏日回响"
-    intro = "这是一条多行的简介。\n" * 12
+    intro = (("修改后的文本内容。\n" if new else "这是一条多行的简介。\n") * 12)
     return {
         "items": [
             item("body", "正文", 0, "正文", body),

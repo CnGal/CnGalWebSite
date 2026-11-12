@@ -72,6 +72,80 @@ public class ExaminePresentationTests
         Assert.That(html, Does.Contain("https://media.example/picture.png").And.Contain("target=\"_blank\""));
     }
     [Test]
+    public async Task TextComparisonHighlightsRemovedAndAddedParts()
+    {
+        using var services = Services();
+        await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
+        var before = new ExaminePreDataModel { Items = [
+            new() { Key = "text/1", Group = "主要信息", Kind = RecordPreviewKind.Text, Label = "简介", Value = "旧内容", DisplayValue = "旧内容" }
+        ] };
+        var after = new ExaminePreDataModel { Items = [
+            new() { Key = "text/1", Group = "主要信息", Kind = RecordPreviewKind.Text, Label = "简介", Value = "新内容", DisplayValue = "新内容" }
+        ] };
+
+        var html = await renderer.Dispatcher.InvokeAsync(async () =>
+            WebUtility.HtmlDecode((await renderer.RenderComponentAsync<RecordContentComparison>(
+                ParameterView.FromDictionary(new Dictionary<string, object?> { ["Before"] = before, ["After"] = after }))).ToHtmlString()));
+
+        Assert.That(html, Does.Contain("record-diff-text__change--removed").And.Contain("record-diff-text__change--added"));
+    }
+
+    [Test]
+    public async Task BodyComparisonUsesInlineHtmlHighlighting()
+    {
+        using var services = Services();
+        await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
+        var before = new ExaminePreDataModel { Items = [
+            new() { Key = "body", Group = "正文", Kind = RecordPreviewKind.Body, Label = "正文", Value = "旧内容", Html = "<p>旧内容</p>" }
+        ] };
+        var after = new ExaminePreDataModel { Items = [
+            new() { Key = "body", Group = "正文", Kind = RecordPreviewKind.Body, Label = "正文", Value = "新内容", Html = "<p>新内容</p>" }
+        ] };
+
+        var html = await renderer.Dispatcher.InvokeAsync(async () =>
+            WebUtility.HtmlDecode((await renderer.RenderComponentAsync<RecordContentComparison>(
+                ParameterView.FromDictionary(new Dictionary<string, object?> { ["Before"] = before, ["After"] = after }))).ToHtmlString()));
+
+        Assert.That(html, Does.Contain("record-value__body-diff--before").And.Contain("record-value__body-diff--after"));
+        Assert.That(html, Does.Contain("<del").And.Contain("<ins"));
+    }
+
+    [Test]
+    public async Task AddedAndRemovedItemsDoNotUseInlineDiffHighlighting()
+    {
+        using var services = Services();
+        await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
+        var textItem = new RecordPreviewItem
+        {
+            Key = "text/1", Group = "主要信息", Kind = RecordPreviewKind.Text,
+            Label = "简介", Value = "新增内容", DisplayValue = "新增内容"
+        };
+
+        var addedHtml = await renderer.Dispatcher.InvokeAsync(async () =>
+            WebUtility.HtmlDecode((await renderer.RenderComponentAsync<RecordContentComparison>(
+                ParameterView.FromDictionary(new Dictionary<string, object?>
+                {
+                    ["Before"] = new ExaminePreDataModel { Items = [] },
+                    ["After"] = new ExaminePreDataModel { Items = [textItem] }
+                }))).ToHtmlString()));
+        var removedHtml = await renderer.Dispatcher.InvokeAsync(async () =>
+            WebUtility.HtmlDecode((await renderer.RenderComponentAsync<RecordContentComparison>(
+                ParameterView.FromDictionary(new Dictionary<string, object?>
+                {
+                    ["Before"] = new ExaminePreDataModel { Items = [textItem] },
+                    ["After"] = new ExaminePreDataModel { Items = [] }
+                }))).ToHtmlString()));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(addedHtml, Does.Contain("record-comparison__row--added"));
+            Assert.That(addedHtml, Does.Not.Contain("record-diff-text__change--added"));
+            Assert.That(removedHtml, Does.Contain("record-comparison__row--removed"));
+            Assert.That(removedHtml, Does.Not.Contain("record-diff-text__change--removed"));
+        });
+    }
+
+    [Test]
     public async Task ReviewContentDefaultsToChangeSummaryTab()
     {
         using var services = Services();

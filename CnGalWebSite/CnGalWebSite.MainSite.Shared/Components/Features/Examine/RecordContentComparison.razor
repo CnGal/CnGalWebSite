@@ -27,11 +27,11 @@
                             @if (!SubmissionOnly)
                             {
                                 <div class="record-comparison__side">
-                                    <RecordItemValue Item="row.Before" Other="row.After" />
+                                    <RecordItemValue Item="row.Before" Other="row.After" IsBefore="true" InlineDiff="@(row.Change == RecordChangeKind.Modified && !SubmissionOnly)" />
                                 </div>
                             }
                             <div class="record-comparison__side">
-                                <RecordItemValue Item="row.After" Other="row.Before" />
+                                <RecordItemValue Item="row.After" Other="row.Before" IsBefore="false" InlineDiff="@(row.Change == RecordChangeKind.Modified && !SubmissionOnly)" />
                             </div>
                         </div>
                     </article>

@@ -10,7 +10,16 @@
         @switch (Item.Kind)
         {
             case RecordPreviewKind.Body:
-                <CgHtmlContent Content="@Item.Html" />
+                @if (InlineDiff)
+                {
+                    <div class="record-value__body-diff @(IsBefore ? "record-value__body-diff--before" : "record-value__body-diff--after")">
+                        <CgHtmlContent Content="@RecordHtmlDiff.Build(DiffBeforeHtml, DiffAfterHtml)" />
+                    </div>
+                }
+                else
+                {
+                    <CgHtmlContent Content="@ThisHtml" />
+                }
                 break;
             case RecordPreviewKind.Image:
                 @if (RecordPresentation.HttpUrl(Item.Url ?? Item.Value) is { } imageUrl)
@@ -30,8 +39,29 @@
                 else { <span class="record-value__empty">—</span> }
                 break;
             default:
-                @if (SafeUrl is { } url) { <a href="@url" target="_blank" rel="noopener noreferrer">@Text</a> }
-                else { <span class="record-value__text">@Text</span> }
+                @if (InlineDiff)
+                {
+                    @if (SafeUrl is { } diffUrl)
+                    {
+                        <a href="@diffUrl" target="_blank" rel="noopener noreferrer">
+                            <RecordDiffText Before="@DiffBeforeText" After="@DiffAfterText" IsBefore="IsBefore" />
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="record-value__text">
+                            <RecordDiffText Before="@DiffBeforeText" After="@DiffAfterText" IsBefore="IsBefore" />
+                        </span>
+                    }
+                }
+                else if (SafeUrl is { } url)
+                {
+                    <a href="@url" target="_blank" rel="noopener noreferrer">@Text</a>
+                }
+                else
+                {
+                    <span class="record-value__text">@Text</span>
+                }
                 break;
         }
         @if (VisibleProperties.Any())
@@ -41,7 +71,17 @@
                 {
                     <div>
                         <dt>@property.Label</dt>
-                        <dd>@property.DisplayValue</dd>
+                        <dd>
+                            @if (InlineDiff)
+                            {
+                                <RecordDiffText Before="@(IsBefore ? property.DisplayValue : OtherPropertyValue(property))"
+                                    After="@(IsBefore ? OtherPropertyValue(property) : property.DisplayValue)" IsBefore="IsBefore" />
+                            }
+                            else
+                            {
+                                @property.DisplayValue
+                            }
+                        </dd>
                     </div>
                 }
             </dl>
@@ -52,9 +92,21 @@
 @code {
     [Parameter] public RecordPreviewItem? Item { get; set; }
     [Parameter] public RecordPreviewItem? Other { get; set; }
+    [Parameter] public bool IsBefore { get; set; }
+    [Parameter] public bool InlineDiff { get; set; } = true;
 
     private string Text => string.IsNullOrEmpty(Item?.DisplayValue) ? Item?.Value is { Length: > 0 } value ? value : "—" : Item.DisplayValue;
+    private string RawText => string.IsNullOrEmpty(Item?.DisplayValue) ? Item?.Value ?? string.Empty : Item.DisplayValue;
+    private string OtherRawText => string.IsNullOrEmpty(Other?.DisplayValue) ? Other?.Value ?? string.Empty : Other?.DisplayValue ?? string.Empty;
+    private string? DiffBeforeText => IsBefore ? RawText : OtherRawText;
+    private string? DiffAfterText => IsBefore ? OtherRawText : RawText;
+    private string? ThisHtml => Item?.Html ?? Item?.Value;
+    private string? OtherHtml => Other?.Kind == RecordPreviewKind.Body ? Other.Html ?? Other.Value : null;
+    private string? DiffBeforeHtml => IsBefore ? ThisHtml : OtherHtml;
+    private string? DiffAfterHtml => IsBefore ? OtherHtml : ThisHtml;
     private string? SafeUrl => RecordPresentation.ContentUrl(Item?.Url);
+    private string? OtherPropertyValue(RecordPreviewProperty property) =>
+        Other?.Properties.FirstOrDefault(other => other.Key == property.Key)?.DisplayValue ?? string.Empty;
     private IEnumerable<RecordPreviewProperty> VisibleProperties => (Item?.Properties ?? [])
         .Where(p => !string.IsNullOrWhiteSpace(p.DisplayValue))
         .Where(p => Other is null || Other.Properties.FirstOrDefault(o => o.Key == p.Key)?.Value != p.Value)

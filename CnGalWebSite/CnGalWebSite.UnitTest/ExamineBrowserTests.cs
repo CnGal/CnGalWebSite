@@ -162,6 +162,17 @@ public class ExamineBrowserTests
     }
 
     [Test]
+    public async Task TextChangesHighlightRemovedAndAddedContent()
+    {
+        await _page.GotoAsync(Site + "/examine?Id=101");
+
+        await Expect(_page.Locator(".record-diff-text__change--removed").First).ToBeVisibleAsync();
+        await Expect(_page.Locator(".record-diff-text__change--added").First).ToBeVisibleAsync();
+        await Expect(_page.Locator(".record-value__body-diff--before del").First).ToBeVisibleAsync();
+        await Expect(_page.Locator(".record-value__body-diff--after ins").First).ToBeVisibleAsync();
+    }
+
+    [Test]
     public async Task SubmissionFailureRetainsCommentsAndSuccessReturnsToContentCenter()
     {
         await _page.GotoAsync(Site + "/examine?Id=107");

@@ -47,7 +47,50 @@ public static class RecordDiffBuilder
             result.AddRange(newItems.Select(i => new RecordDiffItem(null, i,
                 before?.IsComplete == true ? RecordChangeKind.Added : RecordChangeKind.Unknown, before?.IsComplete == true)));
         }
-        return new(result);
+        return new(PairImageReplacements(result));
+    }
+
+    private static List<RecordDiffItem> PairImageReplacements(List<RecordDiffItem> items)
+    {
+        var consumedAdded = new HashSet<int>();
+        var result = new List<RecordDiffItem>(items.Count);
+        for (var index = 0; index < items.Count; index++)
+        {
+            if (consumedAdded.Contains(index)) continue;
+            var removed = items[index];
+            if (removed.Change != RecordChangeKind.Removed || removed.Before?.Kind != RecordPreviewKind.Image)
+            {
+                result.Add(removed);
+                continue;
+            }
+
+            var replacementIndex = FindImageReplacement(items, index, consumedAdded);
+            if (replacementIndex < 0)
+            {
+                result.Add(removed);
+                continue;
+            }
+
+            consumedAdded.Add(replacementIndex);
+            var added = items[replacementIndex];
+            result.Add(new RecordDiffItem(removed.Before, added.After, RecordChangeKind.Modified,
+                removed.BeforeKnown && added.BeforeKnown));
+        }
+        return result;
+    }
+
+    private static int FindImageReplacement(List<RecordDiffItem> items, int removedIndex, HashSet<int> consumed)
+    {
+        var removed = items[removedIndex].Before!;
+        var candidates = Enumerable.Range(0, items.Count)
+            .Where(index => !consumed.Contains(index))
+            .Where(index => items[index].Change == RecordChangeKind.Added
+                && items[index].After?.Kind == RecordPreviewKind.Image
+                && string.Equals(items[index].After!.Group, removed.Group, StringComparison.Ordinal))
+            .ToList();
+        if (candidates.Count == 0) return -1;
+        var sameLabel = candidates.Where(index => string.Equals(Normalize(items[index].After!.Label), Normalize(removed.Label), StringComparison.Ordinal)).ToList();
+        return sameLabel.Count > 0 ? sameLabel[0] : candidates[0];
     }
 
     private static bool Equal(RecordPreviewItem left, RecordPreviewItem right) => left.Kind == right.Kind
