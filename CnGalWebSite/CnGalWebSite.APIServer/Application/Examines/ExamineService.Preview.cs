@@ -21,7 +21,7 @@ public partial class ExamineService
         model.Type = PreviewType(examine);
         model.ObjectId = ObjectId(examine);
         ApplyObjectSummary(model, live);
-        model.EditOverview = HtmlSanitizerHelper.Sanitize(_appHelper.GetJsonStringView(examine.Context));
+        model.EditOverview = BuildEditOverview(examine);
         model.ContributionValue = examine.ContributionValue;
         model.SubmissionOnly = examine.Operation is Operation.PubulishComment or Operation.RequestUserCertification;
         var records = await PreviewHistory(examine).AsNoTracking().ToListAsync();
@@ -97,6 +97,26 @@ public partial class ExamineService
 
     private RecordPreviewProjector CreatePreviewProjector(Type objectType) =>
         new(objectType, value => _appHelper.GetImagePath(value, ""));
+
+    private string BuildEditOverview(Examine examine)
+    {
+        var context = examine.Context ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(context)) return string.Empty;
+        if (IsPlainTextContext(examine.Operation))
+            return HtmlSanitizerHelper.Sanitize($"<pre>{System.Net.WebUtility.HtmlEncode(context)}</pre>");
+        try
+        {
+            return HtmlSanitizerHelper.Sanitize(_appHelper.GetJsonStringView(context));
+        }
+        catch (JsonException)
+        {
+            // Older or malformed records may not contain JSON even for structured operations.
+            return HtmlSanitizerHelper.Sanitize($"<pre>{System.Net.WebUtility.HtmlEncode(context)}</pre>");
+        }
+    }
+
+    private static bool IsPlainTextContext(Operation operation) => operation is
+        Operation.EstablishMainPage or Operation.EditArticleMainPage or Operation.EditVideoMainPage or Operation.UserMainPage;
 
     private void ApplyObjectSummary(ExamineViewModel model, object live)
     {
