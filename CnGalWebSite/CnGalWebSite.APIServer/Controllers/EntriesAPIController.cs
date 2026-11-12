@@ -1421,48 +1421,16 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [HttpGet("{contrastId}/{currentId}")]
         [AllowAnonymous]
-        public async Task<ActionResult<EntryContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
+        public async Task<ActionResult<EditRecordComparison>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
         {
-            if (contrastId > currentId)
+            try
             {
-                return BadRequest("对比的编辑必须先于当前的编辑");
+                return await _examineService.GetEditRecordComparison(contrastId, currentId, ExaminedNormalListModelType.Entry);
             }
-
-            var contrastExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId);
-            var currentExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == currentId);
-
-            if (contrastExamine == null || currentExamine == null || contrastExamine.EntryId == null || currentExamine.EntryId == null || contrastExamine.EntryId != currentExamine.EntryId)
+            catch (ArgumentException error)
             {
-                return NotFound("编辑记录Id不正确");
+                return BadRequest(error.Message);
             }
-
-            var currentEntry = new Entry();
-            var newEntry = new Entry();
-
-            //获取审核记录
-            var examines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.IsPassed == true && s.EntryId == currentExamine.EntryId).ToListAsync();
-
-            foreach (var item in examines.Where(s => s.Id <= contrastId).OrderBy(s => s.Id))
-            {
-                await _entryService.UpdateEntryDataAsync(currentEntry, item);
-            }
-
-            foreach (var item in examines.Where(s => s.Id <= currentId).OrderBy(s => s.Id))
-            {
-                await _entryService.UpdateEntryDataAsync(newEntry, item);
-            }
-
-            var result = await _entryService.ConcompareAndGenerateModel(currentEntry, newEntry);
-
-            var model = new EntryContrastEditRecordViewModel
-            {
-                ContrastId = contrastId,
-                CurrentId = currentId,
-                ContrastModel = result[0],
-                CurrentModel = result[1],
-            };
-
-            return model;
         }
 
         [AllowAnonymous]

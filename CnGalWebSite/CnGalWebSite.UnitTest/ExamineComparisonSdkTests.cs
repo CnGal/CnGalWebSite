@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Text;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
@@ -29,7 +29,7 @@ public class ExamineComparisonSdkTests
         {
             calls.Add(request.RequestUri!.AbsolutePath);
             return Task.FromResult(Json(HttpStatusCode.OK, """
-                {"contrastId":10,"currentId":20,"contrastModel":{"name":"Historical baseline"},"currentModel":{"name":"Historical target"}}
+                {"contrastId":10,"currentId":20,"before":{"items":[{"key":"name","group":"主要信息","kind":1,"label":"名称","value":"Historical baseline","displayValue":"Historical baseline"}]},"after":{"items":[{"key":"name","group":"主要信息","kind":1,"label":"名称","value":"Historical target","displayValue":"Historical target"}]}}
                 """));
         });
         var result = await Query(http, storage, userCache).GetEditRecordComparisonAsync(type, 10, 20);
@@ -39,8 +39,8 @@ public class ExamineComparisonSdkTests
             Assert.That(result.Success, Is.True, result.Error?.Message);
             Assert.That(result.Data?.ContrastId, Is.EqualTo(10));
             Assert.That(result.Data?.CurrentId, Is.EqualTo(20));
-            Assert.That(result.Data?.Before.Texts.SelectMany(t => t.Informations).Any(f => f.DisplayValue == "Historical baseline"), Is.True);
-            Assert.That(result.Data?.After.Texts.SelectMany(t => t.Informations).Any(f => f.DisplayValue == "Historical target"), Is.True);
+            Assert.That(result.Data?.Before.Items.Any(f => f.DisplayValue == "Historical baseline"), Is.True);
+            Assert.That(result.Data?.After.Items.Any(f => f.DisplayValue == "Historical target"), Is.True);
         });
     }
 
@@ -85,42 +85,38 @@ public class ExamineComparisonSdkTests
         using var userCache = new ExamineUserCache(NullLogger<ExamineUserCache>.Instance);
         using var cancellation = new CancellationTokenSource();
         using var http = Client(async (_, token) => { cancellation.Cancel(); await Task.Delay(100, token); return Json(HttpStatusCode.OK, "{}"); });
-        Assert.ThrowsAsync<OperationCanceledException>(() => Query(http, storage, userCache)
+        Assert.CatchAsync<OperationCanceledException>(() => Query(http, storage, userCache)
             .GetEditRecordComparisonAsync(ExaminedNormalListModelType.Entry, 10, 20, cancellation.Token));
     }
 
     [Test]
-    public void EntryProjectionPreservesSpecialGroupsAndDuplicates()
+    public void DiffKeepsDuplicateRowsAndOnlyReportsChangedValues()
     {
-        var result = EditRecordContentMapper.Map(new EntryIndexViewModel
-        {
-            Name = "历史词条", MainPage = "<p>历史正文</p>", Audio = [new() { Name = "音频", Url = "https://example.com/audio" }],
-            ProductionGroups = [new() { Id = 123, DisplayName = "制作组甲" }],
-            Publishers = [new() { Id = 456, DisplayName = "发行商乙" }],
-            Information = [new() { Name = "同名字段", Value = "值一" }, new() { Name = "同名字段", Value = "值二" }],
-            Staffs = [new() { Modifier = "制作", StaffList = [new() { Modifier = "编剧", Names = [new() { DisplayName = "作者甲" }, new() { DisplayName = "作者乙" }] }] }],
-            Releases = [new() { Name = "首发", Engine = "测试引擎", TimeNote = "待定", Link = "https://example.com/release" }],
-            Booking = new() { Open = true, Goals = [new() { Name = "预约目标", Target = 100 }] },
-            WebsiteAddInfor = new() { Html = "<script>untrusted()</script>", Images = [new() { Note = "官网图片", Url = "https://example.com/website.png" }] },
-            Pictures = [new() { Modifier = "CG", Pictures = [new() { Note = "图片备注", Url = "https://example.com/cg.png" }] }],
-            Tags = [new() { Id = 3, Name = "历史标签" }]
-        });
+        var before = new ExaminePreDataModel { Items = [
+            new() { Key = "text/1", Group = "信息", Kind = RecordPreviewKind.Text, Label = "同名字段", Value = "值一", DisplayValue = "值一" },
+            new() { Key = "text/2", Group = "信息", Kind = RecordPreviewKind.Text, Label = "同名字段", Value = "值二", DisplayValue = "值二" },
+            new() { Key = "stable", Group = "信息", Kind = RecordPreviewKind.Text, Label = "固定字段", Value = "相同", DisplayValue = "相同" },
+            new() { Key = "property", Group = "信息", Kind = RecordPreviewKind.Text, Label = "附加字段", Value = "值", DisplayValue = "值",
+                Properties = [new() { Key = "note", Label = "备注", Value = "旧", DisplayValue = "旧" }] }
+        ] };
+        var after = new ExaminePreDataModel { Items = [
+            new() { Key = "text/1", Group = "信息", Kind = RecordPreviewKind.Text, Label = "同名字段", Value = "值一", DisplayValue = "值一" },
+            new() { Key = "text/2", Group = "信息", Kind = RecordPreviewKind.Text, Label = "同名字段", Value = "值二", DisplayValue = "值二" },
+            new() { Key = "stable", Group = "信息", Kind = RecordPreviewKind.Text, Label = "固定字段", Value = "相同", DisplayValue = "相同" },
+            new() { Key = "property", Group = "信息", Kind = RecordPreviewKind.Text, Label = "附加字段", Value = "值", DisplayValue = "值",
+                Properties = [new() { Key = "note", Label = "备注", Value = "新", DisplayValue = "新" }] }
+        ] };
+
+        var diff = RecordDiffBuilder.Build(before, after);
+
         Assert.Multiple(() =>
         {
-            Assert.That(result.Texts.Single(t => t.Modifier == "附加信息").Informations.Select(i => i.DisplayValue), Is.EqualTo(new[] { "值一", "值二" }));
-            Assert.That(result.Texts.Single(t => t.Modifier == "Staff · 制作").Informations.Select(i => i.DisplayValue), Is.EqualTo(new[] { "作者甲", "作者乙" }));
-            Assert.That(result.Texts.Single(t => t.Modifier == "发行信息 · 首发").Informations.Any(i => i.DisplayValue == "测试引擎"), Is.True);
-            Assert.That(result.Texts.Any(t => t.Modifier == "预约"), Is.True);
-            Assert.That(result.Pictures.Select(p => p.Note), Does.Contain("CG · 图片备注").And.Contain("官网 · 官网图片"));
-            Assert.That(result.Texts.Single(t => t.Modifier == "制作组").Informations.Single().DisplayValue, Is.EqualTo("制作组甲"));
-            Assert.That(result.Texts.Single(t => t.Modifier == "发行商").Informations.Single().DisplayValue, Is.EqualTo("发行商乙"));
-            Assert.That(result.Audio.Single().Name, Is.EqualTo("音频"));
-            Assert.That(result.Relevances.Single().tag.Name, Is.EqualTo("历史标签"));
-            Assert.That(result.MainPage, Is.EqualTo("<p>历史正文</p>"));
-            Assert.That(result.MainPage, Does.Not.Contain("untrusted"));
+            Assert.That(diff.Items.Count, Is.EqualTo(4));
+            Assert.That(diff.Items.Count(i => i.Changed), Is.EqualTo(1));
+            Assert.That(diff.Items.Single(i => i.Changed).Item.Key, Is.EqualTo("property"));
+            Assert.That(diff.Items.Where(i => !i.Changed).Select(i => i.Item.Key), Does.Contain("text/1").And.Contain("text/2"));
         });
     }
-
     private static ExamineQueryService Query(HttpClient http, MemoryCache storage, ExamineUserCache users)
         => new(http, new PublicDataCache(storage, new User()), NullLogger<ExamineQueryService>.Instance, users, new User());
     private static HttpClient Client(Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> send)

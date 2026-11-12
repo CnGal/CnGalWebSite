@@ -1,249 +1,31 @@
-﻿@page "/home/editrecord"
-
-
-@inject IHttpService _httpService
-
-
-
-@inject NavigationManager NavigationManager
-
-@inject IJSRuntime JS
-@inject IDataCacheService _dataCatcheService
-
-
-@inject IDataCacheService _dataCatcheService
-@implements IDisposable
-
-
-@if (isReady)
+@page "/home/editrecord"
+@inject IDataCacheService DataCache
+@using CnGalWebSite.DataModel.ViewModel.Admin
+@if (_comparison is not null)
 {
-    <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip NoIndex Title="@("『"+ExaminesOverview.ObjectName+"』第" +(ExaminesOverview.Examines.FindIndex(s=>s.Id==ContrastId)+1)+"次编辑记录")" Description="@ExaminesOverview.ObjectBriefIntroduction" Image="@ExaminesOverview.Image"/>
+    <h2>版本 #@_comparison.ContrastId → #@_comparison.CurrentId</h2>
+    <h3>基准版本</h3>
+    <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="_comparison.Before" />
+    <h3>目标版本</h3>
+    <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="_comparison.After" />
 }
-
-@if (isReady)
-{
-    <OverviewCard Model="ExaminesOverview" @ref="overviewCard" />
-    <ContrastOverview Model="ExaminesOverview" ContrastItem="@ContrastId.ToString()" CurrentItem="@CurrentId.ToString()"
-                                                                                   ContrastChanged="ContrastChanged" CurrentChanged="CurrentChanged">
-        <ContrastView>
-            @if (isRefreshing)
-            {
-                <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
-            }
-            else
-            {
-                @if (ExaminesOverview.Type == ExaminedNormalListModelType.Entry)
-                {
-                    <EntryContrastCard Model="EntryContrast.ContrastModel" />
-                }
-                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Article)
-                {
-                    <ArticleContrastCard Model="ArticleContrast.ContrastModel" />
-                }
-                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Periphery)
-                {
-                    <PeripheryContrastCard Model="PeripheryContrast.ContrastModel" />
-                }
-                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Tag)
-                {
-                    <TagContrastCard Model="TagContrast.ContrastModel" />
-                }
-                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Video)
-                {
-                    <VideoContrastCard Model="VideoContrast.ContrastModel" />
-                }
-            }
-
-        </ContrastView>
-        <CurrentView>
-            @if (isRefreshing)
-            {
-                <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
-            }
-            else
-            {
-                @if (ExaminesOverview.Type == ExaminedNormalListModelType.Entry)
-                {
-                    <EntryContrastCard Model="EntryContrast.CurrentModel" />
-                }
-                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Article)
-                {
-                    <ArticleContrastCard Model="ArticleContrast.CurrentModel" />
-                }
-                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Periphery)
-                {
-                    <PeripheryContrastCard Model="PeripheryContrast.CurrentModel" />
-                }
-                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Tag)
-                {
-                    <TagContrastCard Model="TagContrast.CurrentModel" />
-                }
-                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Video)
-                {
-                    <VideoContrastCard Model="VideoContrast.CurrentModel" />
-                }
-            }
-
-
-        </CurrentView>
-    </ContrastOverview>
-}
-else
-{
-    <CnGalWebSite.Components.Progressings.ProgressingCard Page />
-
-}
-
-
 @code {
-
-    [SupplyParameterFromQuery]
-    [Parameter]
-    public long ContrastId { get; set; }
-
-    [SupplyParameterFromQuery]
-    [Parameter]
-    public long CurrentId { get; set; }
-
-    bool isReady = false;
-    bool isRefreshing = true;
-
-    [CascadingParameter]
-    public ErrorHandler ErrorHandler { get; set; }
-
-    public ExaminesOverviewViewModel ExaminesOverview { get; set; } = new ExaminesOverviewViewModel();
-    public EntryContrastEditRecordViewModel EntryContrast { get; set; } = new EntryContrastEditRecordViewModel();
-    public ArticleContrastEditRecordViewModel ArticleContrast { get; set; } = new ArticleContrastEditRecordViewModel();
-    public PeripheryContrastEditRecordViewModel PeripheryContrast { get; set; } = new PeripheryContrastEditRecordViewModel();
-    public TagContrastEditRecordViewModel TagContrast { get; set; } = new TagContrastEditRecordViewModel();
-    public VideoContrastEditRecordViewModel VideoContrast { get; set; } = new VideoContrastEditRecordViewModel();
-
-    OverviewCard overviewCard;
-
-    async Task OnReLoad()
+    [SupplyParameterFromQuery, Parameter] public long ContrastId { get; set; }
+    [SupplyParameterFromQuery, Parameter] public long CurrentId { get; set; }
+    private EditRecordComparison _comparison;
+    protected override async Task OnParametersSetAsync()
     {
-        try
+        var overview = await DataCache.ExaminesOverviewCatche.GetCache(ContrastId.ToString());
+        var current = CurrentId > 0 ? CurrentId : overview.Examines.OrderBy(r => r.PassedTime).ThenBy(r => r.Id).Last().Id;
+        var key = ContrastId + "/" + current;
+        _comparison = overview.Type switch
         {
-            ExaminesOverview = await _dataCatcheService.ExaminesOverviewCatche.GetCache(ContrastId.ToString());
-
-            await OnRefreshContrastView(ContrastId.ToString(), CurrentId.ToString());
-
-            isReady = true;
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            await ErrorHandler.ProcessError(ex, "获取编辑记录概览失败");
-        }
+            ExaminedNormalListModelType.Entry => await DataCache.EntryContrastEditRecordViewCatche.GetCache(key),
+            ExaminedNormalListModelType.Article => await DataCache.ArticleContrastEditRecordViewCatche.GetCache(key),
+            ExaminedNormalListModelType.Tag => await DataCache.TagContrastEditRecordViewCatche.GetCache(key),
+            ExaminedNormalListModelType.Periphery => await DataCache.PeripheryContrastEditRecordViewCatche.GetCache(key),
+            ExaminedNormalListModelType.Video => await DataCache.VideoContrastEditRecordViewCatche.GetCache(key),
+            _ => null
+        };
     }
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-           await  OnReLoad();
-
-            NavigationManager.LocationChanged -= LocationChanged;
-            NavigationManager.LocationChanged += LocationChanged;
-        }
-
-    }
-    public async void LocationChanged(object sender, LocationChangedEventArgs args)
-    {
-        if(NavigationManager.Uri.Contains("/home/editrecord"))
-        {
-            try
-            {
-                await OnRefreshContrastView(ContrastId.ToString(), CurrentId.ToString());
-            }
-            catch
-            {
-
-            }
-        }
-
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-
-    }
-    public void ContrastChanged(string conId)
-    {
-        if (overviewCard != null)
-        {
-            int index = ExaminesOverview.Examines.FindIndex(s => s.IsSelected);
-            if (index == ExaminesOverview.Examines.Count - 1)
-            {
-                overviewCard.SelecteChanged(ExaminesOverview.Examines[index]);
-            }
-            else
-            {
-                overviewCard.SelecteChanged(ExaminesOverview.Examines[index + 1]);
-            }
-        }
-
-        NavigationManager.NavigateTo("/home/editrecord?ContrastId=" + conId + "&CurrentId=" + CurrentId);
-
-
-    }
-    public void CurrentChanged(string curId)
-    {
-        NavigationManager.NavigateTo("/home/editrecord?ContrastId=" + ContrastId + "&CurrentId=" + curId);
-    }
-
-    public async Task OnRefreshContrastView(string conId, string curId)
-    {
-        try
-        {
-            isRefreshing = true;
-            StateHasChanged();
-            if (ExaminesOverview.Type == ExaminedNormalListModelType.Entry)
-            {
-                EntryContrast = await _dataCatcheService.EntryContrastEditRecordViewCatche.GetCache(conId + "/" + (curId=="0"?ExaminesOverview.Examines.Last().Id: curId));
-                ContrastId = EntryContrast.ContrastId;
-                CurrentId = EntryContrast.CurrentId;
-            }
-            else if (ExaminesOverview.Type == ExaminedNormalListModelType.Article)
-            {
-                ArticleContrast = await _dataCatcheService.ArticleContrastEditRecordViewCatche.GetCache(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId));
-                ContrastId = ArticleContrast.ContrastId;
-                CurrentId = ArticleContrast.CurrentId;
-            }
-            else if (ExaminesOverview.Type == ExaminedNormalListModelType.Periphery)
-            {
-                PeripheryContrast = await _dataCatcheService.PeripheryContrastEditRecordViewCatche.GetCache(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId));
-                ContrastId = PeripheryContrast.ContrastId;
-                CurrentId = PeripheryContrast.CurrentId;
-            }
-            else if (ExaminesOverview.Type == ExaminedNormalListModelType.Tag)
-            {
-                TagContrast = await _dataCatcheService.TagContrastEditRecordViewCatche.GetCache(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId));
-                ContrastId = TagContrast.ContrastId;
-                CurrentId = TagContrast.CurrentId;
-            }
-            else if (ExaminesOverview.Type == ExaminedNormalListModelType.Video)
-            {
-                VideoContrast = await _dataCatcheService.VideoContrastEditRecordViewCatche.GetCache(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId));
-                ContrastId = VideoContrast.ContrastId;
-                CurrentId = VideoContrast.CurrentId;
-            }
-            isRefreshing = false;
-            StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            await ErrorHandler.ProcessError(ex, "获取详细编辑对比视图失败");
-        }
-    }
-    #region 释放实例
-
-    public void  Dispose()
-    {
-
-        NavigationManager.LocationChanged -= LocationChanged;
-
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }

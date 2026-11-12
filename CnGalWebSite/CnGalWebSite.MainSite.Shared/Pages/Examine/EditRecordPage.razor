@@ -1,4 +1,4 @@
-@page "/home/editrecord"
+﻿@page "/home/editrecord"
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 @using CnGalWebSite.DataModel.ViewModel.Home
 @using CnGalWebSite.DataModel.ViewModel.Admin
@@ -56,14 +56,12 @@
                     else if (IsCompare && _comparison is not null)
                     {
                         <div class="edit-record-page__comparison-heading"><h2>版本 #@_comparison.ContrastId → #@_comparison.CurrentId</h2></div>
-                        @if (_comparison.ContrastId == _comparison.CurrentId)
-                        { <p class="edit-record-page__notice" role="status">两个版本相同。</p> }
                         <RecordContentComparison Before="_comparison.Before" After="_comparison.After"
                             BeforeTitle="@($"基准版本 #{_comparison.ContrastId}")" AfterTitle="@($"目标版本 #{_comparison.CurrentId}")"
-                            Single="@(_comparison.ContrastId == _comparison.CurrentId)" />
+                            />
                     }
                     else if (!IsCompare && _record is not null)
-                    { <ReviewContent Model="_record" /> }
+                    { <ReviewContent Model="_record" /><RecordNotes Comments="@_record.Comments" /> }
                 </div>
             </div>
         }
@@ -94,7 +92,7 @@
     private CancellationTokenSource? _cts;
     private bool _disposed;
     private bool IsCompare => RecordPresentation.IsCompareMode(Mode, CurrentId);
-    private IEnumerable<KeyValuePair<string, string>> Options => (_overview?.Examines ?? []).OrderByDescending(e => e.Id)
+    private IEnumerable<KeyValuePair<string, string>> Options => (_overview?.Examines ?? []).OrderByDescending(e => e.PassedTime).ThenByDescending(e => e.Id)
         .Select(e => new KeyValuePair<string, string>(e.Id.ToString(), $"#{e.Id} · {e.Operation.GetDisplayName()} · {e.ApplyTime:yyyy-MM-dd HH:mm}"));
 
     protected override Task OnParametersSetAsync() => LoadDataAsync();
@@ -140,14 +138,14 @@
             _isLoading = false;
             _selectedId = selectedId > 0 ? selectedId : contrastId;
             _selectedRecord = _overview!.Examines.FirstOrDefault(e => e.Id == _selectedId);
-            _currentId = currentId is null or 0 ? _overview.Examines.MaxBy(e => e.Id)?.Id ?? contrastId : currentId.Value;
+            _currentId = currentId is null or 0 ? _overview.Examines.OrderBy(e => e.PassedTime).ThenBy(e => e.Id).LastOrDefault()?.Id ?? contrastId : currentId.Value;
             if (_overview.Examines.Count == 0) return;
             if (_selectedRecord is null || selectedId < 0)
             {
                 _contentError = "选中的记录不属于此对象或已不可用，请重新选择左侧记录。";
                 return;
             }
-            if (compare && (contrastId > _currentId || !_overview.Examines.Any(e => e.Id == contrastId)
+            if (compare && (IsReversed(_overview.Examines, contrastId, _currentId) || !_overview.Examines.Any(e => e.Id == contrastId)
                 || !_overview.Examines.Any(e => e.Id == _currentId)))
             {
                 _contentError = "请选择同一对象的已通过版本，且基准版本不能晚于目标版本。";
@@ -167,7 +165,7 @@
                 var result = await ExamineQueryService.GetExamineDetailAsync(_selectedId, token);
                 if (_disposed || token.IsCancellationRequested) return;
                 if (result.Success && result.Data is not null) _record = result.Data;
-                else _contentError = result.Error?.Message ?? "记录内容加载失败，仍可阅读上方修改说明。";
+                else _contentError = result.Error?.Message ?? "记录内容加载失败，仍可阅读上方原始数据。";
             }
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested) { }
@@ -175,6 +173,12 @@
         {
             if (!_disposed && !token.IsCancellationRequested) { _isLoading = false; _contentLoading = false; }
         }
+    }
+
+    private static bool IsReversed(List<EditRecordAloneViewModel> records, long before, long after)
+    {
+        var ordered = records.OrderBy(r => r.PassedTime).ThenBy(r => r.Id).Select(r => r.Id).ToList();
+        return ordered.IndexOf(before) > ordered.IndexOf(after);
     }
 
     private string ModeUrl(bool compare) => compare

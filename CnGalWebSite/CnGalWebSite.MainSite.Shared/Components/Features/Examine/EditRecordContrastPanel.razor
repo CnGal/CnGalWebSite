@@ -29,7 +29,7 @@
     private string? SelectionError => !long.TryParse(_contrastId, out var before) || !long.TryParse(_currentId, out var after)
         || !ExamineOptions.Any(o => o.Key == _contrastId) || !ExamineOptions.Any(o => o.Key == _currentId)
         ? "请选择此对象的有效历史版本。"
-        : before > after ? "基准版本不能晚于目标版本，请调整选择。" : null;
+        : ExamineOptions.Select(o => o.Key).ToList().IndexOf(_contrastId!) < ExamineOptions.Select(o => o.Key).ToList().IndexOf(_currentId!) ? "基准版本不能晚于目标版本，请调整选择。" : null;
 
     private void NavigateToContrast()
     {

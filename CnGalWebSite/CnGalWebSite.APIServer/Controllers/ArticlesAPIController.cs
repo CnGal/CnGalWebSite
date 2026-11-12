@@ -1148,48 +1148,16 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [HttpGet("{contrastId}/{currentId}")]
         [AllowAnonymous]
-        public async Task<ActionResult<ArticleContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
+        public async Task<ActionResult<EditRecordComparison>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
         {
-            if (contrastId > currentId)
+            try
             {
-                return BadRequest("对比的编辑必须先于当前的编辑");
+                return await _examineService.GetEditRecordComparison(contrastId, currentId, ExaminedNormalListModelType.Article);
             }
-
-            var contrastExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId);
-            var currentExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == currentId);
-
-            if (contrastExamine == null || currentExamine == null || contrastExamine.ArticleId == null || currentExamine.ArticleId == null || contrastExamine.ArticleId != currentExamine.ArticleId)
+            catch (ArgumentException error)
             {
-                return NotFound("编辑记录Id不正确");
+                return BadRequest(error.Message);
             }
-
-            var currentArticle = new Article();
-            var newArticle = new Article();
-
-            //获取审核记录
-            var examines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.IsPassed == true && s.ArticleId == currentExamine.ArticleId).ToListAsync();
-
-            foreach (var item in examines.Where(s => s.Id <= contrastId).OrderBy(s => s.Id))
-            {
-                await _articleService.UpdateArticleData(currentArticle, item);
-            }
-
-            foreach (var item in examines.Where(s => s.Id <= currentId).OrderBy(s => s.Id))
-            {
-                await _articleService.UpdateArticleData(newArticle, item);
-            }
-
-            var result = _articleService.ConcompareAndGenerateModel(currentArticle, newArticle);
-
-            var model = new ArticleContrastEditRecordViewModel
-            {
-                ContrastId = contrastId,
-                CurrentId = currentId,
-                ContrastModel = result[0],
-                CurrentModel = result[1],
-            };
-
-            return model;
         }
 
         [HttpGet("{id}")]

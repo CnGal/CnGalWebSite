@@ -1,16 +1,44 @@
-@using CnGalWebSite.DataModel.ViewModel.Admin
+﻿@using CnGalWebSite.DataModel.ViewModel.Admin
+<div class="review-content">
+    <div class="review-content__tabs" role="tablist" aria-label="审核内容">
+        <button type="button" role="tab" id="review-tab-summary" aria-controls="review-panel-summary"
+            aria-selected="@(_activeTab == ReviewTab.Summary ? "true" : "false")"
+            class="@(_activeTab == ReviewTab.Summary ? "is-active" : "")"
+            @onclick="() => _activeTab = ReviewTab.Summary">变更摘要</button>
+        <button type="button" role="tab" id="review-tab-description" aria-controls="review-panel-description"
+            aria-selected="@(_activeTab == ReviewTab.Description ? "true" : "false")"
+            class="@(_activeTab == ReviewTab.Description ? "is-active" : "")"
+            @onclick="() => _activeTab = ReviewTab.Description">原始数据</button>
+    </div>
 
-@if (RecordPresentation.IsSingleSubmission(Model.Operation))
-{
-    <RecordContentComparison After="Model.AfterModel" AfterTitle="记录提交内容" Single="true" />
-}
-else
-{
-    <RecordContentComparison Before="Model.BeforeModel" After="Model.AfterModel"
-        BeforeTitle="@(Model.IsPassed is null ? "当前内容" : "记录保存内容")"
-        AfterTitle="@(Model.IsPassed is null ? "提交内容" : "查询时内容")" />
-}
+    @if (_activeTab == ReviewTab.Summary)
+    {
+        <div id="review-panel-summary" role="tabpanel" aria-labelledby="review-tab-summary">
+            <RecordContentComparison Before="Model.BeforeModel" After="Model.AfterModel"
+                BeforeTitle="@(Model.IsPassed is null ? "当前内容" : "修改前")"
+                AfterTitle="@(Model.IsPassed == false ? "拟提交内容" : Model.IsPassed is null ? "提交内容" : "修改后")"
+                SubmissionOnly="Model.SubmissionOnly" />
+        </div>
+    }
+    else
+    {
+        <section id="review-panel-description" class="review-content__description" role="tabpanel" aria-labelledby="review-tab-description">
+            <CgHtmlContent Content="@Model.EditOverview" />
+        </section>
+    }
+</div>
 
 @code {
     [Parameter, EditorRequired] public ExamineViewModel Model { get; set; } = default!;
+    private ExamineViewModel? _source;
+    private ReviewTab _activeTab = ReviewTab.Summary;
+
+    protected override void OnParametersSet()
+    {
+        if (ReferenceEquals(_source, Model)) return;
+        _source = Model;
+        _activeTab = ReviewTab.Summary;
+    }
+
+    private enum ReviewTab { Summary, Description }
 }

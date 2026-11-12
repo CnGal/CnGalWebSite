@@ -1,4 +1,4 @@
-﻿
+
 using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.ExamineModel.Videos;
 using CnGalWebSite.DataModel.Model;
@@ -45,10 +45,7 @@ namespace CnGalWebSite.APIServer.Application.Videos
 
         EditVideoMainPageViewModel GetEditMainPage(Video item);
 
-        ExaminePreDataModel GetExamineViewMain(Video item);
 
-        ExaminePreDataModel GetExamineViewRelevances(Video item);
 
-        ExaminePreDataModel GetExamineViewImages(Video item);
     }
 }

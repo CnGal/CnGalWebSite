@@ -1,4 +1,4 @@
-@using CnGalWebSite.DataModel.ViewModel.Home
+﻿@using CnGalWebSite.DataModel.ViewModel.Home
 @using CnGalWebSite.DataModel.ViewModel.Admin
 
 @if (Model is not null)
@@ -7,7 +7,7 @@
         <RecordMetadata Model="@Metadata">
             <a class="edit-record-detail__link" href="/examine?Id=@Model.Id">查看审核详情 →</a>
         </RecordMetadata>
-        <RecordNotes Overview="@Model.EditOverview" Comments="@Model.Comments" Note="@Model.Note" ShowEmpty="true" />
+        <RecordNotes Overview="@Model.EditOverview" Comments="@Model.Comments" Note="@Model.Note" />
     </div>
 }
 

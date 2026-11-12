@@ -1,4 +1,4 @@
-@using CnGalWebSite.DataModel.ViewModel.Admin
+﻿@using CnGalWebSite.DataModel.ViewModel.Admin
 
 <section class="record-object" aria-label="记录所属对象">
     <div class="record-object__image @(IsThumbnail ? "record-object__image--thumbnail" : "")">
@@ -15,12 +15,14 @@
         <span class="record-object__type">@Type.GetDisplayName()</span>
         <h2>@(string.IsNullOrWhiteSpace(Name) ? "记录所属对象" : Name)</h2>
         @if (!string.IsNullOrWhiteSpace(Description)) { <p>@Description</p> }
-        @if (RecordPresentation.ObjectUrl(Type, ObjectId, UserId) is { } url)
-        {
-            <a href="@url">查看对象详情 <span aria-hidden="true">→</span></a>
-        }
+        <div class="record-object__actions">
+            @if (RecordPresentation.ObjectUrl(Type, ObjectId, UserId) is { } url)
+            {
+                <a class="record-object__action" href="@url">查看对象详情 <span aria-hidden="true">→</span></a>
+            }
+            @ChildContent
+        </div>
     </div>
-    @ChildContent
 </section>
 
 @code {

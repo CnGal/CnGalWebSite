@@ -26,6 +26,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
         public string EditOverview { get; set; }
 
+        public bool SubmissionOnly { get; set; }
+
         public bool? IsPassed { get; set; }
 
         public string PassedAdminName { get; set; }
@@ -59,16 +61,40 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
     public class ExaminePreDataModel
     {
-        public List<PicturesAloneViewModel> Pictures { get; set; } = new List<PicturesAloneViewModel>();
+        public List<RecordPreviewItem> Items { get; set; } = new List<RecordPreviewItem>();
+        public bool IsComplete { get; set; } = true;
+    }
 
-        public List<SearchAloneModel> Relevances { get; set; } = new List<SearchAloneModel>();
+    public enum RecordPreviewKind { Body, Text, Image, Relation, Link, Audio }
 
-        public List<InformationsModel> Texts { get; set; } = new List<InformationsModel>();
+    public class RecordPreviewItem
+    {
+        public string Key { get; set; }
+        public string Group { get; set; }
+        public RecordPreviewKind Kind { get; set; }
+        public string Label { get; set; }
+        // Canonical value participates in comparisons; labels and resolved links do not.
+        public string Value { get; set; }
+        public string DisplayValue { get; set; }
+        public string Url { get; set; }
+        public string Html { get; set; }
+        public List<RecordPreviewProperty> Properties { get; set; } = new List<RecordPreviewProperty>();
+        public bool IsKnown { get; set; } = true;
+    }
 
-        public List<RelevancesKeyValueModel> Outlinks { get; set; } = new List<RelevancesKeyValueModel>();
+    public class RecordPreviewProperty
+    {
+        public string Key { get; set; }
+        public string Label { get; set; }
+        public string Value { get; set; }
+        public string DisplayValue { get; set; }
+    }
 
-        public List<EditAudioAloneModel> Audio { get; set; } = new List<EditAudioAloneModel>();
-
-        public string MainPage { get; set; }
+    public class EditRecordComparison
+    {
+        public long ContrastId { get; set; }
+        public long CurrentId { get; set; }
+        public ExaminePreDataModel Before { get; set; } = new ExaminePreDataModel();
+        public ExaminePreDataModel After { get; set; } = new ExaminePreDataModel();
     }
 }

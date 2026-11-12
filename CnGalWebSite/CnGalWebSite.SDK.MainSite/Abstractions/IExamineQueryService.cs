@@ -57,16 +57,10 @@ public interface IExamineQueryService
 
     /// <summary>
     /// 按对象类型调用历史重建接口，返回截至两次已通过编辑的完整内容。
-    /// 两个编号必须属于同一对象，且 contrastId 不得晚于 currentId。
+    /// 两个编号必须属于同一对象，基准版本的通过顺序不得晚于目标版本。
     /// </summary>
     Task<SdkResult<EditRecordComparison>> GetEditRecordComparisonAsync(
         ExaminedNormalListModelType type,
-        long contrastId,
-        long currentId,
-        CancellationToken cancellationToken = default);
-
-    /// <summary>兼容旧调用方式；同样使用历史重建接口。</summary>
-    Task<SdkResult<ExamineViewModel>> GetContrastExamineAsync(
         long contrastId,
         long currentId,
         CancellationToken cancellationToken = default);

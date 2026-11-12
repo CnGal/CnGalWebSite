@@ -1,12 +1,7 @@
-.examine-detail-panel {
+﻿.examine-detail-panel {
     display: grid;
     gap: var(--cg-spacing-5);
     min-width: 0;
-}
-
-.examine-detail-panel__history-action {
-    display: flex;
-    flex-shrink: 0;
 }
 
 
@@ -70,17 +65,6 @@ li {
     overflow-wrap: anywhere;
     font-size: var(--cg-font-size-sm);
     line-height: 1.7;
-}
-
-@media (max-width: 640px) {
-    .examine-detail-panel__history-action {
-        flex-basis: 100%;
-    }
-
-    .examine-detail-panel__history-action ::deep .cg-btn {
-        width: 100%;
-    }
-
 }
 
 .examine-detail-panel__section-title {

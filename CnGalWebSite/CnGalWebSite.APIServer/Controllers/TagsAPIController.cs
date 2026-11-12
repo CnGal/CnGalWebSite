@@ -767,48 +767,16 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [HttpGet("{contrastId}/{currentId}")]
         [AllowAnonymous]
-        public async Task<ActionResult<TagContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
+        public async Task<ActionResult<EditRecordComparison>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
         {
-            if (contrastId > currentId)
+            try
             {
-                return BadRequest("对比的编辑必须先于当前的编辑");
+                return await _examineService.GetEditRecordComparison(contrastId, currentId, ExaminedNormalListModelType.Tag);
             }
-
-            var contrastExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId);
-            var currentExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == currentId);
-
-            if (contrastExamine == null || currentExamine == null || contrastExamine.TagId == null || currentExamine.TagId == null || contrastExamine.TagId != currentExamine.TagId)
+            catch (ArgumentException error)
             {
-                return NotFound("编辑记录Id不正确");
+                return BadRequest(error.Message);
             }
-
-            var currentTag = new Tag();
-            var newTag = new Tag();
-
-            //获取审核记录
-            var examines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.IsPassed == true && s.TagId == currentExamine.TagId).ToListAsync();
-
-            foreach (var item in examines.Where(s => s.Id <= contrastId).OrderBy(s => s.Id))
-            {
-                await _tagService.UpdateTagDataAsync(currentTag, item);
-            }
-
-            foreach (var item in examines.Where(s => s.Id <= currentId).OrderBy(s => s.Id))
-            {
-                await _tagService.UpdateTagDataAsync(newTag, item);
-            }
-
-            var result = await _tagService.ConcompareAndGenerateModel(currentTag, newTag);
-
-            var model = new TagContrastEditRecordViewModel
-            {
-                ContrastId = contrastId,
-                CurrentId = currentId,
-                ContrastModel = result[0],
-                CurrentModel = result[1],
-            };
-
-            return model;
         }
 
 

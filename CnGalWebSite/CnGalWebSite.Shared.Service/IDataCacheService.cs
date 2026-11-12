@@ -1,4 +1,4 @@
-﻿
+
 using CnGalWebSite.Components.Service;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel;
@@ -68,15 +68,15 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<ExaminesOverviewViewModel> ExaminesOverviewCatche { get; set; }
 
-        IPageModelCatche<EntryContrastEditRecordViewModel> EntryContrastEditRecordViewCatche { get; set; }
+        IPageModelCatche<EditRecordComparison> EntryContrastEditRecordViewCatche { get; set; }
 
-        IPageModelCatche<ArticleContrastEditRecordViewModel> ArticleContrastEditRecordViewCatche { get; set; }
+        IPageModelCatche<EditRecordComparison> ArticleContrastEditRecordViewCatche { get; set; }
 
-        IPageModelCatche<PeripheryContrastEditRecordViewModel> PeripheryContrastEditRecordViewCatche { get; set; }
+        IPageModelCatche<EditRecordComparison> PeripheryContrastEditRecordViewCatche { get; set; }
 
-        IPageModelCatche<VideoContrastEditRecordViewModel> VideoContrastEditRecordViewCatche { get; set; }
+        IPageModelCatche<EditRecordComparison> VideoContrastEditRecordViewCatche { get; set; }
 
-        IPageModelCatche<TagContrastEditRecordViewModel> TagContrastEditRecordViewCatche { get; set; }
+        IPageModelCatche<EditRecordComparison> TagContrastEditRecordViewCatche { get; set; }
 
         IPageModelCatche<LotteryViewModel> LotteryIndexPageCatche { get; set; }
 

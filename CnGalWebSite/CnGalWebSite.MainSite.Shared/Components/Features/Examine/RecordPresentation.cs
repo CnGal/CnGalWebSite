@@ -1,32 +1,14 @@
-using CnGalWebSite.DataModel.Model;
+﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 
 namespace CnGalWebSite.MainSite.Shared.Components.Features.Examine;
 
-public enum RecordContentKind { MainPage, Texts, Pictures, Relevances, Outlinks, Audio }
-
 public static class RecordPresentation
 {
-    public static readonly IReadOnlyList<RecordContentKind> ContentKinds = Enum.GetValues<RecordContentKind>();
+    public static bool HasContent(ExaminePreDataModel? data) => data?.Items?.Count > 0;
 
-    public static bool HasContent(ExaminePreDataModel? data, RecordContentKind kind) => kind switch
-    {
-        RecordContentKind.MainPage => !string.IsNullOrWhiteSpace(data?.MainPage),
-        RecordContentKind.Texts => data?.Texts?.Any(g => g.Informations?.Count > 0) == true,
-        RecordContentKind.Pictures => data?.Pictures?.Count > 0,
-        RecordContentKind.Relevances => data?.Relevances?.Count > 0,
-        RecordContentKind.Outlinks => data?.Outlinks?.Count > 0,
-        RecordContentKind.Audio => data?.Audio?.Count > 0,
-        _ => false
-    };
-
-    public static bool HasContent(ExaminePreDataModel? data) => ContentKinds.Any(k => HasContent(data, k));
-    public static string Title(RecordContentKind kind) => kind switch
-    {
-        RecordContentKind.MainPage => "正文", RecordContentKind.Texts => "文本信息",
-        RecordContentKind.Pictures => "图片", RecordContentKind.Relevances => "关联对象",
-        RecordContentKind.Outlinks => "外链", RecordContentKind.Audio => "音频", _ => "内容"
-    };
+    public static string Display(RecordPreviewItem item) =>
+        string.IsNullOrWhiteSpace(item.DisplayValue) ? item.Value : item.DisplayValue;
 
     public static bool SupportsHistory(ExaminedNormalListModelType type) => type is
         ExaminedNormalListModelType.Entry or ExaminedNormalListModelType.Article or ExaminedNormalListModelType.Tag
@@ -46,7 +28,7 @@ public static class RecordPresentation
     };
 
     public static bool IsSingleSubmission(Operation operation) => operation is
-        Operation.PubulishComment or Operation.RequestUserCertification or Operation.EditPlayedGameMain or Operation.EditFavoriteFolderMain;
+        Operation.PubulishComment or Operation.RequestUserCertification;
 
     public static bool CanProcess(ExamineViewModel model) => model.IsAdmin && model.IsPassed is null && model.PrepositionExamineId <= 0;
 
@@ -54,6 +36,9 @@ public static class RecordPresentation
     {
         "record" => false, "compare" => true, _ => currentId.HasValue
     };
+
+    public static string? ContentUrl(string? url) => HttpUrl(url)
+        ?? (url?.StartsWith("/", StringComparison.Ordinal) == true ? url : null);
 
     public static string? HttpUrl(string? url) => Uri.TryCreate(url, UriKind.Absolute, out var parsed)
         && (parsed.Scheme == Uri.UriSchemeHttp || parsed.Scheme == Uri.UriSchemeHttps) ? url : null;

@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Reflection;
 using CnGalWebSite.Core.Models;
 using CnGalWebSite.DataModel.Model;
@@ -29,11 +29,9 @@ public class ExaminePresentationTests
     public static IEnumerable<int> Masks => Enumerable.Range(0, 64);
 
     [TestCaseSource(nameof(Masks))]
-    public async Task ContentCombinationsKeepBothSidesAndNeverInferDeletion(int mask)
+    public async Task ContentCombinationsShowOnlyChangesAndKeepDuplicateItems(int mask)
     {
         var data = Content(mask);
-        Assert.That(RecordPresentation.ContentKinds.Where(k => RecordPresentation.HasContent(data, k)).Count(),
-            Is.EqualTo(System.Numerics.BitOperations.PopCount((uint)mask)));
         using var services = Services();
         await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
         foreach (var reversed in new[] { false, true })
@@ -47,22 +45,23 @@ public class ExaminePresentationTests
                 return WebUtility.HtmlDecode(root.ToHtmlString());
             });
             Assert.That(html, Does.Not.Contain("已删除"));
-            if (mask == 0) Assert.That(html, Does.Contain("没有可展示的内容"));
+            if (mask == 0) Assert.That(html, Does.Contain("无变化"));
             else
             {
-                Assert.That(html.Split("此侧无内容").Length - 1, Is.EqualTo(System.Numerics.BitOperations.PopCount((uint)mask)));
+                Assert.That(html.Split("record-comparison__row--").Length - 1, Is.EqualTo(ItemCount(mask)));
                 if ((mask & 2) != 0) Assert.That(html, Does.Contain("重复字段").And.Contain("第一行").And.Contain("第二行"));
             }
         }
     }
-
     [Test]
     public async Task MediaLinksAndStringsAreRenderedWithoutExecutableHtml()
     {
         var data = Content(63);
-        data.Texts[0].Informations[0].DisplayValue = "<script>alert(1)</script>";
-        data.Outlinks[0].Link = "javascript:alert(1)";
-        data.Outlinks[0].DisplayValue = "unsafe-link";
+        data.Items.First(i => i.Kind == RecordPreviewKind.Text).DisplayValue = "<script>alert(1)</script>";
+        var link = data.Items.First(i => i.Kind == RecordPreviewKind.Link);
+        link.Url = "javascript:alert(1)";
+        link.Value = "javascript:alert(1)";
+        link.DisplayValue = "unsafe-link";
         using var services = Services();
         await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
         var html = await renderer.Dispatcher.InvokeAsync(async () =>
@@ -71,7 +70,31 @@ public class ExaminePresentationTests
         Assert.That(html, Does.Contain("preload=\"none\"").And.Not.Contain("autoplay"));
         Assert.That(html, Does.Contain("https://media.example/picture.png").And.Contain("target=\"_blank\""));
     }
+    [Test]
+    public async Task ReviewContentDefaultsToChangeSummaryTab()
+    {
+        using var services = Services();
+        await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
+        var model = Review(7);
+        model.EditOverview = "<p>description-only</p>";
+        var html = await renderer.Dispatcher.InvokeAsync(async () =>
+            (await renderer.RenderComponentAsync<ReviewContent>(ParameterView.FromDictionary(new Dictionary<string, object?> { ["Model"] = model }))).ToHtmlString());
 
+        Assert.That(html, Does.Contain("变更摘要").And.Contain("原始数据"));
+        Assert.That(html, Does.Contain("id=\"review-panel-summary\"").And.Not.Contain("id=\"review-panel-description\""));
+        Assert.That(WebUtility.HtmlDecode(html), Does.Not.Contain("description-only"));
+    }
+
+    [Test]
+    public async Task EmptyRecordNotesDoNotRenderPlaceholder()
+    {
+        using var services = Services();
+        await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
+        var html = await renderer.Dispatcher.InvokeAsync(async () =>
+            (await renderer.RenderComponentAsync<RecordNotes>(ParameterView.FromDictionary(new Dictionary<string, object?>()))).ToHtmlString());
+
+        Assert.That(WebUtility.HtmlDecode(html), Does.Not.Contain("此记录未附加原始数据"));
+    }
     [TestCase(null, null, false)]
     [TestCase(null, 0L, true)]
     [TestCase(null, 2L, true)]
@@ -99,7 +122,7 @@ public class ExaminePresentationTests
         Assert.That(RecordPresentation.CanProcess(model), Is.EqualTo(admin && passed is null && dependency <= 0));
         if (admin && passed is null && dependency > 0) Assert.That(html, Does.Contain("disabled").And.Contain("查看前置审核 #42"));
         if (passed is null) Assert.That(html, Does.Contain("提交内容").And.Contain("当前内容"));
-        else Assert.That(html, Does.Contain("记录保存内容").And.Not.Contain("编辑后"));
+        else Assert.That(html, Does.Contain(passed == false ? "拟提交内容" : "修改后").And.Not.Contain("编辑后"));
     }
 
     [TestCase(Operation.PubulishComment)]
@@ -112,7 +135,8 @@ public class ExaminePresentationTests
         await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
         var model = Review(7, true);
         model.Operation = operation;
-        model.BeforeModel = model.AfterModel = new() { MainPage = "<p>unique-submission</p>" };
+        model.SubmissionOnly = true;
+        model.BeforeModel = model.AfterModel = new() { Items = [new() { Key = "body", Group = "正文", Kind = RecordPreviewKind.Body, Label = "正文", Value = "<p>unique-submission</p>", Html = "<p>unique-submission</p>" }] };
         var html = await renderer.Dispatcher.InvokeAsync(async () =>
             (await renderer.RenderComponentAsync<ReviewContent>(ParameterView.FromDictionary(new Dictionary<string, object?> { ["Model"] = model }))).ToHtmlString());
         Assert.That(html.Split("unique-submission").Length - 1, Is.EqualTo(1));
@@ -221,7 +245,7 @@ public class ExaminePresentationTests
         });
         Task<SdkResult<ExamineViewModel>> StartOld() { started.TrySetResult(); return old.Task; }
         Task<SdkResult<ExamineViewModel>> StartNew() { newerStarted.TrySetResult(); return Task.FromResult(SdkResult<ExamineViewModel>.Ok(new()
-            { Id = 2, BeforeModel = new() { MainPage = "new-content" } })); }
+            { Id = 2, AfterModel = Body("new-content") })); }
         using var services = Services(query);
         await using var renderer = new TestRenderer(services);
         var root = await renderer.Attach<EditRecordPage>();
@@ -229,27 +253,50 @@ public class ExaminePresentationTests
         await started.Task.WaitAsync(TimeSpan.FromSeconds(5));
         var second = renderer.Render(root, new() { ["ContrastIdQuery"] = "2", ["SelectedIdQuery"] = "2" });
         await newerStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        old.SetResult(SdkResult<ExamineViewModel>.Ok(new() { Id = 1, BeforeModel = new() { MainPage = "stale-content" } }));
+        old.SetResult(SdkResult<ExamineViewModel>.Ok(new() { Id = 1, AfterModel = Body("stale-content") }));
         await Task.WhenAll(first, second).WaitAsync(TimeSpan.FromSeconds(5));
         Assert.That(renderer.AllText(root), Does.Contain("new-content").And.Not.Contain("stale-content"));
     }
 
-    public static ExaminePreDataModel Content(int mask) => new()
+    public static ExaminePreDataModel Content(int mask)
     {
-        MainPage = (mask & 1) != 0 ? "<p>正文内容</p>" : "",
-        Texts = (mask & 2) != 0 ? [new() { Modifier = "信息分组", Informations = [new() { DisplayName = "重复字段", DisplayValue = "第一行" }, new() { DisplayName = "重复字段", DisplayValue = "第二行" }] }] : [],
-        Pictures = (mask & 4) != 0 ? [new() { Note = "图片说明", Url = "https://media.example/picture.png" }] : [],
-        Relevances = (mask & 8) != 0 ? [new() { entry = new() { Id = 1, Name = "关联词条" } }] : [],
-        Outlinks = (mask & 16) != 0 ? [new() { DisplayName = "官网", Link = "https://example.com", DisplayValue = "官方网站" }] : [],
-        Audio = (mask & 32) != 0 ? [new() { Name = "主题曲", Url = "https://media.example/audio.mp3" }] : []
+        var items = new List<RecordPreviewItem>();
+        if ((mask & 1) != 0) items.Add(new() { Key = "body", Group = "正文", Kind = RecordPreviewKind.Body, Label = "正文", Value = "<p>正文内容</p>", Html = "<p>正文内容</p>" });
+        if ((mask & 2) != 0)
+        {
+            items.Add(new() { Key = "text/1", Group = "信息分组", Kind = RecordPreviewKind.Text, Label = "重复字段", Value = "第一行", DisplayValue = "第一行" });
+            items.Add(new() { Key = "text/2", Group = "信息分组", Kind = RecordPreviewKind.Text, Label = "重复字段", Value = "第二行", DisplayValue = "第二行" });
+        }
+        if ((mask & 4) != 0) items.Add(new() { Key = "picture", Group = "图片", Kind = RecordPreviewKind.Image, Label = "图片说明", Value = "https://media.example/picture.png", Url = "https://media.example/picture.png" });
+        if ((mask & 8) != 0) items.Add(new() { Key = "relation", Group = "关联词条", Kind = RecordPreviewKind.Relation, Label = "关联词条", Value = "entry:1", DisplayValue = "关联词条", Url = "/entries/index/1" });
+        if ((mask & 16) != 0) items.Add(new() { Key = "link", Group = "外链", Kind = RecordPreviewKind.Link, Label = "官网", Value = "https://example.com", Url = "https://example.com", DisplayValue = "官方网站" });
+        if ((mask & 32) != 0) items.Add(new() { Key = "audio", Group = "音频", Kind = RecordPreviewKind.Audio, Label = "主题曲", Value = "https://media.example/audio.mp3", Url = "https://media.example/audio.mp3" });
+        return new() { Items = items };
+    }
+
+    private static int ItemCount(int mask)
+    {
+        var count = 0;
+        if ((mask & 1) != 0) count++;
+        if ((mask & 2) != 0) count += 2;
+        if ((mask & 4) != 0) count++;
+        if ((mask & 8) != 0) count++;
+        if ((mask & 16) != 0) count++;
+        if ((mask & 32) != 0) count++;
+        return count;
+    }
+
+    private static ExaminePreDataModel Body(string text) => new()
+    {
+        Items = [new() { Key = "body", Group = "正文", Kind = RecordPreviewKind.Body, Label = "正文", Value = text, Html = text }]
     };
 
     private static ExamineViewModel Review(long id, bool? passed = null, bool admin = true, long dependency = 0)
         => new() { Id = id, ObjectId = 1, ObjectName = "测试对象", UserId = "test-user", UserName = "编辑者", ApplyTime = new(2026, 11, 12),
             IsAdmin = admin, IsPassed = passed, PrepositionExamineId = dependency, Operation = Operation.EstablishMain,
-            BeforeModel = new() { MainPage = "<p>旧内容</p>" }, AfterModel = new() { MainPage = "<p>新内容</p>" } };
-    private static EditRecordAloneViewModel History(long id) => new() { Id = id, UserName = "编辑者", Operation = Operation.EstablishMain };
+            BeforeModel = Body("<p>旧内容</p>"), AfterModel = Body("<p>新内容</p>") };
 
+    private static EditRecordAloneViewModel History(long id) => new() { Id = id, UserName = "编辑者", Operation = Operation.EstablishMain };
     private static ServiceProvider Services(IExamineQueryService? query = null, IExamineCommandService? command = null)
         => new ServiceCollection().AddLogging().AddSingleton(query ?? Proxy<IExamineQueryService>((_, _) => throw new NotSupportedException()))
             .AddSingleton(command ?? Proxy<IExamineCommandService>((_, _) => throw new NotSupportedException()))

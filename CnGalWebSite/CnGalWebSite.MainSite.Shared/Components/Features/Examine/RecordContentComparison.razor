@@ -1,37 +1,69 @@
-@using CnGalWebSite.DataModel.ViewModel.Admin
+﻿@using CnGalWebSite.DataModel.ViewModel.Admin
+@using CnGalWebSite.SDK.MainSite.Models
 
-<div class="record-comparison @(Single ? "record-comparison--single" : "")">
-    @if (!RecordPresentation.HasContent(Before) && !RecordPresentation.HasContent(After))
+<div class="record-comparison @(SubmissionOnly ? "record-comparison--single" : "")">
+    @if (!_diff.HasChanges)
     {
-        <p class="record-comparison__empty">此记录没有可展示的内容，请参阅修改说明。</p>
+        <p class="record-comparison__empty" role="status">无变化</p>
     }
-    @foreach (var kind in RecordPresentation.ContentKinds.Where(k =>
-        RecordPresentation.HasContent(AfterContent, k) || (!Single && RecordPresentation.HasContent(Before, k))))
+    else
     {
-        <section class="record-comparison__section" aria-label="@RecordPresentation.Title(kind)">
-            <h3>@RecordPresentation.Title(kind)</h3>
-            <div class="record-comparison__columns">
-                @if (!Single)
-                {
-                    <div class="record-comparison__side">
-                        <h4>@BeforeTitle</h4>
-                        <ExaminePreDataView Model="Before" Kind="kind" />
-                    </div>
-                }
-                <div class="record-comparison__side">
-                    <h4>@AfterTitle</h4>
-                    <ExaminePreDataView Model="AfterContent" Kind="kind" />
+        @foreach (var group in ChangedItems.GroupBy(i => i.Item.Group))
+        {
+            <section class="record-comparison__section" aria-label="@group.Key">
+                <h3>@group.Key</h3>
+                <div class="record-comparison__headings">
+                    @if (!SubmissionOnly) { <span>@BeforeTitle</span> }
+                    <span>@AfterTitle</span>
                 </div>
-            </div>
-        </section>
+                @foreach (var row in group)
+                {
+                    <article class="record-comparison__row record-comparison__row--@row.Change.ToString().ToLowerInvariant()">
+                        @if (ShowItemLabel(row))
+                        {
+                            <header>@row.Item.Label</header>
+                        }
+                        <div class="record-comparison__columns">
+                            @if (!SubmissionOnly)
+                            {
+                                <div class="record-comparison__side">
+                                    <RecordItemValue Item="row.Before" Other="row.After" />
+                                </div>
+                            }
+                            <div class="record-comparison__side">
+                                <RecordItemValue Item="row.After" Other="row.Before" />
+                            </div>
+                        </div>
+                    </article>
+                }
+            </section>
+        }
     }
 </div>
 
 @code {
     [Parameter] public ExaminePreDataModel? Before { get; set; }
     [Parameter] public ExaminePreDataModel? After { get; set; }
-    [Parameter] public string BeforeTitle { get; set; } = "当前内容";
-    [Parameter] public string AfterTitle { get; set; } = "提交内容";
-    [Parameter] public bool Single { get; set; }
-    private ExaminePreDataModel? AfterContent => Single && !RecordPresentation.HasContent(After) ? Before : After;
+    [Parameter] public string BeforeTitle { get; set; } = "修改前";
+    [Parameter] public string AfterTitle { get; set; } = "修改后";
+    [Parameter] public bool SubmissionOnly { get; set; }
+    private RecordDiff _diff = new([]);
+    private ExaminePreDataModel? _before;
+    private ExaminePreDataModel? _after;
+    private bool _submissionOnly;
+    private IEnumerable<RecordDiffItem> ChangedItems => _diff.Items.Where(i => i.Changed);
+
+    protected override void OnParametersSet()
+    {
+        if (ReferenceEquals(_before, Before) && ReferenceEquals(_after, After) && _submissionOnly == SubmissionOnly) return;
+        _before = Before;
+        _after = After;
+        _submissionOnly = SubmissionOnly;
+        _diff = RecordDiffBuilder.Build(Before, After, SubmissionOnly);
+    }
+
+    private static bool ShowItemLabel(RecordDiffItem row) =>
+        !string.IsNullOrWhiteSpace(row.Item.Label)
+        && !string.Equals(row.Item.Label, row.Item.Group, StringComparison.Ordinal)
+        && !string.Equals(row.Item.Label, RecordPresentation.Display(row.Item), StringComparison.Ordinal);
 }

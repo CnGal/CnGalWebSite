@@ -1,4 +1,4 @@
-﻿
+
 
 using CnGalWebSite.DataModel.ExamineModel;
 using CnGalWebSite.DataModel.Model;
@@ -34,6 +34,7 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// <param name="examine"></param>
         /// <returns></returns>
         Task<bool> GetExamineView(ExamineViewModel model, Examine examine);
+        Task<EditRecordComparison> GetEditRecordComparison(long contrastId, long currentId, ExaminedNormalListModelType type);
       
         /// <summary>
         /// 获取当前用户对该词条部分的待审核记录

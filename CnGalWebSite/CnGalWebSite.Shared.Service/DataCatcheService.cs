@@ -1,4 +1,4 @@
-﻿
+
 using CnGalWebSite.Components.Service;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
@@ -108,23 +108,23 @@ namespace CnGalWebSite.Shared.Service
         /// <summary>
         /// 编辑对比页面数据缓存 词条
         /// </summary>
-        public IPageModelCatche<EntryContrastEditRecordViewModel> EntryContrastEditRecordViewCatche { get; set; }
+        public IPageModelCatche<EditRecordComparison> EntryContrastEditRecordViewCatche { get; set; }
         /// <summary>
         /// 编辑对比页面数据缓存 文章
         /// </summary>
-        public IPageModelCatche<ArticleContrastEditRecordViewModel> ArticleContrastEditRecordViewCatche { get; set; }
+        public IPageModelCatche<EditRecordComparison> ArticleContrastEditRecordViewCatche { get; set; }
         /// <summary>
         /// 编辑对比页面数据缓存 周边
         /// </summary>
-        public IPageModelCatche<PeripheryContrastEditRecordViewModel> PeripheryContrastEditRecordViewCatche { get; set; }
+        public IPageModelCatche<EditRecordComparison> PeripheryContrastEditRecordViewCatche { get; set; }
         /// <summary>
         /// 编辑对比页面数据缓存 标签
         /// </summary>
-        public IPageModelCatche<TagContrastEditRecordViewModel> TagContrastEditRecordViewCatche { get; set; }
+        public IPageModelCatche<EditRecordComparison> TagContrastEditRecordViewCatche { get; set; }
         /// <summary>
         /// 编辑对比页面数据缓存 视频
         /// </summary>
-        public IPageModelCatche<VideoContrastEditRecordViewModel> VideoContrastEditRecordViewCatche { get; set; }
+        public IPageModelCatche<EditRecordComparison> VideoContrastEditRecordViewCatche { get; set; }
         /// <summary>
         /// 图表缓存
         /// </summary>
@@ -262,11 +262,11 @@ namespace CnGalWebSite.Shared.Service
         IPageModelCatche<PeripheryViewModel> peripheryIndexPageCatche, IPageModelCatche<TagIndexViewModel> tagIndexPageCatche, IPageModelCatche<List<HomeNewsAloneViewModel>> homePageNewsCatche,
         IPageModelCatche<List<CarouselViewModel>> homePageCarouselsCatche, IPageModelCatche<ExaminesOverviewViewModel> examinesOverviewCatche,
         IPageModelCatche<LotteryViewModel> lotteryIndexPageCatche,
-        IPageModelCatche<ArticleContrastEditRecordViewModel> articleContrastEditRecordViewCatche,
-        IPageModelCatche<PeripheryContrastEditRecordViewModel> peripheryContrastEditRecordViewCatche,
-        IPageModelCatche<TagContrastEditRecordViewModel> tagContrastEditRecordViewCatche,
-         IPageModelCatche<VideoContrastEditRecordViewModel> videoContrastEditRecordViewCatche,
-        IPageModelCatche<EntryContrastEditRecordViewModel> entryContrastEditRecordViewCatche,
+        IPageModelCatche<EditRecordComparison> articleContrastEditRecordViewCatche,
+        IPageModelCatche<EditRecordComparison> peripheryContrastEditRecordViewCatche,
+        IPageModelCatche<EditRecordComparison> tagContrastEditRecordViewCatche,
+         IPageModelCatche<EditRecordComparison> videoContrastEditRecordViewCatche,
+        IPageModelCatche<EditRecordComparison> entryContrastEditRecordViewCatche,
         IPageModelCatche<SearchViewModel> searchViewCatche,
         IPageModelCatche<LineChartModel> lineChartDataCatche,
         IPageModelCatche<CommentCacheModel> commentDataCatche,

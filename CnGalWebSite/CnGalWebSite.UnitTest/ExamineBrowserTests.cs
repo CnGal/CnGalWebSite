@@ -1,4 +1,4 @@
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using Microsoft.Playwright;
 using NUnit.Framework;
 using static Microsoft.Playwright.Assertions;
@@ -152,7 +152,7 @@ public class ExamineBrowserTests
         await Expect(_page.Locator(".record-notes__empty")).ToHaveCountAsync(1);
         await Expect(_page.Locator(".record-comparison__empty")).ToBeVisibleAsync();
         await _page.GotoAsync(Site + "/examine?Id=102");
-        await Expect(_page.Locator(".record-notes")).ToContainTextAsync(["修改说明", "资料已核对。"]);
+        await Expect(_page.Locator(".record-notes")).ToContainTextAsync(["原始数据", "资料已核对。"]);
         await Expect(_page.GetByRole(AriaRole.Button, new() { Name = "通过", Exact = true })).ToHaveCountAsync(0);
     }
 

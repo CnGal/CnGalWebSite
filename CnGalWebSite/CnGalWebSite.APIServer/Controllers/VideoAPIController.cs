@@ -816,48 +816,16 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [HttpGet("{contrastId}/{currentId}")]
         [AllowAnonymous]
-        public async Task<ActionResult<VideoContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
+        public async Task<ActionResult<EditRecordComparison>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
         {
-            if (contrastId > currentId)
+            try
             {
-                return BadRequest("对比的编辑必须先于当前的编辑");
+                return await _examineService.GetEditRecordComparison(contrastId, currentId, ExaminedNormalListModelType.Video);
             }
-
-            var contrastExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId);
-            var currentExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == currentId);
-
-            if (contrastExamine == null || currentExamine == null || contrastExamine.VideoId == null || currentExamine.VideoId == null || contrastExamine.VideoId != currentExamine.VideoId)
+            catch (ArgumentException error)
             {
-                return NotFound("编辑记录Id不正确");
+                return BadRequest(error.Message);
             }
-
-            var currentVideo = new Video();
-            var newVideo = new Video();
-
-            //获取审核记录
-            var examines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.IsPassed == true && s.VideoId == currentExamine.VideoId).ToListAsync();
-
-            foreach (var item in examines.Where(s => s.Id <= contrastId).OrderBy(s => s.Id))
-            {
-                await _videoService.UpdateData(currentVideo, item);
-            }
-
-            foreach (var item in examines.Where(s => s.Id <= currentId).OrderBy(s => s.Id))
-            {
-                await _videoService.UpdateData(newVideo, item);
-            }
-
-            var result = _videoService.ConcompareAndGenerateModel(currentVideo, newVideo);
-
-            var model = new VideoContrastEditRecordViewModel
-            {
-                ContrastId = contrastId,
-                CurrentId = currentId,
-                ContrastModel = result[0],
-                CurrentModel = result[1],
-            };
-
-            return model;
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-.record-object {
+﻿.record-object {
     display: flex;
     align-items: center;
     gap: var(--cg-spacing-5);
@@ -63,9 +63,22 @@ p {
     overflow: hidden;
 }
 
-a {
+.record-object__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--cg-spacing-4);
+    margin-top: var(--cg-spacing-2);
+}
+
+.record-object__actions ::deep a {
     color: var(--cg-color-link);
     font-size: var(--cg-font-size-sm);
+    text-decoration: none;
+}
+
+.record-object__actions ::deep a:hover {
+    text-decoration: underline;
 }
 
 @media (max-width: 640px) {

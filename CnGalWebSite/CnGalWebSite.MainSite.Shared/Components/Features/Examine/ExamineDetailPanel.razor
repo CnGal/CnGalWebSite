@@ -1,4 +1,4 @@
-@using CnGalWebSite.DataModel.ViewModel.Admin
+﻿@using CnGalWebSite.DataModel.ViewModel.Admin
 @inject IExamineCommandService ExamineCommandService
 @inject IExamineQueryService ExamineQueryService
 @inject ICgToastService ToastService
@@ -9,16 +9,12 @@
         Description="@_record.ObjectBriefIntroduction" Image="@_record.Image" IsThumbnail="_record.IsThumbnail">
         @if (_record.IsPassed == true && RecordPresentation.SupportsHistory(_record.Type))
         {
-            <div class="examine-detail-panel__history-action">
-                <CgButton Variant="secondary" Href="@($"/home/editrecord?ContrastId={_record.Id}&Mode=record")">
-                    <CgMdiIcon Name="mdiHistory" aria-hidden="true" />
-                    查看编辑记录
-                </CgButton>
-            </div>
+            <a class="record-object__action" href="@($"/home/editrecord?ContrastId={_record.Id}&Mode=record")">
+                查看编辑记录 <span aria-hidden="true">→</span>
+            </a>
         }
     </RecordObjectSummary>
     <RecordMetadata Model="_record" />
-    <RecordNotes Overview="@_record.EditOverview" ShowEmpty="@(string.IsNullOrWhiteSpace(_record.Comments) && string.IsNullOrWhiteSpace(_record.Note))" />
 
     @if (_record.PrepositionExamineId > 0 && _record.IsPassed is null)
     {

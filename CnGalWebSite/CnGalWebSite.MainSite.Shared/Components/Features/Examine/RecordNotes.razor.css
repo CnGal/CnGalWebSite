@@ -1,4 +1,4 @@
-.record-notes {
+﻿.record-notes {
     display: grid;
     gap: var(--cg-spacing-4);
     min-width: 0;
@@ -30,11 +30,6 @@ p {
 .record-notes__overview {
     min-width: 0;
     overflow-wrap: anywhere;
-}
-
-.record-notes__empty {
-    color: var(--cg-color-text-muted);
-    padding: var(--cg-spacing-4) 0;
 }
 
 .record-notes__overview ::deep ins {

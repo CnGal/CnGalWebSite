@@ -1,0 +1,63 @@
+﻿@using CnGalWebSite.DataModel.ViewModel.Admin
+
+<div class="record-value">
+    @if (Item is null)
+    {
+        <span class="record-value__empty">—</span>
+    }
+    else
+    {
+        @switch (Item.Kind)
+        {
+            case RecordPreviewKind.Body:
+                <CgHtmlContent Content="@Item.Html" />
+                break;
+            case RecordPreviewKind.Image:
+                @if (RecordPresentation.HttpUrl(Item.Url ?? Item.Value) is { } imageUrl)
+                {
+                    <a href="@imageUrl" target="_blank" rel="noopener noreferrer" aria-label="@($"查看原图：{Item.Label}")">
+                        <RecordImage Url="@imageUrl" Alt="@(Item.Label ?? "记录图片")" Contain="true" />
+                    </a>
+                }
+                else { <span class="record-value__empty">—</span> }
+                break;
+            case RecordPreviewKind.Audio:
+                @if (RecordPresentation.HttpUrl(Item.Url ?? Item.Value) is { } audioUrl)
+                {
+                    <audio controls preload="none" src="@audioUrl" aria-label="@(Item.Label ?? "记录音频")"></audio>
+                    <a href="@audioUrl" target="_blank" rel="noopener noreferrer">打开音频</a>
+                }
+                else { <span class="record-value__empty">—</span> }
+                break;
+            default:
+                @if (SafeUrl is { } url) { <a href="@url" target="_blank" rel="noopener noreferrer">@Text</a> }
+                else { <span class="record-value__text">@Text</span> }
+                break;
+        }
+        @if (VisibleProperties.Any())
+        {
+            <dl>
+                @foreach (var property in VisibleProperties)
+                {
+                    <div>
+                        <dt>@property.Label</dt>
+                        <dd>@property.DisplayValue</dd>
+                    </div>
+                }
+            </dl>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public RecordPreviewItem? Item { get; set; }
+    [Parameter] public RecordPreviewItem? Other { get; set; }
+
+    private string Text => string.IsNullOrEmpty(Item?.DisplayValue) ? Item?.Value is { Length: > 0 } value ? value : "—" : Item.DisplayValue;
+    private string? SafeUrl => RecordPresentation.ContentUrl(Item?.Url);
+    private IEnumerable<RecordPreviewProperty> VisibleProperties => (Item?.Properties ?? [])
+        .Where(p => !string.IsNullOrWhiteSpace(p.DisplayValue))
+        .Where(p => Other is null || Other.Properties.FirstOrDefault(o => o.Key == p.Key)?.Value != p.Value)
+        .Where(p => p.DisplayValue != Item!.Label && p.DisplayValue != Item.DisplayValue)
+        .Where(p => !(Item!.Kind == RecordPreviewKind.Audio && p.Key == "Name"));
+}
