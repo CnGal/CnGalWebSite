@@ -26,7 +26,6 @@ public partial class ExamineService
         model.EditOverview = BuildEditOverview(examine);
         model.ContributionValue = examine.ContributionValue;
         model.SubmissionOnly = ExamineOperationMetadata.IsSubmissionOnly(examine.Operation);
-        var records = await PreviewHistory(examine).AsNoTracking().ToListAsync();
         var state = CreatePreviewProjector(live.GetType());
 
         if (model.SubmissionOnly)
@@ -39,6 +38,7 @@ public partial class ExamineService
         }
         else if (examine.IsPassed == null)
         {
+            var records = await PreviewHistory(examine).AsNoTracking().ToListAsync();
             state.Load(live);
             var dependencies = new List<Examine>();
             var visited = new HashSet<long> { examine.Id };
@@ -60,6 +60,7 @@ public partial class ExamineService
         }
         else
         {
+            var records = await PreviewHistory(examine).AsNoTracking().ToListAsync();
             foreach (var record in RecordVersionOrder.Approved(records).Where(r => RecordVersionOrder.Compare(r, examine) < 0))
                 ReplayPreview(state, record);
             model.BeforeModel = state.Snapshot(RenderPreview);

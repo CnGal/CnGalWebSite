@@ -137,6 +137,10 @@
     private IEnumerable<RecordPreviewProperty> VisibleProperties => (Item?.Properties ?? [])
         .Where(p => !string.IsNullOrWhiteSpace(p.DisplayValue))
         .Where(p => Other is null || Other.Properties.FirstOrDefault(o => o.Key == p.Key)?.Value != p.Value)
-        .Where(p => p.DisplayValue != Item!.Label && p.DisplayValue != Item.DisplayValue)
+        .Where(p => IsChangedProperty(p) || (p.DisplayValue != Item!.Label && p.DisplayValue != Item.DisplayValue))
         .Where(p => !(Item!.Kind == RecordPreviewKind.Audio && p.Key == "Name"));
+
+    private bool IsChangedProperty(RecordPreviewProperty property) =>
+        Other?.Properties.FirstOrDefault(other => other.Key == property.Key) is { } other
+        && !string.Equals(other.Value, property.Value, StringComparison.Ordinal);
 }

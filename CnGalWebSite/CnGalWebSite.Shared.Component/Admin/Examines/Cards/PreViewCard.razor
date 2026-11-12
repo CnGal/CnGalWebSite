@@ -78,7 +78,6 @@
                 DisplayValue = ItemText(i)
             } }.Concat(i.Properties
                 .Where(p => !string.IsNullOrWhiteSpace(p.DisplayValue))
-                .Where(p => p.DisplayValue != i.Label && p.DisplayValue != ItemText(i))
                 .Select(p => new KeyValueModel { DisplayName = p.Label ?? p.Key, DisplayValue = p.DisplayValue }))).ToList()
         })
         .ToList();

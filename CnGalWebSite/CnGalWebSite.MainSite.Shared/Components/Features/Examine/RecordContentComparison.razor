@@ -2,13 +2,13 @@
 @using CnGalWebSite.SDK.MainSite.Models
 
 <div class="record-comparison @(SubmissionOnly ? "record-comparison--single" : "")">
+    @if (SnapshotIncomplete)
+    {
+        <p class="record-comparison__empty" role="status">版本快照不完整，无法确认是否存在变化。</p>
+    }
     @if (!_diff.HasChanges)
     {
-        @if (!SubmissionOnly && (Before is null || After is null || !Before.IsComplete || !After.IsComplete))
-        {
-            <p class="record-comparison__empty" role="status">版本快照不完整，无法确认是否存在变化。</p>
-        }
-        else
+        @if (!SnapshotIncomplete)
         {
             <p class="record-comparison__empty" role="status">无变化</p>
         }
@@ -61,6 +61,8 @@
     private ExaminePreDataModel? _after;
     private bool _submissionOnly;
     private IEnumerable<RecordDiffItem> ChangedItems => _diff.Items.Where(i => i.Changed);
+    private bool SnapshotIncomplete => !SubmissionOnly
+        && (Before is null || After is null || !Before.IsComplete || !After.IsComplete);
 
     protected override void OnParametersSet()
     {

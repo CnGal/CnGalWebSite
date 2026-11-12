@@ -286,4 +286,27 @@ public class RecordPreviewProjectorTests
         var snapshot = projector.Snapshot(value => value);
         Assert.That(snapshot.Items.Any(item => item.Kind == RecordPreviewKind.Relation && item.Value == "entry:9"), Is.False);
     }
+
+    [Test]
+    public void WebsiteImagesWithTheSameUrlButDifferentTypesRemainDistinct()
+    {
+        var projector = new RecordPreviewProjector(typeof(Entry));
+        projector.Load(new Entry
+        {
+            Id = 1,
+            Name = "Entry",
+            WebsiteAddInfor = new EntryWebsite
+            {
+                Images =
+                [
+                    new() { Url = "https://example.com/website.png", Type = EntryWebsiteImageType.Carousel },
+                    new() { Url = "https://example.com/website.png", Type = EntryWebsiteImageType.Background }
+                ]
+            }
+        });
+
+        var images = projector.Snapshot(value => value).Items.Where(item => item.Group == "官网图片").ToList();
+
+        Assert.That(images, Has.Count.EqualTo(2));
+    }
 }

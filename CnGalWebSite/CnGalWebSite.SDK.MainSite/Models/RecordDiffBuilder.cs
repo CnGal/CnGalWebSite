@@ -90,7 +90,9 @@ public static class RecordDiffBuilder
             .ToList();
         if (candidates.Count == 0) return -1;
         var sameLabel = candidates.Where(index => string.Equals(Normalize(items[index].After!.Label), Normalize(removed.Label), StringComparison.Ordinal)).ToList();
-        return sameLabel.Count > 0 ? sameLabel[0] : candidates[0];
+        if (sameLabel.Count == 1) return sameLabel[0];
+        if (sameLabel.Count > 1) return -1;
+        return candidates.Count == 1 ? candidates[0] : -1;
     }
 
     private static bool Equal(RecordPreviewItem left, RecordPreviewItem right) => left.Kind == right.Kind

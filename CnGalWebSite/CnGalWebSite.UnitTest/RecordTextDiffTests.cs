@@ -65,7 +65,24 @@ public class RecordTextDiffTests
     {
         var diff = RecordHtmlDiff.Build("<p>旧内容</p>", "<p>新内容</p>");
         Assert.That(diff, Does.Contain("<del").And.Contain("<ins"));
-        Assert.That(RecordHtmlDiff.Build(string.Empty, "<p>新内容</p>"), Does.StartWith("<ins>").And.EndWith("</ins>"));
-        Assert.That(RecordHtmlDiff.Build("<p>旧内容</p>", string.Empty), Does.StartWith("<del>").And.EndWith("</del>"));
+        Assert.That(RecordHtmlDiff.Build(string.Empty, "<p>新内容</p>"), Does.StartWith("<ins").And.EndWith("</ins>"));
+        Assert.That(RecordHtmlDiff.Build("<p>旧内容</p>", string.Empty), Does.StartWith("<del").And.EndWith("</del>"));
+    }
+
+    [Test]
+    public void SourceInsAndDelElementsAreNotConfusedWithGeneratedChanges()
+    {
+        var inserted = RecordHtmlDiff.Build(string.Empty, "<p><del>retained text</del></p>");
+        var removed = RecordHtmlDiff.Build("<p><ins>retained text</ins></p>", string.Empty);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(inserted, Does.Contain("record-diff-inserted"));
+            Assert.That(inserted, Does.Contain("<del>retained text</del>"));
+            Assert.That(inserted, Does.Not.Contain("record-diff-deleted"));
+            Assert.That(removed, Does.Contain("record-diff-deleted"));
+            Assert.That(removed, Does.Contain("<ins>retained text</ins>"));
+            Assert.That(removed, Does.Not.Contain("record-diff-inserted"));
+        });
     }
 }

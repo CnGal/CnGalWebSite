@@ -97,6 +97,94 @@ public class ExaminePresentationTests
     }
 
     [Test]
+    public async Task IncompleteSnapshotsShowWarningEvenWhenChangesAreVisible()
+    {
+        var before = Content(1);
+        before.IsComplete = false;
+        var after = Content(2);
+        after.IsComplete = true;
+        using var services = Services();
+        await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
+
+        var html = await renderer.Dispatcher.InvokeAsync(async () =>
+            WebUtility.HtmlDecode((await renderer.RenderComponentAsync<RecordContentComparison>(
+                ParameterView.FromDictionary(new Dictionary<string, object?> { ["Before"] = before, ["After"] = after }))).ToHtmlString()));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(html, Does.Contain("版本快照不完整，无法确认是否存在变化。"));
+            Assert.That(html, Does.Contain("record-comparison__row--"));
+        });
+    }
+
+    [Test]
+    public async Task ChangedImageNoteIsVisibleOnBothSides()
+    {
+        var before = new ExaminePreDataModel
+        {
+            Items = [new()
+            {
+                Key = "picture", Group = "图片", Kind = RecordPreviewKind.Image, Label = "旧图片说明",
+                Value = "https://media.example/picture.png", DisplayValue = "https://media.example/picture.png",
+                Url = "https://media.example/picture.png",
+                Properties = [new() { Key = "Note", Label = "说明", Value = "旧图片说明", DisplayValue = "旧图片说明" }]
+            }]
+        };
+        var after = new ExaminePreDataModel
+        {
+            Items = [new()
+            {
+                Key = "picture", Group = "图片", Kind = RecordPreviewKind.Image, Label = "新图片说明",
+                Value = "https://media.example/picture.png", DisplayValue = "https://media.example/picture.png",
+                Url = "https://media.example/picture.png",
+                Properties = [new() { Key = "Note", Label = "说明", Value = "新图片说明", DisplayValue = "新图片说明" }]
+            }]
+        };
+        using var services = Services();
+        await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
+
+        var html = await renderer.Dispatcher.InvokeAsync(async () =>
+            WebUtility.HtmlDecode((await renderer.RenderComponentAsync<RecordContentComparison>(
+                ParameterView.FromDictionary(new Dictionary<string, object?> { ["Before"] = before, ["After"] = after }))).ToHtmlString()));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(html, Does.Contain("旧图片说明"));
+            Assert.That(html, Does.Contain("新图片说明"));
+        });
+    }
+
+    [Test]
+    public void AmbiguousImageReplacementsRemainAdditionsAndRemovals()
+    {
+        var before = new ExaminePreDataModel
+        {
+            Items =
+            [
+                new() { Key = "picture/1", Group = "图片", Kind = RecordPreviewKind.Image, Value = "https://media.example/old-1.png", Url = "https://media.example/old-1.png" },
+                new() { Key = "picture/2", Group = "图片", Kind = RecordPreviewKind.Image, Value = "https://media.example/old-2.png", Url = "https://media.example/old-2.png" }
+            ]
+        };
+        var after = new ExaminePreDataModel
+        {
+            Items =
+            [
+                new() { Key = "picture/3", Group = "图片", Kind = RecordPreviewKind.Image, Value = "https://media.example/new-1.png", Url = "https://media.example/new-1.png" },
+                new() { Key = "picture/4", Group = "图片", Kind = RecordPreviewKind.Image, Value = "https://media.example/new-2.png", Url = "https://media.example/new-2.png" }
+            ]
+        };
+
+        var changes = RecordDiffBuilder.Build(before, after).Items;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(changes.Count(item => item.Change == RecordChangeKind.Removed), Is.EqualTo(2));
+            Assert.That(changes.Count(item => item.Change == RecordChangeKind.Added), Is.EqualTo(2));
+            Assert.That(changes.Any(item => item.Change == RecordChangeKind.Modified), Is.False);
+        });
+    }
+
+    [Test]
     public async Task MediaLinksAndStringsAreRenderedWithoutExecutableHtml()
     {
         var data = Content(63);
@@ -501,7 +589,7 @@ public class ExaminePresentationTests
     private static bool ButtonIsDisabled(string html, string label) =>
         Regex.Matches(html, @"<button\b[^>]*>.*?</button>", RegexOptions.Singleline)
             .Cast<Match>()
-            .Any(button => Regex.IsMatch(button.Value, @"<button\b[^>]*\bdisabled=", RegexOptions.Singleline)
+            .Any(button => Regex.IsMatch(button.Value, @"<button\b[^>]*(?<![\w-])disabled(?=[\s=>])", RegexOptions.Singleline)
                 && button.Value.Contains(label, StringComparison.Ordinal));
 
     private static ExaminePreDataModel Body(string text) => new()

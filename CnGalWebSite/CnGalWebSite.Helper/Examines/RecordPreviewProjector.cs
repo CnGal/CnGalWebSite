@@ -364,7 +364,7 @@ public sealed class RecordPreviewProjector
 
     private void WebsiteImage(JsonObject data) => Put(new()
     {
-        Key = Key("website-image", Text(data["Url"])), Group = "官网图片", Kind = RecordPreviewKind.Image,
+        Key = Key("website-image", Text(data["Url"]), Text(data["Type"])), Group = "官网图片", Kind = RecordPreviewKind.Image,
         Label = Text(data["Note"]), Value = Text(data["Url"]), DisplayValue = Text(data["Url"]), Url = ResolveImage(Text(data["Url"])),
         Properties = Properties(data, WebsiteImageEnumTypes, "Type", "Size", "Note", "Priority")
     }, Deleted(data));
