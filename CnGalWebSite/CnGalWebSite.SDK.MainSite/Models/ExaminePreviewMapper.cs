@@ -38,8 +38,12 @@ public static class ExaminePreviewMapper
             });
         }
 
+        var groupCounts = new Dictionary<string, int>(StringComparer.Ordinal);
         foreach (var group in value.Texts)
         {
+            var groupName = string.IsNullOrWhiteSpace(group.Modifier) ? "文本信息" : group.Modifier;
+            groupCounts.TryGetValue(groupName, out var groupOccurrence);
+            groupCounts[groupName] = groupOccurrence + 1;
             var nameCounts = new Dictionary<string, int>(StringComparer.Ordinal);
             foreach (var information in group.Informations)
             {
@@ -49,8 +53,8 @@ public static class ExaminePreviewMapper
                 nameCounts[label] = occurrence + 1;
                 result.Items.Add(new RecordPreviewItem
                 {
-                    Key = $"text/{group.Modifier}/{label}/{occurrence}",
-                    Group = string.IsNullOrWhiteSpace(group.Modifier) ? "文本信息" : group.Modifier,
+                    Key = $"text/{groupName}/{groupOccurrence}/{label}/{occurrence}",
+                    Group = groupName,
                     Kind = RecordPreviewKind.Text, Label = label,
                     Value = information.DisplayValue, DisplayValue = information.DisplayValue
                 });
