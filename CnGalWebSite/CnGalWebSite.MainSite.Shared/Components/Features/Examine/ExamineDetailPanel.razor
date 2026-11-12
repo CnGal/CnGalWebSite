@@ -7,21 +7,27 @@
 <div class="examine-detail-panel">
     <RecordObjectSummary Type="_record.Type" ObjectId="_record.ObjectId" UserId="@_record.UserId" Name="@_record.ObjectName"
         Description="@_record.ObjectBriefIntroduction" Image="@_record.Image" IsThumbnail="_record.IsThumbnail">
-        <ExamineStatusBadge IsPassed="_record.IsPassed" />
+        @if (_record.IsPassed == true && RecordPresentation.SupportsHistory(_record.Type))
+        {
+            <div class="examine-detail-panel__history-action">
+                <CgButton Variant="secondary" Href="@($"/home/editrecord?ContrastId={_record.Id}&Mode=record")">
+                    <CgMdiIcon Name="mdiHistory" aria-hidden="true" />
+                    查看编辑记录
+                </CgButton>
+            </div>
+        }
     </RecordObjectSummary>
     <RecordMetadata Model="_record" />
     <RecordNotes Overview="@_record.EditOverview" ShowEmpty="@(string.IsNullOrWhiteSpace(_record.Comments) && string.IsNullOrWhiteSpace(_record.Note))" />
 
     @if (_record.PrepositionExamineId > 0 && _record.IsPassed is null)
     {
-        <div class="examine-detail-panel__alert" role="status"><strong>请先处理前置审核</strong><span>此记录暂时无法通过或驳回。</span><a href="/examine?Id=@_record.PrepositionExamineId">查看前置审核 #@_record.PrepositionExamineId →</a></div>
+        <div class="examine-detail-panel__alert" role="status"><strong>请先处理前置审核</strong><a href="/examine?Id=@_record.PrepositionExamineId">查看前置审核 #@_record.PrepositionExamineId →</a></div>
     }
     <ReviewContent Model="_record" />
     <RecordNotes Comments="@_record.Comments" Note="@_record.Note" />
     @if (_record.ContributionValue > 0)
     { <p class="examine-detail-panel__contribution">附加贡献值 <strong>@_record.ContributionValue</strong></p> }
-    @if (_record.IsPassed == true && RecordPresentation.SupportsHistory(_record.Type))
-    { <div><CgButton Variant="secondary" Href="@($"/home/editrecord?ContrastId={_record.Id}&Mode=record")">查看编辑记录</CgButton></div> }
     @if (_record.SensitiveWords is { Count: > 0 })
     {
         <section class="examine-detail-panel__alert"><h3>敏感词检测 · @_record.SensitiveWords.Count</h3><ul>

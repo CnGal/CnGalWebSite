@@ -7,7 +7,6 @@
         <CgButton OnClick="NavigateToContrast" Disabled="@(SelectionError is not null)">对比版本</CgButton>
     </div>
     @if (SelectionError is { } error) { <p role="status">@error</p> }
-    else { <p>仅包含此对象已通过的记录；版本编号表示截至该次编辑的完整内容。</p> }
 </section>
 
 @code {

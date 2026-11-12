@@ -4,6 +4,11 @@
     min-width: 0;
 }
 
+.examine-detail-panel__history-action {
+    display: flex;
+    flex-shrink: 0;
+}
+
 .examine-detail-panel__actions {
     padding: var(--cg-spacing-6);
     background: var(--cg-color-surface);
@@ -92,6 +97,14 @@ li {
 }
 
 @media (max-width: 640px) {
+    .examine-detail-panel__history-action {
+        flex-basis: 100%;
+    }
+
+    .examine-detail-panel__history-action ::deep .cg-btn {
+        width: 100%;
+    }
+
     .examine-detail-panel__actions {
         padding: var(--cg-spacing-4);
     }

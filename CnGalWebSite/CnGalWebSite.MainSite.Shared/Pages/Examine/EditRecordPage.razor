@@ -9,7 +9,7 @@
 <CgPageMeta Title="编辑记录" />
 <div class="edit-record-page">
     <header class="edit-record-page__header">
-        <div><h1><CgMdiIcon Name="mdiHistory" aria-hidden="true" />编辑记录</h1><p>浏览每次修改，或选择两个历史版本进行对比。</p></div>
+        <h1><CgMdiIcon Name="mdiHistory" aria-hidden="true" />编辑记录</h1>
     </header>
     @if (_isLoading)
     { <div class="edit-record-page__state" role="status"><CgProgressRing /><span>正在加载编辑记录…</span></div> }
@@ -55,7 +55,7 @@
                     { <div class="edit-record-page__notice" role="alert"><p>@_contentError</p><CgButton Variant="secondary" OnClick="LoadDataAsync">重试</CgButton></div> }
                     else if (IsCompare && _comparison is not null)
                     {
-                        <div class="edit-record-page__comparison-heading"><h2>版本 #@_comparison.ContrastId → #@_comparison.CurrentId</h2><p>展示两个时间点的完整内容，空白侧表示该版本无此类内容。</p></div>
+                        <div class="edit-record-page__comparison-heading"><h2>版本 #@_comparison.ContrastId → #@_comparison.CurrentId</h2></div>
                         @if (_comparison.ContrastId == _comparison.CurrentId)
                         { <p class="edit-record-page__notice" role="status">两个版本相同。</p> }
                         <RecordContentComparison Before="_comparison.Before" After="_comparison.After"

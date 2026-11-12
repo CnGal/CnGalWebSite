@@ -79,6 +79,13 @@ public class ExamineBrowserTests
                 await Expect(_page.GetByRole(AriaRole.Button, new() { Name = "通过审核", Exact = true })).ToBeEnabledAsync();
                 await NoOverflow();
                 await _page.ScreenshotAsync(new() { Path = Path.Combine(output, $"review-{theme}-{width}.png"), FullPage = true });
+                await _page.GotoAsync(Site + "/examine?Id=102");
+                var history = _page.GetByRole(AriaRole.Link, new() { Name = "查看编辑记录", Exact = true });
+                await Expect(_page.Locator(".record-object").GetByRole(AriaRole.Link, new() { Name = "查看编辑记录", Exact = true })).ToBeVisibleAsync();
+                await Expect(history).ToHaveCountAsync(1);
+                await Expect(history).ToHaveAttributeAsync("href", "/home/editrecord?ContrastId=102&Mode=record");
+                await NoOverflow();
+                await _page.ScreenshotAsync(new() { Path = Path.Combine(output, $"review-approved-{theme}-{width}.png"), FullPage = true });
             }
         }
         await _page.GotoAsync(Site + "/home/editrecord?ContrastId=20");

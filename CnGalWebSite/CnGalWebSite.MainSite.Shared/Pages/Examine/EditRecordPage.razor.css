@@ -21,13 +21,6 @@
     color: var(--cg-color-primary);
 }
 
-.edit-record-page__header p, .edit-record-page__comparison-heading p {
-    margin: var(--cg-spacing-2) 0 0;
-    font-size: var(--cg-font-size-sm);
-    color: var(--cg-color-text-muted);
-    line-height: 1.7;
-}
-
 .edit-record-page__body {
     display: grid;
     grid-template-columns: 280px minmax(0, 1fr);
