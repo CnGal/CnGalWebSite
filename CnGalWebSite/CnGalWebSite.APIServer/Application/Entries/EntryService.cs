@@ -1196,7 +1196,6 @@ namespace CnGalWebSite.APIServer.Application.Entries
                 model.IsDubbing = true;
             }
 
-            model.AllInformation = entry.Information?.ToList() ?? [];
             //初始化图片链接
             model.MainPicture = _appHelper.GetImagePath(entry.MainPicture, (entry.Type == EntryType.Staff || entry.Type == EntryType.Role) ? "" : "app.png");
             model.BackgroundPicture = _appHelper.GetImagePath(entry.BackgroundPicture, "");
@@ -2405,13 +2404,14 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         public async Task<List<EntryIndexViewModel>> ConcompareAndGenerateModel(Entry currentEntry, Entry newEntry)
         {
-            var model = new List<EntryIndexViewModel>
-            {
-                await GetEntryIndexViewModelAsync(currentEntry),
-                await GetEntryIndexViewModelAsync(newEntry)
-            };
+            var currentModel = await GetEntryIndexViewModelAsync(currentEntry);
+            var newModel = await GetEntryIndexViewModelAsync(newEntry);
 
-            return model;
+            // 完整附加信息只用于历史对比，避免普通词条查询携带隐藏/历史字段。
+            currentModel.AllInformation = currentEntry.Information?.ToList() ?? [];
+            newModel.AllInformation = newEntry.Information?.ToList() ?? [];
+
+            return [currentModel, newModel];
         }
 
         public EditMainViewModel GetEditMainViewModel(Entry entry)

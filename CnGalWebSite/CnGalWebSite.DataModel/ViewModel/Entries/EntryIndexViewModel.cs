@@ -6,6 +6,7 @@ using CnGalWebSite.DataModel.ViewModel.Steam;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 namespace CnGalWebSite.DataModel.ViewModel
 {
     public class EntryIndexViewModel
@@ -115,8 +116,10 @@ namespace CnGalWebSite.DataModel.ViewModel
 
         /// <summary>
         /// 历史对比使用的完整附加信息，包含当前页面已隐藏或不再配置展示的类型。
+        /// 仅历史对比接口填充，普通词条查询不返回。
         /// </summary>
-        public List<BasicEntryInformation> AllInformation { get; set; } = new List<BasicEntryInformation>();
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<BasicEntryInformation> AllInformation { get; set; }
         /// <summary>
         /// Staff信息 
         /// </summary>
