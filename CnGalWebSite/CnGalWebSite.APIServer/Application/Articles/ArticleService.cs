@@ -57,6 +57,21 @@ namespace CnGalWebSite.APIServer.Application.Articles
             _userService = userService;
         }
 
+        public async Task<ArticleInforTipViewModel> GetPublicSummaryAsync(long id, CancellationToken cancellationToken = default)
+        {
+            var article = await _articleRepository.GetAll().AsNoTracking()
+                .Where(s => s.Id == id && !s.IsHidden && !string.IsNullOrWhiteSpace(s.Name))
+                .Select(s => new Article
+                {
+                    Id = s.Id, Name = s.Name, DisplayName = s.DisplayName, Type = s.Type,
+                    CreateUserId = s.CreateUserId, MainPicture = s.MainPicture, BriefIntroduction = s.BriefIntroduction,
+                    LastEditTime = s.LastEditTime, ReaderCount = s.ReaderCount, ThumbsUpCount = s.ThumbsUpCount,
+                    CommentCount = s.CommentCount, OriginalLink = s.OriginalLink
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+            return article == null ? null : _appHelper.GetArticleInforTipViewModel(article);
+        }
+
         public async Task<PagedResultDto<Article>> GetPaginatedResult(GetArticleInput input)
         {
             var query = _articleRepository.GetAll().AsNoTracking().Where(s => s.IsHidden != true && string.IsNullOrWhiteSpace(s.Name) == false);
@@ -498,7 +513,7 @@ namespace CnGalWebSite.APIServer.Application.Articles
         {
             var model = new NewsModel
             {
-                Title = article.DisplayName ?? article.Name,
+                Title = string.IsNullOrWhiteSpace(article.DisplayName) ? article.Name : article.DisplayName,
                 BriefIntroduction = article.BriefIntroduction,
                 Link = article.OriginalLink ?? ("/articles/index/" + article.Id),
                 HappenedTime = article.RealNewsTime ?? article.PubishTime,

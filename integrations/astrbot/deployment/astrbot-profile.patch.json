@@ -1,0 +1,60 @@
+{
+  "wake_prefix": [
+    "看板娘"
+  ],
+  "timezone": "Asia/Shanghai",
+  "agent_runner": {
+    "runner_type": "local",
+    "config": {
+      "persona": {
+        "persona_id": "cngal"
+      }
+    }
+  },
+  "disable_builtin_commands": true,
+  "platform_settings": {
+    "friend_message_needs_wake_prefix": false,
+    "unique_session": false,
+    "rate_limit": {
+      "count": 0
+    },
+    "segmented_reply": {
+      "enable": false
+    },
+    "ignore_at_all": true,
+    "reply_prefix": "",
+    "reply_with_mention": false,
+    "reply_with_quote": false
+  },
+  "provider_settings": {
+    "enable": false,
+    "streaming_response": false,
+    "buffer_intermediate_messages": true,
+    "datetime_system_prompt": true,
+    "web_search": false,
+    "computer_use_runtime": "none",
+    "proactive_capability": {
+      "add_cron_tools": false
+    },
+    "display_reasoning_text": false,
+    "show_tool_use_status": false,
+    "show_tool_call_result": false
+  },
+  "provider_ltm_settings": {
+    "group_icl_enable": true,
+    "group_message_max_cnt": 30,
+    "group_message_history_enable": false,
+    "active_reply": {
+      "enable": false
+    }
+  },
+  "content_safety": {
+    "also_use_in_response": true
+  },
+  "provider_tts_settings": {
+    "enable": false
+  },
+  "log_level": "WARNING",
+  "trace_enable": false,
+  "t2i": false
+}

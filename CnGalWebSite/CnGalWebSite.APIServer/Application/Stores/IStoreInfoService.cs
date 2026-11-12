@@ -7,6 +7,8 @@ namespace CnGalWebSite.APIServer.Application.Stores
     {
         Task BatchUpdate(int max);
 
+        Task<int> CountDiscountedGamesAsync(CancellationToken cancellationToken = default);
+
         Task<StoreInfoViewModel> Get(PublishPlatformType platformType, string platformName, string link,string name, int entryId);
 
     }
