@@ -25,6 +25,8 @@ namespace CnGalWebSite.APIServer.Application.Videos
 
         List<KeyValuePair<object, Operation>> ExaminesCompletion(Video currentVideo, Video newVideo);
 
+        List<VideoViewModel> ConcompareAndGenerateModel(Video currentVideo, Video newVideo);
+
         Task<VideoEditState> GetEditState(ApplicationUser user, long id);
 
         void SetDataFromEditMain(Video item, EditVideoMainViewModel model);
@@ -43,7 +45,10 @@ namespace CnGalWebSite.APIServer.Application.Videos
 
         EditVideoMainPageViewModel GetEditMainPage(Video item);
 
+        ExaminePreDataModel GetExamineViewMain(Video item);
 
+        ExaminePreDataModel GetExamineViewRelevances(Video item);
 
+        ExaminePreDataModel GetExamineViewImages(Video item);
     }
 }

@@ -36,7 +36,6 @@ using Microsoft.AspNetCore.Authentication;
 using CnGalWebSite.Core.Models;
 using HtmlAgilityPack;
 using NuGet.Versioning;
-using CnGalWebSite.Helper.Security;
 
 namespace CnGalWebSite.APIServer.Application.Helper
 {

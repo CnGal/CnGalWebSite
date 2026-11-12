@@ -585,6 +585,19 @@ namespace CnGalWebSite.APIServer.Application.Tags
             return examines;
         }
 
+        public async Task<List<TagIndexViewModel>> ConcompareAndGenerateModel(Tag currentTag, Tag newTag)
+        {
+            var model = new List<TagIndexViewModel>
+            {
+                await GetTagViewModel(currentTag),
+                await GetTagViewModel(newTag)
+            };
+
+
+
+            return model;
+        }
+
         public void SetDataFromEditTagMainViewModel(Tag newTag, EditTagMainViewModel model, Tag parentTag)
         {
             newTag.ParentCodeNavigation = parentTag;

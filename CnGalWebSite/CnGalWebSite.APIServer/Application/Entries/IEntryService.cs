@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.Sorting;
+﻿using CnGalWebSite.DataModel.Sorting;
 
 using CnGalWebSite.APIServer.Application.Entries.Dtos;
 
@@ -52,6 +52,8 @@ namespace CnGalWebSite.APIServer.Application.Entries
         Task<int?> GetRandomPublicGameIdAsync(System.Threading.CancellationToken cancellationToken = default);
 
         List<KeyValuePair<object, Operation>> ExaminesCompletion(Entry currentEntry, Entry newEntry);
+
+        Task<List<EntryIndexViewModel>> ConcompareAndGenerateModel(Entry currentEntry, Entry newEntry);
 
         EditMainViewModel GetEditMainViewModel(Entry entry);
 

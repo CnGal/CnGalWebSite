@@ -1,4 +1,6 @@
+﻿using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.SDK.MainSite.Models;
 
 namespace CnGalWebSite.MainSite.Shared.Components.Features.Examine;
 
@@ -7,10 +9,23 @@ public static class RecordPresentation
     public static string Display(RecordPreviewItem item) =>
         string.IsNullOrWhiteSpace(item.DisplayValue) ? item.Value : item.DisplayValue;
 
-    public static bool SupportsHistory(ExaminedNormalListModelType type) => ExamineRecordTypeMetadata.SupportsHistory(type);
+    public static bool SupportsHistory(ExaminedNormalListModelType type) => type is
+        ExaminedNormalListModelType.Entry or ExaminedNormalListModelType.Article or
+        ExaminedNormalListModelType.Tag or ExaminedNormalListModelType.Periphery or
+        ExaminedNormalListModelType.Video;
 
-    public static string? ObjectUrl(ExaminedNormalListModelType type, long id, string? userId = null) =>
-        ExamineRecordTypeMetadata.ObjectUrl(type, id, userId);
+    public static string? ObjectUrl(ExaminedNormalListModelType type, long id, string? userId = null) => type switch
+    {
+        ExaminedNormalListModelType.Entry => id > 0 ? "/entries/index/" + id : null,
+        ExaminedNormalListModelType.Article => id > 0 ? "/articles/index/" + id : null,
+        ExaminedNormalListModelType.Tag => id > 0 ? "/tags/index/" + id : null,
+        ExaminedNormalListModelType.Periphery => id > 0 ? "/peripheries/index/" + id : null,
+        ExaminedNormalListModelType.Video => id > 0 ? "/videos/index/" + id : null,
+        ExaminedNormalListModelType.FavoriteFolder => id > 0 ? "/favoritefolders/index/" + id : null,
+        ExaminedNormalListModelType.User or ExaminedNormalListModelType.UserCertification =>
+            string.IsNullOrWhiteSpace(userId) ? null : "/space/index/" + Uri.EscapeDataString(userId),
+        _ => null
+    };
 
     public static bool CanProcess(ExamineViewModel model) => model.IsAdmin && model.IsPassed is null && model.PrepositionExamineId <= 0;
 

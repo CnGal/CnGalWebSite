@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -34,6 +34,7 @@
   <ItemGroup>
     <PackageReference Include="htmldiff.net" Version="1.5.0" />
     <PackageReference Include="ModelContextProtocol.AspNetCore" Version="2.3.0" />
+    <PackageReference Include="HtmlSanitizer" Version="9.2.995" />
     <PackageReference Include="IdentityModel" Version="7.0.0" />
     <PackageReference Include="Markdig" Version="0.43.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />

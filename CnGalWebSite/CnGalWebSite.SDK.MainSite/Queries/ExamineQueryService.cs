@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.Sorting;
+﻿using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.DataModel.ViewModel;
 using System.Net.Http.Json;
 using System.Security.Cryptography;
@@ -204,18 +204,57 @@ public sealed class ExamineQueryService(
             cancellationToken, userCache.GetExamineGeneration(HttpClient.BaseAddress, examineId));
     }
 
-    // Historical comparisons must replay records, never combine two live review-detail views.
     public async Task<SdkResult<EditRecordComparison>> GetEditRecordComparisonAsync(
         ExaminedNormalListModelType type, long contrastId, long currentId, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (contrastId <= 0 || currentId <= 0)
             return SdkResult<EditRecordComparison>.Fail("EXAMINE_COMPARISON_RANGE", "请选择有效的版本");
-        var path = ExamineRecordTypeMetadata.ApiSegment(type);
-        if (path is null) return SdkResult<EditRecordComparison>.Fail("EXAMINE_COMPARISON_TYPE", "该类型不支持历史版本对比");
-        return await GetAsync<EditRecordComparison>($"api/{path}/GetContrastEditRecordViews/{contrastId}/{currentId}",
-            "EXAMINE_COMPARISON", "历史版本对比", cancellationToken);
+
+        var suffix = $"GetContrastEditRecordViews/{contrastId}/{currentId}";
+        var result = await (type switch
+        {
+            ExaminedNormalListModelType.Entry => GetSingleAsync<EntryContrastEditRecordViewModel, EditRecordComparison>(
+                $"api/entries/{suffix}",
+                m => Compare(m.ContrastId, m.CurrentId,
+                    EditRecordContentMapper.Map(m.ContrastModel), EditRecordContentMapper.Map(m.CurrentModel)),
+                "EXAMINE_COMPARISON", "历史版本对比", contrastId, cancellationToken),
+            ExaminedNormalListModelType.Article => GetSingleAsync<ArticleContrastEditRecordViewModel, EditRecordComparison>(
+                $"api/articles/{suffix}",
+                m => Compare(m.ContrastId, m.CurrentId,
+                    EditRecordContentMapper.Map(m.ContrastModel), EditRecordContentMapper.Map(m.CurrentModel)),
+                "EXAMINE_COMPARISON", "历史版本对比", contrastId, cancellationToken),
+            ExaminedNormalListModelType.Tag => GetSingleAsync<TagContrastEditRecordViewModel, EditRecordComparison>(
+                $"api/tags/{suffix}",
+                m => Compare(m.ContrastId, m.CurrentId,
+                    EditRecordContentMapper.Map(m.ContrastModel), EditRecordContentMapper.Map(m.CurrentModel)),
+                "EXAMINE_COMPARISON", "历史版本对比", contrastId, cancellationToken),
+            ExaminedNormalListModelType.Periphery => GetSingleAsync<PeripheryContrastEditRecordViewModel, EditRecordComparison>(
+                $"api/peripheries/{suffix}",
+                m => Compare(m.ContrastId, m.CurrentId,
+                    EditRecordContentMapper.Map(m.ContrastModel), EditRecordContentMapper.Map(m.CurrentModel)),
+                "EXAMINE_COMPARISON", "历史版本对比", contrastId, cancellationToken),
+            ExaminedNormalListModelType.Video => GetSingleAsync<VideoContrastEditRecordViewModel, EditRecordComparison>(
+                $"api/videos/{suffix}",
+                m => Compare(m.ContrastId, m.CurrentId,
+                    EditRecordContentMapper.Map(m.ContrastModel), EditRecordContentMapper.Map(m.CurrentModel)),
+                "EXAMINE_COMPARISON", "历史版本对比", contrastId, cancellationToken),
+            _ => Task.FromResult(SdkResult<EditRecordComparison>.Fail(
+                "EXAMINE_COMPARISON_TYPE", "该类型不支持历史版本对比"))
+        });
+        cancellationToken.ThrowIfCancellationRequested();
+        return result;
     }
+
+    private static EditRecordComparison Compare(long contrastId, long currentId,
+        CnGalWebSite.DataModel.ViewModel.Admin.ExaminePreDataModel before,
+        CnGalWebSite.DataModel.ViewModel.Admin.ExaminePreDataModel after) => new()
+    {
+        ContrastId = contrastId,
+        CurrentId = currentId,
+        Before = ExaminePreviewMapper.FromPreData(before),
+        After = ExaminePreviewMapper.FromPreData(after)
+    };
 
     private async Task<SdkResult<T>> WithIdentityAsync<T>(
         Func<CurrentUserCacheScope?, CancellationToken, Task<SdkResult<T>>> query,

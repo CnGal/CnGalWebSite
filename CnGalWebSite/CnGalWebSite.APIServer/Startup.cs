@@ -1,4 +1,4 @@
-using CnGalWebSite.APIServer.Application.BackgroundTasks;
+﻿using CnGalWebSite.APIServer.Application.BackgroundTasks;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Mcp;

@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HtmlSanitizer" Version="9.2.995" />
     <PackageReference Include="NodaTime" Version="3.2.2" />
   </ItemGroup>
 

@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.Sorting;
+﻿using CnGalWebSite.DataModel.Sorting;
 
 
 using CnGalWebSite.APIServer.Application.Articles.Dtos;
@@ -39,6 +39,8 @@ namespace CnGalWebSite.APIServer.Application.Articles
         Task<ArticleInforTipViewModel> GetPublicSummaryAsync(long id, System.Threading.CancellationToken cancellationToken = default);
 
         List<KeyValuePair<object, Operation>> ExaminesCompletion(Article currentArticle, Article newArticle);
+
+        List<ArticleViewModel> ConcompareAndGenerateModel(Article currentArticle, Article newArticle);
 
         Task<ArticleEditState> GetArticleEditState(ApplicationUser user, long id);
 

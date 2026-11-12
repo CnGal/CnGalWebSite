@@ -29,7 +29,7 @@ public class ExamineComparisonSdkTests
         {
             calls.Add(request.RequestUri!.AbsolutePath);
             return Task.FromResult(Json(HttpStatusCode.OK, """
-                {"contrastId":10,"currentId":20,"before":{"items":[{"key":"name","group":"主要信息","kind":1,"label":"名称","value":"Historical baseline","displayValue":"Historical baseline"}]},"after":{"items":[{"key":"name","group":"主要信息","kind":1,"label":"名称","value":"Historical target","displayValue":"Historical target"}]}}
+                {"contrastId":10,"currentId":20,"contrastModel":{"name":"Historical baseline"},"currentModel":{"name":"Historical target"}}
                 """));
         });
         var result = await Query(http, storage, userCache).GetEditRecordComparisonAsync(type, 10, 20);
@@ -97,7 +97,7 @@ public class ExamineComparisonSdkTests
         {
             calls.Add(request.RequestUri!.AbsolutePath);
             return Task.FromResult(Json(HttpStatusCode.OK, """
-                {"contrastId":20,"currentId":10,"before":{"items":[]},"after":{"items":[]}}
+                {"contrastId":20,"currentId":10,"contrastModel":{},"currentModel":{}}
                 """));
         });
         var result = await Query(http, storage, userCache).GetEditRecordComparisonAsync(ExaminedNormalListModelType.Entry, 20, 10);
@@ -122,11 +122,11 @@ public class ExamineComparisonSdkTests
     [Test]
     public void ImageReplacementIsReportedAsModifiedInsteadOfRemovedAndAdded()
     {
-        var before = new ExaminePreDataModel { Items = [
+        var before = new RecordPreviewModel { Items = [
             new() { Key = "picture/old", Group = "图片", Kind = RecordPreviewKind.Image, Label = "主视觉",
                 Value = "https://media.example/old.png", DisplayValue = "https://media.example/old.png", Url = "https://media.example/old.png" }
         ] };
-        var after = new ExaminePreDataModel { Items = [
+        var after = new RecordPreviewModel { Items = [
             new() { Key = "picture/new", Group = "图片", Kind = RecordPreviewKind.Image, Label = "主视觉",
                 Value = "https://media.example/new.png", DisplayValue = "https://media.example/new.png", Url = "https://media.example/new.png" }
         ] };
@@ -145,10 +145,10 @@ public class ExamineComparisonSdkTests
     [Test]
     public void ExplicitlyClearedFieldIsModifiedInsteadOfRemoved()
     {
-        var before = new ExaminePreDataModel { Items = [
+        var before = new RecordPreviewModel { Items = [
             new() { Key = "main/Name", Group = "主要信息", Kind = RecordPreviewKind.Text, Label = "名称", Value = "A", DisplayValue = "A" }
         ] };
-        var after = new ExaminePreDataModel { Items = [
+        var after = new RecordPreviewModel { Items = [
             new() { Key = "main/Name", Group = "主要信息", Kind = RecordPreviewKind.Text, Label = "名称", Value = "", DisplayValue = "" }
         ] };
 
@@ -166,14 +166,14 @@ public class ExamineComparisonSdkTests
     [Test]
     public void DiffKeepsDuplicateRowsAndOnlyReportsChangedValues()
     {
-        var before = new ExaminePreDataModel { Items = [
+        var before = new RecordPreviewModel { Items = [
             new() { Key = "text/1", Group = "信息", Kind = RecordPreviewKind.Text, Label = "同名字段", Value = "值一", DisplayValue = "值一" },
             new() { Key = "text/2", Group = "信息", Kind = RecordPreviewKind.Text, Label = "同名字段", Value = "值二", DisplayValue = "值二" },
             new() { Key = "stable", Group = "信息", Kind = RecordPreviewKind.Text, Label = "固定字段", Value = "相同", DisplayValue = "相同" },
             new() { Key = "property", Group = "信息", Kind = RecordPreviewKind.Text, Label = "附加字段", Value = "值", DisplayValue = "值",
                 Properties = [new() { Key = "note", Label = "备注", Value = "旧", DisplayValue = "旧" }] }
         ] };
-        var after = new ExaminePreDataModel { Items = [
+        var after = new RecordPreviewModel { Items = [
             new() { Key = "text/1", Group = "信息", Kind = RecordPreviewKind.Text, Label = "同名字段", Value = "值一", DisplayValue = "值一" },
             new() { Key = "text/2", Group = "信息", Kind = RecordPreviewKind.Text, Label = "同名字段", Value = "值二", DisplayValue = "值二" },
             new() { Key = "stable", Group = "信息", Kind = RecordPreviewKind.Text, Label = "固定字段", Value = "相同", DisplayValue = "相同" },

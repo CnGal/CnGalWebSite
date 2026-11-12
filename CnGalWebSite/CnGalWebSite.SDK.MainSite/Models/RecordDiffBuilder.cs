@@ -1,6 +1,4 @@
-﻿using CnGalWebSite.DataModel.ViewModel.Admin;
-
-namespace CnGalWebSite.SDK.MainSite.Models;
+﻿namespace CnGalWebSite.SDK.MainSite.Models;
 
 public enum RecordChangeKind { Unchanged, Added, Removed, Modified, Unknown, Submission }
 
@@ -18,7 +16,7 @@ public sealed record RecordDiff(IReadOnlyList<RecordDiffItem> Items)
 
 public static class RecordDiffBuilder
 {
-    public static RecordDiff Build(ExaminePreDataModel? before, ExaminePreDataModel? after, bool submissionOnly = false)
+    public static RecordDiff Build(RecordPreviewModel? before, RecordPreviewModel? after, bool submissionOnly = false)
     {
         var left = (before?.Items ?? []).ToList();
         var right = (after?.Items ?? []).ToList();

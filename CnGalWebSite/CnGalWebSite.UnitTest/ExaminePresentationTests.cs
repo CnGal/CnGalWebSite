@@ -70,7 +70,7 @@ public class ExaminePresentationTests
                 Is.All.EqualTo(RecordChangeKind.Unknown));
             Assert.That(RecordDiffBuilder.Build(null, data).Items.Select(item => item.Change),
                 Is.All.EqualTo(RecordChangeKind.Unknown));
-            Assert.That(RecordDiffBuilder.Build(data, new ExaminePreDataModel { IsComplete = false }).Items.Select(item => item.Change),
+            Assert.That(RecordDiffBuilder.Build(data, new RecordPreviewModel { IsComplete = false }).Items.Select(item => item.Change),
                 Is.All.EqualTo(RecordChangeKind.Unknown));
         });
     }
@@ -81,7 +81,7 @@ public class ExaminePresentationTests
         using var services = Services();
         await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
 
-        async Task<string> Render(ExaminePreDataModel before, ExaminePreDataModel after) =>
+        async Task<string> Render(RecordPreviewModel before, RecordPreviewModel after) =>
             WebUtility.HtmlDecode((await renderer.RenderComponentAsync<RecordContentComparison>(
                 ParameterView.FromDictionary(new Dictionary<string, object?> { ["Before"] = before, ["After"] = after }))).ToHtmlString());
 
@@ -120,7 +120,7 @@ public class ExaminePresentationTests
     [Test]
     public async Task ChangedImageNoteIsVisibleOnBothSides()
     {
-        var before = new ExaminePreDataModel
+        var before = new RecordPreviewModel
         {
             Items = [new()
             {
@@ -130,7 +130,7 @@ public class ExaminePresentationTests
                 Properties = [new() { Key = "Note", Label = "说明", Value = "旧图片说明", DisplayValue = "旧图片说明" }]
             }]
         };
-        var after = new ExaminePreDataModel
+        var after = new RecordPreviewModel
         {
             Items = [new()
             {
@@ -157,7 +157,7 @@ public class ExaminePresentationTests
     [Test]
     public void AmbiguousImageReplacementsRemainAdditionsAndRemovals()
     {
-        var before = new ExaminePreDataModel
+        var before = new RecordPreviewModel
         {
             Items =
             [
@@ -165,7 +165,7 @@ public class ExaminePresentationTests
                 new() { Key = "picture/2", Group = "图片", Kind = RecordPreviewKind.Image, Value = "https://media.example/old-2.png", Url = "https://media.example/old-2.png" }
             ]
         };
-        var after = new ExaminePreDataModel
+        var after = new RecordPreviewModel
         {
             Items =
             [
@@ -210,10 +210,10 @@ public class ExaminePresentationTests
     {
         using var services = Services();
         await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
-        var before = new ExaminePreDataModel { Items = [
+        var before = new RecordPreviewModel { Items = [
             new() { Key = "text/1", Group = "主要信息", Kind = RecordPreviewKind.Text, Label = "简介", Value = "旧内容", DisplayValue = "旧内容" }
         ] };
-        var after = new ExaminePreDataModel { Items = [
+        var after = new RecordPreviewModel { Items = [
             new() { Key = "text/1", Group = "主要信息", Kind = RecordPreviewKind.Text, Label = "简介", Value = "新内容", DisplayValue = "新内容" }
         ] };
 
@@ -229,10 +229,10 @@ public class ExaminePresentationTests
     {
         using var services = Services();
         await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
-        var before = new ExaminePreDataModel { Items = [
+        var before = new RecordPreviewModel { Items = [
             new() { Key = "body", Group = "正文", Kind = RecordPreviewKind.Body, Label = "正文", Value = "旧内容", Html = "<p>旧内容</p>" }
         ] };
-        var after = new ExaminePreDataModel { Items = [
+        var after = new RecordPreviewModel { Items = [
             new() { Key = "body", Group = "正文", Kind = RecordPreviewKind.Body, Label = "正文", Value = "新内容", Html = "<p>新内容</p>" }
         ] };
 
@@ -259,15 +259,15 @@ public class ExaminePresentationTests
             WebUtility.HtmlDecode((await renderer.RenderComponentAsync<RecordContentComparison>(
                 ParameterView.FromDictionary(new Dictionary<string, object?>
                 {
-                    ["Before"] = new ExaminePreDataModel { Items = [] },
-                    ["After"] = new ExaminePreDataModel { Items = [textItem] }
+                    ["Before"] = new RecordPreviewModel { Items = [] },
+                    ["After"] = new RecordPreviewModel { Items = [textItem] }
                 }))).ToHtmlString()));
         var removedHtml = await renderer.Dispatcher.InvokeAsync(async () =>
             WebUtility.HtmlDecode((await renderer.RenderComponentAsync<RecordContentComparison>(
                 ParameterView.FromDictionary(new Dictionary<string, object?>
                 {
-                    ["Before"] = new ExaminePreDataModel { Items = [textItem] },
-                    ["After"] = new ExaminePreDataModel { Items = [] }
+                    ["Before"] = new RecordPreviewModel { Items = [textItem] },
+                    ["After"] = new RecordPreviewModel { Items = [] }
                 }))).ToHtmlString()));
 
         Assert.Multiple(() =>
@@ -282,7 +282,7 @@ public class ExaminePresentationTests
     [Test]
     public async Task LinkDestinationsAndAudioNamesAreVisibleInComparison()
     {
-        var before = new ExaminePreDataModel
+        var before = new RecordPreviewModel
         {
             Items =
             [
@@ -290,7 +290,7 @@ public class ExaminePresentationTests
                 new() { Key = "audio", Group = "音频", Kind = RecordPreviewKind.Audio, Label = "旧名称", Value = "https://media.example/audio.mp3", DisplayValue = "https://media.example/audio.mp3", Url = "https://media.example/audio.mp3", Properties = [new() { Key = "Name", Label = "名称", Value = "旧名称", DisplayValue = "旧名称" }] }
             ]
         };
-        var after = new ExaminePreDataModel
+        var after = new RecordPreviewModel
         {
             Items =
             [
@@ -404,16 +404,13 @@ public class ExaminePresentationTests
 
     [TestCase(Operation.PubulishComment)]
     [TestCase(Operation.RequestUserCertification)]
-    [TestCase(Operation.EditPlayedGameMain)]
-    [TestCase(Operation.EditFavoriteFolderMain)]
     public async Task SingleSubmissionsAreNotRepeated(Operation operation)
     {
         using var services = Services();
         await using var renderer = new HtmlRenderer(services, services.GetRequiredService<ILoggerFactory>());
         var model = Review(7, true);
         model.Operation = operation;
-        model.SubmissionOnly = true;
-        model.BeforeModel = model.AfterModel = new() { Items = [new() { Key = "body", Group = "正文", Kind = RecordPreviewKind.Body, Label = "正文", Value = "<p>unique-submission</p>", Html = "<p>unique-submission</p>" }] };
+        model.BeforeModel = model.AfterModel = LegacyBody("<p>unique-submission</p>");
         var html = await renderer.Dispatcher.InvokeAsync(async () =>
             (await renderer.RenderComponentAsync<ReviewContent>(ParameterView.FromDictionary(new Dictionary<string, object?> { ["Model"] = model }))).ToHtmlString());
         Assert.That(html.Split("unique-submission").Length - 1, Is.EqualTo(1));
@@ -545,7 +542,7 @@ public class ExaminePresentationTests
         });
         Task<SdkResult<ExamineViewModel>> StartOld() { started.TrySetResult(); return old.Task; }
         Task<SdkResult<ExamineViewModel>> StartNew() { newerStarted.TrySetResult(); return Task.FromResult(SdkResult<ExamineViewModel>.Ok(new()
-            { Id = 2, AfterModel = Body("new-content") })); }
+            { Id = 2, AfterModel = LegacyBody("new-content") })); }
         using var services = Services(query);
         await using var renderer = new TestRenderer(services);
         var root = await renderer.Attach<EditRecordPage>();
@@ -553,12 +550,12 @@ public class ExaminePresentationTests
         await started.Task.WaitAsync(TimeSpan.FromSeconds(5));
         var second = renderer.Render(root, new() { ["ContrastIdQuery"] = "2", ["SelectedIdQuery"] = "2" });
         await newerStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        old.SetResult(SdkResult<ExamineViewModel>.Ok(new() { Id = 1, AfterModel = Body("stale-content") }));
+        old.SetResult(SdkResult<ExamineViewModel>.Ok(new() { Id = 1, AfterModel = LegacyBody("stale-content") }));
         await Task.WhenAll(first, second).WaitAsync(TimeSpan.FromSeconds(5));
         Assert.That(renderer.AllText(root), Does.Contain("new-content").And.Not.Contain("stale-content"));
     }
 
-    public static ExaminePreDataModel Content(int mask)
+    public static RecordPreviewModel Content(int mask)
     {
         var items = new List<RecordPreviewItem>();
         if ((mask & 1) != 0) items.Add(new() { Key = "body", Group = "正文", Kind = RecordPreviewKind.Body, Label = "正文", Value = "<p>正文内容</p>", Html = "<p>正文内容</p>" });
@@ -592,15 +589,15 @@ public class ExaminePresentationTests
             .Any(button => Regex.IsMatch(button.Value, @"<button\b[^>]*(?<![\w-])disabled(?=[\s=>])", RegexOptions.Singleline)
                 && button.Value.Contains(label, StringComparison.Ordinal));
 
-    private static ExaminePreDataModel Body(string text) => new()
+    private static CnGalWebSite.DataModel.ViewModel.Admin.ExaminePreDataModel LegacyBody(string text) => new()
     {
-        Items = [new() { Key = "body", Group = "正文", Kind = RecordPreviewKind.Body, Label = "正文", Value = text, Html = text }]
+        MainPage = text
     };
 
     private static ExamineViewModel Review(long id, bool? passed = null, bool admin = true, long dependency = 0)
         => new() { Id = id, ObjectId = 1, ObjectName = "测试对象", UserId = "test-user", UserName = "编辑者", ApplyTime = new(2026, 11, 12),
             IsAdmin = admin, IsPassed = passed, PrepositionExamineId = dependency, Operation = Operation.EstablishMain,
-            BeforeModel = Body("<p>旧内容</p>"), AfterModel = Body("<p>新内容</p>") };
+            BeforeModel = LegacyBody("<p>旧内容</p>"), AfterModel = LegacyBody("<p>新内容</p>") };
 
     private static EditRecordAloneViewModel History(long id) => new() { Id = id, UserName = "编辑者", Operation = Operation.EstablishMain };
     private static ServiceProvider Services(IExamineQueryService? query = null, IExamineCommandService? command = null)
@@ -653,3 +650,4 @@ public class ExaminePresentationTests
     }
 }
 #pragma warning restore BL0006
+

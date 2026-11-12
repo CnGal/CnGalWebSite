@@ -34,6 +34,8 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
 
         List<KeyValuePair<object, Operation>> ExaminesCompletion(Periphery currentPeriphery, Periphery newPeriphery);
 
+       List<PeripheryViewModel> ConcompareAndGenerateModel(Periphery currentPeriphery, Periphery newPeriphery);
+
         void SetDataFromEditPeripheryMainViewModel(Periphery newPeriphery, EditPeripheryMainViewModel model);
 
         void SetDataFromEditPeripheryImagesViewModel(Periphery newPeriphery, EditPeripheryImagesViewModel model);

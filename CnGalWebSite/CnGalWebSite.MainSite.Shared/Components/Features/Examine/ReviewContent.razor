@@ -1,4 +1,6 @@
-﻿@using CnGalWebSite.DataModel.ViewModel.Admin
+﻿@using CnGalWebSite.DataModel.Model
+@using CnGalWebSite.DataModel.ViewModel.Admin
+@using CnGalWebSite.SDK.MainSite.Models
 <div class="review-content">
     <div class="review-content__tabs" role="tablist" aria-label="审核内容">
         <button type="button" role="tab" id="review-tab-summary" aria-controls="review-panel-summary"
@@ -14,10 +16,10 @@
     @if (_activeTab == ReviewTab.Summary)
     {
         <div id="review-panel-summary" role="tabpanel" aria-labelledby="review-tab-summary">
-            <RecordContentComparison Before="Model.BeforeModel" After="Model.AfterModel"
+            <RecordContentComparison Before="_before" After="_after"
                 BeforeTitle="@(Model.IsPassed is null ? "当前内容" : "修改前")"
                 AfterTitle="@(Model.IsPassed == false ? "拟提交内容" : Model.IsPassed is null ? "提交内容" : "修改后")"
-                SubmissionOnly="Model.SubmissionOnly" />
+                SubmissionOnly="IsSubmissionOnly" />
         </div>
     }
     else
@@ -31,12 +33,17 @@
 @code {
     [Parameter, EditorRequired] public ExamineViewModel Model { get; set; } = default!;
     private ExamineViewModel? _source;
+    private RecordPreviewModel? _before;
+    private RecordPreviewModel? _after;
     private ReviewTab _activeTab = ReviewTab.Summary;
+    private bool IsSubmissionOnly => Model.Operation is Operation.PubulishComment or Operation.RequestUserCertification;
 
     protected override void OnParametersSet()
     {
         if (ReferenceEquals(_source, Model)) return;
         _source = Model;
+        _before = ExaminePreviewMapper.FromPreData(Model.BeforeModel);
+        _after = ExaminePreviewMapper.FromPreData(Model.AfterModel);
         _activeTab = ReviewTab.Summary;
     }
 

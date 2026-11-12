@@ -1,5 +1,4 @@
-﻿@using CnGalWebSite.DataModel.ViewModel.Admin
-@using CnGalWebSite.SDK.MainSite.Models
+﻿@using CnGalWebSite.SDK.MainSite.Models
 
 <div class="record-comparison @(SubmissionOnly ? "record-comparison--single" : "")">
     @if (SnapshotIncomplete)
@@ -51,14 +50,14 @@
 </div>
 
 @code {
-    [Parameter] public ExaminePreDataModel? Before { get; set; }
-    [Parameter] public ExaminePreDataModel? After { get; set; }
+    [Parameter] public RecordPreviewModel? Before { get; set; }
+    [Parameter] public RecordPreviewModel? After { get; set; }
     [Parameter] public string BeforeTitle { get; set; } = "修改前";
     [Parameter] public string AfterTitle { get; set; } = "修改后";
     [Parameter] public bool SubmissionOnly { get; set; }
     private RecordDiff _diff = new([]);
-    private ExaminePreDataModel? _before;
-    private ExaminePreDataModel? _after;
+    private RecordPreviewModel? _before;
+    private RecordPreviewModel? _after;
     private bool _submissionOnly;
     private IEnumerable<RecordDiffItem> ChangedItems => _diff.Items.Where(i => i.Changed);
     private bool SnapshotIncomplete => !SubmissionOnly

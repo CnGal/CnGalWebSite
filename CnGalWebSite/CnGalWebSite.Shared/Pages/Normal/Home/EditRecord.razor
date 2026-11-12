@@ -1,20 +1,26 @@
 ﻿@page "/home/editrecord"
 
+
+@inject IHttpService _httpService
+
+
+
 @inject NavigationManager NavigationManager
+
 @inject IJSRuntime JS
+@inject IDataCacheService _dataCatcheService
+
+
 @inject IDataCacheService _dataCatcheService
 @implements IDisposable
 
-@if (isReady && !_loadFailed)
+
+@if (isReady)
 {
     <CnGalWebSite.Shared.MasaComponent.Shared.Cards.TitleTip NoIndex Title="@("『"+ExaminesOverview.ObjectName+"』第" +(ExaminesOverview.Examines.FindIndex(s=>s.Id==ContrastId)+1)+"次编辑记录")" Description="@ExaminesOverview.ObjectBriefIntroduction" Image="@ExaminesOverview.Image"/>
 }
 
-@if (_loadFailed)
-{
-    <p role="alert">@_comparisonError</p>
-}
-else if (isReady)
+@if (isReady)
 {
     <OverviewCard Model="ExaminesOverview" @ref="overviewCard" />
     <ContrastOverview Model="ExaminesOverview" ContrastItem="@ContrastId.ToString()" CurrentItem="@CurrentId.ToString()"
@@ -24,34 +30,68 @@ else if (isReady)
             {
                 <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
             }
-            else if (_comparison is null)
-            {
-                <p>@_comparisonError</p>
-            }
             else
             {
-                <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="_comparison.Before" />
+                @if (ExaminesOverview.Type == ExaminedNormalListModelType.Entry)
+                {
+                    <EntryContrastCard Model="EntryContrast.ContrastModel" />
+                }
+                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Article)
+                {
+                    <ArticleContrastCard Model="ArticleContrast.ContrastModel" />
+                }
+                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Periphery)
+                {
+                    <PeripheryContrastCard Model="PeripheryContrast.ContrastModel" />
+                }
+                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Tag)
+                {
+                    <TagContrastCard Model="TagContrast.ContrastModel" />
+                }
+                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Video)
+                {
+                    <VideoContrastCard Model="VideoContrast.ContrastModel" />
+                }
             }
+
         </ContrastView>
         <CurrentView>
             @if (isRefreshing)
             {
                 <CnGalWebSite.Components.Progressings.ProgressingCard Page Fill />
             }
-            else if (_comparison is null)
-            {
-                <p>@_comparisonError</p>
-            }
             else
             {
-                <CnGalWebSite.Shared.Component.Admin.Examines.Cards.PreViewCard Model="_comparison.After" />
+                @if (ExaminesOverview.Type == ExaminedNormalListModelType.Entry)
+                {
+                    <EntryContrastCard Model="EntryContrast.CurrentModel" />
+                }
+                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Article)
+                {
+                    <ArticleContrastCard Model="ArticleContrast.CurrentModel" />
+                }
+                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Periphery)
+                {
+                    <PeripheryContrastCard Model="PeripheryContrast.CurrentModel" />
+                }
+                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Tag)
+                {
+                    <TagContrastCard Model="TagContrast.CurrentModel" />
+                }
+                else if (ExaminesOverview.Type == ExaminedNormalListModelType.Video)
+                {
+                    <VideoContrastCard Model="VideoContrast.CurrentModel" />
+                }
             }
+
+
         </CurrentView>
     </ContrastOverview>
 }
 else
 {
     <CnGalWebSite.Components.Progressings.ProgressingCard Page />
+
 }
 
 
@@ -67,34 +107,25 @@ else
 
     bool isReady = false;
     bool isRefreshing = true;
-    bool _loadFailed;
 
     [CascadingParameter]
     public ErrorHandler ErrorHandler { get; set; }
 
     public ExaminesOverviewViewModel ExaminesOverview { get; set; } = new ExaminesOverviewViewModel();
-
-    private EditRecordComparison _comparison;
-    private string _comparisonError;
-    private long _comparisonRequestVersion;
+    public EntryContrastEditRecordViewModel EntryContrast { get; set; } = new EntryContrastEditRecordViewModel();
+    public ArticleContrastEditRecordViewModel ArticleContrast { get; set; } = new ArticleContrastEditRecordViewModel();
+    public PeripheryContrastEditRecordViewModel PeripheryContrast { get; set; } = new PeripheryContrastEditRecordViewModel();
+    public TagContrastEditRecordViewModel TagContrast { get; set; } = new TagContrastEditRecordViewModel();
+    public VideoContrastEditRecordViewModel VideoContrast { get; set; } = new VideoContrastEditRecordViewModel();
 
     OverviewCard overviewCard;
 
     async Task OnReLoad()
     {
-        _loadFailed = false;
-        _comparisonError = null;
         try
         {
-            var overview = await _dataCatcheService.ExaminesOverviewCatche.GetCache(ContrastId.ToString());
-            if (overview is null)
-            {
-                _loadFailed = true;
-                _comparisonError = "未找到可用的编辑记录。";
-                return;
-            }
+            ExaminesOverview = await _dataCatcheService.ExaminesOverviewCatche.GetCache(ContrastId.ToString());
 
-            ExaminesOverview = overview;
             await OnRefreshContrastView(ContrastId.ToString(), CurrentId.ToString());
 
             isReady = true;
@@ -102,8 +133,6 @@ else
         }
         catch (Exception ex)
         {
-            _loadFailed = true;
-            _comparisonError = "加载编辑记录失败。";
             await ErrorHandler.ProcessError(ex, "获取编辑记录概览失败");
         }
     }
@@ -165,58 +194,46 @@ else
 
     public async Task OnRefreshContrastView(string conId, string curId)
     {
-        var version = ++_comparisonRequestVersion;
         try
         {
             isRefreshing = true;
-            _comparisonError = null;
             StateHasChanged();
-
-            var contrastId = long.Parse(conId);
-            var latest = ExaminesOverview.Examines.LastOrDefault();
-            if (latest is null)
+            if (ExaminesOverview.Type == ExaminedNormalListModelType.Entry)
             {
-                _comparison = null;
-                _comparisonError = "未找到可用的编辑记录。";
-                return;
+                EntryContrast = await _dataCatcheService.EntryContrastEditRecordViewCatche.GetCache(conId + "/" + (curId=="0"?ExaminesOverview.Examines.Last().Id: curId));
+                ContrastId = EntryContrast.ContrastId;
+                CurrentId = EntryContrast.CurrentId;
             }
-
-            var currentId = curId == "0" ? latest.Id : long.Parse(curId);
-            var comparison = await _dataCatcheService.GetEditRecordComparisonAsync(ExaminesOverview.Type, contrastId, currentId);
-            if (version != _comparisonRequestVersion)
+            else if (ExaminesOverview.Type == ExaminedNormalListModelType.Article)
             {
-                return;
+                ArticleContrast = await _dataCatcheService.ArticleContrastEditRecordViewCatche.GetCache(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId));
+                ContrastId = ArticleContrast.ContrastId;
+                CurrentId = ArticleContrast.CurrentId;
             }
-
-            _comparison = comparison;
-            if (_comparison is not null)
+            else if (ExaminesOverview.Type == ExaminedNormalListModelType.Periphery)
             {
-                ContrastId = _comparison.ContrastId;
-                CurrentId = _comparison.CurrentId;
+                PeripheryContrast = await _dataCatcheService.PeripheryContrastEditRecordViewCatche.GetCache(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId));
+                ContrastId = PeripheryContrast.ContrastId;
+                CurrentId = PeripheryContrast.CurrentId;
             }
-            else
+            else if (ExaminesOverview.Type == ExaminedNormalListModelType.Tag)
             {
-                _comparisonError = "无法加载版本对比，该记录可能已失效或不属于同一对象。";
+                TagContrast = await _dataCatcheService.TagContrastEditRecordViewCatche.GetCache(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId));
+                ContrastId = TagContrast.ContrastId;
+                CurrentId = TagContrast.CurrentId;
             }
+            else if (ExaminesOverview.Type == ExaminedNormalListModelType.Video)
+            {
+                VideoContrast = await _dataCatcheService.VideoContrastEditRecordViewCatche.GetCache(conId + "/" + (curId == "0" ? ExaminesOverview.Examines.Last().Id : curId));
+                ContrastId = VideoContrast.ContrastId;
+                CurrentId = VideoContrast.CurrentId;
+            }
+            isRefreshing = false;
+            StateHasChanged();
         }
         catch (Exception ex)
         {
-            if (version != _comparisonRequestVersion)
-            {
-                return;
-            }
-
-            _comparison = null;
-            _comparisonError = "无法加载版本对比，该记录可能已失效或不属于同一对象。";
             await ErrorHandler.ProcessError(ex, "获取详细编辑对比视图失败");
-        }
-        finally
-        {
-            if (version == _comparisonRequestVersion)
-            {
-                isRefreshing = false;
-                StateHasChanged();
-            }
         }
     }
     #region 释放实例

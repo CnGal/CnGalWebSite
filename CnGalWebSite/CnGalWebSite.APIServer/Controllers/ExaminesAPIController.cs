@@ -146,7 +146,7 @@ namespace CnGalWebSite.APIServer.Controllers
             var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
             //获取审核单
             Examine examine =
-                examine = await _examineRepository.GetAll().AsNoTracking()
+                examine = await _examineRepository.GetAll()
                         .Include(s => s.ApplicationUser)
                         .FirstOrDefaultAsync(x => x.Id == id);
 
@@ -663,13 +663,29 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
 
-            model.Examines = RecordVersionOrder.Approved(examines).Select(item => new EditRecordAloneViewModel
+            var examinedView = new ExamineViewModel();
+
+            foreach (var item in examines)
             {
-                ApplyTime = item.ApplyTime, Comments = item.Comments, Id = item.Id, Note = item.Note,
-                Operation = item.Operation, PassedAdminName = item.PassedAdminName,
-                PassedTime = item.PassedTime ?? item.ApplyTime, UserId = item.ApplicationUserId,
-                IsSelected = item.Id == id, UserName = item.ApplicationUser?.UserName
-            }).ToList();
+                if (await _examineService.GetExamineView(examinedView, item))
+                {
+                    model.Examines.Add(new EditRecordAloneViewModel
+                    {
+                        ApplyTime = item.ApplyTime,
+                        Comments = item.Comments,
+                        EditOverview = examinedView.EditOverview,
+                        Id = item.Id,
+                        Note = item.Note,
+                        Operation = item.Operation,
+                        PassedAdminName = item.PassedAdminName,
+                        PassedTime = item.PassedTime.Value,
+                        UserId = item.ApplicationUserId,
+                        IsSelected = item.Id == id,
+                        UserName = item.ApplicationUser.UserName
+                    });
+                }
+
+            }
 
             return model;
         }

@@ -813,6 +813,19 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
             return examines;
         }
 
+        public List<PeripheryViewModel> ConcompareAndGenerateModel(Periphery currentPeriphery, Periphery newPeriphery)
+        {
+            var model = new List<PeripheryViewModel>
+            {
+                 GetPeripheryViewModel(currentPeriphery),
+                 GetPeripheryViewModel(newPeriphery)
+            };
+
+
+
+            return model;
+        }
+
         public void SetDataFromEditPeripheryMainViewModel(Periphery newPeriphery, EditPeripheryMainViewModel model)
         {
 

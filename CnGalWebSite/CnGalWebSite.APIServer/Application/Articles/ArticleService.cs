@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.Sorting;
+﻿using CnGalWebSite.DataModel.Sorting;
 
 using CnGalWebSite.APIServer.Application.Articles.Dtos;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -815,6 +815,17 @@ namespace CnGalWebSite.APIServer.Application.Articles
                 examines.Add(new KeyValuePair<object, Operation>(resulte, Operation.EditArticleMainPage));
             }
             return examines;
+        }
+
+        public List<ArticleViewModel> ConcompareAndGenerateModel(Article currentArticle, Article newArticle)
+        {
+            var model = new List<ArticleViewModel>
+            {
+                GetArticleViewModelAsync(currentArticle),
+                GetArticleViewModelAsync(newArticle)
+            };
+
+            return model;
         }
 
         public async Task<ArticleEditState> GetArticleEditState(ApplicationUser user, long id)

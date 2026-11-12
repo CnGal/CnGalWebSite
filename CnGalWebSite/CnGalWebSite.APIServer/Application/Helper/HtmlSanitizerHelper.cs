@@ -2,7 +2,7 @@ using Ganss.Xss;
 using System;
 using System.Linq;
 
-namespace CnGalWebSite.Helper.Security
+namespace CnGalWebSite.APIServer.Application.Helper
 {
     /// <summary>
     /// HTML 净化器：所有 Markdown 渲染结果在返回前端前统一经过白名单净化，防止存储型 XSS。

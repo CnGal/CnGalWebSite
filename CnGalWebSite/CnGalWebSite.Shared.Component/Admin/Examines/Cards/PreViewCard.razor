@@ -1,48 +1,30 @@
-﻿@using System.Globalization
-@using CnGalWebSite.Core.Models
-@using CnGalWebSite.DataModel.ViewModel.Admin
-@using CnGalWebSite.DataModel.ViewModel.Entries
-@using CnGalWebSite.DataModel.ViewModel.Search
-
+﻿
 <div class="@Class">
-    @if (Model?.IsComplete == false)
-    {
-        <div class="mb-4 pa-3" role="status">历史快照不完整，部分数据可能无法显示。</div>
-    }
-    @foreach (var body in BodyItems)
+    @if (string.IsNullOrWhiteSpace(Model.MainPage) == false)
     {
         <MDCard Class="mb-4 pa-3 ">
-            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@body.Value" IsNeedHighlight="true" />
+            <CnGalWebSite.Shared.MasaComponent.Shared.Components.Markdown.MarkdownViewTip Text="@Model.MainPage" IsNeedHighlight="true" />
         </MDCard>
     }
-    @if (Pictures.Count > 0)
+    @if (Model.Pictures.Count > 0)
     {
-        <CnGalWebSite.Shared.Component.Admin.Examines.Parts.ImageListCard Model="Pictures" />
+        <CnGalWebSite.Shared.Component.Admin.Examines.Parts.ImageListCard Model="Model.Pictures" />
     }
-    @if (Texts.Count > 0)
+    @if (Model.Texts.Count > 0)
     {
-        <CnGalWebSite.Shared.Component.Admin.Examines.Parts.TextListCard Model="Texts" />
+        <CnGalWebSite.Shared.Component.Admin.Examines.Parts.TextListCard Model="Model.Texts" />
     }
-    @if (Relevances.Count > 0)
+    @if (Model.Relevances.Count > 0)
     {
-        <CnGalWebSite.Shared.Component.Admin.Examines.Parts.RelevanceListCard Model="Relevances" />
+        <CnGalWebSite.Shared.Component.Admin.Examines.Parts.RelevanceListCard Model="Model.Relevances" />
     }
-    @if (UnresolvedRelations.Count > 0)
+    @if (Model.Outlinks.Count > 0)
     {
-        <MDCard Class="mb-4 pa-3">
-            @foreach (var relation in UnresolvedRelations)
-            {
-                <div>@relation.Label：@ItemText(relation)</div>
-            }
-        </MDCard>
+        <CnGalWebSite.Shared.Component.Admin.Examines.Parts.OutlinkListCard Model="Model.Outlinks" />
     }
-    @if (Outlinks.Count > 0)
+    @if (Model.Audio.Count > 0)
     {
-        <CnGalWebSite.Shared.Component.Admin.Examines.Parts.OutlinkListCard Model="Outlinks" />
-    }
-    @if (Audio.Count > 0)
-    {
-        <CnGalWebSite.Shared.Component.Admin.Examines.Parts.AudioCard Model="Audio" />
+        <CnGalWebSite.Shared.Component.Admin.Examines.Parts.AudioCard Model="Model.Audio" />
     }
 </div>
 
@@ -53,98 +35,4 @@
     [Parameter]
     public string Class { get; set; }
 
-    private List<RecordPreviewItem> Items => Model?.Items ?? new();
-    private List<RecordPreviewItem> BodyItems => Items.Where(i => i.Kind == RecordPreviewKind.Body).ToList();
-
-    private List<PicturesAloneViewModel> Pictures => Items
-        .Where(i => i.Kind == RecordPreviewKind.Image && !string.IsNullOrWhiteSpace(i.Url ?? i.Value))
-        .Select(i => new PicturesAloneViewModel
-        {
-            Note = i.Label,
-            Url = i.Url ?? i.Value,
-            Priority = IntProperty(i, "Priority")
-        })
-        .ToList();
-
-    private List<InformationsModel> Texts => Items
-        .Where(i => i.Kind == RecordPreviewKind.Text)
-        .GroupBy(i => string.IsNullOrWhiteSpace(i.Group) ? "文本信息" : i.Group)
-        .Select(group => new InformationsModel
-        {
-            Modifier = group.Key,
-            Informations = group.SelectMany(i => new[] { new KeyValueModel
-            {
-                DisplayName = i.Label,
-                DisplayValue = ItemText(i)
-            } }.Concat(i.Properties
-                .Where(p => !string.IsNullOrWhiteSpace(p.DisplayValue))
-                .Select(p => new KeyValueModel { DisplayName = p.Label ?? p.Key, DisplayValue = p.DisplayValue }))).ToList()
-        })
-        .ToList();
-
-    private List<SearchAloneModel> Relevances => Items
-        .Where(i => i.Kind == RecordPreviewKind.Relation)
-        .Select(ToSearchModel)
-        .Where(i => i is not null)
-        .Select(i => i!)
-        .ToList();
-
-    private List<RecordPreviewItem> UnresolvedRelations => Items
-        .Where(i => i.Kind == RecordPreviewKind.Relation && ToSearchModel(i) is null)
-        .ToList();
-
-    private List<RelevancesKeyValueModel> Outlinks => Items
-        .Where(i => i.Kind == RecordPreviewKind.Link)
-        .Select(i => new RelevancesKeyValueModel
-        {
-            DisplayName = i.Label,
-            DisplayValue = i.DisplayValue,
-            Link = SafeOutlink(i.Url ?? i.Value)
-        })
-        .ToList();
-
-    private List<EditAudioAloneModel> Audio => Items
-        .Where(i => i.Kind == RecordPreviewKind.Audio)
-        .Select(i => new EditAudioAloneModel
-        {
-            Name = Property(i, "Name") is { Length: > 0 } name ? name : i.Label,
-            BriefIntroduction = Property(i, "BriefIntroduction"),
-            Url = i.Url ?? i.Value,
-            Duration = DurationProperty(i, "Duration"),
-            Thumbnail = Property(i, "Thumbnail")
-        })
-        .ToList();
-
-    private static SearchAloneModel ToSearchModel(RecordPreviewItem item)
-    {
-        var value = item.Value ?? "";
-        var separator = value.IndexOf(':');
-        if (separator <= 0) return null;
-        var type = value[..separator];
-        var reference = value[(separator + 1)..];
-        var name = ItemText(item);
-        var hasId = long.TryParse(reference, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) && id > 0;
-        return type switch
-        {
-            "entry" when hasId => new SearchAloneModel { entry = new EntryInforTipViewModel { Id = (int)id, Name = name } },
-            "article" when hasId => new SearchAloneModel { article = new ArticleInforTipViewModel { Id = id, Name = name, DisplayName = name } },
-            "video" when hasId => new SearchAloneModel { video = new VideoInforTipViewModel { Id = id, Name = name, DisplayName = name } },
-            "tag" when hasId => new SearchAloneModel { tag = new TagInforTipViewModel { Id = (int)id, Name = name } },
-            "periphery" when hasId => new SearchAloneModel { periphery = new PeripheryInforTipViewModel { Id = id, Name = name } },
-            _ => null
-        };
-    }
-
-    private static string ItemText(RecordPreviewItem item) => string.IsNullOrWhiteSpace(item.DisplayValue) ? item.Value : item.DisplayValue;
-    private static string SafeOutlink(string? value) =>
-        CnGalWebSite.Extensions.UrlSafety.IsExternalHttpUrl(value) ? value! : string.Empty;
-
-    private static string Property(RecordPreviewItem item, string key) =>
-        item.Properties.FirstOrDefault(p => p.Key == key)?.DisplayValue;
-
-    private static int ParseInt(string value) => int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result) ? result : 0;
-    private static long ParseLong(string value) => long.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result) ? result : 0;
-    private static int IntProperty(RecordPreviewItem item, string key) => ParseInt(Property(item, key) ?? "");
-    private static TimeSpan DurationProperty(RecordPreviewItem item, string key) =>
-        TimeSpan.TryParse(Property(item, key), CultureInfo.InvariantCulture, out var result) ? result : TimeSpan.Zero;
 }

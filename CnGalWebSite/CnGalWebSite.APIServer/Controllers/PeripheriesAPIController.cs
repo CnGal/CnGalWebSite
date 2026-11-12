@@ -1,4 +1,3 @@
-﻿using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
@@ -1050,10 +1049,48 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [HttpGet("{contrastId}/{currentId}")]
         [AllowAnonymous]
-        public async Task<ActionResult<EditRecordComparison>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
+        public async Task<ActionResult<PeripheryContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
         {
-            return await ExamineComparisonResult.ExecuteAsync(
-                _examineService, contrastId, currentId, ExaminedNormalListModelType.Periphery);
+            if (contrastId > currentId)
+            {
+                return BadRequest("对比的编辑必须先于当前的编辑");
+            }
+
+            var contrastExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId);
+            var currentExamine = await _examineRepository.FirstOrDefaultAsync(s => s.Id == currentId);
+
+            if (contrastExamine == null || currentExamine == null || contrastExamine.PeripheryId == null || currentExamine.PeripheryId == null || contrastExamine.PeripheryId != currentExamine.PeripheryId)
+            {
+                return NotFound("编辑记录Id不正确");
+            }
+
+            var currentPeriphery = new Periphery();
+            var newPeriphery = new Periphery();
+
+            //获取审核记录
+            var examines = await _examineRepository.GetAll().AsNoTracking().Where(s => s.IsPassed == true && s.PeripheryId == currentExamine.PeripheryId).ToListAsync();
+
+            foreach (var item in examines.Where(s => s.Id <= contrastId).OrderBy(s => s.Id))
+            {
+                await _peripheryService.UpdatePeripheryDataAsync(currentPeriphery, item);
+            }
+
+            foreach (var item in examines.Where(s => s.Id <= currentId).OrderBy(s => s.Id))
+            {
+                await _peripheryService.UpdatePeripheryDataAsync(newPeriphery, item);
+            }
+
+            var result = _peripheryService.ConcompareAndGenerateModel(currentPeriphery, newPeriphery);
+
+            var model = new PeripheryContrastEditRecordViewModel
+            {
+                ContrastId = contrastId,
+                CurrentId = currentId,
+                ContrastModel = result[0],
+                CurrentModel = result[1],
+            };
+
+            return model;
         }
 
         [HttpGet("{id}")]

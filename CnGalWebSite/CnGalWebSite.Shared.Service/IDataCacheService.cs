@@ -68,10 +68,15 @@ namespace CnGalWebSite.Shared.Service
 
         IPageModelCatche<ExaminesOverviewViewModel> ExaminesOverviewCatche { get; set; }
 
-        Task<EditRecordComparison> GetEditRecordComparisonAsync(
-            ExaminedNormalListModelType type, long contrastId, long currentId);
+        IPageModelCatche<EntryContrastEditRecordViewModel> EntryContrastEditRecordViewCatche { get; set; }
 
-        void CleanEditRecordComparisonCache();
+        IPageModelCatche<ArticleContrastEditRecordViewModel> ArticleContrastEditRecordViewCatche { get; set; }
+
+        IPageModelCatche<PeripheryContrastEditRecordViewModel> PeripheryContrastEditRecordViewCatche { get; set; }
+
+        IPageModelCatche<VideoContrastEditRecordViewModel> VideoContrastEditRecordViewCatche { get; set; }
+
+        IPageModelCatche<TagContrastEditRecordViewModel> TagContrastEditRecordViewCatche { get; set; }
 
         IPageModelCatche<LotteryViewModel> LotteryIndexPageCatche { get; set; }
 

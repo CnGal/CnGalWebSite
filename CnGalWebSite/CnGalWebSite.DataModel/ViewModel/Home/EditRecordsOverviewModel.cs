@@ -28,6 +28,8 @@ namespace CnGalWebSite.DataModel.ViewModel.Home
 
         public bool IsSelected { get; set; }
 
+        public string EditOverview { get; set; }
+
         public Operation Operation { get; set; }
 
         public string PassedAdminName { get; set; }
