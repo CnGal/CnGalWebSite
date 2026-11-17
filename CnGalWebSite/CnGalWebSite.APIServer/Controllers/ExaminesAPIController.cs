@@ -210,7 +210,8 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpPost]
         public async Task<ActionResult<ExamineProcResultModel>> ProcAsync(Models.ExaminedViewModel model)
         {
-            var result = await _unitOfWork.RunAsync(() => ProcCoreAsync(model), result => result.Value?.Successful == true);
+            // ProcCoreAsync 每次都会重新查询审核记录与目标对象，因此可以安全地重试死锁。
+            var result = await _unitOfWork.RunAsync(() => ProcCoreAsync(model), result => result.Value?.Successful == true, retryOnDeadlock: true);
             if (result.Value?.Successful == true && model.IsPassed)
             {
                 await _unitOfWork.AfterCommitAsync(async () =>
@@ -469,7 +470,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     await _examineService.ApplyEditRecordToObject(entry, examineData, examine.Operation);
                 }
-                catch (Exception ex) when (ex is not ConfigurationException)
+                // 死锁必须冒泡到事务层重试，不能被转换成业务失败结果。
+                catch (Exception ex) when (ex is not ConfigurationException && !EditRecordUnitOfWork.IsDeadlock(ex))
                 {
                     return new ExamineProcResultModel { Successful = false, Error = "应用审核记录失败，错误信息：" + ex.Message };
                 }

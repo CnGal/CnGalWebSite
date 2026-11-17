@@ -19,7 +19,8 @@ public class RecordHistoryServiceTests
     [SetUp]
     public void SetUp()
     {
-        _connection = new SqliteConnection("Data Source=:memory:;Pooling=False");
+        var database = $"cngal_tests_{Guid.NewGuid():N}";
+        _connection = new SqliteConnection($"Data Source=file:{database}?mode=memory&cache=shared;Pooling=False");
         _connection.Open();
         _options = new DbContextOptionsBuilder<AppDbContext>().UseSqlite(_connection).Options;
         using var db = new AppDbContext(_options);

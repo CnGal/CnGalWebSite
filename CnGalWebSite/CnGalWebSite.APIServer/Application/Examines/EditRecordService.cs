@@ -1,4 +1,4 @@
-
+﻿
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
@@ -110,10 +110,15 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
             await _unitOfWork.RunAsync(async () =>
             {
+                if (isAdmin)
+                {
+                    // 先改目标行再插入审核记录：插入 Examine 会因外键对目标行加共享锁，
+                    // 若之后才去更新目标行，两个并发编辑会互相等待形成 S→X 升级死锁。
+                    await _examineService.ApplyEditRecordToObject(entry, examineData, operation);
+                }
                 var examine = await _examineService.AddEditRecordAsync(entry, user, examineData, operation, note, isAdmin, isCreating);
                 if (isAdmin)
                 {
-                    await _examineService.ApplyEditRecordToObject(entry, examineData, operation);
                     await AddEditRecordToUserReview(examine);
                 }
                 return examine;
