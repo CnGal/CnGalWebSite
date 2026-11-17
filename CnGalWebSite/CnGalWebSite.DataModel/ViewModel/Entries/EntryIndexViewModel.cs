@@ -17,6 +17,10 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// </summary>
         public string Name { get; set; }
         /// <summary>
+        /// 唯一名称，独立于用于页面展示的 Name。
+        /// </summary>
+        public string UniqueName { get; set; }
+        /// <summary>
         /// 别称
         /// </summary>
         public string AnotherName { get; set; }
@@ -103,6 +107,9 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// 预约
         /// </summary>
         public BookingViewModel Booking { get; set; }
+
+        /// <summary>仅历史对比提供的完整预约配置，不受当前发行时间影响，不含实时预约人数。</summary>
+        public BookingHistoryViewModel BookingHistory { get; set; }
 
         /// <summary>
         /// 官网补充信息
@@ -342,6 +349,17 @@ namespace CnGalWebSite.DataModel.ViewModel
 
         public string Note { get; set; }
 
+    }
+
+    public class BookingHistoryViewModel
+    {
+        public bool Open { get; set; }
+
+        public bool IsNeedNotification { get; set; }
+
+        public int LotteryId { get; set; }
+
+        public List<BookingGoalViewModel> Goals { get; set; } = new List<BookingGoalViewModel>();
     }
 
     public class BookingViewModel

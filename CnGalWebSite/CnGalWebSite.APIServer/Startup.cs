@@ -58,6 +58,8 @@ namespace CnGalWebSite.APIServer
         {
             services.AddApiConfiguration();
             services.AddScoped<McpService>();
+            services.AddScoped<CnGalWebSite.APIServer.Application.Examines.RecordHistoryService>();
+            services.AddScoped<CnGalWebSite.APIServer.Application.Examines.EditRecordUnitOfWork>();
             services.AddMcpServer().WithHttpTransport(options => options.Stateless = true).WithTools<McpTools>();
             services.AddProblemDetails();
             services.AddExceptionHandler<ConfigurationExceptionHandler>();

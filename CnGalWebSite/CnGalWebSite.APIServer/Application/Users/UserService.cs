@@ -388,7 +388,7 @@ namespace CnGalWebSite.APIServer.Application.Users
                 //计算G币
                 user.GCoins = await _userIntegralRepository.GetAll().Where(s => s.ApplicationUserId == user.Id && s.Type == UserIntegralType.GCoins).Select(s => s.Count).SumAsync();
 
-                _ = await _userRepository.UpdateAsync(user);
+                _ = await _userRepository.UpdateFieldsAsync(user, u => u.DisplayIntegral, u => u.DisplayContributionValue, u => u.GCoins);
             }
             catch (Exception)
             {

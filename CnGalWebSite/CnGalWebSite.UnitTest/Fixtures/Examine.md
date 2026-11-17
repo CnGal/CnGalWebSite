@@ -7,10 +7,14 @@
 在仓库根目录执行：
 
 ```powershell
-dotnet test CnGalWebSite/CnGalWebSite.UnitTest --filter "FullyQualifiedName~ExaminePresentationTests|FullyQualifiedName~ExamineComparisonSdkTests|FullyQualifiedName~MainSiteSdkRegressionTests|FullyQualifiedName~MainSiteEditorStateTests"
+dotnet test CnGalWebSite/CnGalWebSite.UnitTest --filter "FullyQualifiedName~ExaminePresentationTests|FullyQualifiedName~ExamineComparisonSdkTests|FullyQualifiedName~ExaminePreviewMapperTests|FullyQualifiedName~MainSiteSdkRegressionTests|FullyQualifiedName~MainSiteEditorStateTests|FullyQualifiedName~RecordPersistenceRegressionTests|FullyQualifiedName~RecordReviewRegressionTests|FullyQualifiedName~RecordWriteBoundaryTests|FullyQualifiedName~RecordHistoryServiceTests|FullyQualifiedName~EditRecordUnitOfWorkTests|FullyQualifiedName~RecordRawDiffTests|FullyQualifiedName~RecordTextDiffTests"
 ```
 
 覆盖六类内容的全部 64 种有无组合及左右空侧、重复字段、媒体链接、单份提交、审核状态与权限矩阵、前置审核、重复提交、批注保留、记录切换与过期响应，以及五类历史重建接口和词条专属分组映射。
+
+后端回归使用独立 SQLite 内存数据库和真实领域服务、仓储。通过同步屏障控制 8 个分块的双向两两保存及全部分块提交，并拦截 SQL 校验更新列；覆盖显式字段覆盖写入、嵌套字段与归属限制、普通更新拒绝 detached 实体、商店和积分刷新兼容性，以及 162737/162738/162739 历史夹具在概览与详情中的一致性。测试不连接生产数据库或调用外部商店接口；MySQL 特有的锁竞争需在隔离的 MySQL 环境中另行验证。
+
+`RecordReviewRegressionTests` 覆盖周边关联直接编辑与实际审核接口的双向新增、重复提交和删除，并验证无关关系不能通过任一端转入当前分块；已发行游戏的预约配置（含通知、关联抽奖、关闭/清空配置及目标）在历史回放中完整保留。源码测试覆盖待审核、驳回与通过的词条/文章/视频正文，以及 HTML 标签、实体、换行的保留和文本安全渲染。
 
 ## 浏览器验收
 
@@ -26,6 +30,7 @@ $env:MainSiteApi__TaskApiPath='http://127.0.0.1:5361/'
 $env:ImageApi__BaseAddress='http://127.0.0.1:5361/'
 $env:ASPNETCORE_ENVIRONMENT='Development'
 $env:ASPNETCORE_URLS='http://127.0.0.1:5167'
+$env:NO_PROXY='localhost,127.0.0.1'
 dotnet run --project CnGalWebSite/CnGalWebSite.MainSite --no-launch-profile
 ```
 
@@ -38,6 +43,10 @@ dotnet test CnGalWebSite/CnGalWebSite.UnitTest --filter "FullyQualifiedName~Exam
 截图输出到仓库 `.cache/examine-screenshots/`。测试结束后可用 Ctrl+C 停止两个本地服务。
 
 ## 数据语义
+
+审核详情的 `RawContent` 是作者提交的原始文本，`RawBeforeContent` 为正文修改前的原始文本；后者为 null 时只展示提交内容，为空字符串时表示空基准。前端按纯文本计算差异并转义输出，不能把这两个字段作为 HTML 渲染。`EditOverview` 仍提供旧客户端使用的安全 HTML；新前端仅在旧接口未返回 `RawContent` 时解析兼容格式。
+
+历史对比模型的 `BookingHistory` 包含完整预约配置，不含实时人数，也不受当前日期和发行状态的公开展示条件影响；普通词条查询不填充该字段。
 
 `GetExamineDetailAsync` 返回记录相关内容和查询时内容，不能用来组合完整的历史版本。新 SDK 方法 `GetEditRecordComparisonAsync` 调用五类对象已有的 `GetContrastEditRecordViews` 接口；能力映射统一由 `ExamineRecordTypeMetadata` 提供，后端按通过时间与 ID 的稳定顺序回放已通过记录，使用前应校验版本方向和对象一致性。
 

@@ -27,6 +27,12 @@ namespace CnGalWebSite.DataModel.ViewModel.Admin
 
         public string EditOverview { get; set; }
 
+        /// <summary>作者提交的原始文本。只能按文本显示，不可作为 HTML 渲染；null 表示旧版响应。</summary>
+        public string RawContent { get; set; }
+
+        /// <summary>正文修改前的原始文本；null 表示只展示提交内容，空字符串表示空基准。</summary>
+        public string RawBeforeContent { get; set; }
+
         public bool? IsPassed { get; set; }
 
         public string PassedAdminName { get; set; }

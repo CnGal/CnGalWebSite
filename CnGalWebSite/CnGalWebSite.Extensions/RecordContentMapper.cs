@@ -6,17 +6,16 @@ using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Videos;
-using CnGalWebSite.Extensions;
 
-namespace CnGalWebSite.SDK.MainSite.Models;
+namespace CnGalWebSite.Extensions;
 
 /// <summary>Explicit projections keep historical content separate from live counters and permissions.</summary>
-public static class EditRecordContentMapper
+public static class RecordContentMapper
 {
     public static ExaminePreDataModel Map(EntryIndexViewModel value)
     {
         var result = Create(value.MainPage,
-            ("名称", value.Name), ("别称", value.AnotherName), ("简介", value.BriefIntroduction),
+            ("名称", value.Name), ("唯一名称", value.UniqueName), ("别称", value.AnotherName), ("简介", value.BriefIntroduction),
             ("类型", value.Type), ("样式模板", value.Template), ("配音", value.IsDubbing));
         Images(result, ("主图", value.MainPicture), ("缩略图", value.Thumbnail),
             ("背景图", value.BackgroundPicture), ("小背景图", value.SmallBackgroundPicture));
@@ -49,7 +48,11 @@ public static class EditRecordContentMapper
                 ("游戏平台", string.Join("、", (release.GamePlatformTypes ?? []).Select(p => p.GetDisplayName())))]);
             Link(result, release.Name ?? "发行链接", release.GetLink());
         }
-        if (value.Booking is { } booking)
+        if (value.BookingHistory is { } configuration)
+            Group(result, "预约", new (string, object?)[] { ("开放预约", configuration.Open),
+                ("上线后通知用户", configuration.IsNeedNotification), ("关联抽奖", configuration.LotteryId) }.Concat(
+                (configuration.Goals ?? []).Select(g => (g.Name, (object?)g.Target))));
+        else if (value.Booking is { } booking)
             Group(result, "预约", new[] { ("开放预约", (object?)booking.Open) }.Concat(
                 (booking.Goals ?? []).Select(g => (g.Name, (object?)g.Target))));
         if (value.WebsiteAddInfor is { } website)
@@ -91,7 +94,8 @@ public static class EditRecordContentMapper
     {
         var result = Create(value.MainPage, ("名称", value.Name), ("显示名称", value.DisplayName),
             ("简介", value.BriefIntroduction), ("类型", value.Type), ("版权", value.Copyright),
-            ("时长", value.Duration), ("互动视频", value.IsInteractive), ("原作者", value.OriginalAuthor), ("发布时间", value.PubishTime));
+            ("时长", value.Duration), ("互动视频", value.IsInteractive), ("本人创作", value.IsCreatedByCurrentUser),
+            ("原作者", value.OriginalAuthor), ("发布时间", value.PubishTime));
         Images(result, ("主图", value.MainPicture), ("背景图", value.BackgroundPicture), ("小背景图", value.SmallBackgroundPicture));
         Pictures(result, value.Pictures);
         result.Outlinks.AddRange(value.RelatedOutlinks ?? []);

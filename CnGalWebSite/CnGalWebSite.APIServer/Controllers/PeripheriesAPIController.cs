@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.Sorting;
+﻿using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -61,9 +61,11 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IUserService _userService;
         private readonly IQueryService _queryService;
 
+        private readonly RecordHistoryService _recordHistory;
+
         public PeripheriesAPIController(IPeripheryService peripheryService, IEntryService entryService, IEditRecordService editRecordService, IQueryService queryService,
         IRepository<PeripheryRelevanceUser, long> userOwnedPeripheryRepository, IUserService userService, IRepository<ApplicationUser, string> userRepository,
-        IExamineService examineService, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository)
+        IExamineService examineService, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, RecordHistoryService recordHistory)
         {
             
             _entryRepository = entryRepository;
@@ -78,6 +80,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _userService = userService;
             _userRepository = userRepository;
             _queryService = queryService;
+            _recordHistory = recordHistory;
         }
 
 
@@ -1067,46 +1070,18 @@ namespace CnGalWebSite.APIServer.Controllers
                 return BadRequest("请选择已通过的编辑记录");
             }
 
-            var currentPeriphery = new Periphery();
-            var newPeriphery = new Periphery();
-
-            //按审核通过时间还原历史版本；contrastId=0 表示空基准，用于首个版本
-            var examines = RecordVersionOrder.Approved(
-                await _examineRepository.GetAll().AsNoTracking()
-                    .Where(s => s.IsPassed == true && s.PeripheryId == currentExamine.PeripheryId)
-                    .ToListAsync()).ToList();
-            var contrastIndex = contrastId > 0 ? examines.FindIndex(s => s.Id == contrastId) : -1;
-            var currentIndex = examines.FindIndex(s => s.Id == currentId);
-            if (currentIndex < 0 || (contrastId > 0 && contrastIndex < 0))
+            var result = await _recordHistory.CompareAsync<PeripheryViewModel>(currentExamine, contrastId);
+            if (!result.Success)
             {
-                return BadRequest("编辑记录未通过审核");
+                return BadRequest(result.Error);
             }
-            if (contrastIndex > currentIndex)
-            {
-                return BadRequest("对比的编辑必须先于当前的编辑");
-            }
-
-            if (contrastIndex >= 0)
-            {
-                foreach (var item in examines.Take(contrastIndex + 1))
-                {
-                    await _peripheryService.UpdatePeripheryDataAsync(currentPeriphery, item);
-                }
-            }
-
-            foreach (var item in examines.Take(currentIndex + 1))
-            {
-                await _peripheryService.UpdatePeripheryDataAsync(newPeriphery, item);
-            }
-
-            var result = _peripheryService.ConcompareAndGenerateModel(currentPeriphery, newPeriphery);
 
             var model = new PeripheryContrastEditRecordViewModel
             {
                 ContrastId = contrastId,
                 CurrentId = currentId,
-                ContrastModel = result[0],
-                CurrentModel = result[1],
+                ContrastModel = result.Before,
+                CurrentModel = result.After,
             };
 
             return model;

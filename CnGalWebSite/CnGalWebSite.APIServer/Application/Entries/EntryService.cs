@@ -1170,13 +1170,14 @@ namespace CnGalWebSite.APIServer.Application.Entries
         /// <param name="entry"></param>
         /// <param name="renderMarkdown"></param>
         /// <returns></returns>
-        public async Task<EntryIndexViewModel> GetEntryIndexViewModelAsync(Entry entry, bool renderMarkdown = true)
+        public async Task<EntryIndexViewModel> GetEntryIndexViewModelAsync(Entry entry, bool renderMarkdown = true, bool includeLiveData = true)
         {
             //建立视图模型
             var model = new EntryIndexViewModel
             {
                 Id = entry.Id,
                 Name = entry.DisplayName ?? entry.Name,
+                UniqueName = entry.Name,
                 BriefIntroduction = entry.BriefIntroduction,
                 Type = entry.Type,
                 CanComment = entry.CanComment ?? true,
@@ -1301,7 +1302,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
                     Time = item.Time,
                     TimeNote = item.TimeNote,
                     Type = item.Type,
-                    StoreInfor = await _storeInfoService.Get(item.PublishPlatformType, item.PublishPlatformName, item.Link, item.Name, entry.Id)
+                    StoreInfor = includeLiveData ? await _storeInfoService.Get(item.PublishPlatformType, item.PublishPlatformName, item.Link, item.Name, entry.Id) : null
                 };
 
                 model.Releases.Add(infor);

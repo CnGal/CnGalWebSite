@@ -1,11 +1,28 @@
-using CnGalWebSite.DataModel.Sorting;
+﻿using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Ranks;
+using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
+using CnGalWebSite.DataModel.ExamineModel.Articles;
+using CnGalWebSite.DataModel.ExamineModel.Comments;
+using CnGalWebSite.DataModel.ExamineModel.Dismbigs;
+using CnGalWebSite.DataModel.ExamineModel.Entries;
+using CnGalWebSite.DataModel.ExamineModel.FavoriteFolders;
+using CnGalWebSite.DataModel.ExamineModel.Peripheries;
+using CnGalWebSite.DataModel.ExamineModel.PlayedGames;
+using CnGalWebSite.DataModel.ExamineModel.Shared;
+using CnGalWebSite.DataModel.ExamineModel.Tags;
+using CnGalWebSite.DataModel.ExamineModel.Users;
+using CnGalWebSite.DataModel.ExamineModel.Videos;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.EditRecords;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -19,23 +36,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CnGalWebSite.DataModel.ViewModel.EditRecords;
-using CnGalWebSite.APIServer.Application.Examines;
-using CnGalWebSite.APIServer.Application.Users;
-using CnGalWebSite.DataModel.ExamineModel.Articles;
-using CnGalWebSite.DataModel.ExamineModel.Comments;
-using CnGalWebSite.DataModel.ExamineModel.Dismbigs;
-using CnGalWebSite.DataModel.ExamineModel.Entries;
-using CnGalWebSite.DataModel.ExamineModel.Peripheries;
-using CnGalWebSite.DataModel.ExamineModel.PlayedGames;
-using CnGalWebSite.DataModel.ExamineModel.Users;
-using CnGalWebSite.DataModel.ExamineModel.Tags;
-using CnGalWebSite.DataModel.ExamineModel.Shared;
-using CnGalWebSite.DataModel.ExamineModel.Videos;
-using CnGalWebSite.DataModel.ExamineModel.FavoriteFolders;
-using CnGalWebSite.Core.Models;
-using CnGalWebSite.DataModel.ViewModel.Entries;
-using CnGalWebSite.Core.Services.Query;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
@@ -100,11 +100,13 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IEditRecordService _editRecordService;
         private readonly IUserService _userService;
         private readonly IQueryService _queryService;
+        private readonly EditRecordUnitOfWork _unitOfWork;
+        private readonly RecordHistoryService _recordHistory;
 
         public ExaminesAPIController(IRepository<Disambig, int> disambigRepository, IRankService rankService, IRepository<Comment, long> commentRepository, IUserService userService, IRepository<Video, long> videoRepository,
         IRepository<Message, long> messageRepository, IRepository<ApplicationUser, string> userRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IRepository<FavoriteFolder, long> favoriteFolderRepository,
          IExamineService examineService, IRepository<UserMonitor, long> userMonitorsRepository, IEditRecordService editRecordService, IRepository<UserCertification, long> userCertificationRepository, IQueryService queryService,
-        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository)
+        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository, EditRecordUnitOfWork unitOfWork, RecordHistoryService recordHistory)
         {
             
             _entryRepository = entryRepository;
@@ -128,6 +130,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _videoRepository = videoRepository;
             _favoriteFolderRepository = favoriteFolderRepository;
             _queryService = queryService;
+            _unitOfWork = unitOfWork;
+            _recordHistory = recordHistory;
         }
 
 
@@ -207,6 +211,23 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(Roles = "Admin,Editor")]
         [HttpPost]
         public async Task<ActionResult<ExamineProcResultModel>> ProcAsync(Models.ExaminedViewModel model)
+        {
+            // ProcCoreAsync 每次都会重新查询审核记录与目标对象，因此可以安全地重试死锁。
+            var result = await _unitOfWork.RunAsync(() => ProcCoreAsync(model), result => result.Value?.Successful == true, retryOnDeadlock: true);
+            if (result.Value?.Successful == true && model.IsPassed)
+            {
+                await _unitOfWork.AfterCommitAsync(async () =>
+                {
+                    var record = await _examineRepository.GetAll().AsNoTracking().FirstAsync(e => e.Id == model.Id);
+                    var author = await _userRepository.FirstOrDefaultAsync(u => u.Id == record.ApplicationUserId);
+                    await _userService.UpdateUserIntegral(author);
+                    await _rankService.UpdateUserRanks(author);
+                });
+            }
+            return result;
+        }
+
+        private async Task<ActionResult<ExamineProcResultModel>> ProcCoreAsync(Models.ExaminedViewModel model)
         {
             var examine = await _examineRepository.GetAll().Include(s => s.ApplicationUser).FirstOrDefaultAsync(x => x.Id == model.Id);
             if (examine == null)
@@ -334,6 +355,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 case Operation.EditPeripheryRelatedPeripheries:
                     entry = await _peripheryRepository.GetAll()
                             .Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s => s.ToPeripheryNavigation)
+                            .Include(s => s.PeripheryRelationToPeripheryNavigation)
                             .FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
                     break;
                 case Operation.EditPlayedGameMain:
@@ -387,6 +409,9 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
 
+
+            if (!await _unitOfWork.TryClaimAsync(examine, model.IsPassed))
+                return new ExamineProcResultModel { Successful = false, Error = "该记录已经被审核，不能修改审核状态" };
 
             //判断是否通过
             if (model.IsPassed == true)
@@ -448,7 +473,8 @@ namespace CnGalWebSite.APIServer.Controllers
                 {
                     await _examineService.ApplyEditRecordToObject(entry, examineData, examine.Operation);
                 }
-                catch (Exception ex) when (ex is not ConfigurationException)
+                // 死锁必须冒泡到事务层重试，不能被转换成业务失败结果。
+                catch (Exception ex) when (ex is not ConfigurationException && !EditRecordUnitOfWork.IsDeadlock(ex))
                 {
                     return new ExamineProcResultModel { Successful = false, Error = "应用审核记录失败，错误信息：" + ex.Message };
                 }
@@ -472,11 +498,6 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 //尝试添加审阅
                 await _editRecordService.AddEditRecordToUserReview(examine);
-
-                //更新用户积分
-                await _userService.UpdateUserIntegral(examine.ApplicationUser);
-                await _rankService.UpdateUserRanks(examine.ApplicationUser);
-
             }
             else
             {
@@ -663,10 +684,10 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
 
-            var examinedView = new ExamineViewModel();
-
+            await _recordHistory.PrepareFramesAsync(examines);
             foreach (var item in examines)
             {
+                var examinedView = new ExamineViewModel();
                 if (await _examineService.GetExamineView(examinedView, item))
                 {
                     model.Examines.Add(new EditRecordAloneViewModel

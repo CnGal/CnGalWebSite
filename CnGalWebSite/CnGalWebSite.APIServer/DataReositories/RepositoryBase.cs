@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.APIServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -92,18 +93,81 @@ namespace CnGalWebSite.APIServer.DataReositories
 
         public Tentity Update(Tentity entity)
         {
-            AttachIfNot(entity);
-            _dbContext.Entry(entity).State = EntityState.Modified;
+            PrepareUpdate(entity);
             Save();
             return entity;
         }
 
         public async Task<Tentity> UpdateAsync(Tentity entity)
         {
-            AttachIfNot(entity);
-            _dbContext.Entry(entity).State = EntityState.Modified;
+            PrepareUpdate(entity);
             await SaveAsync();
             return entity;
+        }
+
+        public Tentity UpdateFields(Tentity entity, params Expression<Func<Tentity, object>>[] fields)
+        {
+            MarkFields(entity, fields);
+            Save();
+            return entity;
+        }
+
+        public async Task<Tentity> UpdateFieldsAsync(Tentity entity, params Expression<Func<Tentity, object>>[] fields)
+        {
+            MarkFields(entity, fields);
+            await SaveAsync();
+            return entity;
+        }
+
+        /// <summary>
+        /// 普通更新只接受已跟踪实体；分离实体必须显式声明需要写入的字段。
+        /// </summary>
+        private void PrepareUpdate(Tentity entity)
+        {
+            ArgumentNullException.ThrowIfNull(entity);
+            var entry = _dbContext.Entry(entity);
+            if (entry.State != EntityState.Detached)
+            {
+                return;
+            }
+            throw new InvalidOperationException(
+                $"{typeof(Tentity).Name} is detached. Load a tracked entity or use UpdateFields with explicit properties.");
+        }
+
+        private void MarkFields(Tentity entity, Expression<Func<Tentity, object>>[] fields)
+        {
+            ArgumentNullException.ThrowIfNull(entity);
+            if (fields is null || fields.Length == 0)
+                throw new ArgumentException("At least one property must be specified.", nameof(fields));
+            var entry = _dbContext.Entry(entity);
+            var selected = new HashSet<string>(StringComparer.Ordinal);
+            var properties = new List<PropertyEntry>();
+            foreach (var field in fields)
+            {
+                var body = field.Body is UnaryExpression unary ? unary.Operand : field.Body;
+                if (body is not MemberExpression member || member.Expression != field.Parameters[0])
+                    throw new ArgumentException("Only direct scalar properties can be updated.", nameof(fields));
+                var property = entry.Property(member.Member.Name);
+                if (property.Metadata.IsPrimaryKey())
+                    throw new ArgumentException("Primary keys cannot be updated.", nameof(fields));
+                if (selected.Add(property.Metadata.Name)) properties.Add(property);
+            }
+
+            // 已跟踪实体上可能还挂着选择之外的修改，SaveChanges 会把它们一并写入。
+            // 那样“只写声明的列”就名不副实，这里直接拒绝，避免静默落库未声明的列。
+            var stray = entry.Properties
+                .Where(p => p.IsModified && !selected.Contains(p.Metadata.Name))
+                .Select(p => p.Metadata.Name)
+                .ToArray();
+            if (stray.Length > 0)
+            {
+                throw new InvalidOperationException(
+                    $"{typeof(Tentity).Name} 上存在未声明的挂起修改：{string.Join("、", stray)}。请使用跟踪更新，或把列一并声明。");
+            }
+
+            // Validate first; a rejected update must not leave an attached stale object behind.
+            if (entry.State == EntityState.Detached) entry.State = EntityState.Unchanged;
+            foreach (var property in properties) property.IsModified = true;
         }
 
         public void Delete(Tentity entity)
@@ -179,6 +243,8 @@ namespace CnGalWebSite.APIServer.DataReositories
 
         public void Clear()
         {
+            if (_dbContext.RecordReadDepth > 0)
+                throw new InvalidOperationException("审核预览和历史回放不能清除写入上下文的跟踪状态。");
             _dbContext.ChangeTracker.Clear();
         }
 
@@ -188,13 +254,9 @@ namespace CnGalWebSite.APIServer.DataReositories
         /// <param name="entity"></param>
         protected virtual void AttachIfNot(Tentity entity)
         {
-            var entty = _dbContext.ChangeTracker.Entries().FirstOrDefault(ent => ent.Entity == entity);
-
-            if (entity == null)
-            {
-                return;
-            }
-            Table.Attach(entity);
+            ArgumentNullException.ThrowIfNull(entity);
+            var entry = _dbContext.Entry(entity);
+            if (entry.State == EntityState.Detached) entry.State = EntityState.Unchanged;
         }
 
         protected void Save()

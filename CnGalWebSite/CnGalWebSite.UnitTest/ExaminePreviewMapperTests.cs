@@ -5,6 +5,7 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.DataModel.ViewModel.Videos;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.Extensions;
 using NUnit.Framework;
@@ -64,7 +65,7 @@ public class ExaminePreviewMapperTests
     [Test]
     public void ArticleNewsFieldsParticipateInTheSnapshot()
     {
-        var legacy = EditRecordContentMapper.Map(new ArticleViewModel
+        var legacy = RecordContentMapper.Map(new ArticleViewModel
         {
             Name = "动态标题",
             MainPage = "<p>正文</p>",
@@ -85,9 +86,24 @@ public class ExaminePreviewMapperTests
     }
 
     [Test]
+    public void VideoAuthorshipParticipatesInTheSnapshot()
+    {
+        var legacy = RecordContentMapper.Map(new VideoViewModel
+        {
+            Name = "视频",
+            MainPage = "<p>正文</p>",
+            IsCreatedByCurrentUser = true
+        });
+
+        var values = legacy.Texts.SelectMany(t => t.Informations)
+            .ToDictionary(i => i.DisplayName, i => i.DisplayValue, StringComparer.Ordinal);
+        Assert.That(values["本人创作"], Is.EqualTo("是"));
+    }
+
+    [Test]
     public void DomainHistoryViewModelIsMappedThroughTheLegacyProjection()
     {
-        var legacy = EditRecordContentMapper.Map(new EntryIndexViewModel
+        var legacy = RecordContentMapper.Map(new EntryIndexViewModel
         {
             Name = "历史词条",
             MainPage = "<p>历史正文</p>",
@@ -108,7 +124,7 @@ public class ExaminePreviewMapperTests
     [Test]
     public void EntryNewsAndFullInformationParticipateInComparison()
     {
-        var before = EditRecordContentMapper.Map(new EntryIndexViewModel
+        var before = RecordContentMapper.Map(new EntryIndexViewModel
         {
             Name = "高考恋爱一百天",
             NewsOfEntry =
@@ -120,7 +136,7 @@ public class ExaminePreviewMapperTests
                 new() { Modifier = "基本信息", DisplayName = "发行时间", DisplayValue = "2014年7月20日" }
             ]
         });
-        var after = EditRecordContentMapper.Map(new EntryIndexViewModel
+        var after = RecordContentMapper.Map(new EntryIndexViewModel
         {
             Name = "高考恋爱一百天",
             NewsOfEntry =
@@ -142,7 +158,7 @@ public class ExaminePreviewMapperTests
     [Test]
     public void EmptyStaffModifierDoesNotLeaveTrailingSeparator()
     {
-        var legacy = EditRecordContentMapper.Map(new EntryIndexViewModel
+        var legacy = RecordContentMapper.Map(new EntryIndexViewModel
         {
             Name = "测试词条",
             Staffs =
@@ -194,7 +210,7 @@ public class ExaminePreviewMapperTests
     [Test]
     public void ReleasesWithSameNameAreSeparatedByPlatform()
     {
-        var legacy = EditRecordContentMapper.Map(new EntryIndexViewModel
+        var legacy = RecordContentMapper.Map(new EntryIndexViewModel
         {
             Name = "关于我被小学女生绑架这件事",
             Releases =

@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.Sorting;
+﻿using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
@@ -62,10 +62,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly ILogger<VideoAPIController> _logger;
         private readonly IQueryService _queryService;
 
+        private readonly RecordHistoryService _recordHistory;
+
         public VideoAPIController(IArticleService articleService, IRepository<Comment, long> commentUpRepository, IRepository<ThumbsUp, long> thumbsUpRepository, IUserService userService, ILogger<VideoAPIController> logger,
         IExamineService examineService, IEntryService entryService, IRepository<ApplicationUser, string> userRepository, IWebHostEnvironment webHostEnvironment, IEditRecordService editRecordService,
          IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Examine, long> examineRepository, IVideoService videoService,
-        IRepository<Entry, int> entryRepository, IRepository<Video, long> videoRepository, IQueryService queryService)
+        IRepository<Entry, int> entryRepository, IRepository<Video, long> videoRepository, IQueryService queryService, RecordHistoryService recordHistory)
         {
             
             _entryRepository = entryRepository;
@@ -85,6 +87,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _videoService = videoService;
             _logger = logger;
             _queryService = queryService;
+            _recordHistory = recordHistory;
         }
 
         [AllowAnonymous]
@@ -833,46 +836,18 @@ namespace CnGalWebSite.APIServer.Controllers
                 return BadRequest("请选择已通过的编辑记录");
             }
 
-            var currentVideo = new Video();
-            var newVideo = new Video();
-
-            //按审核通过时间还原历史版本；contrastId=0 表示空基准，用于首个版本
-            var examines = RecordVersionOrder.Approved(
-                await _examineRepository.GetAll().AsNoTracking()
-                    .Where(s => s.IsPassed == true && s.VideoId == currentExamine.VideoId)
-                    .ToListAsync()).ToList();
-            var contrastIndex = contrastId > 0 ? examines.FindIndex(s => s.Id == contrastId) : -1;
-            var currentIndex = examines.FindIndex(s => s.Id == currentId);
-            if (currentIndex < 0 || (contrastId > 0 && contrastIndex < 0))
+            var result = await _recordHistory.CompareAsync<VideoViewModel>(currentExamine, contrastId);
+            if (!result.Success)
             {
-                return BadRequest("编辑记录未通过审核");
+                return BadRequest(result.Error);
             }
-            if (contrastIndex > currentIndex)
-            {
-                return BadRequest("对比的编辑必须先于当前的编辑");
-            }
-
-            if (contrastIndex >= 0)
-            {
-                foreach (var item in examines.Take(contrastIndex + 1))
-                {
-                    await _videoService.UpdateData(currentVideo, item);
-                }
-            }
-
-            foreach (var item in examines.Take(currentIndex + 1))
-            {
-                await _videoService.UpdateData(newVideo, item);
-            }
-
-            var result = _videoService.ConcompareAndGenerateModel(currentVideo, newVideo);
 
             var model = new VideoContrastEditRecordViewModel
             {
                 ContrastId = contrastId,
                 CurrentId = currentId,
-                ContrastModel = result[0],
-                CurrentModel = result[1],
+                ContrastModel = result.Before,
+                CurrentModel = result.After,
             };
 
             return model;

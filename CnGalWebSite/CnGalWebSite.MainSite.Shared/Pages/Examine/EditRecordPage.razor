@@ -5,6 +5,7 @@
 @using CnGalWebSite.SDK.MainSite.Models
 @using CnGalWebSite.MainSite.Shared.Components.Features.Examine
 @inject IExamineQueryService ExamineQueryService
+@inject NavigationManager NavigationManager
 @implements IDisposable
 
 <CgPageMeta Title="编辑记录" />
@@ -72,13 +73,13 @@
 </div>
 
 @code {
-    [SupplyParameterFromQuery(Name = "ContrastId"), Parameter] public string? ContrastIdQuery { get; set; }
-    [SupplyParameterFromQuery(Name = "CurrentId"), Parameter] public string? CurrentIdQuery { get; set; }
-    [SupplyParameterFromQuery(Name = "SelectedId"), Parameter] public string? SelectedIdQuery { get; set; }
+    [SupplyParameterFromQuery(Name = "ContrastId")] public string? ContrastIdQuery { get; set; }
+    [SupplyParameterFromQuery(Name = "CurrentId")] public string? CurrentIdQuery { get; set; }
+    [SupplyParameterFromQuery(Name = "SelectedId")] public string? SelectedIdQuery { get; set; }
     private long ContrastId => long.TryParse(ContrastIdQuery, out var id) ? id : 0;
     private long? CurrentId => CurrentIdQuery is null ? null : long.TryParse(CurrentIdQuery, out var id) ? id : -1;
     private long SelectedId => SelectedIdQuery is null ? 0 : long.TryParse(SelectedIdQuery, out var id) ? id : -1;
-    [SupplyParameterFromQuery, Parameter] public string? Mode { get; set; }
+    [SupplyParameterFromQuery] public string? Mode { get; set; }
 
     private ExaminesOverviewViewModel? _overview;
     private EditRecordAloneViewModel? _selectedRecord;
@@ -97,6 +98,10 @@
     private CancellationTokenSource? _cts;
     private bool _disposed;
     private bool IsCompare => RecordPresentation.IsCompareMode(Mode, CurrentId);
+    /// <summary>与 <c>@page "/home/editrecord"</c> 保持一致：离开路由后查询参数会消失，不能当成非法 ID 校验。</summary>
+    private bool IsCurrentPage => string.Equals(
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0].TrimEnd('/'),
+        "home/editrecord", StringComparison.OrdinalIgnoreCase);
     private IEnumerable<KeyValuePair<string, string>> Options => (_overview?.Examines ?? []).OrderByDescending(e => e.PassedTime).ThenByDescending(e => e.Id)
         .Select(e => new KeyValuePair<string, string>(e.Id.ToString(), $"#{e.Id} · {e.Operation.GetDisplayName()} · {e.ApplyTime:yyyy-MM-dd HH:mm}"));
 
@@ -105,6 +110,13 @@
     private async Task LoadDataAsync()
     {
         if (_disposed) return;
+        // Query notifications can reach the outgoing component before the router
+        // disposes it. They describe the destination, not an invalid record URL.
+        if (!IsCurrentPage)
+        {
+            _cts?.Cancel();
+            return;
+        }
         _cts?.Cancel();
         _cts?.Dispose();
         _cts = new();
