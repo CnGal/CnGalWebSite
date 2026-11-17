@@ -32,8 +32,12 @@ namespace CnGalWebSite.APIServer.ExamineX
         /// </summary>
         /// <param name="model"></param>
         /// <param name="examine"></param>
+        /// <param name="includeHistory">
+        /// 是否为已通过记录补齐“上一条/本条”历史快照。列表场景只需要 <c>EditOverview</c>，
+        /// 关闭它可以避免对同一对象按记录数量重复回放历史。
+        /// </param>
         /// <returns></returns>
-        Task<bool> GetExamineView(ExamineViewModel model, Examine examine);
+        Task<bool> GetExamineView(ExamineViewModel model, Examine examine, bool includeHistory = true);
       
         /// <summary>
         /// 获取当前用户对该词条部分的待审核记录

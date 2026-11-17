@@ -1,4 +1,4 @@
-using CnGalWebSite.APIServer.Application.Articles;
+﻿using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Peripheries;
 using CnGalWebSite.APIServer.Application.Tags;
@@ -21,87 +21,206 @@ using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.Examines;
 
+/// <summary>对比结果。用户输入导致的失败以错误信息返回，由控制器映射为 400。</summary>
+public sealed record RecordComparison<T>(bool Success, T Before, T After, string? Error)
+{
+    public static RecordComparison<T> Fail(string error) => new(false, default!, default!, error);
+}
+
+/// <summary>某条已通过记录的上一条与本条快照；<paramref name="BeforeMainPage"/> 等为原始 Markdown。</summary>
+public sealed record RecordFrame(ExaminePreDataModel Before, ExaminePreDataModel After,
+    string? BeforeMainPage, string? AfterMainPage);
+
 /// <summary>Request-scoped, immutable projections of approved submissions; never a reconstruction of old database side effects.</summary>
 public sealed class RecordHistoryService(AppDbContext db, IEntryService entries, IArticleService articles,
     ITagService tags, IPeripheryService peripheries, IVideoService videos)
 {
-    private sealed record Timeline(List<long> Order, Dictionary<long, object> Views);
-    private readonly Dictionary<(string Kind, long Id), Timeline> timelines = new();
+    private sealed record Timeline(Dictionary<long, object> Views, Dictionary<long, string?> MainPages);
 
-    public static bool Supports(Examine record) => record.EntryId.HasValue || record.ArticleId.HasValue
-        || record.TagId.HasValue || record.PeripheryId.HasValue || record.VideoId.HasValue;
+    private readonly Dictionary<(string Kind, long Id), List<Examine>> histories = new();
+    private readonly Dictionary<(string Kind, long Id, string Ids), Timeline> timelines = new();
 
-    public async Task<(T Before, T After)> CompareAsync<T>(Examine record, long contrastId)
+    public static bool Supports(Examine record) => TryGetKey(record, out _);
+
+    /// <summary>
+    /// 按通过时间还原 <paramref name="contrastId"/>（0 表示空基准）与 <paramref name="record"/> 的视图。
+    /// </summary>
+    public async Task<RecordComparison<T>> CompareAsync<T>(Examine record, long contrastId)
     {
-        var timeline = await GetTimelineAsync(record);
-        if (!timeline.Views.TryGetValue(contrastId, out var before) || !timeline.Views.TryGetValue(record.Id, out var after)
-            || timeline.Order.IndexOf(contrastId) > timeline.Order.IndexOf(record.Id))
-            throw new InvalidOperationException("请选择同一对象按通过时间排序的已通过版本。");
-        return (Clone((T)before), Clone((T)after));
-    }
-
-    public async Task<(ExaminePreDataModel Before, ExaminePreDataModel After)> GetFrameAsync(Examine record)
-    {
-        var timeline = await GetTimelineAsync(record);
-        var index = timeline.Order.IndexOf(record.Id);
-        if (index <= 0) throw new InvalidOperationException("无法找到已通过的历史记录。");
-        return (Map(timeline.Views[timeline.Order[index - 1]]), Map(timeline.Views[record.Id]));
-    }
-
-    private async Task<Timeline> GetTimelineAsync(Examine record)
-    {
-        using var read = new RecordReadScope(db);
-        var key = record.EntryId is { } entry ? ("entry", (long)entry)
-            : record.ArticleId is { } article ? ("article", article)
-            : record.TagId is { } tag ? ("tag", (long)tag)
-            : record.PeripheryId is { } periphery ? ("periphery", periphery)
-            : record.VideoId is { } video ? ("video", video)
-            : throw new InvalidOperationException("该对象不支持历史回放。");
-        if (timelines.TryGetValue(key, out var cached)) return cached;
-        var query = db.Examines.AsNoTracking().Where(e => e.IsPassed == true);
-        query = key.Item1 switch
+        if (!TryGetKey(record, out var key))
         {
-            "entry" => query.Where(e => e.EntryId == record.EntryId),
-            "article" => query.Where(e => e.ArticleId == record.ArticleId),
-            "tag" => query.Where(e => e.TagId == record.TagId),
-            "periphery" => query.Where(e => e.PeripheryId == record.PeripheryId),
-            _ => query.Where(e => e.VideoId == record.VideoId)
+            return RecordComparison<T>.Fail("该对象不支持历史回放。");
+        }
+
+        var records = await GetApprovedAsync(key);
+        var currentIndex = records.FindIndex(s => s.Id == record.Id);
+        var contrastIndex = contrastId > 0 ? records.FindIndex(s => s.Id == contrastId) : -1;
+        if (currentIndex < 0 || (contrastId > 0 && contrastIndex < 0))
+        {
+            return RecordComparison<T>.Fail("编辑记录未通过审核");
+        }
+        if (contrastIndex > currentIndex)
+        {
+            return RecordComparison<T>.Fail("对比的编辑必须先于当前的编辑");
+        }
+
+        var beforeId = contrastId > 0 ? contrastId : 0;
+        var timeline = await GetTimelineAsync(key, records, [beforeId, record.Id]);
+        if (!timeline.Views.TryGetValue(beforeId, out var before) || !timeline.Views.TryGetValue(record.Id, out var after))
+        {
+            return RecordComparison<T>.Fail("编辑记录未通过审核");
+        }
+        return new(true, Clone((T)before), Clone((T)after), null);
+    }
+
+    /// <summary>
+    /// 获取上一条已通过版本与本条记录的快照；历史不可用时返回 <c>null</c>，由调用方降级显示。
+    /// </summary>
+    public async Task<RecordFrame?> GetFrameAsync(Examine record)
+    {
+        if (!TryGetKey(record, out var key))
+        {
+            return null;
+        }
+
+        var records = await GetApprovedAsync(key);
+        var index = records.FindIndex(s => s.Id == record.Id);
+        if (index < 0)
+        {
+            return null;
+        }
+        var beforeId = index == 0 ? 0 : records[index - 1].Id;
+        var timeline = await GetTimelineAsync(key, records, [beforeId, record.Id]);
+        if (!timeline.Views.TryGetValue(beforeId, out var before) || !timeline.Views.TryGetValue(record.Id, out var after))
+        {
+            return null;
+        }
+        return new RecordFrame(Map(before), Map(after),
+            timeline.MainPages.GetValueOrDefault(beforeId), timeline.MainPages.GetValueOrDefault(record.Id));
+    }
+
+    private async Task<List<Examine>> GetApprovedAsync((string Kind, long Id) key)
+    {
+        if (histories.TryGetValue(key, out var cached))
+        {
+            return cached;
+        }
+
+        using var read = new RecordReadScope(db);
+        var query = db.Examines.AsNoTracking().Where(e => e.IsPassed == true);
+        query = key.Kind switch
+        {
+            "entry" => query.Where(e => (long?)e.EntryId == key.Id),
+            "article" => query.Where(e => e.ArticleId == key.Id),
+            "tag" => query.Where(e => (long?)e.TagId == key.Id),
+            "periphery" => query.Where(e => e.PeripheryId == key.Id),
+            _ => query.Where(e => e.VideoId == key.Id)
         };
         var records = RecordVersionOrder.Approved(await query.ToListAsync()).ToList();
-        var result = key.Item1 switch
-        {
-            "entry" => await BuildAsync(new Entry(), records, entries.UpdateEntryDataAsync, async value =>
-            {
-                var view = await entries.GetEntryIndexViewModelAsync(value);
-                view.AllInformation = value.Information.ToList();
-                return view;
-            }),
-            "article" => await BuildAsync(new Article(), records, articles.UpdateArticleData,
-                value => Task.FromResult(articles.GetArticleViewModelAsync(value))),
-            "tag" => await BuildAsync(new Tag(), records, tags.UpdateTagDataAsync, tags.GetTagViewModel),
-            "periphery" => await BuildAsync(new Periphery(), records, peripheries.UpdatePeripheryDataAsync,
-                value => Task.FromResult(peripheries.GetPeripheryViewModel(value))),
-            _ => await BuildAsync(new Video(), records, videos.UpdateData,
-                value => Task.FromResult(videos.GetViewModel(value)))
-        };
-        timelines.Add(key, result);
-        return result;
+        histories.Add(key, records);
+        return records;
     }
 
-    private static async Task<Timeline> BuildAsync<T, TView>(T state, List<Examine> records,
-        Func<T, Examine, Task> apply, Func<T, Task<TView>> project)
+    private async Task<Timeline> GetTimelineAsync((string Kind, long Id) key, List<Examine> records,
+        IReadOnlyCollection<long> projectIds)
     {
-        var result = new Timeline([0], new() { [0] = Clone(await project(state)) });
+        using var read = new RecordReadScope(db);
+        // Only project the versions the caller actually needs; applying the rest is cheap and
+        // keeps the request from rendering every historical Markdown page.
+        var known = records.Select(s => s.Id).ToHashSet();
+        var ids = projectIds.Where(id => id == 0 || known.Contains(id)).ToHashSet();
+        var cacheKey = (key.Kind, key.Id, string.Join(',', ids.OrderBy(id => id)));
+        if (timelines.TryGetValue(cacheKey, out var cached))
+        {
+            return cached;
+        }
+
+        var timeline = key.Kind switch
+        {
+            "entry" => await BuildAsync(new Entry(), records, ids, entries.UpdateEntryDataAsync, ProjectEntryAsync, value => value.MainPage),
+            "article" => await BuildAsync(new Article(), records, ids, articles.UpdateArticleData,
+                value => Task.FromResult(articles.GetArticleViewModelAsync(value)), value => value.MainPage),
+            "tag" => await BuildAsync(new Tag(), records, ids, tags.UpdateTagDataAsync, tags.GetTagViewModel, _ => null),
+            "periphery" => await BuildAsync(new Periphery(), records, ids, peripheries.UpdatePeripheryDataAsync,
+                value => Task.FromResult(peripheries.GetPeripheryViewModel(value)), _ => null),
+            _ => await BuildAsync(new Video(), records, ids, videos.UpdateData,
+                value => Task.FromResult(videos.GetViewModel(value)), value => value.MainPage)
+        };
+        timelines.Add(cacheKey, timeline);
+        return timeline;
+
+        async Task<EntryIndexViewModel> ProjectEntryAsync(Entry value)
+        {
+            var view = await entries.GetEntryIndexViewModelAsync(value);
+            view.AllInformation = value.Information?.ToList() ?? [];
+            return view;
+        }
+    }
+
+    private static async Task<Timeline> BuildAsync<T, TView>(T state, List<Examine> records, HashSet<long> ids,
+        Func<T, Examine, Task> apply, Func<T, Task<TView>> project, Func<T, string?> mainPage)
+    {
+        var views = new Dictionary<long, object>();
+        var mainPages = new Dictionary<long, string?>();
+        await CaptureAsync(0);
+
+        var last = ids.Count == 0 ? 0 : ids.Max();
         foreach (var record in records)
         {
             await apply(state, record);
-            result.Order.Add(record.Id);
-            result.Views.Add(record.Id, Clone(await project(state)));
+            await CaptureAsync(record.Id);
+            if (record.Id == last)
+            {
+                break;
+            }
         }
-        return result;
+
+        return new Timeline(views, mainPages);
+
+        async Task CaptureAsync(long id)
+        {
+            if (!ids.Contains(id))
+            {
+                return;
+            }
+            views[id] = Clone(await project(state));
+            mainPages[id] = mainPage(state);
+        }
     }
 
-    private static T Clone<T>(T value) => JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(value));
+    private static bool TryGetKey(Examine record, out (string Kind, long Id) key)
+    {
+        if (record.EntryId is { } entry)
+        {
+            key = ("entry", entry);
+            return true;
+        }
+        if (record.ArticleId is { } article)
+        {
+            key = ("article", article);
+            return true;
+        }
+        if (record.TagId is { } tag)
+        {
+            key = ("tag", tag);
+            return true;
+        }
+        if (record.PeripheryId is { } periphery)
+        {
+            key = ("periphery", periphery);
+            return true;
+        }
+        if (record.VideoId is { } video)
+        {
+            key = ("video", video);
+            return true;
+        }
+        key = default;
+        return false;
+    }
+
+    private static T Clone<T>(T value) => JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(value))!;
+
     private static ExaminePreDataModel Map(object view) => view switch
     {
         EntryIndexViewModel value => RecordContentMapper.Map(value),

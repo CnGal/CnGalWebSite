@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.Sorting;
+﻿using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
@@ -1166,6 +1166,10 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             var result = await history.CompareAsync<ArticleViewModel>(currentExamine, contrastId);
+            if (!result.Success)
+            {
+                return BadRequest(result.Error);
+            }
 
             var model = new ArticleContrastEditRecordViewModel
             {

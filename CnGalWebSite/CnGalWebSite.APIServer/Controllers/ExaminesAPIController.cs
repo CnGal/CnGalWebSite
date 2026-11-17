@@ -1,11 +1,28 @@
-using CnGalWebSite.DataModel.Sorting;
+﻿using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Ranks;
+using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.ExamineX;
+using CnGalWebSite.Core.Models;
+using CnGalWebSite.Core.Services.Query;
+using CnGalWebSite.DataModel.ExamineModel.Articles;
+using CnGalWebSite.DataModel.ExamineModel.Comments;
+using CnGalWebSite.DataModel.ExamineModel.Dismbigs;
+using CnGalWebSite.DataModel.ExamineModel.Entries;
+using CnGalWebSite.DataModel.ExamineModel.FavoriteFolders;
+using CnGalWebSite.DataModel.ExamineModel.Peripheries;
+using CnGalWebSite.DataModel.ExamineModel.PlayedGames;
+using CnGalWebSite.DataModel.ExamineModel.Shared;
+using CnGalWebSite.DataModel.ExamineModel.Tags;
+using CnGalWebSite.DataModel.ExamineModel.Users;
+using CnGalWebSite.DataModel.ExamineModel.Videos;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.EditRecords;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -19,23 +36,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CnGalWebSite.DataModel.ViewModel.EditRecords;
-using CnGalWebSite.APIServer.Application.Examines;
-using CnGalWebSite.APIServer.Application.Users;
-using CnGalWebSite.DataModel.ExamineModel.Articles;
-using CnGalWebSite.DataModel.ExamineModel.Comments;
-using CnGalWebSite.DataModel.ExamineModel.Dismbigs;
-using CnGalWebSite.DataModel.ExamineModel.Entries;
-using CnGalWebSite.DataModel.ExamineModel.Peripheries;
-using CnGalWebSite.DataModel.ExamineModel.PlayedGames;
-using CnGalWebSite.DataModel.ExamineModel.Users;
-using CnGalWebSite.DataModel.ExamineModel.Tags;
-using CnGalWebSite.DataModel.ExamineModel.Shared;
-using CnGalWebSite.DataModel.ExamineModel.Videos;
-using CnGalWebSite.DataModel.ExamineModel.FavoriteFolders;
-using CnGalWebSite.Core.Models;
-using CnGalWebSite.DataModel.ViewModel.Entries;
-using CnGalWebSite.Core.Services.Query;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
 namespace CnGalWebSite.APIServer.Controllers
@@ -101,12 +101,11 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IUserService _userService;
         private readonly IQueryService _queryService;
         private readonly EditRecordUnitOfWork _unitOfWork;
-        private readonly CnGalWebSite.APIServer.Infrastructure.AppDbContext _dbContext;
 
         public ExaminesAPIController(IRepository<Disambig, int> disambigRepository, IRankService rankService, IRepository<Comment, long> commentRepository, IUserService userService, IRepository<Video, long> videoRepository,
         IRepository<Message, long> messageRepository, IRepository<ApplicationUser, string> userRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IRepository<FavoriteFolder, long> favoriteFolderRepository,
          IExamineService examineService, IRepository<UserMonitor, long> userMonitorsRepository, IEditRecordService editRecordService, IRepository<UserCertification, long> userCertificationRepository, IQueryService queryService,
-        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository, EditRecordUnitOfWork unitOfWork, CnGalWebSite.APIServer.Infrastructure.AppDbContext dbContext)
+        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository, EditRecordUnitOfWork unitOfWork)
         {
             
             _entryRepository = entryRepository;
@@ -131,7 +130,6 @@ namespace CnGalWebSite.APIServer.Controllers
             _favoriteFolderRepository = favoriteFolderRepository;
             _queryService = queryService;
             _unitOfWork = unitOfWork;
-            _dbContext = dbContext;
         }
 
 
@@ -227,7 +225,6 @@ namespace CnGalWebSite.APIServer.Controllers
         }
 
         private async Task<ActionResult<ExamineProcResultModel>> ProcCoreAsync(Models.ExaminedViewModel model)
-
         {
             var examine = await _examineRepository.GetAll().Include(s => s.ApplicationUser).FirstOrDefaultAsync(x => x.Id == model.Id);
             if (examine == null)
@@ -496,10 +493,6 @@ namespace CnGalWebSite.APIServer.Controllers
 
                 //尝试添加审阅
                 await _editRecordService.AddEditRecordToUserReview(examine);
-
-                //更新用户积分
-
-
             }
             else
             {
@@ -689,7 +682,7 @@ namespace CnGalWebSite.APIServer.Controllers
             foreach (var item in examines)
             {
                 var examinedView = new ExamineViewModel();
-                if (await _examineService.GetExamineView(examinedView, item))
+                if (await _examineService.GetExamineView(examinedView, item, includeHistory: false))
                 {
                     model.Examines.Add(new EditRecordAloneViewModel
                     {

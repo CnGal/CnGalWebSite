@@ -1,4 +1,4 @@
-using CnGalWebSite.DataModel.Sorting;
+﻿using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
@@ -1068,6 +1068,10 @@ namespace CnGalWebSite.APIServer.Controllers
             }
 
             var result = await history.CompareAsync<PeripheryViewModel>(currentExamine, contrastId);
+            if (!result.Success)
+            {
+                return BadRequest(result.Error);
+            }
 
             var model = new PeripheryContrastEditRecordViewModel
             {

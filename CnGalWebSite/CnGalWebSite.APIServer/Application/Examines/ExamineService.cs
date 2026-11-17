@@ -1,6 +1,4 @@
-using CnGalWebSite.DataModel.Sorting;
-
-using CnGalWebSite.APIServer.Application.Articles;
+﻿using CnGalWebSite.APIServer.Application.Articles;
 using CnGalWebSite.APIServer.Application.Comments;
 using CnGalWebSite.APIServer.Application.Disambigs;
 using CnGalWebSite.APIServer.Application.Entries;
@@ -30,6 +28,7 @@ using CnGalWebSite.DataModel.ExamineModel.Users;
 using CnGalWebSite.DataModel.ExamineModel.Videos;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.Sorting;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Disambig;
@@ -52,7 +51,7 @@ using Tag = CnGalWebSite.DataModel.Model.Tag;
 
 namespace CnGalWebSite.APIServer.Application.Examines
 {
-    public partial class ExamineService : IExamineService
+    public class ExamineService : IExamineService
     {
         private static readonly CnGalWebSite.Core.Services.Query.SortMap<Examine, ExamineSortField> ListSorting =
             new CnGalWebSite.Core.Services.Query.SortMap<Examine, ExamineSortField>(ExamineSortField.Id, ExamineSortField.Id)
@@ -239,7 +238,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         }
 
 
-        public async Task<bool> GetExamineView(ExamineViewModel model, Examine examine)
+        public async Task<bool> GetExamineView(ExamineViewModel model, Examine examine, bool includeHistory = true)
         {
             using var read = new RecordReadScope(_dbContext);
             var success = examine.Operation switch
@@ -276,13 +275,21 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 Operation.EstablishWebsite => await GetEstablishWebsiteExamineView(model, examine),
                 _ => false,
             };
-            if (success && examine.IsPassed == true && RecordHistoryService.Supports(examine))
+            if (includeHistory && success && examine.IsPassed == true && RecordHistoryService.Supports(examine))
             {
+                // 历史不可用时保持各分项的兜底展示，而不是让整页失败。
                 var frame = await _history.GetFrameAsync(examine);
-                model.BeforeModel = frame.Before;
-                model.AfterModel = frame.After;
-                if (examine.Operation is Operation.EstablishMainPage or Operation.EditArticleMainPage or Operation.EditVideoMainPage)
-                    model.EditOverview = new HtmlDiff.HtmlDiff(frame.Before.MainPage ?? "", frame.After.MainPage ?? "").Build();
+                if (frame is not null)
+                {
+                    model.BeforeModel = frame.Before;
+                    model.AfterModel = frame.After;
+                    if (examine.Operation is Operation.EstablishMainPage or Operation.EditArticleMainPage or Operation.EditVideoMainPage)
+                    {
+                        // 原始数据页签展示作者提交的 Markdown 差异，而不是渲染后 HTML 的差异。
+                        model.EditOverview = new HtmlDiff.HtmlDiff(frame.BeforeMainPage ?? "", frame.AfterMainPage ?? "")
+                            .Build().Replace("\r\n", "<br>");
+                    }
+                }
             }
             if (success)
             {
