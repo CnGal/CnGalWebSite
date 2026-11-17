@@ -63,8 +63,10 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IUserService _userService;
         private readonly IQueryService _queryService;
 
+        private readonly RecordHistoryService _recordHistory;
+
         public TagsAPIController( IAppHelper appHelper, IRepository<Tag, int> tagRepository, ITagService tagService, IEditRecordService editRecordService, IRepository<Article, long> articleRepository, IUserService userService, IQueryService queryService,
-        IRepository<Entry, int> entryRepository, IExamineService examineService, IRepository<Examine, long> examineRepository, IEntryService entryService, IRepository<Carousel, int> carouselRepository, IArticleService articleService)
+        IRepository<Entry, int> entryRepository, IExamineService examineService, IRepository<Examine, long> examineRepository, IEntryService entryService, IRepository<Carousel, int> carouselRepository, IArticleService articleService, RecordHistoryService recordHistory)
         {
             
             _tagRepository = tagRepository;
@@ -80,6 +82,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _articleService = articleService;
             _userService = userService;
             _queryService = queryService;
+            _recordHistory = recordHistory;
         }
 
         [AllowAnonymous]
@@ -767,7 +770,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [HttpGet("{contrastId}/{currentId}")]
         [AllowAnonymous]
-        public async Task<ActionResult<TagContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId, [FromServices] RecordHistoryService history)
+        public async Task<ActionResult<TagContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
         {
             var contrastExamine = contrastId > 0
                 ? await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId)
@@ -784,7 +787,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return BadRequest("请选择已通过的编辑记录");
             }
 
-            var result = await history.CompareAsync<TagIndexViewModel>(currentExamine, contrastId);
+            var result = await _recordHistory.CompareAsync<TagIndexViewModel>(currentExamine, contrastId);
             if (!result.Success)
             {
                 return BadRequest(result.Error);

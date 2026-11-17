@@ -79,10 +79,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IUserService _userService;
         private readonly IQueryService _queryService;
 
+        private readonly RecordHistoryService _recordHistory;
+
         public EntriesAPIController( IRepository<Article, long> articleRepository, IRepository<Periphery, long> peripheryRepository, IVideoService videoService, IRepository<Lottery, long> lotteryRepository,
         IPerfectionService perfectionService, IRepository<Examine, long> examineRepository, IArticleService articleService, IEditRecordService editRecordService, ILogger<EntriesAPIController> logger, IUserService userService,
         IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IExamineService examineService, IRepository<Video, long> videoRepository, IQueryService queryService,
-        IRepository<EntryInformationType, long> entryInformationTypeRepository)
+        IRepository<EntryInformationType, long> entryInformationTypeRepository, RecordHistoryService recordHistory)
         {
             
             _entryRepository = entryRepository;
@@ -103,6 +105,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _userService = userService;
             _queryService = queryService;
             _entryInformationTypeRepository = entryInformationTypeRepository;
+            _recordHistory = recordHistory;
         }
 
         /// <summary>
@@ -1421,7 +1424,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [HttpGet("{contrastId}/{currentId}")]
         [AllowAnonymous]
-        public async Task<ActionResult<EntryContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId, [FromServices] RecordHistoryService history)
+        public async Task<ActionResult<EntryContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
         {
             var contrastExamine = contrastId > 0
                 ? await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId)
@@ -1438,7 +1441,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return BadRequest("请选择已通过的编辑记录");
             }
 
-            var result = await history.CompareAsync<EntryIndexViewModel>(currentExamine, contrastId);
+            var result = await _recordHistory.CompareAsync<EntryIndexViewModel>(currentExamine, contrastId);
             if (!result.Success)
             {
                 return BadRequest(result.Error);

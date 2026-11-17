@@ -61,9 +61,11 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IUserService _userService;
         private readonly IQueryService _queryService;
 
+        private readonly RecordHistoryService _recordHistory;
+
         public PeripheriesAPIController(IPeripheryService peripheryService, IEntryService entryService, IEditRecordService editRecordService, IQueryService queryService,
         IRepository<PeripheryRelevanceUser, long> userOwnedPeripheryRepository, IUserService userService, IRepository<ApplicationUser, string> userRepository,
-        IExamineService examineService, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository)
+        IExamineService examineService, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, RecordHistoryService recordHistory)
         {
             
             _entryRepository = entryRepository;
@@ -78,6 +80,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _userService = userService;
             _userRepository = userRepository;
             _queryService = queryService;
+            _recordHistory = recordHistory;
         }
 
 
@@ -1050,7 +1053,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [HttpGet("{contrastId}/{currentId}")]
         [AllowAnonymous]
-        public async Task<ActionResult<PeripheryContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId, [FromServices] RecordHistoryService history)
+        public async Task<ActionResult<PeripheryContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
         {
             var contrastExamine = contrastId > 0
                 ? await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId)
@@ -1067,7 +1070,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 return BadRequest("请选择已通过的编辑记录");
             }
 
-            var result = await history.CompareAsync<PeripheryViewModel>(currentExamine, contrastId);
+            var result = await _recordHistory.CompareAsync<PeripheryViewModel>(currentExamine, contrastId);
             if (!result.Success)
             {
                 return BadRequest(result.Error);
