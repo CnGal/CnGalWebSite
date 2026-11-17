@@ -311,6 +311,25 @@ public class ExamineComparisonSdkTests
     }
 
     [Test]
+    public void ReplayStopsAtTheLastRequestedVersionNotTheHighestId()
+    {
+        // 基准版本先通过但 Id 更大，当前版本后通过却 Id 更小。
+        var contrast = new Examine { Id = 100, IsPassed = true, PassedTime = new DateTime(2026, 11, 12, 9, 0, 0) };
+        var current = new Examine { Id = 90, IsPassed = true, PassedTime = new DateTime(2026, 11, 12, 10, 0, 0) };
+        var records = RecordVersionOrder.Approved([contrast, current]).ToList();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(records.Select(r => r.Id), Is.EqualTo(new[] { 100L, 90L }));
+            // 停在第 1 条才能回放出当前版本；按最大 Id=100 会在第 0 条就停。
+            Assert.That(RecordVersionOrder.LastRequestedPosition(records, new HashSet<long> { 100, 90 }), Is.EqualTo(1));
+            Assert.That(RecordVersionOrder.LastRequestedPosition(records, new HashSet<long> { 90 }), Is.EqualTo(1));
+            Assert.That(RecordVersionOrder.LastRequestedPosition(records, new HashSet<long> { 100 }), Is.EqualTo(0));
+            Assert.That(RecordVersionOrder.LastRequestedPosition(records, new HashSet<long> { 0 }), Is.EqualTo(-1));
+        });
+    }
+
+    [Test]
     public void DiffKeepsDuplicateRowsAndOnlyReportsChangedValues()
     {
         var before = new RecordPreviewModel { Items = [

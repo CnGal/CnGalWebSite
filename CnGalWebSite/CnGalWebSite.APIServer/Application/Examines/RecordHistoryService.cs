@@ -164,15 +164,14 @@ public sealed class RecordHistoryService(AppDbContext db, IEntryService entries,
         var mainPages = new Dictionary<long, string?>();
         await CaptureAsync(0);
 
-        var last = ids.Count == 0 ? 0 : ids.Max();
-        foreach (var record in records)
+        // 记录按通过顺序回放，不能按最大 Id 提前结束：基准版本可能先于当前版本通过、
+        // 但 Id 更大，那样当前版本永远不会被回放，合法的对比请求会变成 400。
+        var lastPosition = RecordVersionOrder.LastRequestedPosition(records, ids);
+        for (var position = 0; position <= lastPosition; position++)
         {
+            var record = records[position];
             await apply(state, record);
             await CaptureAsync(record.Id);
-            if (record.Id == last)
-            {
-                break;
-            }
         }
 
         return new Timeline(views, mainPages);
