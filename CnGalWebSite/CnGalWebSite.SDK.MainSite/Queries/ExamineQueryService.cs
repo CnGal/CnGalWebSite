@@ -12,6 +12,7 @@ using CnGalWebSite.DataModel.ViewModel.Home;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Videos;
+using CnGalWebSite.Extensions;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using CnGalWebSite.SDK.MainSite.Models;
@@ -248,27 +249,27 @@ public sealed class ExamineQueryService(
             ExaminedNormalListModelType.Entry => GetSingleAsync<EntryContrastEditRecordViewModel, EditRecordComparison>(
                 $"api/entries/{suffix}",
                 m => Compare(m.ContrastId, m.CurrentId,
-                    EditRecordContentMapper.Map(m.ContrastModel), EditRecordContentMapper.Map(m.CurrentModel)),
+                    RecordContentMapper.Map(m.ContrastModel), RecordContentMapper.Map(m.CurrentModel)),
                 "EXAMINE_COMPARISON", "历史版本对比", contrastId, cancellationToken),
             ExaminedNormalListModelType.Article => GetSingleAsync<ArticleContrastEditRecordViewModel, EditRecordComparison>(
                 $"api/articles/{suffix}",
                 m => Compare(m.ContrastId, m.CurrentId,
-                    EditRecordContentMapper.Map(m.ContrastModel), EditRecordContentMapper.Map(m.CurrentModel)),
+                    RecordContentMapper.Map(m.ContrastModel), RecordContentMapper.Map(m.CurrentModel)),
                 "EXAMINE_COMPARISON", "历史版本对比", contrastId, cancellationToken),
             ExaminedNormalListModelType.Tag => GetSingleAsync<TagContrastEditRecordViewModel, EditRecordComparison>(
                 $"api/tags/{suffix}",
                 m => Compare(m.ContrastId, m.CurrentId,
-                    EditRecordContentMapper.Map(m.ContrastModel), EditRecordContentMapper.Map(m.CurrentModel)),
+                    RecordContentMapper.Map(m.ContrastModel), RecordContentMapper.Map(m.CurrentModel)),
                 "EXAMINE_COMPARISON", "历史版本对比", contrastId, cancellationToken),
             ExaminedNormalListModelType.Periphery => GetSingleAsync<PeripheryContrastEditRecordViewModel, EditRecordComparison>(
                 $"api/peripheries/{suffix}",
                 m => Compare(m.ContrastId, m.CurrentId,
-                    EditRecordContentMapper.Map(m.ContrastModel), EditRecordContentMapper.Map(m.CurrentModel)),
+                    RecordContentMapper.Map(m.ContrastModel), RecordContentMapper.Map(m.CurrentModel)),
                 "EXAMINE_COMPARISON", "历史版本对比", contrastId, cancellationToken),
             ExaminedNormalListModelType.Video => GetSingleAsync<VideoContrastEditRecordViewModel, EditRecordComparison>(
                 $"api/videos/{suffix}",
                 m => Compare(m.ContrastId, m.CurrentId,
-                    EditRecordContentMapper.Map(m.ContrastModel), EditRecordContentMapper.Map(m.CurrentModel)),
+                    RecordContentMapper.Map(m.ContrastModel), RecordContentMapper.Map(m.CurrentModel)),
                 "EXAMINE_COMPARISON", "历史版本对比", contrastId, cancellationToken),
             _ => Task.FromResult(SdkResult<EditRecordComparison>.Fail(
                 "EXAMINE_COMPARISON_TYPE", "该类型不支持历史版本对比"))

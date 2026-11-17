@@ -6,7 +6,6 @@ using CnGalWebSite.DataModel.ViewModel.Peripheries;
 using CnGalWebSite.DataModel.ViewModel.Search;
 using CnGalWebSite.DataModel.ViewModel.Tags;
 using CnGalWebSite.DataModel.ViewModel.Videos;
-using CnGalWebSite.Extensions;
 
 namespace CnGalWebSite.Extensions;
 

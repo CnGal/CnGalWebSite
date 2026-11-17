@@ -64,7 +64,7 @@ public class ExaminePreviewMapperTests
     [Test]
     public void ArticleNewsFieldsParticipateInTheSnapshot()
     {
-        var legacy = EditRecordContentMapper.Map(new ArticleViewModel
+        var legacy = RecordContentMapper.Map(new ArticleViewModel
         {
             Name = "动态标题",
             MainPage = "<p>正文</p>",
@@ -87,7 +87,7 @@ public class ExaminePreviewMapperTests
     [Test]
     public void DomainHistoryViewModelIsMappedThroughTheLegacyProjection()
     {
-        var legacy = EditRecordContentMapper.Map(new EntryIndexViewModel
+        var legacy = RecordContentMapper.Map(new EntryIndexViewModel
         {
             Name = "历史词条",
             MainPage = "<p>历史正文</p>",
@@ -108,7 +108,7 @@ public class ExaminePreviewMapperTests
     [Test]
     public void EntryNewsAndFullInformationParticipateInComparison()
     {
-        var before = EditRecordContentMapper.Map(new EntryIndexViewModel
+        var before = RecordContentMapper.Map(new EntryIndexViewModel
         {
             Name = "高考恋爱一百天",
             NewsOfEntry =
@@ -120,7 +120,7 @@ public class ExaminePreviewMapperTests
                 new() { Modifier = "基本信息", DisplayName = "发行时间", DisplayValue = "2014年7月20日" }
             ]
         });
-        var after = EditRecordContentMapper.Map(new EntryIndexViewModel
+        var after = RecordContentMapper.Map(new EntryIndexViewModel
         {
             Name = "高考恋爱一百天",
             NewsOfEntry =
@@ -142,7 +142,7 @@ public class ExaminePreviewMapperTests
     [Test]
     public void EmptyStaffModifierDoesNotLeaveTrailingSeparator()
     {
-        var legacy = EditRecordContentMapper.Map(new EntryIndexViewModel
+        var legacy = RecordContentMapper.Map(new EntryIndexViewModel
         {
             Name = "测试词条",
             Staffs =
@@ -194,7 +194,7 @@ public class ExaminePreviewMapperTests
     [Test]
     public void ReleasesWithSameNameAreSeparatedByPlatform()
     {
-        var legacy = EditRecordContentMapper.Map(new EntryIndexViewModel
+        var legacy = RecordContentMapper.Map(new EntryIndexViewModel
         {
             Name = "关于我被小学女生绑架这件事",
             Releases =
