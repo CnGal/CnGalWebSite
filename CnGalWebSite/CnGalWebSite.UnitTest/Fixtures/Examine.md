@@ -7,10 +7,12 @@
 在仓库根目录执行：
 
 ```powershell
-dotnet test CnGalWebSite/CnGalWebSite.UnitTest --filter "FullyQualifiedName~ExaminePresentationTests|FullyQualifiedName~ExamineComparisonSdkTests|FullyQualifiedName~MainSiteSdkRegressionTests|FullyQualifiedName~MainSiteEditorStateTests"
+dotnet test CnGalWebSite/CnGalWebSite.UnitTest --filter "FullyQualifiedName~ExaminePresentationTests|FullyQualifiedName~ExamineComparisonSdkTests|FullyQualifiedName~ExaminePreviewMapperTests|FullyQualifiedName~MainSiteSdkRegressionTests|FullyQualifiedName~MainSiteEditorStateTests|FullyQualifiedName~RecordPersistenceRegressionTests|FullyQualifiedName~RecordWriteBoundaryTests|FullyQualifiedName~RecordHistoryServiceTests|FullyQualifiedName~EditRecordUnitOfWorkTests|FullyQualifiedName~RecordRawDiffTests"
 ```
 
 覆盖六类内容的全部 64 种有无组合及左右空侧、重复字段、媒体链接、单份提交、审核状态与权限矩阵、前置审核、重复提交、批注保留、记录切换与过期响应，以及五类历史重建接口和词条专属分组映射。
+
+后端回归使用独立 SQLite 内存数据库和真实领域服务、仓储。通过同步屏障控制 8 个分块的双向两两保存及全部分块提交，并拦截 SQL 校验更新列；覆盖显式字段覆盖写入、嵌套字段与归属限制、普通更新拒绝 detached 实体、商店和积分刷新兼容性，以及 162737/162738/162739 历史夹具在概览与详情中的一致性。测试不连接生产数据库或调用外部商店接口；MySQL 特有的锁竞争需在隔离的 MySQL 环境中另行验证。
 
 ## 浏览器验收
 

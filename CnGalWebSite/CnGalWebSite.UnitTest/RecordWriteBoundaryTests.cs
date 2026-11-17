@@ -126,7 +126,7 @@ public class RecordWriteBoundaryTests
     }
 
     [Test]
-    public async Task RepositoryUpdateStillAcceptsDetachedEntitiesOutsideABoundary()
+    public async Task RepositoryUpdateRejectsDetachedEntitiesOutsideABoundary()
     {
         using var db = Context();
         db.Tags.Add(new Tag { Name = "商店信息等价场景" });
@@ -136,10 +136,11 @@ public class RecordWriteBoundaryTests
         var detached = await db.Tags.AsNoTracking().SingleAsync(s => s.Name == "商店信息等价场景");
         detached.Name = "商店信息等价场景-已更新";
         var repository = new RepositoryBase<Tag, int>(db);
-        await repository.UpdateAsync(detached);
+        Assert.That(async () => { await repository.UpdateAsync(detached); }, Throws.InvalidOperationException);
+        Assert.That(() => repository.Update(detached), Throws.InvalidOperationException);
 
         using var verify = Context();
-        Assert.That(verify.Tags.Single(s => s.Name == "商店信息等价场景-已更新").Name, Is.EqualTo("商店信息等价场景-已更新"));
+        Assert.That(verify.Tags.Single(s => s.Name == "商店信息等价场景").Name, Is.EqualTo("商店信息等价场景"));
     }
 
     [Test]

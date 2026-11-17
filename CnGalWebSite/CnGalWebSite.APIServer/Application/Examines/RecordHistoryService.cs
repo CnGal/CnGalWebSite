@@ -39,6 +39,7 @@ public sealed class RecordHistoryService(AppDbContext db, IEntryService entries,
 
     private readonly Dictionary<(string Kind, long Id), List<Examine>> histories = new();
     private readonly Dictionary<(string Kind, long Id, string Ids), Timeline> timelines = new();
+    private readonly Dictionary<long, RecordFrame> frames = new();
 
     public static bool Supports(Examine record) => TryGetKey(record, out _);
 
@@ -78,6 +79,7 @@ public sealed class RecordHistoryService(AppDbContext db, IEntryService entries,
     /// </summary>
     public async Task<RecordFrame?> GetFrameAsync(Examine record)
     {
+        if (frames.TryGetValue(record.Id, out var prepared)) return Clone(prepared);
         if (!TryGetKey(record, out var key))
         {
             return null;
@@ -97,6 +99,36 @@ public sealed class RecordHistoryService(AppDbContext db, IEntryService entries,
         }
         return new RecordFrame(Map(before), Map(after),
             timeline.MainPages.GetValueOrDefault(beforeId), timeline.MainPages.GetValueOrDefault(record.Id));
+    }
+
+    /// <summary>Generate an overview's differences in one replay per object, with immutable per-record snapshots.</summary>
+    public async Task PrepareFramesAsync(IEnumerable<Examine> requested)
+    {
+        foreach (var group in requested.Where(r => r.IsPassed == true && Supports(r)).GroupBy(r =>
+        {
+            TryGetKey(r, out var key);
+            return key;
+        }))
+        {
+            var records = await GetApprovedAsync(group.Key);
+            var wanted = group.Select(r => r.Id).ToHashSet();
+            var ids = new HashSet<long>();
+            for (var i = 0; i < records.Count; i++)
+                if (wanted.Contains(records[i].Id))
+                {
+                    ids.Add(records[i].Id);
+                    ids.Add(i == 0 ? 0 : records[i - 1].Id);
+                }
+            var timeline = await GetTimelineAsync(group.Key, records, ids);
+            for (var i = 0; i < records.Count; i++)
+            {
+                var id = records[i].Id;
+                if (!wanted.Contains(id)) continue;
+                var beforeId = i == 0 ? 0 : records[i - 1].Id;
+                frames[id] = new RecordFrame(Map(timeline.Views[beforeId]), Map(timeline.Views[id]),
+                    timeline.MainPages.GetValueOrDefault(beforeId), timeline.MainPages.GetValueOrDefault(id));
+            }
+        }
     }
 
     private async Task<List<Examine>> GetApprovedAsync((string Kind, long Id) key)
@@ -151,7 +183,7 @@ public sealed class RecordHistoryService(AppDbContext db, IEntryService entries,
 
         async Task<EntryIndexViewModel> ProjectEntryAsync(Entry value)
         {
-            var view = await entries.GetEntryIndexViewModelAsync(value);
+            var view = await entries.GetEntryIndexViewModelAsync(value, includeLiveData: false);
             view.AllInformation = value.Information?.ToList() ?? [];
             return view;
         }

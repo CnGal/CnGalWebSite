@@ -95,12 +95,10 @@ namespace CnGalWebSite.APIServer.DataReositories
 
         #region 更新
         /// <summary>
-        /// <summary>
         /// 更新现有实体
         /// </summary>
         /// <remarks>
-        /// 已跟踪实体只写入实际变化的列；分离实体会被整体覆盖。
-        /// 在审核写入边界内（<c>EditWriteBoundary</c>）不接受分离实体，请改用
+        /// 已跟踪实体只写入实际变化的列；普通更新始终拒绝分离实体，请改用
         /// <see cref="UpdateFields"/> 显式声明要写入的字段。
         /// </remarks>
         /// <param name="entity">实体</param>

@@ -48,7 +48,6 @@ namespace CnGalWebSite.APIServer.Application.Stores
             if (storeInfo == null)
             {
                 storeInfo = await Update(platformType, platformName, link, name, entryId);
-                _storeInfoRepository.Clear();
             }
 
             //复制数据
@@ -142,10 +141,15 @@ namespace CnGalWebSite.APIServer.Application.Stores
             //最后更新时间
             storeInfo.UpdateTime = DateTime.Now.ToCstTime();
 
-            await _storeInfoRepository.UpdateAsync(storeInfo);
+            await SaveRefreshedAsync(storeInfo);
 
             _logger.LogInformation("更新平台 - {platformType}, Id/链接 - {link}, 游戏 - {name}({id}) 的商店信息", storeInfo.PlatformType == PublishPlatformType.Other ? storeInfo.PlatformName : storeInfo.PlatformType.GetDisplayName(), storeInfo.Link, storeInfo.Name, storeInfo.EntryId);
         }
+
+        internal Task<StoreInfo> SaveRefreshedAsync(StoreInfo storeInfo)
+            => _storeInfoRepository.UpdateFieldsAsync(storeInfo, s => s.State, s => s.PriceLowest, s => s.OriginalPrice,
+                s => s.PriceNow, s => s.CutNow, s => s.CutLowest, s => s.PlayTime, s => s.EvaluationCount,
+                s => s.RecommendationRate, s => s.EstimationOwnersMax, s => s.EstimationOwnersMin, s => s.Revenue, s => s.UpdateTime);
 
         #region Steam
 

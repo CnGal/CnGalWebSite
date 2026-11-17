@@ -120,9 +120,7 @@ namespace CnGalWebSite.APIServer.DataReositories
         }
 
         /// <summary>
-        /// 已跟踪实体按变更跟踪写入；分离实体与历史行为一致，作为整体覆盖写入。
-        /// 审核写入边界内只接受已跟踪实体——边界依赖“实际修改了哪些列”来校验越权写入，
-        /// 分离实体无法提供该信息，必须改用 <see cref="UpdateFields"/> 显式声明字段。
+        /// 普通更新只接受已跟踪实体；分离实体必须显式声明需要写入的字段。
         /// </summary>
         private void PrepareUpdate(Tentity entity)
         {
@@ -132,12 +130,8 @@ namespace CnGalWebSite.APIServer.DataReositories
             {
                 return;
             }
-            if (_dbContext.EditWriteBoundaries.Count > 0)
-            {
-                throw new InvalidOperationException(
-                    $"{typeof(Tentity).Name} is detached. Inside an edit-record write boundary pass a tracked entity or use UpdateFields with explicit properties.");
-            }
-            entry.State = EntityState.Modified;
+            throw new InvalidOperationException(
+                $"{typeof(Tentity).Name} is detached. Load a tracked entity or use UpdateFields with explicit properties.");
         }
 
         private void MarkFields(Tentity entity, Expression<Func<Tentity, object>>[] fields)
@@ -146,9 +140,6 @@ namespace CnGalWebSite.APIServer.DataReositories
             if (fields is null || fields.Length == 0)
                 throw new ArgumentException("At least one property must be specified.", nameof(fields));
             var entry = _dbContext.Entry(entity);
-            // Attach only the root, never a detached navigation graph supplied by a caller.
-            if (entry.State == EntityState.Detached) entry.State = EntityState.Unchanged;
-
             var selected = new HashSet<string>(StringComparer.Ordinal);
             var properties = new List<PropertyEntry>();
             foreach (var field in fields)
@@ -171,9 +162,11 @@ namespace CnGalWebSite.APIServer.DataReositories
             if (stray.Length > 0)
             {
                 throw new InvalidOperationException(
-                    $"{typeof(Tentity).Name} 上存在未声明的挂起修改：{string.Join("、", stray)}。请改用 Update 整体覆盖，或把列一并声明。");
+                    $"{typeof(Tentity).Name} 上存在未声明的挂起修改：{string.Join("、", stray)}。请使用跟踪更新，或把列一并声明。");
             }
 
+            // Validate first; a rejected update must not leave an attached stale object behind.
+            if (entry.State == EntityState.Detached) entry.State = EntityState.Unchanged;
             foreach (var property in properties) property.IsModified = true;
         }
 
@@ -250,6 +243,8 @@ namespace CnGalWebSite.APIServer.DataReositories
 
         public void Clear()
         {
+            if (_dbContext.RecordReadDepth > 0)
+                throw new InvalidOperationException("审核预览和历史回放不能清除写入上下文的跟踪状态。");
             _dbContext.ChangeTracker.Clear();
         }
 

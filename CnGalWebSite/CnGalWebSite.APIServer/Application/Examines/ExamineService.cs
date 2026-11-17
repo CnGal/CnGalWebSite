@@ -3391,6 +3391,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         {
             //更新数据
             _entryService.UpdateEntryDataMain(entry, examine);
+            MarkSubmittedFields(entry, examine);
             //保存
             _ = await _entryRepository.UpdateAsync(entry);
 
@@ -3590,9 +3591,26 @@ namespace CnGalWebSite.APIServer.Application.Examines
         }
 
         /// <summary>
-        /// 主页正文是整段覆盖：审核通过时必须写回，哪怕与加载时的值一模一样。
-        /// EF 会跳过“值没变”的属性，于是并发审核同一对象时，另一份已提交的内容会让本次审核静默失效。
+        /// 显式提交的字段是覆盖命令：即使等于加载时的值，也必须参与本次写入。
         /// </summary>
+        private void MarkSubmittedFields<T>(T entity, ExamineMain submitted) where T : class
+        {
+            var entry = _dbContext.Entry(entity);
+            foreach (var item in submitted.Items)
+            {
+                if (entity is Tag && item.Key == "ParentTagId")
+                {
+                    foreach (var property in entry.Metadata.FindNavigation(nameof(Tag.ParentCodeNavigation)).ForeignKey.Properties)
+                        entry.Property(property.Name).IsModified = true;
+                }
+                else
+                {
+                    entry.Property(item.Key).IsModified = true;
+                }
+            }
+        }
+
+        /// <summary>正文按整段覆盖，仅标记该列，保留其他分块的并发修改。</summary>
         private void MarkOverwrite<T>(T entity, string property) where T : class
             => _dbContext.Entry(entity).Property(property).IsModified = true;
 
@@ -3637,6 +3655,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         public async Task ExamineEditArticleMainAsync(Article article, ExamineMain examine)
         {
             _articleService.UpdateArticleDataMain(article, examine);
+            MarkSubmittedFields(article, examine);
 
             _ = await _articleRepository.UpdateAsync(article);
         }
@@ -3765,6 +3784,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         public async Task ExamineEditTagMainAsync(Tag tag, ExamineMain examine)
         {
             await _tagService.UpdateTagDataMainAsync(tag, examine);
+            MarkSubmittedFields(tag, examine);
 
             _ = await _tagRepository.UpdateAsync(tag);
         }
@@ -3828,6 +3848,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         {
             //更新数据
             _peripheryService.UpdatePeripheryDataMain(periphery, examine);
+            MarkSubmittedFields(periphery, examine);
             //保存
             _ = await _peripheryRepository.UpdateAsync(periphery);
         }
@@ -4008,6 +4029,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         public async Task ExamineEditVideoMainAsync(Video item, ExamineMain examine)
         {
             _videoService.UpdateMain(item, examine);
+            MarkSubmittedFields(item, examine);
 
             _ = await _videoRepository.UpdateAsync(item);
         }
@@ -4288,12 +4310,12 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                examine = await GetUserEntryActiveExamineAsync(entry.Id, user.Id, operation);
+                examine = await _examineRepository.FirstOrDefaultAsync(s => s.EntryId == entry.Id && s.ApplicationUserId == user.Id && s.Operation == operation && s.IsPassed == null);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    examine = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateFieldsAsync(examine, e => e.Context, e => e.ApplyTime);
                 }
                 else
                 {
@@ -4400,12 +4422,12 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                examine = await GetUserArticleActiveExamineAsync(article.Id, user.Id, operation);
+                examine = await _examineRepository.FirstOrDefaultAsync(s => s.ArticleId == article.Id && s.ApplicationUserId == user.Id && s.Operation == operation && s.IsPassed == null);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    examine = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateFieldsAsync(examine, e => e.Context, e => e.ApplyTime);
                 }
                 else
                 {
@@ -4572,7 +4594,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    examine = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateFieldsAsync(examine, e => e.Context, e => e.ApplyTime);
                 }
                 else
                 {
@@ -4684,7 +4706,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    examine = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateFieldsAsync(examine, e => e.Context, e => e.ApplyTime);
                 }
                 else
                 {
@@ -4737,7 +4759,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    examine = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateFieldsAsync(examine, e => e.Context, e => e.ApplyTime);
                 }
                 else
                 {
@@ -4847,7 +4869,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    examine = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateFieldsAsync(examine, e => e.Context, e => e.ApplyTime);
                 }
                 else
                 {
@@ -4944,7 +4966,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    examine = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateFieldsAsync(examine, e => e.Context, e => e.ApplyTime);
                 }
                 else
                 {
@@ -4997,7 +5019,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    examine = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateFieldsAsync(examine, e => e.Context, e => e.ApplyTime);
                 }
                 else
                 {
@@ -5101,12 +5123,12 @@ namespace CnGalWebSite.APIServer.Application.Examines
             {
                 //查找是否在之前有审核
                 //获取审核记录
-                examine = await GetUserVideoActiveExamineAsync(video.Id, user.Id, operation);
+                examine = await _examineRepository.FirstOrDefaultAsync(s => s.VideoId == video.Id && s.ApplicationUserId == user.Id && s.Operation == operation && s.IsPassed == null);
                 if (examine != null)
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    examine = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateFieldsAsync(examine, e => e.Context, e => e.ApplyTime);
                 }
                 else
                 {
@@ -5161,7 +5183,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 {
                     examine.Context = examineStr;
                     examine.ApplyTime = DateTime.Now.ToCstTime();
-                    examine = await _examineRepository.UpdateAsync(examine);
+                    examine = await _examineRepository.UpdateFieldsAsync(examine, e => e.Context, e => e.ApplyTime);
                 }
                 else
                 {

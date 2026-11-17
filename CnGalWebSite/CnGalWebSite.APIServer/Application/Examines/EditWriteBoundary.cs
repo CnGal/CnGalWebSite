@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.APIServer.Infrastructure;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
+using CnGalWebSite.DataModel.ExamineModel.Entries;
 using CnGalWebSite.DataModel.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -53,6 +54,26 @@ public sealed class EditWriteBoundary : IDisposable
         [Operation.EditTagChildEntries] = new("", "", "Entries")
     };
 
+    // Content columns only. Ownership foreign keys are validated separately; counters and IDs are never command keys.
+    private static readonly Dictionary<Type, HashSet<string>> DependentFields = new()
+    {
+        [typeof(BasicEntryInformation)] = Words("Modifier DisplayName DisplayValue"),
+        [typeof(BasicEntryInformationAdditional)] = Words("DisplayName DisplayValue"),
+        [typeof(EntryStaff)] = Words("Name CustomName PositionOfficial PositionGeneral SubordinateOrganization Modifier"),
+        [typeof(GameRelease)] = Words("Name PublishPlatformType PublishPlatformName Type GamePlatformTypes Time TimeNote Engine Link"),
+        [typeof(Booking)] = Words("IsNeedNotification Open LotteryId"),
+        [typeof(BookingGoal)] = Words("Name Target"),
+        [typeof(EntryPicture)] = Words("Modifier Note Url Priority"),
+        [typeof(EntryAudio)] = Words("Name BriefIntroduction Url Priority Duration Thumbnail"),
+        [typeof(EntryWebsite)] = Words("Introduction Html FirstPage Logo SubTitle Impressions Color"),
+        [typeof(EntryWebsiteImage)] = Words("Type Size Url Priority Note"),
+        [typeof(Outlink)] = Words("Name BriefIntroduction Link"),
+        [typeof(EntryRelation)] = Words(""),
+        [typeof(ArticleRelation)] = Words(""),
+        [typeof(VideoRelation)] = Words(""),
+        [typeof(PeripheryRelation)] = Words("")
+    };
+
     public EditWriteBoundary(AppDbContext db, object target, Operation operation, object data)
     {
         this.db = db;
@@ -74,7 +95,18 @@ public sealed class EditWriteBoundary : IDisposable
                 if (!keys.Contains(item.Key))
                     throw new InvalidOperationException($"{operation} 不允许修改字段 {item.Key}。");
         }
+        if (data is EntryAddInfor addInfo)
+            ValidateNestedKeys(addInfo.Booking.MainInfor, typeof(Booking));
+        if (data is EntryWebsiteExamineModel website)
+            ValidateNestedKeys(website.MainInfor, typeof(EntryWebsite));
         db.EditWriteBoundaries.Add(this);
+    }
+
+    private void ValidateNestedKeys(IEnumerable<ExamineMainAlone> items, Type type)
+    {
+        foreach (var item in items)
+            if (!DependentFields[type].Contains(item.Key))
+                throw new InvalidOperationException($"{operation} 不允许修改 {type.Name}.{item.Key}。");
     }
 
     /// <summary>该操作是否受写入边界约束。</summary>
@@ -105,7 +137,15 @@ public sealed class EditWriteBoundary : IDisposable
             return entry.State == EntityState.Modified && entry.Properties.Where(p => p.IsModified)
                 .All(p => p.Metadata.GetContainingForeignKeys().Any(f => f.PrincipalEntityType.ClrType == typeof(Tag)))
                 && IsOwned(entry);
-        return IsOwned(entry);
+        if (!DependentFields.TryGetValue(entry.Metadata.ClrType, out var allowed)) return false;
+        var properties = entry.Properties.Where(p => entry.State == EntityState.Added
+            ? !Equals(p.CurrentValue, p.Metadata.ClrType.IsValueType ? Activator.CreateInstance(p.Metadata.ClrType) : null)
+            : p.IsModified).ToArray();
+        if (entry.State == EntityState.Modified && properties.Any(p => p.Metadata.GetContainingForeignKeys().Any()
+            && !allowed.Contains(p.Metadata.Name) && !p.Metadata.Name.StartsWith("To", StringComparison.Ordinal)
+            && p.OriginalValue is not null && p.CurrentValue is not null && !Equals(p.CurrentValue, p.OriginalValue))) return false;
+        return properties.All(p => allowed.Contains(p.Metadata.Name) || p.Metadata.IsPrimaryKey()
+            || p.Metadata.GetContainingForeignKeys().Any()) && IsOwned(entry);
     }
 
     /// <summary>
@@ -124,9 +164,14 @@ public sealed class EditWriteBoundary : IDisposable
             var current = pending.Dequeue();
             foreach (var foreignKey in current.Metadata.GetForeignKeys())
             {
-                // 先看当前关系，再看原始关系；两者都用来证明归属，因此重挂到别的对象也会被接受。
+                // Relation rows belong to their source, not whichever object they happen to link to.
+                if (current.Entity is EntryRelation or EntryStaff or ArticleRelation or VideoRelation or PeripheryRelation
+                    && foreignKey.Properties.Any(p => p.Name.StartsWith("To", StringComparison.Ordinal))) continue;
                 foreach (var useOriginal in new[] { false, true })
                 {
+                    // Original ownership permits removal, never transferring another object's row into this section.
+                    if (useOriginal && current.State != EntityState.Deleted
+                        && ForeignKeyValues(current, foreignKey, false).All(value => value is not null)) continue;
                     var values = ForeignKeyValues(current, foreignKey, useOriginal);
                     if (values.Any(value => value is null)) continue;
                     if (ReferencesTarget(foreignKey, values, root)) return true;

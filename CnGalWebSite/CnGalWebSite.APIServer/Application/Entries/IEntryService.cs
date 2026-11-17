@@ -45,7 +45,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
 
         Task<EntryEditState> GetEntryEditState(ApplicationUser user, int entryId);
 
-        Task<EntryIndexViewModel> GetEntryIndexViewModelAsync(Entry entry, bool renderMarkdown = true);
+        Task<EntryIndexViewModel> GetEntryIndexViewModelAsync(Entry entry, bool renderMarkdown = true, bool includeLiveData = true);
 
         Task<EntryInforTipViewModel> GetPublicSummaryAsync(int id, System.Threading.CancellationToken cancellationToken = default);
 

@@ -101,11 +101,12 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IUserService _userService;
         private readonly IQueryService _queryService;
         private readonly EditRecordUnitOfWork _unitOfWork;
+        private readonly RecordHistoryService _recordHistory;
 
         public ExaminesAPIController(IRepository<Disambig, int> disambigRepository, IRankService rankService, IRepository<Comment, long> commentRepository, IUserService userService, IRepository<Video, long> videoRepository,
         IRepository<Message, long> messageRepository, IRepository<ApplicationUser, string> userRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IRepository<FavoriteFolder, long> favoriteFolderRepository,
          IExamineService examineService, IRepository<UserMonitor, long> userMonitorsRepository, IEditRecordService editRecordService, IRepository<UserCertification, long> userCertificationRepository, IQueryService queryService,
-        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository, EditRecordUnitOfWork unitOfWork)
+        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository, EditRecordUnitOfWork unitOfWork, RecordHistoryService recordHistory)
         {
             
             _entryRepository = entryRepository;
@@ -130,6 +131,7 @@ namespace CnGalWebSite.APIServer.Controllers
             _favoriteFolderRepository = favoriteFolderRepository;
             _queryService = queryService;
             _unitOfWork = unitOfWork;
+            _recordHistory = recordHistory;
         }
 
 
@@ -681,10 +683,11 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
 
+            await _recordHistory.PrepareFramesAsync(examines);
             foreach (var item in examines)
             {
                 var examinedView = new ExamineViewModel();
-                if (await _examineService.GetExamineView(examinedView, item, includeHistory: false))
+                if (await _examineService.GetExamineView(examinedView, item))
                 {
                     model.Examines.Add(new EditRecordAloneViewModel
                     {
