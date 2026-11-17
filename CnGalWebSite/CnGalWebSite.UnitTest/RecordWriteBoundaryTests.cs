@@ -3,6 +3,7 @@ using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.Infrastructure;
 using CnGalWebSite.DataModel.ExamineModel.Entries;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
+using CnGalWebSite.DataModel.ExamineModel.Tags;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using Microsoft.Data.Sqlite;
@@ -178,6 +179,207 @@ public class RecordWriteBoundaryTests
         using var verify = Context();
         var saved = verify.Tags.Single(s => s.Name == "字段更新-改名");
         Assert.That(saved.BriefIntroduction, Is.EqualTo("原文"));
+    }
+
+    [Test]
+    public async Task RepositoryUpdateFieldsRejectsUndeclaredTrackedChanges()
+    {
+        using var db = Context();
+        var tag = new Tag { Name = "跟踪字段更新", BriefIntroduction = "原文" };
+        db.Tags.Add(tag);
+        await db.SaveChangesAsync();
+
+        // 已跟踪实体上还有选择之外的挂起修改时，SaveChanges 会把它们一并写入，
+        // 与“只写声明的列”矛盾，必须显式拒绝而不是静默落库。
+        tag.Name = "跟踪字段更新-改名";
+        tag.BriefIntroduction = "不应写入";
+        var repository = new RepositoryBase<Tag, int>(db);
+        Assert.That(async () => { await repository.UpdateFieldsAsync(tag, s => s.Name); }, Throws.InvalidOperationException);
+
+        using var verify = Context();
+        var saved = verify.Tags.Single(s => s.Id == tag.Id);
+        Assert.That(saved.Name, Is.EqualTo("跟踪字段更新"));
+        Assert.That(saved.BriefIntroduction, Is.EqualTo("原文"));
+    }
+
+    [Test]
+    public async Task DependentOwnedByAnotherTargetIsRejected()
+    {
+        using var db = Context();
+        var entry = new Entry { Name = "边界词条" };
+        var other = new Entry { Name = "其他词条" };
+        db.Entries.AddRange(entry, other);
+        await db.SaveChangesAsync();
+        entry.Pictures.Add(new EntryPicture { Url = "a.png" });
+        other.Pictures.Add(new EntryPicture { Url = "b.png" });
+        await db.SaveChangesAsync();
+
+        using var boundary = new EditWriteBoundary(db, entry, Operation.EstablishImages, new EntryImages());
+        db.Entry(other.Pictures.Single()).State = EntityState.Deleted;
+
+        var error = Assert.CatchAsync<InvalidOperationException>(async () => { await db.SaveChangesAsync(); });
+        Assert.That(error, Is.Not.Null);
+        Assert.That(error!.Message, Does.Contain("EntryPicture"), "错误信息必须指出越界的对象，便于线上定位");
+
+        using var verify = Context();
+        Assert.That(await verify.Set<EntryPicture>().CountAsync(), Is.EqualTo(2));
+    }
+
+    [Test]
+    public async Task DependentOwnedByTheTargetCanStillBeRemoved()
+    {
+        using var db = Context();
+        var entry = new Entry { Name = "图片词条" };
+        db.Entries.Add(entry);
+        await db.SaveChangesAsync();
+        entry.Pictures.Add(new EntryPicture { Url = "a.png" });
+        await db.SaveChangesAsync();
+
+        using (new EditWriteBoundary(db, entry, Operation.EstablishImages, new EntryImages()))
+        {
+            // 编辑时是从目标集合里移除，可选外键会被置空，归属只能靠原始关系判断。
+            entry.Pictures.Remove(entry.Pictures.Single());
+            Assert.That(async () => { await db.SaveChangesAsync(); }, Throws.Nothing);
+        }
+
+        using var verify = Context();
+        Assert.That((await verify.Entries.Include(s => s.Pictures).SingleAsync(s => s.Id == entry.Id)).Pictures, Is.Empty);
+    }
+
+    [Test]
+    public async Task NestedDependentOfTheTargetIsAccepted()
+    {
+        using var db = Context();
+        var entry = new Entry { Name = "官网词条" };
+        db.Entries.Add(entry);
+        await db.SaveChangesAsync();
+
+        using (new EditWriteBoundary(db, entry, Operation.EstablishWebsite, new EntryWebsiteExamineModel()))
+        {
+            // EntryWebsiteImage → EntryWebsite → Entry：归属要能穿过中间子项。
+            entry.WebsiteAddInfor = new EntryWebsite();
+            entry.WebsiteAddInfor.Images.Add(new EntryWebsiteImage { Url = "w.png" });
+            Assert.That(async () => { await db.SaveChangesAsync(); }, Throws.Nothing);
+        }
+
+        using var verify = Context();
+        var saved = await verify.EntryWebsites.Include(s => s.Images).SingleAsync();
+        Assert.That(saved.Images.Single().Url, Is.EqualTo("w.png"));
+    }
+
+    [Test]
+    public async Task JoinRowOfTheTargetIsAccepted()
+    {
+        using var db = Context();
+        var entry = new Entry { Name = "标签词条" };
+        var tag = new Tag { Name = "标签" };
+        db.Entries.Add(entry);
+        db.Tags.Add(tag);
+        await db.SaveChangesAsync();
+
+        using (new EditWriteBoundary(db, entry, Operation.EstablishTags, new EntryTags()))
+        {
+            entry.Tags.Add(tag);
+            Assert.That(async () => { await db.SaveChangesAsync(); }, Throws.Nothing);
+        }
+
+        using var verify = Context();
+        var saved = await verify.Entries.Include(s => s.Tags).SingleAsync(s => s.Id == entry.Id);
+        Assert.That(saved.Tags.Select(s => s.Name), Is.EqualTo(new[] { "标签" }));
+    }
+
+    [Test]
+    public async Task JoinRowOfAnotherTargetIsRejected()
+    {
+        using var db = Context();
+        var entry = new Entry { Name = "边界词条" };
+        var other = new Entry { Name = "其他词条" };
+        var tag = new Tag { Name = "标签" };
+        db.Entries.AddRange(entry, other);
+        db.Tags.Add(tag);
+        await db.SaveChangesAsync();
+
+        using var boundary = new EditWriteBoundary(db, entry, Operation.EstablishTags, new EntryTags());
+        other.Tags.Add(tag);
+
+        var error = Assert.CatchAsync<InvalidOperationException>(async () => { await db.SaveChangesAsync(); });
+        Assert.That(error, Is.Not.Null);
+    }
+
+    [Test]
+    public async Task RelevanceEditOfTheTargetIsAccepted()
+    {
+        using var db = Context();
+        var entry = new Entry { Name = "关联词条" };
+        var to = new Entry { Name = "关联目标" };
+        var article = new Article { Name = "关联文章" };
+        var video = new Video { Name = "关联视频" };
+        db.Entries.AddRange(entry, to);
+        db.Articles.Add(article);
+        db.Videos.Add(video);
+        await db.SaveChangesAsync();
+
+        using (new EditWriteBoundary(db, entry, Operation.EstablishRelevances, new EntryRelevances()))
+        {
+            // 与 EntryService.UpdateEntryDataRelevances 的写法保持一致。
+            entry.EntryRelationFromEntryNavigation.Add(new EntryRelation
+            {
+                FromEntry = entry.Id,
+                FromEntryNavigation = entry,
+                ToEntry = to.Id,
+                ToEntryNavigation = to
+            });
+            entry.Outlinks.Add(new Outlink { Name = "官网", Link = "https://example.com" });
+            entry.Articles.Add(article);
+            entry.Videos.Add(video);
+            Assert.That(async () => { await db.SaveChangesAsync(); }, Throws.Nothing);
+        }
+
+        using var verify = Context();
+        Assert.That((await verify.Entries.Include(s => s.EntryRelationFromEntryNavigation).SingleAsync(s => s.Id == entry.Id))
+            .EntryRelationFromEntryNavigation.Single().ToEntry, Is.EqualTo(to.Id));
+    }
+
+    [Test]
+    public async Task BookingGoalOfTheTargetIsAccepted()
+    {
+        using var db = Context();
+        var entry = new Entry { Name = "预约词条" };
+        db.Entries.Add(entry);
+        await db.SaveChangesAsync();
+
+        using (new EditWriteBoundary(db, entry, Operation.EstablishAddInfor, new EntryAddInfor()))
+        {
+            // BookingGoal 没有显式外键，只能靠 Booking 这一层中间子项证明归属。
+            entry.Booking = new Booking { Open = true };
+            entry.Booking.Goals.Add(new BookingGoal { Name = "目标", Target = 100 });
+            Assert.That(async () => { await db.SaveChangesAsync(); }, Throws.Nothing);
+        }
+
+        using var verify = Context();
+        var booking = await verify.Bookings.Include(s => s.Goals).SingleAsync();
+        Assert.That(booking.Goals.Single().Name, Is.EqualTo("目标"));
+    }
+
+    [Test]
+    public async Task ChildTagEditIsStillAcceptedByTheBoundary()
+    {
+        using var db = Context();
+        var parent = new Tag { Name = "父标签" };
+        var child = new Tag { Name = "子标签" };
+        db.Tags.AddRange(parent, child);
+        await db.SaveChangesAsync();
+
+        using (new EditWriteBoundary(db, parent, Operation.EditTagChildTags, new TagChildTags()))
+        {
+            // 子标签只改父子关联，归属由 ParentCode 外键证明。
+            parent.InverseParentCodeNavigation.Add(child);
+            Assert.That(async () => { await db.SaveChangesAsync(); }, Throws.Nothing);
+        }
+
+        using var verify = Context();
+        var saved = await verify.Tags.Include(s => s.ParentCodeNavigation).SingleAsync(s => s.Id == child.Id);
+        Assert.That(saved.ParentCodeNavigation!.Id, Is.EqualTo(parent.Id));
     }
 
     [Test]

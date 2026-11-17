@@ -24,6 +24,7 @@ public class RecordRawDiffTests
     [TestCase("<a href='https://example.com/?q=a>b'><del>旧</del><ins>新</ins></a>", "<a href='https://example.com/?q=a>b'>旧新</a>")]
     [TestCase("<p><strong>源码</strong><img src='https://example.com/raw.png'></p>", "<p><strong>源码</strong><img src='https://example.com/raw.png'></p>")]
     [TestCase("<div><ins>未闭合", "<div>未闭合")]
+    [TestCase("<div><span>x</div>", "<div><span>x</div>")]
     [TestCase("<!-- 注释 --><h1>源码</h1>", "<!-- 注释 --><h1>源码</h1>")]
     [TestCase("<pre><code class=\"language-json\">{\n  &quot;name&quot;: &quot;&lt;img&gt;&quot;\n}\n</code></pre>\n", "{\n  \"name\": \"<img>\"\n}\n\n")]
     [TestCase("", "")]

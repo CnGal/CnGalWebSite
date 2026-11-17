@@ -1014,7 +1014,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 return false;
             }
             model.ObjectId = entry.Id;
-            model.ObjectName = examine.Entry.Name;
+            // 预览在 RecordReadScope 里无跟踪查询，审核单上的 Entry 导航不会被填充。
+            model.ObjectName = entry.Name;
             model.ObjectBriefIntroduction = entry.BriefIntroduction;
             if (entry.Type is EntryType.Game or EntryType.ProductionGroup)
             {
@@ -3588,10 +3589,18 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         }
 
+        /// <summary>
+        /// 主页正文是整段覆盖：审核通过时必须写回，哪怕与加载时的值一模一样。
+        /// EF 会跳过“值没变”的属性，于是并发审核同一对象时，另一份已提交的内容会让本次审核静默失效。
+        /// </summary>
+        private void MarkOverwrite<T>(T entity, string property) where T : class
+            => _dbContext.Entry(entity).Property(property).IsModified = true;
+
         public async Task ExamineEstablishMainPageAsync(Entry entry, string examine)
         {
             //更新数据
             _entryService.UpdateEntryDataMainPage(entry, examine);
+            MarkOverwrite(entry, nameof(Entry.MainPage));
 
             _ = await _entryRepository.UpdateAsync(entry);
 
@@ -3746,6 +3755,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
         {
             _articleService.UpdateArticleDataMainPage(article, examine);
 
+            MarkOverwrite(article, nameof(Article.MainPage));
+
             _ = await _articleRepository.UpdateAsync(article);
         }
         #endregion
@@ -3802,6 +3813,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
         public async Task ExamineEditUserMainPageAsync(ApplicationUser user, string examine)
         {
             await _userService.UpdateUserDataMainPage(user, examine);
+
+            MarkOverwrite(user, nameof(ApplicationUser.MainPageContext));
 
             _ = await _userRepository.UpdateAsync(user);
         }
@@ -4108,6 +4121,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
         public async Task ExamineEditVideoMainPageAsync(Video item, string examine)
         {
             _videoService.UpdateMainPage(item, examine);
+
+            MarkOverwrite(item, nameof(Video.MainPage));
 
             _ = await _videoRepository.UpdateAsync(item);
         }

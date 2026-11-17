@@ -3,6 +3,7 @@ using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,13 +96,87 @@ public sealed class EditWriteBoundary : IDisposable
         if (fields is null) return false;
         if (ReferenceEquals(entry.Entity, target))
             return entry.State == EntityState.Modified && entry.Properties.Where(p => p.IsModified).All(p => fields.Contains(p.Metadata.Name));
-        if (joins.Contains(entry.Metadata.Name)) return true;
+        // 类型匹配只说明“这类子项允许改”，还得证明这一行确实挂在目标对象上，
+        // 否则一份词条图片的编辑记录能把别的词条的图片一起删掉。
+        if (joins.Contains(entry.Metadata.Name)) return IsOwned(entry);
         if (!dependents.Contains(entry.Metadata.ClrType.Name)) return false;
         // A child-tag edit changes only parent linkage, never the child's content or counters.
         if (entry.Entity is Tag)
             return entry.State == EntityState.Modified && entry.Properties.Where(p => p.IsModified)
-                .All(p => p.Metadata.GetContainingForeignKeys().Any(f => f.PrincipalEntityType.ClrType == typeof(Tag)));
+                .All(p => p.Metadata.GetContainingForeignKeys().Any(f => f.PrincipalEntityType.ClrType == typeof(Tag)))
+                && IsOwned(entry);
+        return IsOwned(entry);
+    }
+
+    /// <summary>
+    /// 变更行是否挂在目标对象上。沿外键向上追溯到目标，允许经由中间子项
+    /// （例如 <c>BookingGoal → Booking → Entry</c>、<c>EntryWebsiteImage → EntryWebsite → Entry</c>），
+    /// 同时接受当前关系与原始关系：删除可选子项时外键会被置空，只有原始关系还留着归属信息。
+    /// </summary>
+    private bool IsOwned(EntityEntry entry)
+    {
+        var root = db.Entry(target);
+        var visited = new HashSet<object>(ReferenceEqualityComparer.Instance) { entry.Entity };
+        var pending = new Queue<EntityEntry>();
+        pending.Enqueue(entry);
+        while (pending.Count > 0)
+        {
+            var current = pending.Dequeue();
+            foreach (var foreignKey in current.Metadata.GetForeignKeys())
+            {
+                // 先看当前关系，再看原始关系；两者都用来证明归属，因此重挂到别的对象也会被接受。
+                foreach (var useOriginal in new[] { false, true })
+                {
+                    var values = ForeignKeyValues(current, foreignKey, useOriginal);
+                    if (values.Any(value => value is null)) continue;
+                    if (ReferencesTarget(foreignKey, values, root)) return true;
+                    var principal = FindTracked(foreignKey, values, current);
+                    if (principal is not null && visited.Add(principal.Entity)) pending.Enqueue(principal);
+                }
+            }
+        }
+        return false;
+    }
+
+    private static object?[] ForeignKeyValues(EntityEntry entry, IForeignKey foreignKey, bool useOriginal)
+    {
+        var values = new object?[foreignKey.Properties.Count];
+        for (var i = 0; i < values.Length; i++)
+        {
+            var property = entry.Property(foreignKey.Properties[i].Name);
+            values[i] = useOriginal ? property.OriginalValue : property.CurrentValue;
+        }
+        return values;
+    }
+
+    private bool ReferencesTarget(IForeignKey foreignKey, object?[] values, EntityEntry root)
+    {
+        if (!foreignKey.PrincipalEntityType.ClrType.IsInstanceOfType(target)) return false;
+        var keys = foreignKey.PrincipalKey.Properties;
+        if (keys.Count != values.Length) return false;
+        for (var i = 0; i < keys.Count; i++)
+        {
+            if (!Equals(root.Property(keys[i].Name).CurrentValue, values[i])) return false;
+        }
         return true;
+    }
+
+    private EntityEntry? FindTracked(IForeignKey foreignKey, object?[] values, EntityEntry current)
+    {
+        foreach (var candidate in db.ChangeTracker.Entries())
+        {
+            if (ReferenceEquals(candidate.Entity, current.Entity)) continue;
+            if (!foreignKey.PrincipalEntityType.IsAssignableFrom(candidate.Metadata)) continue;
+            var keys = foreignKey.PrincipalKey.Properties;
+            if (keys.Count != values.Length) continue;
+            var matches = true;
+            for (var i = 0; i < keys.Count && matches; i++)
+            {
+                matches = Equals(candidate.Property(keys[i].Name).CurrentValue, values[i]);
+            }
+            if (matches) return candidate;
+        }
+        return null;
     }
 
     /// <summary>根实体上被修改、但不在本契约允许列内的属性；用于生成可诊断的错误信息。</summary>

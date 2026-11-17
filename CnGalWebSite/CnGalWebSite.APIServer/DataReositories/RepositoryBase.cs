@@ -1,5 +1,6 @@
 ﻿using CnGalWebSite.APIServer.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -147,6 +148,9 @@ namespace CnGalWebSite.APIServer.DataReositories
             var entry = _dbContext.Entry(entity);
             // Attach only the root, never a detached navigation graph supplied by a caller.
             if (entry.State == EntityState.Detached) entry.State = EntityState.Unchanged;
+
+            var selected = new HashSet<string>(StringComparer.Ordinal);
+            var properties = new List<PropertyEntry>();
             foreach (var field in fields)
             {
                 var body = field.Body is UnaryExpression unary ? unary.Operand : field.Body;
@@ -155,8 +159,22 @@ namespace CnGalWebSite.APIServer.DataReositories
                 var property = entry.Property(member.Member.Name);
                 if (property.Metadata.IsPrimaryKey())
                     throw new ArgumentException("Primary keys cannot be updated.", nameof(fields));
-                property.IsModified = true;
+                if (selected.Add(property.Metadata.Name)) properties.Add(property);
             }
+
+            // 已跟踪实体上可能还挂着选择之外的修改，SaveChanges 会把它们一并写入。
+            // 那样“只写声明的列”就名不副实，这里直接拒绝，避免静默落库未声明的列。
+            var stray = entry.Properties
+                .Where(p => p.IsModified && !selected.Contains(p.Metadata.Name))
+                .Select(p => p.Metadata.Name)
+                .ToArray();
+            if (stray.Length > 0)
+            {
+                throw new InvalidOperationException(
+                    $"{typeof(Tentity).Name} 上存在未声明的挂起修改：{string.Join("、", stray)}。请改用 Update 整体覆盖，或把列一并声明。");
+            }
+
+            foreach (var property in properties) property.IsModified = true;
         }
 
         public void Delete(Tentity entity)

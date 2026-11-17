@@ -75,8 +75,10 @@ public static class RecordRawDiff
             var innerStart = node.Closed ? node.InnerStartIndex : node.ChildNodes[0].OuterStartIndex;
             Append(content[node.OuterStartIndex..innerStart], change);
             foreach (var child in node.ChildNodes) Read(child, change);
-            // Preserve only a closing tag actually present in the source.
+            // Preserve only a closing tag actually present in the source. HtmlAgilityPack 会为
+            // 未闭合的子节点造一个 SyntheticEndNode，它的 OuterStartIndex 是 -1，没有源文本。
             if (node.EndNode is { } closing && closing != node
+                && closing.OuterStartIndex >= 0
                 && content.AsSpan(closing.OuterStartIndex).StartsWith("</", StringComparison.Ordinal))
                 Append(content.Substring(closing.OuterStartIndex, closing.OuterLength), change);
         }

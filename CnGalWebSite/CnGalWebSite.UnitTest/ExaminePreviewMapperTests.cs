@@ -5,6 +5,7 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.DataModel.ViewModel.Videos;
 using CnGalWebSite.SDK.MainSite.Models;
 using CnGalWebSite.Extensions;
 using NUnit.Framework;
@@ -82,6 +83,21 @@ public class ExaminePreviewMapperTests
             Assert.That(values["真实动态时间"], Is.EqualTo("2026-11-12 09:30"));
             Assert.That(values["用户创作"], Is.EqualTo("是"));
         });
+    }
+
+    [Test]
+    public void VideoAuthorshipParticipatesInTheSnapshot()
+    {
+        var legacy = RecordContentMapper.Map(new VideoViewModel
+        {
+            Name = "视频",
+            MainPage = "<p>正文</p>",
+            IsCreatedByCurrentUser = true
+        });
+
+        var values = legacy.Texts.SelectMany(t => t.Informations)
+            .ToDictionary(i => i.DisplayName, i => i.DisplayValue, StringComparer.Ordinal);
+        Assert.That(values["本人创作"], Is.EqualTo("是"));
     }
 
     [Test]
