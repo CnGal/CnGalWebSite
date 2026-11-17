@@ -17,6 +17,10 @@ namespace CnGalWebSite.DataModel.ViewModel
         /// </summary>
         public string Name { get; set; }
         /// <summary>
+        /// 唯一名称，独立于用于页面展示的 Name。
+        /// </summary>
+        public string UniqueName { get; set; }
+        /// <summary>
         /// 别称
         /// </summary>
         public string AnotherName { get; set; }

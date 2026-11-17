@@ -19,7 +19,9 @@ using CnGalWebSite.APIServer.ExamineX;
 using CnGalWebSite.DataModel.ExamineModel.Entries;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Model;
+using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.SDK.MainSite.Models;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -339,32 +341,154 @@ public class RecordPersistenceRegressionTests
         Assert.That(async () => await db.SaveChangesAsync(), Throws.InvalidOperationException);
     }
 
-    [TestCase(Operation.EstablishMainPage)]
-    [TestCase(Operation.EditArticleMainPage)]
-    [TestCase(Operation.EditVideoMainPage)]
+    private static readonly Operation[] PendingOperations = [Operation.EstablishMainPage, Operation.EditArticleMainPage,
+        Operation.EditVideoMainPage, Operation.EditTagMain, Operation.DisambigMain, Operation.UserMainPage,
+        Operation.EditPeripheryMain, Operation.EditPlayedGameMain, Operation.RequestUserCertification, Operation.EditFavoriteFolderMain];
+
+    private async Task<(object Target, ApplicationUser Author)> PendingTargetAsync(AppDbContext db, Operation operation)
+    {
+        var author = new ApplicationUser { Id = "editor", UserName = "editor" };
+        db.Users.Add(author);
+        object target = operation switch
+        {
+            Operation.EditArticleMainPage => new Article { Name = "article" },
+            Operation.EditVideoMainPage => new Video { Name = "video" },
+            Operation.EditTagMain => await db.Tags.SingleAsync(t => t.Id == tagId),
+            Operation.DisambigMain => new Disambig { Name = "disambig" },
+            Operation.UserMainPage => author,
+            Operation.EditPeripheryMain => new Periphery { Name = "periphery" },
+            Operation.EditPlayedGameMain => new PlayedGame { EntryId = entryId, ApplicationUser = author },
+            Operation.RequestUserCertification => new UserCertification(),
+            Operation.EditFavoriteFolderMain => new FavoriteFolder { Name = "folder", ApplicationUser = author },
+            _ => await LoadEntryAsync(db)
+        };
+        if (target is not UserCertification && db.Entry(target).State == EntityState.Detached) db.Add(target);
+        await db.SaveChangesAsync();
+        return (target, author);
+    }
+
+    [TestCaseSource(nameof(PendingOperations))]
     public async Task UpdatingPendingSubmissionWorksWithStrictDetachedUpdates(Operation operation)
     {
         await using var db = Context();
-        var author = new ApplicationUser { Id = "editor", UserName = "editor" };
-        db.Users.Add(author);
-        object target = operation switch { Operation.EditArticleMainPage => new Article { Name = "article" }, Operation.EditVideoMainPage => new Video { Name = "video" }, _ => await LoadEntryAsync(db) };
-        if (target is not Entry) db.Add(target);
-        await db.SaveChangesAsync();
+        var (target, author) = await PendingTargetAsync(db, operation);
         var service = new RealRecordServices(db).Get<ExamineService>();
         var initial = await service.AddEditRecordAsync(target, author, "first", operation, "note", false);
+        initial.ApplyTime = DateTime.UtcNow.AddDays(-1);
+        await db.SaveChangesAsync();
+        var originalTime = initial.ApplyTime;
         var updated = await service.AddEditRecordAsync(target, author, "second", operation, "note", false);
         Assert.That(updated.Id, Is.EqualTo(initial.Id));
+        Assert.That(updated.Context, Is.EqualTo(operation is Operation.EstablishMainPage or Operation.EditArticleMainPage
+            or Operation.EditVideoMainPage or Operation.UserMainPage ? "second" : JsonConvert.SerializeObject("second")));
+        Assert.That(updated.ApplyTime, Is.GreaterThan(originalTime));
+        Assert.That(db.ChangeTracker.HasChanges(), Is.False);
+        await db.SaveChangesAsync();
         await using var verify = Context();
-        Assert.That((await verify.Examines.SingleAsync()).Context, Is.EqualTo("second"));
+        var stored = await verify.Examines.SingleAsync();
+        Assert.That(stored.Context, Is.EqualTo(updated.Context));
+        Assert.That(stored.ApplyTime, Is.EqualTo(updated.ApplyTime));
+        Assert.That(stored.IsPassed, Is.Null);
+    }
+
+    private static IEnumerable<TestCaseData> ReviewedPendingOperations() =>
+        from operation in PendingOperations
+        from passed in new[] { true, false }
+        select new TestCaseData(operation, passed);
+
+    [TestCaseSource(nameof(ReviewedPendingOperations))]
+    public async Task PendingSubmissionCannotOverwriteARecordReviewedAfterLookup(Operation operation, bool passed)
+    {
+        var capture = new SqlCapture();
+        await using var db = Context(capture);
+        var (target, author) = await PendingTargetAsync(db, operation);
+        var service = new RealRecordServices(db).Get<ExamineService>();
+        var initial = await service.AddEditRecordAsync(target, author, "first", operation, "note", false);
+        var originalContext = initial.Context;
+        var originalTime = initial.ApplyTime;
+        var claimed = false;
+        // Commit the real approval claim after the submitter's pending lookup and before its UPDATE.
+        capture.BeforeExamineUpdate = async () =>
+        {
+            await using var reviewer = Context();
+            var record = await reviewer.Examines.SingleAsync();
+            var unitOfWork = new RealRecordServices(reviewer).Get<EditRecordUnitOfWork>();
+            claimed = await unitOfWork.RunAsync(() => unitOfWork.TryClaimAsync(record, passed));
+        };
+
+        Assert.That(async () => await service.AddEditRecordAsync(target, author, "second", operation, "note", false),
+            Throws.InvalidOperationException.With.Message.EqualTo("该记录已经被审核，不能修改审核状态"));
+        Assert.That(claimed, Is.True);
+        // A later save in this context must not leak the rejected submission into history either.
+        await db.SaveChangesAsync();
+        await using var verify = Context();
+        var stored = await verify.Examines.SingleAsync();
+        Assert.Multiple(() =>
+        {
+            Assert.That(stored.Context, Is.EqualTo(originalContext));
+            Assert.That(stored.ApplyTime, Is.EqualTo(originalTime));
+            Assert.That(stored.IsPassed, Is.EqualTo(passed));
+        });
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task EntryHistoryCapturesUniqueNameChangesWithAnUnchangedDisplayName(bool prepareFrames)
+    {
+        await using var db = Context();
+        var time = DateTime.UtcNow.AddHours(-1);
+        var first = new Examine
+        {
+            EntryId = entryId, Operation = Operation.EstablishMain, IsPassed = true,
+            ApplyTime = time, PassedTime = time,
+            Context = JsonConvert.SerializeObject(new ExamineMain
+            {
+                Items = [new() { Key = "Name", Value = "old-unique" }, new() { Key = "DisplayName", Value = "display" }]
+            })
+        };
+        var second = new Examine
+        {
+            EntryId = entryId, Operation = Operation.EstablishMain, IsPassed = true,
+            ApplyTime = time.AddMinutes(1), PassedTime = time.AddMinutes(1),
+            Context = JsonConvert.SerializeObject(new ExamineMain { Items = [new() { Key = "Name", Value = "new-unique" }] })
+        };
+        db.Examines.AddRange(first, second);
+        await db.SaveChangesAsync();
+        var history = new RealRecordServices(db).Get<RecordHistoryService>();
+        var comparison = await history.CompareAsync<EntryIndexViewModel>(second, first.Id);
+        Assert.That(comparison.Success, Is.True);
+        Assert.That(comparison.Before.Name, Is.EqualTo("display"));
+        Assert.That(comparison.After.Name, Is.EqualTo("display"));
+        if (prepareFrames) await history.PrepareFramesAsync([second]);
+        var frame = (await history.GetFrameAsync(second))!;
+        var diff = RecordDiffBuilder.Build(ExaminePreviewMapper.FromPreData(frame.Before), ExaminePreviewMapper.FromPreData(frame.After));
+        var nameChange = diff.Items.Single(i => i.Item.Label == "唯一名称");
+        Assert.Multiple(() =>
+        {
+            Assert.That(nameChange.Change, Is.EqualTo(RecordChangeKind.Modified));
+            Assert.That(nameChange.Before!.DisplayValue, Is.EqualTo("old-unique"));
+            Assert.That(nameChange.After!.DisplayValue, Is.EqualTo("new-unique"));
+            Assert.That(diff.Items.Single(i => i.Item.Label == "名称").Change, Is.EqualTo(RecordChangeKind.Unchanged));
+        });
     }
 
     private sealed class SqlCapture : DbCommandInterceptor
     {
         public ConcurrentQueue<string> Commands { get; } = new();
-        public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken token = default)
-        { Commands.Enqueue(command.CommandText); return ValueTask.FromResult(result); }
-        public override ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<int> result, CancellationToken token = default)
-        { Commands.Enqueue(command.CommandText); return ValueTask.FromResult(result); }
+        public Func<Task>? BeforeExamineUpdate { get; set; }
+        private async Task CaptureAsync(DbCommand command)
+        {
+            Commands.Enqueue(command.CommandText);
+            if (BeforeExamineUpdate is { } action && command.CommandText.StartsWith("UPDATE \"Examines\"", StringComparison.Ordinal))
+            {
+                BeforeExamineUpdate = null;
+                await action();
+            }
+        }
+        public override async ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken token = default)
+        { await CaptureAsync(command); return result; }
+        public override async ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<int> result, CancellationToken token = default)
+        { await CaptureAsync(command); return result; }
     }
 }
 

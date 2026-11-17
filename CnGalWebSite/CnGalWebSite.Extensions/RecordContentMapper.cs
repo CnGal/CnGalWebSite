@@ -15,7 +15,7 @@ public static class RecordContentMapper
     public static ExaminePreDataModel Map(EntryIndexViewModel value)
     {
         var result = Create(value.MainPage,
-            ("名称", value.Name), ("别称", value.AnotherName), ("简介", value.BriefIntroduction),
+            ("名称", value.Name), ("唯一名称", value.UniqueName), ("别称", value.AnotherName), ("简介", value.BriefIntroduction),
             ("类型", value.Type), ("样式模板", value.Template), ("配音", value.IsDubbing));
         Images(result, ("主图", value.MainPicture), ("缩略图", value.Thumbnail),
             ("背景图", value.BackgroundPicture), ("小背景图", value.SmallBackgroundPicture));

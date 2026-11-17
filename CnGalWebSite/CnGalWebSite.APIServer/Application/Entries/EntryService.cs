@@ -1177,6 +1177,7 @@ namespace CnGalWebSite.APIServer.Application.Entries
             {
                 Id = entry.Id,
                 Name = entry.DisplayName ?? entry.Name,
+                UniqueName = entry.Name,
                 BriefIntroduction = entry.BriefIntroduction,
                 Type = entry.Type,
                 CanComment = entry.CanComment ?? true,
