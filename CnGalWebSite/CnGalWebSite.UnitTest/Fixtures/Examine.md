@@ -26,6 +26,7 @@ $env:MainSiteApi__TaskApiPath='http://127.0.0.1:5361/'
 $env:ImageApi__BaseAddress='http://127.0.0.1:5361/'
 $env:ASPNETCORE_ENVIRONMENT='Development'
 $env:ASPNETCORE_URLS='http://127.0.0.1:5167'
+$env:NO_PROXY='localhost,127.0.0.1'
 dotnet run --project CnGalWebSite/CnGalWebSite.MainSite --no-launch-profile
 ```
 

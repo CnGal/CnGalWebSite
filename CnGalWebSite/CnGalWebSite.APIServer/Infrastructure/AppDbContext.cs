@@ -16,6 +16,27 @@ namespace CnGalWebSite.APIServer.Infrastructure
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
+        internal readonly System.Collections.Generic.List<CnGalWebSite.APIServer.Application.Examines.EditWriteBoundary> EditWriteBoundaries = new();
+        internal int RecordReadDepth;
+
+        private void ValidateRecordWrite()
+        {
+            if (RecordReadDepth > 0) throw new InvalidOperationException("审核预览和历史回放不能保存数据。");
+            CnGalWebSite.APIServer.Application.Examines.EditWriteBoundary.Validate(this);
+        }
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            ValidateRecordWrite();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override System.Threading.Tasks.Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, System.Threading.CancellationToken cancellationToken = default)
+        {
+            ValidateRecordWrite();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
 

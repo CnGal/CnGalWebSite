@@ -23,13 +23,14 @@ namespace CnGalWebSite.APIServer.Application.Examines
         private readonly IRepository<UserReviewEditRecord, long> _userReviewEditRecordRepository;
         private readonly IAppHelper _appHelper;
         private readonly IExamineService _examineService;
+        private readonly EditRecordUnitOfWork _unitOfWork;
         private readonly IUserService _userService;
         
         private readonly IRepository<UserCertification, long> _userCertificationRepository;
         private readonly IRepository<UserMonitor, long> _userMonitorsRepository;
 
         public EditRecordService(IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IRepository<UserMonitor, long> userMonitorsRepository, IAppHelper appHelper, IUserService userService,
-             IRepository<UserCertification, long> userCertificationRepository, IExamineService examineService)
+             IRepository<UserCertification, long> userCertificationRepository, IExamineService examineService, EditRecordUnitOfWork unitOfWork)
         {
             _userMonitorsRepository = userMonitorsRepository;
             _userReviewEditRecordRepository = userReviewEditRecordRepository;
@@ -38,6 +39,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             
             _userCertificationRepository = userCertificationRepository;
             _examineService = examineService;
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -106,19 +108,17 @@ namespace CnGalWebSite.APIServer.Application.Examines
             //判断是否有权限直接编辑
             var isAdmin = await CheckUserExaminePermission(entry,user,allowEditor);
 
-            //添加审核记录
-            var examine = await _examineService.AddEditRecordAsync(entry, user, examineData, operation, note, isAdmin, isCreating);
-
-
-            if (isAdmin)
+            await _unitOfWork.RunAsync(async () =>
             {
-                //应用审核记录
-                await _examineService.ApplyEditRecordToObject(entry, examineData, operation);
-                //更新用户积分
-                await _userService.UpdateUserIntegral(user);
-                //尝试添加审阅
-                await AddEditRecordToUserReview(examine);
-            }
+                var examine = await _examineService.AddEditRecordAsync(entry, user, examineData, operation, note, isAdmin, isCreating);
+                if (isAdmin)
+                {
+                    await _examineService.ApplyEditRecordToObject(entry, examineData, operation);
+                    await AddEditRecordToUserReview(examine);
+                }
+                return examine;
+            });
+            if (isAdmin) await _unitOfWork.AfterCommitAsync(() => _userService.UpdateUserIntegral(user));
         }
 
         public async Task AddEditRecordToUserReview(Examine examine)

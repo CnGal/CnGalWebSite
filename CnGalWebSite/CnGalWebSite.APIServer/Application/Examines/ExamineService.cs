@@ -52,7 +52,7 @@ using Tag = CnGalWebSite.DataModel.Model.Tag;
 
 namespace CnGalWebSite.APIServer.Application.Examines
 {
-    public class ExamineService : IExamineService
+    public partial class ExamineService : IExamineService
     {
         private static readonly CnGalWebSite.Core.Services.Query.SortMap<Examine, ExamineSortField> ListSorting =
             new CnGalWebSite.Core.Services.Query.SortMap<Examine, ExamineSortField>(ExamineSortField.Id, ExamineSortField.Id)
@@ -68,6 +68,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         private readonly IRepository<Examine, int> _examineRepository;
         private readonly IAppHelper _appHelper;
+        private readonly CnGalWebSite.APIServer.Infrastructure.AppDbContext _dbContext;
+        private readonly RecordHistoryService _history;
         private readonly IRepository<Disambig, int> _disambigRepository;
         private readonly IRepository<Tag, int> _tagRepository;
         private readonly IRepository<Article, long> _articleRepository;
@@ -106,7 +108,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
         IArticleService articleService, ITagService tagService, IDisambigService disambigService, IUserService userService, IRepository<ApplicationUser, string> userRepository, IRepository<Message, long> messageRepository,
         IRepository<Article, long> articleRepository, IRepository<Tag, int> tagRepository, IEntryService entryService, IPeripheryService peripheryService, IPlayedGameService playedGameService, IRepository<UserCertification, long> userCertificationRepository,
         IRepository<Comment, long> commentRepository, IRepository<Disambig, int> disambigRepository, IRepository<Periphery, long> peripheryRepository, ILogger<ExamineService> logger, IRepository<Lottery, long> lotteryRepository,
-        IOptions<AutomationUsersOptions> automationUsersOptions,  IRepository<PlayedGame, long> playedGameRepository, ICommentService commentService, IRepository<Vote, long> voteRepository)
+        IOptions<AutomationUsersOptions> automationUsersOptions,  IRepository<PlayedGame, long> playedGameRepository, ICommentService commentService, IRepository<Vote, long> voteRepository, CnGalWebSite.APIServer.Infrastructure.AppDbContext dbContext, RecordHistoryService history)
         {
             _examineRepository = examineRepository;
             _appHelper = appHelper;
@@ -132,6 +134,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
             _playedGameRepository = playedGameRepository;
             _messageRepository = messageRepository;
             _commentService = commentService;
+            _dbContext = dbContext;
+            _history = history;
             _lotteryRepository = lotteryRepository;
             _voteRepository = voteRepository;
             _userCertificationRepository = userCertificationRepository;
@@ -237,6 +241,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         public async Task<bool> GetExamineView(ExamineViewModel model, Examine examine)
         {
+            using var read = new RecordReadScope(_dbContext);
             var success = examine.Operation switch
             {
                 Operation.UserMainPage => GetUserMainPageExamineView(model, examine),
@@ -271,6 +276,14 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 Operation.EstablishWebsite => await GetEstablishWebsiteExamineView(model, examine),
                 _ => false,
             };
+            if (success && examine.IsPassed == true && RecordHistoryService.Supports(examine))
+            {
+                var frame = await _history.GetFrameAsync(examine);
+                model.BeforeModel = frame.Before;
+                model.AfterModel = frame.After;
+                if (examine.Operation is Operation.EstablishMainPage or Operation.EditArticleMainPage or Operation.EditVideoMainPage)
+                    model.EditOverview = new HtmlDiff.HtmlDiff(frame.Before.MainPage ?? "", frame.After.MainPage ?? "").Build();
+            }
             if (success)
             {
                 model.EditOverview = HtmlSanitizerHelper.Sanitize(model.EditOverview);
@@ -775,7 +788,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = entryMain;
                 model.AfterModel = entryMainBefore;
@@ -1017,7 +1030,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = information_examine;
 
@@ -1080,7 +1093,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = pictures_examine;
                 model.AfterModel = pictures;
@@ -1179,7 +1192,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = relevances_examine;
                 model.AfterModel = relevances;
@@ -1237,7 +1250,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = tags_examine;
                 model.AfterModel = tags;
@@ -1278,7 +1291,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             var mainpage_examine = entry.MainPage;
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 //序列化数据
                 var htmlDiff = new HtmlDiff.HtmlDiff(mainpage_examine ?? "", mainpage ?? "");
@@ -1364,7 +1377,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = audio_examine;
                 model.AfterModel = audio;
@@ -1487,7 +1500,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = website_examine;
                 model.AfterModel = website;
@@ -1643,7 +1656,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = articleMain;
                 model.AfterModel = articleMainBefore;
@@ -1737,7 +1750,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = relevances_examine;
                 model.AfterModel = relevances;
@@ -1772,7 +1785,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             var mainpage_examine = article.MainPage;
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 //序列化数据
                 var htmlDiff = new HtmlDiff.HtmlDiff(mainpage_examine ?? "", mainpage ?? "");
@@ -1916,7 +1929,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = entryMain;
                 model.AfterModel = entryMainBefore;
@@ -1970,7 +1983,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = relevances_examine;
                 model.AfterModel = relevances;
@@ -2024,7 +2037,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = relevances_examine;
                 model.AfterModel = relevances;
@@ -2196,7 +2209,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             disambigMain.SmallBackgroundPicture = _appHelper.GetImagePath(disambigMain.SmallBackgroundPicture, "background.png");
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 var htmlDiff = new HtmlDiff.HtmlDiff(disambigMain.Name ?? "", disambig.Name ?? "");
                 model.EditOverview = "<h5>名称</h5>" + "<h5>" + htmlDiff.Build().Replace("\r\n", "<br>") + "</h5>";
@@ -2332,7 +2345,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
             ////判断是否是等待审核状态
-            //if (examine.IsPassed != null)
+            //if (examine.IsPassed == true)
             //{
             //    model.BeforeModel = disambigAloneModels_examine;
             //    model.AfterModel = disambigAloneModels;
@@ -2360,7 +2373,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.IsThumbnail = true;
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 var htmlDiff = new HtmlDiff.HtmlDiff(examine.Context ?? "", examine.ApplicationUser.MainPageContext ?? "");
                 model.EditOverview = htmlDiff.Build().Replace("\r\n", "<br>");
@@ -2479,7 +2492,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = userMain;
                 model.AfterModel = userMainBefore;
@@ -2685,7 +2698,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = entryMain;
                 model.AfterModel = entryMainBefore;
@@ -2740,7 +2753,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = pictures_examine;
                 model.AfterModel = pictures;
@@ -2796,7 +2809,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = relevances_examine;
                 model.AfterModel = relevances;
@@ -2852,7 +2865,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = relevances_examine;
                 model.AfterModel = relevances;
@@ -3039,7 +3052,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             //json格式化
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = viewAfter;
                 model.AfterModel = viewBefore;
@@ -3087,7 +3100,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = viewAfter;
                 model.AfterModel = viewBefore;
@@ -3122,7 +3135,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             var viewAfter = item.MainPage;
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 //序列化数据
                 var htmlDiff = new HtmlDiff.HtmlDiff(viewAfter ?? "", viewBefore ?? "");
@@ -3181,7 +3194,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
             model.EditOverview = _appHelper.GetJsonStringView(examine.Context);
 
             //判断是否是等待审核状态
-            if (examine.IsPassed != null)
+            if (examine.IsPassed == true)
             {
                 model.BeforeModel = viewAfter;
                 model.AfterModel = viewBefore;
@@ -3269,6 +3282,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         public async Task ApplyEditRecordToObject(object entry,object examine, Operation operation)
         {
+            using var boundary = new EditWriteBoundary(_dbContext, entry, operation, examine);
             switch (operation)
             {
                 case Operation.EstablishMain:
@@ -3419,7 +3433,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                             resulte = text.ToString();
                         }
 
-                        await ExamineEstablishRelevancesAsync(temp, examinedModel);
+                        await ApplyEditRecordToObject(temp, examinedModel, Operation.EstablishRelevances);
                         await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动关联词条");
                     }
                 }
@@ -3480,7 +3494,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         resulte = text.ToString();
                     }
 
-                    await ExamineEstablishRelevancesAsync(temp, examinedModel);
+                    await ApplyEditRecordToObject(temp, examinedModel, Operation.EstablishRelevances);
                     await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
                 }
 
@@ -3513,7 +3527,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         resulte = text.ToString();
                     }
 
-                    await ExamineEditArticleRelevancesAsync(temp, examinedModel);
+                    await ApplyEditRecordToObject(temp, examinedModel, Operation.EditArticleRelevanes);
                     await UniversalEditArticleExaminedAsync(temp, admin, true, resulte, Operation.EditArticleRelevanes, "自动反向关联");
                 }
 
@@ -3546,7 +3560,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         resulte = text.ToString();
                     }
 
-                    await ExamineEditVideoRelevancesAsync(temp, examinedModel);
+                    await ApplyEditRecordToObject(temp, examinedModel, Operation.EditVideoRelevanes);
                     await UniversalEditVideoExaminedAsync(temp, admin, true, resulte, Operation.EditVideoRelevanes, "自动反向关联");
                 }
 
@@ -3646,7 +3660,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         resulte = text.ToString();
                     }
 
-                    await ExamineEditArticleRelevancesAsync(temp, examinedModel);
+                    await ApplyEditRecordToObject(temp, examinedModel, Operation.EditArticleRelevanes);
                     await UniversalEditArticleExaminedAsync(temp, admin, true, resulte, Operation.EditArticleRelevanes, "自动反向关联");
                 }
 
@@ -3679,7 +3693,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         resulte = text.ToString();
                     }
 
-                    await ExamineEstablishRelevancesAsync(temp, examinedModel);
+                    await ApplyEditRecordToObject(temp, examinedModel, Operation.EstablishRelevances);
                     await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
                 }
 
@@ -3712,7 +3726,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         resulte = text.ToString();
                     }
 
-                    await ExamineEditVideoRelevancesAsync(temp, examinedModel);
+                    await ApplyEditRecordToObject(temp, examinedModel, Operation.EditVideoRelevanes);
                     await UniversalEditVideoExaminedAsync(temp, admin, true, resulte, Operation.EditVideoRelevanes, "自动反向关联");
                 }
 
@@ -4014,7 +4028,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         resulte = text.ToString();
                     }
 
-                    await ExamineEditVideoRelevancesAsync(temp, examinedModel);
+                    await ApplyEditRecordToObject(temp, examinedModel, Operation.EditVideoRelevanes);
                     await UniversalEditVideoExaminedAsync(temp, admin, true, resulte, Operation.EditVideoRelevanes, "自动反向关联");
                 }
 
@@ -4047,7 +4061,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         resulte = text.ToString();
                     }
 
-                    await ExamineEstablishRelevancesAsync(temp, examinedModel);
+                    await ApplyEditRecordToObject(temp, examinedModel, Operation.EstablishRelevances);
                     await UniversalEditExaminedAsync(temp, admin, true, resulte, Operation.EstablishRelevances, "自动反向关联");
                 }
             }
@@ -4078,7 +4092,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                         resulte = text.ToString();
                     }
 
-                    await ExamineEditArticleRelevancesAsync(temp, examinedModel);
+                    await ApplyEditRecordToObject(temp, examinedModel, Operation.EditArticleRelevanes);
                     await UniversalEditArticleExaminedAsync(temp, admin, true, resulte, Operation.EditArticleRelevanes, "自动反向关联");
                 }
             }

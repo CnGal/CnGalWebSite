@@ -107,6 +107,9 @@ namespace CnGalWebSite.APIServer.DataReositories
         /// <param name="entity">实体</param>
         /// <returns>被更新的实体</returns>
         Task<TEntity> UpdateAsync(TEntity entity);
+
+        TEntity UpdateFields(TEntity entity, params Expression<Func<TEntity, object>>[] fields);
+        Task<TEntity> UpdateFieldsAsync(TEntity entity, params Expression<Func<TEntity, object>>[] fields);
  
         #endregion
 

@@ -1,0 +1,24 @@
+.record-raw-data {
+    margin: 0;
+    max-width: 100%;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    font-family: 'Cascadia Code', 'Consolas', monospace;
+    font-size: var(--cg-font-size-sm);
+    line-height: 1.8;
+    color: var(--cg-color-text);
+}
+
+.record-raw-data del {
+    color: var(--cg-color-error);
+    background: color-mix(in srgb, var(--cg-color-error) 16%, transparent);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+}
+
+.record-raw-data ins {
+    color: var(--cg-color-success);
+    background: color-mix(in srgb, var(--cg-color-success) 16%, transparent);
+    text-decoration: none;
+}

@@ -100,11 +100,13 @@ namespace CnGalWebSite.APIServer.Controllers
         private readonly IEditRecordService _editRecordService;
         private readonly IUserService _userService;
         private readonly IQueryService _queryService;
+        private readonly EditRecordUnitOfWork _unitOfWork;
+        private readonly CnGalWebSite.APIServer.Infrastructure.AppDbContext _dbContext;
 
         public ExaminesAPIController(IRepository<Disambig, int> disambigRepository, IRankService rankService, IRepository<Comment, long> commentRepository, IUserService userService, IRepository<Video, long> videoRepository,
         IRepository<Message, long> messageRepository, IRepository<ApplicationUser, string> userRepository, IRepository<UserReviewEditRecord, long> userReviewEditRecordRepository, IRepository<FavoriteFolder, long> favoriteFolderRepository,
          IExamineService examineService, IRepository<UserMonitor, long> userMonitorsRepository, IEditRecordService editRecordService, IRepository<UserCertification, long> userCertificationRepository, IQueryService queryService,
-        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository)
+        IRepository<Article, long> articleRepository, IAppHelper appHelper, IRepository<Entry, int> entryRepository, IRepository<Periphery, long> peripheryRepository, IRepository<Examine, long> examineRepository, IRepository<Tag, int> tagRepository, IRepository<PlayedGame, long> playedGameRepository, EditRecordUnitOfWork unitOfWork, CnGalWebSite.APIServer.Infrastructure.AppDbContext dbContext)
         {
             
             _entryRepository = entryRepository;
@@ -128,6 +130,8 @@ namespace CnGalWebSite.APIServer.Controllers
             _videoRepository = videoRepository;
             _favoriteFolderRepository = favoriteFolderRepository;
             _queryService = queryService;
+            _unitOfWork = unitOfWork;
+            _dbContext = dbContext;
         }
 
 
@@ -207,6 +211,23 @@ namespace CnGalWebSite.APIServer.Controllers
         [Authorize(Roles = "Admin,Editor")]
         [HttpPost]
         public async Task<ActionResult<ExamineProcResultModel>> ProcAsync(Models.ExaminedViewModel model)
+        {
+            var result = await _unitOfWork.RunAsync(() => ProcCoreAsync(model), result => result.Value?.Successful == true);
+            if (result.Value?.Successful == true && model.IsPassed)
+            {
+                await _unitOfWork.AfterCommitAsync(async () =>
+                {
+                    var record = await _examineRepository.GetAll().AsNoTracking().FirstAsync(e => e.Id == model.Id);
+                    var author = await _userRepository.FirstOrDefaultAsync(u => u.Id == record.ApplicationUserId);
+                    await _userService.UpdateUserIntegral(author);
+                    await _rankService.UpdateUserRanks(author);
+                });
+            }
+            return result;
+        }
+
+        private async Task<ActionResult<ExamineProcResultModel>> ProcCoreAsync(Models.ExaminedViewModel model)
+
         {
             var examine = await _examineRepository.GetAll().Include(s => s.ApplicationUser).FirstOrDefaultAsync(x => x.Id == model.Id);
             if (examine == null)
@@ -388,6 +409,9 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
 
+            if (!await _unitOfWork.TryClaimAsync(examine, model.IsPassed))
+                return new ExamineProcResultModel { Successful = false, Error = "该记录已经被审核，不能修改审核状态" };
+
             //判断是否通过
             if (model.IsPassed == true)
             {
@@ -474,8 +498,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 await _editRecordService.AddEditRecordToUserReview(examine);
 
                 //更新用户积分
-                await _userService.UpdateUserIntegral(examine.ApplicationUser);
-                await _rankService.UpdateUserRanks(examine.ApplicationUser);
+
 
             }
             else
@@ -663,10 +686,9 @@ namespace CnGalWebSite.APIServer.Controllers
 
 
 
-            var examinedView = new ExamineViewModel();
-
             foreach (var item in examines)
             {
+                var examinedView = new ExamineViewModel();
                 if (await _examineService.GetExamineView(examinedView, item))
                 {
                     model.Examines.Add(new EditRecordAloneViewModel

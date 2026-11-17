@@ -767,7 +767,7 @@ namespace CnGalWebSite.APIServer.Controllers
         /// <returns></returns>
         [HttpGet("{contrastId}/{currentId}")]
         [AllowAnonymous]
-        public async Task<ActionResult<TagContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId)
+        public async Task<ActionResult<TagContrastEditRecordViewModel>> GetContrastEditRecordViewsAsync(long contrastId, long currentId, [FromServices] RecordHistoryService history)
         {
             var contrastExamine = contrastId > 0
                 ? await _examineRepository.FirstOrDefaultAsync(s => s.Id == contrastId)
@@ -784,46 +784,14 @@ namespace CnGalWebSite.APIServer.Controllers
                 return BadRequest("请选择已通过的编辑记录");
             }
 
-            var currentTag = new Tag();
-            var newTag = new Tag();
-
-            //按审核通过时间还原历史版本；contrastId=0 表示空基准，用于首个版本
-            var examines = RecordVersionOrder.Approved(
-                await _examineRepository.GetAll().AsNoTracking()
-                    .Where(s => s.IsPassed == true && s.TagId == currentExamine.TagId)
-                    .ToListAsync()).ToList();
-            var contrastIndex = contrastId > 0 ? examines.FindIndex(s => s.Id == contrastId) : -1;
-            var currentIndex = examines.FindIndex(s => s.Id == currentId);
-            if (currentIndex < 0 || (contrastId > 0 && contrastIndex < 0))
-            {
-                return BadRequest("编辑记录未通过审核");
-            }
-            if (contrastIndex > currentIndex)
-            {
-                return BadRequest("对比的编辑必须先于当前的编辑");
-            }
-
-            if (contrastIndex >= 0)
-            {
-                foreach (var item in examines.Take(contrastIndex + 1))
-                {
-                    await _tagService.UpdateTagDataAsync(currentTag, item);
-                }
-            }
-
-            foreach (var item in examines.Take(currentIndex + 1))
-            {
-                await _tagService.UpdateTagDataAsync(newTag, item);
-            }
-
-            var result = await _tagService.ConcompareAndGenerateModel(currentTag, newTag);
+            var result = await history.CompareAsync<TagIndexViewModel>(currentExamine, contrastId);
 
             var model = new TagContrastEditRecordViewModel
             {
                 ContrastId = contrastId,
                 CurrentId = currentId,
-                ContrastModel = result[0],
-                CurrentModel = result[1],
+                ContrastModel = result.Before,
+                CurrentModel = result.After,
             };
 
             return model;

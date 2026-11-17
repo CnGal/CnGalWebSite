@@ -1,0 +1,15 @@
+<pre class="record-raw-data">@foreach (var segment in _segments) { if (segment.Change == RecordTextChangeKind.Removed) { <del>@segment.Text</del> } else if (segment.Change == RecordTextChangeKind.Added) { <ins>@segment.Text</ins> } else { @segment.Text } }</pre>
+
+@code {
+    [Parameter] public string? Content { get; set; }
+
+    private string? _source;
+    private IReadOnlyList<RecordTextSegment> _segments = [];
+
+    protected override void OnParametersSet()
+    {
+        if (string.Equals(_source, Content, StringComparison.Ordinal)) return;
+        _source = Content;
+        _segments = RecordRawDiff.Parse(Content);
+    }
+}

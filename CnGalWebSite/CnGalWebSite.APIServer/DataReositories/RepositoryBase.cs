@@ -92,18 +92,57 @@ namespace CnGalWebSite.APIServer.DataReositories
 
         public Tentity Update(Tentity entity)
         {
-            AttachIfNot(entity);
-            _dbContext.Entry(entity).State = EntityState.Modified;
+            RequireTracked(entity);
             Save();
             return entity;
         }
 
         public async Task<Tentity> UpdateAsync(Tentity entity)
         {
-            AttachIfNot(entity);
-            _dbContext.Entry(entity).State = EntityState.Modified;
+            RequireTracked(entity);
             await SaveAsync();
             return entity;
+        }
+
+        public Tentity UpdateFields(Tentity entity, params Expression<Func<Tentity, object>>[] fields)
+        {
+            MarkFields(entity, fields);
+            Save();
+            return entity;
+        }
+
+        public async Task<Tentity> UpdateFieldsAsync(Tentity entity, params Expression<Func<Tentity, object>>[] fields)
+        {
+            MarkFields(entity, fields);
+            await SaveAsync();
+            return entity;
+        }
+
+        private void RequireTracked(Tentity entity)
+        {
+            ArgumentNullException.ThrowIfNull(entity);
+            if (_dbContext.Entry(entity).State == EntityState.Detached)
+                throw new InvalidOperationException($"{typeof(Tentity).Name} is detached. Load a tracked entity or use UpdateFields with explicit properties.");
+        }
+
+        private void MarkFields(Tentity entity, Expression<Func<Tentity, object>>[] fields)
+        {
+            ArgumentNullException.ThrowIfNull(entity);
+            if (fields is null || fields.Length == 0)
+                throw new ArgumentException("At least one property must be specified.", nameof(fields));
+            var entry = _dbContext.Entry(entity);
+            // Attach only the root, never a detached navigation graph supplied by a caller.
+            if (entry.State == EntityState.Detached) entry.State = EntityState.Unchanged;
+            foreach (var field in fields)
+            {
+                var body = field.Body is UnaryExpression unary ? unary.Operand : field.Body;
+                if (body is not MemberExpression member || member.Expression != field.Parameters[0])
+                    throw new ArgumentException("Only direct scalar properties can be updated.", nameof(fields));
+                var property = entry.Property(member.Member.Name);
+                if (property.Metadata.IsPrimaryKey())
+                    throw new ArgumentException("Primary keys cannot be updated.", nameof(fields));
+                property.IsModified = true;
+            }
         }
 
         public void Delete(Tentity entity)
@@ -188,13 +227,9 @@ namespace CnGalWebSite.APIServer.DataReositories
         /// <param name="entity"></param>
         protected virtual void AttachIfNot(Tentity entity)
         {
-            var entty = _dbContext.ChangeTracker.Entries().FirstOrDefault(ent => ent.Entity == entity);
-
-            if (entity == null)
-            {
-                return;
-            }
-            Table.Attach(entity);
+            ArgumentNullException.ThrowIfNull(entity);
+            var entry = _dbContext.Entry(entity);
+            if (entry.State == EntityState.Detached) entry.State = EntityState.Unchanged;
         }
 
         protected void Save()

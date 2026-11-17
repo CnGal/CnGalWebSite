@@ -76,7 +76,11 @@ def record(record_id):
         "isPassed": None if record_id >= 100 else True,
         "beforeModel": legacy_content(),
         "afterModel": legacy_content(True),
-        "editOverview": "<p>补充游戏简介与关联资料，更新主视觉。</p><p><del>原有介绍</del> <ins>补充后的介绍</ins></p>",
+        "editOverview": ("补充游戏简介与关联资料，更新主视觉。<br>"
+                         "<del>原有介绍</del> <ins>补充后的介绍</ins> 未修改的内容<br>"
+                         "# Markdown 标题 **加粗** [链接](https://example.com/)<br>"
+                         f"<img src='{MEDIA}?raw-source'><iframe src='{MEDIA}?raw-frame'></iframe><br>"
+                         "![主视觉](https://example.com/" + "long-source-path/" * 20 + "image.png)"),
         "comments": "",
         "note": "资料来源：官方发布信息。\n补充内容已核对。",
         "sensitiveWords": [],
@@ -171,6 +175,25 @@ def entry_model(version):
     }
 
 
+def caption_body():
+    # Match the existing Markdown renderer's image + strong output, including
+    # captions inside linked images, plus semantic figure markup.
+    image = f'<img src="{MEDIA}" alt="主视觉">'
+    return (
+        f'<p>{image}<strong id="caption-plain">普通图片说明</strong></p>'
+        f'<p><a id="caption-link" href="https://example.com/game">{image}'
+        '<strong id="caption-linked">带外链图片说明</strong></a></p>'
+        f'<p><a href="https://example.com/game">{image}</a>'
+        '<strong id="caption-outside">链接外的图片说明</strong></p>'
+        f'<figure>{image}<figcaption id="caption-semantic">'
+        '<strong><a href="https://example.com/source">图片来源说明</a></strong></figcaption></figure>'
+        f'<p>{image}<strong id="caption-long">' + 'long-caption-without-spaces-' * 15
+        + f'</strong><br>{image}<strong id="caption-next">连续图片说明</strong></p>'
+        f'<p>{image}</p><p><strong id="ordinary-bold">普通正文加粗</strong> '
+        '<a id="ordinary-link" href="https://example.com">普通正文链接</a></p>'
+    )
+
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, *_):
         pass
@@ -183,7 +206,7 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         try:
             self.wfile.write(raw)
-        except (BrokenPipeError, ConnectionResetError):
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
             pass
 
     def do_GET(self):
@@ -199,6 +222,19 @@ class Handler(BaseHTTPRequestHandler):
             return self.send(svg, content_type="image/svg+xml")
         if "missing" in path or "fixture-audio" in path:
             return self.send({}, 404)
+        if path == "/api/entries/getentryview/42":
+            return self.send({
+                "id": 42, "name": "图片注释测试", "type": 1,
+                "mainPicture": MEDIA, "mainPage": caption_body(),
+            })
+        if path == "/api/entries/getentryeditinforbindmodel/42":
+            return self.send({"examines": [{
+                "id": 20, "type": 0, "operation": 2, "isPassed": True,
+                "applyTime": "2026-11-12T09:30:00",
+                "userInfor": {"id": "editor-test", "name": "星海编辑"},
+            }]})
+        if path == "/api/peripheries/getentryoverviewperipheries/42":
+            return self.send({"objectId": "42", "name": "图片注释测试", "peripheries": []})
         if "getexaminesoverview/" in path:
             record_id = int(path.rsplit("/", 1)[1])
             if record_id == 404:
@@ -208,7 +244,7 @@ class Handler(BaseHTTPRequestHandler):
             record_id = int(path.rsplit("/", 1)[1])
             if record_id == 404:
                 return self.send({}, 404)
-            if record_id == 109:
+            if record_id in (19, 109):
                 time.sleep(.5)
             return self.send(record(record_id))
         if "getcontrasteditrecordviews/" in path:

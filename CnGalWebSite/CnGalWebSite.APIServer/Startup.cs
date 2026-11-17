@@ -1,4 +1,4 @@
-﻿using CnGalWebSite.APIServer.Application.BackgroundTasks;
+using CnGalWebSite.APIServer.Application.BackgroundTasks;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.News;
 using CnGalWebSite.APIServer.Application.Mcp;
@@ -58,6 +58,8 @@ namespace CnGalWebSite.APIServer
         {
             services.AddApiConfiguration();
             services.AddScoped<McpService>();
+            services.AddScoped<CnGalWebSite.APIServer.Application.Examines.RecordHistoryService>();
+            services.AddScoped<CnGalWebSite.APIServer.Application.Examines.EditRecordUnitOfWork>();
             services.AddMcpServer().WithHttpTransport(options => options.Stateless = true).WithTools<McpTools>();
             services.AddProblemDetails();
             services.AddExceptionHandler<ConfigurationExceptionHandler>();

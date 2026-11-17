@@ -569,13 +569,9 @@ public class ExaminePresentationTests
         });
         using var services = Services(query);
         await using var renderer = new TestRenderer(services);
+        await renderer.Navigate("/home/editrecord?ContrastId=1&CurrentId=1&Mode=compare");
         var root = await renderer.Attach<EditRecordPage>();
-        await renderer.Render(root, new()
-        {
-            ["ContrastIdQuery"] = "1",
-            ["CurrentIdQuery"] = "1",
-            ["Mode"] = "compare"
-        });
+        await renderer.Render(root, new());
 
         Assert.That(renderer.AllText(root), Does.Contain("两个版本相同。"));
     }
@@ -599,14 +595,48 @@ public class ExaminePresentationTests
             { Id = 2, AfterModel = LegacyBody("new-content") })); }
         using var services = Services(query);
         await using var renderer = new TestRenderer(services);
+        await renderer.Navigate("/home/editrecord?ContrastId=1");
         var root = await renderer.Attach<EditRecordPage>();
-        var first = renderer.Render(root, new() { ["ContrastIdQuery"] = "1" });
+        var first = renderer.Render(root, new());
         await started.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        var second = renderer.Render(root, new() { ["ContrastIdQuery"] = "2", ["SelectedIdQuery"] = "2" });
+        var second = renderer.Navigate("/home/editrecord?ContrastId=2&SelectedId=2");
         await newerStarted.Task.WaitAsync(TimeSpan.FromSeconds(5));
         old.SetResult(SdkResult<ExamineViewModel>.Ok(new() { Id = 1, AfterModel = LegacyBody("stale-content") }));
         await Task.WhenAll(first, second).WaitAsync(TimeSpan.FromSeconds(5));
         Assert.That(renderer.AllText(root), Does.Contain("new-content").And.Not.Contain("stale-content"));
+    }
+
+    [Test]
+    public async Task LeavingRecordRouteDoesNotValidateDestinationQueryAndCancelsItsLoad()
+    {
+        var pending = new TaskCompletionSource<SdkResult<ExamineViewModel>>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        CancellationToken contentToken = default;
+        var query = Proxy<IExamineQueryService>((method, args) => method.Name switch
+        {
+            "GetExaminesOverviewAsync" => Task.FromResult(SdkResult<ExaminesOverviewViewModel>.Ok(new()
+                { ObjectId = 1, ObjectName = "测试对象", Examines = [History(1)] })),
+            "GetExamineDetailAsync" => Start((CancellationToken)args![1]!),
+            _ => throw new InvalidOperationException(method.Name)
+        });
+        Task<SdkResult<ExamineViewModel>> Start(CancellationToken token)
+        {
+            contentToken = token;
+            started.SetResult();
+            return pending.Task;
+        }
+        using var services = Services(query);
+        await using var renderer = new TestRenderer(services);
+        await renderer.Navigate("/home/editrecord?ContrastId=1");
+        var root = await renderer.Attach<EditRecordPage>();
+        var load = renderer.Render(root, new());
+        await started.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        await renderer.Navigate("/entries/index/1");
+        Assert.That(contentToken.IsCancellationRequested, Is.True);
+        Assert.That(renderer.AllText(root), Does.Not.Contain("请提供有效的编辑记录 ID"));
+        pending.SetResult(SdkResult<ExamineViewModel>.Ok(new() { Id = 1, AfterModel = LegacyBody("stale-content") }));
+        await load.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.That(renderer.AllText(root), Does.Not.Contain("stale-content"));
     }
 
     public static RecordPreviewModel Content(int mask)
@@ -655,7 +685,7 @@ public class ExaminePresentationTests
 
     private static EditRecordAloneViewModel History(long id) => new() { Id = id, UserName = "编辑者", Operation = Operation.EstablishMain };
     private static ServiceProvider Services(IExamineQueryService? query = null, IExamineCommandService? command = null)
-        => new ServiceCollection().AddLogging().AddSingleton(query ?? Proxy<IExamineQueryService>((_, _) => throw new NotSupportedException()))
+        => new ServiceCollection().AddLogging().AddSupplyValueFromQueryProvider().AddSingleton(query ?? Proxy<IExamineQueryService>((_, _) => throw new NotSupportedException()))
             .AddSingleton(command ?? Proxy<IExamineCommandService>((_, _) => throw new NotSupportedException()))
             .AddSingleton<ICgToastService, CgToastService>().AddSingleton<NavigationManager, TestNavigation>()
             .AddSingleton<IJSRuntime, NullJs>().BuildServiceProvider();
@@ -684,12 +714,14 @@ public class ExaminePresentationTests
     }
     private sealed class TestRenderer(IServiceProvider services) : Renderer(services, services.GetRequiredService<ILoggerFactory>())
     {
+        private readonly NavigationManager _navigation = services.GetRequiredService<NavigationManager>();
         public override Dispatcher Dispatcher { get; } = Dispatcher.CreateDefault();
         protected override IComponent ResolveComponentForRenderMode(Type type, int? parent, IComponentActivator activator, IComponentRenderMode mode) => activator.CreateInstance(type);
         protected override Task UpdateDisplayAsync(in RenderBatch batch) => Task.CompletedTask;
         protected override void HandleException(Exception ex) => throw new InvalidOperationException("Render failed", ex);
         private RenderTreeFrame[] Frames(int id) { var frames = GetCurrentRenderTreeFrames(id); return frames.Array.Take(frames.Count).ToArray(); }
         public Task<int> Attach<T>() where T : IComponent => Dispatcher.InvokeAsync(() => AssignRootComponentId(InstantiateComponent(typeof(T))));
+        public Task Navigate(string uri) => Dispatcher.InvokeAsync(() => _navigation.NavigateTo(uri));
         public Task Render(int id, Dictionary<string, object?> values) => Dispatcher.InvokeAsync(() => RenderRootComponentAsync(id, ParameterView.FromDictionary(values)));
         public async Task<int> Mount<T>(Dictionary<string, object?> values) where T : IComponent { var id = await Attach<T>(); await Render(id, values); return id; }
         public int[] Children<T>(int id) => Frames(id).Where(f => f.FrameType == RenderTreeFrameType.Component && f.ComponentType == typeof(T)).Select(f => f.ComponentId).ToArray();

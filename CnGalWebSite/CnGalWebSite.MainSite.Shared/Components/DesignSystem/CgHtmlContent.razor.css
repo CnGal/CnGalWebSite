@@ -72,6 +72,69 @@
     margin: 1em 0;
 }
 
+/* The existing Markdown renderer appends a strong caption immediately after
+   each labelled image, sometimes inside the image's external link. */
+.cg-html-content ::deep img + strong,
+.cg-html-content ::deep a:has(> img) + strong,
+.cg-html-content ::deep figcaption {
+    display: block;
+    margin: 0 0 var(--cg-spacing-5);
+    padding-inline: var(--cg-spacing-2);
+    color: var(--cg-color-text-muted);
+    font-size: var(--cg-font-size-sm);
+    font-weight: 400;
+    line-height: 1.6;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+.cg-html-content ::deep img:has(+ strong),
+.cg-html-content ::deep a:has(+ strong) > img,
+.cg-html-content ::deep figure:has(> figcaption) > img,
+.cg-html-content ::deep figure:has(> figcaption) > a > img {
+    margin-bottom: var(--cg-spacing-2);
+}
+
+.cg-html-content ::deep figure {
+    margin: 1em 0;
+}
+
+.cg-html-content ::deep figcaption strong,
+.cg-html-content ::deep figcaption a,
+.cg-html-content ::deep img + strong a,
+.cg-html-content ::deep a:has(> img) + strong a {
+    color: inherit;
+    font-weight: inherit;
+}
+
+.cg-html-content ::deep a:has(> img + strong) {
+    display: block;
+    border-radius: var(--cg-radius-md);
+    text-decoration: none;
+}
+
+.cg-html-content ::deep a:has(> img + strong):hover > strong,
+.cg-html-content ::deep a:has(> img + strong):focus-visible > strong,
+.cg-html-content ::deep figcaption a:hover,
+.cg-html-content ::deep figcaption a:focus-visible,
+.cg-html-content ::deep img + strong a:hover,
+.cg-html-content ::deep img + strong a:focus-visible,
+.cg-html-content ::deep a:has(> img) + strong a:hover,
+.cg-html-content ::deep a:has(> img) + strong a:focus-visible {
+    color: var(--cg-color-link);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+}
+
+.cg-html-content ::deep a:has(> img + strong):focus-visible,
+.cg-html-content ::deep figcaption a:focus-visible,
+.cg-html-content ::deep img + strong a:focus-visible,
+.cg-html-content ::deep a:has(> img) + strong a:focus-visible {
+    outline: 2px solid var(--cg-color-primary);
+    outline-offset: 3px;
+    border-radius: var(--cg-radius-sm);
+}
+
 .cg-html-content ::deep video,
 .cg-html-content ::deep audio {
     max-width: 100%;
