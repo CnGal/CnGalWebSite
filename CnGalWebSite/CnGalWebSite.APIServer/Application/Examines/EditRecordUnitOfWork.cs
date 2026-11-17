@@ -1,4 +1,4 @@
-using CnGalWebSite.APIServer.Infrastructure;
+﻿using CnGalWebSite.APIServer.Infrastructure;
 using CnGalWebSite.DataModel.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

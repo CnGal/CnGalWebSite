@@ -16,6 +16,8 @@ namespace CnGalWebSite.APIServer.Infrastructure
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
+        // 审核写入边界与只读回放的请求级状态。上下文由 AddDbContextPool 复用，
+        // 因此每个使用点都必须用 using 包裹，由 Dispose 把状态移除，避免残留到后续请求。
         internal readonly System.Collections.Generic.List<CnGalWebSite.APIServer.Application.Examines.EditWriteBoundary> EditWriteBoundaries = new();
         internal int RecordReadDepth;
 

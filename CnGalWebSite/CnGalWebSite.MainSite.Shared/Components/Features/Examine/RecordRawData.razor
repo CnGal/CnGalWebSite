@@ -1,4 +1,4 @@
-<pre class="record-raw-data">@foreach (var segment in _segments) { if (segment.Change == RecordTextChangeKind.Removed) { <del>@segment.Text</del> } else if (segment.Change == RecordTextChangeKind.Added) { <ins>@segment.Text</ins> } else { @segment.Text } }</pre>
+﻿<pre class="record-raw-data">@foreach (var segment in _segments) { if (segment.Change == RecordTextChangeKind.Removed) { <del>@segment.Text</del> } else if (segment.Change == RecordTextChangeKind.Added) { <ins>@segment.Text</ins> } else { @segment.Text } }</pre>
 
 @code {
     [Parameter] public string? Content { get; set; }

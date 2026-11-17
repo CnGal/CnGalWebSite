@@ -98,6 +98,10 @@
     private CancellationTokenSource? _cts;
     private bool _disposed;
     private bool IsCompare => RecordPresentation.IsCompareMode(Mode, CurrentId);
+    /// <summary>与 <c>@page "/home/editrecord"</c> 保持一致：离开路由后查询参数会消失，不能当成非法 ID 校验。</summary>
+    private bool IsCurrentPage => string.Equals(
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0].TrimEnd('/'),
+        "home/editrecord", StringComparison.OrdinalIgnoreCase);
     private IEnumerable<KeyValuePair<string, string>> Options => (_overview?.Examines ?? []).OrderByDescending(e => e.PassedTime).ThenByDescending(e => e.Id)
         .Select(e => new KeyValuePair<string, string>(e.Id.ToString(), $"#{e.Id} · {e.Operation.GetDisplayName()} · {e.ApplyTime:yyyy-MM-dd HH:mm}"));
 
@@ -108,8 +112,7 @@
         if (_disposed) return;
         // Query notifications can reach the outgoing component before the router
         // disposes it. They describe the destination, not an invalid record URL.
-        if (!string.Equals(NavigationManager.ToBaseRelativePath(NavigationManager.Uri)
-            .Split('?', '#')[0].TrimEnd('/'), "home/editrecord", StringComparison.OrdinalIgnoreCase))
+        if (!IsCurrentPage)
         {
             _cts?.Cancel();
             return;

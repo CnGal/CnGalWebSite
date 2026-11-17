@@ -1,4 +1,4 @@
-using HtmlAgilityPack;
+﻿using HtmlAgilityPack;
 using System.Text;
 
 namespace CnGalWebSite.MainSite.Shared.Components.Features.Examine;

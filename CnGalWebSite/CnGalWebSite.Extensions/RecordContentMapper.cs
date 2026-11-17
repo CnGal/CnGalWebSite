@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using CnGalWebSite.DataModel.ViewModel;
 using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Articles;
