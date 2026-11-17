@@ -92,14 +92,14 @@ namespace CnGalWebSite.APIServer.DataReositories
 
         public Tentity Update(Tentity entity)
         {
-            RequireTracked(entity);
+            PrepareUpdate(entity);
             Save();
             return entity;
         }
 
         public async Task<Tentity> UpdateAsync(Tentity entity)
         {
-            RequireTracked(entity);
+            PrepareUpdate(entity);
             await SaveAsync();
             return entity;
         }
@@ -118,11 +118,25 @@ namespace CnGalWebSite.APIServer.DataReositories
             return entity;
         }
 
-        private void RequireTracked(Tentity entity)
+        /// <summary>
+        /// 已跟踪实体按变更跟踪写入；分离实体与历史行为一致，作为整体覆盖写入。
+        /// 审核写入边界内只接受已跟踪实体——边界依赖“实际修改了哪些列”来校验越权写入，
+        /// 分离实体无法提供该信息，必须改用 <see cref="UpdateFields"/> 显式声明字段。
+        /// </summary>
+        private void PrepareUpdate(Tentity entity)
         {
             ArgumentNullException.ThrowIfNull(entity);
-            if (_dbContext.Entry(entity).State == EntityState.Detached)
-                throw new InvalidOperationException($"{typeof(Tentity).Name} is detached. Load a tracked entity or use UpdateFields with explicit properties.");
+            var entry = _dbContext.Entry(entity);
+            if (entry.State != EntityState.Detached)
+            {
+                return;
+            }
+            if (_dbContext.EditWriteBoundaries.Count > 0)
+            {
+                throw new InvalidOperationException(
+                    $"{typeof(Tentity).Name} is detached. Inside an edit-record write boundary pass a tracked entity or use UpdateFields with explicit properties.");
+            }
+            entry.State = EntityState.Modified;
         }
 
         private void MarkFields(Tentity entity, Expression<Func<Tentity, object>>[] fields)

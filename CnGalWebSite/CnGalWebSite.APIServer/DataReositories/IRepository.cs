@@ -95,8 +95,14 @@ namespace CnGalWebSite.APIServer.DataReositories
 
         #region 更新
         /// <summary>
+        /// <summary>
         /// 更新现有实体
         /// </summary>
+        /// <remarks>
+        /// 已跟踪实体只写入实际变化的列；分离实体会被整体覆盖。
+        /// 在审核写入边界内（<c>EditWriteBoundary</c>）不接受分离实体，请改用
+        /// <see cref="UpdateFields"/> 显式声明要写入的字段。
+        /// </remarks>
         /// <param name="entity">实体</param>
         /// <returns>被更新的实体</returns>
         TEntity Update(TEntity entity);
@@ -104,11 +110,25 @@ namespace CnGalWebSite.APIServer.DataReositories
         /// <summary>
         /// 更新现有实体
         /// </summary>
+        /// <remarks>约束同 <see cref="Update"/></remarks>
         /// <param name="entity">实体</param>
         /// <returns>被更新的实体</returns>
         Task<TEntity> UpdateAsync(TEntity entity);
 
+        /// <summary>
+        /// 只更新指定字段；分离实体也会被附加为根实体，不会连带写入导航图。
+        /// </summary>
+        /// <param name="entity">实体</param>
+        /// <param name="fields">要写入的标量属性（不能是主键或导航属性）</param>
+        /// <returns>被更新的实体</returns>
         TEntity UpdateFields(TEntity entity, params Expression<Func<TEntity, object>>[] fields);
+
+        /// <summary>
+        /// 只更新指定字段；分离实体也会被附加为根实体，不会连带写入导航图。
+        /// </summary>
+        /// <param name="entity">实体</param>
+        /// <param name="fields">要写入的标量属性（不能是主键或导航属性）</param>
+        /// <returns>被更新的实体</returns>
         Task<TEntity> UpdateFieldsAsync(TEntity entity, params Expression<Func<TEntity, object>>[] fields);
  
         #endregion

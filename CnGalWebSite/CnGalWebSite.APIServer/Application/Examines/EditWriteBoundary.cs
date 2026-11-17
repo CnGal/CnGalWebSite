@@ -1,4 +1,4 @@
-using CnGalWebSite.APIServer.Infrastructure;
+﻿using CnGalWebSite.APIServer.Infrastructure;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Model;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +15,17 @@ public sealed class EditWriteBoundary : IDisposable
     private readonly AppDbContext db;
     private readonly object target;
     private readonly HashSet<string> fields;
+    private readonly IReadOnlySet<string> keys;
     private readonly HashSet<string> dependents;
     private readonly HashSet<string> joins = new();
     private readonly Operation operation;
 
-    private sealed record Contract(string Fields, string Dependents = "", string Navigations = "");
+    /// <summary>
+    /// <paramref name="Fields"/> are entity columns; <paramref name="Keys"/> are extra keys the
+    /// submitted edit record may carry without mapping to a column (for example <c>ParentTagId</c>,
+    /// which is turned into a navigation assignment by the apply step).
+    /// </summary>
+    private sealed record Contract(string Fields, string Dependents = "", string Navigations = "", string Keys = "");
     private static readonly Dictionary<Operation, Contract> Contracts = new()
     {
         [Operation.EstablishMain] = new("Name DisplayName AnotherName BriefIntroduction MainPicture Thumbnail BackgroundPicture SmallBackgroundPicture Type Template"),
@@ -41,7 +47,7 @@ public sealed class EditWriteBoundary : IDisposable
         [Operation.EditPeripheryImages] = new("", "EntryPicture"),
         [Operation.EditPeripheryRelatedEntries] = new("", "", "RelatedEntries"),
         [Operation.EditPeripheryRelatedPeripheries] = new("", "PeripheryRelation"),
-        [Operation.EditTagMain] = new("Name BriefIntroduction MainPicture BackgroundPicture SmallBackgroundPicture Thumbnail ParentCode", "", "ParentCodeNavigation"),
+        [Operation.EditTagMain] = new("Name BriefIntroduction MainPicture BackgroundPicture SmallBackgroundPicture Thumbnail ParentCode", "", "ParentCodeNavigation", "ParentTagId"),
         [Operation.EditTagChildTags] = new("", "Tag", "InverseParentCodeNavigation"),
         [Operation.EditTagChildEntries] = new("", "", "Entries")
     };
@@ -54,6 +60,7 @@ public sealed class EditWriteBoundary : IDisposable
         if (!Contracts.TryGetValue(operation, out var contract)) return;
         fields = Words(contract.Fields);
         fields.Add("LastEditTime");
+        keys = AllowedKeys(operation);
         dependents = Words(contract.Dependents);
         var metadata = db.Entry(target).Metadata;
         foreach (var navigation in metadata.GetSkipNavigations().Where(n => Words(contract.Navigations).Contains(n.Name)))
@@ -63,10 +70,24 @@ public sealed class EditWriteBoundary : IDisposable
         if (data is ExamineMain main)
         {
             foreach (var item in main.Items)
-                if (!fields.Contains(item.Key) || item.Key == "LastEditTime")
+                if (!keys.Contains(item.Key))
                     throw new InvalidOperationException($"{operation} 不允许修改字段 {item.Key}。");
         }
         db.EditWriteBoundaries.Add(this);
+    }
+
+    /// <summary>该操作是否受写入边界约束。</summary>
+    internal static bool IsGuarded(Operation operation) => Contracts.ContainsKey(operation);
+
+    /// <summary>该操作的编辑记录允许携带的 key（实体字段与命令键，不含 LastEditTime）。</summary>
+    internal static IReadOnlySet<string> AllowedKeys(Operation operation)
+    {
+        if (!Contracts.TryGetValue(operation, out var contract)) return new HashSet<string>();
+        var result = Words(contract.Fields);
+        result.UnionWith(Words(contract.Keys));
+        // LastEditTime is an entity column the apply step maintains, never an incoming key.
+        result.Remove("LastEditTime");
+        return result;
     }
 
     internal bool Allows(EntityEntry entry)
