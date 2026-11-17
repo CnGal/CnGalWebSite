@@ -30,7 +30,7 @@ public sealed class EditWriteBoundary : IDisposable
     {
         [Operation.EstablishMain] = new("Name DisplayName AnotherName BriefIntroduction MainPicture Thumbnail BackgroundPicture SmallBackgroundPicture Type Template"),
         [Operation.EstablishMainPage] = new("MainPage"),
-        [Operation.EstablishAddInfor] = new("", "BasicEntryInformation BasicEntryInformationAdditional EntryStaff GameRelease Booking BookingGoal"),
+        [Operation.EstablishAddInfor] = new("PubulishTime", "BasicEntryInformation BasicEntryInformationAdditional EntryStaff GameRelease Booking BookingGoal"),
         [Operation.EstablishImages] = new("", "EntryPicture"),
         [Operation.EstablishAudio] = new("", "EntryAudio"),
         [Operation.EstablishWebsite] = new("", "EntryWebsite EntryWebsiteImage"),
@@ -104,6 +104,16 @@ public sealed class EditWriteBoundary : IDisposable
         return true;
     }
 
+    /// <summary>根实体上被修改、但不在本契约允许列内的属性；用于生成可诊断的错误信息。</summary>
+    internal IEnumerable<string> DisallowedProperties(EntityEntry entry)
+    {
+        if (fields is null || !ReferenceEquals(entry.Entity, target) || entry.State != EntityState.Modified)
+        {
+            return [];
+        }
+        return entry.Properties.Where(p => p.IsModified && !fields.Contains(p.Metadata.Name)).Select(p => p.Metadata.Name);
+    }
+
     internal static void Validate(AppDbContext db)
     {
         if (db.EditWriteBoundaries.Count == 0) return;
@@ -111,8 +121,11 @@ public sealed class EditWriteBoundary : IDisposable
         foreach (var entry in db.ChangeTracker.Entries().Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted))
         {
             if (entry.Entity is Examine or UserReviewEditRecord or Message) continue;
-            if (!db.EditWriteBoundaries.Any(boundary => boundary.Allows(entry)))
-                throw new InvalidOperationException($"编辑操作越界：{entry.Metadata.ClrType.Name} ({entry.State})。");
+            if (db.EditWriteBoundaries.Any(boundary => boundary.Allows(entry))) continue;
+            // 把越界列写进异常信息，否则线上只能看到 “Entry (Modified)” 无法定位。
+            var disallowed = db.EditWriteBoundaries.SelectMany(boundary => boundary.DisallowedProperties(entry)).Distinct().ToArray();
+            var detail = disallowed.Length == 0 ? "" : $"，不允许修改的列：{string.Join("、", disallowed)}";
+            throw new InvalidOperationException($"编辑操作越界：{entry.Metadata.ClrType.Name} ({entry.State}){detail}。");
         }
     }
 

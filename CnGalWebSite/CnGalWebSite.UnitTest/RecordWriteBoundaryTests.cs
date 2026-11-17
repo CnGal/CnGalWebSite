@@ -1,6 +1,7 @@
 ﻿using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.DataReositories;
 using CnGalWebSite.APIServer.Infrastructure;
+using CnGalWebSite.DataModel.ExamineModel.Entries;
 using CnGalWebSite.DataModel.ExamineModel.Shared;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
@@ -97,7 +98,30 @@ public class RecordWriteBoundaryTests
 
         using var boundary = new EditWriteBoundary(db, tag, Operation.EditTagMain, Main(("Name", "越界列标签-改名")));
         tag.Priority = 9;
-        Assert.That(async () => { await db.SaveChangesAsync(); }, Throws.InvalidOperationException);
+        var error = Assert.CatchAsync<InvalidOperationException>(async () => { await db.SaveChangesAsync(); });
+        Assert.That(error, Is.Not.Null);
+        Assert.That(error!.Message, Does.Contain("Priority"), "错误信息必须指出越界的列，便于线上定位");
+    }
+
+    [Test]
+    public async Task AddInfoEditCanUpdateTheDerivedPublishTime()
+    {
+        using var db = Context();
+        var entry = new Entry { Name = "附加信息词条" };
+        db.Entries.Add(entry);
+        await db.SaveChangesAsync();
+
+        // 附加信息应用步骤会用最早的正式发行时间回填 PubulishTime。
+        using (new EditWriteBoundary(db, entry, Operation.EstablishAddInfor, new EntryAddInfor()))
+        {
+            entry.PubulishTime = new DateTime(2020, 1, 2);
+            entry.LastEditTime = DateTime.Now;
+            Assert.That(async () => { await db.SaveChangesAsync(); }, Throws.Nothing);
+        }
+
+        using var verify = Context();
+        var saved = verify.Entries.Single(s => s.Name == "附加信息词条");
+        Assert.That(saved.PubulishTime, Is.EqualTo(new DateTime(2020, 1, 2)));
     }
 
     [Test]
