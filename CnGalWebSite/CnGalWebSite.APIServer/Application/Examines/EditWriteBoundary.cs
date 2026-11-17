@@ -156,6 +156,20 @@ public sealed class EditWriteBoundary : IDisposable
     private bool IsOwned(EntityEntry entry)
     {
         var root = db.Entry(target);
+        // 周边关联是双向关系；本分块同时维护 A→B 与 B→A。
+        // 只检查关系行是否直接连接目标，不沿另一端遍历，避免放行其他周边的子项。
+        if (entry.Entity is PeripheryRelation && operation == Operation.EditPeripheryRelatedPeripheries)
+        {
+            var foreignKeys = entry.Metadata.GetForeignKeys().ToArray();
+            // 修改必须原本就属于本分块，不能把 B→C 改成 B→A 来绕过归属限制。
+            if (entry.State == EntityState.Modified && !foreignKeys.Any(foreignKey =>
+                ReferencesTarget(foreignKey, ForeignKeyValues(entry, foreignKey, true), root))) return false;
+            return foreignKeys.Any(foreignKey =>
+                ReferencesTarget(foreignKey, ForeignKeyValues(entry, foreignKey, false), root)
+                || ((entry.State == EntityState.Deleted
+                        || ForeignKeyValues(entry, foreignKey, false).Any(value => value is null))
+                    && ReferencesTarget(foreignKey, ForeignKeyValues(entry, foreignKey, true), root)));
+        }
         var visited = new HashSet<object>(ReferenceEqualityComparer.Instance) { entry.Entity };
         var pending = new Queue<EntityEntry>();
         pending.Enqueue(entry);

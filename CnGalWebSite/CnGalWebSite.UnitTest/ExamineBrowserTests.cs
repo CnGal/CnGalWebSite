@@ -191,6 +191,8 @@ public class ExamineBrowserTests
         await Expect(raw).ToContainTextAsync("补充游戏简介与关联资料，更新主视觉。");
         await Expect(raw).ToContainTextAsync("# Markdown 标题 **加粗** [链接](https://example.com/)");
         await Expect(raw).ToContainTextAsync("<img src=");
+        await Expect(raw).ToContainTextAsync("<del>作者原有删除线</del><ins class='diffmod'>作者原有下划线</ins> &amp;");
+        await Expect(raw).ToContainTextAsync("</iframe><br>");
         await Expect(raw.Locator("img, iframe, a, h1, strong, .cg-html-content")).ToHaveCountAsync(0);
         Assert.That(sourceMediaRequests, Is.Empty, "Raw source must not initiate media requests.");
         foreach (var (tag, token, decoration) in new[]

@@ -178,97 +178,44 @@ namespace CnGalWebSite.APIServer.Application.Peripheries
 
         public async Task UpdatePeripheryDataRelatedPeripheriesAsync(Periphery periphery, PeripheryRelatedPeripheries examine)
         {
-
-            //序列化相关性列表 From
-            //先读取周边信息
-            var relevances = periphery.PeripheryRelationFromPeripheryNavigation;
-
             foreach (var item in examine.Relevances)
             {
-                var isAdd = false;
-
-                //遍历信息列表寻找关键词
-                foreach (var infor in relevances)
+                // 调用方加载两个方向；使用快照删除，兼容历史上已有的重复关系。
+                var outgoing = periphery.PeripheryRelationFromPeripheryNavigation;
+                var incoming = periphery.PeripheryRelationToPeripheryNavigation;
+                if (item.IsDelete)
                 {
-
-                    if (infor.ToPeriphery == item.PeripheryId)
-                    {
-                        //查看是否为删除操作
-                        if (item.IsDelete == true)
-                        {
-                            relevances.Remove(infor);
-                            isAdd = true;
-                            break;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
+                    foreach (var relation in outgoing.Where(s => s.ToPeriphery == item.PeripheryId).ToList())
+                        outgoing.Remove(relation);
+                    foreach (var relation in incoming.Where(s => s.FromPeriphery == item.PeripheryId).ToList())
+                        incoming.Remove(relation);
+                    continue;
                 }
-                if (isAdd == false && item.IsDelete == false)
+
+                var related = outgoing.FirstOrDefault(s => s.ToPeriphery == item.PeripheryId)?.ToPeripheryNavigation
+                    ?? await _peripheryRepository.FirstOrDefaultAsync(s => s.Id == item.PeripheryId);
+                if (related is null) continue;
+                if (!outgoing.Any(s => s.ToPeriphery == item.PeripheryId))
                 {
-                    //查找周边
-                    var peripheryNew = await _peripheryRepository.FirstOrDefaultAsync(s => s.Id == item.PeripheryId);
-                    if (peripheryNew != null)
+                    outgoing.Add(new PeripheryRelation
                     {
-                        relevances.Add(new PeripheryRelation
-                        {
-                            FromPeriphery = periphery.Id,
-                            FromPeripheryNavigation = periphery,
-                            ToPeriphery = peripheryNew.Id,
-                            ToPeripheryNavigation = peripheryNew
-                        });
-                    }
+                        FromPeriphery = periphery.Id,
+                        FromPeripheryNavigation = periphery,
+                        ToPeriphery = related.Id,
+                        ToPeripheryNavigation = related
+                    });
                 }
-            }
-            periphery.PeripheryRelationFromPeripheryNavigation = relevances;
-
-
-            //序列化相关性列表 To
-            //先读取周边信息
-            relevances = periphery.PeripheryRelationToPeripheryNavigation;
-
-            foreach (var item in examine.Relevances)
-            {
-                var isAdd = false;
-
-                //遍历信息列表寻找关键词
-                foreach (var infor in relevances)
+                if (!incoming.Any(s => s.FromPeriphery == item.PeripheryId))
                 {
-
-                    if (infor.FromPeriphery == item.PeripheryId)
+                    incoming.Add(new PeripheryRelation
                     {
-                        //查看是否为删除操作
-                        if (item.IsDelete == true)
-                        {
-                            relevances.Remove(infor);
-                            isAdd = true;
-                            break;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                }
-                if (isAdd == false && item.IsDelete == false)
-                {
-                    //查找周边
-                    var peripheryNew = periphery.PeripheryRelationFromPeripheryNavigation.FirstOrDefault(s => s.ToPeriphery == item.PeripheryId).ToPeripheryNavigation;
-                    if (peripheryNew != null)
-                    {
-                        relevances.Add(new PeripheryRelation
-                        {
-                            ToPeriphery = periphery.Id,
-                            ToPeripheryNavigation = periphery,
-                            FromPeriphery = peripheryNew.Id,
-                            FromPeripheryNavigation = peripheryNew
-                        });
-                    }
+                        ToPeriphery = periphery.Id,
+                        ToPeripheryNavigation = periphery,
+                        FromPeriphery = related.Id,
+                        FromPeripheryNavigation = related
+                    });
                 }
             }
-            periphery.PeripheryRelationToPeripheryNavigation = relevances;
 
             //更新最后编辑时间
             periphery.LastEditTime = DateTime.Now.ToCstTime();

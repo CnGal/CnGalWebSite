@@ -11,11 +11,20 @@ public static class RecordTextDiff
     private const int MaxLcsCells = 1_500_000;
 
     public static IReadOnlyList<RecordTextSegment> BuildSide(string? before, string? after, bool beforeSide)
+        => SplitSide(Build(before, after), beforeSide);
+
+    /// <summary>按纯文本生成完整差异；源码视图保留原始换行，不解释 HTML 标签或实体。</summary>
+    public static IReadOnlyList<RecordTextSegment> Build(string? before, string? after, bool normalizeLineEndings = true)
     {
-        before = Normalize(before ?? string.Empty);
-        after = Normalize(after ?? string.Empty);
+        before ??= string.Empty;
+        after ??= string.Empty;
+        if (normalizeLineEndings)
+        {
+            before = Normalize(before);
+            after = Normalize(after);
+        }
         if (string.Equals(before, after, StringComparison.Ordinal))
-            return SplitSide([new(before, RecordTextChangeKind.Unchanged)], beforeSide);
+            return Coalesce([new(before, RecordTextChangeKind.Unchanged)]);
 
         var beforeTokens = Tokenize(before);
         var afterTokens = Tokenize(after);
@@ -41,7 +50,7 @@ public static class RecordTextDiff
         for (var i = suffix; i > 0; i--)
             Append(all, beforeTokens[beforeTokens.Count - i], RecordTextChangeKind.Unchanged);
 
-        return SplitSide(all, beforeSide);
+        return Coalesce(all);
     }
 
     private static IReadOnlyList<RecordTextSegment> SplitSide(IEnumerable<RecordTextSegment> segments, bool beforeSide) =>

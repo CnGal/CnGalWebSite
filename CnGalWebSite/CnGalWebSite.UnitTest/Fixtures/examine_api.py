@@ -61,6 +61,12 @@ def empty_model():
 
 
 def record(record_id):
+    raw_after = ("补充游戏简介与关联资料，更新主视觉。\n"
+                 "补充后的介绍 未修改的内容\n"
+                 "# Markdown 标题 **加粗** [链接](https://example.com/)\n"
+                 f"<img src='{MEDIA}?raw-source'><iframe src='{MEDIA}?raw-frame'></iframe><br>\n"
+                 "<del>作者原有删除线</del><ins class='diffmod'>作者原有下划线</ins> &amp;\n"
+                 "![主视觉](https://example.com/" + "long-source-path/" * 20 + "image.png)")
     result = {
         "id": record_id,
         "objectId": 42,
@@ -76,6 +82,8 @@ def record(record_id):
         "isPassed": None if record_id >= 100 else True,
         "beforeModel": legacy_content(),
         "afterModel": legacy_content(True),
+        "rawContent": raw_after,
+        "rawBeforeContent": raw_after.replace("补充后的介绍", "原有介绍"),
         "editOverview": ("补充游戏简介与关联资料，更新主视觉。<br>"
                          "<del>原有介绍</del> <ins>补充后的介绍</ins> 未修改的内容<br>"
                          "# Markdown 标题 **加粗** [链接](https://example.com/)<br>"

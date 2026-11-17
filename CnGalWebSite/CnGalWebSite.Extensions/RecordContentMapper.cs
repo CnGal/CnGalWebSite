@@ -48,7 +48,11 @@ public static class RecordContentMapper
                 ("游戏平台", string.Join("、", (release.GamePlatformTypes ?? []).Select(p => p.GetDisplayName())))]);
             Link(result, release.Name ?? "发行链接", release.GetLink());
         }
-        if (value.Booking is { } booking)
+        if (value.BookingHistory is { } configuration)
+            Group(result, "预约", new (string, object?)[] { ("开放预约", configuration.Open),
+                ("上线后通知用户", configuration.IsNeedNotification), ("关联抽奖", configuration.LotteryId) }.Concat(
+                (configuration.Goals ?? []).Select(g => (g.Name, (object?)g.Target))));
+        else if (value.Booking is { } booking)
             Group(result, "预约", new[] { ("开放预约", (object?)booking.Open) }.Concat(
                 (booking.Goals ?? []).Select(g => (g.Name, (object?)g.Target))));
         if (value.WebsiteAddInfor is { } website)

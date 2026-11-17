@@ -45,7 +45,8 @@ public static class RecordRawDiff
                 foreach (var child in node.ChildNodes) Read(child, change);
                 return;
             }
-            if (node.Name is "ins" or "del")
+            if ((node.Name is "ins" or "del") && node.GetAttributeValue("class", "")
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries).Any(value => value is "diffins" or "diffdel" or "diffmod"))
             {
                 foreach (var child in node.ChildNodes)
                     Read(child, node.Name == "ins" ? RecordTextChangeKind.Added : RecordTextChangeKind.Removed);

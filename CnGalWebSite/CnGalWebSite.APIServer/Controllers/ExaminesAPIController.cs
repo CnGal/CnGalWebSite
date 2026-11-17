@@ -355,6 +355,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 case Operation.EditPeripheryRelatedPeripheries:
                     entry = await _peripheryRepository.GetAll()
                             .Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s => s.ToPeripheryNavigation)
+                            .Include(s => s.PeripheryRelationToPeripheryNavigation)
                             .FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
                     break;
                 case Operation.EditPlayedGameMain:

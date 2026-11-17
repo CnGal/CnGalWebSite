@@ -185,6 +185,20 @@ public sealed class RecordHistoryService(AppDbContext db, IEntryService entries,
         {
             var view = await entries.GetEntryIndexViewModelAsync(value, includeLiveData: false);
             view.AllInformation = value.Information?.ToList() ?? [];
+            if (value.Booking is { } booking)
+            {
+                view.BookingHistory = new BookingHistoryViewModel
+                {
+                    Open = booking.Open,
+                    IsNeedNotification = booking.IsNeedNotification,
+                    LotteryId = booking.LotteryId,
+                    Goals = booking.Goals.Select(goal => new BookingGoalViewModel
+                    {
+                        Name = goal.Name,
+                        Target = goal.Target
+                    }).ToList()
+                };
+            }
             return view;
         }
     }

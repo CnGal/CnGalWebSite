@@ -241,6 +241,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
         public async Task<bool> GetExamineView(ExamineViewModel model, Examine examine, bool includeHistory = true)
         {
             using var read = new RecordReadScope(_dbContext);
+            model.RawContent = null;
+            model.RawBeforeContent = null;
             var success = examine.Operation switch
             {
                 Operation.UserMainPage => GetUserMainPageExamineView(model, examine),
@@ -285,6 +287,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                     model.AfterModel = frame.After;
                     if (examine.Operation is Operation.EstablishMainPage or Operation.EditArticleMainPage or Operation.EditVideoMainPage)
                     {
+                        model.RawBeforeContent = frame.BeforeMainPage ?? "";
                         // 原始数据页签展示作者提交的 Markdown 差异，而不是渲染后 HTML 的差异。
                         model.EditOverview = new HtmlDiff.HtmlDiff(frame.BeforeMainPage ?? "", frame.AfterMainPage ?? "")
                             .Build().Replace("\r\n", "<br>");
@@ -293,6 +296,8 @@ namespace CnGalWebSite.APIServer.Application.Examines
             }
             if (success)
             {
+                // 源码独立传输，前端只能按文本显示；EditOverview 保留旧客户端所需的安全 HTML。
+                model.RawContent = examine.Context ?? "";
                 model.EditOverview = HtmlSanitizerHelper.Sanitize(model.EditOverview);
                 if (model.BeforeModel != null)
                     model.BeforeModel.MainPage = HtmlSanitizerHelper.Sanitize(model.BeforeModel.MainPage);
@@ -1293,6 +1298,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
                 model.IsThumbnail = true;
             }
             var mainpage = entry.MainPage;
+            if (examine.IsPassed != true) model.RawBeforeContent = mainpage ?? "";
 
             await _entryService.UpdateEntryDataAsync(entry, examine);
 
@@ -1787,6 +1793,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
 
             var mainpage = article.MainPage;
+            if (examine.IsPassed != true) model.RawBeforeContent = mainpage ?? "";
 
             await _articleService.UpdateArticleData(article, examine);
 
@@ -2373,6 +2380,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
         public bool GetUserMainPageExamineView(ExamineViewModel model, Examine examine)
         {
+            if (examine.IsPassed != true) model.RawBeforeContent = examine.ApplicationUser.MainPageContext ?? "";
             model.Type = ExaminedNormalListModelType.User;
             //model.ObjectId = examine.ApplicationUser.Id;
             model.ObjectName = examine.ApplicationUser.UserName;
@@ -2849,7 +2857,10 @@ namespace CnGalWebSite.APIServer.Application.Examines
         public async Task<bool> GetEditPeripheryRelatedPeripheriesExamineView(ExamineViewModel model, Examine examine)
         {
             model.Type = ExaminedNormalListModelType.Periphery;
-            var periphery = await _peripheryRepository.GetAll().Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s => s.ToPeripheryNavigation).ThenInclude(s => s.PeripheryRelationFromPeripheryNavigation).FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
+            var periphery = await _peripheryRepository.GetAll()
+                .Include(s => s.PeripheryRelationFromPeripheryNavigation).ThenInclude(s => s.ToPeripheryNavigation)
+                .Include(s => s.PeripheryRelationToPeripheryNavigation)
+                .FirstOrDefaultAsync(s => s.Id == examine.PeripheryId);
             if (periphery == null)
             {
                 return false;
@@ -3137,6 +3148,7 @@ namespace CnGalWebSite.APIServer.Application.Examines
 
 
             var viewBefore = item.MainPage;
+            if (examine.IsPassed != true) model.RawBeforeContent = viewBefore ?? "";
 
             await _videoService.UpdateData(item, examine);
 

@@ -492,7 +492,7 @@ public class RecordPersistenceRegressionTests
     }
 }
 
-internal sealed class RealRecordServices(AppDbContext db)
+internal sealed class RealRecordServices(AppDbContext db, IReadOnlyDictionary<Type, object>? overrides = null)
 {
     private readonly Dictionary<Type, object> instances = new();
     public T Get<T>() => (T)Create(typeof(T));
@@ -505,6 +505,7 @@ internal sealed class RealRecordServices(AppDbContext db)
     }
     private object? Resolve(Type type)
     {
+        if (overrides is not null && overrides.TryGetValue(type, out var replacement)) return replacement;
         if (type == typeof(AppDbContext)) return db;
         if (type == typeof(IAppHelper)) return DispatchProxy.Create<IAppHelper, RecordPresentationProxy>();
         if (type == typeof(IStoreInfoService)) return DispatchProxy.Create<IStoreInfoService, NoStoreLookupProxy>();
@@ -514,6 +515,7 @@ internal sealed class RealRecordServices(AppDbContext db)
         if (type == typeof(IPeripheryService)) return Get<PeripheryService>();
         if (type == typeof(IVideoService)) return Get<VideoService>();
         if (type == typeof(IExamineService)) return Get<ExamineService>();
+        if (type == typeof(IEditRecordService)) return Get<EditRecordService>();
         if (type == typeof(RecordHistoryService)) return Get<RecordHistoryService>();
         if (type == typeof(EditRecordUnitOfWork)) return Get<EditRecordUnitOfWork>();
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IRepository<,>))
