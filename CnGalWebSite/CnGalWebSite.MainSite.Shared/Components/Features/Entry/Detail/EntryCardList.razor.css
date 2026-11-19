@@ -16,6 +16,14 @@
     gap: 0.75rem;
 }
 
+.entry-card-list-toggle {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+}
+
 .entry-card-list-action {
     display: flex;
     justify-content: center;
@@ -43,6 +51,11 @@
     color: var(--cg-color-primary);
     border-color: var(--cg-color-primary);
     background-color: color-mix(in oklab, var(--cg-color-primary) 5%, transparent);
+}
+
+.entry-card-list-toggle:focus-visible + .entry-card-list-action .entry-card-list-btn {
+    outline: 2px solid var(--cg-color-primary);
+    outline-offset: 2px;
 }
 
 .entry-card-list-toggle:not(:checked) ~ .entry-card-list-action .hide-text {
@@ -77,14 +90,16 @@
 }
 
 /* 隐藏状态 */
-.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-4 ::deep li:nth-child(n+5),
-.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-6 ::deep li:nth-child(n+7),
-.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-8 ::deep li:nth-child(n+9),
-.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-9 ::deep li:nth-child(n+10),
-.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-10 ::deep li:nth-child(n+11),
-.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-12 ::deep li:nth-child(n+13),
-.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-16 ::deep li:nth-child(n+17),
-.entry-card-list-toggle:not(:checked) ~ .entry-card-list.limit-20 ::deep li:nth-child(n+21) {
+.entry-card-list:has(+ .entry-card-list-toggle:not(:checked)) ::deep :is(
+    .limit-4 > li:nth-child(n+5),
+    .limit-6 > li:nth-child(n+7),
+    .limit-8 > li:nth-child(n+9),
+    .limit-9 > li:nth-child(n+10),
+    .limit-10 > li:nth-child(n+11),
+    .limit-12 > li:nth-child(n+13),
+    .limit-16 > li:nth-child(n+17),
+    .limit-20 > li:nth-child(n+21)
+) {
     display: none !important;
     grid-template-rows: 0fr;
     opacity: 0;
@@ -93,14 +108,16 @@
 
 /* 展开时的入场动画起始状态 */
 @starting-style {
-    .entry-card-list-toggle:checked ~ .entry-card-list.limit-4 ::deep li:nth-child(n+5),
-    .entry-card-list-toggle:checked ~ .entry-card-list.limit-6 ::deep li:nth-child(n+7),
-    .entry-card-list-toggle:checked ~ .entry-card-list.limit-8 ::deep li:nth-child(n+9),
-    .entry-card-list-toggle:checked ~ .entry-card-list.limit-9 ::deep li:nth-child(n+10),
-    .entry-card-list-toggle:checked ~ .entry-card-list.limit-10 ::deep li:nth-child(n+11),
-    .entry-card-list-toggle:checked ~ .entry-card-list.limit-12 ::deep li:nth-child(n+13),
-    .entry-card-list-toggle:checked ~ .entry-card-list.limit-16 ::deep li:nth-child(n+17),
-    .entry-card-list-toggle:checked ~ .entry-card-list.limit-20 ::deep li:nth-child(n+21) {
+    .entry-card-list:has(+ .entry-card-list-toggle:checked) ::deep :is(
+        .limit-4 > li:nth-child(n+5),
+        .limit-6 > li:nth-child(n+7),
+        .limit-8 > li:nth-child(n+9),
+        .limit-9 > li:nth-child(n+10),
+        .limit-10 > li:nth-child(n+11),
+        .limit-12 > li:nth-child(n+13),
+        .limit-16 > li:nth-child(n+17),
+        .limit-20 > li:nth-child(n+21)
+    ) {
         grid-template-rows: 0fr;
         opacity: 0;
         transform: translateY(-10px);
