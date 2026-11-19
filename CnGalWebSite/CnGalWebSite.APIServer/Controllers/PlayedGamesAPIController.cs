@@ -15,6 +15,7 @@ using CnGalWebSite.DataModel.ExamineModel.PlayedGames;
 using CnGalWebSite.DataModel.Helper;
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.PlayedGames;
+using CnGalWebSite.DataModel.ViewModel.Space;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -458,10 +459,12 @@ namespace CnGalWebSite.APIServer.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<PlayedGameOverviewModel>> GetPlayedGameOverview(int id)
         {
+            var cancellationToken = HttpContext.RequestAborted;
             var entry = await _entryRepository.GetAll().AsNoTracking()
-                .Include(s => s.PlayedGames).ThenInclude(s => s.ApplicationUser)
+                .Include(s => s.PlayedGames.Where(score => score.ShowPublicly && score.ApplicationUserId != null))
+                .ThenInclude(s => s.ApplicationUser)
                 .Include(s => s.Tags)
-                .FirstOrDefaultAsync(s => s.Id == id);
+                .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
 
             if (entry == null)
             {
@@ -472,38 +475,25 @@ namespace CnGalWebSite.APIServer.Controllers
                 return NotFound("只有游戏才有评分");
             }
 
+            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
+            var userScore = user == null ? null : await _playedGameRepository.GetAll().AsNoTracking()
+                .FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id && s.EntryId == entry.Id, cancellationToken);
+
+            var scoreUsers = entry.PlayedGames.Select(score => score.ApplicationUser);
+            if (userScore != null)
+            {
+                scoreUsers = scoreUsers.Append(user);
+            }
+
+            var userSummaries = await _userService.GetUserSummariesAsync(scoreUsers, cancellationToken);
             var model = new PlayedGameOverviewModel
             {
                 Game = _appHelper.GetEntryInforTipViewModel(entry),
-                UserScores = entry.PlayedGames.Where(s => s.ShowPublicly).Select(s => new PlayedGameUserScoreModel
-                {
-                    Socres = new PlayedGameScoreModel
-                    {
-                        ScriptSocre = s.ScriptSocre,
-                        ShowSocre = s.ShowSocre,
-                        MusicSocre = s.MusicSocre,
-                        PaintSocre = s.PaintSocre,
-                        TotalSocre = s.TotalSocre,
-                        SystemSocre = s.SystemSocre,
-                        CVSocre = s.CVSocre,
-
-                    },
-                    LastEditTime = s.LastEditTime,
-                    PlayImpressions = s.PlayImpressions,
-                    User = _userService.GetUserInforViewModel(s.ApplicationUser, true).Result
-                }).ToList(),
+                IsDubbing = entry.Tags?.Any(tag => tag.Name == "无配音") != true,
+                UserScores = entry.PlayedGames
+                    .Select(score => CreateOverviewUserScore(score, userSummaries[score.ApplicationUserId]))
+                    .ToList(),
             };
-            //判断是否有配音
-            if (entry.Tags != null && entry.Tags.Any(s => s.Name == "无配音"))
-            {
-                model.IsDubbing = false;
-
-            }
-            else
-            {
-                model.IsDubbing = true;
-            }
-
 
             var gameScores = await _playedGameService.GetGameScores(entry.Id);
             if (gameScores != null)
@@ -525,21 +515,11 @@ namespace CnGalWebSite.APIServer.Controllers
                 model.GameReviewsScores.CVSocre = gameScores.FilterCVSocre;
             }
 
-            var user = await _appHelper.GetAPICurrentUserAsync(HttpContext);
-
-            if (user == null)
-            {
-                return model;
-            }
-
-            var userScore = await _playedGameRepository.GetAll().FirstOrDefaultAsync(s => s.ApplicationUserId == user.Id && s.EntryId == entry.Id);
             if (userScore != null)
             {
-                //获取审核记录
-                var examines = await _examineRepository.GetAll().Include(s => s.PlayedGame).Where(s => s.PlayedGameId == userScore.Id && s.ApplicationUserId == user.Id
-                  && (s.Operation == Operation.EditPlayedGameMain) && s.IsPassed == null).ToListAsync();
-
-                var examine = examines.FirstOrDefault(s => s.Operation == Operation.EditPlayedGameMain);
+                var examine = await _examineRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(
+                    s => s.PlayedGameId == userScore.Id && s.ApplicationUserId == user.Id &&
+                         s.Operation == Operation.EditPlayedGameMain && s.IsPassed == null, cancellationToken);
                 if (examine != null)
                 {
                     _playedGameService.UpdatePlayedGameData(userScore, examine);
@@ -548,23 +528,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 var current = model.UserScores.FirstOrDefault(s => s.User.Id == user.Id);
                 if (current == null)
                 {
-                    current = new PlayedGameUserScoreModel
-                    {
-                        Socres = new PlayedGameScoreModel
-                        {
-                            ScriptSocre = userScore.ScriptSocre,
-                            ShowSocre = userScore.ShowSocre,
-                            MusicSocre = userScore.MusicSocre,
-                            PaintSocre = userScore.PaintSocre,
-                            TotalSocre = userScore.TotalSocre,
-                            SystemSocre = userScore.SystemSocre,
-                            CVSocre = userScore.CVSocre,
-
-                        },
-                        LastEditTime = userScore.LastEditTime,
-                        PlayImpressions = userScore.PlayImpressions,
-                        User = await _userService.GetUserInforViewModel(user, true)
-                    };
+                    current = CreateOverviewUserScore(userScore, userSummaries[user.Id]);
                     model.UserScores.Add(current);
                 }
 
@@ -579,6 +543,24 @@ namespace CnGalWebSite.APIServer.Controllers
 
             return model;
         }
+
+        private static PlayedGameUserScoreModel CreateOverviewUserScore(PlayedGame score, UserInforViewModel user) =>
+            new PlayedGameUserScoreModel
+            {
+                Socres = new PlayedGameScoreModel
+                {
+                    ScriptSocre = score.ScriptSocre,
+                    ShowSocre = score.ShowSocre,
+                    MusicSocre = score.MusicSocre,
+                    PaintSocre = score.PaintSocre,
+                    TotalSocre = score.TotalSocre,
+                    SystemSocre = score.SystemSocre,
+                    CVSocre = score.CVSocre,
+                },
+                LastEditTime = score.LastEditTime,
+                PlayImpressions = score.PlayImpressions,
+                User = user,
+            };
 
         [AllowAnonymous]
         [HttpGet]

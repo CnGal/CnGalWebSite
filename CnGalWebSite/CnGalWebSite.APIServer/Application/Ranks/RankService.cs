@@ -8,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.Ranks
@@ -177,24 +178,29 @@ namespace CnGalWebSite.APIServer.Application.Ranks
                 ranks = await _rankUserRepository.GetAll().Include(s => s.Rank).Where(s => s.ApplicationUserId == userId && s.IsHidden == false && s.Rank.IsHidden == false).Select(s => s.Rank).OrderByDescending(s => s.Priority).AsNoTracking().ToListAsync();
             }
 
-            var model = new List<RankViewModel>();
-
-            foreach (var item in ranks)
-            {
-                var temp = new RankViewModel
-                {
-                    Styles = item.Styles,
-                    CSS = item.CSS,
-                    Name = item.Name,
-                    Text = item.Text,
-                    Image=item.Image,
-                    Type = item.Type,
-                };
-                model.Add(temp);
-            }
-
-            return model;
+            return ranks.Select(ToRankViewModel).ToList();
         }
+
+        public async Task<ILookup<string, RankViewModel>> GetVisibleUserRanksAsync(string[] userIds, CancellationToken cancellationToken)
+        {
+            var ranks = await _rankUserRepository.GetAll().AsNoTracking()
+                .Where(item => userIds.Contains(item.ApplicationUserId) && !item.IsHidden && !item.Rank.IsHidden)
+                .OrderByDescending(item => item.Rank.Priority)
+                .Select(item => new { item.ApplicationUserId, item.Rank })
+                .ToListAsync(cancellationToken);
+
+            return ranks.ToLookup(item => item.ApplicationUserId, item => ToRankViewModel(item.Rank));
+        }
+
+        private static RankViewModel ToRankViewModel(Rank rank) => new RankViewModel
+        {
+            Styles = rank.Styles,
+            CSS = rank.CSS,
+            Name = rank.Name,
+            Text = rank.Text,
+            Image = rank.Image,
+            Type = rank.Type,
+        };
 
         public async Task<List<UserEditRankIsShow>> GetUserRankListForEdit(ApplicationUser user)
         {

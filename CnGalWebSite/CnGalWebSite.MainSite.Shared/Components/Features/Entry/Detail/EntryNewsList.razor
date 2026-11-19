@@ -7,8 +7,12 @@
         {
             var item = News[index];
             <li class="@(index == PreviewCount - 1 ? "entry-news-list-preview-end" : null)">
-                <a href="@(GetNewsLink?.Invoke(item) ?? "")" target="@GetTarget?.Invoke(item.Link)" rel="noopener noreferrer">@item.Title</a>
-                <span>@item.HappenedTime.ToString("yyyy-MM-dd")</span>
+                <div class="entry-news-row-clip">
+                    <div class="entry-news-row">
+                        <a href="@(GetNewsLink?.Invoke(item) ?? "")" target="@GetTarget?.Invoke(item.Link)" rel="noopener noreferrer">@item.Title</a>
+                        <span>@item.HappenedTime.ToString("yyyy-MM-dd")</span>
+                    </div>
+                </div>
             </li>
         }
     </EntryCardList>

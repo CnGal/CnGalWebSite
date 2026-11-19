@@ -80,7 +80,7 @@
 .entry-card-list ::deep li {
     display: grid;
     grid-template-rows: 1fr;
-    transition: opacity 0.3s ease-out, transform 0.3s ease-out, grid-template-rows 0.3s ease-out, display 0.3s allow-discrete;
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out, grid-template-rows 0.3s ease-out, visibility 0.3s, display 0.3s allow-discrete;
     opacity: 1;
     transform: translateY(0);
 }
@@ -100,7 +100,8 @@
     .limit-16 > li:nth-child(n+17),
     .limit-20 > li:nth-child(n+21)
 ) {
-    display: none !important;
+    display: var(--entry-card-list-collapsed-display, none);
+    visibility: hidden;
     grid-template-rows: 0fr;
     opacity: 0;
     transform: translateY(-10px);
@@ -142,5 +143,12 @@
 
     .entry-card-list-action {
         margin-top: 0.5rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .entry-card-list ::deep li,
+    .entry-card-list-btn ::deep .icon-arrow {
+        transition: none;
     }
 }

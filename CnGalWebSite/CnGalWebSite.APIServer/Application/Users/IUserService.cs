@@ -7,6 +7,7 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Others;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.Users
@@ -27,6 +28,8 @@ namespace CnGalWebSite.APIServer.Application.Users
         Task AddUserIntegral(AddUserIntegralModel model);
 
         Task<UserInforViewModel> GetUserInforViewModel(ApplicationUser user, bool ignoreAddinfor = false);
+
+        Task<Dictionary<string, UserInforViewModel>> GetUserSummariesAsync(IEnumerable<ApplicationUser> users, CancellationToken cancellationToken);
 
         Task<string> GenerateBindGroupQQCode(ApplicationUser user);
 

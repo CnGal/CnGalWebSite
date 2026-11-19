@@ -24,6 +24,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.Users
@@ -218,18 +219,8 @@ namespace CnGalWebSite.APIServer.Application.Users
 
         public async Task<UserInforViewModel> GetUserInforViewModel(ApplicationUser user, bool ignoreAddinfor = false)
         {
-            var model = new UserInforViewModel
-            {
-                Id = user.Id,
-                PersonalSignature = user.PersonalSignature,
-                Name = user.UserName,
-                SBgImage = user.SBgImage,
-                MBgImage = user.MBgImage,
-                GCoins = user.GCoins,
-                PhotoPath = _appHelper.GetImagePath(user.PhotoPath, "user.png"),
-                BackgroundImage = _appHelper.GetImagePath(user.BackgroundImage, "userbackground.jpg"),
-                Ranks = await _rankService.GetUserRanks(user),
-            };
+            var model = CreateUserSummary(user);
+            model.Ranks = await _rankService.GetUserRanks(user);
 
             if (ignoreAddinfor)
             {
@@ -274,6 +265,36 @@ namespace CnGalWebSite.APIServer.Application.Users
             return model;
 
         }
+
+        public async Task<Dictionary<string, UserInforViewModel>> GetUserSummariesAsync(
+            IEnumerable<ApplicationUser> users, CancellationToken cancellationToken)
+        {
+            var summaries = users.DistinctBy(user => user.Id).ToDictionary(user => user.Id, CreateUserSummary);
+            if (summaries.Count == 0)
+            {
+                return summaries;
+            }
+
+            var ranks = await _rankService.GetVisibleUserRanksAsync(summaries.Keys.ToArray(), cancellationToken);
+            foreach (var summary in summaries.Values)
+            {
+                summary.Ranks = ranks[summary.Id].ToList();
+            }
+
+            return summaries;
+        }
+
+        private UserInforViewModel CreateUserSummary(ApplicationUser user) => new UserInforViewModel
+        {
+            Id = user.Id,
+            PersonalSignature = user.PersonalSignature,
+            Name = user.UserName,
+            SBgImage = user.SBgImage,
+            MBgImage = user.MBgImage,
+            GCoins = user.GCoins,
+            PhotoPath = _appHelper.GetImagePath(user.PhotoPath, "user.png"),
+            BackgroundImage = _appHelper.GetImagePath(user.BackgroundImage, "userbackground.jpg"),
+        };
 
         public (bool IsSignIn, int SignInDays) GetUserSignInDays(ApplicationUser user)
         {

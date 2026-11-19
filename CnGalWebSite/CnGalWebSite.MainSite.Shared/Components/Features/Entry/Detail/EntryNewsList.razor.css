@@ -2,12 +2,18 @@
    EntryNewsList — mobile-first
    ═══════════════════════════════════════════════ */
 .entry-news ::deep .entry-news-list {
+    /* 保留额外行的网格轨道，让收起和展开都能过渡行高。 */
+    --entry-card-list-collapsed-display: grid;
     display: flex;
     flex-direction: column;
     gap: 0;
 }
 
-.entry-news ::deep .entry-news-list > li {
+.entry-news-row-clip {
+    overflow: hidden;
+}
+
+.entry-news-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -17,13 +23,17 @@
     min-height: 40px;
 }
 
-.entry-news ::deep .entry-news-list > li:last-child,
-.entry-news ::deep .entry-news-list:has(+ .entry-card-list-toggle:not(:checked)) > .entry-news-list-preview-end {
+.entry-news-list-preview-end .entry-news-row {
+    transition: padding-bottom 0.3s ease-out, border-bottom-width 0.3s ease-out;
+}
+
+.entry-news-list > li:last-child .entry-news-row,
+.entry-news-list:has(+ .entry-card-list-toggle:not(:checked)) > .entry-news-list-preview-end .entry-news-row {
     border-bottom: 0;
     padding-bottom: 0;
 }
 
-.entry-news ::deep .entry-news-list a {
+.entry-news-row a {
     color: var(--cg-color-text);
     text-decoration: none;
     font-weight: 600;
@@ -35,11 +45,11 @@
     white-space: nowrap;
 }
 
-.entry-news ::deep .entry-news-list a:hover {
+.entry-news-row a:hover {
     color: var(--cg-color-primary);
 }
 
-.entry-news ::deep .entry-news-list span {
+.entry-news-row span {
     color: var(--cg-color-text-muted);
     font-size: 0.7rem;
     white-space: nowrap;
@@ -48,16 +58,22 @@
 
 /* ── Tablet (≥ 768px) ── */
 @media (min-width: 768px) {
-    .entry-news ::deep .entry-news-list > li {
+    .entry-news-row {
         gap: 1rem;
         padding: 0.75rem 0;
     }
 
-    .entry-news ::deep .entry-news-list a {
+    .entry-news-row a {
         font-size: 0.9rem;
     }
 
-    .entry-news ::deep .entry-news-list span {
+    .entry-news-row span {
         font-size: 0.8rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .entry-news-list-preview-end .entry-news-row {
+        transition: none;
     }
 }

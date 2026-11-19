@@ -3,6 +3,8 @@ using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Space;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CnGalWebSite.APIServer.Application.Ranks
@@ -12,6 +14,8 @@ namespace CnGalWebSite.APIServer.Application.Ranks
         Task UpdateUserRanks(ApplicationUser user);
 
         Task<List<RankViewModel>> GetUserRanks(ApplicationUser user);
+
+        Task<ILookup<string, RankViewModel>> GetVisibleUserRanksAsync(string[] userIds, CancellationToken cancellationToken);
 
         Task<List<UserEditRankIsShow>> GetUserRankListForEdit(ApplicationUser user);
 
