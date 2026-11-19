@@ -74,7 +74,7 @@ else if (Model is not null)
 
                 <div class="entry-cell entry-cell--news">
                     <EntryCard Title="动态时间线" Icon="mdiTimelineTextOutline" Show="Model.NewsOfEntry.Count > 0">
-                        <EntryNewsList News="Model.NewsOfEntry" MaxCount="10" GetNewsLink="GetNewsLink" GetTarget="ExternalLinkHelper.GetTarget" />
+                        <EntryNewsList News="Model.NewsOfEntry" GetNewsLink="GetNewsLink" GetTarget="ExternalLinkHelper.GetTarget" />
                     </EntryCard>
                 </div>
 

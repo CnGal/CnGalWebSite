@@ -1,19 +1,23 @@
 ﻿@using CnGalWebSite.DataModel.Model
 @using CnGalWebSite.DataModel.ViewModel
 
-<ul class="entry-news-list">
-    @foreach (var item in News.Take(MaxCount))
-    {
-        <li>
-            <a href="@(GetNewsLink?.Invoke(item) ?? "")" target="@GetTarget?.Invoke(item.Link)" rel="noopener noreferrer">@item.Title</a>
-            <span>@item.HappenedTime.ToString("yyyy-MM-dd")</span>
-        </li>
-    }
-</ul>
+<div class="entry-news">
+    <EntryCardList LimitCount="PreviewCount" ShowExpandButton="News.Count > PreviewCount" ListClass="entry-news-list">
+        @for (var index = 0; index < News.Count; index++)
+        {
+            var item = News[index];
+            <li class="@(index == PreviewCount - 1 ? "entry-news-list-preview-end" : null)">
+                <a href="@(GetNewsLink?.Invoke(item) ?? "")" target="@GetTarget?.Invoke(item.Link)" rel="noopener noreferrer">@item.Title</a>
+                <span>@item.HappenedTime.ToString("yyyy-MM-dd")</span>
+            </li>
+        }
+    </EntryCardList>
+</div>
 
 @code {
+    private const int PreviewCount = 10;
+
     [Parameter] public IReadOnlyList<NewsModel> News { get; set; } = [];
-    [Parameter] public int MaxCount { get; set; } = 10;
     // 渲染辅助函数，非事件回调
     [Parameter] public Func<NewsModel, string>? GetNewsLink { get; set; } = _ => "";
     // 渲染辅助函数，非事件回调

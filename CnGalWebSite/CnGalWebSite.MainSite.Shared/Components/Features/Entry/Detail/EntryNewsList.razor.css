@@ -1,16 +1,13 @@
 /* ═══════════════════════════════════════════════
    EntryNewsList — mobile-first
    ═══════════════════════════════════════════════ */
-.entry-news-list {
+.entry-news ::deep .entry-news-list {
     display: flex;
     flex-direction: column;
     gap: 0;
-    list-style: none;
-    margin: 0;
-    padding: 0;
 }
 
-.entry-news-list li {
+.entry-news ::deep .entry-news-list > li {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -20,12 +17,13 @@
     min-height: 40px;
 }
 
-.entry-news-list li:last-child {
+.entry-news ::deep .entry-news-list > li:last-child,
+.entry-news ::deep .entry-news-list:has(+ .entry-card-list-toggle:not(:checked)) > .entry-news-list-preview-end {
     border-bottom: 0;
     padding-bottom: 0;
 }
 
-.entry-news-list a {
+.entry-news ::deep .entry-news-list a {
     color: var(--cg-color-text);
     text-decoration: none;
     font-weight: 600;
@@ -37,11 +35,11 @@
     white-space: nowrap;
 }
 
-.entry-news-list a:hover {
+.entry-news ::deep .entry-news-list a:hover {
     color: var(--cg-color-primary);
 }
 
-.entry-news-list span {
+.entry-news ::deep .entry-news-list span {
     color: var(--cg-color-text-muted);
     font-size: 0.7rem;
     white-space: nowrap;
@@ -50,16 +48,16 @@
 
 /* ── Tablet (≥ 768px) ── */
 @media (min-width: 768px) {
-    .entry-news-list li {
+    .entry-news ::deep .entry-news-list > li {
         gap: 1rem;
         padding: 0.75rem 0;
     }
 
-    .entry-news-list a {
+    .entry-news ::deep .entry-news-list a {
         font-size: 0.9rem;
     }
 
-    .entry-news-list span {
+    .entry-news ::deep .entry-news-list span {
         font-size: 0.8rem;
     }
 }
