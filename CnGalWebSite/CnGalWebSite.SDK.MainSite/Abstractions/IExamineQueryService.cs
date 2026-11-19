@@ -79,9 +79,9 @@ public interface IExamineQueryService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// 获取指定词条的编辑记录列表（已通过的审核记录）。
+    /// 获取词条详情卡片使用的最近编辑记录和可见总数。
     /// </summary>
-    Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetEntryEditRecordsAsync(
+    Task<SdkResult<EntryEditRecordPreview>> GetEntryEditRecordPreviewAsync(
         int entryId,
         CancellationToken cancellationToken = default);
 

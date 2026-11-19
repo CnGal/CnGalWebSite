@@ -73,22 +73,45 @@ export function install(blazor) {
         disconnectedCallback() { this.cgDispose?.(); this.cgDispose = null; }
     });
     const refresh = () => connected.forEach(element => element.refresh());
-    window.addEventListener('pagehide', () => connected.forEach(element => element.controller?.suspend?.()));
+    const statusLabel = document.querySelector('#cg-navigation-status .cg-navigation-status__label');
+    const blazorScript = document.querySelector('script[src*="/blazor.web"]')?.src;
+    let statusTimer;
+    const clearStatus = () => {
+        clearTimeout(statusTimer);
+        if (statusLabel) statusLabel.textContent = '';
+    };
+    window.addEventListener('pagehide', () => {
+        clearStatus();
+        connected.forEach(element => element.controller?.suspend?.());
+    });
     window.addEventListener('pageshow', event => {
-        if (event.persisted) connected.forEach(element => { element.controller?.resume?.(); element.refresh(); });
+        if (event.persisted) finishNavigation();
+    });
+    window.addEventListener('unhandledrejection', event => {
+        // A failed fetch can reject before Blazor sends enhancednavigationend.
+        if (navigating && blazorScript && event.reason instanceof TypeError
+            && event.reason.stack?.includes(blazorScript)) {
+            finishNavigation();
+        }
     });
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', refresh, { once: true });
     else refresh();
     blazor.addEventListener('enhancednavigationstart', () => {
+        clearStatus();
+        if (statusLabel) {
+            statusTimer = setTimeout(() => { statusLabel.textContent = '正在打开页面…'; }, 100);
+        }
         navigating = true;
         connected.forEach(element => element.controller?.suspend?.());
         document.dispatchEvent(new Event('cg-navigation-start'));
     });
     blazor.addEventListener('enhancedload', refresh);
-    blazor.addEventListener('enhancednavigationend', () => {
+    function finishNavigation() {
+        clearStatus();
         navigating = false;
         connected.forEach(element => { element.controller?.resume?.(); element.refresh(); });
-    });
+    }
+    blazor.addEventListener('enhancednavigationend', finishNavigation);
     document.addEventListener('click', event => {
         const retry = event.target.closest?.('[data-cg-module-retry]');
         retry?.closest('[data-cg-module-error]')?.refresh();

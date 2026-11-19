@@ -4,6 +4,7 @@ using CnGalWebSite.APIServer.Application.Entries;
 using CnGalWebSite.APIServer.Application.Examines;
 using CnGalWebSite.APIServer.Application.Helper;
 using CnGalWebSite.APIServer.Application.Perfections;
+using CnGalWebSite.APIServer.Application.Ranks;
 using CnGalWebSite.APIServer.Application.Users;
 using CnGalWebSite.APIServer.Application.Videos;
 using CnGalWebSite.APIServer.DataReositories;
@@ -18,6 +19,7 @@ using CnGalWebSite.DataModel.ViewModel.Admin;
 using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Ranks;
 using CnGalWebSite.DataModel.ViewModel.Search;
+using CnGalWebSite.Extensions;
 using CnGalWebSite.Helper.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -29,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Result = CnGalWebSite.DataModel.Model.Result;
 
@@ -1380,6 +1383,69 @@ namespace CnGalWebSite.APIServer.Controllers
                 result += (item.Key + "," + item.Value + "\n");
             }
             return result;
+        }
+
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<ActionResult<EntryEditRecordPreview>> GetEntryEditRecordPreview(
+            int id,
+            [FromServices] IRankService rankService,
+            [FromServices] IRepository<ApplicationUser, string> users,
+            CancellationToken cancellationToken)
+        {
+            var entries = _entryRepository.GetAll().AsNoTracking().Where(entry => entry.Id == id);
+            if (_userService.CheckCurrentUserRole("Editor") && HttpContext.User.Claims.GetUserId() is { Length: > 0 } userId)
+            {
+                var editor = users.GetAll().Where(user => user.Id == userId);
+                entries = entries.Where(entry => !entry.IsHidden || editor.Any());
+            }
+            else
+            {
+                entries = entries.Where(entry => !entry.IsHidden);
+            }
+
+            if (!await entries.AnyAsync(cancellationToken))
+            {
+                return NotFound("该词条不存在");
+            }
+
+            var records = _examineRepository.GetAll().AsNoTracking()
+                .Where(record => record.EntryId == id && record.IsPassed == true
+                    && record.ApplicationUser.UserName != "看板娘");
+            var totalCount = await records.CountAsync(cancellationToken);
+            if (totalCount == 0)
+            {
+                return new EntryEditRecordPreview(0, []);
+            }
+
+            var latest = await records.OrderByDescending(record => record.ApplyTime)
+                .ThenByDescending(record => record.Id)
+                .Take(EntryEditRecordPreview.PageSize)
+                .Select(record => new
+                {
+                    record.Id,
+                    record.ApplyTime,
+                    record.Operation,
+                    record.ApplicationUserId,
+                    record.ApplicationUser.UserName,
+                    record.ApplicationUser.PhotoPath,
+                })
+                .ToListAsync(cancellationToken);
+            if (latest.Count == 0)
+            {
+                return new EntryEditRecordPreview(0, []);
+            }
+
+            var ranks = await rankService.GetVisibleUserRanksAsync(
+                latest.Select(record => record.ApplicationUserId).Distinct().ToArray(), cancellationToken);
+
+            return new EntryEditRecordPreview(totalCount, latest.Select(record => new EntryEditRecordItem(
+                record.Id,
+                record.ApplyTime,
+                record.Operation,
+                record.UserName,
+                _appHelper.GetImagePath(record.PhotoPath, "user.png"),
+                ranks[record.ApplicationUserId].Where(rank => rank.Name != "编辑者").ToList())).ToList());
         }
 
         [HttpGet("{id}")]

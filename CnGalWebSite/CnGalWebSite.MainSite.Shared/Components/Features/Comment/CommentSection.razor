@@ -84,6 +84,9 @@
     [Parameter]
     public bool Desc { get; set; }
 
+    [Parameter]
+    public SdkResult<CommentListViewModel>? InitialResult { get; set; }
+
     private IReadOnlyList<CommentItemViewModel>? _items;
     private int _totalCount;
     private SdkResult<CommentListViewModel>? _initialResult;
@@ -93,25 +96,34 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        if (!CanComment)
-        {
-            _request?.Cancel(); _items = null; _initialResult = null; _totalCount = 0;
-            return;
-        }
-
-        await LoadDataAsync();
-    }
-
-    private async Task LoadDataAsync()
-    {
         _errorMessage = null;
         var version = ++_version;
         _request?.Cancel(); _request?.Dispose();
+        _request = null;
+        if (!CanComment)
+        {
+            _items = null; _initialResult = null; _totalCount = 0;
+            return;
+        }
+
+        if (InitialResult is { } initialResult)
+        {
+            ApplyResult(initialResult);
+            return;
+        }
+
         var request = _request = new CancellationTokenSource();
         try
         {
-        var result = await CommentQueryService.GetCommentsAsync(Type, ObjectId, request.Token);
-        if (request.IsCancellationRequested || version != _version) return;
+            var result = await CommentQueryService.GetCommentsAsync(Type, ObjectId, request.Token);
+            if (request.IsCancellationRequested || version != _version) return;
+            ApplyResult(result);
+        }
+        catch (OperationCanceledException) when (request.IsCancellationRequested) { }
+    }
+
+    private void ApplyResult(SdkResult<CommentListViewModel> result)
+    {
         _initialResult = result;
         if (result.Success && result.Data is not null)
         {
@@ -129,8 +141,6 @@
             _items = null;
             _totalCount = 0;
         }
-        }
-        catch (OperationCanceledException) when (request.IsCancellationRequested) { }
     }
     public void Dispose() { _version++; _request?.Cancel(); _request?.Dispose(); }
 }
