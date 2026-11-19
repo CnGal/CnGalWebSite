@@ -6,17 +6,16 @@
 
 @if (Records is not null && Records.Count > 0)
 {
-    var filteredRecords = Records.Where(r => r.UserInfor?.Name != "看板娘").ToList();
+    var filteredRecords = VisibleTotalCount.HasValue ? Records : Records.Where(r => r.UserInfor?.Name != "看板娘").ToList();
+    var totalCount = VisibleTotalCount ?? filteredRecords.Count;
 
     if (filteredRecords.Count > 0)
     {
+        var displayRecords = ShowAll ? filteredRecords : filteredRecords.Take(MaxCount).ToList();
         <section class="edit-record-list-card" aria-label="编辑记录">
             <h2><CgMdiIcon Name="mdiHistory" aria-hidden="true" />编辑记录</h2>
 
             <div class="edit-record-list-card__list @(Columns >= 2 ? "edit-record-list-card__list--two-col" : "")" role="list">
-                @{
-                    var displayRecords = ShowAll ? filteredRecords : filteredRecords.Take(MaxCount).ToList();
-                }
                 @foreach (var item in displayRecords)
                 {
                     <a class="edit-record-list-card__item"
@@ -53,11 +52,11 @@
                 }
             </div>
 
-            @if (!ShowAll && filteredRecords.Count > MaxCount)
+            @if (!ShowAll && totalCount > displayRecords.Count)
             {
                 <a class="edit-record-list-card__more"
                    href="@($"/home/editrecord?ContrastId={filteredRecords.First().Id}")">
-                    查看全部 @filteredRecords.Count 条编辑记录
+                    查看全部 @totalCount 条编辑记录
                     <CgMdiIcon Name="mdiArrowRight" aria-hidden="true" />
                 </a>
             }
@@ -71,6 +70,10 @@
     /// </summary>
     [Parameter]
     public IReadOnlyList<ExaminedNormalListModel>? Records { get; set; }
+
+    /// <summary>传入服务端筛选后的预览时，由服务端提供完整可见数量。</summary>
+    [Parameter]
+    public int? VisibleTotalCount { get; set; }
 
     /// <summary>
     /// 默认最多显示的记录数。

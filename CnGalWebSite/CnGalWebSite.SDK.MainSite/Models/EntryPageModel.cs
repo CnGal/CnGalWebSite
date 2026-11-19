@@ -1,6 +1,7 @@
-using CnGalWebSite.DataModel.ViewModel.Admin;
+using CnGalWebSite.DataModel.ViewModel.Entries;
 using CnGalWebSite.DataModel.ViewModel.Favorites;
 using CnGalWebSite.DataModel.ViewModel.Peripheries;
+using CnGalWebSite.SDK.MainSite.Models.Comments;
 
 namespace CnGalWebSite.SDK.MainSite.Models;
 
@@ -9,4 +10,5 @@ public sealed record EntryPageModel(
     SdkResult<PlayedGameOverviewViewModel>? Score,
     SdkResult<GameOverviewPeripheryListModel> Periphery,
     SdkResult<IReadOnlyList<FavoriteFolderOverviewModel>> Catalog,
-    SdkResult<IReadOnlyList<ExaminedNormalListModel>> EditRecords);
+    SdkResult<EntryEditRecordPreview> EditRecords,
+    SdkResult<CommentListViewModel> Comments);

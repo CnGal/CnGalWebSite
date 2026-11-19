@@ -1,3 +1,5 @@
+@using CnGalWebSite.MainSite.Shared.Components.DesignSystem
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 
@@ -47,6 +49,12 @@
 
 <body>
 <Routes/>
+<div id="cg-navigation-status" role="status" data-permanent>
+    <div class="cg-navigation-status__icon" aria-hidden="true">
+        <CgProgressRing Size="sm" StrokeWidth="4" />
+    </div>
+    <span class="cg-navigation-status__label"></span>
+</div>
 <script src="@Assets["_framework/blazor.web.js"]"></script>
 
 </body>

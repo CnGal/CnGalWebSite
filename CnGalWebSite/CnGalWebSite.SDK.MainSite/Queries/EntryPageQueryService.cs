@@ -1,6 +1,7 @@
 using CnGalWebSite.DataModel.Model;
 using CnGalWebSite.SDK.MainSite.Abstractions;
 using CnGalWebSite.SDK.MainSite.Models;
+using CnGalWebSite.SDK.MainSite.Models.Comments;
 using CnGalWebSite.SDK.MainSite.Infrastructure;
 using Microsoft.Extensions.Logging;
 
@@ -12,6 +13,7 @@ public sealed class EntryPageQueryService(
     IPeripheryQueryService peripheries,
     IFavoriteFolderQueryService folders,
     IExamineQueryService examines,
+    ICommentQueryService comments,
     ICurrentUserAccessor currentUser,
     ILogger<EntryPageQueryService> logger) : IEntryPageQueryService
 {
@@ -27,7 +29,8 @@ public sealed class EntryPageQueryService(
             var entryTask = entries.GetEntryDetailAsync(id, token); tasks.Add(entryTask);
             var peripheryTask = peripheries.GetEntryOverviewPeripheriesAsync(id, token); tasks.Add(peripheryTask);
             var catalogTask = folders.GetRelateFavoriteFoldersAsync(FavoriteObjectType.Entry, id, token); tasks.Add(catalogTask);
-            var recordsTask = examines.GetEntryEditRecordsAsync(id, token); tasks.Add(recordsTask);
+            var recordsTask = examines.GetEntryEditRecordPreviewAsync(id, token); tasks.Add(recordsTask);
+            var commentsTask = GetCommentsAsync(id, token); tasks.Add(commentsTask);
             var entry = await entryTask;
             if (!entry.Success || entry.Data is null)
             {
@@ -41,7 +44,7 @@ public sealed class EntryPageQueryService(
             cancellationToken.ThrowIfCancellationRequested();
             if (identityVersion != currentUser.IdentityVersion) throw new SdkIdentityChangedException();
             return SdkResult<EntryPageModel>.Ok(new(entry.Data, scoreTask is null ? null : await scoreTask,
-                await peripheryTask, await catalogTask, await recordsTask));
+                await peripheryTask, await catalogTask, await recordsTask, await commentsTask));
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch (Exception ex)
@@ -57,6 +60,21 @@ public sealed class EntryPageQueryService(
             catch (OperationCanceledException) when (token.IsCancellationRequested) { }
             catch (Exception ex) { logger.LogWarning(ex, "Entry page request cleanup. EntryId={EntryId}", id); }
             cancellationToken.ThrowIfCancellationRequested();
+        }
+    }
+
+    private async Task<SdkResult<CommentListViewModel>> GetCommentsAsync(int id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await comments.GetCommentsAsync(CommentType.CommentEntries,
+                id.ToString(System.Globalization.CultureInfo.InvariantCulture), cancellationToken);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Entry comment query failed. EntryId={EntryId}", id);
+            return SdkFailure.FromException<CommentListViewModel>(ex, "ENTRY_COMMENTS_FAILED", "获取评论失败");
         }
     }
 }

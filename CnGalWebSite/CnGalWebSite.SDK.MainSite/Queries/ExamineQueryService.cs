@@ -317,42 +317,31 @@ public sealed class ExamineQueryService(
 
     // ─── 词条编辑记录列表 ───
 
-    public async Task<SdkResult<IReadOnlyList<ExaminedNormalListModel>>> GetEntryEditRecordsAsync(
+    public async Task<SdkResult<EntryEditRecordPreview>> GetEntryEditRecordPreviewAsync(
         int entryId, CancellationToken cancellationToken = default)
     {
         var cacheRead = await memoryCache.BeginQueryAsync(cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
         var cacheKey = ExamineCacheKeys.EntryEditRecords(entryId);
-        if (memoryCache.TryGetValue(cacheKey, out IReadOnlyList<ExaminedNormalListModel>? cached, cacheRead) && cached is not null)
+        if (memoryCache.TryGetValue(cacheKey, out EntryEditRecordPreview? cached, cacheRead) && cached is not null)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(cached);
+            return memoryCache.Complete(cached, cacheRead);
         }
 
-        var result = await GetAsync<EditEntryInforBindModel>(
-            $"api/entries/GetEntryEditInforBindModel/{entryId}",
+        var result = await GetAsync<EntryEditRecordPreview>(
+            $"api/entries/GetEntryEditRecordPreview/{entryId}",
             "ENTRY_EDIT_RECORDS",
             "词条编辑记录",
             cancellationToken);
 
-        if (!result.Success || result.Data is null)
+        cancellationToken.ThrowIfCancellationRequested();
+        if (result.Success && result.Data is not null)
         {
-            return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Fail(
-                result.Error?.Code ?? "ENTRY_EDIT_RECORDS_FAILED",
-                result.Error?.Message ?? "获取词条编辑记录失败",
-                result.Error?.StatusCode);
+            memoryCache.Set(cacheKey, result.Data, ListCacheDuration, cacheRead);
         }
 
-        IReadOnlyList<ExaminedNormalListModel> records = result.Data.Examines
-            .Where(e => e.IsPassed == true)
-            .OrderByDescending(e => e.ApplyTime)
-            .ToList();
-
-        cancellationToken.ThrowIfCancellationRequested();
-
-        memoryCache.Set(cacheKey, records, ListCacheDuration, cacheRead);
-        cancellationToken.ThrowIfCancellationRequested();
-        return SdkResult<IReadOnlyList<ExaminedNormalListModel>>.Ok(records);
+        return memoryCache.CompleteResult(result, cacheRead);
     }
 
     // ─── 文章编辑记录列表 ───

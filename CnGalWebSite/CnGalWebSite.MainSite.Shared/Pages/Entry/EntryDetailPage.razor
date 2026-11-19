@@ -7,7 +7,6 @@
 @using CnGalWebSite.DataModel.Model
 @implements IDisposable
 @using CnGalWebSite.DataModel.ViewModel
-@using CnGalWebSite.DataModel.ViewModel.Admin
 @using CnGalWebSite.DataModel.ViewModel.Search
 @using CnGalWebSite.DataModel.ViewModel.Peripheries
 @using CnGalWebSite.DataModel.ViewModel.Favorites
@@ -15,6 +14,7 @@
 @using CnGalWebSite.MainSite.Shared.Services
 @using CnGalWebSite.MainSite.Shared.Components.DesignSystem
 @using CnGalWebSite.Extensions
+@using Microsoft.AspNetCore.Http
 @using System.Text.Json.Nodes
 
 <CgPageMeta Title="@(Model?.Name)" Description="@(Model?.BriefIntroduction)" Image="@(Model?.MainPicture)" StructuredData="@GenerateStructuredDataJson()" />
@@ -139,7 +139,8 @@ else if (Model is not null)
                     <CnGalWebSite.MainSite.Shared.Components.Features.Comment.CommentSection
                         Type="CommentType.CommentEntries"
                         ObjectId="@Model.Id.ToString()"
-                        CanComment="Model.CanComment" />
+                        CanComment="Model.CanComment"
+                        InitialResult="_page?.Comments" />
                 </div>
             </div>
 
@@ -202,7 +203,7 @@ else if (Model is not null)
                 <div class="entry-cell entry-cell--records">
                     <CgMiniModeContainer>
                         @if (_page?.EditRecords.Error is { } recordsError) { <CgAlert>@recordsError.Message</CgAlert> }
-                        <EntryEditRecordCard Records="EditRecords" />
+                        <EntryEditRecordCard Preview="_page?.EditRecords.Data" />
                     </CgMiniModeContainer>
                 </div>
 
@@ -226,11 +227,13 @@ else
     [Parameter]
     public int Id { get; set; }
 
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
+
     private EntryDetailViewModel? Model;
     private PlayedGameOverviewViewModel? ScoreOverview;
     private GameOverviewPeripheryListModel? PeripheryOverview;
     private IReadOnlyList<FavoriteFolderOverviewModel>? RelateFolders;
-    private IReadOnlyList<ExaminedNormalListModel>? EditRecords;
     private string? ErrorMessage;
     private CancellationTokenSource? _cts;
     private long _requestVersion;
@@ -243,10 +246,10 @@ else
         var version = ++_requestVersion;
         _cts?.Cancel();
         _cts?.Dispose();
-        using var request = new CancellationTokenSource();
+        using var request = CancellationTokenSource.CreateLinkedTokenSource(HttpContext?.RequestAborted ?? default);
         _cts = request;
         Model = null; ScoreOverview = null; PeripheryOverview = null;
-        RelateFolders = null; EditRecords = null; ErrorMessage = null; _page = null;
+        RelateFolders = null; ErrorMessage = null; _page = null;
         try
         {
             var result = await EntryPageQueryService.GetAsync(Id, request.Token);
@@ -258,7 +261,6 @@ else
                 ScoreOverview = page.Score?.Data;
                 PeripheryOverview = page.Periphery.Data;
                 RelateFolders = page.Catalog.Data;
-                EditRecords = page.EditRecords.Data;
             }
             else { PageResponse.Failed(result.Error); ErrorMessage = result.Error?.Message ?? "请稍后重试"; }
         }
