@@ -31,6 +31,8 @@ namespace CnGalWebSite.DataModel.ViewModel.PlayedGames
 
     public class PlayedGameUserScoreModel
     {
+        // 旧客户端通过 UserScores 读取本人的游玩记录，包括私有记录和待审感想。
+        public bool IsPersonalOnly { get; set; }
         public UserInforViewModel User { get; set; } = new UserInforViewModel();
         public PlayedGameScoreModel Socres { get; set; } = new PlayedGameScoreModel();
 

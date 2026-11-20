@@ -1,52 +1,57 @@
-@* 评分概览区域（交互式包装器，仅登录用户使用）
-   拥有数据所有权并处理刷新，将渲染委托给 EntryScoreOverview *@
-
 @rendermode InteractiveServer
 @implements IDisposable
+@inject IPlayedGameQueryService Scores
 
-@inject IPlayedGameQueryService PlayedGameQueryService
-
-@if (_model is not null)
+@if (_overview is not null)
 {
-    <EntryScoreOverview Model="_model" OnDataChanged="RefreshAsync" />
+    <EntryScoreOverview Model="_overview" OnSaved="RefreshAsync" />
+}
+@if (_error is not null)
+{
+    <CgAlert>@_error</CgAlert>
+    <CgButton OnClick="RefreshAsync">重试加载评分</CgButton>
 }
 
 @code {
-    [Parameter]
-    public int EntryId { get; set; }
+    [Parameter] public int EntryId { get; set; }
 
-    [Parameter] public PlayedGameOverviewViewModel? InitialModel { get; set; }
-    [Parameter] public bool HasInitialResult { get; set; }
+    // 预渲染复用词条查询结果；进入 circuit 时只有 EntryId 作为根组件参数传输。
+    [CascadingParameter] private PlayedGameOverviewViewModel? PrerenderedOverview { get; set; }
+
+    private PlayedGameOverviewViewModel? _overview;
+    private string? _error;
     private int? _loadedId;
-    private PlayedGameOverviewViewModel? _model;
     private CancellationTokenSource? _request;
 
     protected override Task OnParametersSetAsync()
     {
         if (_loadedId == EntryId) return Task.CompletedTask;
-        _request?.Cancel(); _request?.Dispose();
         _loadedId = EntryId;
-        _model = InitialModel;
-        return !HasInitialResult && _model is null ? LoadDataAsync() : Task.CompletedTask;
+        _overview = PrerenderedOverview;
+        return _overview is null ? RefreshAsync() : Task.CompletedTask;
     }
-
-    private async Task LoadDataAsync()
-    {
-        _request?.Cancel(); _request?.Dispose();
-        var request = _request = new CancellationTokenSource();
-        var id = EntryId;
-        try
-        {
-            var result = await PlayedGameQueryService.GetOverviewAsync(id, request.Token);
-            if (!request.IsCancellationRequested && id == EntryId) _model = result.Success ? result.Data : null;
-        }
-        catch (OperationCanceledException) when (request.IsCancellationRequested) { }
-    }
-
-    public void Dispose() { _request?.Cancel(); _request?.Dispose(); }
 
     private async Task RefreshAsync()
     {
-        await LoadDataAsync();
+        _request?.Cancel();
+        using var request = new CancellationTokenSource();
+        _request = request;
+        _error = null;
+        try
+        {
+            var result = await Scores.GetOverviewAsync(EntryId, request.Token);
+            if (request.IsCancellationRequested) return;
+            if (result.Success && result.Data is not null)
+                _overview = result.Data;
+            else
+                _error = result.Error?.Message ?? "评分加载失败";
+        }
+        catch (OperationCanceledException) when (request.IsCancellationRequested) { }
+        finally
+        {
+            if (ReferenceEquals(_request, request)) _request = null;
+        }
     }
+
+    public void Dispose() => _request?.Cancel();
 }

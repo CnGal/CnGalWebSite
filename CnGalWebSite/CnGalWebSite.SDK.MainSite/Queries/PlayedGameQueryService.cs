@@ -135,7 +135,7 @@ public sealed class PlayedGameQueryService(
             TotalScores = MapScoreSummary(model.GameTotalScores),
             FilteredScores = MapScoreSummary(model.GameReviewsScores),
             UserScores = model.UserScores?
-                .Where(s => s.Socres is not null && s.User is not null)
+                .Where(s => !s.IsPersonalOnly && s.Socres is not null && s.User is not null)
                 .Select(s => new UserScoreItem
                 {
                     UserId = s.User.Id ?? string.Empty,

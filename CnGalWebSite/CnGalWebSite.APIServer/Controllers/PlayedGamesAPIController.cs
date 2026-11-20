@@ -461,7 +461,11 @@ namespace CnGalWebSite.APIServer.Controllers
         {
             var cancellationToken = HttpContext.RequestAborted;
             var entry = await _entryRepository.GetAll().AsNoTracking()
-                .Include(s => s.PlayedGames.Where(score => score.ShowPublicly && score.ApplicationUserId != null))
+                // 评价卡片展示完整评分或公开感想，单纯入库/标记游玩的记录无需加载。
+                .Include(s => s.PlayedGames.Where(score => score.ShowPublicly && score.ApplicationUserId != null &&
+                    ((score.MusicSocre != 0 && score.ShowSocre != 0 && score.TotalSocre != 0 &&
+                      score.PaintSocre != 0 && score.ScriptSocre != 0 && score.CVSocre != 0 && score.SystemSocre != 0) ||
+                     !string.IsNullOrWhiteSpace(score.PlayImpressions))))
                 .ThenInclude(s => s.ApplicationUser)
                 .Include(s => s.Tags)
                 .FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
@@ -529,6 +533,7 @@ namespace CnGalWebSite.APIServer.Controllers
                 if (current == null)
                 {
                     current = CreateOverviewUserScore(userScore, userSummaries[user.Id]);
+                    current.IsPersonalOnly = true;
                     model.UserScores.Add(current);
                 }
 

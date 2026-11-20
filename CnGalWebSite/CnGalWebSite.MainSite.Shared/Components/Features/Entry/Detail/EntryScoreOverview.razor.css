@@ -146,7 +146,7 @@
 
 /* User scores section */
 .entry-score-users__title {
-    margin: 0 0 0.85rem 0;
+    margin: 0;
     font-size: 1.05rem;
     font-weight: 700;
     display: flex;
@@ -161,13 +161,40 @@
     color: var(--cg-color-primary);
 }
 
-.entry-score-users__list {
-    display: grid;
+.entry-score-users ::deep .entry-score-users__list {
+    --entry-card-list-collapsed-display: grid;
+    --score-gap: var(--cg-spacing-3);
     grid-template-columns: 1fr;
-    gap: var(--cg-spacing-3);
-    list-style: none;
-    padding: 0;
-    margin: 0;
+    gap: 0 var(--score-gap);
+}
+
+/* 让卡片和行间距一起收进 EntryCardList 的 0fr 轨道。 */
+.entry-score-users__clip {
+    display: grid;
+    overflow: clip;
+}
+
+/* 阴影画在裁切层外，边界与卡片对齐。 */
+.entry-score-users__item {
+    position: relative;
+}
+
+.entry-score-users__item::after {
+    content: "";
+    position: absolute;
+    inset: var(--score-gap) 0 0;
+    border-radius: var(--cg-radius-lg);
+    pointer-events: none;
+    transition: box-shadow var(--cg-transition-fast);
+}
+
+.entry-score-users__item:has(.entry-user-score-card:hover)::after {
+    box-shadow: var(--cg-shadow-card-hover);
+}
+
+.entry-score-users__clip ::deep .entry-user-score-card {
+    margin-block-start: var(--score-gap);
+    height: auto;
 }
 
 /* Footer action */
@@ -250,7 +277,6 @@
     }
 
     .entry-score-users__title {
-        margin: 0 0 1.25rem 0;
         font-size: 1.25rem;
         gap: 1rem;
     }
@@ -260,8 +286,8 @@
         height: 2rem;
     }
 
-    .entry-score-users__list {
+    .entry-score-users ::deep .entry-score-users__list {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: var(--cg-spacing-4);
+        --score-gap: var(--cg-spacing-4);
     }
 }
