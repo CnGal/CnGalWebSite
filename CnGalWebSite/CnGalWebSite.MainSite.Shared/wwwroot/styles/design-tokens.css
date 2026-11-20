@@ -190,6 +190,11 @@
 }
 
 /* ── 全局重置 ── */
+/* 展开控件获得焦点时，避免浏览器在列表变高或变矮时跟随按钮滚动。 */
+html:has(.entry-card-list-toggle:focus) {
+    overflow-anchor: none;
+}
+
 html,
 body {
     margin: 0;

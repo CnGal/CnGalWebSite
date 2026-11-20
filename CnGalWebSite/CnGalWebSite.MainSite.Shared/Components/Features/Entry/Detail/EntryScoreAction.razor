@@ -1,7 +1,6 @@
 @* 词条详情页中的"添加/编辑游玩记录"交互按钮 *@
-@* 此组件声明为 InteractiveServer，嵌套在静态页中，被 AuthorizeView 包裹 *@
-
-
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
 @using CnGalWebSite.MainSite.Shared.Components.Features.Space
 
 @if (IsCurrentUserScoreExist)
@@ -32,9 +31,6 @@ else
     [Parameter]
     public string Variant { get; set; } = "outline";
 
-    [Parameter]
-    public EventCallback OnDataChanged { get; set; }
-
     private SpaceGameRecordEditModal? _editModal;
 
     private async Task OnEditClick()
@@ -45,8 +41,5 @@ else
         }
     }
 
-    private async Task OnSaved()
-    {
-        await OnDataChanged.InvokeAsync();
-    }
+    private void OnSaved() => Navigation.Refresh();
 }

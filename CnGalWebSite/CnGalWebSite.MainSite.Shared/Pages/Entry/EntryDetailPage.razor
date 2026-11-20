@@ -117,20 +117,9 @@ else if (Model is not null)
                     <CgMiniModeContainer>
                         @if (_page?.Score?.Error is { } scoreError) { <CgAlert>@scoreError.Message</CgAlert> }
                         @* 仅游戏类词条显示评分区域 *@
-                        @if (Model.Type == EntryType.Game)
+                        @if (Model.Type == EntryType.Game && ScoreOverview is not null)
                         {
-                            @* 登录用户使用交互式评分区域（支持编辑后实时刷新），未登录用户使用静态渲染 *@
-                            <AuthorizeView>
-                                <Authorized>
-                                    <EntryScoreSection EntryId="Id" InitialModel="ScoreOverview" HasInitialResult="true" />
-                                </Authorized>
-                                <NotAuthorized>
-                                    @if (ScoreOverview is not null)
-                                    {
-                                        <EntryScoreOverview Model="ScoreOverview" />
-                                    }
-                                </NotAuthorized>
-                            </AuthorizeView>
+                            <EntryScoreOverview Model="ScoreOverview" />
                         }
                     </CgMiniModeContainer>
                 </div>

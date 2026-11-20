@@ -46,6 +46,17 @@ public class PlayedGameOverviewTests
     }
 
     [Test]
+    public async Task PublicReviewsIncludeCompleteScoresAndTextOnlyImpressions()
+    {
+        await using var fixture = await OverviewFixture.CreateAsync(1, includeTextReview: true);
+        var result = await fixture.Controller.GetPlayedGameOverview(fixture.EntryId);
+        var reviews = result.Value!.UserScores;
+        Assert.That(reviews.Select(s => s.User.Id), Is.EquivalentTo(new[] { "public-0", "text-only" }));
+        Assert.That(reviews.Single(s => s.Socres.IsScored).User.Id, Is.EqualTo("public-0"));
+        Assert.That(reviews.Single(s => !s.Socres.IsScored).PlayImpressions, Is.EqualTo("短评"));
+    }
+
+    [Test]
     public async Task OverviewWithoutPublicScoresDoesNotQueryRanks()
     {
         await using var fixture = await OverviewFixture.CreateAsync(0);
@@ -69,6 +80,7 @@ public class PlayedGameOverviewTests
         Assert.That(model.IsCurrentUserScorePublic, Is.EqualTo(pendingIsPublic));
         Assert.That(model.UserScores, Has.Count.EqualTo(expectedCount));
         var ownScore = model.UserScores.Single(score => score.User.Id == userId);
+        Assert.That(ownScore.IsPersonalOnly, Is.EqualTo(userId == "private"));
         Assert.That(ownScore.PlayImpressions, Is.EqualTo("Pending"));
         Assert.That(ownScore.User.Ranks.Select(rank => rank.Name), Is.EqualTo(new[] { "Badge", "Lv 0" }));
         Assert.That(fixture.Commands.Sql.Count(sql => sql.Contains("\"RankUsers\"")), Is.EqualTo(1));
@@ -98,7 +110,7 @@ public class PlayedGameOverviewTests
 
         public static async Task<OverviewFixture> CreateAsync(
             int publicCount, string? currentUserId = null, bool seedRanks = true,
-            QuerySplittingBehavior querySplitting = QuerySplittingBehavior.SingleQuery)
+            QuerySplittingBehavior querySplitting = QuerySplittingBehavior.SingleQuery, bool includeTextReview = false)
         {
             var connection = new SqliteConnection("Data Source=:memory:");
             await connection.OpenAsync();
@@ -122,7 +134,9 @@ public class PlayedGameOverviewTests
                     var user = new ApplicationUser { Id = id, UserName = id };
                     var score = new PlayedGame
                     {
-                        ApplicationUser = user, ShowPublicly = isPublic, TotalSocre = 8, PlayImpressions = "Published",
+                        ApplicationUser = user, ShowPublicly = isPublic, TotalSocre = 8,
+                        MusicSocre = 8, ShowSocre = 8, ScriptSocre = 8, SystemSocre = 8, PaintSocre = 8, CVSocre = -1,
+                        PlayImpressions = includeTextReview ? null : "Published",
                     };
                     entry.PlayedGames.Add(score);
                     db.Examines.Add(new Examine
@@ -142,6 +156,22 @@ public class PlayedGameOverviewTests
                     }
                 }
 
+                entry.PlayedGames.Add(new PlayedGame
+                {
+                    ApplicationUser = new ApplicationUser { Id = "library-only" }, ShowPublicly = true,
+                });
+                entry.PlayedGames.Add(new PlayedGame
+                {
+                    ApplicationUser = new ApplicationUser { Id = "incomplete" }, ShowPublicly = true,
+                    TotalSocre = 8, PlayImpressions = "   ",
+                });
+                if (includeTextReview)
+                {
+                    entry.PlayedGames.Add(new PlayedGame
+                    {
+                        ApplicationUser = new ApplicationUser { Id = "text-only" }, ShowPublicly = true, PlayImpressions = "短评",
+                    });
+                }
                 db.Add(entry);
                 await db.SaveChangesAsync();
                 db.GameScores.Add(new GameScoreTableModel { GameId = entry.Id, AllTotalSocre = 8.5, FilterTotalSocre = 9 });
