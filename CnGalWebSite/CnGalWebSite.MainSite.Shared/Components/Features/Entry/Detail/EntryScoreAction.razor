@@ -1,6 +1,4 @@
 @* 词条详情页中的"添加/编辑游玩记录"交互按钮 *@
-@rendermode InteractiveServer
-@inject NavigationManager Navigation
 @using CnGalWebSite.MainSite.Shared.Components.Features.Space
 
 @if (IsCurrentUserScoreExist)
@@ -41,5 +39,5 @@ else
         }
     }
 
-    private void OnSaved() => Navigation.Refresh();
+    [Parameter] public EventCallback OnSaved { get; set; }
 }

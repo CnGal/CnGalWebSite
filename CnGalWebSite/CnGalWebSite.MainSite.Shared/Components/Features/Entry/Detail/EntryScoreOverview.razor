@@ -117,6 +117,7 @@
     public required PlayedGameOverviewViewModel Model { get; set; }
 
     private const int PreviewCount = 6;
+    [Parameter] public EventCallback OnSaved { get; set; }
 
     private RenderFragment ActionContent(string variant) => __builder =>
     {
@@ -125,7 +126,7 @@
                 <EntryScoreAction GameId="Model.GameId"
                                   IsDubbing="Model.IsDubbing"
                                   IsCurrentUserScoreExist="Model.IsCurrentUserScoreExist"
-                                  Variant="@variant" />
+                                  Variant="@variant" OnSaved="OnSaved" />
             </Authorized>
             <NotAuthorized>
                 <CgButton Href="/authentication/login" Variant="@variant">

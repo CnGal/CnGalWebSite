@@ -119,7 +119,16 @@ else if (Model is not null)
                         @* 仅游戏类词条显示评分区域 *@
                         @if (Model.Type == EntryType.Game && ScoreOverview is not null)
                         {
-                            <EntryScoreOverview Model="ScoreOverview" />
+                            <AuthorizeView>
+                                <Authorized>
+                                    <CascadingValue Value="ScoreOverview" IsFixed="true">
+                                        <EntryScoreSection EntryId="Id" @key="Id" />
+                                    </CascadingValue>
+                                </Authorized>
+                                <NotAuthorized>
+                                    <EntryScoreOverview Model="ScoreOverview" />
+                                </NotAuthorized>
+                            </AuthorizeView>
                         }
                     </CgMiniModeContainer>
                 </div>

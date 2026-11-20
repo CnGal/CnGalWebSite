@@ -1,0 +1,57 @@
+@rendermode InteractiveServer
+@implements IDisposable
+@inject IPlayedGameQueryService Scores
+
+@if (_overview is not null)
+{
+    <EntryScoreOverview Model="_overview" OnSaved="RefreshAsync" />
+}
+@if (_error is not null)
+{
+    <CgAlert>@_error</CgAlert>
+    <CgButton OnClick="RefreshAsync">重试加载评分</CgButton>
+}
+
+@code {
+    [Parameter] public int EntryId { get; set; }
+
+    // 预渲染复用词条查询结果；进入 circuit 时只有 EntryId 作为根组件参数传输。
+    [CascadingParameter] private PlayedGameOverviewViewModel? PrerenderedOverview { get; set; }
+
+    private PlayedGameOverviewViewModel? _overview;
+    private string? _error;
+    private int? _loadedId;
+    private CancellationTokenSource? _request;
+
+    protected override Task OnParametersSetAsync()
+    {
+        if (_loadedId == EntryId) return Task.CompletedTask;
+        _loadedId = EntryId;
+        _overview = PrerenderedOverview;
+        return _overview is null ? RefreshAsync() : Task.CompletedTask;
+    }
+
+    private async Task RefreshAsync()
+    {
+        _request?.Cancel();
+        using var request = new CancellationTokenSource();
+        _request = request;
+        _error = null;
+        try
+        {
+            var result = await Scores.GetOverviewAsync(EntryId, request.Token);
+            if (request.IsCancellationRequested) return;
+            if (result.Success && result.Data is not null)
+                _overview = result.Data;
+            else
+                _error = result.Error?.Message ?? "评分加载失败";
+        }
+        catch (OperationCanceledException) when (request.IsCancellationRequested) { }
+        finally
+        {
+            if (ReferenceEquals(_request, request)) _request = null;
+        }
+    }
+
+    public void Dispose() => _request?.Cancel();
+}
